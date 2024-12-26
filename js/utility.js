@@ -23,18 +23,18 @@ const _serviceWorker = {
 		calendar_uncompletedevents: function (data) {
 			let notif;
 			if ("calendar_uncompletedevents" in data) {
-				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.calendar_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.calendar_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			}
 		},
 		document_approval: function (data) {
 			let notif;
 			if ("document_approval" in data) {
-				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.record_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.record_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.document_approval);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.documents_manage_approval").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.documents_manage_approval").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.document_approval);
 			}
 		},
@@ -42,9 +42,9 @@ const _serviceWorker = {
 		message_unseen: function (data) {
 			if ("message_unseen" in data) {
 				let notif;
-				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.communication_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.communication_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
-				notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.message_conversations").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.message_conversations").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			}
 		},
@@ -55,21 +55,21 @@ const _serviceWorker = {
 					order_unprocessed = 0,
 					consumables_pendingincorporation = 0;
 				if ("order_prepared" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_prepared_orders").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase_prepared_orders").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.order_prepared);
 					order_prepared = data.order_prepared;
 				}
 				if ("order_unprocessed" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 					order_unprocessed = data.order_unprocessed;
 				}
 				if ("consumables_pendingincorporation" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + LANG.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 					consumables_pendingincorporation = data.consumables_pendingincorporation;
 				}
-				notif = document.querySelector("[data-for=userMenu" + LANG.GET("menu.purchase_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.purchase_header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", parseInt(order_prepared, 10) + parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
 			}
 		},
@@ -85,11 +85,11 @@ const _serviceWorker = {
 			if (parseInt(data.message_unnotified, 10)) {
 				let body =
 					data.message_unnotified > 1
-						? LANG.GET("message.new_messages", {
+						? api._lang.GET("message.new_messages", {
 								":amount": data.message_unnotified,
 						  })
-						: LANG.GET("message.new_message");
-				this.showLocalNotification(LANG.GET("menu.communication_header"), body);
+						: api._lang.GET("message.new_message");
+				this.showLocalNotification(api._lang.GET("menu.communication_header"), body);
 			}
 		}
 		this.notif.message_unseen(data);
@@ -165,7 +165,7 @@ const _client = {
 		},
 		postLabelSheet: (value, appendDate = null, othervalues = {}) => {
 			const formdata = new FormData();
-			formdata.append(LANG.GET("record.create_identifier"), value);
+			formdata.append(api._lang.GET("record.create_identifier"), value);
 			for (const [key, val] of Object.entries(othervalues)) {
 				formdata.append(key, val);
 			}
@@ -178,7 +178,7 @@ const _client = {
 				navigator.clipboard.writeText(node.value);
 				node.selectionStart = node.selectionEnd;
 			} else navigator.clipboard.writeText(node); // passed string
-			new Toast(LANG.GET("general.copied_to_clipboard"), "info");
+			new Toast(api._lang.GET("general.copied_to_clipboard"), "info");
 		},
 		toggleFullScreen: () => {
 			let image,
@@ -198,10 +198,10 @@ const _client = {
 			window.calendarFormData = new FormData();
 			units = [];
 			for (const [key, value] of Object.entries(data)) {
-				if (value === "unit") units.push(Object.keys(LANGUAGEFILE["units"]).find((unit) => LANGUAGEFILE["units"][unit] === key));
+				if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
 			}
-			if (units.length) window.calendarFormData.append(LANG.GET("calendar.event_organizational_unit"), units.join(","));
+			if (units.length) window.calendarFormData.append(api._lang.GET("calendar.event_organizational_unit"), units.join(","));
 		},
 		setFieldVisibilityByNames: (names = "", display = true) => {
 			/**
@@ -239,22 +239,22 @@ const _client = {
 		newMessage: (dialogheader = "", recipient = "", message = "", options = {}, datalist = []) => {
 			//returns a message modal dialog
 			if (!Object.keys(options)) {
-				options[LANG.GET("order.add_information_cancel")] = false;
-				options[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+				options[api._lang.GET("order.add_information_cancel")] = false;
+				options[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
 			}
 
 			const body = [
 				{
 					type: "hidden",
 					attributes: {
-						name: LANG.GET("message.to"),
+						name: api._lang.GET("message.to"),
 						value: recipient,
 					},
 				},
 				{
 					type: "textarea",
 					attributes: {
-						name: LANG.GET("message.message"),
+						name: api._lang.GET("message.message"),
 						rows: 8,
 						value: message,
 					},
@@ -278,10 +278,10 @@ const _client = {
 				render: body,
 				options: options,
 			}).then((response) => {
-				if (response[LANG.GET("message.message")]) {
+				if (response[api._lang.GET("message.message")]) {
 					const formdata = new FormData();
-					formdata.append(LANG.GET("message.to"), response[LANG.GET("message.to")]);
-					formdata.append(LANG.GET("message.message"), response[LANG.GET("message.message")]);
+					formdata.append(api._lang.GET("message.to"), response[api._lang.GET("message.to")]);
+					formdata.append(api._lang.GET("message.message"), response[api._lang.GET("message.message")]);
 					api.message("post", "message", formdata);
 				}
 			});
@@ -294,7 +294,7 @@ const _client = {
 			if ([...data].length < 6) data = ["", ...data];
 			else data = [...data];
 			const autidem = {};
-			autidem[LANG.GET("order.aut_idem")] = [];
+			autidem[api._lang.GET("order.aut_idem")] = [];
 			const nodes = document.querySelectorAll("main>form>article"),
 				cart = {
 					content: [
@@ -302,7 +302,7 @@ const _client = {
 							{
 								type: "number",
 								attributes: {
-									name: LANG.GET("order.quantity_label") + "[]",
+									name: api._lang.GET("order.quantity_label") + "[]",
 									value: data[0],
 									min: "1",
 									max: "99999",
@@ -313,7 +313,7 @@ const _client = {
 							{
 								type: "textsection",
 								attributes: {
-									name: LANG.GET("order.added_product", {
+									name: api._lang.GET("order.added_product", {
 										":unit": data[1],
 										":number": data[2],
 										":name": data[3],
@@ -324,35 +324,35 @@ const _client = {
 							{
 								type: "hidden",
 								attributes: {
-									name: LANG.GET("order.unit_label") + "[]",
+									name: api._lang.GET("order.unit_label") + "[]",
 									value: data[1] ? data[1] : " ",
 								},
 							},
 							{
 								type: "hidden",
 								attributes: {
-									name: LANG.GET("order.ordernumber_label") + "[]",
+									name: api._lang.GET("order.ordernumber_label") + "[]",
 									value: data[2],
 								},
 							},
 							{
 								type: "hidden",
 								attributes: {
-									name: LANG.GET("order.productname_label") + "[]",
+									name: api._lang.GET("order.productname_label") + "[]",
 									value: data[3],
 								},
 							},
 							{
 								type: "hidden",
 								attributes: {
-									name: LANG.GET("order.barcode_label") + "[]",
+									name: api._lang.GET("order.barcode_label") + "[]",
 									value: data[4] ? data[4] : " ",
 								},
 							},
 							{
 								type: "hidden",
 								attributes: {
-									name: LANG.GET("order.vendor_label") + "[]",
+									name: api._lang.GET("order.vendor_label") + "[]",
 									value: data[5],
 								},
 							},
@@ -360,14 +360,14 @@ const _client = {
 								type: "checkbox",
 								inline: true,
 								attributes: {
-									name: LANG.GET("order.aut_idem") + "[]",
+									name: api._lang.GET("order.aut_idem") + "[]",
 								},
 								content: autidem,
 							},
 							{
 								type: "deletebutton",
 								attributes: {
-									value: LANG.GET("order.add_delete"),
+									value: api._lang.GET("order.add_delete"),
 									onpointerup: "this.parentNode.remove()",
 								},
 							},
@@ -385,26 +385,26 @@ const _client = {
 				buttons = {},
 				links = {},
 				labels = [];
-			filter[LANG.GET("order.order.unprocessed")] = { checked: true, onchange: "_client.order.filter()" };
-			filter[LANG.GET("order.order.ordered")] = { onchange: '_client.order.filter("ordered")' };
-			filter[LANG.GET("order.order.partially_received")] = { onchange: '_client.order.filter("partially_received")' };
-			filter[LANG.GET("order.order.received")] = { onchange: '_client.order.filter("received")' };
-			filter[LANG.GET("order.order.partially_delivered")] = { onchange: '_client.order.filter("partially_delivered")' };
-			filter[LANG.GET("order.order.delivered")] = { onchange: '_client.order.filter("delivered")' };
-			filter[LANG.GET("order.order.archived")] = { onchange: '_client.order.filter("archived")' };
+			filter[api._lang.GET("order.order.unprocessed")] = { checked: true, onchange: "_client.order.filter()" };
+			filter[api._lang.GET("order.order.ordered")] = { onchange: '_client.order.filter("ordered")' };
+			filter[api._lang.GET("order.order.partially_received")] = { onchange: '_client.order.filter("partially_received")' };
+			filter[api._lang.GET("order.order.received")] = { onchange: '_client.order.filter("received")' };
+			filter[api._lang.GET("order.order.partially_delivered")] = { onchange: '_client.order.filter("partially_delivered")' };
+			filter[api._lang.GET("order.order.delivered")] = { onchange: '_client.order.filter("delivered")' };
+			filter[api._lang.GET("order.order.archived")] = { onchange: '_client.order.filter("archived")' };
 
 			content.push([
 				{
 					type: "radio",
 					attributes: {
-						name: LANG.GET("order.order_filter"),
+						name: api._lang.GET("order.order_filter"),
 					},
 					content: filter,
 				},
 				{
 					type: "filtered",
 					attributes: {
-						name: LANG.GET("order.order_filter_label"),
+						name: api._lang.GET("order.order_filter_label"),
 						onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
 						onblur: "api.purchase('get', 'filter', this.value); return false;",
 						id: "productsearch",
@@ -419,7 +419,7 @@ const _client = {
 				collapsible.push({
 					type: "textsection",
 					content:
-						LANG.GET("order.prepared_order_item", {
+						api._lang.GET("order.prepared_order_item", {
 							":quantity": element.quantity ? element.quantity : "",
 							":unit": element.unit ? element.unit : "",
 							":number": element.ordernumber ? element.ordernumber : "",
@@ -428,7 +428,7 @@ const _client = {
 							":aut_idem": element.aut_idem ? element.aut_idem : "",
 						}) + (element.ordertext ? "\n" + element.ordertext : ""),
 					attributes: {
-						name: LANG.GET("order.ordertype." + element.ordertype),
+						name: api._lang.GET("order.ordertype." + element.ordertype),
 						"data-type": element.ordertype,
 						class: "imagealigned",
 					},
@@ -440,7 +440,7 @@ const _client = {
 						type: "image",
 						attributes: {
 							imageonly: {},
-							name: LANG.GET("order.approval_image"),
+							name: api._lang.GET("order.approval_image"),
 							url: data.approval[element.approval],
 							class: "order2dcode",
 						},
@@ -453,13 +453,13 @@ const _client = {
 				// append commission
 				if (element.commission) {
 					buttons = {};
-					buttons[LANG.GET("general.ok_button")] = true;
+					buttons[api._lang.GET("general.ok_button")] = true;
 					labels = [];
 					for (const [label, setting] of Object.entries(api._settings.config.label)) {
 						labels.push({
 							type: "button",
 							attributes: {
-								value: LANG.GET("record.create_identifier_type", { ":format": setting.format }),
+								value: api._lang.GET("record.create_identifier_type", { ":format": setting.format }),
 								onpointerup: `_client.application.postLabelSheet('element.commission', null, {_type: '${label}'});`,
 							},
 						});
@@ -469,24 +469,24 @@ const _client = {
 						type: "text_copy",
 						attributes: {
 							value: element.commission,
-							name: LANG.GET("order.commission"),
+							name: api._lang.GET("order.commission"),
 							readonly: true,
 							class: "imagealigned",
 							onpointerup: function () {
 								new Dialog({
 									type: "input",
-									header: LANG.GET("order.commission"),
+									header: api._lang.GET("order.commission"),
 									render: [
 										[
 											{
 												type: "text",
 												attributes: {
 													value: "element.commission",
-													name: LANG.GET("order.commission"),
+													name: api._lang.GET("order.commission"),
 													readonly: true,
 													onpointerup: "_client.application.toClipboard(this)",
 												},
-												hint: LANG.GET("order.copy_value"),
+												hint: api._lang.GET("order.copy_value"),
 											},
 											...labels,
 										],
@@ -497,7 +497,7 @@ const _client = {
 								.toString()
 								._replaceArray(["labels", "element.commission", "buttons"], [JSON.stringify(labels), element.commission, JSON.stringify(buttons)]),
 						},
-						hint: LANG.GET("order.copy_or_labelsheet"),
+						hint: api._lang.GET("order.copy_or_labelsheet"),
 					});
 				}
 				// display qrcode
@@ -517,7 +517,7 @@ const _client = {
 				// append order number
 				if (element.ordernumber) {
 					buttons = {};
-					buttons[LANG.GET("general.ok_button")] = true;
+					buttons[api._lang.GET("general.ok_button")] = true;
 					labels = [];
 					if (api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true") {
 						labels = [
@@ -545,10 +545,10 @@ const _client = {
 							{
 								type: "text",
 								attributes: {
-									name: LANG.GET("order.trace_label"),
+									name: api._lang.GET("order.trace_label"),
 									id: "_trace",
 								},
-								hint: LANG.GET("order.trace_label_hint"),
+								hint: api._lang.GET("order.trace_label_hint"),
 							},
 						];
 						for (const [label, setting] of Object.entries(api._settings.config.label)) {
@@ -556,7 +556,7 @@ const _client = {
 							labels.push({
 								type: "button",
 								attributes: {
-									value: LANG.GET("record.create_identifier_type", { ":format": setting.format }),
+									value: api._lang.GET("record.create_identifier_type", { ":format": setting.format }),
 									onpointerup:
 										`let _ordernumber = document.getElementById('_ordernumber').value, _name = document.getElementById('_name').value, _commission = document.getElementById('_commission').value, _vendor = document.getElementById('_vendor').value, _trace = document.getElementById('_trace').value;` +
 										` _client.application.postLabelSheet(_ordernumber + ' - ' + _name.substring(0, 64) + ' - ' + _vendor + ' - ' + _commission + ' - ' + _trace, true, {_type: '${label}'});`,
@@ -569,25 +569,25 @@ const _client = {
 						type: "text_copy",
 						attributes: {
 							value: element.ordernumber,
-							name: LANG.GET("order.ordernumber_label"),
+							name: api._lang.GET("order.ordernumber_label"),
 							readonly: true,
 							class: "imagealigned",
 							onpointerup: function () {
 								new Dialog({
 									type: "input",
-									header: LANG.GET("order.ordernumber_label"),
+									header: api._lang.GET("order.ordernumber_label"),
 									render: [
 										[
 											{
 												type: "text",
 												attributes: {
 													value: "element.ordernumber",
-													name: LANG.GET("order.ordernumber_label"),
+													name: api._lang.GET("order.ordernumber_label"),
 													id: "_ordernumber",
 													readonly: true,
 													onpointerup: "_client.application.toClipboard(this)",
 												},
-												hint: LANG.GET("order.copy_value"),
+												hint: api._lang.GET("order.copy_value"),
 											},
 											...labels,
 										],
@@ -601,7 +601,7 @@ const _client = {
 									[JSON.stringify(labels), element.ordernumber, element.name, element.commission, element.vendor, JSON.stringify(buttons)]
 								),
 						},
-						hint: api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true" ? LANG.GET("order.copy_or_labelsheet") : LANG.GET("order.copy_value"),
+						hint: api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true" ? api._lang.GET("order.copy_or_labelsheet") : api._lang.GET("order.copy_value"),
 					});
 
 					// display barcode
@@ -635,35 +635,35 @@ const _client = {
 						type: "textarea_copy",
 						attributes: {
 							value: element.information,
-							name: LANG.GET("order.additional_info"),
+							name: api._lang.GET("order.additional_info"),
 							readonly: true,
 						},
 						numeration: "none",
-						hint: LANG.GET("order.copy_value"),
+						hint: api._lang.GET("order.copy_value"),
 					});
 				}
 
 				// append add info button
 				if (element.addinformation) {
 					buttons = {};
-					buttons[LANG.GET("order.add_information_cancel")] = false;
-					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					buttons[api._lang.GET("order.add_information_cancel")] = false;
+					buttons[api._lang.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "button",
 						attributes: {
-							value: LANG.GET("order.add_information"),
+							value: api._lang.GET("order.add_information"),
 							type: "button",
 							onpointerup: function () {
 								new Dialog({
 									type: "input",
-									header: LANG.GET("order.add_information"),
+									header: api._lang.GET("order.add_information"),
 									render: [
 										{
 											type: "textarea",
 											attributes: {
-												name: LANG.GET("order.additional_info"),
+												name: api._lang.GET("order.additional_info"),
 											},
-											hint: LANG.GET("order.add_information_modal_body"),
+											hint: api._lang.GET("order.add_information_modal_body"),
 										},
 									],
 									options: buttons,
@@ -680,17 +680,17 @@ const _client = {
 				// append orderer and message option
 				if (element.orderer) {
 					buttons = {};
-					buttons[LANG.GET("order.add_information_cancel")] = false;
-					buttons[LANG.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+					buttons[api._lang.GET("order.add_information_cancel")] = false;
+					buttons[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
 					links = {};
-					links[LANG.GET("order.message_orderer", { ":orderer": element.orderer })] = {
+					links[api._lang.GET("order.message_orderer", { ":orderer": element.orderer })] = {
 						href: "javascript:void(0)",
 						"data-type": "input",
 						onpointerup: function () {
 							_client.message.newMessage(
-								LANG.GET("order.message_orderer", { ":orderer": "element.orderer" }),
+								api._lang.GET("order.message_orderer", { ":orderer": "element.orderer" }),
 								"element.orderer",
-								LANG.GET("order.message", {
+								api._lang.GET("order.message", {
 									":quantity": "element.quantity",
 									":unit": "element.unit",
 									":number": "element.ordernumber",
@@ -730,7 +730,7 @@ const _client = {
 					collapsible.push({
 						type: "textsection",
 						attributes: {
-							name: LANG.GET("consumables.edit_product_special_attention"),
+							name: api._lang.GET("consumables.edit_product_special_attention"),
 							class: "orange",
 						},
 					});
@@ -749,30 +749,30 @@ const _client = {
 				// append state
 				let states = {};
 				for (const [state, attributes] of Object.entries(element.state)) {
-					states[LANG.GET("order.order." + state)] = {};
-					for (const [attribute, value] of Object.entries(attributes)) states[LANG.GET("order.order." + state)][attribute] = value;
-					if (attributes["data-" + state] === "true") states[LANG.GET("order.order." + state)].checked = true;
-					if (!attributes.disabled && !states[LANG.GET("order.order." + state)].onchange)
-						states[LANG.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+					states[api._lang.GET("order.order." + state)] = {};
+					for (const [attribute, value] of Object.entries(attributes)) states[api._lang.GET("order.order." + state)][attribute] = value;
+					if (attributes["data-" + state] === "true") states[api._lang.GET("order.order." + state)].checked = true;
+					if (!attributes.disabled && !states[api._lang.GET("order.order." + state)].onchange)
+						states[api._lang.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
-				if (states[LANG.GET("order.order.partially_received")] && !states[LANG.GET("order.order.partially_received")].disabled) {
+				if (states[api._lang.GET("order.order.partially_received")] && !states[api._lang.GET("order.order.partially_received")].disabled) {
 					buttons = {};
-					buttons[LANG.GET("order.add_information_cancel")] = false;
-					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
-					states[LANG.GET("order.order.partially_received")].onchange = function () {
+					buttons[api._lang.GET("order.add_information_cancel")] = false;
+					buttons[api._lang.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					states[api._lang.GET("order.order.partially_received")].onchange = function () {
 						api.purchase("put", "approved", "element.id", "partially_received", this.checked);
 						this.setAttribute("data-partially_received", this.checked.toString());
 						if (this.checked)
 							new Dialog({
 								type: "input",
-								header: LANG.GET("order.add_information"),
+								header: api._lang.GET("order.add_information"),
 								render: [
 									{
 										type: "textarea",
 										attributes: {
-											name: LANG.GET("order.additional_info"),
+											name: api._lang.GET("order.additional_info"),
 										},
-										hint: LANG.GET("order.add_information_modal_body"),
+										hint: api._lang.GET("order.add_information_modal_body"),
 									},
 								],
 								options: buttons,
@@ -785,21 +785,21 @@ const _client = {
 				}
 				if (element.disapprove && element.organizationalunit) {
 					buttons = {};
-					buttons[LANG.GET("order.disapprove_message_cancel")] = false;
-					buttons[LANG.GET("order.disapprove_message_ok")] = { value: true, class: "reducedCTA" };
-					states[LANG.GET("order.disapprove")] = {
+					buttons[api._lang.GET("order.disapprove_message_cancel")] = false;
+					buttons[api._lang.GET("order.disapprove_message_ok")] = { value: true, class: "reducedCTA" };
+					states[api._lang.GET("order.disapprove")] = {
 						data_disapproved: "false",
 						onchange: function () {
 							new Dialog({
 								type: "input",
-								header: LANG.GET("order.disapprove"),
+								header: api._lang.GET("order.disapprove"),
 								render: [
 									{
 										type: "textarea",
 										attributes: {
-											name: LANG.GET("message.message"),
+											name: api._lang.GET("message.message"),
 										},
-										hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units." + "element.organizationalunit") }),
+										hint: api._lang.GET("order.disapprove_message", { ":unit": api._lang.GET("units." + "element.organizationalunit") }),
 									},
 								],
 								options: buttons,
@@ -817,21 +817,21 @@ const _client = {
 				}
 				if (element.cancel) {
 					buttons = {};
-					buttons[LANG.GET("order.cancellation_message_cancel")] = false;
-					buttons[LANG.GET("order.cancellation_message_ok")] = { value: true, class: "reducedCTA" };
-					states[LANG.GET("order.cancellation")] = {
+					buttons[api._lang.GET("order.cancellation_message_cancel")] = false;
+					buttons[api._lang.GET("order.cancellation_message_ok")] = { value: true, class: "reducedCTA" };
+					states[api._lang.GET("order.cancellation")] = {
 						data_cancellation: "false",
 						onchange: function () {
 							new Dialog({
 								type: "input",
-								header: LANG.GET("order.cancellation"),
+								header: api._lang.GET("order.cancellation"),
 								render: [
 									{
 										type: "textarea",
 										attributes: {
-											name: LANG.GET("message.message"),
+											name: api._lang.GET("message.message"),
 										},
-										hint: LANG.GET("order.cancellation_message"),
+										hint: api._lang.GET("order.cancellation_message"),
 									},
 								],
 								options: buttons,
@@ -849,21 +849,21 @@ const _client = {
 				}
 				if (element.return) {
 					buttons = {};
-					buttons[LANG.GET("order.return_message_cancel")] = false;
-					buttons[LANG.GET("order.return_message_ok")] = { value: true, class: "reducedCTA" };
-					states[LANG.GET("order.return")] = {
+					buttons[api._lang.GET("order.return_message_cancel")] = false;
+					buttons[api._lang.GET("order.return_message_ok")] = { value: true, class: "reducedCTA" };
+					states[api._lang.GET("order.return")] = {
 						data_return: "false",
 						onchange: function () {
 							new Dialog({
 								type: "input",
-								header: LANG.GET("order.return"),
+								header: api._lang.GET("order.return"),
 								render: [
 									{
 										type: "textarea",
 										attributes: {
-											name: LANG.GET("message.message"),
+											name: api._lang.GET("message.message"),
 										},
-										hint: LANG.GET("order.return_message"),
+										hint: api._lang.GET("order.return_message"),
 									},
 								],
 								options: buttons,
@@ -885,32 +885,32 @@ const _client = {
 				// append orderstatechange
 				if (element.orderstatechange && Object.keys(element.orderstatechange).length && element.organizationalunit) {
 					buttons = {};
-					buttons[LANG.GET("order.add_information_cancel")] = false;
-					buttons[LANG.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					buttons[api._lang.GET("order.add_information_cancel")] = false;
+					buttons[api._lang.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "select",
 						content: element.orderstatechange,
 						numeration: 0,
 						attributes: {
-							name: LANG.GET("order.orderstate_description"),
+							name: api._lang.GET("order.orderstate_description"),
 							onchange: function () {
 								if (this.value === "...") return false;
 								new Dialog({
 									type: "input",
-									header: LANG.GET("order.orderstate_description") + " " + this.value,
+									header: api._lang.GET("order.orderstate_description") + " " + this.value,
 									render: [
 										{
 											type: "textarea",
 											attributes: {
-												name: LANG.GET("order.additional_info"),
+												name: api._lang.GET("order.additional_info"),
 											},
-											hint: LANG.GET("order.disapprove_message", { ":unit": LANG.GET("units." + "element.organizationalunit") }),
+											hint: api._lang.GET("order.disapprove_message", { ":unit": api._lang.GET("units." + "element.organizationalunit") }),
 										},
 									],
 									options: buttons,
 								}).then((response) => {
 									if (response) {
-										response[LANG.GET("order.additional_info")] = LANG.GET("order.orderstate_description") + " - " + this.value + ": " + response[LANG.GET("order.additional_info")];
+										response[api._lang.GET("order.additional_info")] = api._lang.GET("order.orderstate_description") + " - " + this.value + ": " + response[api._lang.GET("order.additional_info")];
 										api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
 									}
 								});
@@ -924,16 +924,16 @@ const _client = {
 				// append delete button
 				if (element.delete) {
 					buttons = {};
-					buttons[LANG.GET("order.delete_prepared_order_confirm_cancel")] = false;
-					buttons[LANG.GET("order.delete_prepared_order_confirm_ok")] = { value: true, class: "reducedCTA" };
+					buttons[api._lang.GET("order.delete_prepared_order_confirm_cancel")] = false;
+					buttons[api._lang.GET("order.delete_prepared_order_confirm_ok")] = { value: true, class: "reducedCTA" };
 					collapsible.push({
 						type: "deletebutton",
 						hint: element.autodelete ? element.autodelete : null,
 						attributes: {
 							type: "button",
-							value: LANG.GET("order.delete_prepared_order"),
+							value: api._lang.GET("order.delete_prepared_order"),
 							onpointerup: function () {
-								new Dialog({ type: "confirm", header: LANG.GET("order.delete_prepared_order_confirm_header"), options: buttons }).then((confirmation) => {
+								new Dialog({ type: "confirm", header: api._lang.GET("order.delete_prepared_order_confirm_header"), options: buttons }).then((confirmation) => {
 									if (confirmation) api.purchase("delete", "approved", "element.id");
 								});
 							}
@@ -963,7 +963,7 @@ const _client = {
 						order.push({
 							type: "button",
 							attributes: {
-								value: LANG.GET("order.incorporation"),
+								value: api._lang.GET("order.incorporation"),
 								type: "button",
 								onpointerup: "if (!this.disabled) api.purchase('get', 'incorporation', " + element.incorporation.item + "); this.disabled = true",
 							},
@@ -982,7 +982,7 @@ const _client = {
 						order.push({
 							type: "button",
 							attributes: {
-								value: LANG.GET("order.sample_check"),
+								value: api._lang.GET("order.sample_check"),
 								type: "button",
 								onpointerup: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
 							},
@@ -1000,7 +1000,7 @@ const _client = {
 					order.push({
 						type: "button",
 						attributes: {
-							value: LANG.GET("consumables.edit_product_add_new"),
+							value: api._lang.GET("consumables.edit_product_add_new"),
 							type: "button",
 							onpointerup:
 								"api.purchase('get', 'product', '" +
@@ -1061,26 +1061,26 @@ const _client = {
 				if (key.startsWith("_")) {
 					submit.append(key, value);
 				} else if (value && value !== "on") check.push(key + ": " + value);
-				else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
+				else check.push(api._lang.GET("order.sample_check_checked", { ":checked": key }));
 			}
 			if (check.length) {
 				const result = check.join("\n");
 				submit.append("content", result);
 				api.purchase("post", "incorporation", productid, submit);
-			} else new Toast(LANG.GET("order.incorporation_failure"), "error");
+			} else new Toast(api._lang.GET("order.incorporation_failure"), "error");
 		},
 		performSampleCheck: (formdata, productid) => {
 			const check = [];
 			for (const [key, value] of Object.entries(formdata)) {
 				if (value && value !== "on") check.push(key + ": " + value);
-				else check.push(LANG.GET("order.sample_check_checked", { ":checked": key }));
+				else check.push(api._lang.GET("order.sample_check_checked", { ":checked": key }));
 			}
 			if (check.length) {
 				const result = check.join("\n");
 				formdata = new FormData();
 				formdata.append("content", result);
 				api.purchase("post", "mdrsamplecheck", productid, formdata);
-			} else new Toast(LANG.GET("order.sample_check_failure"), "error");
+			} else new Toast(api._lang.GET("order.sample_check_failure"), "error");
 		},
 	},
 	record: {
@@ -1098,7 +1098,7 @@ const _client = {
 		data: null,
 		update: () => {
 			const replacements = {},
-				genii = document.getElementsByName(LANG.GET("texttemplate.use_person")),
+				genii = document.getElementsByName(api._lang.GET("texttemplate.use_person")),
 				blocks = document.querySelectorAll("[data-usecase=useblocks]"),
 				placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
 			let selectedgenus = 0,

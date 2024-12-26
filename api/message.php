@@ -68,15 +68,15 @@ class MESSAGE extends API {
 							'type' => 'message',
 							'content' => [
 								'img' => $conversation['image'],
-								'user' => $conversation['conversation_user_name'] ? : LANG::GET('message.deleted_user'),
+								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('message.deleted_user'),
 								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
 								'date' => $conversation['timestamp'],
 							],
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
 								//inline system links won't work otherwise
-								'ICON_onpointerup' => "_client.message.newMessage('". LANG::GET('message.forward') ."', '', '" . 
-									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], LANG::GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
+								'ICON_onpointerup' => "_client.message.newMessage('". $this->_lang->GET('message.forward') ."', '', '" . 
+									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')"
 							]
 						];
@@ -85,11 +85,11 @@ class MESSAGE extends API {
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
-								'value' => LANG::GET('message.delete'),
+								'value' => $this->_lang->GET('message.delete'),
 								'type' => 'button',
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('message.delete') ."', options:{".
-									"'".LANG::GET('message.delete_confirm_cancel')."': false,".
-									"'".LANG::GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
+									"'".$this->_lang->GET('message.delete_confirm_cancel')."': false,".
+									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', " . $conversation['conversation_user'] . ", 'inbox')})"
 							]
 						]
@@ -100,16 +100,16 @@ class MESSAGE extends API {
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => LANG::GET('message.to'),
+									'name' => $this->_lang->GET('message.to'),
 									'value' => $conversation_user['name']
 								]
 							],
 							[
 								'type' => 'textarea',
 								'attributes' => [
-									'name' => LANG::GET('message.message_to', [':user' => $conversation_user['name']]),
+									'name' => $this->_lang->GET('message.message_to', [':user' => $conversation_user['name']]),
 								],
-								'hint' => LANG::GET('message.forward_hint')
+								'hint' => $this->_lang->GET('message.forward_hint')
 							]
 						];
 						$result['render']['form'] = [
@@ -126,9 +126,9 @@ class MESSAGE extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
-								'value' => LANG::GET('message.new'),
+								'value' => $this->_lang->GET('message.new'),
 								'type' => 'button',
-								'onpointerup' => "_client.message.newMessage('". LANG::GET('message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
+								'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
 							]
 						]
 					];
@@ -155,7 +155,7 @@ class MESSAGE extends API {
 									'type' => 'message',
 									'content' => [
 										'img' => $conversation['image'],
-										'user' => $conversation['conversation_user_name'] ? : LANG::GET('message.deleted_user'),
+										'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('message.deleted_user'),
 										'text' => (strlen($conversation['message'])>128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
 										'date' => $conversation['timestamp'],
 										'unseen' => $unseen
@@ -166,7 +166,7 @@ class MESSAGE extends API {
 								]
 							];
 						}
-					} else $result['render']['content'][] = $this->noContentAvailable(LANG::GET('message.no_messages'))[0];
+					} else $result['render']['content'][] = $this->noContentAvailable($this->_lang->GET('message.no_messages'))[0];
 				}
 				break;
 			case 'DELETE':
@@ -177,13 +177,13 @@ class MESSAGE extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'msg' => LANG::GET('message.delete_success'),
+						'msg' => $this->_lang->GET('message.delete_success'),
 						'redirect' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => LANG::GET('message.delete_failure'),
+						'msg' => $this->_lang->GET('message.delete_failure'),
 						'redirect' => false,
 						'type' => 'error'
 					]]);
@@ -206,12 +206,12 @@ class MESSAGE extends API {
 				$recipients = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
-						':name' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to')) ? : ''))
+						':name' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.to')) ? : ''))
 					]
 				]);
 				if (!$recipients) $this->response([
 					'response' => [
-						'msg' => LANG::GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.to'))]),
+						'msg' => $this->_lang->GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.to'))]),
 						'type' => 'error'
 					]]);
 				// do not send messages to yourself
@@ -219,17 +219,17 @@ class MESSAGE extends API {
 					unset($recipients[$self]);
 					if (!$recipients) $this->response([
 						'response' => [
-							'msg' => LANG::GET('message.send_failure_self'),
+							'msg' => $this->_lang->GET('message.send_failure_self'),
 							'type' => 'error'
 						]]);
 					}
 				$success = 0;
 				foreach ($recipients as $recipient){
 					if ($recipient['id'] < 2) continue;
-					$message = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message_to', [':user' => $recipient['name']]));
+					$message = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message_to', [':user' => $recipient['name']]));
 					if (!$message) $this->response([
 						'response' => [
-							'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
+							'msg' => $this->_lang->GET('message.send_failure', [':number' => count($recipients) - $success]),
 							'redirect' => false,
 							'type' => 'error'
 						]]);
@@ -243,13 +243,13 @@ class MESSAGE extends API {
 				}
 				if ($success === count($recipients)) $this->response([
 					'response' => [
-						'msg' => LANG::GET('message.send_success'),
+						'msg' => $this->_lang->GET('message.send_success'),
 						'redirect' => 'conversation',
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => LANG::GET('message.send_failure', [':number' => count($recipients) - $success]),
+						'msg' => $this->_lang->GET('message.send_failure', [':number' => count($recipients) - $success]),
 						'redirect' => false,
 						'type' => 'error'
 					]]);
@@ -275,7 +275,7 @@ class MESSAGE extends API {
 			$mailto =  [
 				'href' => 'javascript:void(0)',
 				'data-type' => 'input',
-				'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
+				'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
 			];
 			$groups['name'][] = $user['name'];
 			if ($user['orderauth']) $groups['orderauth'][] = $user['name'];
@@ -299,14 +299,14 @@ class MESSAGE extends API {
 				foreach($content as $user) $links[$user] = [
 					'href' => 'javascript:void(0)',
 					'data-type' => 'input',
-					'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user]) . "', '" . $user . "', '', {}, [])"
+					'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) . "', '" . $user . "', '', {}, [])"
 				];
 				switch ($group){
 					case 'name':
-						$description = LANG::GET('message.register_users');
+						$description = $this->_lang->GET('message.register_users');
 						break;
 					case 'orderauth':
-						$description = LANG::GET('message.register_orderauth');
+						$description = $this->_lang->GET('message.register_orderauth');
 						break;
 				}
 				$result['render']['content'][] = [
@@ -322,21 +322,21 @@ class MESSAGE extends API {
 					$users = array_unique($users);
 					ksort($users);
 					$links = [
-						LANG::GET('message.register_message_all') => [
+						$this->_lang->GET('message.register_message_all') => [
 							'href' => 'javascript:void(0)',
 							'data-type' => 'input',
-							'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => implode(', ', $users)]) ."', '" . implode(', ', $users) . "', '', {}, [])"
+							'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => implode(', ', $users)]) ."', '" . implode(', ', $users) . "', '', {}, [])"
 						]
 					];
 					foreach($users as $user) $links[$user] = [
 						'href' => 'javascript:void(0)',
 						'data-type' => 'input',
-						'onpointerup' => "_client.message.newMessage('". LANG::GET('order.message_orderer', [':orderer' => $user]) ."', '" . $user . "', '', {}, [])"
+						'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) ."', '" . $user . "', '', {}, [])"
 					];
 					$panel[] = [
 						[
 							'type' => 'links',
-							'description' => ($group === 'units' ? LANG::GET('user.edit_units') : LANG::GET('user.display_permissions')) . ' ' . LANGUAGEFILE[$group][$sub],
+							'description' => ($group === 'units' ? $this->_lang->GET('user.edit_units') : $this->_lang->GET('user.display_permissions')) . ' ' . $this->_lang->_USER[$group][$sub],
 							'content' => $links,
 						]
 					];

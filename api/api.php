@@ -62,6 +62,11 @@ class API {
 	private $_messages = [];
 
 	/**
+	 * make languagemodel LANG class and its methods available
+	 */
+	public $_lang = [];
+
+	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
 	 */
@@ -77,6 +82,8 @@ class API {
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
 		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+
+		$this->_lang = new LANG();
 
 		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])){
 			session_unset();

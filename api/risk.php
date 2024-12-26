@@ -44,17 +44,17 @@ class RISK extends API {
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
 				$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				$risk = [
-					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),
-					':risk' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk')),
-					':cause' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.cause')),
-					':effect' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.effect')),
-					':probability' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.probability'))),
-					':damage' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.damage'))),
-					':measure' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure')),
-					':measure_probability' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_probability'))),
-					':measure_damage' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_damage'))),
-					':risk_benefit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk_benefit')),
-					':measure_remainder' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_remainder')) ? : '',
+					':process' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.process')),
+					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')),
+					':cause' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.cause')),
+					':effect' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.effect')),
+					':probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.probability'))),
+					':damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.damage'))),
+					':measure' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure')),
+					':measure_probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_probability'))),
+					':measure_damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_damage'))),
+					':risk_benefit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_benefit')),
+					':measure_remainder' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_remainder')) ? : '',
 					':last_edit' => json_encode(['user' => $_SESSION['user']['name'], 'date' => $date->format('Y-m-d H:i')])
 				];
 				foreach($risk as $key => $value){
@@ -65,13 +65,13 @@ class RISK extends API {
 					'values' => $risk
 				])) $this->response([
 					'response' => [
-						'msg' => LANG::GET('risk.risk_saved'),
+						'msg' => $this->_lang->GET('risk.risk_saved'),
 						'id' => $this->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => LANG::GET('risk.risk_save_error'),
+						'msg' => $this->_lang->GET('risk.risk_save_error'),
 						'id' => false,
 						'type' => 'error'
 					]]);
@@ -81,17 +81,17 @@ class RISK extends API {
 				$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				$risk = [
 					':id' => intval($this->_requestedID),
-					':process' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.process')),
-					':risk' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk')),
-					':cause' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.cause')),
-					':effect' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.effect')),
-					':probability' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.probability'))),
-					':damage' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.damage'))),
-					':measure' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure')),
-					':measure_probability' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_probability'))),
-					':measure_damage' => intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_damage'))),
-					':risk_benefit' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.risk_benefit')),
-					':measure_remainder' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('risk.measure_remainder')) ? : '',
+					':process' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.process')),
+					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')),
+					':cause' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.cause')),
+					':effect' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.effect')),
+					':probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.probability'))),
+					':damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.damage'))),
+					':measure' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure')),
+					':measure_probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_probability'))),
+					':measure_damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_damage'))),
+					':risk_benefit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_benefit')),
+					':measure_remainder' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_remainder')) ? : '',
 					':last_edit' => json_encode(['user' => $_SESSION['user']['name'], 'date' => $date->format('Y-m-d H:i')])
 				];
 				foreach($risk as $key => $value){
@@ -102,20 +102,20 @@ class RISK extends API {
 					'values' => $risk
 				])) $this->response([
 					'response' => [
-						'msg' => LANG::GET('risk.risk_saved'),
+						'msg' => $this->_lang->GET('risk.risk_saved'),
 						'id' => intval($this->_requestedID),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => LANG::GET('risk.risk_save_error'),
+						'msg' => $this->_lang->GET('risk.risk_save_error'),
 						'id' => false,
 						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
-				$processes = LANGUAGEFILE['risk']['preset_process'];
-				$risks = LANGUAGEFILE['risk']['preset_risk'];
+				$processes = $this->_lang->_USER['risk']['preset_process'];
+				$risks = $this->_lang->_USER['risk']['preset_risk'];
 				$select = [];
 				$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 				foreach($risk_datalist as $row){
@@ -137,21 +137,21 @@ class RISK extends API {
 					'risk' => '',
 					'cause' => '',
 					'effect' => '',
-					'probability' => count(LANGUAGEFILE['risk']['probabilities']),
-					'damage' => count(LANGUAGEFILE['risk']['damages']),
+					'probability' => count($this->_lang->_USER['risk']['probabilities']),
+					'damage' => count($this->_lang->_USER['risk']['damages']),
 					'measure' => '',
-					'measure_probability' => count(LANGUAGEFILE['risk']['probabilities']),
-					'measure_damage' => count(LANGUAGEFILE['risk']['damages']),
+					'measure_probability' => count($this->_lang->_USER['risk']['probabilities']),
+					'measure_damage' => count($this->_lang->_USER['risk']['damages']),
 					'risk_benefit' => '',
 					'measure_remainder' => '',
 					'last_edit' => ''
 				];
 				$probabilities = $measure_probabilities = $damages = $measure_damages = [];
-				foreach(LANGUAGEFILE['risk']['probabilities'] as $index => $description){
+				foreach($this->_lang->_USER['risk']['probabilities'] as $index => $description){
 					$probabilities[$description] = $risk['probability'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 					$measure_probabilities[$description] = $risk['measure_probability'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 				}
-				foreach(LANGUAGEFILE['risk']['damages'] as $index => $description){
+				foreach($this->_lang->_USER['risk']['damages'] as $index => $description){
 					$damages[$description] = $risk['damage'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 					$measure_damages[$description] = $risk['measure_damage'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 				}
@@ -187,7 +187,7 @@ class RISK extends API {
 					], [
 						'type' => 'text',
 						'attributes' => [
-							'name' => LANG::GET('risk.process'),
+							'name' => $this->_lang->GET('risk.process'),
 							'list' => 'processes',
 							'value' => $risk['process'],
 							'required' => true
@@ -195,7 +195,7 @@ class RISK extends API {
 					], [
 						'type' => 'text',
 						'attributes' => [
-							'name' => LANG::GET('risk.risk'),
+							'name' => $this->_lang->GET('risk.risk'),
 							'list' => 'risks',
 							'value' => $risk['risk'],
 							'required' => true
@@ -203,7 +203,7 @@ class RISK extends API {
 					], [
 						'type' => 'textarea',
 						'attributes' => [
-							'name' => LANG::GET('risk.cause'),
+							'name' => $this->_lang->GET('risk.cause'),
 							'value' => $risk['cause'],
 							'rows' => 4,
 							'required' => true
@@ -213,7 +213,7 @@ class RISK extends API {
 					], [
 						'type' => 'textarea',
 						'attributes' => [
-							'name' => LANG::GET('risk.effect'),
+							'name' => $this->_lang->GET('risk.effect'),
 							'value' => $risk['effect'],
 							'rows' => 4,
 							'required' => true
@@ -223,25 +223,25 @@ class RISK extends API {
 					], [
 						'type' => 'select',
 						'attributes' => [
-							'name' => LANG::GET('risk.probability')
+							'name' => $this->_lang->GET('risk.probability')
 						],
 						'content' => $probabilities
 					], [
 						'type' => 'select',
 						'attributes' => [
-							'name' => LANG::GET('risk.damage')
+							'name' => $this->_lang->GET('risk.damage')
 						],
 						'content' => $damages
 					], [
 						'type' => 'textsection',
 						'attributes' => [
 							'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-							'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
+							'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 						]
 					], [
 						'type' => 'textarea',
 						'attributes' => [
-							'name' => LANG::GET('risk.measure'),
+							'name' => $this->_lang->GET('risk.measure'),
 							'value' => $risk['measure'],
 							'rows' => 4,
 							'required' => true
@@ -251,25 +251,25 @@ class RISK extends API {
 					], [
 						'type' => 'select',
 						'attributes' => [
-							'name' => LANG::GET('risk.measure_probability')
+							'name' => $this->_lang->GET('risk.measure_probability')
 						],
 						'content' => $measure_probabilities
 					], [
 						'type' => 'select',
 						'attributes' => [
-							'name' => LANG::GET('risk.measure_damage')
+							'name' => $this->_lang->GET('risk.measure_damage')
 						],
 						'content' => $measure_damages
 					], [
 						'type' => 'textsection',
 						'attributes' => [
 							'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-							'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? LANG::GET('risk.acceptance_level_above') : LANG::GET('risk.acceptance_level_below')
+							'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 						]
 					], [
 						'type' => 'textarea',
 						'attributes' => [
-							'name' => LANG::GET('risk.risk_benefit'),
+							'name' => $this->_lang->GET('risk.risk_benefit'),
 							'value' => $risk['risk_benefit'],
 							'rows' => 4,
 							'required' => true
@@ -279,22 +279,22 @@ class RISK extends API {
 					], [
 						'type' => 'textarea',
 						'attributes' => [
-							'name' => LANG::GET('risk.measure_remainder'),
+							'name' => $this->_lang->GET('risk.measure_remainder'),
 							'value' => $risk['measure_remainder'],
 							'rows' => 4
 						],
-						'hint' => (isset($last_edit['user'])) ? LANG::GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): ''
+						'hint' => (isset($last_edit['user'])) ? $this->_lang->GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): ''
 					]
 				];
 				if (boolval($risk['id']) && PERMISSION::permissionFor('riskmanagement')) {
 					$result['render']['content'][count($result['render']['content']) -1][] = [
 						'type' => 'deletebutton',
 						'attributes' => [
-							'value' => LANG::GET('risk.delete_button'),
+							'value' => $this->_lang->GET('risk.delete_button'),
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerup' => $risk['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('risk.delete_confirm_header') ."', options:{".
-								"'".LANG::GET('risk.delete_cancel')."': false,".
-								"'".LANG::GET('risk.delete_confirm')."': {value: true, class: 'reducedCTA'},".
+							'onpointerup' => $risk['id'] ? "new Dialog({type: 'confirm', header: '". $this->_lang->GET('risk.delete_confirm_header') ."', options:{".
+								"'".$this->_lang->GET('risk.delete_cancel')."': false,".
+								"'".$this->_lang->GET('risk.delete_confirm')."': {value: true, class: 'reducedCTA'},".
 								"}}).then(confirmation => {if (confirmation) api.risk('delete', 'risk', ". $risk['id'] . ")})" : ''
 						]
 					];
@@ -314,13 +314,13 @@ class RISK extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'msg' => LANG::GET('risk.risk_deleted'),
+						'msg' => $this->_lang->GET('risk.risk_deleted'),
 						'id' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => LANG::GET('risk.risk_delete_error'),
+						'msg' => $this->_lang->GET('risk.risk_delete_error'),
 						'id' => intval($this->_requestedID),
 						'type' => 'error'
 					]]);

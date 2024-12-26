@@ -82,36 +82,36 @@ class USER extends API {
 
 				// convert image
 				// save and convert image
-				if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_reset_photo'))) {
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_reset_photo'))) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
+					$_FILES[$this->_lang->PROPERTY('user.edit_take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if(isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
+				if(isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
-					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
 				// process settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_force_desktop'));
-				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_homeoffice'));
-				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_language')) ? : 'en';
-				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_theme'));
-				if ($primaryUnit = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_unit'))){
-					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, LANGUAGEFILE['units']);
+				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_force_desktop'));
+				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_homeoffice'));
+				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_language')) ? : 'en';
+				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_theme'));
+				if ($primaryUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_primary_unit'))){
+					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, $this->_lang->_USER['units']);
 				}
-				if ($primaryRecordState = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_primary_recordstate'))){
-					if ($primaryRecordState === LANG::GET('record.record_casestate_filter_all'))
+				if ($primaryRecordState = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_primary_recordstate'))){
+					if ($primaryRecordState === $this->_lang->GET('record.record_casestate_filter_all'))
 						unset($user['app_settings']['primaryRecordState']);
 					else
-						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, LANGUAGEFILE['casestate']['casedocumentation']);
+						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
 				}
 				foreach($user['app_settings'] as $key => $value){
 					if (!$value) unset($user['app_settings'][$key]);
@@ -133,14 +133,14 @@ class USER extends API {
 					$this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => LANG::GET('user.edit_user_not_saved'),
+						'msg' => $this->_lang->GET('user.edit_user_not_saved'),
 						'type' => 'error'
 					]]);
 
@@ -165,32 +165,32 @@ class USER extends API {
 
 				$permissions = [];
 				foreach(explode(',', $user['permissions']) as $level){
-					$permissions[] = LANG::GET('permissions.' . $level);
+					$permissions[] = $this->_lang->GET('permissions.' . $level);
 				}
 
 				$units = $primary_unit = [];
 				foreach(explode(',', $user['units']) as $unit){
 					if (!$unit) continue;
-					$primary_unit[LANG::GET('units.' . $unit)] = ['name' => LANG::PROPERTY('user.settings_primary_unit')];
-					$units[] = LANG::GET('units.' . $unit);
+					$primary_unit[$this->_lang->GET('units.' . $unit)] = ['name' => $this->_lang->PROPERTY('user.settings_primary_unit')];
+					$units[] = $this->_lang->GET('units.' . $unit);
 				}
-				if(isset($user['app_settings']['primaryUnit'])) $primary_unit[LANG::GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
+				if(isset($user['app_settings']['primaryUnit'])) $primary_unit[$this->_lang->GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
 
-				$primary_casestates = [LANG::GET('record.record_casestate_filter_all') => ['name' => LANG::PROPERTY('user.settings_primary_recordstate')]];
-				foreach(LANGUAGEFILE['casestate']['casedocumentation'] as $state => $translation){
-					$primary_casestates[$translation] = ['name' => LANG::PROPERTY('user.settings_primary_recordstate')];
+				$primary_casestates = [$this->_lang->GET('record.record_casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')]];
+				foreach($this->_lang->_USER['casestate']['casedocumentation'] as $state => $translation){
+					$primary_casestates[$translation] = ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')];
 				}
-				if(isset($user['app_settings']['primaryRecordState'])) $primary_casestates[LANG::GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
-				else $primary_casestates[LANG::GET('record.record_casestate_filter_all')]['checked'] = true;
+				if(isset($user['app_settings']['primaryRecordState'])) $primary_casestates[$this->_lang->GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
+				else $primary_casestates[$this->_lang->GET('record.record_casestate_filter_all')]['checked'] = true;
 
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
 				$skillmatrix = '';
-				foreach (LANGUAGEFILE['skills'] as $duty => $skills){
+				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === 'LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
 						if ($skill === '_DESCRIPTION') continue;
-						foreach(LANGUAGEFILE['skills']['LEVEL'] as $level => $leveldescription){
-							$skillmatrix .= in_array($duty . '.' . $skill . '.' . $level, $user['skills']) ? " \n" . LANG::GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription: '';
+						foreach($this->_lang->_USER['skills']['LEVEL'] as $level => $leveldescription){
+							$skillmatrix .= in_array($duty . '.' . $skill . '.' . $level, $user['skills']) ? " \n" . $this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription: '';
 						}
 					}
 				}
@@ -198,26 +198,26 @@ class USER extends API {
 						[
 							['type' => 'textsection',
 							'attributes' => [
-								'name' => LANG::GET('user.display_user')
+								'name' => $this->_lang->GET('user.display_user')
 							],
-							'content' => LANG::GET('user.edit_name') . ': ' . $user['name'] . "\n" .
-								LANG::GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
-								($units ? LANG::GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" : '') .
-								($user['orderauth'] ? " \n" . LANG::GET('user.display_orderauth'): '') .
-								(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . LANG::GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
-								(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . LANG::GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
-								(isset($timesheet_stats['_overtime']) ? " \n" . LANG::GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
-								(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . LANG::GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
-								(isset($timesheet_stats['_leftvacation']) ? " \n" . LANG::GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
+							'content' => $this->_lang->GET('user.edit_name') . ': ' . $user['name'] . "\n" .
+								$this->_lang->GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
+								($units ? $this->_lang->GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" : '') .
+								($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
+								(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
+								(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
+								(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
+								(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
+								(isset($timesheet_stats['_leftvacation']) ? " \n" . $this->_lang->GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
 								($skillmatrix ? " \n" . $skillmatrix : '')
 							]
 						],[
 							[
 								'type' => 'photo',
 								'attributes' => [
-									'name' => LANG::GET('user.edit_take_photo')
+									'name' => $this->_lang->GET('user.edit_take_photo')
 								],
-								'hint' => LANG::GET('user.edit_take_photo_hint')
+								'hint' => $this->_lang->GET('user.edit_take_photo_hint')
 							],
 						]
 					],
@@ -232,7 +232,7 @@ class USER extends API {
 						[
 							[
 								'type' => 'image',
-								'description' => LANG::GET('user.edit_export_user_image'),
+								'description' => $this->_lang->GET('user.edit_export_user_image'),
 								'attributes' => [
 									'name' => $user['name'] . '_pic',
 									'url' => $user['image']
@@ -244,7 +244,7 @@ class USER extends API {
 					$result['render']['content'][1][1][] = [
 						'type' => 'checkbox',
 						'content' => [
-							LANG::GET('user.edit_reset_photo') => []
+							$this->_lang->GET('user.edit_reset_photo') => []
 						]
 					];
 				}
@@ -258,28 +258,28 @@ class USER extends API {
 					[
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => LANG::GET('user.settings')
+							'name' => $this->_lang->GET('user.settings')
 						],
 						'content' => [
-							LANG::GET('user.settings_force_desktop') => [],
-							LANG::GET('user.settings_homeoffice') => [],
+							$this->_lang->GET('user.settings_force_desktop') => [],
+							$this->_lang->GET('user.settings_homeoffice') => [],
 						]
 					], [
 						'type' => 'select',
 						'attributes' => [
-							'name' => LANG::GET('user.settings_language')
+							'name' => $this->_lang->GET('user.settings_language')
 						],
 						'content' => $languages,
-						'hint' => LANG::GET('user.settings_language_hint', [':lang' => CONFIG['application']['defaultlanguage']])
+						'hint' => $this->_lang->GET('user.settings_language_hint', [':lang' => CONFIG['application']['defaultlanguage']])
 					], [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => LANG::GET('user.settings_theme')
+							'name' => $this->_lang->GET('user.settings_theme')
 						],
 						'content' => [
-							LANG::GET('user.settings_theme_light') => (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === 'light') ? ['checked' => true, 'value' => 'light'] : ['value' => 'light'],
-							LANG::GET('user.settings_theme_aurora') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'aurora') ? ['checked' => true, 'value' => 'aurora'] : ['value' => 'aurora'],
-							LANG::GET('user.settings_theme_dark') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
+							$this->_lang->GET('user.settings_theme_light') => (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === 'light') ? ['checked' => true, 'value' => 'light'] : ['value' => 'light'],
+							$this->_lang->GET('user.settings_theme_aurora') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'aurora') ? ['checked' => true, 'value' => 'aurora'] : ['value' => 'aurora'],
+							$this->_lang->GET('user.settings_theme_dark') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
 						]
 					]
 				];
@@ -287,7 +287,7 @@ class USER extends API {
 					$result['render']['content'][count($result['render']['content'])-1][] = [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => LANG::GET('user.settings_primary_unit')
+							'name' => $this->_lang->GET('user.settings_primary_unit')
 						],
 						'content' => $primary_unit
 					];
@@ -295,15 +295,15 @@ class USER extends API {
 				$result['render']['content'][count($result['render']['content'])-1][] = [
 					'type' => 'radio',
 					'attributes' => [
-						'name' => LANG::GET('user.settings_primary_recordstate')
+						'name' => $this->_lang->GET('user.settings_primary_recordstate')
 					],
-					'hint' => LANG::GET('user.settings_hint'),
+					'hint' => $this->_lang->GET('user.settings_hint'),
 					'content' => $primary_casestates
 				];
 
 
-				if (isset($user['app_settings']['forceDesktop'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_force_desktop')] = ['checked' => true];
-				if (isset($user['app_settings']['homeoffice'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][LANG::GET('user.settings_homeoffice')] = ['checked' => true];
+				if (isset($user['app_settings']['forceDesktop'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][$this->_lang->GET('user.settings_force_desktop')] = ['checked' => true];
+				if (isset($user['app_settings']['homeoffice'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][$this->_lang->GET('user.settings_homeoffice')] = ['checked' => true];
 
 
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
@@ -313,7 +313,7 @@ class USER extends API {
 				]);
 				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach ($trainings as $row){
-					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					$attributes = ['name' => $this->_lang->GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $today) $attributes['class'] = 'red';
@@ -324,7 +324,7 @@ class USER extends API {
 					}
 					$result['render']['content'][0][] = [
 						'type' => 'textsection',
-						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'content' => $this->_lang->GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $result['render']['content'][0][] = [
@@ -355,7 +355,7 @@ class USER extends API {
 				$permissions = [];
 				$units = [];
 				$user = [
-					'name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_name')),
+					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_name')),
 					'permissions' => '',
 					'units' => '',
 					'token' => '',
@@ -368,48 +368,48 @@ class USER extends API {
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
-						':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_name'))
+						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_name'))
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
 
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || $nametaken) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || $nametaken) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 		
 				// checked permission levels
-				if ($setpermissions = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_permissions'))){
+				if ($setpermissions = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_permissions'))){
 					foreach(explode(' | ', $setpermissions) as $setpermission){
-						$permissions[] = array_search($setpermission, LANGUAGEFILE['permissions']);
+						$permissions[] = array_search($setpermission, $this->_lang->_USER['permissions']);
 					}
 				}
 				$user['permissions'] = implode(',', $permissions);
 
 				// checked organizational units
-				if ($setunits = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_units'))){
+				if ($setunits = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_units'))){
 					foreach(explode(' | ', $setunits) as $setunit){
-						$units[] = array_search($setunit, LANGUAGEFILE['units']);
+						$units[] = array_search($setunit, $this->_lang->_USER['units']);
 					}
 				}
 				$user['units'] = implode(',', $units);
 
-				$annualvacation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
+				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
-				$weeklyhours = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
+				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
-				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_initial_overtime'));
+				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
 
-				foreach (LANGUAGEFILE['skills'] as $duty => $skills){
+				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === 'LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
-						if ($level = UTILITY::propertySet($this->_payload, LANG::PROPERTY('skills.' . $duty . '._DESCRIPTION') . '_' . LANG::PROPERTY('skills.' . $duty . '.' . $skill))){
+						if ($level = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('skills.' . $duty . '._DESCRIPTION') . '_' . $this->_lang->PROPERTY('skills.' . $duty . '.' . $skill))){
 							if ($level != 0) $user['skills'][] = $duty . '.' . $skill . '.' . $level;
 						}
 					}
 				}
 
 				// generate order auth
-				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization')) == $this->_lang->GET('user.edit_order_authorization_generate')){
 					$orderauths = [];
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
@@ -421,40 +421,40 @@ class USER extends API {
 				}
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_token_renew'))){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
 				// save and convert image or create default
-				if (!(isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name'])) {
+				if (!(isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name'])) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
+					$_FILES[$this->_lang->PROPERTY('user.edit_take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
+				$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 				UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
 				// add user training
 				$training = [];
-				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
+				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training'))){
 					$training[':user_id'] = $user['id'];
 					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
-					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
-					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
+					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
+					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
+					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
 						'user' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i'),
-						'content' => [LANG::PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation'))]
+						'content' => [$this->_lang->PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation'))]
 					]): null;
-						if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
-						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+						if (isset($_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
@@ -497,7 +497,7 @@ class USER extends API {
 					}
 					foreach($roles as $key => &$values){
 						$values = array_unique($values);
-						$values = array_map(fn($v) => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\''. LANG::GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
+						$values = array_map(fn($v) => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\''. $this->_lang->GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
 					}
 
 					$message = [
@@ -506,24 +506,24 @@ class USER extends API {
 						':supervisor' => implode(', ', $roles['supervisor']),
 						':qmo' => implode(', ', $roles['qmo']),
 						':prrc' => implode(', ', $roles['prrc']),
-						':register' => '<a href="javascript:void(0);" onpointerup="api.message(\'get\', \'register\')">' . LANG::GET('menu.message_register', [], true) . '</a>',
-						':landingpage' => '<a href="javascript:void(0);" onpointerup="api.application(\'get\', \'start\')">' . LANG::GET('menu.application_start', [], true) . '</a>',
-						':profile' => '<a href="javascript:void(0);" onpointerup="api.user(\'get\', \'profile\')">' . LANG::GET('menu.application_user_profile', [], true) . '</a>',
+						':register' => '<a href="javascript:void(0);" onpointerup="api.message(\'get\', \'register\')">' . $this->_lang->GET('menu.message_register', [], true) . '</a>',
+						':landingpage' => '<a href="javascript:void(0);" onpointerup="api.application(\'get\', \'start\')">' . $this->_lang->GET('menu.application_start', [], true) . '</a>',
+						':profile' => '<a href="javascript:void(0);" onpointerup="api.user(\'get\', \'profile\')">' . $this->_lang->GET('menu.application_user_profile', [], true) . '</a>',
 						':admin' => implode(', ', $roles['admin'])
 					];
-					$this->alertUserGroup(['user' => [$user['name']]], preg_replace(['/\r/'], [''], LANG::GET('user.welcome_message', $message, true)));
+					$this->alertUserGroup(['user' => [$user['name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
 					
 					$this->response([
 					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
 					'response' => [
 						'id' => false,
-						'msg' => LANG::GET('user.edit_user_not_saved'),
+						'msg' => $this->_lang->GET('user.edit_user_not_saved'),
 						'type' => 'error'
 					]]);
 				break;
@@ -542,57 +542,57 @@ class USER extends API {
 				// prepare user-array to update, return error if not found
 				if (!$user) $this->response(null, 406);
 				
-				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name')));
-				$user['name'] = UTILITY::propertySet($this->_payload, LANG::GET('user.edit_name'));
+				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, $this->_lang->GET('user.edit_name')));
+				$user['name'] = UTILITY::propertySet($this->_payload, $this->_lang->GET('user.edit_name'));
 
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
-						':name' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_name'))
+						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_name'))
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
 
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 				
 				// chain checked permission levels
-				foreach(LANGUAGEFILE['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('permissions.' . $level))) {
+				foreach($this->_lang->_USER['permissions'] as $level => $description){
+					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('permissions.' . $level))) {
 						$permissions[] = $level;
 					}
 				}
 				$user['permissions'] = implode(',', $permissions);
 
 				// chain checked organizational units
-				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('units.' . $unit))) {
+				foreach($this->_lang->_USER['units'] as $unit => $description){
+					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('units.' . $unit))) {
 						$units[] = $unit;
 					}
 				}
 				$user['units'] = implode(',', $units);
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-				$annualvacation = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_annual_vacation'));
+				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
-				$weeklyhours = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_weekly_hours'));
+				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
-				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.settings_initial_overtime'));
+				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
 
 				$user['skills'] = [];
-				foreach (LANGUAGEFILE['skills'] as $duty => $skills){
+				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === 'LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
-						if ($level = UTILITY::propertySet($this->_payload, LANG::PROPERTY('skills.' . $duty . '._DESCRIPTION') . '_' . LANG::PROPERTY('skills.' . $duty . '.' . $skill))){
+						if ($level = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('skills.' . $duty . '._DESCRIPTION') . '_' . $this->_lang->PROPERTY('skills.' . $duty . '.' . $skill))){
 							if ($level != 0) $user['skills'][] = $duty . '.' . $skill . '.' . $level;
 						}
 					}
 				}
 				// generate order auth
-				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_revoke')){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization')) == $this->_lang->GET('user.edit_order_authorization_revoke')){
 					$user['orderauth'] = '';
 				}
-				if(UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization')) == LANG::GET('user.edit_order_authorization_generate')){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization')) == $this->_lang->GET('user.edit_order_authorization_generate')){
 					$orderauths = [];
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
@@ -604,49 +604,49 @@ class USER extends API {
 				}
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', LANG::GET('user.edit_token_renew')))){
+				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', $this->_lang->GET('user.edit_token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// save and convert image or create default
-				if ((!(isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_reset_photo'))) {
+				if ((!(isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_reset_photo'))) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES[LANG::PROPERTY('user.edit_take_photo')] = [
+					$_FILES[$this->_lang->PROPERTY('user.edit_take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if (isset($_FILES[LANG::PROPERTY('user.edit_take_photo')]) && $_FILES[LANG::PROPERTY('user.edit_take_photo')]['tmp_name']) {
+				if (isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
-					$user['image'] = UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
 
 				// add user training
 				$training = [];
-				if ($training[':name'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training'))){
+				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training'))){
 					$training[':user_id'] = $user['id'];
 					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-					$training[':date'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
-					$training[':expires'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
-					$training[':experience_points'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_experience_points')) ? : 0;
+					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
+					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
+					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
 						'user' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i'),
-						'content' => [LANG::PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_add_training_evaluation'))]
+						'content' => [$this->_lang->PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation'))]
 					]): null;
-						if (isset($_FILES[LANG::PROPERTY('user.edit_add_training_document')]) && $_FILES[LANG::PROPERTY('user.edit_add_training_document')]['tmp_name']) {
-						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([LANG::PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+						if (isset($_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]['tmp_name']) {
+						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
 					]);
 				}
 				// delete checked user trainings
-				if ($delete_training = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_delete_training'))){
+				if ($delete_training = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_delete_training'))){
 					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 						'replacements' => [
 							':ids' => $user['id'] ? : 0
@@ -680,21 +680,21 @@ class USER extends API {
 					$this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => LANG::GET('user.edit_user_saved', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.edit_user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => LANG::GET('user.edit_user_not_saved'),
+						'msg' => $this->_lang->GET('user.edit_user_not_saved'),
 						'type' => 'error'
 					]]);
 				break;
 
 			case 'GET':
 				$datalist = [];
-				$options = ['...' . LANG::GET('user.edit_existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
+				$options = ['...' . $this->_lang->GET('user.edit_existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
 				$result = [];
 				
 				// prepare existing users lists
@@ -725,15 +725,15 @@ class USER extends API {
 					'app_settings' => '',
 					'skills' => ''
 				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . LANG::GET('user.edit_existing_user_new')) $result['response'] = ['msg' => LANG::GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.edit_existing_user_new')) $result['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// display form for adding a new user with ini related permissions
 				$permissions = [];
-				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+				foreach($this->_lang->_USER['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, explode(',', $user['permissions'])) ? ['checked' => true] : [];
 				}
 				$units = [];
-				foreach(LANGUAGEFILE['units'] as $unit => $description){
+				foreach($this->_lang->_USER['units'] as $unit => $description){
 					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
@@ -745,37 +745,37 @@ class USER extends API {
 						[
 							'type' => 'text',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_add_training')
+								'name' => $this->_lang->GET('user.edit_add_training')
 							],
 						], [
 							'type' => 'date',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_add_training_date')
+								'name' => $this->_lang->GET('user.edit_add_training_date')
 							],
 						], [
 							'type' => 'date',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_add_training_expires')
+								'name' => $this->_lang->GET('user.edit_add_training_expires')
 							],
 						], [
 							'type' => 'number',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_add_training_experience_points')
+								'name' => $this->_lang->GET('user.edit_add_training_experience_points')
 							],
 						], [
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => LANG::GET("user.edit_add_training_evaluation")
+								'name' => $this->_lang->GET("user.edit_add_training_evaluation")
 							],
 							'content' => [
-								LANG::GET('user.edit_add_training_evaluation_unreasonable') => []
+								$this->_lang->GET('user.edit_add_training_evaluation_unreasonable') => []
 							]
 						], [
 							'type' => 'file',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_add_training_document')
+								'name' => $this->_lang->GET('user.edit_add_training_document')
 							],
-							'hint' => LANG::GET('user.edit_add_training_hint')
+							'hint' => $this->_lang->GET('user.edit_add_training_hint')
 						]
 					]
 				];
@@ -786,7 +786,7 @@ class USER extends API {
 				]);
 				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach ($trainings as $row){
-					$attributes = ['name' => LANG::GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					$attributes = ['name' => $this->_lang->GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $today) $attributes['class'] = 'red';
@@ -797,7 +797,7 @@ class USER extends API {
 					}
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'content' => LANG::GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'content' => $this->_lang->GET('user.edit_add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $skillmatrix[0][] = [
@@ -809,18 +809,18 @@ class USER extends API {
 					$skillmatrix[0][] = [
 						'type' => 'checkbox',
 						'content' => [
-							LANG::GET('user.edit_delete_training') . '[]' => ['value' => $row['id']]
+							$this->_lang->GET('user.edit_delete_training') . '[]' => ['value' => $row['id']]
 						]
 					];
 				}
 
 				$skilldatalistwithlabel = $skilldatalist = [];
 				$skilldatalistnum = 0;
-				foreach (LANGUAGEFILE['skills'] as $duty => $skills){
+				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					$skillselection = [];
 					if ($duty === 'LEVEL') {
 						$skilldatalistnum ++;
-						foreach(LANGUAGEFILE['skills']['LEVEL'] as $level => $leveldescription){
+						foreach($this->_lang->_USER['skills']['LEVEL'] as $level => $leveldescription){
 							$skilldatalistwithlabel[] = ['value' => $level, 'label' => $leveldescription];
 							$skilldatalist[] = ['value' => $level];
 						}
@@ -837,7 +837,7 @@ class USER extends API {
 					foreach ($skills as $skill => $skilldescription){
 						if ($skill === '_DESCRIPTION') continue;
 						$userlevel = 0;
-						foreach(LANGUAGEFILE['skills']['LEVEL'] as $level => $leveldescription){
+						foreach($this->_lang->_USER['skills']['LEVEL'] as $level => $leveldescription){
 							if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])) $userlevel = $level;
 						}
 						$skillselection[] = [
@@ -845,7 +845,7 @@ class USER extends API {
 							'attributes' => [
 								'name' => $skills['_DESCRIPTION'] . ' ' . $skilldescription,
 								'min' => 0,
-								'max' => count(LANGUAGEFILE['skills']['LEVEL']) - 1,
+								'max' => count($this->_lang->_USER['skills']['LEVEL']) - 1,
 								'value' => strval($userlevel),
 								'list' => array_search($skill, array_keys($skills)) < 2 ? 'skillmarkerswithlabels' . $skilldatalistnum : ''
 							],
@@ -869,7 +869,7 @@ class USER extends API {
 						[
 							'type' => 'select',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_existing_user_select'),
+								'name' => $this->_lang->GET('user.edit_existing_user_select'),
 								'onchange' => "api.user('get', 'user', this.value)"
 							],
 							'content' => $options
@@ -877,7 +877,7 @@ class USER extends API {
 						[
 							'type' => 'search',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_existing_user'),
+								'name' => $this->_lang->GET('user.edit_existing_user'),
 								'list' => 'users',
 								'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
 							]
@@ -886,7 +886,7 @@ class USER extends API {
 						[
 							'type' => 'text',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_name'),
+								'name' => $this->_lang->GET('user.edit_name'),
 								'required' => true,
 								'value' => $user['name'] ? : ''
 							]
@@ -894,36 +894,36 @@ class USER extends API {
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_permissions')
+								'name' => $this->_lang->GET('user.edit_permissions')
 							],
 							'content' => $permissions,
-							'hint' => LANG::GET('user.edit_permissions_hint')
+							'hint' => $this->_lang->GET('user.edit_permissions_hint')
 						],
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_units')
+								'name' => $this->_lang->GET('user.edit_units')
 							],
 							'content' => $units,
-							'hint' => LANG::GET('user.edit_units_hint')
+							'hint' => $this->_lang->GET('user.edit_units_hint')
 						]
 					], [
 						[
 							'type' => 'photo',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_take_photo')
+								'name' => $this->_lang->GET('user.edit_take_photo')
 							],
-							'hint' => LANG::GET('user.edit_take_photo_hint')
+							'hint' => $this->_lang->GET('user.edit_take_photo_hint')
 						],
 					], [
 						[
 							'type' => 'radio',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_order_authorization')
+								'name' => $this->_lang->GET('user.edit_order_authorization')
 							],
 							'content' => [
-								LANG::GET('user.edit_order_authorization_generate') => [],
-								LANG::GET('user.edit_order_authorization_revoke') => []
+								$this->_lang->GET('user.edit_order_authorization_generate') => [],
+								$this->_lang->GET('user.edit_order_authorization_revoke') => []
 							]
 						]
 					], [
@@ -931,27 +931,27 @@ class USER extends API {
 							[
 								'type' => 'text',
 								'attributes' => [
-									'name' => LANG::GET('user.settings_initial_overtime'),
+									'name' => $this->_lang->GET('user.settings_initial_overtime'),
 									'value' => isset($user['app_settings']['initialovertime']) ? $user['app_settings']['initialovertime'] : 0
 								],
-								'hint' => LANG::GET('user.settings_initial_overtime_hint')
+								'hint' => $this->_lang->GET('user.settings_initial_overtime_hint')
 							],
 							[
 								'type' => 'textarea',
 								'attributes' => [
-									'name' => LANG::GET('user.settings_weekly_hours'),
+									'name' => $this->_lang->GET('user.settings_weekly_hours'),
 									'value' => isset($user['app_settings']['weeklyhours']) ? str_replace(';', "\n", $user['app_settings']['weeklyhours']) : ''
 								],
-								'hint' => LANG::GET('user.settings_weekly_hours_hint')
+								'hint' => $this->_lang->GET('user.settings_weekly_hours_hint')
 							]
 						], [
 							[
 								'type' => 'textarea',
 								'attributes' => [
-									'name' => LANG::GET('user.settings_annual_vacation'),
+									'name' => $this->_lang->GET('user.settings_annual_vacation'),
 									'value' => isset($user['app_settings']['annualvacation']) ? str_replace(';', "\n", $user['app_settings']['annualvacation']) : ''
 								],
-								'hint' => LANG::GET('user.settings_annual_vacation_hint')
+								'hint' => $this->_lang->GET('user.settings_annual_vacation_hint')
 							]
 						]
 					],
@@ -960,20 +960,20 @@ class USER extends API {
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_token')
+								'name' => $this->_lang->GET('user.edit_token')
 							],
 							'content' => [
-								LANG::GET('user.edit_token_renew') => []
+								$this->_lang->GET('user.edit_token_renew') => []
 							]
 						],
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
-								'value' => LANG::GET('user.edit_delete_button'),
+								'value' => $this->_lang->GET('user.edit_delete_button'),
 								'type' => 'button', // apparently defaults to submit otherwise
-								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". LANG::GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', options:{".
-									"'".LANG::GET('user.edit_delete_confirm_cancel')."': false,".
-									"'".LANG::GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". $this->_lang->GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', options:{".
+									"'".$this->_lang->GET('user.edit_delete_confirm_cancel')."': false,".
+									"'".$this->_lang->GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',
 								'disabled' => $user['id'] < 2
 							]
@@ -989,7 +989,7 @@ class USER extends API {
 							[
 								[
 									'type' => 'image',
-									'description' => LANG::GET('user.edit_export_user_image'),
+									'description' => $this->_lang->GET('user.edit_export_user_image'),
 									'attributes' => [
 										'name' => $user['name'] . '_pic',
 										'url' => $user['image']
@@ -1001,7 +1001,7 @@ class USER extends API {
 						$result['render']['content'][2][1][] = [
 							'type' => 'checkbox',
 							'content' => [
-								LANG::GET('user.edit_reset_photo') => []
+								$this->_lang->GET('user.edit_reset_photo') => []
 							]
 						];
 					}
@@ -1011,7 +1011,7 @@ class USER extends API {
 							[
 								'type' => 'text',
 								'attributes' => [
-									'name' => LANG::GET('user.edit_order_authorization_current'),
+									'name' => $this->_lang->GET('user.edit_order_authorization_current'),
 									'value' => $user['orderauth'],
 									'readonly' => true
 								]
@@ -1024,7 +1024,7 @@ class USER extends API {
 						[
 							[
 								'type' => 'image',
-								'description' => LANG::GET('user.edit_export_qr_token'),
+								'description' => $this->_lang->GET('user.edit_export_qr_token'),
 								'attributes' => [
 								'name' => $user['name'] . '_token',
 								'qrcode' => $user['token']]
@@ -1062,13 +1062,13 @@ class USER extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'msg' => LANG::GET('user.edit_user_deleted', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.edit_user_deleted', [':name' => $user['name']]),
 						'id' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => LANG::GET('user.edit_user_not_deleted', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.edit_user_not_deleted', [':name' => $user['name']]),
 						'id' => $user['id'],
 						'type' => 'error'
 					]]);

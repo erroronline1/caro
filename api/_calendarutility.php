@@ -40,6 +40,11 @@ class CALENDARUTILITY {
 	public $_days = [];
 
 	/**
+	 * make languagemodel LANG class and its methods available
+	 */
+	public $_lang = [];
+
+	/**
 	 * ini settings avoiding repetitive calls
 	 */
 	private $_holidays = [];
@@ -48,6 +53,8 @@ class CALENDARUTILITY {
 
 	public function __construct($pdo){
 		$this->_pdo = $pdo;
+		$this->_lang = new LANG();
+
 		$this->_holidays = preg_split('/[^\d-]+/', CONFIG['calendar']['holidays']);
 		$this->_easter_holidays = CONFIG['calendar']['easter_holidays'];
 		$this->_workdays = preg_split('/[^\d-]+/', CONFIG['calendar']['workdays']);
@@ -202,7 +209,7 @@ class CALENDARUTILITY {
 
 		// prepare lists and datetime types for modification 
 		$units = [];
-		foreach(LANGUAGEFILE['units'] as $unit => $description){
+		foreach($this->_lang->_USER['units'] as $unit => $description){
 			$units[$description] = (in_array($unit, explode(',', $columns[':organizational_unit'])) || (!$columns[':organizational_unit'] && isset($_SESSION['user']['app_settings']['primaryUnit']) && $unit === $_SESSION['user']['app_settings']['primaryUnit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
 
@@ -221,7 +228,7 @@ class CALENDARUTILITY {
 		}
 
 		$alert = $span_start = $span_end = null; 
-		$alert = [LANG::GET('calendar.event_alert') => $columns[':alert'] ? ['checked' => true] : []];
+		$alert = [$this->_lang->GET('calendar.event_alert') => $columns[':alert'] ? ['checked' => true] : []];
 		
 		if ($columns[':span_start']) $span_start = new DateTime($columns[':span_start'], new DateTimeZone(CONFIG['application']['timezone']));
 		else $span_start = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
@@ -237,7 +244,7 @@ class CALENDARUTILITY {
 					[
 						'type' => 'scanner',
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_content'),
+							'name' => $this->_lang->GET('calendar.event_content'),
 							'value' => $columns[':subject'],
 							'required' => true
 						]
@@ -245,7 +252,7 @@ class CALENDARUTILITY {
 					[
 						'type' => 'date',
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_date'),
+							'name' => $this->_lang->GET('calendar.event_date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
@@ -253,7 +260,7 @@ class CALENDARUTILITY {
 					[
 						'type' => 'date',
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_due'),
+							'name' => $this->_lang->GET('calendar.event_due'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
@@ -261,29 +268,29 @@ class CALENDARUTILITY {
 					[
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_organizational_unit')
+							'name' => $this->_lang->GET('calendar.event_organizational_unit')
 						],
 						'content' => $units,
-						'hint' => LANG::GET('calendar.event_organizational_unit_hint')
+						'hint' => $this->_lang->GET('calendar.event_organizational_unit_hint')
 					],
 					[
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_affected_user')
+							'name' => $this->_lang->GET('calendar.event_affected_user')
 						]
 					],
 					[
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_alert_description')
+							'name' => $this->_lang->GET('calendar.event_alert_description')
 						],
 						'content' => $alert
 					],
 					[
 						'type' => 'hidden',
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_type'),
+							'name' => $this->_lang->GET('calendar.event_type'),
 							'value' => $columns[':type']
 						]
 					],
@@ -306,7 +313,7 @@ class CALENDARUTILITY {
 				$misc = $columns[':misc'] ? json_decode($columns[':misc'], true) : [];
 				
 				$ptoselect = [];
-				foreach(LANGUAGEFILE['calendar']['timesheet_pto'] as $subject => $reason){
+				foreach($this->_lang->_USER['calendar']['timesheet_pto'] as $subject => $reason){
 					$ptoselect[$reason] = ['value' => $subject];
 					if ($columns[':subject'] === $subject) $ptoselect[$reason]['selected'] = true;
 				}
@@ -318,7 +325,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_affected_user'),
+							'name' => $this->_lang->GET('calendar.event_affected_user'),
 							'required' => true
 						]
 					];
@@ -327,7 +334,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'content' => $affected_unit_users,
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_affected_user'),
+							'name' => $this->_lang->GET('calendar.event_affected_user'),
 							'required' => true
 						]
 					];
@@ -335,71 +342,71 @@ class CALENDARUTILITY {
 					$inputs[] = [
 						'type' => 'hidden',
 						'attributes' => [
-							'name' => LANG::GET('calendar.event_affected_user'),
+							'name' => $this->_lang->GET('calendar.event_affected_user'),
 							'value' => $columns[':affected_user_id']
 						]
 					];
 				}
 				// name => required bool
 				$setFieldVisibility = [
-					LANG::GET('calendar.timesheet_start_time') => true,
-					LANG::GET('calendar.timesheet_end_time') => true,
-					LANG::GET('calendar.timesheet_break_time') => true,
-					LANG::GET('calendar.timesheet_homeoffice') => true
+					$this->_lang->GET('calendar.timesheet_start_time') => true,
+					$this->_lang->GET('calendar.timesheet_end_time') => true,
+					$this->_lang->GET('calendar.timesheet_break_time') => true,
+					$this->_lang->GET('calendar.timesheet_homeoffice') => true
 				];
 				array_push($inputs, ...[
 					[
 						'type' => 'select',
 						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_pto_exemption'),
+							'name' => $this->_lang->GET('calendar.timesheet_pto_exemption'),
 							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === 'regular')"
 						],
 						'content' => $ptoselect
 					],[
 						'type' => 'date',
 						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_start_date'),
+							'name' => $this->_lang->GET('calendar.timesheet_start_date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
 					],[
 						'type' => 'time',
 						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_start_time'),
+							'name' => $this->_lang->GET('calendar.timesheet_start_time'),
 							'value' => $span_start->format('H:i'),
 							'required' => true
 						]
 					],[
 						'type' => 'date',
 						'attributes' => [
-							'name' => LANG::GET('calendar.timesheet_end_date'),
+							'name' => $this->_lang->GET('calendar.timesheet_end_date'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
 						],[
 							'type' => 'time',
 							'attributes' => [
-								'name' => LANG::GET('calendar.timesheet_end_time'),
+								'name' => $this->_lang->GET('calendar.timesheet_end_time'),
 								'value' => $span_end->format('H:i'),
 								'required' => true
 							]
 						],[
 							'type' => 'time',
 							'attributes' => [
-								'name' => LANG::GET('calendar.timesheet_break_time'),
+								'name' => $this->_lang->GET('calendar.timesheet_break_time'),
 								'value' => isset($misc['break']) ? $misc['break'] : '',
 								'required' => true
 							]
 						],[
 							'type' => 'text',
 							'attributes' => [
-								'name' => LANG::GET('calendar.timesheet_pto_note'),
+								'name' => $this->_lang->GET('calendar.timesheet_pto_note'),
 								'value' => isset($misc['note']) ? $misc['note'] : '',
 							]
 						],[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => LANG::GET('calendar.event_alert_description')
+								'name' => $this->_lang->GET('calendar.event_alert_description')
 							],
 							'content' => $alert
 						],[
@@ -415,7 +422,7 @@ class CALENDARUTILITY {
 						[
 							'type' => 'time',
 							'attributes' => [
-								'name' => LANG::GET('calendar.timesheet_homeoffice'),
+								'name' => $this->_lang->GET('calendar.timesheet_homeoffice'),
 								'value' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
 								'required' => true
 							]
@@ -424,7 +431,7 @@ class CALENDARUTILITY {
 				break;
 		}
 
-		return "new Dialog({type:'input', header: '', render: " . json_encode($inputs) . ", options:{'" . LANG::GET('calendar.event_cancel') . "': false, '" . LANG::GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
+		return "new Dialog({type:'input', header: '', render: " . json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.event_cancel') . "': false, '" . $this->_lang->GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
 			".then(response => {if (response) {_client.calendar.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
 	}
 	
@@ -616,14 +623,14 @@ class CALENDARUTILITY {
 				}
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
-					'display' => LANGUAGEFILE['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
+					'display' => $this->_lang->_USER['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
 					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
 					'selected' => $date === $day->format('Y-m-d'),
 					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
 				];
 				if ($result['header']) continue;
-				if ($format === 'week') $result['header'] = LANG::GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
-				if ($format === 'month') $result['header'] = LANGUAGEFILE['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
+				if ($format === 'week') $result['header'] = $this->_lang->GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
+				if ($format === 'month') $result['header'] = $this->_lang->_USER['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
 			}
 		}
 		return $result;

@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
- require_once('./_calendarutility.php');
+require_once('./_calendarutility.php');
 
 // handle all notification within one call
 class NOTIFICATION extends API {
@@ -75,7 +75,7 @@ class NOTIFICATION extends API {
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
-			$reminders = $calendar->search(LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
+			$reminders = $calendar->search($this->_lang->GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
 			$open = false;
 			foreach($reminders as $reminder){
 				if (!$reminder['closed']) $open = true;
@@ -88,7 +88,7 @@ class NOTIFICATION extends API {
 					':author_id' => 1,
 					':affected_user_id' => 1,
 					':organizational_unit' => 'admin,office',
-					':subject' => LANG::GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
+					':subject' => $this->_lang->GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
 					':misc' => '',
 					':closed' => '',
 					':alert' => 1
@@ -109,10 +109,10 @@ class NOTIFICATION extends API {
 			if (intval(abs($trainingdate->diff($this->_currentdate)->days)) > CONFIG['lifespan']['training_evaluation']){
 				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) {// no deleted users
 					// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
-					$subject = LANG::GET('audit.userskills_notification_message', [
+					$subject = $this->_lang->GET('audit.userskills_notification_message', [
 						':user' => $users[$user]['name'],
 						':training' => $training['name'],
-						':module' => LANG::GET('menu.audit'),
+						':module' => $this->_lang->GET('menu.audit'),
 						':date' => $training['date']
 					], true);
 					$reminders = $calendar->search($subject);
@@ -147,7 +147,7 @@ class NOTIFICATION extends API {
 		}
 		foreach ($units as $unit => $num){
 			if ($num > CONFIG['limits']['order_approved_archived']) {
-				$subject = LANG::GET('order.alert_achived_limit', [
+				$subject = $this->_lang->GET('order.alert_achived_limit', [
 					':max' => CONFIG['limits']['order_approved_archived']
 				], true);
 				$reminders = $calendar->search($subject);
@@ -174,7 +174,7 @@ class NOTIFICATION extends API {
 
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], LANG::GET('calendar.event_alert_message', [':content' => (isset(LANGUAGEFILE['calendar']['timesheet_pto'][$event['subject']]) ? LANG::GET('calendar.timesheet_pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], $this->_lang->GET('calendar.event_alert_message', [':content' => (isset($this->_lang->_USER['calendar']['timesheet_pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet_pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
 		}
 
 		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
@@ -317,9 +317,9 @@ class NOTIFICATION extends API {
 					$decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['permission' => ['purchase']],
-						LANG::GET('order.alert_unreceived_order', [
+						$this->_lang->GET('order.alert_unreceived_order', [
 							':days' => $ordered->diff($this->_currentdate)->days,
-							':ordertype' => LANG::GET('order.ordertype.' . $order['ordertype'], [], true),
+							':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
 							':number' => isset($decoded_order_data['ordernumber_label']) ? $decoded_order_data['ordernumber_label'] : '',
@@ -338,9 +338,9 @@ class NOTIFICATION extends API {
 					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['unit' => [$order['organizational_unit']]],
-						LANG::GET('order.alert_undelivered_order', [
+						$this->_lang->GET('order.alert_undelivered_order', [
 							':days' => $received->diff($this->_currentdate)->days,
-							':ordertype' => '<a href="javascript:void(0);" onpointerup="api.purchase(\'get\', \'approved\')"> ' . LANG::GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
+							':ordertype' => '<a href="javascript:void(0);" onpointerup="api.purchase(\'get\', \'approved\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
 							':number' => isset($decoded_order_data['ordernumber_label']) ? $decoded_order_data['ordernumber_label'] : '',
@@ -420,11 +420,11 @@ class NOTIFICATION extends API {
 				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered document
-					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => LANG::GET('record.record_retype_pseudodocument_name', [], true)];
+					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.record_retype_pseudodocument_name', [], true)];
 
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
-						LANG::GET('record.record_reminder_message', [
+						$this->_lang->GET('record.record_reminder_message', [
 							':days' => $last->diff($this->_currentdate)->days,
 							':date' => substr($row['last_touch'], 0, -3),
 							':document' => $lastdocument['name'],			

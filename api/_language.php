@@ -17,12 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-$language = CONFIG['application']['defaultlanguage'];
-if (isset($_SESSION['user']) && isset($_SESSION['user']['app_settings']['language'])) $language = $_SESSION['user']['app_settings']['language'];
-$file = file_exists('language.' . $language) ? 'language.' . $language : 'language.' . CONFIG['application']['defaultlanguage'];
-
-define ('LANGUAGEFILE', parse_ini_file($file, true));
-
 class LANG {
 	/*
 	language files have a context level and their chunks
@@ -31,37 +25,66 @@ class LANG {
 	*/
 
 	/**
+	 * contains the preloaded language file as a named array
+	 */
+	public $_DEFAULT = [];
+	public $_USER = [];
+
+	/**
+	 * initalize languagefiles 
+	 */
+	public function __construct(){
+		$file = file_get_contents('./language.' . CONFIG['application']['defaultlanguage'] . '.json');
+		$this->_DEFAULT = json_decode($file, true);
+		
+		if (isset($_SESSION['user']) && isset($_SESSION['user']['app_settings']['language'])){
+			$language = $_SESSION['user']['app_settings']['language'];
+			if ($file = file_get_contents('./language.' . $language . '.json'))	$this->_USER = json_decode($file, true);
+			else $this->_USER = $this->_DEFAULT;
+		}
+		else $this->_USER = $this->_DEFAULT;
+	}
+
+	/**
 	 * returns a language specific chunk
 	 * @param str $request dot separated keys of LANGUAGEFILE
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
 	 * @param str $forceDefault override user setting, especially on logout, otherwise first login attempts may fail
 	 * @return str textchunk with replacements
 	 */
-	public static function GET($request, $replace = [], $forceDefault = false){
+	public function GET($request, $replace = [], $forceDefault = false){
 		$request = explode('.', $request);
-		$languagefile = !$forceDefault ? LANGUAGEFILE : parse_ini_file('language.' . CONFIG['application']['defaultlanguage'], true); 
+		$languagefile = !$forceDefault ? $this->_USER : $this->_DEFAULT; 
 
-		if (!isset($languagefile[$request[0]]) ||
-			!isset($languagefile[$request[0]][$request[1]]) ||
-			(isset($request[2]) && !isset($languagefile[$request[0]][$request[1]][$request[2]]))){
-			return 'undefined language';
+		if ($chunk = self::find($request[0], $request, $languagefile)) {
+			$patterns = [];
+			$replacements = [];
+			foreach($replace as $pattern => $replacement){
+				$patterns[] = '/' . $pattern . '/';
+				$replacements[] = $replacement;
+			}
+			return preg_replace($patterns, $replacements, $chunk);
 		}
-		$patterns = [];
-		$replacements = [];
-		foreach($replace as $pattern => $replacement){
-			$patterns[] = '/' . $pattern . '/';
-			$replacements[] = $replacement;
+		return 'undefined language';
+	}
+	// recursively find the language chunk independent of nesting depth
+	private static function find($key, $chain, $lang){
+		if (isset($lang[$key])){
+			if (gettype($lang[$key]) === 'array') {
+				$index = array_search($key, $chain) + 1;
+				if (!isset($chain[$index])) return false;
+				return self::find($chain[$index], $chain, $lang[$key]);
+			}
+			else return $lang[$key];
 		}
-		if (isset($request[2])) return preg_replace($patterns, $replacements, $languagefile[$request[0]][$request[1]][$request[2]]);
-		return preg_replace($patterns, $replacements, $languagefile[$request[0]][$request[1]]);
 	}
 
 	/**
 	 * returns slightly reduced languagefile as transfer for js frontend
 	 * @return object
 	 */
-	public static function GETALL(){
-		$return = LANGUAGEFILE;
+	public function GETALL(){
+		$return = $this->_USER;
 		foreach(['skills', 'documentcontext', 'risk', 'regulatory'] as $unset) {
 			unset($return[$unset]);
 		}
@@ -70,12 +93,12 @@ class LANG {
 	
 	/**
 	 * returns a language specific chunk with whitespaces and periods replaced with underscore as in request parameters
-	 * @param str $request dot separated keys of LANGUAGEFILE
+	 * @param str $request dot separated keys of languagefile
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
-	 * @return str textchunk with replacements with whitespaces replaced with underscore as in request parameters
+	 * @return str textchunk with replacements and whitespaces replaced with underscore as in request parameters
 	 */
-	public static function PROPERTY($request, $replace=[]){
-		return preg_replace('/[\s\.]/', '_', self::GET($request, $replace));
+	public function PROPERTY($request, $replace = []){
+		return preg_replace('/[\s\.]/', '_', $this->GET($request, $replace));
 	}
 }
 ?>

@@ -53,13 +53,13 @@ export const assemble_helper = {
 		const menu = document.querySelector("nav"),
 			elements = [],
 			icons = {};
-		icons[LANG.GET("menu.application_header")] = "url('./media/bars.svg')";
-		icons[LANG.GET("menu.communication_header")] = "url('./media/comment.svg')";
-		icons[LANG.GET("menu.record_header")] = "url('./media/file-signature.svg')";
-		icons[LANG.GET("menu.calendar_header")] = "url('./media/calendar-alt.svg')";
-		icons[LANG.GET("menu.purchase_header")] = "url('./media/shopping-bag.svg')";
-		icons[LANG.GET("menu.files_header")] = "url('./media/folders.svg')";
-		icons[LANG.GET("menu.tools_header")] = "url('./media/tools.svg')";
+		icons[api._lang.GET("menu.application_header")] = "url('./media/bars.svg')";
+		icons[api._lang.GET("menu.communication_header")] = "url('./media/comment.svg')";
+		icons[api._lang.GET("menu.record_header")] = "url('./media/file-signature.svg')";
+		icons[api._lang.GET("menu.calendar_header")] = "url('./media/calendar-alt.svg')";
+		icons[api._lang.GET("menu.purchase_header")] = "url('./media/shopping-bag.svg')";
+		icons[api._lang.GET("menu.files_header")] = "url('./media/folders.svg')";
+		icons[api._lang.GET("menu.tools_header")] = "url('./media/tools.svg')";
 
 		let label, div, input, div2, button, span;
 		for (const [group, items] of Object.entries(content)) {
@@ -225,7 +225,7 @@ export class Dialog {
 					scanner.button.removeAttribute("disabled");
 					scanner.scanner.html5Qrcode.stop();
 					scanner.canvas.style.border = "none";
-					scanner.canvas.replaceChildren(document.createTextNode(LANG.GET("general.scan_successful")));
+					scanner.canvas.replaceChildren(document.createTextNode(api._lang.GET("general.scan_successful")));
 				}
 				scanner.scanner.render(scanSuccess);
 			}
@@ -287,7 +287,7 @@ export class Dialog {
 	alert() {
 		const button = document.createElement("button");
 		button.value = true;
-		button.append(document.createTextNode(LANG.GET("general.ok_button")));
+		button.append(document.createTextNode(api._lang.GET("general.ok_button")));
 		return [button];
 	}
 	confirm() {
@@ -321,7 +321,7 @@ export class Dialog {
 		div.id = getNextElementID();
 		input.type = "hidden";
 		input.name = "scanner";
-		button.append(document.createTextNode(LANG.GET("general.import_scan_result_button_from_modal")));
+		button.append(document.createTextNode(api._lang.GET("general.import_scan_result_button_from_modal")));
 		button.classList.add("confirmButton");
 		button.disabled = true;
 		button.value = true;
@@ -442,7 +442,7 @@ export class Assemble {
 				{
 					type: "submitbutton",
 					attributes: {
-						value: LANG.GET("general.submit_button"),
+						value: api._lang.GET("general.submit_button"),
 						type: "submit",
 					},
 				},
@@ -590,7 +590,7 @@ export class Assemble {
 					content: JSON.stringify(elements, null, " "),
 					attributes: {
 						class: "red",
-						name: LANG.GET("assemble.error_faulty_widget"),
+						name: api._lang.GET("assemble.error_faulty_widget"),
 					},
 				};
 				content = content.concat(this.textsection());
@@ -737,12 +737,12 @@ export class Assemble {
 				return;
 			}
 			const options = {};
-			options[LANG.GET("assemble.compose_document_cancel")] = false;
-			options[LANG.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({ type: "confirm", header: LANG.GET("assemble.compose_document"), options: options }).then((confirmation) => {
+			options[api._lang.GET("assemble.compose_document_cancel")] = false;
+			options[api._lang.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose_document"), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
-		} else new Toast(LANG.GET("general.missing_form_data"), "error");
+		} else new Toast(api._lang.GET("general.missing_form_data"), "error");
 	}
 
 	/**
@@ -1151,8 +1151,8 @@ export class Assemble {
 							.map((x) => x.name)
 							.join(", ") +
 					  " " +
-					  LANG.GET("assemble.files_rechoose")
-					: LANG.GET("assemble.files_choose");
+					  api._lang.GET("assemble.files_rechoose")
+					: api._lang.GET("assemble.files_choose");
 			};
 		else
 			input.onchange = function () {
@@ -1161,8 +1161,8 @@ export class Assemble {
 							.map((x) => x.name)
 							.join(", ") +
 					  " " +
-					  LANG.GET("assemble.file_rechoose")
-					: LANG.GET("assemble.file_choose");
+					  api._lang.GET("assemble.file_rechoose")
+					: api._lang.GET("assemble.file_choose");
 			};
 		label.onpointerup = () => {
 			document.getElementById(input.id).click();
@@ -1170,7 +1170,7 @@ export class Assemble {
 		label.type = "button";
 		label.dataset.type = "file";
 		label.classList.add("inlinebutton");
-		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? LANG.GET("assemble.files_choose") : LANG.GET("assemble.file_choose")));
+		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? api._lang.GET("assemble.files_choose") : api._lang.GET("assemble.file_choose")));
 		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 
 		button.onpointerup = () => {
@@ -1355,8 +1355,8 @@ export class Assemble {
 			let currentElement = this.currentElement;
 			input.onpointerup = function () {
 				const options = {};
-				options[LANG.GET("assemble.compose_document_cancel")] = false;
-				options[LANG.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
+				options[api._lang.GET("assemble.compose_document_cancel")] = false;
+				options[api._lang.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
 				new Dialog({
 					type: "input",
 					header: currentElement.attributes.name.replace(/\[\]/g, ""),
@@ -1568,8 +1568,8 @@ export class Assemble {
 						.map((x) => x.name)
 						.join(", ") +
 				  " " +
-				  LANG.GET("assemble.photo_rechoose")
-				: LANG.GET("assemble.photo_choose");
+				  api._lang.GET("assemble.photo_rechoose")
+				: api._lang.GET("assemble.photo_choose");
 			if (this.files.length) {
 				this.nextSibling.src = URL.createObjectURL(this.files[0]);
 				this.nextSibling.onload = () => {
@@ -1590,7 +1590,7 @@ export class Assemble {
 		button.type = "button";
 		button.dataset.type = "photo";
 		button.classList.add("inlinebutton");
-		button.appendChild(document.createTextNode(LANG.GET("assemble.photo_choose")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.photo_choose")));
 
 		img.classList.add("photoupload");
 
@@ -1599,7 +1599,7 @@ export class Assemble {
 			e.value = "";
 			e.dispatchEvent(new Event("change"));
 		};
-		resetbutton.appendChild(document.createTextNode(LANG.GET("assemble.reset")));
+		resetbutton.appendChild(document.createTextNode(api._lang.GET("assemble.reset")));
 		resetbutton.dataset.type = "reset";
 		resetbutton.classList.add("inlinebutton");
 		resetbutton.type = "button";
@@ -1668,11 +1668,11 @@ export class Assemble {
 		button.dataset.type = "search";
 		button.onpointerup = function () {
 			const options = {};
-			options[LANG.GET("assemble.compose_document_cancel")] = false;
-			options[LANG.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
+			options[api._lang.GET("assemble.compose_document_cancel")] = false;
+			options[api._lang.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
 			new Dialog({
 				type: "input",
-				header: LANG.GET("consumables.edit_product_search"),
+				header: api._lang.GET("consumables.edit_product_search"),
 				render: [
 					[
 						{
@@ -1682,7 +1682,7 @@ export class Assemble {
 						{
 							type: "search",
 							attributes: {
-								name: LANG.GET("consumables.edit_product_search"),
+								name: api._lang.GET("consumables.edit_product_search"),
 								onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;}",
 								onblur: "api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;",
 								id: "productsearch",
@@ -1770,7 +1770,7 @@ export class Assemble {
 			multiple = true;
 			// delete for input apply_attributes
 			delete this.currentElement.attributes.multiple;
-			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + LANG.GET("assemble.scan_multiple") : LANG.GET("assemble.scan_multiple");
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.scan_multiple") : api._lang.GET("assemble.scan_multiple");
 		}
 
 		if (this.currentElement.destination !== undefined) {
@@ -1815,7 +1815,7 @@ export class Assemble {
 		if (multiple) this.currentElement.attributes.multiple = true;
 
 		let button = document.createElement("button");
-		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.scan_button")));
+		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.scan_button")));
 		button.type = "button";
 		button.dataset.type = "scanner";
 
@@ -1841,7 +1841,7 @@ export class Assemble {
 
 		if (originaltype === "identify") {
 			let button = document.createElement("button");
-			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : LANG.GET("assemble.compose_merge")));
+			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.compose_merge")));
 			button.type = "button";
 			button.dataset.type = "merge";
 			button.onpointerup = function () {
@@ -1851,7 +1851,7 @@ export class Assemble {
 
 			for (const [label, setting] of Object.entries(api._settings.config.label)) {
 				button = document.createElement("button");
-				button.appendChild(document.createTextNode(LANG.GET("record.create_identifier_type", { ":format": setting.format })));
+				button.appendChild(document.createTextNode(api._lang.GET("record.create_identifier_type", { ":format": setting.format })));
 				button.type = "button";
 				button.onpointerup = function () {
 					if (document.getElementById(inputid).value) _client.application.postLabelSheet(document.getElementById(inputid).value, true, { _type: label });
@@ -1899,7 +1899,7 @@ export class Assemble {
 			multiple = true;
 			delete this.currentElement.attributes.multiple;
 			selectElementClone = structuredClone(this.currentElement);
-			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + LANG.GET("assemble.select_multiple") : LANG.GET("assemble.select_multiple");
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.select_multiple") : api._lang.GET("assemble.select_multiple");
 		}
 		hint = this.hint();
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
@@ -1997,7 +1997,7 @@ export class Assemble {
 		input.hidden = true;
 		result.push(input);
 		this.currentElement.attributes = {
-			value: LANG.GET("assemble.clear_signature"),
+			value: api._lang.GET("assemble.clear_signature"),
 			type: "button",
 			onpointerup: "signaturePad.clear()",
 		};
@@ -2066,7 +2066,7 @@ export class Assemble {
 		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			this.currentElement.attributes = {
-				value: LANG.GET("menu.texttemplate_texts"),
+				value: api._lang.GET("menu.texttemplate_texts"),
 				type: "button",
 				onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')",
 				class: "floatright",

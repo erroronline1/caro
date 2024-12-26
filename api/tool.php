@@ -108,15 +108,15 @@ class TOOL extends API {
 				[
 					'type' => 'text',
 					'attributes' => [
-						'name' => LANG::GET('tool.calculator_pow_parts'),
-						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_parts')) ? : ''
+						'name' => $this->_lang->GET('tool.calculator_pow_parts'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_pow_parts')) ? : ''
 					],
-					'hint' => LANG::GET('tool.calculator_pow_hint')
+					'hint' => $this->_lang->GET('tool.calculator_pow_hint')
 				], [
 					'type' => 'text',
 					'attributes' => [
-						'name' => LANG::GET('tool.calculator_pow_weight'),
-						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_weight')) ? : ''
+						'name' => $this->_lang->GET('tool.calculator_pow_weight'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_pow_weight')) ? : ''
 					]
 				]
 			],
@@ -124,15 +124,15 @@ class TOOL extends API {
 				[
 					'type' => 'text',
 					'attributes' => [
-						'name' => LANG::GET('tool.calculator_poa_parts'),
-						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_parts')) ? : ''
+						'name' => $this->_lang->GET('tool.calculator_poa_parts'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_poa_parts')) ? : ''
 					],
-					'hint' => LANG::GET('tool.calculator_poa_hint')
+					'hint' => $this->_lang->GET('tool.calculator_poa_hint')
 				], [
 					'type' => 'number',
 					'attributes' => [
-						'name' => LANG::GET('tool.calculator_poa_target'),
-						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_target')) ? : ''
+						'name' => $this->_lang->GET('tool.calculator_poa_target'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_poa_target')) ? : ''
 					]
 				]
 			],
@@ -140,15 +140,15 @@ class TOOL extends API {
 				[
 					'type' => 'text',
 					'attributes' => [
-						'name' => LANG::GET('tool.calculator_cd_diameter'),
-						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_diameter')) ? : ''
+						'name' => $this->_lang->GET('tool.calculator_cd_diameter'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_cd_diameter')) ? : ''
 					],
-					'hint' => LANG::GET('tool.calculator_cd_hint')
+					'hint' => $this->_lang->GET('tool.calculator_cd_hint')
 				], [
 					'type' => 'number',
 					'attributes' => [
-						'name' => LANG::GET('tool.calculator_cd_bores'),
-						'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_bores')) ? : ''
+						'name' => $this->_lang->GET('tool.calculator_cd_bores'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_cd_bores')) ? : ''
 					]
 				]
 			],
@@ -163,13 +163,13 @@ class TOOL extends API {
 				[
 					'type' => 'select',
 					'attributes' => [
-						'name' => LANG::GET('tool.calculator_select_type'),
+						'name' => $this->_lang->GET('tool.calculator_select_type'),
 						'onchange' => "api.tool('get', 'calculator', this.value)"
 					],
 					'content' => [
-						LANG::GET('tool.calculator_pow') => $this->_requestedType === 'pow' ? ['value' => 'pow', 'selected' => true] : ['value' => 'pow'],
-						LANG::GET('tool.calculator_poa') => $this->_requestedType === 'poa' ? ['value' => 'poa', 'selected' => true] : ['value' => 'poa'],
-						LANG::GET('tool.calculator_cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
+						$this->_lang->GET('tool.calculator_pow') => $this->_requestedType === 'pow' ? ['value' => 'pow', 'selected' => true] : ['value' => 'pow'],
+						$this->_lang->GET('tool.calculator_poa') => $this->_requestedType === 'poa' ? ['value' => 'poa', 'selected' => true] : ['value' => 'poa'],
+						$this->_lang->GET('tool.calculator_cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
 					]
 				],
 				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
@@ -181,20 +181,20 @@ class TOOL extends API {
 				$calculation = '';
 				switch($this->_requestedType){
 					case 'pow':
-						$calculation = parts_of_weight(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_parts')), UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_pow_weight')));
+						$calculation = parts_of_weight(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_pow_parts')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_pow_weight')));
 						break;
 					case 'poa':
-						$calculation = parts_of_attribute(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_parts')), UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_poa_target')));
+						$calculation = parts_of_attribute(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_poa_parts')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_poa_target')));
 						break;
 					case 'cd':
-						$calculation = circular_distance(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_diameter')), UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.calculator_cd_bores')));
+						$calculation = circular_distance(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_cd_diameter')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator_cd_bores')));
 						break;
 				}
 				$result['render']['content'][] = [
 					[
 						'type' => 'text',
 						'attributes' => [
-							'name' => LANG::GET('tool.calculator_result'),
+							'name' => $this->_lang->GET('tool.calculator_result'),
 							'value' => $calculation,
 							'readonly' => true
 						]
@@ -214,93 +214,93 @@ class TOOL extends API {
 	 */
 	public function code(){
 		$types = [
-			'qrcode_text' => ['name' => LANG::GET('tool.qrcode_text'),
+			'qrcode_text' => ['name' => $this->_lang->GET('tool.qrcode_text'),
 				'content'=> [
 					[
 						'type' => 'textarea',
 						'attributes' => [
-							'name' => LANG::GET('tool.qrcode_text'),
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_text')) ? : ''
+							'name' => $this->_lang->GET('tool.qrcode_text'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_text')) ? : ''
 						]
 					]
 				],
-				'code' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_text')) ? : ''],
-			'qrcode_appointment' => ['name' => LANG::GET('tool.qrcode_appointment'),
+				'code' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_text')) ? : ''],
+			'qrcode_appointment' => ['name' => $this->_lang->GET('tool.qrcode_appointment'),
 				'content'=> [
 					[
 						'type' => 'date',
 						'attributes' => [
-							'name' => LANG::GET('tool.qrcode_appointment_date'),
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_date')) ? : ''
+							'name' => $this->_lang->GET('tool.qrcode_appointment_date'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_date')) ? : ''
 						]
 					],
 					[
 						'type' => 'time',
 						'attributes' => [
-							'name' => LANG::GET('tool.qrcode_appointment_time'),
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_time')) ? : ''
+							'name' => $this->_lang->GET('tool.qrcode_appointment_time'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_time')) ? : ''
 						]
 					],
 					[
 						'type' => 'text',
-						'hint' => LANG::GET('tool.qrcode_appointment_occasion_hint'),
+						'hint' => $this->_lang->GET('tool.qrcode_appointment_occasion_hint'),
 						'attributes' => [
-							'name' => LANG::GET('tool.qrcode_appointment_occasion'),
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_occasion')) ? : ''
+							'name' => $this->_lang->GET('tool.qrcode_appointment_occasion'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_occasion')) ? : ''
 						]
 					],
 					[
 						'type' => 'text',
-						'hint' => LANG::GET('tool.qrcode_appointment_reminder_hint'),
+						'hint' => $this->_lang->GET('tool.qrcode_appointment_reminder_hint'),
 						'attributes' => [
-							'name' => LANG::GET('tool.qrcode_appointment_reminder'),
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_reminder')) ? : ''
+							'name' => $this->_lang->GET('tool.qrcode_appointment_reminder'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_reminder')) ? : ''
 						]
 					],
 					[
 						'type' => 'number',
 						'attributes' => [
-							'name' => LANG::GET('tool.qrcode_appointment_duration'),
+							'name' => $this->_lang->GET('tool.qrcode_appointment_duration'),
 							'min' => 1,
 							'max' => 200,
 							'step' => 1,
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_duration')) ? : 1
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_duration')) ? : 1
 						]
 					],
 				],
 				'code' =>
 					"BEGIN:VEVENT\n" .
-					"SUMMARY:" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_occasion')) . "\n" .
-					"LOCATION:" . LANG::GET('company.address') . "\n" .
-					"DESCRIPTION:" . (UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_reminder')) ? : UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_occasion'))) . "\n" .
-					"DTSTART:" . str_replace('-', '', UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_date'))) . 'T' . str_replace(':', '', UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_time'))) . "00\n" .
-					"DTEND:" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.qrcode_appointment_duration')))*3600) . "\n" .
+					"SUMMARY:" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_occasion')) . "\n" .
+					"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
+					"DESCRIPTION:" . (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_reminder')) ? : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_occasion'))) . "\n" .
+					"DTSTART:" . str_replace('-', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_date'))) . 'T' . str_replace(':', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_time'))) . "00\n" .
+					"DTEND:" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.qrcode_appointment_duration')))*3600) . "\n" .
 					"END:VEVENT"
 			],
-			'barcode_code128' => ['name' => LANG::GET('tool.barcode_code128'),
+			'barcode_code128' => ['name' => $this->_lang->GET('tool.barcode_code128'),
 				'content'=> [
 					[
 						'type' => 'text',
-						'hint' => LANG::GET('tool.barcode_code128_hint'),
+						'hint' => $this->_lang->GET('tool.barcode_code128_hint'),
 						'attributes' => [
-							'name' => LANG::GET('tool.barcode_description'),
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.barcode_description')) ? : ''
+							'name' => $this->_lang->GET('tool.barcode_description'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.barcode_description')) ? : ''
 						]
 					],
 				],
-				'code' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.barcode_description')) ? : ''],
-			'barcode_ean13' => ['name' => LANG::GET('tool.barcode_ean13'),
+				'code' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.barcode_description')) ? : ''],
+			'barcode_ean13' => ['name' => $this->_lang->GET('tool.barcode_ean13'),
 				'content'=> [
 					[
 						'type' => 'number',
-						'hint' => LANG::GET('tool.barcode_ean13_hint'),
+						'hint' => $this->_lang->GET('tool.barcode_ean13_hint'),
 						'attributes' => [
-							'name' => LANG::GET('tool.barcode_description'),
-							'value' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.barcode_description')) ? : ''
+							'name' => $this->_lang->GET('tool.barcode_description'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.barcode_description')) ? : ''
 						]
 					],
 				],
-				'code' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.barcode_description')) ? : ''],
+				'code' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.barcode_description')) ? : ''],
 		];
 
 		$options = [];
@@ -318,7 +318,7 @@ class TOOL extends API {
 				[
 					'type' => 'select',
 					'attributes' => [
-						'name' => LANG::GET('tool.code_select_type'),
+						'name' => $this->_lang->GET('tool.code_select_type'),
 						'onchange' => "api.tool('get', 'code', this.value)"
 					],
 					'content' => $options
@@ -333,7 +333,7 @@ class TOOL extends API {
 					$result['render']['content'][] = [
 						[
 							'type' => 'image',
-							'description' => LANG::GET('tool.code_created'),
+							'description' => $this->_lang->GET('tool.code_created'),
 							'attributes' =>[
 								'name' => $types[$this->_requestedType]['name'],
 								'qrcode' => $types[$this->_requestedType]['code']
@@ -345,7 +345,7 @@ class TOOL extends API {
 					$result['render']['content'][] = [
 						[
 							'type' => 'image',
-							'description' => LANG::GET('tool.code_created'),
+							'description' => $this->_lang->GET('tool.code_created'),
 							'attributes' => [
 								'name' => $types[$this->_requestedType]['name'],
 								'barcode' => ['value' => $types[$this->_requestedType]['code'], 'format' => strtoupper(substr(stristr($this->_requestedType, '_'), 1))]
@@ -367,9 +367,9 @@ class TOOL extends API {
 	 */
 	public function image(){
 
-		$size = UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.image_size'));
-		$watermark = UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.image_options_watermark'));
-		$label = UTILITY::propertySet($this->_payload, LANG::PROPERTY('tool.image_label'));
+		$size = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.image_size'));
+		$watermark = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.image_options_watermark'));
+		$label = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.image_label'));
 
 		$result['render'] = ['form' => [
 			'data-usecase' => 'tool_image',
@@ -380,7 +380,7 @@ class TOOL extends API {
 				[
 					'type' => 'file',
 					'attributes' => [
-						'name' => LANG::GET('tool.image_source'),
+						'name' => $this->_lang->GET('tool.image_source'),
 						'multiple' => true,
 						'accept' => '.jpg,.jpeg,.png,.gif'
 					]
@@ -391,23 +391,23 @@ class TOOL extends API {
 				[
 					'type' => 'checkbox',
 					'attributes' => [
-						'name' => LANG::GET('tool.image_options')
+						'name' => $this->_lang->GET('tool.image_options')
 					],
 					'content' => [
-						LANG::GET('tool.image_options_watermark') => $watermark ? ['checked' => true] : []
+						$this->_lang->GET('tool.image_options_watermark') => $watermark ? ['checked' => true] : []
 					]
 				],
 				[
 					'type' => 'text',
 					'attributes' => [
-						'name' => LANG::GET('tool.image_label'),
+						'name' => $this->_lang->GET('tool.image_label'),
 						'value' => $label ? : ''
 					]
 				],
 				[
 					'type' => 'select',
 					'attributes' => [
-						'name' => LANG::GET('tool.image_size'),
+						'name' => $this->_lang->GET('tool.image_size'),
 					],
 					'content' => [
 						'...' => !$size? ['selected' => true]: [],
@@ -423,9 +423,9 @@ class TOOL extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (isset($_FILES[LANG::PROPERTY('tool.image_source')]) && $_FILES[LANG::PROPERTY('tool.image_source')]['tmp_name'][0]) {
+				if (isset($_FILES[$this->_lang->PROPERTY('tool.image_source')]) && $_FILES[$this->_lang->PROPERTY('tool.image_source')]['tmp_name'][0]) {
 					$result['render']['content'][] = [];
-					$images = UTILITY::storeUploadedFiles([LANG::PROPERTY('tool.image_source')], UTILITY::directory('tmp'), [$size]);
+					$images = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('tool.image_source')], UTILITY::directory('tmp'), [$size]);
 
 					foreach($images as $image){
 						UTILITY::alterImage($image, 0, UTILITY_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
@@ -455,12 +455,12 @@ class TOOL extends API {
 			[
 				[
 					'type' => 'scanner',
-					'description' => LANG::GET('menu.tools_scanner'),
+					'description' => $this->_lang->GET('menu.tools_scanner'),
 					'destination' => 'tool_scanner'
 				], [
 					'type' => 'textarea',
 					'attributes' =>[
-						'name' => LANG::GET('tool.scanner_result'),
+						'name' => $this->_lang->GET('tool.scanner_result'),
 						'rows' => 8,
 						'readonly' => true,
 						'id' => 'tool_scanner'
@@ -496,7 +496,7 @@ class TOOL extends API {
 					[
 						'type' => 'select',
 						'attributes' => [
-							'name' => LANG::GET('tool.stl_viewer_select'),
+							'name' => $this->_lang->GET('tool.stl_viewer_select'),
 							'onchange' => "_client.tool.initStlViewer('../' + this.value)"
 						],
 						'content' => $options
@@ -505,7 +505,7 @@ class TOOL extends API {
 					]
 				]
 			]];
-		} else $result['render']['content'] = $this->noContentAvailable(LANG::GET('file.no_files'));
+		} else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
 		$this->response($result);
 	}
 }

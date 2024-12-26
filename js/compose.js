@@ -80,7 +80,7 @@ export const compose_helper = {
 				description: ["links"],
 			},
 			buttonValues = {
-				calendarbutton: LANG.GET("planning.event_new"),
+				calendarbutton: api._lang.GET("planning.event_new"),
 			},
 			element = {
 				attributes: {},
@@ -104,22 +104,22 @@ export const compose_helper = {
 			elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
 			value = sibling.value;
 			if (["links", "radio", "select", "checkbox"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_multilist_name")) {
+				if (elementName === api._lang.GET("assemble.compose_multilist_name")) {
 					setTo = Object.keys(setName).find((key) => setName[key].includes(element.type));
 					if (value && setTo === "name") element.attributes.name = value;
 					else if (value && setTo === "description") element.description = value;
 					else return;
 				}
-				if (elementName === LANG.GET("assemble.compose_multilist_add_item") && value) {
+				if (elementName === api._lang.GET("assemble.compose_multilist_add_item") && value) {
 					if (element.content === undefined) element.content = {};
 					element.content[value] = {};
 				}
 			} else if (["file", "photo", "scanner", "signature", "identify"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_simple_element")) {
+				if (elementName === api._lang.GET("assemble.compose_simple_element")) {
 					if (value) element.attributes.name = value;
 					else return;
 				}
-				if (elementName === LANG.GET("assemble.compose_context_identify") && sibling.checked) {
+				if (elementName === api._lang.GET("assemble.compose_context_identify") && sibling.checked) {
 					element.attributes.required = true;
 					delete element.attributes.multiple;
 					element.type = "identify";
@@ -136,23 +136,23 @@ export const compose_helper = {
 					}
 				}
 			} else if (["textsection"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_textsection_description")) {
+				if (elementName === api._lang.GET("assemble.compose_textsection_description")) {
 					if (value) element.attributes.name = value;
 					else return;
 				}
-				if (elementName === LANG.GET("assemble.compose_textsection_content") && value) {
+				if (elementName === api._lang.GET("assemble.compose_textsection_content") && value) {
 					element.content = value;
 				}
 			} else if (["documentbutton"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_link_document_select")) {
+				if (elementName === api._lang.GET("assemble.compose_link_document_select")) {
 					if (value) element.attributes.value = value;
 					else return;
 				}
 			} else if (["image"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_image_description")) {
+				if (elementName === api._lang.GET("assemble.compose_image_description")) {
 					if (value) element.description = value;
 				}
-				if (elementName === LANG.GET("assemble.compose_image")) {
+				if (elementName === api._lang.GET("assemble.compose_image")) {
 					if (value) {
 						element.attributes = {
 							name: value,
@@ -167,35 +167,35 @@ export const compose_helper = {
 					} else return;
 				}
 			} else if (["range"].includes(element.type)) {
-				if (elementName === LANG.GET("assemble.compose_simple_element")) {
+				if (elementName === api._lang.GET("assemble.compose_simple_element")) {
 					if (value) element.attributes.name = value;
 					else return;
 				}
 				element.attributes.value = "0";
-				if (elementName === LANG.GET("assemble.compose_range_min")) element.attributes.min = Number(value);
-				if (elementName === LANG.GET("assemble.compose_range_max")) element.attributes.max = Number(value);
-				if (elementName === LANG.GET("assemble.compose_range_step")) {
+				if (elementName === api._lang.GET("assemble.compose_range_min")) element.attributes.min = Number(value);
+				if (elementName === api._lang.GET("assemble.compose_range_max")) element.attributes.max = Number(value);
+				if (elementName === api._lang.GET("assemble.compose_range_step")) {
 					value = value.replace(",", ".");
 					if ((typeof Number(value) === "number" && Number(value) < element.attributes.max) || value === "any") element.attributes.step = value;
 				}
 			} else {
 				// ...input
-				if (elementName === LANG.GET("assemble.compose_field_name")) {
+				if (elementName === api._lang.GET("assemble.compose_field_name")) {
 					if (value) element.attributes.name = value;
 					else return;
 				}
 			}
-			if (elementName === LANG.GET("assemble.compose_texttemplate") && value) element.texttemplates = true;
-			if (elementName === LANG.GET("assemble.compose_field_hint") && value) element.hint = value;
-			if (elementName === LANG.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
-			if (elementName === LANG.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
-			if (elementName === LANG.GET("assemble.compose_link_document_choice") && value === LANG.GET("assemble.compose_link_document_display") && sibling.checked) {
+			if (elementName === api._lang.GET("assemble.compose_texttemplate") && value) element.texttemplates = true;
+			if (elementName === api._lang.GET("assemble.compose_field_hint") && value) element.hint = value;
+			if (elementName === api._lang.GET("assemble.compose_required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
+			if (elementName === api._lang.GET("assemble.compose_multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
+			if (elementName === api._lang.GET("assemble.compose_link_document_choice") && value === api._lang.GET("assemble.compose_link_document_display") && sibling.checked) {
 				element.attributes.onpointerup = "api.record('get','displayonly', '" + element.attributes.value + "')";
-				element.attributes.value = LANG.GET("assemble.compose_link_document_display_button", { ":document": element.attributes.value });
+				element.attributes.value = api._lang.GET("assemble.compose_link_document_display_button", { ":document": element.attributes.value });
 			}
-			if (elementName === LANG.GET("assemble.compose_link_document_choice") && value === LANG.GET("assemble.compose_link_document_continue") && sibling.checked) {
+			if (elementName === api._lang.GET("assemble.compose_link_document_choice") && value === api._lang.GET("assemble.compose_link_document_continue") && sibling.checked) {
 				element.attributes.onpointerup = "api.record('get','document', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
-				element.attributes.value = LANG.GET("assemble.compose_link_document_continue_button", { ":document": element.attributes.value });
+				element.attributes.value = api._lang.GET("assemble.compose_link_document_continue_button", { ":document": element.attributes.value });
 			}
 			sibling = sibling.nextSibling;
 		} while (sibling);
@@ -307,7 +307,7 @@ export const compose_helper = {
 		};
 		if (isForm) answer.form = {};
 		if (raw_import || (name && componentContent)) return answer;
-		new Toast(LANG.GET("assemble.edit_component_not_saved_missing"), "error");
+		new Toast(api._lang.GET("assemble.edit_component_not_saved_missing"), "error");
 		return null;
 	},
 
@@ -342,7 +342,7 @@ export const compose_helper = {
 				permitted_export: permitted_export,
 				restricted_access: restricted_access,
 			};
-		new Toast(LANG.GET("assemble.edit_document_not_saved_missing"), "error");
+		new Toast(api._lang.GET("assemble.edit_document_not_saved_missing"), "error");
 		return null;
 	},
 
@@ -382,7 +382,7 @@ export const compose_helper = {
 				content: templateContent,
 				hidden: hidden,
 			};
-		new Toast(LANG.GET("assemble.edit_template_not_saved_missing"), "error");
+		new Toast(api._lang.GET("assemble.edit_template_not_saved_missing"), "error");
 		return null;
 	},
 
@@ -438,8 +438,8 @@ export const compose_helper = {
 			compose_helper.newDocumentElements.add(component.name);
 			lookupIdentify(current.content);
 		}
-		if (compose_helper.componentIdentify > 1) new Toast(LANG.GET("assemble.compose_document_multiple_identify"), "error");
-		if (compose_helper.componentSignature > 1) new Toast(LANG.GET("assemble.compose_document_multiple_signature"), "error");
+		if (compose_helper.componentIdentify > 1) new Toast(api._lang.GET("assemble.compose_document_multiple_identify"), "error");
+		if (compose_helper.componentSignature > 1) new Toast(api._lang.GET("assemble.compose_document_multiple_signature"), "error");
 	},
 
 	/**
@@ -510,7 +510,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_2top")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_2top")));
 			button.onpointerup = () => {
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
@@ -525,7 +525,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_1up")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_1up")));
 			button.onpointerup = () => {
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
@@ -540,7 +540,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_1down")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_1down")));
 			button.onpointerup = () => {
 				if (target.nextElementSibling) {
 					targetClone = target.cloneNode(true);
@@ -555,7 +555,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_2bottom")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_2bottom")));
 			button.onpointerup = () => {
 				targetClone = target.cloneNode(true);
 				target.parentNode.append(targetClone);
@@ -568,12 +568,12 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(LANG.GET("assemble.compose_context_delete")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_delete")));
 			let options = {};
-			(options[LANG.GET("general.cancel_button")] = false),
-				(options[LANG.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
+			(options[api._lang.GET("general.cancel_button")] = false),
+				(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
 				(button.onpointerup = () => {
-					new Dialog({ type: "confirm", header: LANG.GET("assemble.compose_context_delete"), options: options }).then((confirmation) => {
+					new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose_context_delete"), options: options }).then((confirmation) => {
 						if (confirmation) {
 							compose_helper.dragNdrop.drop_delete(evnt);
 						}
@@ -748,19 +748,19 @@ export const compose_helper = {
 							continue;
 						}
 						elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
-						if (elementName === LANG.GET("assemble.compose_field_hint") && importable.hint) sibling.value = importable.hint;
-						if (elementName === LANG.GET("assemble.compose_texttemplate")) sibling.checked = Boolean(importable.texttemplates);
-						if (elementName === LANG.GET("assemble.compose_required")) sibling.checked = Boolean("required" in importable.attributes && importable.attributes.required);
-						if (elementName === LANG.GET("assemble.compose_multiple")) sibling.checked = Boolean("multiple" in importable.attributes && importable.attributes.multiple);
-						if (elementName === LANG.GET("assemble.compose_context_identify")) sibling.checked = Boolean(importable.type === "identify");
+						if (elementName === api._lang.GET("assemble.compose_field_hint") && importable.hint) sibling.value = importable.hint;
+						if (elementName === api._lang.GET("assemble.compose_texttemplate")) sibling.checked = Boolean(importable.texttemplates);
+						if (elementName === api._lang.GET("assemble.compose_required")) sibling.checked = Boolean("required" in importable.attributes && importable.attributes.required);
+						if (elementName === api._lang.GET("assemble.compose_multiple")) sibling.checked = Boolean("multiple" in importable.attributes && importable.attributes.multiple);
+						if (elementName === api._lang.GET("assemble.compose_context_identify")) sibling.checked = Boolean(importable.type === "identify");
 
 						if (["links", "radio", "select", "checkbox"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_multilist_name")) {
+							if (elementName === api._lang.GET("assemble.compose_multilist_name")) {
 								setTo = Object.keys(setName).find((key) => setName[key].includes(importable.type));
 								if (setTo === "name") sibling.value = importable.attributes.name;
 								else if (setTo === "description") sibling.value = importable.description;
 							}
-							if (elementName === LANG.GET("assemble.compose_multilist_add_item")) {
+							if (elementName === api._lang.GET("assemble.compose_multilist_add_item")) {
 								let deletesibling = sibling.nextSibling;
 								while (deletesibling.nextElementSibling.constructor.name !== "HTMLButtonElement") {
 									deletesibling.nextElementSibling.remove();
@@ -782,18 +782,18 @@ export const compose_helper = {
 								continue;
 							}
 						} else if (["file", "photo", "scanner", "signature", "identify"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
+							if (elementName === api._lang.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
 						} else if (["textsection"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_textsection_description")) sibling.value = importable.attributes.name;
-							if (elementName === LANG.GET("assemble.compose_textsection_content")) if (importable.content) sibling.value = importable.content;
+							if (elementName === api._lang.GET("assemble.compose_textsection_description")) sibling.value = importable.attributes.name;
+							if (elementName === api._lang.GET("assemble.compose_textsection_content")) if (importable.content) sibling.value = importable.content;
 						} else if (["range"].includes(importable.type)) {
-							if (elementName === LANG.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
-							if (elementName === LANG.GET("assemble.compose_range_min")) sibling.value = importable.attributes.min;
-							if (elementName === LANG.GET("assemble.compose_range_max")) sibling.value = importable.attributes.max;
-							if (elementName === LANG.GET("assemble.compose_range_step")) sibling.value = importable.attributes.step;
+							if (elementName === api._lang.GET("assemble.compose_simple_element")) sibling.value = importable.attributes.name;
+							if (elementName === api._lang.GET("assemble.compose_range_min")) sibling.value = importable.attributes.min;
+							if (elementName === api._lang.GET("assemble.compose_range_max")) sibling.value = importable.attributes.max;
+							if (elementName === api._lang.GET("assemble.compose_range_step")) sibling.value = importable.attributes.step;
 						} else {
 							// ...input
-							if (elementName === LANG.GET("assemble.compose_field_name")) {
+							if (elementName === api._lang.GET("assemble.compose_field_name")) {
 								sibling.value = importable.attributes.name;
 							}
 						}
@@ -973,14 +973,14 @@ export class Compose extends Assemble {
 			type: "textsection",
 			attributes: {
 				"data-type": "calendarbutton",
-				name: LANG.GET("assemble.compose_calendarbutton"),
+				name: api._lang.GET("assemble.compose_calendarbutton"),
 			},
-			content: LANG.GET("assemble.compose_calendarbutton_not_working"),
+			content: api._lang.GET("assemble.compose_calendarbutton_not_working"),
 		};
 		result = result.concat(...this.textsection());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_calendarbutton"),
+				value: api._lang.GET("assemble.compose_calendarbutton"),
 				"data-type": "addblock",
 			},
 		};
@@ -991,29 +991,29 @@ export class Compose extends Assemble {
 	compose_checkbox() {
 		return this.compose_multilist({
 			type: "checkbox",
-			description: LANG.GET("assemble.compose_checkbox"),
+			description: api._lang.GET("assemble.compose_checkbox"),
 		});
 	}
 
 	compose_component(
 		std = {
-			name: LANG.GET("assemble.compose_component_name"),
-			description: LANG.GET("assemble.compose_component"),
+			name: api._lang.GET("assemble.compose_component_name"),
+			description: api._lang.GET("assemble.compose_component"),
 			list: "components",
 			action:
 				"new Dialog({type: 'confirm', header: '" +
-				LANG.GET("assemble.compose_component") +
+				api._lang.GET("assemble.compose_component") +
 				"', options:{" +
 				"'" +
-				LANG.GET("assemble.compose_component_cancel") +
+				api._lang.GET("assemble.compose_component_cancel") +
 				"': false," +
 				"'" +
-				LANG.GET("assemble.compose_component_confirm") +
+				api._lang.GET("assemble.compose_component_confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
 				"}}).then(confirmation => {if (confirmation) api.document('post', 'component')})",
 			hidden: {
-				name: LANG.GET("assemble.edit_component_hidden"),
-				hint: LANG.GET("assemble.edit_component_hidden_hint"),
+				name: api._lang.GET("assemble.edit_component_hidden"),
+				hint: api._lang.GET("assemble.edit_component_hidden_hint"),
 			},
 		}
 	) {
@@ -1078,7 +1078,7 @@ export class Compose extends Assemble {
 				type: "checkbox2text",
 				content: restricted_access.content,
 				attributes: {
-					name: LANG.GET("assemble.edit_document_restricted_access"),
+					name: api._lang.GET("assemble.edit_document_restricted_access"),
 					id: "ComponentRestrictedAccess",
 				},
 				hint: restricted_access.hint,
@@ -1090,7 +1090,7 @@ export class Compose extends Assemble {
 				type: "checkbox2text",
 				content: regulatory_context,
 				attributes: {
-					name: LANG.GET("assemble.compose_document_regulatory_context"),
+					name: api._lang.GET("assemble.compose_document_regulatory_context"),
 					id: "ComponentRegulatoryContext",
 				},
 			};
@@ -1111,12 +1111,12 @@ export class Compose extends Assemble {
 		}
 		if (prefilled) {
 			const options = {};
-			options[LANG.GET("assemble.edit_component_document_hidden_visible")] = !(hidden && Object.keys(hidden).length)
+			options[api._lang.GET("assemble.edit_component_document_hidden_visible")] = !(hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 				  }
 				: {};
-			options[LANG.GET("assemble.edit_component_document_hidden_hidden")] = (hidden && Object.keys(hidden).length)
+			options[api._lang.GET("assemble.edit_component_document_hidden_hidden")] = (hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 						"data-hiddenradio": "ComponentHidden",
@@ -1129,7 +1129,7 @@ export class Compose extends Assemble {
 				hint:
 					std.hidden.hint +
 					((hidden && Object.keys(hidden).length)
-						? " " + LANG.GET("assemble.edit_hidden_set", {
+						? " " + api._lang.GET("assemble.edit_hidden_set", {
 								":name": hidden.name,
 								":date": hidden.date,
 						  })
@@ -1155,44 +1155,44 @@ export class Compose extends Assemble {
 	compose_date() {
 		return this.compose_input({
 			type: "date",
-			description: LANG.GET("assemble.compose_date"),
+			description: api._lang.GET("assemble.compose_date"),
 		});
 	}
 
 	compose_email() {
 		return this.compose_input({
 			type: "email",
-			description: LANG.GET("assemble.compose_email"),
+			description: api._lang.GET("assemble.compose_email"),
 		});
 	}
 
 	compose_file() {
 		return this.compose_simpleElement({
 			type: "file",
-			description: LANG.GET("assemble.compose_file"),
+			description: api._lang.GET("assemble.compose_file"),
 			multiple: "optional",
 		});
 	}
 
 	compose_document() {
 		return this.compose_component({
-			name: LANG.GET("assemble.compose_document_label"),
-			description: LANG.GET("assemble.compose_document"),
+			name: api._lang.GET("assemble.compose_document_label"),
+			description: api._lang.GET("assemble.compose_document"),
 			list: "documents",
 			action:
 				"new Dialog({type: 'confirm', header: '" +
-				LANG.GET("assemble.compose_document") +
+				api._lang.GET("assemble.compose_document") +
 				"', options:{" +
 				"'" +
-				LANG.GET("assemble.compose_document_cancel") +
+				api._lang.GET("assemble.compose_document_cancel") +
 				"': false," +
 				"'" +
-				LANG.GET("assemble.compose_document_confirm") +
+				api._lang.GET("assemble.compose_document_confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
 				"}}).then(confirmation => {if (confirmation) api.document('post', 'document')})",
 			hidden: {
-				name: LANG.GET("assemble.edit_document_hidden"),
-				hint: LANG.GET("assemble.edit_document_hidden_hint"),
+				name: api._lang.GET("assemble.edit_document_hidden"),
+				hint: api._lang.GET("assemble.edit_document_hidden_hint"),
 			},
 		});
 	}
@@ -1205,7 +1205,7 @@ export class Compose extends Assemble {
 			type: "textsection",
 			attributes: {
 				"data-type": "documentbutton",
-				name: LANG.GET("assemble.compose_link_document"),
+				name: api._lang.GET("assemble.compose_link_document"),
 			},
 		};
 		result = result.concat(...this.textsection());
@@ -1213,7 +1213,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "select",
 			attributes: {
-				name: LANG.GET("assemble.compose_link_document_select"),
+				name: api._lang.GET("assemble.compose_link_document_select"),
 			},
 			content: document,
 		};
@@ -1221,20 +1221,20 @@ export class Compose extends Assemble {
 
 		this.currentElement = {
 			type: "radio",
-			attributes: { name: LANG.GET("assemble.compose_link_document_choice") },
+			attributes: { name: api._lang.GET("assemble.compose_link_document_choice") },
 			content: {},
 		};
-		this.currentElement.content[LANG.GET("assemble.compose_link_document_display")] = {
+		this.currentElement.content[api._lang.GET("assemble.compose_link_document_display")] = {
 			required: true,
 		};
-		this.currentElement.content[LANG.GET("assemble.compose_link_document_continue")] = {
+		this.currentElement.content[api._lang.GET("assemble.compose_link_document_continue")] = {
 			required: true,
 		};
 		result = result.concat(...this.br(), ...this.radio());
 
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_link_document"),
+				value: api._lang.GET("assemble.compose_link_document"),
 				"data-type": "addblock",
 			},
 		};
@@ -1247,20 +1247,20 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "image",
 			attributes: {
-				name: LANG.GET("assemble.compose_image_description"),
+				name: api._lang.GET("assemble.compose_image_description"),
 			},
 		};
 		result = result.concat(...this.text(), ...this.br());
 		this.currentElement = {
 			type: "photo",
 			attributes: {
-				name: LANG.GET("assemble.compose_image"),
+				name: api._lang.GET("assemble.compose_image"),
 			},
 		};
 		result = result.concat(...this.photo(), ...this.br());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_image"),
+				value: api._lang.GET("assemble.compose_image"),
 				"data-type": "addblock",
 			},
 		};
@@ -1273,7 +1273,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: type.type,
 			attributes: {
-				name: LANG.GET("assemble.compose_field_name"),
+				name: api._lang.GET("assemble.compose_field_name"),
 				required: true,
 			},
 		};
@@ -1281,23 +1281,23 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textsection",
 			attributes: {
-				name: LANG.GET("assemble.compose_field_hint"),
+				name: api._lang.GET("assemble.compose_field_hint"),
 			},
 		};
 		result = result.concat(...this.text());
 		this.currentElement = {
 			content: {},
 		};
-		this.currentElement.content[LANG.GET("assemble.compose_required")] = {
-			name: LANG.GET("assemble.compose_required"),
+		this.currentElement.content[api._lang.GET("assemble.compose_required")] = {
+			name: api._lang.GET("assemble.compose_required"),
 		};
 		if (type.multiple)
-			this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
-				name: LANG.GET("assemble.compose_multiple"),
+			this.currentElement.content[api._lang.GET("assemble.compose_multiple")] = {
+				name: api._lang.GET("assemble.compose_multiple"),
 			};
 		if (type.type === "textarea")
-			this.currentElement.content[LANG.GET("assemble.compose_texttemplate")] = {
-				name: LANG.GET("assemble.compose_texttemplate"),
+			this.currentElement.content[api._lang.GET("assemble.compose_texttemplate")] = {
+				name: api._lang.GET("assemble.compose_texttemplate"),
 			};
 		result = result.concat(...this.br(), ...this.checkbox());
 		this.currentElement = {
@@ -1313,7 +1313,7 @@ export class Compose extends Assemble {
 	compose_link() {
 		return this.compose_input({
 			type: "link",
-			description: LANG.GET("assemble.compose_link"),
+			description: api._lang.GET("assemble.compose_link"),
 			multiple: "optional",
 		});
 	}
@@ -1321,7 +1321,7 @@ export class Compose extends Assemble {
 	compose_links() {
 		return this.compose_multilist({
 			type: "links",
-			description: LANG.GET("assemble.compose_links"),
+			description: api._lang.GET("assemble.compose_links"),
 		});
 	}
 
@@ -1330,7 +1330,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: type.type,
 			attributes: {
-				name: LANG.GET("assemble.compose_multilist_name"),
+				name: api._lang.GET("assemble.compose_multilist_name"),
 				required: true,
 			},
 		};
@@ -1338,7 +1338,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textsection",
 			attributes: {
-				name: LANG.GET("assemble.compose_field_hint"),
+				name: api._lang.GET("assemble.compose_field_hint"),
 			},
 		};
 		result = result.concat(...this.text());
@@ -1346,7 +1346,7 @@ export class Compose extends Assemble {
 			type: "text",
 			attributes: {
 				rows: 3,
-				name: LANG.GET("assemble.compose_multilist_add_item") + "[]",
+				name: api._lang.GET("assemble.compose_multilist_add_item") + "[]",
 				required: true,
 			},
 		};
@@ -1354,7 +1354,7 @@ export class Compose extends Assemble {
 		else result = result.concat(...this.textarea());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_multilist_add_item_button"),
+				value: api._lang.GET("assemble.compose_multilist_add_item_button"),
 				"data-type": "additem",
 				type: "button",
 				onpointerup: function () {
@@ -1362,19 +1362,19 @@ export class Compose extends Assemble {
 				}.toString(),
 			},
 		};
-		if (type.type === "select") this.currentElement.hint = LANG.GET("assemble.compose_select_hint");
+		if (type.type === "select") this.currentElement.hint = api._lang.GET("assemble.compose_select_hint");
 		result = result.concat(...this.button());
 		if (type.required !== undefined || type.multiple !== undefined) {
 			this.currentElement = {
 				content: {},
 			};
 			if (type.required !== undefined)
-				this.currentElement.content[LANG.GET("assemble.compose_required")] = {
-					name: LANG.GET("assemble.compose_required"),
+				this.currentElement.content[api._lang.GET("assemble.compose_required")] = {
+					name: api._lang.GET("assemble.compose_required"),
 				};
 			if (type.multiple !== undefined)
-				this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
-					name: LANG.GET("assemble.compose_multiple"),
+				this.currentElement.content[api._lang.GET("assemble.compose_multiple")] = {
+					name: api._lang.GET("assemble.compose_multiple"),
 				};
 			result = result.concat(...this.br(), ...this.checkbox());
 		}
@@ -1391,7 +1391,7 @@ export class Compose extends Assemble {
 	compose_number() {
 		return this.compose_input({
 			type: "number",
-			description: LANG.GET("assemble.compose_number"),
+			description: api._lang.GET("assemble.compose_number"),
 			multiple: "optional",
 		});
 	}
@@ -1399,7 +1399,7 @@ export class Compose extends Assemble {
 	compose_photo() {
 		return this.compose_simpleElement({
 			type: "photo",
-			description: LANG.GET("assemble.compose_photo"),
+			description: api._lang.GET("assemble.compose_photo"),
 			multiple: "optional",
 		});
 	}
@@ -1407,7 +1407,7 @@ export class Compose extends Assemble {
 	compose_productselection() {
 		return this.compose_input({
 			type: "productselection",
-			description: LANG.GET("assemble.compose_productselection"),
+			description: api._lang.GET("assemble.compose_productselection"),
 			multiple: "optional",
 		});
 	}
@@ -1415,7 +1415,7 @@ export class Compose extends Assemble {
 	compose_radio() {
 		return this.compose_multilist({
 			type: "radio",
-			description: LANG.GET("assemble.compose_radio"),
+			description: api._lang.GET("assemble.compose_radio"),
 			required: "optional",
 		});
 	}
@@ -1425,7 +1425,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "range",
 			attributes: {
-				name: LANG.GET("assemble.compose_simple_element"),
+				name: api._lang.GET("assemble.compose_simple_element"),
 				required: true,
 			},
 		};
@@ -1433,38 +1433,38 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textsection",
 			attributes: {
-				name: LANG.GET("assemble.compose_field_hint"),
+				name: api._lang.GET("assemble.compose_field_hint"),
 			},
 		};
 		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "number",
 			attributes: {
-				name: LANG.GET("assemble.compose_range_min"),
+				name: api._lang.GET("assemble.compose_range_min"),
 			},
-			hint: LANG.GET("assemble.compose_range_min_hint"),
+			hint: api._lang.GET("assemble.compose_range_min_hint"),
 		};
 		result = result.concat(...this.number());
 		this.currentElement = {
 			type: "number",
 			attributes: {
-				name: LANG.GET("assemble.compose_range_max"),
+				name: api._lang.GET("assemble.compose_range_max"),
 			},
-			hint: LANG.GET("assemble.compose_range_max_hint"),
+			hint: api._lang.GET("assemble.compose_range_max_hint"),
 		};
 		result = result.concat(...this.number());
 		this.currentElement = {
 			type: "text",
 			attributes: {
-				name: LANG.GET("assemble.compose_range_step"),
+				name: api._lang.GET("assemble.compose_range_step"),
 			},
-			hint: LANG.GET("assemble.compose_range_step_hint"),
+			hint: api._lang.GET("assemble.compose_range_step_hint"),
 		};
 		result = result.concat(...this.text());
 
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_range"),
+				value: api._lang.GET("assemble.compose_range"),
 				"data-type": "addblock",
 			},
 		};
@@ -1476,23 +1476,23 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: "code",
-			hint: LANG.GET("assemble.compose_raw_hint"),
+			hint: api._lang.GET("assemble.compose_raw_hint"),
 			attributes: {
-				name: LANG.GET("assemble.compose_raw"),
+				name: api._lang.GET("assemble.compose_raw"),
 				id: "_compose_raw",
 			},
 		};
 		result = result.concat(...this.code());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_raw"),
+				value: api._lang.GET("assemble.compose_raw"),
 				"data-type": "addblock",
 				onpointerup: function () {
 					if (document.getElementById("_compose_raw").value)
 						try {
 							compose_helper.importComponent({ content: JSON.parse(document.getElementById("_compose_raw").value) });
 						} catch (e) {
-							new Dialog({ type: "alert", header: LANG.GET("assemble.compose_raw"), render: LANG.GET("assemble.compose_raw_json_error") });
+							new Dialog({ type: "alert", header: api._lang.GET("assemble.compose_raw"), render: api._lang.GET("assemble.compose_raw_json_error") });
 						}
 				}.toString(),
 			},
@@ -1500,7 +1500,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.button());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_raw_import"),
+				value: api._lang.GET("assemble.compose_raw_import"),
 				"data-type": "import",
 				onpointerup: function () {
 					let component = compose_helper.composeNewComponent(true);
@@ -1516,7 +1516,7 @@ export class Compose extends Assemble {
 	compose_scanner() {
 		return this.compose_simpleElement({
 			type: "scanner",
-			description: LANG.GET("assemble.compose_scanner"),
+			description: api._lang.GET("assemble.compose_scanner"),
 			multiple: "optional",
 		});
 	}
@@ -1524,7 +1524,7 @@ export class Compose extends Assemble {
 	compose_select() {
 		return this.compose_multilist({
 			type: "select",
-			description: LANG.GET("assemble.compose_select"),
+			description: api._lang.GET("assemble.compose_select"),
 			required: "optional",
 			multiple: "optional",
 		});
@@ -1533,9 +1533,9 @@ export class Compose extends Assemble {
 	compose_signature() {
 		return this.compose_simpleElement({
 			type: "signature",
-			description: LANG.GET("assemble.compose_signature"),
+			description: api._lang.GET("assemble.compose_signature"),
 			required: "optional",
-			hint: LANG.GET("assemble.compose_signature_hint"),
+			hint: api._lang.GET("assemble.compose_signature_hint"),
 		});
 	}
 
@@ -1544,7 +1544,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: type.type,
 			attributes: {
-				name: LANG.GET("assemble.compose_simple_element"),
+				name: api._lang.GET("assemble.compose_simple_element"),
 				required: true,
 			},
 		};
@@ -1552,7 +1552,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textsection",
 			attributes: {
-				name: LANG.GET("assemble.compose_field_hint"),
+				name: api._lang.GET("assemble.compose_field_hint"),
 			},
 			hint: type.hint ? type.hint : null,
 		};
@@ -1561,8 +1561,8 @@ export class Compose extends Assemble {
 			this.currentElement = {
 				content: {},
 			};
-			this.currentElement.content[LANG.GET("assemble.compose_required")] = {
-				name: LANG.GET("assemble.compose_required"),
+			this.currentElement.content[api._lang.GET("assemble.compose_required")] = {
+				name: api._lang.GET("assemble.compose_required"),
 			};
 			result = result.concat(...this.br(), ...this.checkbox());
 		}
@@ -1572,13 +1572,13 @@ export class Compose extends Assemble {
 			content: {},
 		};
 		if (type.multiple !== undefined) {
-			this.currentElement.content[LANG.GET("assemble.compose_multiple")] = {
-				name: LANG.GET("assemble.compose_multiple"),
+			this.currentElement.content[api._lang.GET("assemble.compose_multiple")] = {
+				name: api._lang.GET("assemble.compose_multiple"),
 			};
 		}
 		if (type.type === "scanner") {
-			this.currentElement.content[LANG.GET("assemble.compose_context_identify")] = {
-				name: LANG.GET("assemble.compose_context_identify"),
+			this.currentElement.content[api._lang.GET("assemble.compose_context_identify")] = {
+				name: api._lang.GET("assemble.compose_context_identify"),
 				id: "setIdentify",
 			};
 		}
@@ -1597,7 +1597,7 @@ export class Compose extends Assemble {
 	compose_tel() {
 		return this.compose_input({
 			type: "tel",
-			description: LANG.GET("assemble.compose_tel"),
+			description: api._lang.GET("assemble.compose_tel"),
 			multiple: "optional",
 		});
 	}
@@ -1605,7 +1605,7 @@ export class Compose extends Assemble {
 	compose_text() {
 		return this.compose_input({
 			type: "text",
-			description: LANG.GET("assemble.compose_text"),
+			description: api._lang.GET("assemble.compose_text"),
 			multiple: "optional",
 		});
 	}
@@ -1613,7 +1613,7 @@ export class Compose extends Assemble {
 	compose_textarea() {
 		return this.compose_input({
 			type: "textarea",
-			description: LANG.GET("assemble.compose_textarea"),
+			description: api._lang.GET("assemble.compose_textarea"),
 		});
 	}
 
@@ -1622,7 +1622,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textsection",
 			attributes: {
-				name: LANG.GET("assemble.compose_textsection_description"),
+				name: api._lang.GET("assemble.compose_textsection_description"),
 				required: true,
 			},
 		};
@@ -1630,14 +1630,14 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			type: "textarea",
 			attributes: {
-				name: LANG.GET("assemble.compose_textsection_content"),
+				name: api._lang.GET("assemble.compose_textsection_content"),
 				rows: 5,
 			},
 		};
 		result = result.concat(...this.textarea());
 		this.currentElement = {
 			attributes: {
-				value: LANG.GET("assemble.compose_textsection"),
+				value: api._lang.GET("assemble.compose_textsection"),
 				"data-type": "addblock",
 			},
 		};

@@ -53,7 +53,7 @@ class ORDER extends API {
 					]
 				]);
 				$order = $order ? $order[0] : null;
-				if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => LANG::GET('order.not_found'), 'type' => 'error']]);
+				if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
 				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
 				if (in_array($this->_subMethod, ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'])){
 					switch ($this->_subMethod){
@@ -64,7 +64,7 @@ class ORDER extends API {
 									$result = [
 									'response' => [
 										'id' => false,
-										'msg' => LANG::GET('order.deleted'),
+										'msg' => $this->_lang->GET('order.deleted'),
 										'type' => 'success'
 									],
 									'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
@@ -72,7 +72,7 @@ class ORDER extends API {
 								else $result = [
 									'response' => [
 										'id' => $this->_requestedID,
-										'msg' => LANG::GET('order.failed_delete'),
+										'msg' => $this->_lang->GET('order.failed_delete'),
 										'type' => 'error'
 									]];
 								$this->response($result);
@@ -150,7 +150,7 @@ class ORDER extends API {
 						else $prepared['items'][0][$key] = $value;
 					}
 					// add initially approval date
-					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . LANG::GET('order.approved_on', [], true) . ': ' . $order['approved'];
+					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
 					// clear unused keys
 					foreach ($prepared as $key => $value) {
 						if (!$value) unset($prepared[$key]);
@@ -182,24 +182,24 @@ class ORDER extends API {
 								$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 							}
 							$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
-							$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_disapprove_order', [
-								':order' => LANG::GET('order.message', $messagepayload, true),
-								':unit' => LANG::GET('units.' . $prepared['organizational_unit'], [], true),
-								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
-							], true)) . "\n \n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message')));
+							$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
+								':order' => $this->_lang->GET('order.message', $messagepayload, true),
+								':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
+								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+							], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')));
 							break;
 						case 'addinformation':
 							if (isset($decoded_order_data['additional_info'])){
-								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.additional_info'));
+								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
 							}
-							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.additional_info'));
+							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_addinformation', [
 								'values' => [
 									':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
 									':id' => intval($this->_requestedID)
 								]
 							]);
-							if (str_starts_with(UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.additional_info')), LANG::GET('order.orderstate_description'))){
+							if (str_starts_with(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info')), $this->_lang->GET('order.orderstate_description'))){
 								// inform user group
 								$messagepayload = [];
 								foreach (['quantity'=> 'quantity_label',
@@ -211,19 +211,19 @@ class ORDER extends API {
 									$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 								}
 								$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
-								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', LANG::GET('order.alert_orderstate_change', [
-									':order' => LANG::GET('order.message', $messagepayload, true),
-									':unit' => LANG::GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . LANG::GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', LANG::GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
+									':order' => $this->_lang->GET('order.message', $messagepayload, true),
+									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
+									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
 								])));
 							}
 							break;
 						case 'cancellation':
 							if (isset($decoded_order_data['additional_info'])){
-								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
+								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
 							}
-							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on', [], true) . ': ' . $order['approved'];
+							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
 								'values' => [
@@ -231,16 +231,16 @@ class ORDER extends API {
 									':id' => intval($this->_requestedID)
 								]
 							]);
-							$this->alertUserGroup(['permission' => ['purchase']], LANG::GET('order.alert_purchase', [], true));		
+							$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
 							break;
 						case 'return':
 							if (isset($decoded_order_data['additional_info'])){
-								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
+								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
 							}
-							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, LANG::PROPERTY('message.message'));
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.approved_on', [], true) . ': ' . $order['approved'];
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.received', [], true) . ': ' . $order['received'];
-							$decoded_order_data['additional_info'] .= "\n" . LANG::GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
+							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
+							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
+							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
 							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
 
 							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
@@ -255,15 +255,15 @@ class ORDER extends API {
 								$result = [
 								'response' => [
 									'id' => $this->_requestedID,
-									'msg' => LANG::GET('order.saved'),
+									'msg' => $this->_lang->GET('order.saved'),
 									'type' => 'success'
 								]];
-								$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase', [], true));
+								$this->alertUserGroup(['permission'=>['purchase']], $this->_lang->GET('order.alert_purchase', [], true));
 							}
 							else $result = [
 								'response' => [
 									'id' => false,
-									'msg' => LANG::GET('order.failed_save'),
+									'msg' => $this->_lang->GET('order.failed_save'),
 									'type' => 'error'
 								]];
 							break;
@@ -271,7 +271,7 @@ class ORDER extends API {
 				}
 				$result = isset($result) ? $result: [
 					'response' => [
-						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? LANG::GET('order.order.' . $this->_subMethod) : LANG::GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => LANG::GET('order.order.' . $this->_subMethod)]),
+						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_subMethod) : $this->_lang->GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_subMethod)]),
 						'type' => 'info'
 					],
 					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
@@ -292,7 +292,7 @@ class ORDER extends API {
 				}
 
 				$result = ['data' => ['order' => [], 'approval' => []]];
-				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
 					
 				$allproducts_key = []; // for quicker matching and access
@@ -326,7 +326,7 @@ class ORDER extends API {
 				]]);
 
 				$statechange = ['...' => ['value' => '']];
-				foreach(LANGUAGEFILE['order']['orderstate'] as $value){
+				foreach($this->_lang->_USER['order']['orderstate'] as $value){
 					$statechange[$value] = [];
 				}
 				ksort($statechange);
@@ -359,19 +359,19 @@ class ORDER extends API {
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
-						'ordertext' => LANG::GET('order.organizational_unit') . ': ' . LANG::GET('units.' . $row['organizational_unit']),
+						'ordertext' => $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']),
 						'quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : null,
 						'unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : null,
 						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
 						'name' => UTILITY::propertySet($decoded_order_data, 'productname_label') ? : null,
 						'vendor' => UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : null,
-						'aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? LANG::GET('order.aut_idem') : null,
+						'aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? $this->_lang->GET('order.aut_idem') : null,
 						'ordernumber' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : null,
 						'commission' => UTILITY::propertySet($decoded_order_data, 'commission') ? : null,
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
-						'lastorder' => $product && $product['last_order'] ? LANG::GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null,
+						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null,
 						'orderer' => UTILITY::propertySet($decoded_order_data, 'orderer') ? : null,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
@@ -390,9 +390,9 @@ class ORDER extends API {
 					];
 
 					if ($orderer_group_identify = UTILITY::propertySet($decoded_order_data, 'orderer_group_identify')){
-						$data['ordertext'] .= "\n" .LANG::GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
+						$data['ordertext'] .= "\n" .$this->_lang->GET('order.orderer_group_identify') . ': ' . $orderer_group_identify;
 					}
-					$data['ordertext'] .= "\n" .LANG::GET('order.order.approved') . ': ' . $row['approved'] . ' ';
+					$data['ordertext'] .= "\n" .$this->_lang->GET('order.order.approved') . ': ' . $row['approved'] . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) {
 						$data['ordertext'] .= "\n". $row['approval'];
 					} else {
@@ -407,16 +407,16 @@ class ORDER extends API {
 						if (!isset($data['state'][$s])) $data['state'][$s] = [];
 						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
-							$data['ordertext'] .= "\n" . LANG::GET('order.order.' . $s) . ': ' . $row[$s];
+							$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.' . $s) . ': ' . $row[$s];
 						}
 						switch ($s){
 							case 'ordered':
 								if (!$row['received'] && $data['aut_idem']){
 									$data['state'][$s]['onchange'] =
 										"new Dialog({type:'confirm', header:'" . 
-										LANG::GET('order.aut_idem_order_confirmation_header', [':user' => $data['orderer'], ':product' => $data['name']]) .
-										"', render:'" . LANG::GET('order.aut_idem_order_confirmation_render', [':user' => $data['orderer']]) .
-										"', options:{'" . LANG::GET('general.prevent_dataloss_cancel') . "': false, '" . LANG::GET('general.prevent_dataloss_ok') . "': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {" .
+										$this->_lang->GET('order.aut_idem_order_confirmation_header', [':user' => $data['orderer'], ':product' => $data['name']]) .
+										"', render:'" . $this->_lang->GET('order.aut_idem_order_confirmation_render', [':user' => $data['orderer']]) .
+										"', options:{'" . $this->_lang->GET('general.prevent_dataloss_cancel') . "': false, '" . $this->_lang->GET('general.prevent_dataloss_ok') . "': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {" .
 	 									"if (confirmation) {api.purchase('put', 'approved', '" . $data['id'] . "', '" . $s . "', this.checked); this.setAttribute('data-" . $s . "', this.checked.toString());}" .
 										"else {this.checked = false; return}" .
 										"});";
@@ -458,14 +458,14 @@ class ORDER extends API {
 							$data['incorporation']['item'] = $product['id'];
 						} else {
 							// simple groups are not allowed to make records
-							$data['incorporation']['state'] = LANG::GET('order.incorporation_neccessary_by_user');
+							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation_neccessary_by_user');
 						}
 					}
 					elseif ($product && array_search($product['id'], $incorporationdenied) !== false){
-						$data['incorporation']['state'] = LANG::GET('order.incorporation_denied');
+						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation_denied');
 					}
 					elseif ($product && array_search($product['id'], $pendingincorporation) !== false){
-						$data['incorporation']['state'] = LANG::GET('order.incorporation_pending');
+						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation_pending');
 					}
 					
 					// request MDR §14 sample check
@@ -474,7 +474,7 @@ class ORDER extends API {
 							$data['samplecheck']['item'] = $product['id'];
 						} else {
 							// simple groups are not allowed to make records
-							$data['samplecheck']['state'] = LANG::GET('order.sample_check_by_user');
+							$data['samplecheck']['state'] = $this->_lang->GET('order.sample_check_by_user');
 						}
 					}
 
@@ -498,7 +498,7 @@ class ORDER extends API {
 					$result = [
 					'response' => [
 						'id' => false,
-						'msg' => LANG::GET('order.deleted'),
+						'msg' => $this->_lang->GET('order.deleted'),
 						'type' => 'success'
 					],
 					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
@@ -506,7 +506,7 @@ class ORDER extends API {
 				else $result = [
 					'response' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('order.failed_delete'),
+						'msg' => $this->_lang->GET('order.failed_delete'),
 						'type' => 'error'
 					]];
 				break;
@@ -550,7 +550,7 @@ class ORDER extends API {
 	 *
 	 */
 	public function filter(){
-		if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+		if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 		else $units = $_SESSION['user']['units']; // display only orders for own units
 
 		$filtered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_filter', [
@@ -593,7 +593,7 @@ class ORDER extends API {
 					$result = [
 						'response' => [
 							'id' => $this->_pdo->lastInsertId(),
-							'msg' => LANG::GET('order.saved_to_prepared'),
+							'msg' => $this->_lang->GET('order.saved_to_prepared'),
 							'type' => 'info'
 						],
 						'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
@@ -616,7 +616,7 @@ class ORDER extends API {
 					$result = [
 						'response' => [
 							'id' => $this->_requestedID,
-							'msg' => LANG::GET('order.saved_to_prepared'),
+							'msg' => $this->_lang->GET('order.saved_to_prepared'),
 							'type' => 'info'
 						]
 					];
@@ -625,7 +625,7 @@ class ORDER extends API {
 				
 				$result = $this->postApprovedOrder($processedOrderData);
 
-				if ($result['response']['msg'] === LANG::GET('order.saved')){
+				if ($result['response']['msg'] === $this->_lang->GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
 							':id' => intval($this->_requestedID)
@@ -641,7 +641,7 @@ class ORDER extends API {
 
 				// prepare existing vendor lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-				$vendors[LANG::GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
+				$vendors[$this->_lang->GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 				
 				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
@@ -675,14 +675,14 @@ class ORDER extends API {
 					$order = json_decode($order['order_data'], true);
 				}
 				$organizational_units = [];
-				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					$organizational_units[$description] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'required' => true];
+				foreach($this->_lang->_USER['units'] as $unit => $description){
+					$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'required' => true];
 					if (isset($order['organizational_unit']) && in_array($unit, explode(',', $order['organizational_unit']))) $organizational_units[$description]['checked'] = true;
-					elseif (isset($_SESSION['user']['app_settings']['primaryUnit'])) $organizational_units[LANG::GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
+					elseif (isset($_SESSION['user']['app_settings']['primaryUnit'])) $organizational_units[$this->_lang->GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
 				}
 
 				$order_type = [];
-				foreach(LANGUAGEFILE['order']['ordertype'] as $key => $description){
+				foreach($this->_lang->_USER['order']['ordertype'] as $key => $description){
 					$order_type[$description] = ['value' => $key];
 					if (isset($order['order_type']) && $order['order_type'] == $key) $order_type[$description]['selected'] = true;
 				}
@@ -692,7 +692,7 @@ class ORDER extends API {
 						[
 							'type' => 'number',
 							'attributes' => [
-								'name' => LANG::GET('user.edit_order_authorization'),
+								'name' => $this->_lang->GET('user.edit_order_authorization'),
 								'type' => 'password'
 							]
 						]
@@ -702,7 +702,7 @@ class ORDER extends API {
 					[
 						'type' => 'scanner',
 						'attributes' => [
-							'name' => LANG::GET('user.edit_token'),
+							'name' => $this->_lang->GET('user.edit_token'),
 							'type' => 'password'
 						]
 					]
@@ -711,7 +711,7 @@ class ORDER extends API {
 					[
 						'type' => 'signature',
 						'attributes' => [
-							'name' => LANG::GET('order.add_approval_signature')
+							'name' => $this->_lang->GET('order.add_approval_signature')
 						]
 					]
 				];
@@ -730,12 +730,12 @@ class ORDER extends API {
 							'content' => $vendors,
 							'attributes' => [
 								'id' => 'productsearchvendor',
-								'name' => LANG::GET('consumables.edit_product_vendor_select')
+								'name' => $this->_lang->GET('consumables.edit_product_vendor_select')
 							]
 						], [
 							'type' => 'search',
 							'attributes' => [
-								'name' => LANG::GET('consumables.edit_product_search'),
+								'name' => $this->_lang->GET('consumables.edit_product_search'),
 									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
 								'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
 								'id' => 'productsearch'
@@ -743,9 +743,9 @@ class ORDER extends API {
 						], [
 							'type' => 'button',
 							'attributes' => [
-								'value' => LANG::GET('order.add_manually'),
+								'value' => $this->_lang->GET('order.add_manually'),
 								'type' => 'button',
-								'onpointerup' => "new Dialog({type: 'input', header: '". LANG::GET('order.add_manually') ."', render: JSON.parse('".
+								'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
 									json_encode([
 										[
 											[
@@ -764,36 +764,36 @@ class ORDER extends API {
 										[
 											'type' => 'number',
 											'attributes' => [
-												'name' => LANG::GET('order.quantity_label'),
+												'name' => $this->_lang->GET('order.quantity_label'),
 											]
 										], [
 											'type' => 'text',
 											'attributes' => [
-												'name' => LANG::GET('order.unit_label'),
+												'name' => $this->_lang->GET('order.unit_label'),
 												'list' => 'units'
 											]
 										], [
 											'type' => 'text',
 											'attributes' => [
-												'name' => LANG::GET('order.ordernumber_label')
+												'name' => $this->_lang->GET('order.ordernumber_label')
 											]
 										], [
 											'type' => 'text',
 											'attributes' => [
-												'name' => LANG::GET('order.productname_label')
+												'name' => $this->_lang->GET('order.productname_label')
 											]
 										], [
 											'type' => 'text',
 											'attributes' => [
-												'name' => LANG::GET('order.vendor_label'),
+												'name' => $this->_lang->GET('order.vendor_label'),
 												'list' => 'vendors'
 											]
 										]
 									]
 								])
 								."'), options:{".
-									"'".LANG::GET('order.add_manually_confirm')."': true,".
-									"'".LANG::GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
+									"'".$this->_lang->GET('order.add_manually_confirm')."': true,".
+									"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
 								"}}).then(response => {if (Object.keys(response).length) {".
 									"_client.order.addProduct(response[LANG.GET('order.quantity_label')] || '', response[LANG.GET('order.unit_label')] || '', response[LANG.GET('order.ordernumber_label')] || '', response[LANG.GET('order.productname_label')] || '', response[LANG.GET('order.barcode_label')] || '', response[LANG.GET('order.vendor_label')] || '');".
 									"api.preventDataloss.monitor = true;}".
@@ -805,15 +805,15 @@ class ORDER extends API {
 						[
 							'type' => 'radio',
 							'attributes' => [
-								'name' => LANG::GET('order.organizational_unit')
+								'name' => $this->_lang->GET('order.organizational_unit')
 							],
 							'content' => $organizational_units
 						], [
 							'type' => 'text',
-							'hint' => LANG::GET('order.commission_hint'),
+							'hint' => $this->_lang->GET('order.commission_hint'),
 							'attributes' => [
 								'required' => true,
-								'name' => LANG::GET('order.commission'),
+								'name' => $this->_lang->GET('order.commission'),
 								'value' => isset($order['commission']) ? $order['commission'] : '',
 								'data-loss' => 'prevent',
 								'id' => 'commission'
@@ -825,18 +825,18 @@ class ORDER extends API {
 							'type' => 'select',
 							'content' => $order_type,
 							'attributes' => [
-								'name' => LANG::GET('order.order_type')
+								'name' => $this->_lang->GET('order.order_type')
 							]
 						], [
 							'type' => 'date',
 							'attributes' => [
-								'name' => LANG::GET('order.delivery_date'),
+								'name' => $this->_lang->GET('order.delivery_date'),
 								'value' => isset($order['delivery_date']) ? $order['delivery_date'] : ''
 							]
 						], [
 							'type' => 'textarea',
 							'attributes' => [
-								'name' => LANG::GET('order.additional_info'),
+								'name' => $this->_lang->GET('order.additional_info'),
 								'value' => isset($order['additional_info']) ? preg_replace('/\\\\n/', "\n", $order['additional_info']) : '',
 								'data-loss' => 'prevent'
 							]
@@ -846,7 +846,7 @@ class ORDER extends API {
 							[
 								'type' => 'file',
 								'attributes' => [
-									'name' => LANG::GET('order.attach_file'),
+									'name' => $this->_lang->GET('order.attach_file'),
 									'multiple' => true
 								]
 							]
@@ -854,7 +854,7 @@ class ORDER extends API {
 							[
 								'type' => 'photo',
 								'attributes' => [
-									'name' => LANG::GET('order.attach_photo'),
+									'name' => $this->_lang->GET('order.attach_photo'),
 									'multiple' => true
 								]
 							]
@@ -865,9 +865,9 @@ class ORDER extends API {
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
 					array_splice($result['render']['content'][2], 1, 0, [[
 							'type' => 'text',
-							'hint' => LANG::GET('order.orderer_group_hint'),
+							'hint' => $this->_lang->GET('order.orderer_group_hint'),
 							'attributes' => [
-								'name' => LANG::GET('order.orderer_group_identify'),
+								'name' => $this->_lang->GET('order.orderer_group_identify'),
 								'required' => true,
 								'value' => isset($order['orderer_group_identify']) ? $order['orderer_group_identify'] : '',
 							]
@@ -883,7 +883,7 @@ class ORDER extends API {
 						[
 							[
 								'type' => 'links',
-								'description' => LANG::GET('order.attached_files'),
+								'description' => $this->_lang->GET('order.attached_files'),
 								'content' => $files
 							], [
 								'type' => 'hidden',
@@ -905,7 +905,7 @@ class ORDER extends API {
 							[
 								'type' => 'number',
 								'attributes' => [
-									'name' => LANG::GET('order.quantity_label') . '[]',
+									'name' => $this->_lang->GET('order.quantity_label') . '[]',
 									'value' => UTILITY::propertySet($order['items'][$i], 'quantity_label') ? : ' ',
 									'min' => '1',
 									'max' => '99999',
@@ -916,7 +916,7 @@ class ORDER extends API {
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => LANG::GET('order.added_product', [
+									'name' => $this->_lang->GET('order.added_product', [
 										':unit' => UTILITY::propertySet($order['items'][$i], 'unit_label') ? : '',
 										':number' => UTILITY::propertySet($order['items'][$i], 'ordernumber_label') ? : '',
 										':name' => UTILITY::propertySet($order['items'][$i], 'productname_label') ? : '',
@@ -927,35 +927,35 @@ class ORDER extends API {
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => LANG::GET('order.unit_label') . '[]',
+									'name' => $this->_lang->GET('order.unit_label') . '[]',
 									'value' => UTILITY::propertySet($order['items'][$i], 'unit_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => LANG::GET('order.ordernumber_label') . '[]',
+									'name' => $this->_lang->GET('order.ordernumber_label') . '[]',
 									'value' => UTILITY::propertySet($order['items'][$i], 'ordernumber_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => LANG::GET('order.productname_label') . '[]',
+									'name' => $this->_lang->GET('order.productname_label') . '[]',
 									'value' => UTILITY::propertySet($order['items'][$i], 'productname_label') ? : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => LANG::GET('order.barcode_label') . '[]',
+									'name' => $this->_lang->GET('order.barcode_label') . '[]',
 									'value' => UTILITY::propertySet($order['items'][$i], 'barcode_label') ?  : ' '
 								]
 							],
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => LANG::GET('order.vendor_label') . '[]',
+									'name' => $this->_lang->GET('order.vendor_label') . '[]',
 									'value' => UTILITY::propertySet($order['items'][$i], 'vendor_label') ? : ' '
 								]
 							],
@@ -963,16 +963,16 @@ class ORDER extends API {
 								'type' => 'checkbox',
 								'inline' => true,
 								'attributes' => [
-									'name' => LANG::GET('order.aut_idem') . '[]'
+									'name' => $this->_lang->GET('order.aut_idem') . '[]'
 								],
 								'content' => [
-									LANG::GET('order.aut_idem') => UTILITY::propertySet($order['items'][$i], 'aut_idem') ? ['checked' => true] : []
+									$this->_lang->GET('order.aut_idem') => UTILITY::propertySet($order['items'][$i], 'aut_idem') ? ['checked' => true] : []
 								]
 							],
 							[
 								'type' => 'deletebutton',
 								'attributes' => [
-									'value' => LANG::GET('order.add_delete'),
+									'value' => $this->_lang->GET('order.add_delete'),
 									'onpointerup' => 'this.parentNode.remove()'
 								]
 							]
@@ -983,11 +983,11 @@ class ORDER extends API {
 				if ($this->_requestedID) array_push($result['render']['content'], [
 					['type' => 'deletebutton',
 					'attributes' => [
-						'value' => LANG::GET('order.delete_prepared_order'),
+						'value' => $this->_lang->GET('order.delete_prepared_order'),
 						'type' => 'button', // apparently defaults to submit otherwise
-						'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('order.delete_prepared_order_confirm_header') ."', options:{".
-							"'".LANG::GET('order.delete_prepared_order_confirm_cancel')."': false,".
-							"'".LANG::GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+						'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('order.delete_prepared_order_confirm_header') ."', options:{".
+							"'".$this->_lang->GET('order.delete_prepared_order_confirm_cancel')."': false,".
+							"'".$this->_lang->GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 							"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'order', " . $this->_requestedID . ")})"
 					]]
 				]);
@@ -1018,14 +1018,14 @@ class ORDER extends API {
 					$result = [
 					'response' => [
 						'id' => false,
-						'msg' => LANG::GET('order.deleted'),
+						'msg' => $this->_lang->GET('order.deleted'),
 						'type' => 'success'
 					]];
 				}
 				else $result = [
 					'response' => [
 						'id' => $this->_requestedID,
-						'msg' => LANG::GET('order.failed_delete'),
+						'msg' => $this->_lang->GET('order.failed_delete'),
 						'type' => 'error'
 					]];
 				break;
@@ -1116,16 +1116,16 @@ class ORDER extends API {
 			$result = [
 				'response' => [
 					'id' => false,
-					'msg' => LANG::GET('order.saved'),
+					'msg' => $this->_lang->GET('order.saved'),
 					'type' => 'success'
 				]
 			];
-			$this->alertUserGroup(['permission'=>['purchase']], LANG::GET('order.alert_purchase', [], true));		
+			$this->alertUserGroup(['permission'=>['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
 		}
 		else $result = [
 			'response' => [
 				'id' => false,
-				'msg' => LANG::GET('order.failed_save'),
+				'msg' => $this->_lang->GET('order.failed_save'),
 				'type' => 'error'
 			]];
 		return $result;
@@ -1142,7 +1142,7 @@ class ORDER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$approval = false;
-				if ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
+				if ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization'))){
 					$result = SQLQUERY::EXECUTE($this->_pdo, 'user_get_orderauth', [
 						'values' => [
 							':orderauth' => $orderauth
@@ -1150,10 +1150,10 @@ class ORDER extends API {
 					]);
 					$result = $result ? $result[0] : null;
 					if ($result){
-						$approval = $result['name'] . LANG::GET('order.orderauth_verified');
+						$approval = $result['name'] . $this->_lang->GET('order.orderauth_verified');
 					}
 				}
-				elseif ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_token'))){
+				elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_token'))){
 					$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 						'values' => [
 							':token' => $orderauth
@@ -1161,14 +1161,14 @@ class ORDER extends API {
 					]);
 					$result = $result ? $result[0] : null;
 					if ($result && $result['orderauth']){
-						$approval = $result['name'] . LANG::GET('order.token_verified');
+						$approval = $result['name'] . $this->_lang->GET('order.token_verified');
 					}
 				}
-				elseif (isset($_FILES[LANG::PROPERTY('order.add_approval_signature')]) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
-					$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
+				elseif (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
+					$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
 					$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
 				}
-				$approvedIDs = UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.bulk_approve_order'));
+				$approvedIDs = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.bulk_approve_order'));
 				if (!$approval) $this->response([], 401);
 				if (!$approvedIDs) $this->response([], 406);
 
@@ -1196,7 +1196,7 @@ class ORDER extends API {
 				if(!count($order_data['items'])) $this->response([], 406);
 				$result = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
 
-				if ($result['response']['msg'] === LANG::GET('order.saved')){
+				if ($result['response']['msg'] === $this->_lang->GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
 							':id' => implode(",", array_map(fn($id) => intval($id), $approvedIDs))
@@ -1211,7 +1211,7 @@ class ORDER extends API {
 				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 				// display all orders assigned to organizational unit
 				if ($this->_requestedID) $units = [$this->_requestedID]; // see orders from selected unit
-				elseif (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys(LANGUAGEFILE['units']); // see all orders
+				elseif (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // see only orders for own units
 
 				$organizational_orders = [];
@@ -1224,16 +1224,16 @@ class ORDER extends API {
 				$result = ['render' => ['content' => []]];
 				if ($_SESSION['user']['orderauth']){
 					$organizational_units = [];
-					foreach(LANGUAGEFILE['units'] as $unit => $description){
-						$organizational_units[$description] = ['name' => LANG::PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared', '" . $unit . "')"];
+					foreach($this->_lang->_USER['units'] as $unit => $description){
+						$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared', '" . $unit . "')"];
 						//$organizational_units[$description]['checked'] = true;
 					}
-					if (!$this->_requestedID && isset($_SESSION['user']['app_settings']['primaryUnit'])) $organizational_units[LANG::GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
-					elseif($this->_requestedID) $organizational_units[LANG::GET('units.' . $this->_requestedID)]['checked'] = true;
+					if (!$this->_requestedID && isset($_SESSION['user']['app_settings']['primaryUnit'])) $organizational_units[$this->_lang->GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
+					elseif($this->_requestedID) $organizational_units[$this->_lang->GET('units.' . $this->_requestedID)]['checked'] = true;
 					$result['render']['content'][] = [
 						['type' => 'radio',
 						'attributes' => [
-							'name' => LANG::GET('order.organizational_unit')
+							'name' => $this->_lang->GET('order.organizational_unit')
 						],
 						'content' => $organizational_units
 						]
@@ -1247,27 +1247,27 @@ class ORDER extends API {
 						foreach ($processedOrderData as $key => $value){ // data
 							if (is_array($value)){
 								foreach($value as $item){
-									$items .= LANG::GET('order.prepared_order_item', [
+									$items .= $this->_lang->GET('order.prepared_order_item', [
 										':quantity' => UTILITY::propertySet($item, 'quantity_label') ? : '',
 										':unit' => UTILITY::propertySet($item, 'unit_label') ? : '',
 										':number' => UTILITY::propertySet($item, 'ordernumber_label') ? : '',
 										':name' => UTILITY::propertySet($item, 'productname_label') ? : '',
 										':vendor' => UTILITY::propertySet($item, 'vendor_label') ? : '',
-										':aut_idem' => UTILITY::propertySet($item, 'aut_idem') ? LANG::GET('order.aut_idem') : ''
+										':aut_idem' => UTILITY::propertySet($item, 'aut_idem') ? $this->_lang->GET('order.aut_idem') : ''
 									])."\n";
 								}
 							} else {
 								if ($key === 'attachments') continue;
-								if ($key === 'organizational_unit') $value = LANG::GET('units.' . $value);
+								if ($key === 'organizational_unit') $value = $this->_lang->GET('units.' . $value);
 								if ($key === 'order_type') {
 									$order_attributes = [
-										'name' => LANG::GET('order.ordertype.' . $value),
+										'name' => $this->_lang->GET('order.ordertype.' . $value),
 										'data-type' => $value
 									];
-									$value = LANG::GET('order.ordertype.' . $value);
+									$value = $this->_lang->GET('order.ordertype.' . $value);
 								}
 
-								$info .= LANG::GET('order.' . $key) . ': ' . $value . "\n";
+								$info .= $this->_lang->GET('order.' . $key) . ': ' . $value . "\n";
 							}
 						}
 						array_push($result['render']['content'], [
@@ -1281,12 +1281,12 @@ class ORDER extends API {
 							], [
 								'type' => 'checkbox',
 								'content' => [
-									LANG::GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]
+									$this->_lang->GET('order.bulk_approve_order'). '[]' => ['value' => $order['id']]
 								]
 							], [
 								'type' => 'button',
 								'attributes' =>[
-									'value' => LANG::GET('order.edit_prepared_order'),
+									'value' => $this->_lang->GET('order.edit_prepared_order'),
 									'type' => 'button',
 									'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"
 								]
@@ -1301,7 +1301,7 @@ class ORDER extends API {
 								[
 									[
 										'type' => 'links',
-										'description' => LANG::GET('order.attached_files'),
+										'description' => $this->_lang->GET('order.attached_files'),
 										'content' => $files
 									], [
 										'type' => 'hidden',
@@ -1321,7 +1321,7 @@ class ORDER extends API {
 								[
 									'type' => 'number',
 									'attributes' => [
-										'name' => LANG::GET('user.edit_order_authorization'),
+										'name' => $this->_lang->GET('user.edit_order_authorization'),
 										'type' => 'password'
 									]
 								]
@@ -1331,7 +1331,7 @@ class ORDER extends API {
 							[
 								'type' => 'scanner',
 								'attributes' => [
-									'name' => LANG::GET('user.edit_token'),
+									'name' => $this->_lang->GET('user.edit_token'),
 									'type' => 'password'
 								]
 							]
@@ -1340,7 +1340,7 @@ class ORDER extends API {
 							[
 								'type' => 'signature',
 								'attributes' => [
-									'name' => LANG::GET('order.add_approval_signature')
+									'name' => $this->_lang->GET('order.add_approval_signature')
 								]
 							]
 						];
@@ -1349,7 +1349,7 @@ class ORDER extends API {
 						$result['render']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];
 					}
 				}
-				else $result['render']['content'][] = $this->noContentAvailable(LANG::GET('order.no_orders'))[0];
+				else $result['render']['content'][] = $this->noContentAvailable($this->_lang->GET('order.no_orders'))[0];
 				break;
 		}
 		$this->response($result);
@@ -1363,14 +1363,14 @@ class ORDER extends API {
 	 *  |_|
 	 */
 	private function processOrderForm(){
-		$unset = LANG::PROPERTY('consumables.edit_product_search');
+		$unset = $this->_lang->PROPERTY('consumables.edit_product_search');
 		unset ($this->_payload->$unset);
-		$unset = LANG::PROPERTY('consumables.edit_product_vendor_select');
+		$unset = $this->_lang->PROPERTY('consumables.edit_product_vendor_select');
 		unset ($this->_payload->$unset);
 
 		// detect approval
 		$approval = false;
-		if ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_order_authorization'))){
+		if ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization'))){
 			$result = SQLQUERY::EXECUTE($this->_pdo, 'user_get_orderauth', [
 				'values' => [
 					':orderauth' => $orderauth
@@ -1378,10 +1378,10 @@ class ORDER extends API {
 			]);
 			$result = $result ? $result[0] : null;
 			if ($result){
-				$approval = $result['name'] . LANG::GET('order.orderauth_verified');
+				$approval = $result['name'] . $this->_lang->GET('order.orderauth_verified');
 			}
 		}
-		elseif ($orderauth = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_token'))){
+		elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_token'))){
 			$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
 					':token' => $orderauth
@@ -1389,14 +1389,14 @@ class ORDER extends API {
 			]);
 			$result = $result ? $result[0] : null;
 			if ($result && $result['orderauth']){
-				$approval = $result['name'] . LANG::GET('order.token_verified');
+				$approval = $result['name'] . $this->_lang->GET('order.token_verified');
 			}
 		}
-		unset ($this->_payload->{LANG::PROPERTY('user.edit_order_authorization')});
-		unset ($this->_payload->{LANG::PROPERTY('user.edit_token')});
+		unset ($this->_payload->{$this->_lang->PROPERTY('user.edit_order_authorization')});
+		unset ($this->_payload->{$this->_lang->PROPERTY('user.edit_token')});
 
-		if (isset($_FILES[LANG::PROPERTY('order.add_approval_signature')]) && $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name']){
-			$signature = gettype($_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[LANG::PROPERTY('order.add_approval_signature')]['tmp_name'];
+		if (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
+			$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];
 			$approval = 'data:image/png;base64,' . base64_encode(UTILITY::alterImage($signature, CONFIG['limits']['order_approvalsignature_image'], UTILITY_IMAGE_RESOURCE, 'png'));
 		}
 
@@ -1405,15 +1405,15 @@ class ORDER extends API {
 		
 		// handle attachments
 		$attachments = [];
-		if (isset($_FILES[LANG::PROPERTY('order.attach_photo')]) && $_FILES[LANG::PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
+		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
 		}
-		if (isset($_FILES[LANG::PROPERTY('order.attach_file')]) && $_FILES[LANG::PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([LANG::PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
+		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
@@ -1426,12 +1426,12 @@ class ORDER extends API {
 		}
 
 		// convert organizations unit from value to key according to language file
-		$this->_payload->{LANG::PROPERTY('order.organizational_unit')} = array_search(UTILITY::propertySet($this->_payload, LANG::PROPERTY('order.organizational_unit')), LANGUAGEFILE['units']);
+		$this->_payload->{$this->_lang->PROPERTY('order.organizational_unit')} = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.organizational_unit')), $this->_lang->_USER['units']);
 
 		// translate payload-names to languagefile keys
 		$language = [];
-		foreach(array_keys(LANGUAGEFILE['order']) as $key){
-			$language[$key] = LANG::PROPERTY('order.' . $key);
+		foreach(array_keys($this->_lang->_USER['order']) as $key){
+			$language[$key] = $this->_lang->PROPERTY('order.' . $key);
 		}
 		// set data
 		foreach ($this->_payload as $key => $value){

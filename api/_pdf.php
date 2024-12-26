@@ -24,11 +24,12 @@ class PDF{
 	public static function identifierPDF($content, $type = 'sheet'){
 		// create a pdf for a label sheet with qr code and plain text
 		// or label for label printer as selected
+		$_lang = new LANG();
 
 		$setup = [
 			'orientation' => isset(CONFIG['label'][$type]['orientation']) ? CONFIG['label'][$type]['orientation'] : 'portrait',
 			'format' => isset(CONFIG['label'][$type]['format']) ? CONFIG['label'][$type]['format'] : 'A4',
-			'title' => LANG::GET('record.create_identifier'),
+			'title' => $_lang->GET('record.create_identifier'),
 			'margin' => [
 				'top' => isset(CONFIG['label'][$type]['margintop']) ? CONFIG['label'][$type]['margintop'] : 0,
 				'right' => isset(CONFIG['label'][$type]['marginright']) ? CONFIG['label'][$type]['marginright'] : 0,
@@ -471,6 +472,8 @@ class RECORDTCPDF extends TCPDF {
 
 	// Page footer
 	public function Footer() {
+		$_lang = new LANG();
+
 		// Position at 15 mm from bottom
 		$this->SetY(-15);
 		$imageMargin = 0;
@@ -488,7 +491,7 @@ class RECORDTCPDF extends TCPDF {
 		$this->SetFont('helvetica', 'I', 8);
 		// company contacts and page number
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$this->MultiCell($this->getPageWidth() - CONFIG['pdf']['record']['marginleft'] - 10 - $imageMargin, 10, LANG::GET('company.address') . ' | ' . CONFIG['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, CONFIG['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, CONFIG['pdf']['record']['marginbottom'], 'T', true);
+		$this->MultiCell($this->getPageWidth() - CONFIG['pdf']['record']['marginleft'] - 10 - $imageMargin, 10, $_lang->GET('company.address') . ' | ' . CONFIG['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, CONFIG['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, CONFIG['pdf']['record']['marginbottom'], 'T', true);
 	}
 }
 

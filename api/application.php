@@ -42,10 +42,10 @@ class APPLICATION extends API {
 	 *  | | .'|   | . | | | .'| . | -_|
 	 *  |_|__,|_|_|_  |___|__,|_  |___|
 	 *            |___|       |___|
-	 * respond with constant LANGUAGEFILE as transfer to js frontend
+	 * respond with $this->_lang->_USER as transfer to js frontend
 	 */
     public function language(){
-		$this->response(['data' => LANG::GETALL()]);
+		$this->response(['data' => $this->_lang->GETALL()]);
 	}
 
 	/**
@@ -59,7 +59,7 @@ class APPLICATION extends API {
 	 */
 	public function login(){
 		if (!$this->_requestedLogout){
-			if (!UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description')) && isset($_SESSION['user'])){
+			if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.login_description')) && isset($_SESSION['user'])){
 				$this->response([
 					'user' => [
 					'image' => $_SESSION['user']['image'],
@@ -85,10 +85,10 @@ class APPLICATION extends API {
 			// select single user based on token
 			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
-					':token' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.login_description'))
+					':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.login_description'))
 				]
 			]);
-			if ($query && UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.terms_of_service_accepted'))){
+			if ($query && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.terms_of_service_accepted'))){
 				$result = $query[0];
 				$_SESSION['user'] = $result;
 				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
@@ -131,7 +131,7 @@ class APPLICATION extends API {
 						[
 							'type' => 'scanner',
 							'attributes' => [
-								'name' => LANG::GET('user.login_description', [], true),
+								'name' => $this->_lang->GET('user.login_description', [], true),
 								'type' => 'password'
 							]
 						]
@@ -145,9 +145,9 @@ class APPLICATION extends API {
 		$replacements = [
 			':issue_mail' => CONFIG['application']['issue_mail'],
 			// no use of PERMISSIONS::permissionFor, because this method required a logged in user
-			':permissions' => implode(', ', array_map(fn($v) => LANGUAGEFILE['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])]))
+			':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])]))
 		];
-		foreach (LANGUAGEFILE['application']['terms_of_service'] as $description => $content){
+		foreach ($this->_lang->_USER['application']['terms_of_service'] as $description => $content){
 			$tos[] = [[
 				'type' => 'textsection',
 				'attributes' => [
@@ -161,7 +161,7 @@ class APPLICATION extends API {
 			[
 				'type' => 'checkbox',
 				'content' => [
-					LANG::GET('application.terms_of_service_accepted', [], true) => ['required' => true]
+					$this->_lang->GET('application.terms_of_service_accepted', [], true) => ['required' => true]
 				]
 			]
 		];
@@ -188,17 +188,17 @@ class APPLICATION extends API {
 			case 'POST':
 				$permissions = [];
 				$entry = [
-					'title' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_title')),
-					'content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_content')),
+					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_title')),
+					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_content')),
 					'permissions' => '',
 				];
 		
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
-				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+				foreach($this->_lang->_USER['permissions'] as $level => $description){
 					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
 						$permissions[] = $level;
 					}
@@ -216,30 +216,30 @@ class APPLICATION extends API {
 				if ($query) $this->response([
 					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
+						'msg' => $this->_lang->GET('application.edit_manual_saved', [':name' => $entry['title']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
 						'id' => false,
-						'name' => LANG::GET('application.edit_manual_not_saved'),
+						'name' => $this->_lang->GET('application.edit_manual_not_saved'),
 						'type' => 'error'
 					]]);
 				break;
 			case 'PUT':
 				$permissions = [];
 				$entry = [
-					'title' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_title')),
-					'content' => UTILITY::propertySet($this->_payload, LANG::PROPERTY('application.edit_manual_content')),
+					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_title')),
+					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.edit_manual_content')),
 					'permissions' => '',
 				];
 		
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => LANG::GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.edit_manual_forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
 		
 				// chain checked permission levels
-				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+				foreach($this->_lang->_USER['permissions'] as $level => $description){
 					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
 						$permissions[] = $level;
 					}
@@ -257,13 +257,13 @@ class APPLICATION extends API {
 				if ($query) $this->response([
 					'response' => [
 						'id' => $this->_requestedManual,
-						'msg' => LANG::GET('application.edit_manual_saved', [':name' => $entry['title']]),
+						'msg' => $this->_lang->GET('application.edit_manual_saved', [':name' => $entry['title']]),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
 						'id' => false,
-						'name' => LANG::GET('application.edit_manual_not_saved'),
+						'name' => $this->_lang->GET('application.edit_manual_not_saved'),
 						'type' => 'error'
 					]]);
 
@@ -287,7 +287,7 @@ class APPLICATION extends API {
 					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
 
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
-				$options = ['...' . LANG::GET('application.edit_new_manual_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . LANG::GET('application.edit_new_manual_topic')) ? ['selected' => true] : []];
+				$options = ['...' . $this->_lang->GET('application.edit_new_manual_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . $this->_lang->GET('application.edit_new_manual_topic')) ? ['selected' => true] : []];
 				foreach ($query as $row){
 					$options[$row['title']] = ['value' => $row['id']];
 					if ($entry['id'] === $row['id']) $options[$row['title']]['selected'] = true; 
@@ -295,7 +295,7 @@ class APPLICATION extends API {
 				ksort($options);
 
 				$permissions = [];
-				foreach(LANGUAGEFILE['permissions'] as $level => $description){
+				foreach($this->_lang->_USER['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, explode(',', $entry['permissions'])) ? ['checked' => true] : [];
 				}
 
@@ -304,7 +304,7 @@ class APPLICATION extends API {
 						[
 							'type' => 'select',
 							'attributes' => [
-								'name' => LANG::GET('application.edit_select_manual_topic'),
+								'name' => $this->_lang->GET('application.edit_select_manual_topic'),
 								'onchange' => "api.application('get', 'manual', this.value)"
 							],
 							'content' => $options
@@ -312,7 +312,7 @@ class APPLICATION extends API {
 						[
 							'type' => 'text',
 							'attributes' => [
-								'name' => LANG::GET('application.edit_manual_title'),
+								'name' => $this->_lang->GET('application.edit_manual_title'),
 								'value' => $entry['title'],
 							]
 						],
@@ -320,14 +320,14 @@ class APPLICATION extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'rows' => 8,
-								'name' => LANG::GET('application.edit_manual_content'),
+								'name' => $this->_lang->GET('application.edit_manual_content'),
 								'value' => $entry['content']
 							]
 						],
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => LANG::GET('application.edit_manual_permissions')
+								'name' => $this->_lang->GET('application.edit_manual_permissions')
 							],
 							'content' => $permissions
 						]
@@ -337,11 +337,11 @@ class APPLICATION extends API {
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
-								'value' => LANG::GET('application.edit_manual_delete'),
+								'value' => $this->_lang->GET('application.edit_manual_delete'),
 								'type' => 'button',
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". LANG::GET('application.edit_manual_delete_confirm') ."', options: {".
-								"'".LANG::GET('general.cancel_button')."': false,".
-								"'".LANG::GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
+								'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('application.edit_manual_delete_confirm') ."', options: {".
+								"'".$this->_lang->GET('general.cancel_button')."': false,".
+								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
 									"}}).then(confirmation => {if (confirmation) api.application('delete', 'manual', " . $entry['id'] . ")})"
 							]
 						]
@@ -356,13 +356,13 @@ class APPLICATION extends API {
 				]);
 				if ($query) $this->response([
 					'response' => [
-						'msg' => LANG::GET('application.edit_manual_deleted'),
+						'msg' => $this->_lang->GET('application.edit_manual_deleted'),
 						'id' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => LANG::GET('application.edit_manual_error'),
+						'msg' => $this->_lang->GET('application.edit_manual_error'),
 						'id' => $this->_requestedManual,
 						'type' => 'error'
 					]]);
@@ -381,71 +381,71 @@ class APPLICATION extends API {
 	 */
 	public function menu(){
 		// get permission based menu items
-		if (!isset($_SESSION['user'])) $this->response(['body' => [LANG::GET('menu.application_header') => [LANG::GET('menu.application_signin') => []]]]);			
+		if (!isset($_SESSION['user'])) $this->response(['body' => [$this->_lang->GET('menu.application_header') => [$this->_lang->GET('menu.application_signin') => []]]]);			
 		$menu = [
-			LANG::GET('menu.communication_header') => [
-				LANG::GET('menu.message_conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
-				LANG::GET('menu.message_register') => ['onpointerup' => "api.message('get', 'register')"],
-				LANG::GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
+			$this->_lang->GET('menu.communication_header') => [
+				$this->_lang->GET('menu.message_conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
+				$this->_lang->GET('menu.message_register') => ['onpointerup' => "api.message('get', 'register')"],
+				$this->_lang->GET('menu.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
 			],
-			LANG::GET('menu.record_header') => [
-				LANG::GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
-				LANG::GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
+			$this->_lang->GET('menu.record_header') => [
+				$this->_lang->GET('menu.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
+				$this->_lang->GET('menu.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
-			LANG::GET('menu.calendar_header') => [
-				LANG::GET('menu.calendar_scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
+			$this->_lang->GET('menu.calendar_header') => [
+				$this->_lang->GET('menu.calendar_scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
 			],
-			LANG::GET('menu.application_header') => [
-				LANG::GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('post', 'login', 'logout')"],
-				LANG::GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
-				LANG::GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
+			$this->_lang->GET('menu.application_header') => [
+				$this->_lang->GET('menu.application_signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('post', 'login', 'logout')"],
+				$this->_lang->GET('menu.application_start') => ['onpointerup' => "api.application('get', 'start')"],			
+				$this->_lang->GET('menu.application_user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
 			],
-			LANG::GET('menu.files_header') => [
-				LANG::GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
-				LANG::GET('menu.files_bundles') => ['onpointerup' => "api.file('get', 'bundle')"],
-				LANG::GET('menu.files_sharepoint') => ['onpointerup' => "api.file('get', 'sharepoint')"],
+			$this->_lang->GET('menu.files_header') => [
+				$this->_lang->GET('menu.files_files') => ['onpointerup' => "api.file('get', 'files')"],
+				$this->_lang->GET('menu.files_bundles') => ['onpointerup' => "api.file('get', 'bundle')"],
+				$this->_lang->GET('menu.files_sharepoint') => ['onpointerup' => "api.file('get', 'sharepoint')"],
 			],
-			LANG::GET('menu.purchase_header') => [
-				LANG::GET('menu.purchase_order') => ['onpointerup' => "api.purchase('get', 'order')"],
-				LANG::GET('menu.purchase_prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
-				LANG::GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
-				LANG::GET('menu.purchase_vendor') => ['onpointerup' => "api.purchase('get', 'vendor')"],
-				LANG::GET('menu.purchase_product') => ['onpointerup' => "api.purchase('get', 'product')"],
+			$this->_lang->GET('menu.purchase_header') => [
+				$this->_lang->GET('menu.purchase_order') => ['onpointerup' => "api.purchase('get', 'order')"],
+				$this->_lang->GET('menu.purchase_prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
+				$this->_lang->GET('menu.purchase_approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
+				$this->_lang->GET('menu.purchase_vendor') => ['onpointerup' => "api.purchase('get', 'vendor')"],
+				$this->_lang->GET('menu.purchase_product') => ['onpointerup' => "api.purchase('get', 'product')"],
 			],
-			LANG::GET('menu.tools_header') => [
-				LANG::GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
-				LANG::GET('menu.tools_scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
-				LANG::GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"],
-				LANG::GET('menu.tools_calculator') => ['onpointerup' => "api.tool('get', 'calculator')"],
-				LANG::GET('menu.tools_image') => ['onpointerup' => "api.tool('get', 'image')"],
+			$this->_lang->GET('menu.tools_header') => [
+				$this->_lang->GET('menu.tools_digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
+				$this->_lang->GET('menu.tools_scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
+				$this->_lang->GET('menu.tools_stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"],
+				$this->_lang->GET('menu.tools_calculator') => ['onpointerup' => "api.tool('get', 'calculator')"],
+				$this->_lang->GET('menu.tools_image') => ['onpointerup' => "api.tool('get', 'image')"],
 			],
 		];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_bundles')] = ['onpointerup' => "api.document('get', 'bundles')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[LANG::GET('menu.record_header')][LANG::GET('menu.record_record')] = ['onpointerup' => "api.document('get', 'documents')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.record_header')][$this->_lang->GET('menu.record_bundles')] = ['onpointerup' => "api.document('get', 'bundles')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.record_header')][$this->_lang->GET('menu.record_record')] = ['onpointerup' => "api.document('get', 'documents')"];
 		// make sure risk management comes after documents 
-		$menu[LANG::GET('menu.record_header')][LANG::GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
+		$menu[$this->_lang->GET('menu.record_header')][$this->_lang->GET('menu.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
-			$menu[LANG::GET('menu.calendar_header')][LANG::GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
+			$menu[$this->_lang->GET('menu.calendar_header')][$this->_lang->GET('menu.calendar_timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
 
-		if (PERMISSION::permissionFor('files')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
-		if (PERMISSION::permissionFor('externaldocuments')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
+		if (PERMISSION::permissionFor('files')) $menu[$this->_lang->GET('menu.files_header')][$this->_lang->GET('menu.files_file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
+		if (PERMISSION::permissionFor('externaldocuments')) $menu[$this->_lang->GET('menu.files_header')][$this->_lang->GET('menu.files_external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
 		if (PERMISSION::permissionFor('documentcomposer')){
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_components')] = ['onpointerup' => "api.document('get', 'component_editor')"];
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_documents')] = ['onpointerup' => "api.document('get', 'document_editor')"];
-			$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_bundles')] = ['onpointerup' => "api.document('get', 'bundle')"];
+			$menu[$this->_lang->GET('menu.record_header')][$this->_lang->GET('menu.documents_manage_components')] = ['onpointerup' => "api.document('get', 'component_editor')"];
+			$menu[$this->_lang->GET('menu.record_header')][$this->_lang->GET('menu.documents_manage_documents')] = ['onpointerup' => "api.document('get', 'document_editor')"];
+			$menu[$this->_lang->GET('menu.record_header')][$this->_lang->GET('menu.documents_manage_bundles')] = ['onpointerup' => "api.document('get', 'bundle')"];
 		}
-		if (PERMISSION::permissionFor('filebundles')) $menu[LANG::GET('menu.files_header')][LANG::GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
-		if (PERMISSION::permissionFor('users')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
+		if (PERMISSION::permissionFor('filebundles')) $menu[$this->_lang->GET('menu.files_header')][$this->_lang->GET('menu.files_bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
+		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application_header')][$this->_lang->GET('menu.application_user_manager')] =['onpointerup' => "api.user('get', 'user')"];
 		if (PERMISSION::permissionFor('texttemplates')) {
-			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
-			$menu[LANG::GET('menu.communication_header')][LANG::GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
+			$menu[$this->_lang->GET('menu.communication_header')][$this->_lang->GET('menu.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
+			$menu[$this->_lang->GET('menu.communication_header')][$this->_lang->GET('menu.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 		}
-		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
-		if (PERMISSION::permissionFor('csvfilter')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
-		if (PERMISSION::permissionFor('documentapproval'))$menu[LANG::GET('menu.record_header')][LANG::GET('menu.documents_manage_approval')] = ['onpointerup' => "api.document('get', 'approval')"];
-		if (PERMISSION::permissionFor('appmanual')) $menu[LANG::GET('menu.application_header')][LANG::GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
-		if (PERMISSION::permissionFor('csvrules')) $menu[LANG::GET('menu.tools_header')][LANG::GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
-		if (PERMISSION::permissionFor('audits')) $menu[LANG::GET('menu.purchase_header')][LANG::GET('menu.purchase_incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
+		if (PERMISSION::permissionFor('audits')) $menu[$this->_lang->GET('menu.tools_header')][$this->_lang->GET('menu.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools_header')][$this->_lang->GET('menu.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
+		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.record_header')][$this->_lang->GET('menu.documents_manage_approval')] = ['onpointerup' => "api.document('get', 'approval')"];
+		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application_header')][$this->_lang->GET('menu.application_manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
+		if (PERMISSION::permissionFor('csvrules')) $menu[$this->_lang->GET('menu.tools_header')][$this->_lang->GET('menu.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
+		if (PERMISSION::permissionFor('audits')) $menu[$this->_lang->GET('menu.purchase_header')][$this->_lang->GET('menu.purchase_incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
 
 		$this->response(['render' => $menu, 'user' => $_SESSION['user']['name']]);
 	}
@@ -476,10 +476,10 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => LANG::GET('application.overview_messages', [':number' => $unseen]),
+						'content' => $this->_lang->GET('application.overview_messages', [':number' => $unseen]),
 						'attributes' => [
 							'data-type' => 'message',
-							'name' => LANG::GET('menu.message_conversations')
+							'name' => $this->_lang->GET('menu.message_conversations')
 						]
 					]
 				]
@@ -498,10 +498,10 @@ class APPLICATION extends API {
 					'content' => [
 						[
 							'type' => 'textsection',
-							'content' => LANG::GET('application.overview_orders', [':number' => $unprocessed]),
+							'content' => $this->_lang->GET('application.overview_orders', [':number' => $unprocessed]),
 							'attributes' => [
 								'data-type' => 'purchase',
-								'name' => LANG::GET('menu.purchase_approved_orders')
+								'name' => $this->_lang->GET('menu.purchase_approved_orders')
 							]
 						]
 					]
@@ -521,10 +521,10 @@ class APPLICATION extends API {
 					'content' => [
 						[
 							'type' => 'textsection',
-							'content' => LANG::GET('application.overview_preparedorders', [':number' => $prepared]),
+							'content' => $this->_lang->GET('application.overview_preparedorders', [':number' => $prepared]),
 							'attributes' => [
 								'data-type' => 'purchase',
-								'name' => LANG::GET('menu.purchase_prepared_orders')
+								'name' => $this->_lang->GET('menu.purchase_prepared_orders')
 							]
 						]
 					]
@@ -543,10 +543,10 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => LANG::GET('application.overview_cases', [':number' => $number]),
+						'content' => $this->_lang->GET('application.overview_cases', [':number' => $number]),
 						'attributes' => [
 							'data-type' => 'record',
-							'name' => LANG::GET('menu.record_header')
+							'name' => $this->_lang->GET('menu.record_header')
 						]
 					]
 				]
@@ -564,10 +564,10 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => LANG::GET('assemble.approve_landing_page', [':number' => $unapproved]),
+						'content' => $this->_lang->GET('assemble.approve_landing_page', [':number' => $unapproved]),
 						'attributes' => [
 							'data-type' => 'record',
-							'name' => LANG::GET('menu.documents_manage_approval')
+							'name' => $this->_lang->GET('menu.documents_manage_approval')
 						]
 					]
 				]
@@ -585,10 +585,10 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => LANG::GET('consumables.approve_landing_page', [':number' => $unapproved]),
+						'content' => $this->_lang->GET('consumables.approve_landing_page', [':number' => $unapproved]),
 						'attributes' => [
 							'data-type' => 'purchase',
-							'name' => LANG::GET('menu.purchase_incorporated_pending')
+							'name' => $this->_lang->GET('menu.purchase_incorporated_pending')
 						]
 					]
 				]
@@ -606,10 +606,10 @@ class APPLICATION extends API {
 				'content' => [
 					[
 						'type' => 'textsection',
-						'content' => LANG::GET('record.record_complaints_landing_page', [':number' => $complaints]),
+						'content' => $this->_lang->GET('record.record_complaints_landing_page', [':number' => $complaints]),
 						'attributes' => [
 							'data-type' => 'record',
-							'name' => LANG::GET('menu.record_header')
+							'name' => $this->_lang->GET('menu.record_header')
 						]
 					]
 				]
@@ -621,7 +621,7 @@ class APPLICATION extends API {
 			[
 				'type' => 'search',
 				'attributes' => [
-					'name' => LANG::GET('application.search'),
+					'name' => $this->_lang->GET('application.search'),
 					'value' => $this->_search,
 					'onkeypress' => "if (event.key === 'Enter') {api.application('get', 'start', this.value); return false;}",
 				]
@@ -634,7 +634,7 @@ class APPLICATION extends API {
 				$matches = [];
 				foreach ($records as $contextkey => $context){
 					foreach($context as $record){
-						$display = LANG::GET('record.record_list_touched', [
+						$display = $this->_lang->GET('record.record_list_touched', [
 							':identifier' => $record['identifier'],
 							':date' => $record['last_touch'],
 							':document' => $record['last_document']
@@ -650,7 +650,7 @@ class APPLICATION extends API {
 					}
 					$searchelements[] = [
 						'type' => 'links',
-						'description' => LANG::GET('documentcontext.' . $contextkey),
+						'description' => $this->_lang->GET('documentcontext.' . $contextkey),
 						'content' => $matches
 					];
 				}
@@ -663,7 +663,7 @@ class APPLICATION extends API {
 				}
 				$searchelements[] = [
 					'type' => 'links',
-					'description' => LANG::GET('menu.record_record'),
+					'description' => $this->_lang->GET('menu.record_record'),
 					'content' => $matches
 				];
 			}
@@ -675,7 +675,7 @@ class APPLICATION extends API {
 				}
 				$searchelements[] = [
 					'type' => 'links',
-					'description' => LANG::GET('menu.files_header'),
+					'description' => $this->_lang->GET('menu.files_header'),
 					'content' => $matches
 				];
 			}
@@ -683,7 +683,7 @@ class APPLICATION extends API {
 			if (count($searchelements) < 2) $searchelements[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => LANG::GET('application.search_empty'),
+					'name' => $this->_lang->GET('application.search_empty'),
 					'class' => 'orange'
 				]
 			];
@@ -705,21 +705,21 @@ class APPLICATION extends API {
 		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 		foreach ($thisDaysEvents as $row){
-			if (!$row['affected_user']) $row['affected_user'] = LANG::GET('message.deleted_user');
-			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== LANG::GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
-			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". LANGUAGEFILE['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
+			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
+			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'textsection',
 			'attributes' => [
-					'name' => LANG::GET('calendar.events_assigned_units')
+					'name' => $this->_lang->GET('calendar.events_assigned_units')
 			],
 			'content' => $displayevents
 		];
 		if ($displayabsentmates) $overview[] = [
 			'type' => 'textsection',
 			'attributes' => [
-					'name' => LANG::GET('calendar.timesheet_irregular')
+					'name' => $this->_lang->GET('calendar.timesheet_irregular')
 			],
 			'content' => $displayabsentmates
 		];
@@ -732,7 +732,7 @@ class APPLICATION extends API {
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',
-			'description' => LANG::GET('calendar.events_assigned_units_uncompleted'),
+			'description' => $this->_lang->GET('calendar.events_assigned_units_uncompleted'),
 			'content' => $uncompleted
 		];
 

@@ -115,7 +115,7 @@ class SHARED {
 				if (in_array($row, $matches)) continue;
 
 				foreach(explode(',', $row['regulatory_context']) as $context) {
-					if (stristr(LANG::GET('regulatory.' . $context), $parameter['search']) !== false) {
+					if (stristr($this->_lang->GET('regulatory.' . $context), $parameter['search']) !== false) {
 						$matches[] = $row;
 						break;	
 					}
@@ -168,7 +168,7 @@ class SHARED {
 			}
 			elseif (isset($parameter['unit']) && $parameter['unit'] !== '_unassigned') continue;
 
-			foreach(LANGUAGEFILE['documentcontext'] as $key => $subkeys){
+			foreach($this->_lang->_USER['documentcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
 			if (isset($contexts[$row['context']])) {
@@ -180,7 +180,7 @@ class SHARED {
 			$contexts[$row['context']][] = [
 				'identifier' => $row['identifier'],
 				'last_touch' => substr($row['last_touch'], 0, -3),
-				'last_document' => $row['last_document'] ? : LANG::GET('record.record_altering_pseudodocument_name'),
+				'last_document' => $row['last_document'] ? : $this->_lang->GET('record.record_altering_pseudodocument_name'),
 				'case_state' => json_decode($row['case_state'] ? : '', true) ? : [],
 				'complaint' => $row['record_type'] === 'complaint',
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),
@@ -237,7 +237,7 @@ class SHARED {
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
+									'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
 								],
 							]
 						];
@@ -276,7 +276,7 @@ class SHARED {
 							if (!isset($matches[$article][$slide][1])) $matches[$article][$slide][] = [
 								'type' => 'radio',
 								'attributes' => [
-									'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
+									'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
 								],
 								'content' => []
 							];
@@ -286,11 +286,11 @@ class SHARED {
 							break;
 						default: // order.php can make good use of this method!
 							$incorporationState = '';
-							if ($row['incorporated'] === '') $incorporationState = LANG::GET('order.incorporation_neccessary');
+							if ($row['incorporated'] === '') $incorporationState = $this->_lang->GET('order.incorporation_neccessary');
 							else {
 								$row['incorporated'] = json_decode($row['incorporated'], true);
-								if (isset($row['incorporated']['_denied'])) $incorporationState = LANG::GET('order.incorporation_denied');
-								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = LANG::GET('order.incorporation_pending');
+								if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation_denied');
+								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation_pending');
 							}
 							$matches[$article][$slide][] = [
 								'type' => 'tile',
@@ -311,7 +311,7 @@ class SHARED {
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => LANG::GET('order.add_product_search_matches', [':number' => count($search)])
+							'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
 						],
 					]
 				];
