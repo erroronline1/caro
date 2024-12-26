@@ -377,18 +377,18 @@ class USER extends API {
 					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || $nametaken) $this->response(['response' => ['msg' => LANG::GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
 		
-				// chain checked permission levels
-				foreach(LANGUAGEFILE['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('permissions.' . $level))) {
-						$permissions[] = $level;
+				// checked permission levels
+				if ($setpermissions = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_permissions'))){
+					foreach(explode(' | ', $setpermissions) as $setpermission){
+						$permissions[] = array_search($setpermission, LANGUAGEFILE['permissions']);
 					}
 				}
 				$user['permissions'] = implode(',', $permissions);
 
-				// chain checked organizational units
-				foreach(LANGUAGEFILE['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, LANG::PROPERTY('permissions.' . $unit))) {
-						$units[] = $unit;
+				// checked organizational units
+				if ($setunits = UTILITY::propertySet($this->_payload, LANG::PROPERTY('user.edit_units'))){
+					foreach(explode(' | ', $setunits) as $setunit){
+						$units[] = array_search($setunit, LANGUAGEFILE['units']);
 					}
 				}
 				$user['units'] = implode(',', $units);
