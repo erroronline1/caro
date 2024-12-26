@@ -46,6 +46,7 @@ var httpResponse = {
 	204: "No Content",
 	205: "Reset Content",
 	206: "Partial Content",
+	207: "Multistatus",
 	300: "Multiple Choices",
 	301: "Moved Permanently",
 	302: "Found",
