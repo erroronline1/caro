@@ -614,9 +614,9 @@ class FILE extends API {
 					array_push($result['render']['content'][0],
 						[
 							'type' => 'links',
-							'description' => $this->_lang->GET('menu.files_sharepoint'),
+							'description' => $this->_lang->GET('menu.files.sharepoint'),
 							'content' => [
-								$this->_lang->GET('menu.files_sharepoint') => ['href' => "javascript:api.file('get', 'filemanager', 'sharepoint')"]
+								$this->_lang->GET('menu.files.sharepoint') => ['href' => "javascript:api.file('get', 'filemanager', 'sharepoint')"]
 							]
 						]
 					);

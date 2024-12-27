@@ -299,7 +299,7 @@ export const api = {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
 						render.processAfterInsertion();
-						let signin = api._lang.GET("menu.application_signin"),
+						let signin = api._lang.GET("menu.application.signin"),
 							greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 						api.update_header(
 							api._lang.GET("general.welcome_header", {
@@ -312,7 +312,7 @@ export const api = {
 						let applicationLabel;
 						while (!applicationLabel) {
 							await _.sleep(50);
-							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.application_header") + "]>label");
+							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.application.header") + "]>label");
 						}
 						applicationLabel.style.maskImage = applicationLabel.style.webkitMaskImage = "none";
 						applicationLabel.style.backgroundImage = "url('" + api._settings.user.image + "')";
@@ -361,7 +361,7 @@ export const api = {
 				break;
 			case "start":
 				successFn = function (data) {
-					let signin = api._lang.GET("menu.application_signin"),
+					let signin = api._lang.GET("menu.application.signin"),
 						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 					if (data.user) greeting = " " + data.user;
 					api.update_header(
@@ -378,7 +378,7 @@ export const api = {
 				switch (method) {
 					case "get":
 						successFn = function (data) {
-							api.update_header(api._lang.GET("menu.application_manual_manager"));
+							api.update_header(api._lang.GET("menu.application.manual_manager"));
 							const render = new Assemble(data.render);
 							document.getElementById("main").replaceChildren(render.initializeSection());
 							render.processAfterInsertion();
@@ -434,7 +434,7 @@ export const api = {
 				}
 			},
 			title = {
-				checks: api._lang.GET("menu.audit"),
+				checks: api._lang.GET("menu.tools.audit"),
 			};
 		switch (method) {
 			case "get":
@@ -517,8 +517,8 @@ export const api = {
 				if (data.data) _serviceWorker.notif.calendar_uncompletedevents(data.data);
 			},
 			title = {
-				schedule: api._lang.GET("menu.calendar_scheduling"),
-				timesheet: api._lang.GET("menu.calendar_timesheet"),
+				schedule: api._lang.GET("menu.calendar.scheduling"),
+				timesheet: api._lang.GET("menu.calendar.timesheet"),
 			};
 		switch (method) {
 			case "get":
@@ -586,8 +586,8 @@ export const api = {
 				}
 			},
 			title = {
-				rule: api._lang.GET("menu.csvfilter_filter_manager"),
-				filter: api._lang.GET("menu.csvfilter_filter"),
+				rule: api._lang.GET("menu.tools.csvfilter_filter_manager"),
+				filter: api._lang.GET("menu.tools.csvfilter_filter"),
 			};
 		switch (method) {
 			case "get":
@@ -637,12 +637,12 @@ export const api = {
 			},
 			payload,
 			title = {
-				files: api._lang.GET("menu.files_files"),
-				bundle: api._lang.GET("menu.files_bundles"),
-				sharepoint: api._lang.GET("menu.files_sharepoint"),
-				filemanager: api._lang.GET("menu.files_file_manager"),
-				bundlemanager: api._lang.GET("menu.files_bundle_manager"),
-				externalfilemanager: api._lang.GET("menu.files_external_file_manager"),
+				files: api._lang.GET("menu.files.files"),
+				bundle: api._lang.GET("menu.files.bundles"),
+				sharepoint: api._lang.GET("menu.files.sharepoint"),
+				filemanager: api._lang.GET("menu.files.file_manager"),
+				bundlemanager: api._lang.GET("menu.files.bundle_manager"),
+				externalfilemanager: api._lang.GET("menu.files.external_file_manager"),
 			};
 
 		switch (method) {
@@ -715,12 +715,12 @@ export const api = {
 			},
 			payload,
 			title = {
-				component_editor: api._lang.GET("menu.documents_manage_components"),
-				document_editor: api._lang.GET("menu.documents_manage_documents"),
-				approval: api._lang.GET("menu.documents_manage_approval"),
-				bundle: api._lang.GET("menu.documents_manage_bundles"),
-				bundles: api._lang.GET("menu.record_bundles"),
-				documents: api._lang.GET("menu.record_record"),
+				component_editor: api._lang.GET("menu.records.documents_manage_components"),
+				document_editor: api._lang.GET("menu.records.documents_manage_documents"),
+				approval: api._lang.GET("menu.records.documents_manage_approval"),
+				bundle: api._lang.GET("menu.records.documents_manage_bundles"),
+				bundles: api._lang.GET("menu.records.records_bundles"),
+				documents: api._lang.GET("menu.records.records_record"),
 			},
 			composedComponent;
 		switch (method) {
@@ -871,8 +871,8 @@ export const api = {
 				if (data.response !== undefined && data.response.redirect) api.message("get", data.response.redirect);
 			},
 			title = {
-				conversation: api._lang.GET("menu.message_conversations"),
-				register: api._lang.GET("menu.message_register"),
+				conversation: api._lang.GET("menu.communication.conversations"),
+				register: api._lang.GET("menu.communication.register"),
 			};
 
 		switch (method) {
@@ -933,14 +933,14 @@ export const api = {
 				if (data.data) _serviceWorker.notif.order_unprocessed_consumables_pendingincorporation(data.data);
 			},
 			title = {
-				vendor: api._lang.GET("menu.purchase_vendor"),
-				product: api._lang.GET("menu.purchase_product"),
-				order: api._lang.GET("menu.purchase_order"),
-				prepared: api._lang.GET("menu.purchase_prepared_orders"),
-				approved: api._lang.GET("menu.purchase_approved_orders"),
-				pendingincorporations: api._lang.GET("menu.purchase_incorporated_pending"),
-				vendorinformation: api._lang.GET("menu.purchase_vendor_information"),
-				productinformation: api._lang.GET("menu.purchase_product_information"),
+				vendor: api._lang.GET("menu.purchase.vendor"),
+				product: api._lang.GET("menu.purchase.product"),
+				order: api._lang.GET("menu.purchase.order"),
+				prepared: api._lang.GET("menu.purchase.prepared_orders"),
+				approved: api._lang.GET("menu.purchase.approved_orders"),
+				pendingincorporations: api._lang.GET("menu.purchase.incorporated_pending"),
+				vendorinformation: api._lang.GET("menu.purchase.vendor_information"),
+				productinformation: api._lang.GET("menu.purchase.product_information"),
 			};
 		if (request[2] === api._lang.GET("consumables.vendor.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {
@@ -1139,9 +1139,9 @@ export const api = {
 				}
 			},
 			title = {
-				identifier: api._lang.GET("menu.record_create_identifier"),
-				record: api._lang.GET("menu.record_summary"),
-				records: api._lang.GET("menu.record_summary"),
+				identifier: api._lang.GET("menu.records.records_create_identifier"),
+				record: api._lang.GET("menu.records.records_summary"),
+				records: api._lang.GET("menu.records.records_summary"),
 			};
 		switch (method) {
 			case "get":
@@ -1324,7 +1324,7 @@ export const api = {
 				new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				risk: api._lang.GET("menu.risk_management"),
+				risk: api._lang.GET("menu.records.risk_management"),
 			};
 		switch (method) {
 			case "get":
@@ -1374,9 +1374,9 @@ export const api = {
 				new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				chunk: api._lang.GET("menu.texttemplate_chunks"),
-				template: api._lang.GET("menu.texttemplate_templates"),
-				text: api._lang.GET("menu.texttemplate_texts"),
+				chunk: api._lang.GET("menu.communication.texttemplate_chunks"),
+				template: api._lang.GET("menu.communication.texttemplate_templates"),
+				text: api._lang.GET("menu.communication.texttemplate_texts"),
 			};
 		switch (method) {
 			case "get":
@@ -1384,7 +1384,7 @@ export const api = {
 					case "modal":
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({ type: "input", header: api._lang.GET("menu.texttemplate_texts"), render: data.render });
+								new Dialog({ type: "input", header: api._lang.GET("menu.communication.texttemplate_texts"), render: data.render });
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.data !== undefined) _client.texttemplate.data = data.data;
@@ -1456,11 +1456,11 @@ export const api = {
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				code: api._lang.GET("menu.tools_digital_codes"),
-				calculator: api._lang.GET("menu.tools_calculator"),
-				scanner: api._lang.GET("menu.tools_scanner"),
-				stlviewer: api._lang.GET("menu.tools_stl_viewer"),
-				image: api._lang.GET("menu.tools_image"),
+				code: api._lang.GET("menu.tools.digital_codes"),
+				calculator: api._lang.GET("menu.tools.calculator"),
+				scanner: api._lang.GET("menu.tools.scanner"),
+				stlviewer: api._lang.GET("menu.tools.stl_viewer"),
+				image: api._lang.GET("menu.tools.image"),
 			};
 		switch (method) {
 			case "get":
@@ -1505,8 +1505,8 @@ export const api = {
 				if (data.response.id) api.user("get", request[1], data.response.id);
 			},
 			title = {
-				profile: api._lang.GET("menu.application_user_profile"),
-				user: api._lang.GET("menu.application_user_manager"),
+				profile: api._lang.GET("menu.application.user_profile"),
+				user: api._lang.GET("menu.application.user_manager"),
 			};
 		switch (method) {
 			case "get":

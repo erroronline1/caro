@@ -23,18 +23,18 @@ const _serviceWorker = {
 		calendar_uncompletedevents: function (data) {
 			let notif;
 			if ("calendar_uncompletedevents" in data) {
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.calendar_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.calendar.header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.calendar_scheduling").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.calendar.scheduling").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			}
 		},
 		document_approval: function (data) {
 			let notif;
 			if ("document_approval" in data) {
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.record_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.records.header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.document_approval);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.documents_manage_approval").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.documents_manage_approval").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.document_approval);
 			}
 		},
@@ -42,9 +42,9 @@ const _serviceWorker = {
 		message_unseen: function (data) {
 			if ("message_unseen" in data) {
 				let notif;
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.communication_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.message_conversations").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			}
 		},
@@ -55,21 +55,21 @@ const _serviceWorker = {
 					order_unprocessed = 0,
 					consumables_pendingincorporation = 0;
 				if ("order_prepared" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase_prepared_orders").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.prepared_orders").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.order_prepared);
 					order_prepared = data.order_prepared;
 				}
 				if ("order_unprocessed" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase_approved_orders").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.approved_orders").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 					order_unprocessed = data.order_unprocessed;
 				}
 				if ("consumables_pendingincorporation" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase_incorporated_pending").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.incorporated_pending").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 					consumables_pendingincorporation = data.consumables_pendingincorporation;
 				}
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.purchase_header").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.purchase.header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", parseInt(order_prepared, 10) + parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
 			}
 		},
@@ -89,7 +89,7 @@ const _serviceWorker = {
 								":amount": data.message_unnotified,
 						  })
 						: api._lang.GET("message.new_message");
-				this.showLocalNotification(api._lang.GET("menu.communication_header"), body);
+				this.showLocalNotification(api._lang.GET("menu.communication.header"), body);
 			}
 		}
 		this.notif.message_unseen(data);

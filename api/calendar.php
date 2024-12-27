@@ -211,17 +211,17 @@ class CALENDAR extends API {
 		array_splice($timesheets, 0, 0, $self);
 
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', $this->_lang->GET('menu.calendar_timesheet') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/[^\w\d]/', '', $this->_lang->GET('menu.calendar.timesheet') . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => $this->prepareTimesheetOutput($timesheets),
 			'files' => [],
 			'images' => [],
-			'title' => $this->_lang->GET('menu.calendar_timesheet'),
+			'title' => $this->_lang->GET('menu.calendar.timesheet'),
 			'date' => $this->_currentdate->format('y-m-d H:i')
 		];
 
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.calendar_timesheet')] = [
+		$downloadfiles[$this->_lang->GET('menu.calendar.timesheet')] = [
 			'href' => PDF::timesheetPDF($summary)
 		];
 		$body = [];

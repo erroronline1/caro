@@ -400,7 +400,7 @@ class RECORD extends API {
 		$content = $this->summarizeRecord($summarize, false, $export);
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
 			'href' => PDF::recordsPDF($content)
 		];
 
@@ -1597,7 +1597,7 @@ class RECORD extends API {
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => $this->_lang->GET('menu.record_summary'),
+			'title' => $this->_lang->GET('menu.records.records_summary'),
 			'date' => $this->_currentdate->format('y-m-d H:i'),
 			'closed' => $data['closed'],
 			'record_type' => $data['record_type'],

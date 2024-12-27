@@ -53,13 +53,13 @@ export const assemble_helper = {
 		const menu = document.querySelector("nav"),
 			elements = [],
 			icons = {};
-		icons[api._lang.GET("menu.application_header")] = "url('./media/bars.svg')";
-		icons[api._lang.GET("menu.communication_header")] = "url('./media/comment.svg')";
-		icons[api._lang.GET("menu.record_header")] = "url('./media/file-signature.svg')";
-		icons[api._lang.GET("menu.calendar_header")] = "url('./media/calendar-alt.svg')";
-		icons[api._lang.GET("menu.purchase_header")] = "url('./media/shopping-bag.svg')";
-		icons[api._lang.GET("menu.files_header")] = "url('./media/folders.svg')";
-		icons[api._lang.GET("menu.tools_header")] = "url('./media/tools.svg')";
+		icons[api._lang.GET("menu.application.header")] = "url('./media/bars.svg')";
+		icons[api._lang.GET("menu.communication.header")] = "url('./media/comment.svg')";
+		icons[api._lang.GET("menu.records.header")] = "url('./media/file-signature.svg')";
+		icons[api._lang.GET("menu.calendar.header")] = "url('./media/calendar-alt.svg')";
+		icons[api._lang.GET("menu.purchase.header")] = "url('./media/shopping-bag.svg')";
+		icons[api._lang.GET("menu.files.header")] = "url('./media/folders.svg')";
+		icons[api._lang.GET("menu.tools.header")] = "url('./media/tools.svg')";
 
 		let label, div, input, div2, button, span;
 		for (const [group, items] of Object.entries(content)) {
@@ -2066,7 +2066,7 @@ export class Assemble {
 		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			this.currentElement.attributes = {
-				value: api._lang.GET("menu.texttemplate_texts"),
+				value: api._lang.GET("menu.communication.texttemplate_texts"),
 				type: "button",
 				onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')",
 				class: "floatright",

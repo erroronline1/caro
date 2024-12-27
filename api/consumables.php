@@ -397,7 +397,7 @@ class CONSUMABLES extends API {
 					])) {
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 						$this->_lang->GET('order.sample_check_alert', [
-							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.audit') . '</a>'
+							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit') . '</a>'
 						], true) . $content);
 						$this->response([
 						'response' => [
@@ -2004,7 +2004,7 @@ class CONSUMABLES extends API {
 							'type' => 'button',
 							'attributes' => [
 								'type' => 'button',
-								'value' => $this->_lang->GET('menu.texttemplate_texts'),
+								'value' => $this->_lang->GET('menu.communication.texttemplate_texts'),
 								'onpointerup' => "api.texttemplate('get', 'text', 'false', 'modal', '" . json_encode([
 									':PRD' => 'select_special_attention_products',
 									':CID' => 'vendor_customer_id',

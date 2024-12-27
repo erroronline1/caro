@@ -506,9 +506,9 @@ class USER extends API {
 						':supervisor' => implode(', ', $roles['supervisor']),
 						':qmo' => implode(', ', $roles['qmo']),
 						':prrc' => implode(', ', $roles['prrc']),
-						':register' => '<a href="javascript:void(0);" onpointerup="api.message(\'get\', \'register\')">' . $this->_lang->GET('menu.message_register', [], true) . '</a>',
-						':landingpage' => '<a href="javascript:void(0);" onpointerup="api.application(\'get\', \'start\')">' . $this->_lang->GET('menu.application_start', [], true) . '</a>',
-						':profile' => '<a href="javascript:void(0);" onpointerup="api.user(\'get\', \'profile\')">' . $this->_lang->GET('menu.application_user_profile', [], true) . '</a>',
+						':register' => '<a href="javascript:void(0);" onpointerup="api.message(\'get\', \'register\')">' . $this->_lang->GET('menu.communication.register', [], true) . '</a>',
+						':landingpage' => '<a href="javascript:void(0);" onpointerup="api.application(\'get\', \'start\')">' . $this->_lang->GET('menu.application.start', [], true) . '</a>',
+						':profile' => '<a href="javascript:void(0);" onpointerup="api.user(\'get\', \'profile\')">' . $this->_lang->GET('menu.application.user_profile', [], true) . '</a>',
 						':admin' => implode(', ', $roles['admin'])
 					];
 					$this->alertUserGroup(['user' => [$user['name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
