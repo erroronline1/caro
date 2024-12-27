@@ -899,17 +899,13 @@ class RECORD extends API {
 					], $data['case_state'])){
 					$body[] = [$casestate];
 				}
-
-				// get document recommendations
+				// get document recommendations for matching units or common
 				$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 				$hidden = $bundles = [];
 				foreach($bd as $key => $row) {
-					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!in_array($row['name'], $hidden)) {
-						if (!isset($bundles[$row['unit']]))	$bundles[$row['unit']] = [];
-						if (!isset($bundles[$row['unit']][$row['name']])) $bundles[$row['unit']][$row['name']] = $row['content'] ? explode(',', $row['content']) : [];
-						ksort($bundles[$row['unit']]);
-					}
+					if ($row['hidden'] || !((in_array($row['unit'], $content['units']) && array_intersect($_SESSION['user']['units'], $content['units'])) || $row['unit'] === 'common')) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+					if (!in_array($row['name'], $hidden) && !isset($bundles[$row['name']]))
+						$bundles[$row['name']] = $row['content'] ? explode(',', $row['content']) : [];
 				}
 				$includedDocuments = array_keys($content['content']);
 
@@ -991,30 +987,21 @@ class RECORD extends API {
 							]
 						]);
 					}
-					$recommended = [];
-					// append next recommendations for common and matching user units inline -> caveat, missing first documents will not be displayed inline
-					if (in_array($document, $includedDocuments)){
-						foreach (['common', ...array_intersect($_SESSION['user']['units'], $content['units'])] as $unit){
-							if (!isset($bundles[$unit])) continue;
-							foreach($bundles[$unit] as $bundle => $necessarydocuments){
-								if (($documentindex = array_search($document, $necessarydocuments)) !== false){ // this document is part of the current bundle
-									if (isset($necessarydocuments[++$documentindex])) { // there is a document defined in bundle coming afterwards 
-										if (array_search($necessarydocuments[$documentindex], $includedDocuments) === false) { // the following document has not been taken into account
-											// recurring queries to make sure linked documents are permitted
-											if ($approveddocument = $this->latestApprovedName('document_document_get_by_name', $necessarydocuments[$documentindex])) // document is permitted
-												$recommended[$this->_lang->GET('record.append_missing_document_of_bundle', [':document' => $approveddocument['name'], ':bundle' => $bundle])] = ['href' => "javascript:api.record('get', 'document', '" . $approveddocument['name'] . "', '" . $this->_requestedID . "')"];
-										}
-									}
-								}
-							}
-						}
-					}
-					if ($recommended) $body[]= [[
-							'type' => 'links',
-							'description' => $this->_lang->GET('record.append_missing_document'),
-							'content' => $recommended
-						]];
 				}
+				// append document recommendations for common and matching user units
+				foreach($bundles as $bundle => $necessarydocuments){
+					$recommendation = [];
+					foreach(array_diff($necessarydocuments, $includedDocuments) as $recommended){ // possible missing documents
+						if (in_array($recommended, $validDocuments)) // document is permitted
+						$recommendation[$recommended] = ['href' => "javascript:api.record('get', 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
+					}
+					if ($recommendation) $body[]= [[
+						'type' => 'links',
+						'description' => $this->_lang->GET('record.append_missing_document') . ' ' . $bundle,
+						'content' => $recommendation
+					]];
+				}
+
 				// append record_retype_pseudodocument
 				if (isset($content['content'][$this->_lang->GET('record.altering_pseudodocument_name', [], true)])){
 					$entries = $content['content'][$this->_lang->GET('record.altering_pseudodocument_name', [], true)];
