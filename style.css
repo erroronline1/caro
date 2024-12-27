@@ -85,7 +85,7 @@ header {
 body > header {
 	margin: 0;
 	max-width: none;
-	height: 4.4em;
+	min-height: 4.4em;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -96,6 +96,7 @@ body > header {
 
 	& > h1 {
 		font-size: 1.5em;
+		margin: 1em 5em;
 	}
 
 	/* toggle fullscreen */
