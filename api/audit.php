@@ -424,7 +424,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $file['path']
 					],
-					'content' => $this->_lang->GET('file.external_file_introduced', [':user' => $file['author'], ':introduced' => $date->format('Y-m-d H:i')])
+					'content' => $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $date->format('Y-m-d H:i')])
 				];
 			}
 		}
