@@ -409,24 +409,20 @@ class AUDIT extends API {
 
 		$externalcontent = [
 			[
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_in_use_external')
-				],
+				'type' => 'links',
+				'description' => $this->_lang->GET('audit.documents_in_use_external'),
 				'content' => ''
 			]
 		];
+		$links = [];
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
-				$date = new DateTime('@' . filemtime($file['path']), new DateTimeZone(CONFIG['application']['timezone']));
-				$externalcontent[] = [
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => $file['path']
-					],
-					'content' => $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $date->format('Y-m-d H:i')])
-				];
+				if (preg_match('/^\.\.\//', $file['path'])){
+					$file['path'] = substr($file['path'], 1);
+				}
+				$links[$file['path'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])] = ['href'=>$file['path'], 'target' => 'blank'];
 			}
+			$externalcontent[0]['content'] = $links;
 		}
 
 		$bundlescontent = [
@@ -485,9 +481,14 @@ class AUDIT extends API {
 
 		$documents = $this->documents();
 
-		for($i = 1; $i<count($documents); $i++){
+		for($i = 1; $i < count($documents); $i++){
 			foreach($documents[$i] as $item){
-				if (isset($item['content'])) $summary['content'][$item['attributes']['name']] = $item['content'];	
+				if (isset($item['content'])){
+					if (gettype($item['content']) === 'string' && isset($item['attributes']['name']))
+						$summary['content'][$item['attributes']['name']] = $item['content'];
+					elseif (gettype($item['content']) === 'array' && isset($item['description']))
+						$summary['content'][$item['description']] = implode("\n", array_keys($item['content']));
+				}
 			}
 		}
 		$downloadfiles = [];
@@ -863,16 +864,24 @@ class AUDIT extends API {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
 				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
-					$regulatory[$regulatory_context][$row['name'] . ' (' . $row['date'] . ')'] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
+					$satisfied = false;
+					if (isset($regulatory[$regulatory_context])){
+						foreach ($regulatory[$regulatory_context] as $key => $value){
+							if (preg_match('/^' . $row['name'] . ' \(/', $key)) $satisfied = true;
+						}
+					}
+					if (!$satisfied) $regulatory[$regulatory_context][$row['name'] . ' (' . $row['date'] . ')'] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
 				}
 			}
 		}
 		// get active external documents
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
-				$date = new DateTime('@' . filemtime($file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 				foreach(explode(',', $file['regulatory_context']) as $context){
-					$regulatory[$context][$file['path'] . ' (' . $date->format('Y-m-d H:i') . ')'] = ['href' => substr($file['path'], 1)];
+					if (preg_match('/^\.\.\//', $file['path'])){
+						$file['path'] = substr($file['path'], 1);
+					}
+					$regulatory[$context][$file['path'] . ' (' . $file['activated'] . ')'] = ['href' => substr($file['path'], 1)];
 				}
 			}
 		}
