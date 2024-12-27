@@ -108,7 +108,7 @@ class USER extends API {
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, $this->_lang->_USER['units']);
 				}
 				if ($primaryRecordState = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_primary_recordstate'))){
-					if ($primaryRecordState === $this->_lang->GET('record.record_casestate_filter_all'))
+					if ($primaryRecordState === $this->_lang->GET('record.casestate_filter_all'))
 						unset($user['app_settings']['primaryRecordState']);
 					else
 						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
@@ -176,12 +176,12 @@ class USER extends API {
 				}
 				if(isset($user['app_settings']['primaryUnit'])) $primary_unit[$this->_lang->GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
 
-				$primary_casestates = [$this->_lang->GET('record.record_casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')]];
+				$primary_casestates = [$this->_lang->GET('record.casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')]];
 				foreach($this->_lang->_USER['casestate']['casedocumentation'] as $state => $translation){
 					$primary_casestates[$translation] = ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')];
 				}
 				if(isset($user['app_settings']['primaryRecordState'])) $primary_casestates[$this->_lang->GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
-				else $primary_casestates[$this->_lang->GET('record.record_casestate_filter_all')]['checked'] = true;
+				else $primary_casestates[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
 
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
 				$skillmatrix = '';

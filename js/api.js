@@ -719,8 +719,8 @@ export const api = {
 				document_editor: api._lang.GET("menu.records.documents_manage_documents"),
 				approval: api._lang.GET("menu.records.documents_manage_approval"),
 				bundle: api._lang.GET("menu.records.documents_manage_bundles"),
-				bundles: api._lang.GET("menu.records.records_bundles"),
-				documents: api._lang.GET("menu.records.records_record"),
+				bundles: api._lang.GET("menu.records.record_bundles"),
+				documents: api._lang.GET("menu.records.record_record"),
 			},
 			composedComponent;
 		switch (method) {
@@ -1139,9 +1139,9 @@ export const api = {
 				}
 			},
 			title = {
-				identifier: api._lang.GET("menu.records.records_create_identifier"),
-				record: api._lang.GET("menu.records.records_summary"),
-				records: api._lang.GET("menu.records.records_summary"),
+				identifier: api._lang.GET("menu.records.record_create_identifier"),
+				record: api._lang.GET("menu.records.record_summary"),
+				records: api._lang.GET("menu.records.record_summary"),
 			};
 		switch (method) {
 			case "get":
@@ -1227,8 +1227,8 @@ export const api = {
 							}
 							if (data.response.msg !== undefined) {
 								const options = {};
-								options[api._lang.GET("record.record_import_ok")] = false;
-								options[api._lang.GET("record.record_import_clear_identifier")] = {
+								options[api._lang.GET("record.import_ok")] = false;
+								options[api._lang.GET("record.import_clear_identifier")] = {
 									value: true,
 									class: "reducedCTA",
 								};

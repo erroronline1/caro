@@ -420,11 +420,11 @@ class NOTIFICATION extends API {
 				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered document
-					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.record_retype_pseudodocument_name', [], true)];
+					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)];
 
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
-						$this->_lang->GET('record.record_reminder_message', [
+						$this->_lang->GET('record.reminder_message', [
 							':days' => $last->diff($this->_currentdate)->days,
 							':date' => substr($row['last_touch'], 0, -3),
 							':document' => $lastdocument['name'],			

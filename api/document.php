@@ -1089,9 +1089,9 @@ class DOCUMENT extends API {
 		$document_id = $identifier = $context = null;
 		if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
 		if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
-		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.record_type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.record_type_description')});
-		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.record_date'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.record_date')});
-		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.record_time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.record_time')});
+		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
+		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.date'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.date')});
+		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
 
 		// used by audit for export of outdated documents
 		if ($maxDocumentTimestamp = UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp')) unset($this->_payload->_maxDocumentTimestamp);
@@ -1276,7 +1276,7 @@ class DOCUMENT extends API {
 				foreach ($this->_lang->_USER['record']['record_type'] as $key => $value){
 					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
 				}
-				$summary['content'] = array_merge([$this->_lang->GET('record.record_type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
+				$summary['content'] = array_merge([$this->_lang->GET('record.type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
 			}
 			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => $this->_lang->GET('assemble.render.required_asterisk')], $this->_lang->GET('assemble.render.export_by') . ' *' => [
 				'type' => 'text',

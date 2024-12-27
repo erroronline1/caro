@@ -182,7 +182,7 @@ class SHARED {
 			$contexts[$row['context']][] = [
 				'identifier' => $row['identifier'],
 				'last_touch' => substr($row['last_touch'], 0, -3),
-				'last_document' => $row['last_document'] ? : $this->_lang->GET('record.record_altering_pseudodocument_name'),
+				'last_document' => $row['last_document'] ? : $this->_lang->GET('record.altering_pseudodocument_name'),
 				'case_state' => json_decode($row['case_state'] ? : '', true) ? : [],
 				'complaint' => $row['record_type'] === 'complaint',
 				'closed' => $row['closed'] && ($row['record_type'] !== 'complaint' || ($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed']))),

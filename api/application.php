@@ -389,8 +389,8 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.communication.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
 			],
 			$this->_lang->GET('menu.records.header') => [
-				$this->_lang->GET('menu.records.records_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
-				$this->_lang->GET('menu.records.records_summary') => ['onpointerup' => "api.record('get', 'records')"]
+				$this->_lang->GET('menu.records.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
+				$this->_lang->GET('menu.records.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
 			],
 			$this->_lang->GET('menu.calendar.header') => [
 				$this->_lang->GET('menu.calendar.scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
@@ -420,8 +420,8 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.tools.image') => ['onpointerup' => "api.tool('get', 'image')"],
 			],
 		];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.records_bundles')] = ['onpointerup' => "api.document('get', 'bundles')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.records_record')] = ['onpointerup' => "api.document('get', 'documents')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onpointerup' => "api.document('get', 'bundles')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_record')] = ['onpointerup' => "api.document('get', 'documents')"];
 		// make sure risk management comes after documents 
 		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
@@ -634,7 +634,7 @@ class APPLICATION extends API {
 				$matches = [];
 				foreach ($records as $contextkey => $context){
 					foreach($context as $record){
-						$display = $this->_lang->GET('record.record_list_touched', [
+						$display = $this->_lang->GET('record.list_touched', [
 							':identifier' => $record['identifier'],
 							':date' => $record['last_touch'],
 							':document' => $record['last_document']
@@ -663,7 +663,7 @@ class APPLICATION extends API {
 				}
 				$searchelements[] = [
 					'type' => 'links',
-					'description' => $this->_lang->GET('menu.records.records_record'),
+					'description' => $this->_lang->GET('menu.records.record_record'),
 					'content' => $matches
 				];
 			}

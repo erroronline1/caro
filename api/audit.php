@@ -224,7 +224,7 @@ class AUDIT extends API {
 			])] = $row['content'];
 		}
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 
@@ -232,7 +232,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]
 		);
@@ -491,7 +491,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 
@@ -499,7 +499,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
@@ -611,7 +611,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 
@@ -619,7 +619,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
@@ -815,7 +815,7 @@ class AUDIT extends API {
 		}
 
 		$writer->writeToFile($tempFile);
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => substr($tempFile, 1),
 		];
 
@@ -823,7 +823,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' => $this->_lang->GET('record.record_export_proceed'),
+				'description' => $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
@@ -928,7 +928,7 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 
@@ -936,7 +936,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
@@ -1026,7 +1026,7 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 
@@ -1034,7 +1034,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
@@ -1295,7 +1295,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 
@@ -1303,7 +1303,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
@@ -1577,7 +1577,7 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 
@@ -1585,7 +1585,7 @@ class AUDIT extends API {
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
@@ -1696,14 +1696,14 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.records_summary')] = [
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
 			'href' => PDF::auditPDF($summary)
 		];
 		$body = [];
 		array_push($body, 
 			[[
 				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.record_export_proceed'),
+				'description' =>  $this->_lang->GET('record.export_proceed'),
 				'content' => $downloadfiles
 			]]
 		);
