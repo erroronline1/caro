@@ -628,7 +628,6 @@ class TEXTTEMPLATE extends API {
 				'type' => 'radio',
 				'attributes' => [
 					'name' => $this->_lang->GET('texttemplate.use.person'),
-					'id' => 'genus'
 				],
 				'content' => $usegenus
 			];
