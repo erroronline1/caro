@@ -905,11 +905,12 @@ class RECORD extends API {
 				$hidden = $bundles = [];
 				foreach($bd as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-					if (!in_array($row['name'], $hidden) && !isset($bundles[$row['name']])) {
-						$bundles[$row['name']] = $row['content'] ? explode(',', $row['content']) : [];
+					if (!in_array($row['name'], $hidden)) {
+						if (!isset($bundles[$row['unit']]))	$bundles[$row['unit']] = [];
+						if (!isset($bundles[$row['unit']][$row['name']])) $bundles[$row['unit']][$row['name']] = $row['content'] ? explode(',', $row['content']) : [];
+						ksort($bundles[$row['unit']]);
 					}
 				}
-				ksort($bundles);
 				$includedDocuments = array_keys($content['content']);
 
 				// prepare available documents to control appending button
@@ -991,14 +992,19 @@ class RECORD extends API {
 						]);
 					}
 					$recommended = [];
-					// append next recommendations inline -> caveat, missing first documents will not be displayed inline
-					if (in_array($document, $includedDocuments)) foreach($bundles as $bundle => $necessarydocuments){
-						if (($documentindex = array_search($document, $necessarydocuments)) !== false){ // this document is part of the current bundle
-							if (isset($necessarydocuments[++$documentindex])) { // there is a document defined in bundle coming afterwards 
-								if (array_search($necessarydocuments[$documentindex], $includedDocuments) === false) { // the following document has not been taken into account
-									// recurring queries to make sure linked documents are permitted
-									if ($approveddocument = $this->latestApprovedName('document_document_get_by_name', $necessarydocuments[$documentindex])) // document is permitted
-										$recommended[$this->_lang->GET('record.append_missing_document_of_bundle', [':document' => $approveddocument['name'], ':bundle' => $bundle])] = ['href' => "javascript:api.record('get', 'document', '" . $approveddocument['name'] . "', '" . $this->_requestedID . "')"];
+					// append next recommendations for common and matching user units inline -> caveat, missing first documents will not be displayed inline
+					if (in_array($document, $includedDocuments)){
+						foreach (['common', ...array_intersect($_SESSION['user']['units'], $content['units'])] as $unit){
+							if (!isset($bundles[$unit])) continue;
+							foreach($bundles[$unit] as $bundle => $necessarydocuments){
+								if (($documentindex = array_search($document, $necessarydocuments)) !== false){ // this document is part of the current bundle
+									if (isset($necessarydocuments[++$documentindex])) { // there is a document defined in bundle coming afterwards 
+										if (array_search($necessarydocuments[$documentindex], $includedDocuments) === false) { // the following document has not been taken into account
+											// recurring queries to make sure linked documents are permitted
+											if ($approveddocument = $this->latestApprovedName('document_document_get_by_name', $necessarydocuments[$documentindex])) // document is permitted
+												$recommended[$this->_lang->GET('record.append_missing_document_of_bundle', [':document' => $approveddocument['name'], ':bundle' => $bundle])] = ['href' => "javascript:api.record('get', 'document', '" . $approveddocument['name'] . "', '" . $this->_requestedID . "')"];
+										}
+									}
 								}
 							}
 						}
@@ -1612,7 +1618,7 @@ class RECORD extends API {
 			$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 			if (!PERMISSION::permissionIn($document['restricted_access'])) continue;
 			if (in_array($type, ['document', 'simplifieddocument']) && ($document['name'] != $this->_documentExport)) continue;
-			if ($record['document'] == 0) { // retype and casestate autodocument
+			if ($record['document'] == 0) { // retype and casestate pseudodocument
 				if (in_array($type, ['simplified', 'simplifieddocument'])) continue;
 				$useddocument = $this->_lang->GET('record.altering_pseudodocument_name', [], true);
 			}
