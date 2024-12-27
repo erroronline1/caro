@@ -119,10 +119,11 @@ class API {
 					foreach ($payload as $key => $value){
 						if ($value && gettype($value) === 'array') unset($payload[$key]);
 					}
+					//var_dump(json_encode($payload));
 					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
 						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
 						}, json_encode($payload) );
-					$payload = preg_replace('/[\W_]/', '', preg_replace('/\\\\r|\\\\n|\\\\t/', '', $payload));  // harmonized cross browser
+					$payload = preg_replace(['/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is not resolved properly on the backend
 					//var_dump(strlen($payload), $payload);
 					$query = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
 						'values' => [
