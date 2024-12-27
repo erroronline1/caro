@@ -984,8 +984,8 @@ class RECORD extends API {
 								'data-type' => 'download',
 								'class' => 'inlinebutton',
 								'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-								"{type:'button', attributes:{value: LANG.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
-								"{type:'button', attributes:{value: LANG.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
+								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
+								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
 								"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 							]
 						]);
@@ -1158,8 +1158,8 @@ class RECORD extends API {
 									'value' => $this->_lang->GET('record.export'),
 									'data-type' => 'download',
 									'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-									"{type:'button', attributes:{value: LANG.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'fullexport\', \'" . $this->_requestedID . "\')'}},".
-									"{type:'button', attributes:{value: LANG.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
+									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'fullexport\', \'" . $this->_requestedID . "\')'}},".
+									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
 									"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 								]
 							]
