@@ -23,9 +23,11 @@
 class SHARED {
     private $_pdo = null;
 	private $_currentdate = null;
+	public $_lang = [];
 
 	public function __construct($pdo = null){
         $this->_pdo = $pdo;
+		$this->_lang = new LANG();
 		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 	}
 
