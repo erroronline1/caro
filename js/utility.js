@@ -963,7 +963,7 @@ const _client = {
 						order.push({
 							type: "button",
 							attributes: {
-								value: api._lang.GET("order.incorporation"),
+								value: api._lang.GET("order.incorporation.incorporation"),
 								type: "button",
 								onpointerup: "if (!this.disabled) api.purchase('get', 'incorporation', " + element.incorporation.item + "); this.disabled = true",
 							},
@@ -982,7 +982,7 @@ const _client = {
 						order.push({
 							type: "button",
 							attributes: {
-								value: api._lang.GET("order.sample_check"),
+								value: api._lang.GET("order.sample_check.sample_check"),
 								type: "button",
 								onpointerup: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
 							},
@@ -1061,26 +1061,26 @@ const _client = {
 				if (key.startsWith("_")) {
 					submit.append(key, value);
 				} else if (value && value !== "on") check.push(key + ": " + value);
-				else check.push(api._lang.GET("order.sample_check_checked", { ":checked": key }));
+				else check.push(api._lang.GET("order.sample_check.checked", { ":checked": key }));
 			}
 			if (check.length) {
 				const result = check.join("\n");
 				submit.append("content", result);
 				api.purchase("post", "incorporation", productid, submit);
-			} else new Toast(api._lang.GET("order.incorporation_failure"), "error");
+			} else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 		},
 		performSampleCheck: (formdata, productid) => {
 			const check = [];
 			for (const [key, value] of Object.entries(formdata)) {
 				if (value && value !== "on") check.push(key + ": " + value);
-				else check.push(api._lang.GET("order.sample_check_checked", { ":checked": key }));
+				else check.push(api._lang.GET("order.sample_check.checked", { ":checked": key }));
 			}
 			if (check.length) {
 				const result = check.join("\n");
 				formdata = new FormData();
 				formdata.append("content", result);
 				api.purchase("post", "mdrsamplecheck", productid, formdata);
-			} else new Toast(api._lang.GET("order.sample_check_failure"), "error");
+			} else new Toast(api._lang.GET("order.sample_check.failure"), "error");
 		},
 	},
 	record: {

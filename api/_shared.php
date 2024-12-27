@@ -288,11 +288,11 @@ class SHARED {
 							break;
 						default: // order.php can make good use of this method!
 							$incorporationState = '';
-							if ($row['incorporated'] === '') $incorporationState = $this->_lang->GET('order.incorporation_neccessary');
+							if ($row['incorporated'] === '') $incorporationState = $this->_lang->GET('order.incorporation.neccessary');
 							else {
 								$row['incorporated'] = json_decode($row['incorporated'], true);
-								if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation_denied');
-								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation_pending');
+								if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
+								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 							}
 							$matches[$article][$slide][] = [
 								'type' => 'tile',

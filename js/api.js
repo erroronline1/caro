@@ -999,7 +999,7 @@ export const api = {
 							if (data.render) {
 								new Dialog({
 									type: "input",
-									header: api._lang.GET("order.incorporation"),
+									header: api._lang.GET("order.incorporation.incorporation"),
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {
@@ -1016,7 +1016,7 @@ export const api = {
 							if (data.render) {
 								new Dialog({
 									type: "input",
-									header: api._lang.GET("order.sample_check"),
+									header: api._lang.GET("order.sample_check.sample_check"),
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {

@@ -458,14 +458,14 @@ class ORDER extends API {
 							$data['incorporation']['item'] = $product['id'];
 						} else {
 							// simple groups are not allowed to make records
-							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation_neccessary_by_user');
+							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.neccessary_by_user');
 						}
 					}
 					elseif ($product && array_search($product['id'], $incorporationdenied) !== false){
-						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation_denied');
+						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.denied');
 					}
 					elseif ($product && array_search($product['id'], $pendingincorporation) !== false){
-						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation_pending');
+						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.pending');
 					}
 					
 					// request MDR §14 sample check
@@ -474,7 +474,7 @@ class ORDER extends API {
 							$data['samplecheck']['item'] = $product['id'];
 						} else {
 							// simple groups are not allowed to make records
-							$data['samplecheck']['state'] = $this->_lang->GET('order.sample_check_by_user');
+							$data['samplecheck']['state'] = $this->_lang->GET('order.sample_check.by_user');
 						}
 					}
 

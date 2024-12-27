@@ -160,7 +160,7 @@ class CONSUMABLES extends API {
 	 * processes contents of the incorporation and updates the products database
 	 * 
 	 * $this->_payload->content is a string passed by utility.js _client.order.performIncorporation()
-	 * incorporation denial is detected by pattern matching $this->_lang->GET('order.incorporation_denied')
+	 * incorporation denial is detected by pattern matching $this->_lang->GET('order.incorporation.denied')
 	 */
 	public function incorporation(){
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -177,7 +177,7 @@ class CONSUMABLES extends API {
 				]);
 				if (!$products || !$this->_payload->content) $this->response([]);
 				// check content denial or not
-				preg_match("/" . $this->_lang->GET('order.incorporation_denied') . ".*/m", $this->_payload->content, $denied);
+				preg_match("/" . $this->_lang->GET('order.incorporation.denied') . ".*/m", $this->_payload->content, $denied);
 				$approve = ['_check' => $denied ? $denied[0] : $this->_payload->content];
 				if ($denied) $approve['_denied'] = true;
 
@@ -198,12 +198,12 @@ class CONSUMABLES extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('order.incorporation_success'),
+						'msg' => $this->_lang->GET('order.incorporation.success'),
 						'type' => 'success'
 					]]);
 				$this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('order.incorporation_failure'),
+						'msg' => $this->_lang->GET('order.incorporation.failure'),
 						'type' => 'error'
 					]]);
 				break;
@@ -248,7 +248,7 @@ class CONSUMABLES extends API {
 						'content' => $similarproducts,
 						'attributes' => [
 							'type' => 'button',
-							'value' => $this->_lang->GET('order.incorporation_batch'),
+							'value' => $this->_lang->GET('order.incorporation.batch'),
 							'onpointerup' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input2')
 						]
 					];
@@ -274,8 +274,8 @@ class CONSUMABLES extends API {
 						], ...$incorporationdocument
 					],
 					'options' => [
-							$this->_lang->GET('order.incorporation_cancel') => false,
-							$this->_lang->GET('order.incorporation_submit') => [ 'value' => true, 'class'=> 'reducedCTA']
+							$this->_lang->GET('order.incorporation.cancel') => false,
+							$this->_lang->GET('order.incorporation.submit') => [ 'value' => true, 'class'=> 'reducedCTA']
 					],
 					'productid' => $product['id']
 				];
@@ -295,9 +295,9 @@ class CONSUMABLES extends API {
 					if (!in_array($identifyproduct, $hideduplicates)){
 						foreach ($check['content'] as $information){
 							similar_text($information, $product['article_no'], $article_no_percent);
-							if ($article_no_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== $this->_lang->GET('order.incorporation_revoked')) $probability['article_no'][] = $check['id'];
+							if ($article_no_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== $this->_lang->GET('order.incorporation.revoked')) $probability['article_no'][] = $check['id'];
 							similar_text($information, $product['vendor_name'], $vendor_name_percent);
-							if ($vendor_name_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== $this->_lang->GET('order.incorporation_revoked')) $probability['vendor_name'][] = $check['id'];
+							if ($vendor_name_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== $this->_lang->GET('order.incorporation.revoked')) $probability['vendor_name'][] = $check['id'];
 						}
 						if (array_intersect($probability['article_no'], $probability['vendor_name'])){
 							$article = intval(count($matches) - 1);
@@ -306,7 +306,7 @@ class CONSUMABLES extends API {
 									[
 										'type' => 'textsection',
 										'attributes' => [
-											'name' => $this->_lang->GET('order.incorporation_matching_previous')
+											'name' => $this->_lang->GET('order.incorporation.matching_previous')
 										]
 									]
 								];
@@ -333,9 +333,9 @@ class CONSUMABLES extends API {
 					$result['render']['content'][] = [
 						[
 							'type' => 'text',
-							'hint' => $this->_lang->GET('order.incorporation_matching_previous_hint'),
+							'hint' => $this->_lang->GET('order.incorporation.matching_previous_hint'),
 							'attributes' => [
-								'name' => $this->_lang->GET('order.incorporation_matching_previous'),
+								'name' => $this->_lang->GET('order.incorporation.matching_previous'),
 								'id' => 'incorporationmatchingprevious',
 								'readonly' => true
 							]
@@ -345,9 +345,9 @@ class CONSUMABLES extends API {
 				$result['render']['content'][] = [
 					[
 						'type' => 'textarea',
-						'hint' => $this->_lang->GET('order.incorporation_denied_hint'),
+						'hint' => $this->_lang->GET('order.incorporation.denied_hint'),
 						'attributes' => [
-							'name' => $this->_lang->GET('order.incorporation_denied'),
+							'name' => $this->_lang->GET('order.incorporation.denied'),
 						]
 					]
 				];
@@ -396,19 +396,19 @@ class CONSUMABLES extends API {
 						]
 					])) {
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
-						$this->_lang->GET('order.sample_check_alert', [
+						$this->_lang->GET('order.sample_check.alert', [
 							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit') . '</a>'
 						], true) . $content);
 						$this->response([
 						'response' => [
-							'msg' => $this->_lang->GET('order.sample_check_success'),
+							'msg' => $this->_lang->GET('order.sample_check.success'),
 							'type' => 'success'
 						]]);
 					}
 				}
 				$this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('order.sample_check_failure'),
+						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
 				break;
@@ -443,8 +443,8 @@ class CONSUMABLES extends API {
 							]])['content']
 					],
 					'options' => [
-						$this->_lang->GET('order.sample_check_cancel') => false,
-						$this->_lang->GET('order.sample_check_submit') => ['value' => true, 'class' => 'reducedCTA']
+						$this->_lang->GET('order.sample_check.cancel') => false,
+						$this->_lang->GET('order.sample_check.submit') => ['value' => true, 'class' => 'reducedCTA']
 					],
 					'productid' => $product['id']
 				]];
@@ -487,12 +487,12 @@ class CONSUMABLES extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('order.sample_check_revoked'),
+						'msg' => $this->_lang->GET('order.sample_check.revoked'),
 						'type' => 'success'
 					]]);
 				$this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('order.sample_check_failure'),
+						'msg' => $this->_lang->GET('order.sample_check.failure'),
 						'type' => 'error'
 					]]);
 				break;
@@ -637,7 +637,7 @@ class CONSUMABLES extends API {
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : 0;
 				}
 				if (PERMISSION::permissionFor('incorporation') && $product['incorporated']) {
-					if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation_state_approve'))){
+					if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation.state_approve'))){
 						$incorporation = explode(', ', $incorporation);
 						if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $product['incorporated'] = '';
 						else {
@@ -923,9 +923,9 @@ class CONSUMABLES extends API {
 						if ($product['incorporated'] !== '') {					
 							$product['incorporated'] = json_decode($product['incorporated'], true);
 							$incorporationState = '';
-							if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation_denied');
-							elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation_pending');
-							elseif (PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation_accepted');
+							if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
+							elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
+							elseif (PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.accepted');
 			
 							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 							foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
@@ -1164,8 +1164,8 @@ class CONSUMABLES extends API {
 					if ($product['incorporated'] !== '') {					
 						$product['incorporated'] = json_decode($product['incorporated'], true);
 						$incorporationState = '';
-						if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation_denied');
-						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation_pending');
+						if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
+						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 
 						$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 						foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
@@ -1191,7 +1191,7 @@ class CONSUMABLES extends API {
 							array_push($result['render']['content'][3], [
 									'type' => 'checkbox',
 									'attributes' => [
-										'name' => $this->_lang->GET('order.incorporation_state_approve')
+										'name' => $this->_lang->GET('order.incorporation.state_approve')
 									],
 									'content' => $incorporation,
 									'hint' => $this->_lang->GET('consumables.product.similar_hint'),
