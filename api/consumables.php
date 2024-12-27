@@ -123,7 +123,7 @@ class CONSUMABLES extends API {
 			CONFIG['csv']['dialect']['escape']);
 		}
 		fclose($file);
-		$downloadfiles[$this->_lang->GET('csvfilter.use_filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
+		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
 			'href' => substr($tempFile, 1),
 			'download' => pathinfo($tempFile)['basename']
 		];
@@ -139,7 +139,7 @@ class CONSUMABLES extends API {
 		$file = fopen($tempFile, 'w');
 		fwrite($file, json_encode($filter, JSON_PRETTY_PRINT));
 		fclose($file);
-		$downloadfiles[$this->_lang->GET('csvfilter.use_filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
+		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
 			'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 			'download' => pathinfo($tempFile)['basename']
 		];
