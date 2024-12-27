@@ -39,6 +39,9 @@ class USER extends API {
 	 *  |___|___|_| |__,|___|_|_| |  _|_|___|
 	 *                            |_|
 	 * create a default user profile picture from initials
+	 * @param string $name username
+	 * 
+	 * @return binary image data
 	 */
 	private function defaultPic($name){
 		$names = explode(' ', $name);
@@ -66,6 +69,7 @@ class USER extends API {
 	 *  | . |  _| . |  _| | | -_|
 	 *  |  _|_| |___|_| |_|_|___|
 	 *  |_|
+	 * display user profile and set application settings
 	 */
 	public function profile(){
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -116,7 +120,8 @@ class USER extends API {
 				foreach($user['app_settings'] as $key => $value){
 					if (!$value) unset($user['app_settings'][$key]);
 				}
-				
+
+				// update user
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
 					'values' => [
 						':id' => $user['id'],
@@ -156,18 +161,22 @@ class USER extends API {
 				// prepare user-array to update, return error if not found
 				if (!$user) $this->response(null, 406);
 
+				// import calendar to process timesheet data
 				$calendar = new CALENDARUTILITY($this->_pdo);
 				$timesheet_stats = $calendar->timesheetSummary([$user]);//, '2024-05-01'));
 				$usertimesheet = array_search($user['id'], array_column($timesheet_stats, '_id'));
 				if ($usertimesheet !== false) $timesheet_stats = $timesheet_stats[$usertimesheet];
 
+				// resolve application settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 
+				// resolve permissions
 				$permissions = [];
 				foreach(explode(',', $user['permissions']) as $level){
 					$permissions[] = $this->_lang->GET('permissions.' . $level);
 				}
 
+				// resolve units
 				$units = $primary_unit = [];
 				foreach(explode(',', $user['units']) as $unit){
 					if (!$unit) continue;
@@ -176,6 +185,7 @@ class USER extends API {
 				}
 				if(isset($user['app_settings']['primaryUnit'])) $primary_unit[$this->_lang->GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
 
+				// resolve primary case states for default view within records
 				$primary_casestates = [$this->_lang->GET('record.casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')]];
 				foreach($this->_lang->_USER['casestate']['casedocumentation'] as $state => $translation){
 					$primary_casestates[$translation] = ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')];
@@ -183,6 +193,7 @@ class USER extends API {
 				if(isset($user['app_settings']['primaryRecordState'])) $primary_casestates[$this->_lang->GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
 				else $primary_casestates[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
 
+				// gather current skills
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
 				$skillmatrix = '';
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
@@ -227,6 +238,7 @@ class USER extends API {
 					]
 				];
 
+				// append image options
 				if ($user['image']) {
 					$result['render']['content'][1] = [
 						[
@@ -248,12 +260,13 @@ class USER extends API {
 						]
 					];
 				}
-
+				// retrieve language options
 				$languages = [];
-				foreach(glob('language.*') as $file){
+				foreach(glob('language.*.json') as $file){
 					$lang = explode('.', $file);
 					$languages[$lang[1]] = (isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
 				}
+				// append application settings
 				$result['render']['content'][] = [
 					[
 						'type' => 'checkbox',
@@ -261,8 +274,8 @@ class USER extends API {
 							'name' => $this->_lang->GET('user.settings')
 						],
 						'content' => [
-							$this->_lang->GET('user.settings_force_desktop') => [],
-							$this->_lang->GET('user.settings_homeoffice') => [],
+							$this->_lang->GET('user.settings_force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
+							$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
 						]
 					], [
 						'type' => 'select',
@@ -283,6 +296,7 @@ class USER extends API {
 						]
 					]
 				];
+				// append primary unit selection for orders
 				if ($units) {
 					$result['render']['content'][count($result['render']['content'])-1][] = [
 						'type' => 'radio',
@@ -292,6 +306,7 @@ class USER extends API {
 						'content' => $primary_unit
 					];
 				}
+				// append primary case state selection for records
 				$result['render']['content'][count($result['render']['content'])-1][] = [
 					'type' => 'radio',
 					'attributes' => [
@@ -301,11 +316,7 @@ class USER extends API {
 					'content' => $primary_casestates
 				];
 
-
-				if (isset($user['app_settings']['forceDesktop'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][$this->_lang->GET('user.settings_force_desktop')] = ['checked' => true];
-				if (isset($user['app_settings']['homeoffice'])) $result['render']['content'][count($result['render']['content'])-1][0]['content'][$this->_lang->GET('user.settings_homeoffice')] = ['checked' => true];
-
-
+				// append user training with expiry info 
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 					'replacements' => [
 						':ids' => $user['id'] ? : 0
@@ -346,6 +357,7 @@ class USER extends API {
 	 *  | | |_ -| -_|  _|
 	 *  |___|___|___|_|
 	 *
+	 * edit users
 	 */
 	public function user(){
 		if (!PERMISSION::permissionFor('users')) $this->response([], 401);
@@ -354,6 +366,7 @@ class USER extends API {
 			case 'POST':
 				$permissions = [];
 				$units = [];
+				//set up user properties
 				$user = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name')),
 					'permissions' => '',
@@ -364,7 +377,8 @@ class USER extends API {
 					'app_settings' => [],
 					'skills' => []
 				];
-				
+
+				//check forbidden names
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
@@ -372,7 +386,6 @@ class USER extends API {
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || $nametaken) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
@@ -393,12 +406,14 @@ class USER extends API {
 				}
 				$user['units'] = implode(',', $units);
 
+				// gather timesheet setup
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
 
+				// gather user skills
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === '_LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
@@ -439,7 +454,7 @@ class USER extends API {
 				UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
-				// add user training
+				// add user training if provided
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
@@ -461,6 +476,7 @@ class USER extends API {
 					]);
 				}
 
+				// insert user into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
 					'values' => [
 						':name' => $user['name'],
@@ -473,6 +489,7 @@ class USER extends API {
 						':skills' => implode(',', $user['skills'])
 					]
 				])) {
+					// create welcome message
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					$appname = 'Caro App';
 					$roles = [
@@ -481,6 +498,7 @@ class USER extends API {
 						'prrc' => [],
 						'admin' => [],						
 					];
+					// construct permission- and unit-contact persons
 					foreach ($users as $registered){
 						if ($registered['id'] < 2){
 							$appname = $registered['name'];
@@ -542,9 +560,9 @@ class USER extends API {
 				// prepare user-array to update, return error if not found
 				if (!$user) $this->response(null, 406);
 				
+				// check forbidden names
 				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, $this->_lang->GET('user.name')));
 				$user['name'] = UTILITY::propertySet($this->_payload, $this->_lang->GET('user.name'));
-
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
@@ -552,7 +570,6 @@ class USER extends API {
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				}
@@ -572,6 +589,8 @@ class USER extends API {
 					}
 				}
 				$user['units'] = implode(',', $units);
+
+				// update timesheet settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
@@ -579,6 +598,7 @@ class USER extends API {
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
 
+				// update skills
 				$user['skills'] = [];
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === '_LEVEL') continue;
@@ -588,6 +608,7 @@ class USER extends API {
 						}
 					}
 				}
+
 				// generate order auth
 				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
 					$user['orderauth'] = '';
@@ -607,6 +628,7 @@ class USER extends API {
 				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', $this->_lang->GET('user.token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
+
 				// save and convert image or create default
 				if ((!(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					$tempPhoto = tmpfile();
@@ -645,6 +667,7 @@ class USER extends API {
 						'values' => $training
 					]);
 				}
+
 				// delete checked user trainings
 				if ($delete_training = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.delete_training'))){
 					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
@@ -664,6 +687,7 @@ class USER extends API {
 					}
 				}
 
+				// update user
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
 					'values' => [
 						':id' => $user['id'],
@@ -727,19 +751,23 @@ class USER extends API {
 				];}
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.existing_user_new')) $result['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
-				// display form for adding a new user with ini related permissions
+				// gather available permissions
 				$permissions = [];
 				foreach($this->_lang->_USER['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, explode(',', $user['permissions'])) ? ['checked' => true] : [];
 				}
+				// gather available units
 				$units = [];
 				foreach($this->_lang->_USER['units'] as $unit => $description){
 					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
+
+				// gather application settings, especially for timesheet settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 
+				// gather ans construct skill matrix
 				$user['skills'] = explode(',', $user['skills'] ?  : '');
-				// also see adit.php
+				// also see audit.php
 				$skillmatrix = [
 					[
 						[
@@ -779,20 +807,21 @@ class USER extends API {
 						]
 					]
 				];
+
+				// gather user trainings
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 					'replacements' => [
 						':ids' => $user['id'] ? : 0
 					]
 				]);
-				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach ($trainings as $row){
 					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
-						if ($expire < $today) $attributes['class'] = 'red';
+						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $today) $attributes['class'] = 'orange';
+							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
 						}
 					}
 					$skillmatrix[0][] = [
@@ -814,6 +843,7 @@ class USER extends API {
 					];
 				}
 
+				// create skill matrix
 				$skilldatalistwithlabel = $skilldatalist = [];
 				$skilldatalistnum = 0;
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
@@ -984,6 +1014,7 @@ class USER extends API {
 						'action' => $user['id'] ? "javascript:api.user('put', 'user', '" . $user['id'] . "')" : "javascript:api.user('post', 'user')"
 					]];
 
+					// append image options
 					if ($user['image']) {
 								$result['render']['content'][2] = [
 							[
@@ -1006,6 +1037,7 @@ class USER extends API {
 						];
 					}
 
+					// append order auth options
 					if ($user['orderauth']) $result['render']['content'][3]=[
 						[
 							[
@@ -1020,6 +1052,7 @@ class USER extends API {
 						$result['render']['content'][3]
 					];
 
+					// append login token options
 					if ($user['token']) $result['render']['content'][6]=[
 						[
 							[
@@ -1046,7 +1079,11 @@ class USER extends API {
 				]);
 				$user = $user[0];
 				if ($user['id'] < 2) $this->response([], 401);
+
+				// delete user image
 				if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
+
+				// delete training attachments (certificates)
 				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 					'replacements' => [
 						':ids' => $user['id'] ? : 0
