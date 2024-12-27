@@ -363,7 +363,7 @@
 			"error_faulty_widget": "Dieses Element entspricht nicht der erlaubten Syntax:",
 			"error_no_approved_components": "Es scheint als wären alle Inhalte für dieses Dokument deaktiviert worden. Bitte informiere einen von :permission hier aufzuräumen!",
 			"export": "Exportiere das Dokument als PDF",
-			"ebenfalls": "Datei- und Fotouploads werden durch Hinweise ersetzt.",
+			"export_hint": "Datei- und Fotouploads werden durch Hinweise ersetzt.",
 			"export_identifier": "Aufkleber hier platzieren",
 			"export_exported": "V:version, exportiert am :date",
 			"export_by": "Beurteilt / ausgefüllt von, am",
