@@ -103,6 +103,7 @@ export const api = {
 				if (value == "0") sanitizedpayload[key] = "";
 			}
 			sanitizedpayload = JSON.stringify(sanitizedpayload)
+				.replace(/\\r|\\n|\\t/g, "")
 				.replaceAll(/[\W_]/g, ""); // harmonize cross browser
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",

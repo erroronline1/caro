@@ -123,7 +123,7 @@ class API {
 					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
 						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
 						}, json_encode($payload) );
-					$payload = preg_replace(['/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is not resolved properly on the backend
+					$payload = preg_replace(['/\\\\r|\\\\n|\\\\t/', '/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is somehow not resolved properly on the backend
 					//var_dump(strlen($payload), $payload);
 					$query = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
 						'values' => [
@@ -140,7 +140,7 @@ class API {
 						$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 						$_SESSION['user']['image'] = './' . $result['image'];
 					}
-					else $this->response([], 401);
+					else $this->response([strlen($payload), $payload], 401);
 				}
 			}
 			else {
