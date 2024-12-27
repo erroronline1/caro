@@ -228,7 +228,7 @@ class CALENDARUTILITY {
 		}
 
 		$alert = $span_start = $span_end = null; 
-		$alert = [$this->_lang->GET('calendar.event_alert') => $columns[':alert'] ? ['checked' => true] : []];
+		$alert = [$this->_lang->GET('calendar.schedule.alert') => $columns[':alert'] ? ['checked' => true] : []];
 		
 		if ($columns[':span_start']) $span_start = new DateTime($columns[':span_start'], new DateTimeZone(CONFIG['application']['timezone']));
 		else $span_start = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
@@ -244,7 +244,7 @@ class CALENDARUTILITY {
 					[
 						'type' => 'scanner',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_content'),
+							'name' => $this->_lang->GET('calendar.schedule.content'),
 							'value' => $columns[':subject'],
 							'required' => true
 						]
@@ -252,7 +252,7 @@ class CALENDARUTILITY {
 					[
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_date'),
+							'name' => $this->_lang->GET('calendar.schedule.date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
@@ -260,7 +260,7 @@ class CALENDARUTILITY {
 					[
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_due'),
+							'name' => $this->_lang->GET('calendar.schedule.due'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
@@ -268,29 +268,29 @@ class CALENDARUTILITY {
 					[
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_organizational_unit')
+							'name' => $this->_lang->GET('calendar.schedule.organizational_unit')
 						],
 						'content' => $units,
-						'hint' => $this->_lang->GET('calendar.event_organizational_unit_hint')
+						'hint' => $this->_lang->GET('calendar.schedule.organizational_unit_hint')
 					],
 					[
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_affected_user')
+							'name' => $this->_lang->GET('calendar.schedule.affected_user')
 						]
 					],
 					[
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_alert_description')
+							'name' => $this->_lang->GET('calendar.schedule.alert_description')
 						],
 						'content' => $alert
 					],
 					[
 						'type' => 'hidden',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_type'),
+							'name' => $this->_lang->GET('calendar.schedule.type'),
 							'value' => $columns[':type']
 						]
 					],
@@ -313,7 +313,7 @@ class CALENDARUTILITY {
 				$misc = $columns[':misc'] ? json_decode($columns[':misc'], true) : [];
 				
 				$ptoselect = [];
-				foreach($this->_lang->_USER['calendar']['timesheet_pto'] as $subject => $reason){
+				foreach($this->_lang->_USER['calendar']['timesheet']['pto'] as $subject => $reason){
 					$ptoselect[$reason] = ['value' => $subject];
 					if ($columns[':subject'] === $subject) $ptoselect[$reason]['selected'] = true;
 				}
@@ -325,7 +325,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_affected_user'),
+							'name' => $this->_lang->GET('calendar.schedule.affected_user'),
 							'required' => true
 						]
 					];
@@ -334,7 +334,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'content' => $affected_unit_users,
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_affected_user'),
+							'name' => $this->_lang->GET('calendar.schedule.affected_user'),
 							'required' => true
 						]
 					];
@@ -342,71 +342,71 @@ class CALENDARUTILITY {
 					$inputs[] = [
 						'type' => 'hidden',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.event_affected_user'),
+							'name' => $this->_lang->GET('calendar.schedule.affected_user'),
 							'value' => $columns[':affected_user_id']
 						]
 					];
 				}
 				// name => required bool
 				$setFieldVisibility = [
-					$this->_lang->GET('calendar.timesheet_start_time') => true,
-					$this->_lang->GET('calendar.timesheet_end_time') => true,
-					$this->_lang->GET('calendar.timesheet_break_time') => true,
-					$this->_lang->GET('calendar.timesheet_homeoffice') => true
+					$this->_lang->GET('calendar.timesheet.start_time') => true,
+					$this->_lang->GET('calendar.timesheet.end_time') => true,
+					$this->_lang->GET('calendar.timesheet.break_time') => true,
+					$this->_lang->GET('calendar.timesheet.homeoffice') => true
 				];
 				array_push($inputs, ...[
 					[
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet_pto_exemption'),
+							'name' => $this->_lang->GET('calendar.timesheet.pto_exemption'),
 							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === 'regular')"
 						],
 						'content' => $ptoselect
 					],[
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet_start_date'),
+							'name' => $this->_lang->GET('calendar.timesheet.start_date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
 					],[
 						'type' => 'time',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet_start_time'),
+							'name' => $this->_lang->GET('calendar.timesheet.start_time'),
 							'value' => $span_start->format('H:i'),
 							'required' => true
 						]
 					],[
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.timesheet_end_date'),
+							'name' => $this->_lang->GET('calendar.timesheet.end_date'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
 						],[
 							'type' => 'time',
 							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet_end_time'),
+								'name' => $this->_lang->GET('calendar.timesheet.end_time'),
 								'value' => $span_end->format('H:i'),
 								'required' => true
 							]
 						],[
 							'type' => 'time',
 							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet_break_time'),
+								'name' => $this->_lang->GET('calendar.timesheet.break_time'),
 								'value' => isset($misc['break']) ? $misc['break'] : '',
 								'required' => true
 							]
 						],[
 							'type' => 'text',
 							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet_pto_note'),
+								'name' => $this->_lang->GET('calendar.timesheet.pto_note'),
 								'value' => isset($misc['note']) ? $misc['note'] : '',
 							]
 						],[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('calendar.event_alert_description')
+								'name' => $this->_lang->GET('calendar.schedule.alert_description')
 							],
 							'content' => $alert
 						],[
@@ -422,7 +422,7 @@ class CALENDARUTILITY {
 						[
 							'type' => 'time',
 							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet_homeoffice'),
+								'name' => $this->_lang->GET('calendar.timesheet.homeoffice'),
 								'value' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
 								'required' => true
 							]
@@ -431,7 +431,7 @@ class CALENDARUTILITY {
 				break;
 		}
 
-		return "new Dialog({type:'input', header: '', render: " . json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.event_cancel') . "': false, '" . $this->_lang->GET('calendar.event_submit') . "': {'value': true, class: 'reducedCTA'}}})" .
+		return "new Dialog({type:'input', header: '', render: " . json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.schedule.cancel') . "': false, '" . $this->_lang->GET('calendar.schedule.submit') . "': {'value': true, class: 'reducedCTA'}}})" .
 			".then(response => {if (response) {_client.calendar.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
 	}
 	

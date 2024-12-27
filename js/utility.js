@@ -201,7 +201,7 @@ const _client = {
 				if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
 			}
-			if (units.length) window.calendarFormData.append(api._lang.GET("calendar.event_organizational_unit"), units.join(","));
+			if (units.length) window.calendarFormData.append(api._lang.GET("calendar.schedule.organizational_unit"), units.join(","));
 		},
 		setFieldVisibilityByNames: (names = "", display = true) => {
 			/**

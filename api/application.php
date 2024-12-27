@@ -707,7 +707,7 @@ class APPLICATION extends API {
 		foreach ($thisDaysEvents as $row){
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
 			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
-			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet_pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 		}
 		if ($displayevents) $overview[] = [
 			'type' => 'textsection',
@@ -719,7 +719,7 @@ class APPLICATION extends API {
 		if ($displayabsentmates) $overview[] = [
 			'type' => 'textsection',
 			'attributes' => [
-					'name' => $this->_lang->GET('calendar.timesheet_irregular')
+					'name' => $this->_lang->GET('calendar.timesheet.irregular')
 			],
 			'content' => $displayabsentmates
 		];

@@ -206,9 +206,9 @@ class USER extends API {
 								($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
 								(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
 								(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
-								(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.export_sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
+								(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
 								(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
-								(isset($timesheet_stats['_leftvacation']) ? " \n" . $this->_lang->GET('calendar.export_sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
+								(isset($timesheet_stats['_leftvacation']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
 								($skillmatrix ? " \n" . $skillmatrix : '')
 							]
 						],[

@@ -226,7 +226,7 @@ class RECORD extends API {
 						$subs['attributes']['value'] = $identify;
 					}
 					if ($subs['type'] === 'calendarbutton'){
-						$subs['attributes']['value'] = $this->_lang->GET('calendar.event_new');
+						$subs['attributes']['value'] = $this->_lang->GET('calendar.schedule.new');
 						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
 					}
 					if (in_array($subs['type'], [
