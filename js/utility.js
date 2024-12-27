@@ -1098,7 +1098,7 @@ const _client = {
 		data: null,
 		update: () => {
 			const replacements = {},
-				genii = document.getElementsByName(api._lang.GET("texttemplate.use_person")),
+				genii = document.getElementsByName(api._lang.GET("texttemplate.use.person")),
 				blocks = document.querySelectorAll("[data-usecase=useblocks]"),
 				placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
 			let selectedgenus = 0,
