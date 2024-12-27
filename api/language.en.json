@@ -31,7 +31,7 @@
 		"admin": "Administration"
 	},
 	"skills": {
-		"LEVEL": ["None", "Backup", "Secondary task", "Primary task", "Substitutional responsibility", "Primary responsibility"],
+		"_LEVEL": ["None", "Backup", "Secondary task", "Primary task", "Substitutional responsibility", "Primary responsibility"],
 		"prosthetics_I": {
 			"_DESCRIPTION": "Prothetics I",
 			"technical_responsibility": "Technical responsibility",

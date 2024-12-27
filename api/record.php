@@ -328,7 +328,7 @@ class RECORD extends API {
 			];
 			if (in_array($document['context'], ['casedocumentation'])) {
 				$options = [];
-				foreach ($this->_lang->_USER['record']['record_type'] as $key => $value){
+				foreach ($this->_lang->_USER['record']['type'] as $key => $value){
 					$options[$value] = boolval(CONFIG['application']['require_record_type_selection']) ? ['value' => $key, 'required' => true] : ['value' => $key];
 				}
 				$defaults[] = [
@@ -1038,10 +1038,10 @@ class RECORD extends API {
 					$typeaction = '';
 					if (PERMISSION::permissionFor('recordsretyping')){
 						$options = [];
-						foreach ($this->_lang->_USER['record']['record_type'] as $record_type => $description){
+						foreach ($this->_lang->_USER['record']['type'] as $record_type => $description){
 							$options[$description] = ['value' => $record_type];
 						}						
-						$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['record_type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
+						$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
 							[[
 								'type' => 'radio',
 								'attributes' => [
@@ -1059,13 +1059,13 @@ class RECORD extends API {
 						"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 						"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
 						"}}).then(response => { if (response) api.record('post', 'retype', null, _client.application.dialogToFormdata(response))})"
-						. "\">" . $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['record_type'][$content['record_type']]]) . '</a>';
+						. "\">" . $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . '</a>';
 					}
 					$return['render']['content'][] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $this->_lang->_USER['record']['record_type'][$content['record_type']],
+								'name' => $this->_lang->_USER['record']['type'][$content['record_type']],
 							],
 							'linkedcontent' => $typeaction
 						]

@@ -31,7 +31,7 @@
 		"admin": "Leitung"
 	},
 	"skills": {
-		"LEVEL": ["Kein", "Backup", "Sekundäraufgabe", "Primäraufgabe", "Stellvertretende Verantwortung", "Primäre Verantwortung"],
+		"_LEVEL": ["Kein", "Backup", "Sekundäraufgabe", "Primäraufgabe", "Stellvertretende Verantwortung", "Primäre Verantwortung"],
 		"prosthetics_I": {
 			"_DESCRIPTION": "Prothetik I",
 			"technical_responsibility": "Technische Verantwortung",

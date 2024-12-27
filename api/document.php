@@ -1273,7 +1273,7 @@ class DOCUMENT extends API {
 		if ($fillable){
 			if (in_array($document['context'], ['casedocumentation'])) {
 				$type = ['type' => 'selection', 'value' => []];
-				foreach ($this->_lang->_USER['record']['record_type'] as $key => $value){
+				foreach ($this->_lang->_USER['record']['type'] as $key => $value){
 					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
 				}
 				$summary['content'] = array_merge([$this->_lang->GET('record.type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);

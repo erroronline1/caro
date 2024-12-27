@@ -1370,7 +1370,7 @@ class AUDIT extends API {
 		$unfulfilledskills = [];
 		$bulkselection = ['...' => ['value' => '']];
 		foreach ($this->_lang->_USER['skills'] as $duty => $skills){
-			if ($duty === 'LEVEL') continue;
+			if ($duty === '_LEVEL') continue;
 			foreach ($skills as $skill => $skilldescription){
 				if ($skill === '_DESCRIPTION') continue;
 				$unfulfilledskills[] = $this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
@@ -1391,10 +1391,10 @@ class AUDIT extends API {
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			$skillmatrix = '';
 			foreach ($this->_lang->_USER['skills'] as $duty => $skills){
-				if ($duty === 'LEVEL') continue;
+				if ($duty === '_LEVEL') continue;
 				foreach ($skills as $skill => $skilldescription){
 					if ($skill === '_DESCRIPTION') continue;
-					foreach($this->_lang->_USER['skills']['LEVEL'] as $level => $leveldescription){
+					foreach($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
 						if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])){
 							$skillmatrix .=  $this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription . " \n";
 							unset($unfulfilledskills[array_search($this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription, $unfulfilledskills)]);
@@ -1523,7 +1523,7 @@ class AUDIT extends API {
 	private function skillfulfilment(){
 		$content = $allskills = [];
 		foreach ($this->_lang->_USER['skills'] as $duty => $skills){
-			if ($duty === 'LEVEL') continue;
+			if ($duty === '_LEVEL') continue;
 			foreach ($skills as $skill => $skilldescription){
 				if ($skill === '_DESCRIPTION') continue;
 				$allskills[$duty . '.' . $skill] = [];
