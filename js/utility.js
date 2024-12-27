@@ -730,7 +730,7 @@ const _client = {
 					collapsible.push({
 						type: "textsection",
 						attributes: {
-							name: api._lang.GET("consumables.edit_product_special_attention"),
+							name: api._lang.GET("consumables.product.special_attention"),
 							class: "orange",
 						},
 					});
@@ -1000,7 +1000,7 @@ const _client = {
 					order.push({
 						type: "button",
 						attributes: {
-							value: api._lang.GET("consumables.edit_product_add_new"),
+							value: api._lang.GET("consumables.product.add_new"),
 							type: "button",
 							onpointerup:
 								"api.purchase('get', 'product', '" +

@@ -1672,7 +1672,7 @@ export class Assemble {
 			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
 			new Dialog({
 				type: "input",
-				header: api._lang.GET("consumables.edit_product_search"),
+				header: api._lang.GET("consumables.product.search"),
 				render: [
 					[
 						{
@@ -1682,7 +1682,7 @@ export class Assemble {
 						{
 							type: "search",
 							attributes: {
-								name: api._lang.GET("consumables.edit_product_search"),
+								name: api._lang.GET("consumables.product.search"),
 								onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;}",
 								onblur: "api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;",
 								id: "productsearch",

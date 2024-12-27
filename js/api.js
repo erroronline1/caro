@@ -942,7 +942,7 @@ export const api = {
 				vendorinformation: api._lang.GET("menu.purchase_vendor_information"),
 				productinformation: api._lang.GET("menu.purchase_product_information"),
 			};
-		if (request[2] === api._lang.GET("consumables.edit_existing_vendors_new")) request.splice(2, 1);
+		if (request[2] === api._lang.GET("consumables.vendor.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {
 			case "get":
 				switch (request[1]) {

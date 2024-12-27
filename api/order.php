@@ -641,7 +641,7 @@ class ORDER extends API {
 
 				// prepare existing vendor lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-				$vendors[$this->_lang->GET('consumables.edit_product_search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
+				$vendors[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 				
 				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
@@ -730,12 +730,12 @@ class ORDER extends API {
 							'content' => $vendors,
 							'attributes' => [
 								'id' => 'productsearchvendor',
-								'name' => $this->_lang->GET('consumables.edit_product_vendor_select')
+								'name' => $this->_lang->GET('consumables.product.vendor_select')
 							]
 						], [
 							'type' => 'search',
 							'attributes' => [
-								'name' => $this->_lang->GET('consumables.edit_product_search'),
+								'name' => $this->_lang->GET('consumables.product.search'),
 									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
 								'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
 								'id' => 'productsearch'
@@ -1363,9 +1363,9 @@ class ORDER extends API {
 	 *  |_|
 	 */
 	private function processOrderForm(){
-		$unset = $this->_lang->PROPERTY('consumables.edit_product_search');
+		$unset = $this->_lang->PROPERTY('consumables.product.search');
 		unset ($this->_payload->$unset);
-		$unset = $this->_lang->PROPERTY('consumables.edit_product_vendor_select');
+		$unset = $this->_lang->PROPERTY('consumables.product.vendor_select');
 		unset ($this->_payload->$unset);
 
 		// detect approval

@@ -1607,12 +1607,12 @@ class AUDIT extends API {
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$lastchecks = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_last_checked');
 		$vendor_info = [
-			'infotext' => 'consumables.edit_vendor_info',
-			'mail' => 'consumables.edit_vendor_mail',
-			'phone' => 'consumables.edit_vendor_phone',
-			'address' => 'consumables.edit_vendor_address',
-			'sales_representative' => 'consumables.edit_vendor_sales_representative',
-			'customer_id' => 'consumables.edit_vendor_customer_id',
+			'infotext' => 'consumables.vendor.info',
+			'mail' => 'consumables.vendor.mail',
+			'phone' => 'consumables.vendor.phone',
+			'address' => 'consumables.vendor.address',
+			'sales_representative' => 'consumables.vendor.sales_representative',
+			'customer_id' => 'consumables.vendor.customer_id',
 		];
 
 		// add export button
@@ -1635,13 +1635,13 @@ class AUDIT extends API {
 					$info .= implode(" \n", array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) . "\n";
 				}
 				$pricelist = json_decode($vendor['pricelist'], true);
-				if ($pricelist['validity']) $info .= $this->_lang->GET('consumables.edit_vendor_pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
+				if ($pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
 				if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
 				$certificate = json_decode($vendor['certificate'], true);
-				if ($certificate['validity']) $info .= $this->_lang->GET('consumables.edit_vendor_certificate_validity') . ' ' . $certificate['validity'] . "\n";
+				if ($certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				if ($vendor['evaluation']){
 					$vendor['evaluation'] = json_decode($vendor['evaluation'], true);
-					$info .= $this->_lang->GET('consumables.edit_vendor_last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']]) . "\n";
+					$info .= $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']]) . "\n";
 					unset($vendor['evaluation']['_author'], $vendor['evaluation']['_date']);
 					foreach($vendor['evaluation'] as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";
 				}
@@ -1661,7 +1661,7 @@ class AUDIT extends API {
 				}
 				if ($certificates) $vendorlist[] = [
 					'type' => 'links',
-					'description' => $this->_lang->GET('consumables.edit_vendor_documents_download'),
+					'description' => $this->_lang->GET('consumables.vendor.documents_download'),
 					'content' => $certificates
 				];
 			}
