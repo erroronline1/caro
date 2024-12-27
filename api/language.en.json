@@ -318,6 +318,7 @@
 				"edit_existing_bundle": "Search by name",
 				"insert_default": "Select",
 				"name": "Name",
+				"unit": "Likely used by",
 				"insert_name": "Insert document name on cursor position or selection",
 				"content": "Documents",
 				"content_hint": "These documents will be available within bundle selection as long as they are approved and available. Each document name needs a new line, otherwise documents will be unaccessible. On submitting a document, the next in line will be recommended.",

@@ -318,6 +318,7 @@
 				"edit_existing_bundle": "Nach Namen suchen",
 				"insert_default": "Auswahl",
 				"name": "Name",
+				"unit": "Typischerweise verwendet von",
 				"insert_name": "Füge Dokumentennamen an der Cursorposition oder Auswahl ein.",
 				"content": "Dokumente",
 				"content_hint": "Diese Dokumente werden im Paket verfügbar sein sofern sie freigegeben und verfügbar sind. Jeder Name muss in einer neuen Zeile stehen, sonst sind die Dokumente nicht erreichbar. Beim Speichern eines Dokuments wird das der nächsten Zeile vorgeschlagen.",

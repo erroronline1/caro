@@ -294,7 +294,7 @@ class DOCUMENT extends API {
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.name')),
 					':alias' => '',
 					':context' => 'bundle',
-					':unit' => null,
+					':unit' => UTILITY::propertySET($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.unit')) ? : 'common',
 					':author' => $_SESSION['user']['name'],
 					':content' => $content,
 					':regulatory_context' => '',
@@ -315,12 +315,13 @@ class DOCUMENT extends API {
 				foreach ($documents as $exists){
 					break;
 				}
+				// update unit and hidden on latest available bundle if content remains
 				if ($exists && $exists['content'] === $bundle[':content']) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
 						'values' => [
 							':alias' => $exists['alias'],
 							':context' => $exists['context'],
-							':unit' => $exists['unit'],
+							':unit' => $bundle[':unit'],
 							':author' => $exists['author'],
 							':content' => $exists['content'],
 							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.hidden')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden_hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
@@ -423,6 +424,12 @@ class DOCUMENT extends API {
 				}
 				ksort($insertdocument);
 
+				$units = [];
+				foreach ($this->_lang->_USER['units'] as $unit => $translation){
+					$units[$translation] = ['value' => $unit];
+					if ($bundle['unit'] == $unit) $units[$translation]['selected'] = true;
+				}
+
 				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'bundle',
@@ -472,6 +479,12 @@ class DOCUMENT extends API {
 									'data-loss' => 'prevent'
 								],
 								'hint' => ($bundle['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => substr($bundle['date'], 0, -3)]) . '<br>' : $this->_lang->GET('assemble.compose.component.component_name_hint'))
+							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('assemble.compose.bundle.unit'),
+								],
+								'content' => $units
 							], [
 								'type' => 'select',
 								'attributes' => [
