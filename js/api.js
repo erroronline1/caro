@@ -27,7 +27,7 @@ export const api = {
 	},
 
 	_lang: new Lang(),
-	
+
 	/**
 	 *                           _     _     _       _
 	 *   ___ ___ ___ _ _ ___ ___| |_ _| |___| |_ ___| |___ ___ ___
@@ -1235,7 +1235,7 @@ export const api = {
 
 								new Dialog({
 									type: "confirm",
-									header: api._lang.GET("assemble.compose_merge"),
+									header: api._lang.GET("assemble.render.merge"),
 									options: options,
 									render: data.response.msg,
 								}).then((response) => {

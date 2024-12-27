@@ -207,7 +207,7 @@ class RECORD extends API {
 	public function document(){
 		// prepare existing documents lists
 		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
-		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.error_document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document__not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $document['name'], 'render' => [
 			'content' => []
@@ -264,7 +264,7 @@ class RECORD extends API {
 			'type' => 'textsection',
 			'attributes' => [
 				'class' => 'orange',
-				'name' => $this->_lang->GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))])
+				'name' => $this->_lang->GET('assemble.render.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))])
 			]
 		]]);
 
@@ -347,16 +347,16 @@ class RECORD extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('assemble.required_asterisk')
+						'name' => $this->_lang->GET('assemble.render.required_asterisk')
 					]
 				],
 				[
 					'type' => 'button',
-					'hint' => $this->_lang->GET('assemble.document_export_hint'),
+					'hint' => $this->_lang->GET('assemble.render.export_hint'),
 					'attributes' => [
 						'type' => 'submit',
 						'formnovalidate' => true,
-						'value' => $this->_lang->GET('assemble.document_export'),
+						'value' => $this->_lang->GET('assemble.render.export'),
 						'formaction' => "javascript:api.document('post', 'export')"
 					]
 				]
@@ -367,7 +367,7 @@ class RECORD extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('assemble.document_export_permission', [':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentexport', true)))])
+						'name' => $this->_lang->GET('assemble.render.export_permission', [':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentexport', true)))])
 					]
 				]
 			];
@@ -1730,12 +1730,12 @@ class RECORD extends API {
 				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $document
-					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . $this->_lang->GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
+					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
 			}
 			$summary['content'] = $printablecontent;
 			if ($type === 'simplifieddocument'){
-				$summary['content'] = [' ' => $printablecontent[$useddocument['name'] . ' ' . $this->_lang->GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])]];
-				$summary['date'] = $this->_lang->GET('assemble.document_export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')]);
+				$summary['content'] = [' ' => $printablecontent[$useddocument['name'] . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])]];
+				$summary['date'] = $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')]);
 				$summary['title'] = $useddocument['name'];
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}

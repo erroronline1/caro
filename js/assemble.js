@@ -590,7 +590,7 @@ export class Assemble {
 					content: JSON.stringify(elements, null, " "),
 					attributes: {
 						class: "red",
-						name: api._lang.GET("assemble.error_faulty_widget"),
+						name: api._lang.GET("assemble.render.error_faulty_widget"),
 					},
 				};
 				content = content.concat(this.textsection());
@@ -737,9 +737,9 @@ export class Assemble {
 				return;
 			}
 			const options = {};
-			options[api._lang.GET("assemble.compose_document_cancel")] = false;
-			options[api._lang.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose_document"), options: options }).then((confirmation) => {
+			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.document.document"), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
 		} else new Toast(api._lang.GET("general.missing_form_data"), "error");
@@ -1151,8 +1151,8 @@ export class Assemble {
 							.map((x) => x.name)
 							.join(", ") +
 					  " " +
-					  api._lang.GET("assemble.files_rechoose")
-					: api._lang.GET("assemble.files_choose");
+					  api._lang.GET("assemble.render.files_rechoose")
+					: api._lang.GET("assemble.render.files_choose");
 			};
 		else
 			input.onchange = function () {
@@ -1161,8 +1161,8 @@ export class Assemble {
 							.map((x) => x.name)
 							.join(", ") +
 					  " " +
-					  api._lang.GET("assemble.file_rechoose")
-					: api._lang.GET("assemble.file_choose");
+					  api._lang.GET("assemble.render.file_rechoose")
+					: api._lang.GET("assemble.render.file_choose");
 			};
 		label.onpointerup = () => {
 			document.getElementById(input.id).click();
@@ -1170,7 +1170,7 @@ export class Assemble {
 		label.type = "button";
 		label.dataset.type = "file";
 		label.classList.add("inlinebutton");
-		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? api._lang.GET("assemble.files_choose") : api._lang.GET("assemble.file_choose")));
+		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? api._lang.GET("assemble.render.files_choose") : api._lang.GET("assemble.render.file_choose")));
 		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 
 		button.onpointerup = () => {
@@ -1355,8 +1355,8 @@ export class Assemble {
 			let currentElement = this.currentElement;
 			input.onpointerup = function () {
 				const options = {};
-				options[api._lang.GET("assemble.compose_document_cancel")] = false;
-				options[api._lang.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
+				options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
+				options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
 				new Dialog({
 					type: "input",
 					header: currentElement.attributes.name.replace(/\[\]/g, ""),
@@ -1568,8 +1568,8 @@ export class Assemble {
 						.map((x) => x.name)
 						.join(", ") +
 				  " " +
-				  api._lang.GET("assemble.photo_rechoose")
-				: api._lang.GET("assemble.photo_choose");
+				  api._lang.GET("assemble.render.photo_rechoose")
+				: api._lang.GET("assemble.render.photo_choose");
 			if (this.files.length) {
 				this.nextSibling.src = URL.createObjectURL(this.files[0]);
 				this.nextSibling.onload = () => {
@@ -1590,7 +1590,7 @@ export class Assemble {
 		button.type = "button";
 		button.dataset.type = "photo";
 		button.classList.add("inlinebutton");
-		button.appendChild(document.createTextNode(api._lang.GET("assemble.photo_choose")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.render.photo_choose")));
 
 		img.classList.add("photoupload");
 
@@ -1599,7 +1599,7 @@ export class Assemble {
 			e.value = "";
 			e.dispatchEvent(new Event("change"));
 		};
-		resetbutton.appendChild(document.createTextNode(api._lang.GET("assemble.reset")));
+		resetbutton.appendChild(document.createTextNode(api._lang.GET("assemble.render.reset")));
 		resetbutton.dataset.type = "reset";
 		resetbutton.classList.add("inlinebutton");
 		resetbutton.type = "button";
@@ -1668,8 +1668,8 @@ export class Assemble {
 		button.dataset.type = "search";
 		button.onpointerup = function () {
 			const options = {};
-			options[api._lang.GET("assemble.compose_document_cancel")] = false;
-			options[api._lang.GET("assemble.compose_document_confirm")] = { value: true, class: "reducedCTA" };
+			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
 			new Dialog({
 				type: "input",
 				header: api._lang.GET("consumables.edit_product_search"),
@@ -1770,7 +1770,7 @@ export class Assemble {
 			multiple = true;
 			// delete for input apply_attributes
 			delete this.currentElement.attributes.multiple;
-			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.scan_multiple") : api._lang.GET("assemble.scan_multiple");
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.render.scan_multiple") : api._lang.GET("assemble.render.scan_multiple");
 		}
 
 		if (this.currentElement.destination !== undefined) {
@@ -1815,7 +1815,7 @@ export class Assemble {
 		if (multiple) this.currentElement.attributes.multiple = true;
 
 		let button = document.createElement("button");
-		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.scan_button")));
+		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.scan_button")));
 		button.type = "button";
 		button.dataset.type = "scanner";
 
@@ -1841,7 +1841,7 @@ export class Assemble {
 
 		if (originaltype === "identify") {
 			let button = document.createElement("button");
-			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.compose_merge")));
+			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.merge")));
 			button.type = "button";
 			button.dataset.type = "merge";
 			button.onpointerup = function () {
@@ -1899,7 +1899,7 @@ export class Assemble {
 			multiple = true;
 			delete this.currentElement.attributes.multiple;
 			selectElementClone = structuredClone(this.currentElement);
-			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.select_multiple") : api._lang.GET("assemble.select_multiple");
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.render.select_multiple") : api._lang.GET("assemble.render.select_multiple");
 		}
 		hint = this.hint();
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
@@ -1997,7 +1997,7 @@ export class Assemble {
 		input.hidden = true;
 		result.push(input);
 		this.currentElement.attributes = {
-			value: api._lang.GET("assemble.clear_signature"),
+			value: api._lang.GET("assemble.render.clear_signature"),
 			type: "button",
 			onpointerup: "signaturePad.clear()",
 		};

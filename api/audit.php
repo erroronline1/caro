@@ -346,7 +346,7 @@ class AUDIT extends API {
 				if ($cmpnnt = latestApprovedComponent($components, $this->_requestedDate . ' ' . $this->_requestedTime, $used_component_name)){
 					$has_components = true;
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
-					$entry .= " \n" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose_component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
+					$entry .= " \n" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $cmpnnt['author'], ':date' => $cmpnnt['date']]) . "\n";
 					foreach($cmpnnt['approval'] as $position => $data){
 						$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
 							':permission' => $this->_lang->GET('permissions.' . $position),
@@ -363,26 +363,26 @@ class AUDIT extends API {
 			$documentscontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose_component_author', [':author' => $document['author'], ':date' => $document['date']])
+					'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $document['date']])
 				],
 				'content' => $entry
 			];
 			if (!$has_components) {
 				$documentscontent[count($documentscontent) - 1]['attributes']['class'] = 'orange';
-				$documentscontent[count($documentscontent) - 1]['content'] .="\n \n" . $this->_lang->GET('assemble.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>$this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))]);
+				$documentscontent[count($documentscontent) - 1]['content'] .="\n \n" . $this->_lang->GET('assemble.render.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>$this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))]);
 			}
 			$documentscontent[] = [
 				'type' => 'button',
 				'attributes' => [
 					'type' => 'button',
 					'data-type' => 'download',
-					'value' => $this->_lang->GET('assemble.document_export'),
-					'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('assemble.document_export') . "', render: JSON.parse('" . json_encode(
+					'value' => $this->_lang->GET('assemble.render.export'),
+					'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('assemble.render.export') . "', render: JSON.parse('" . json_encode(
 						[
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose_component_author', [':author' => $document['author'], ':date' => $document['date']])
+									'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $document['date']])
 								],
 							],
 							[
@@ -444,7 +444,7 @@ class AUDIT extends API {
 			$bundlescontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose_component_author', [':author' => $bundle['author'], ':date' => $bundle['date']])
+					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => $bundle['date']])
 				],
 				'content' => implode("\n", $documentslist)
 			];

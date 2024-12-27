@@ -494,7 +494,7 @@ class FILE extends API {
 									'type' => 'checkbox2text',
 									'content' => $regulatory_context,
 									'attributes' => [
-										'name' => $this->_lang->GET('assemble.compose_document_regulatory_context'),
+										'name' => $this->_lang->GET('assemble.compose.document.document_regulatory_context'),
 										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
 										'data-filtered' => $file['path']
 									],

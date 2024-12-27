@@ -57,10 +57,10 @@ class TEXTTEMPLATE extends API {
 
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 				}
 				preg_match("/[^\w\d]/m", $chunk[':name'], $matches);
-				if ($matches) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
+				if ($matches) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
@@ -151,7 +151,7 @@ class TEXTTEMPLATE extends API {
 						$options[$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						if ($row['type'] === 'replacement') $insertreplacement[$this->_lang->GET('units.' . $row['unit']) . ' '. $row['name'] . ' (' . $row['language'] . ')'] = ['value' => ':' . $row['name']];
 					}
-					$alloptions[$display . ' ' . $this->_lang->GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					$alloptions[$display . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
 				ksort($options);
@@ -406,7 +406,7 @@ class TEXTTEMPLATE extends API {
 							$templatedatalist[] = $row['name'];
 							$options[$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-						$alloptions[$display . ' ' . $this->_lang->GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$alloptions[$display . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					if ($row['type'] === 'text'){
 						if (!isset($chunks[':' . $row['name']]) && !in_array($row['name'], $hidden)) {
@@ -514,10 +514,10 @@ class TEXTTEMPLATE extends API {
 										$this->_lang->GET("texttemplate.edit_template_save") .
 										"', options:{" .
 										"'" .
-										$this->_lang->GET("assemble.compose_document_cancel") .
+										$this->_lang->GET("assemble.compose.document.document_cancel") .
 										"': false," .
 										"'" .
-										$this->_lang->GET("assemble.compose_document_confirm") .
+										$this->_lang->GET("assemble.compose.document.document_confirm") .
 										"': {value: true, class: 'reducedCTA'}," .
 										"}}).then(confirmation => {if (confirmation) api.texttemplate('post', 'template')})",
 						
@@ -674,7 +674,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $this->_lang->GET('texttemplate.use_import', [':placeholders' => implode(', ', array_keys($clientimport))]),
 						'onpointerup' => "_client.texttemplate.import('" . $this->_clientimport . "');"
 					],
-					'hint' => $this->_lang->GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])
+					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])
 				];	
 			}
 
@@ -700,7 +700,7 @@ class TEXTTEMPLATE extends API {
 					'onpointerup' => '_client.texttemplate.update();',
 					'data-type' => 'generateupdate'
 				],
-				'hint' => $this->_lang->GET('assemble.compose_component_author', [':author' => $row['author'], ':date' => $row['date']])
+				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])
 			];
 			$return['render']['content'][] = $inputs;
 

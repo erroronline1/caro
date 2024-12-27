@@ -339,7 +339,7 @@ class CALENDAR extends API {
 				[
 					'type' => 'scanner',
 					'destination' => 'recordfilter',
-					'description' => $this->_lang->GET('assemble.scan_button')
+					'description' => $this->_lang->GET('assemble.render.scan_button')
 				], [
 					'type' => 'search',
 					'attributes' => [
@@ -486,7 +486,7 @@ class CALENDAR extends API {
 					[
 						'type' => 'scanner',
 						'destination' => 'recordfilter',
-						'description' => $this->_lang->GET('assemble.scan_button')
+						'description' => $this->_lang->GET('assemble.render.scan_button')
 					], [
 						'type' => 'search',
 						'attributes' => [
