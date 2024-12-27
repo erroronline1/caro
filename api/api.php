@@ -286,7 +286,7 @@ class API {
 	public function noContentAvailable($type){
 		return [[
 			['type' => 'nocontent',
-			'content' => LANG::GET('general.no_content_available', [':content' => $type])]
+			'content' => $this->_lang->GET('general.no_content_available', [':content' => $type])]
 		]];
 	}
 
