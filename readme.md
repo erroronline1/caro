@@ -141,6 +141,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
+* review texttemplate genus id not usable for same value
+* review audit current documents linked resources
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1057,7 +1059,7 @@ Technically the application is being usable on any webserver but this is **not r
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up api/config.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set pemissions to _install.default.XX-files.
-* [Customize](#customisation) your appropriate language-files (language.XX and _install.default.XX)
+* [Customize](#customisation) your appropriate language-files (language.XX.json and _install.default.XX)
 * Select an installation password for the system user.
 
 ### Installation procedure
@@ -1066,12 +1068,12 @@ Technically the application is being usable on any webserver but this is **not r
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.XX files and some settings in config.ini. These options are mostly considered critical for the applications stability, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
+Some variables can be edited during runtime. This applies for all *values* of language.XX.json files and some settings in config.ini. These options are mostly considered critical for the applications stability, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
 
 ```
 ; general application settings
 [application]
-defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX files; user can customize within profile
+defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
 issue_mail = "dev@erroronline.one" ; address for application and security issues
 order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
 order_gtin_barcode = 0 ; 1: yes, 0: no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
@@ -1095,7 +1097,7 @@ workdays = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same mark
 default_due = 7 ; scheduled events are due in x days by default
 
 hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty value is processed to avoid displaying regular working hours entries. do not change
-; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.XX to adhere to your company policies regarding data safety
+; hide_offduty_reasons[] = "sickleave" ; append reason keys as defined in language.XX.json to adhere to your company policies regarding data safety
 
 ; default values for csv processing if left out of filter rules
 [csv]
@@ -1149,7 +1151,7 @@ record_image = 2048 ; max pixels on longer side
 risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
 user_image = 256 ; max pixels on longer side
 
-; permissions based of and matching languages.xx.ini permissions
+; permissions based of and matching language.XX.json permissions
 ; dynamic handling for modules and methods
 ; admin by default
 ; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
@@ -1265,7 +1267,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.ini for the selected default language prior to the installation process.
 * Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so you may occasionally append to but better not reduce
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-folder) you may occasionally append to but better not reduce
     * [permissions] (has no effect without consideration in role management within config.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
@@ -4256,7 +4258,7 @@ I welcome any constructive input on this topic.
     * v2.3.8
     * \> 5k stars
     * \> 950 forks
-    * slightly modified for multi-language integration of applications language model, use regex search `(return|throw)".+?"` to find language chunks at approximately the beginning of the last third of the minified sourcecode to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en, language.de or [applicable language files](#customisation). Respective chunks can be identified by their english representation within the provided files.
+    * slightly modified for multi-language integration of applications language model, use regex search `(return|throw)".+?"` to find language chunks at approximately the beginning of the last third of the minified sourcecode to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en.json, language.de.json or [applicable language files](#customisation). Respective chunks can be identified by their english representation within the provided files.
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * v5.0.4
