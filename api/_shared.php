@@ -37,21 +37,25 @@ class SHARED {
 	 *  |  _| | | -_|_ -| -_| .'|  _|  _|   |
 	 *  |_| |_|_|___|___|___|__,|_| |___|_|_|
 	 * 
-	 *
+	 * return paths to files according to parameters
+	 * @param array $parameter having optional search and folder as key
+	 * 
+	 * @return array with paths
 	 */
 	public function filesearch($parameter = []){
 		$files = [];
-		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['sharepoint'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc'));
-		if (!isset($parameter['folder']) || !$parameter['folder'] || !in_array($parameter['folder'], ['sharepoint', 'external_documents'])){
+		if (!isset($parameter['folder']) || !$parameter['folder'] || in_array($parameter['folder'], ['sharepoint'])) $files = array_merge($files, UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc')); // sharepoint specified or all
+		if (!isset($parameter['folder']) || !$parameter['folder'] || !in_array($parameter['folder'], ['sharepoint', 'external_documents'])){ // all if not specified
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			foreach ($folders as $folder) {
 				$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
 			}
 		}
-		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path'));
-		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc');
+		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path')); // all
+		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'); // external_document specified
 		
 		if (!$parameter['search']) return $files;
+		// return based on similarity if search is provided 
 		$matches = [];
 		foreach ($files as $file){
 			similar_text($parameter['search'], pathinfo($file)['filename'], $percent);
@@ -66,12 +70,20 @@ class SHARED {
 	 *  | . | . |  _| | |     | -_|   |  _|_ -| -_| .'|  _|  _|   |
 	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|___|__,|_| |___|_|_|
 	 * 
+	 * returns documents based on search
+	 * @param array $parameter with search as key
 	 * 
+	 * @return array of document names
 	 */
 	public function documentsearch($parameter = []){
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $matches = [];
 
+		/**
+		 * looks for names, descriptions, hints and contents similar to search string
+		 * @param array $element component
+		 * @param string $search keyword
+		 */
 		function findInComponent($element, $search){
 			$found = false;
 			foreach($element as $subs){
@@ -103,10 +115,12 @@ class SHARED {
 		};
 
 		foreach($fd as $row) {
-			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access']) || !PERMISSION::fullyapproved('documentapproval', $row['approval'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
+				// set up search terms with name and alias
 				$terms = [$row['name']];
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
+				// match similarity
 				foreach ($terms as $term){
 					similar_text($parameter['search'], $term, $percent);
 					if (($percent >= CONFIG['likeliness']['file_search_similarity'])) {
@@ -116,6 +130,7 @@ class SHARED {
 				}
 				if (in_array($row, $matches)) continue;
 
+				// if not found within name, search regulatory contexts
 				foreach(explode(',', $row['regulatory_context']) as $context) {
 					if (stristr($this->_lang->GET('regulatory.' . $context), $parameter['search']) !== false) {
 						$matches[] = $row;
@@ -124,6 +139,7 @@ class SHARED {
 				}
 				if (in_array($row, $matches)) continue;
 
+				// if not found already search within components
 				$document = $this->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $row['name']
@@ -142,7 +158,10 @@ class SHARED {
 	 *  |  _| -_|  _| . |  _| . |_ -| -_| .'|  _|  _|   |
 	 *  |_| |___|___|___|_| |___|___|___|__,|_| |___|_|_|
 	 * 
+	 * returns records based on matching identifier with search
+	 * @param array $parameter with search as key
 	 * 
+	 * @return array of records
 	 */
 	public function recordsearch($parameter = []){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
@@ -198,9 +217,11 @@ class SHARED {
 	 *  | . |  _| . | . | | |  _|  _|_ -| -_| .'|  _|  _|   |
 	 *  |  _|_| |___|___|___|___|_| |___|___|__,|_| |___|_|_|
 	 *  |_|
-	 * 
+	 * returns product tiles based on search
 	 * @param string $usecase
 	 * @param array $parameter named array, currently with search string and _-separated vendor ids
+	 * 
+	 * @return array render content
 	 */
 	public function productsearch($usecase = '', $parameter = []){
 		// order of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
@@ -332,6 +353,7 @@ class SHARED {
 	 * populate a document with passed payload
 	 * @param array $element document structure
 	 * @param array $values payload
+	 * 
 	 * @return array prefilled document structure
 	 */
 	public function populatedocument($element, $values){
@@ -368,6 +390,7 @@ class SHARED {
 	 * check whether all required fields of a document have been considered
 	 * @param array $element document structure
 	 * @param array $values payload
+	 * 
 	 * @return array of unmatched document names
 	 */
 	public function unmatchedrequired($element, $values){
@@ -447,5 +470,4 @@ class SHARED {
 		return $result;
 	}
 }
-
 ?>
