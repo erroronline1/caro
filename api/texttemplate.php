@@ -40,11 +40,13 @@ class TEXTTEMPLATE extends API {
 	 *  |  _|   | | |   | '_|
 	 *  |___|_|_|___|_|_|_,_|
 	 *
+	 * edit text chunks
 	 */
 	public function chunk(){
 		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				// set up chunk
 				$chunk = [
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.name')),
 					':unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.unit')) ? : array_key_first($this->_lang->_USER['units']),
@@ -55,6 +57,7 @@ class TEXTTEMPLATE extends API {
 					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.hidden')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden_hidden')? 1 : 0,
 				];
 
+				// check forbidden names
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
@@ -83,7 +86,7 @@ class TEXTTEMPLATE extends API {
 								'type' => 'success'
 							]]);	
 				}
-
+				// else post new chunk
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
 					'values' => $chunk
 				])) $this->response([
@@ -122,6 +125,7 @@ class TEXTTEMPLATE extends API {
 					]);
 				}
 				$chunk = $chunk ? $chunk[0] : null;
+				// set up chunk
 				if (!$chunk) $chunk = [
 					'id' => '',
 					'name' => '',
@@ -276,7 +280,6 @@ class TEXTTEMPLATE extends API {
 				if ($chunk['type'] === 'text') $return['render']['content'][1][1]['content'][$this->_lang->GET('texttemplate.chunk.types.text')]['selected'] = true;
 				if ($chunk['type'] === 'replacement') $return['render']['content'][1][1]['content'][$this->_lang->GET('texttemplate.chunk.types.replacement')]['selected'] = true;
 				if ($chunk['id']){
-
 					$hidden = [
 						'type' => 'radio',
 						'attributes' => [
@@ -303,11 +306,13 @@ class TEXTTEMPLATE extends API {
 	 *  |  _| -_|     | . | | .'|  _| -_|
 	 *  |_| |___|_|_|_|  _|_|__,|_| |___|
 	 *                |_|
+	 * edit templates
 	 */
 	public function template(){
 		if (!PERMISSION::permissionFor('texttemplates')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				//set up template
 				$template = [
 					':name' => UTILITY::propertySet($this->_payload, 'name'),
 					':unit' => UTILITY::propertySet($this->_payload, 'unit') ? : array_key_first($this->_lang->_USER['units']),
@@ -341,11 +346,11 @@ class TEXTTEMPLATE extends API {
 							'type' => 'success'
 						]]);	
 				}
-
+				//check forbidden names
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]), 'type' => 'error']]);
 				}
-
+				// else post new template
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
 					'values' => $template])) $this->response([
 					'response' => [
@@ -383,6 +388,7 @@ class TEXTTEMPLATE extends API {
 					]);
 				}
 				$template = $template ? $template[0] : null;
+				//set up template
 				if (!$template) $template = [
 					'id' => '',
 					'name' => '',
@@ -520,7 +526,6 @@ class TEXTTEMPLATE extends API {
 										$this->_lang->GET("assemble.compose.document.document_confirm") .
 										"': {value: true, class: 'reducedCTA'}," .
 										"}}).then(confirmation => {if (confirmation) api.texttemplate('post', 'template')})",
-						
 								]
 							]
 						], [
@@ -558,6 +563,7 @@ class TEXTTEMPLATE extends API {
 	 *  |  _| -_|_'_|  _|
 	 *  |_| |___|_,_|_|
 	 *
+	 * retrieve the actual templates for use
 	 */
 	public function text(){
 		$templatedatalist = $options = $return = $hidden = $texts = $replacements = [];
@@ -604,6 +610,7 @@ class TEXTTEMPLATE extends API {
 		}
 		$return['render'] = ['content' => [[]]];
 
+		// sort templates to units for easier access
 		foreach ($options as $unit => $templates) {
 			$return['render']['content'][0][] = [
 				[
@@ -618,6 +625,7 @@ class TEXTTEMPLATE extends API {
 		}
 		
 		if ($template['name']){
+			// prepare selected template form
 			$inputs = $undefined = [];
 
 			$usegenus = [];
@@ -677,6 +685,7 @@ class TEXTTEMPLATE extends API {
 				];	
 			}
 
+			// set up selectable blocks
 			foreach (json_decode($template['content']) as $block){
 				$useblocks = [];
 				foreach($block as $key => $value){
@@ -690,6 +699,7 @@ class TEXTTEMPLATE extends API {
 					'content' => $useblocks
 				];
 			}
+
 			// refreshbutton
 			$inputs[] = [
 				'type' => 'button',
@@ -701,8 +711,11 @@ class TEXTTEMPLATE extends API {
 				],
 				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])
 			];
+
+			// append inputs
 			$return['render']['content'][] = $inputs;
 
+			// append output 
 			$return['render']['content'][] = [
 				[
 					'type' => 'textarea',
@@ -716,6 +729,7 @@ class TEXTTEMPLATE extends API {
 						]
 				]
 			];
+			// append data for frontent processing
 			$return['data'] = ['blocks' => $texts, 'replacements' => $replacements];
 		}
 		$this->response($return);
