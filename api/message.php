@@ -336,7 +336,7 @@ class MESSAGE extends API {
 					$panel[] = [
 						[
 							'type' => 'links',
-							'description' => ($group === 'units' ? $this->_lang->GET('user.edit_units') : $this->_lang->GET('user.display_permissions')) . ' ' . $this->_lang->_USER[$group][$sub],
+							'description' => ($group === 'units' ? $this->_lang->GET('user.units') : $this->_lang->GET('user.display_permissions')) . ' ' . $this->_lang->_USER[$group][$sub],
 							'content' => $links,
 						]
 					];

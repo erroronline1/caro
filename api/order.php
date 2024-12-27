@@ -692,7 +692,7 @@ class ORDER extends API {
 						[
 							'type' => 'number',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_order_authorization'),
+								'name' => $this->_lang->GET('user.order_authorization'),
 								'type' => 'password'
 							]
 						]
@@ -702,7 +702,7 @@ class ORDER extends API {
 					[
 						'type' => 'scanner',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.edit_token'),
+							'name' => $this->_lang->GET('user.token'),
 							'type' => 'password'
 						]
 					]
@@ -1142,7 +1142,7 @@ class ORDER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				$approval = false;
-				if ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization'))){
+				if ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization'))){
 					$result = SQLQUERY::EXECUTE($this->_pdo, 'user_get_orderauth', [
 						'values' => [
 							':orderauth' => $orderauth
@@ -1153,7 +1153,7 @@ class ORDER extends API {
 						$approval = $result['name'] . $this->_lang->GET('order.orderauth_verified');
 					}
 				}
-				elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_token'))){
+				elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token'))){
 					$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 						'values' => [
 							':token' => $orderauth
@@ -1321,7 +1321,7 @@ class ORDER extends API {
 								[
 									'type' => 'number',
 									'attributes' => [
-										'name' => $this->_lang->GET('user.edit_order_authorization'),
+										'name' => $this->_lang->GET('user.order_authorization'),
 										'type' => 'password'
 									]
 								]
@@ -1331,7 +1331,7 @@ class ORDER extends API {
 							[
 								'type' => 'scanner',
 								'attributes' => [
-									'name' => $this->_lang->GET('user.edit_token'),
+									'name' => $this->_lang->GET('user.token'),
 									'type' => 'password'
 								]
 							]
@@ -1370,7 +1370,7 @@ class ORDER extends API {
 
 		// detect approval
 		$approval = false;
-		if ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization'))){
+		if ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization'))){
 			$result = SQLQUERY::EXECUTE($this->_pdo, 'user_get_orderauth', [
 				'values' => [
 					':orderauth' => $orderauth
@@ -1381,7 +1381,7 @@ class ORDER extends API {
 				$approval = $result['name'] . $this->_lang->GET('order.orderauth_verified');
 			}
 		}
-		elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_token'))){
+		elseif ($orderauth = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token'))){
 			$result = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
 					':token' => $orderauth
@@ -1392,8 +1392,8 @@ class ORDER extends API {
 				$approval = $result['name'] . $this->_lang->GET('order.token_verified');
 			}
 		}
-		unset ($this->_payload->{$this->_lang->PROPERTY('user.edit_order_authorization')});
-		unset ($this->_payload->{$this->_lang->PROPERTY('user.edit_token')});
+		unset ($this->_payload->{$this->_lang->PROPERTY('user.order_authorization')});
+		unset ($this->_payload->{$this->_lang->PROPERTY('user.token')});
 
 		if (isset($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]) && $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name']){
 			$signature = gettype($_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'])=='array' ? $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'][0] : $_FILES[$this->_lang->PROPERTY('order.add_approval_signature')]['tmp_name'];

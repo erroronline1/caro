@@ -82,19 +82,19 @@ class USER extends API {
 
 				// convert image
 				// save and convert image
-				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_reset_photo'))) {
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES[$this->_lang->PROPERTY('user.edit_take_photo')] = [
+					$_FILES[$this->_lang->PROPERTY('user.take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if(isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name']) {
+				if(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
-					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
@@ -133,14 +133,14 @@ class USER extends API {
 					$this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => $this->_lang->GET('user.edit_user_saved', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => $this->_lang->GET('user.edit_user_not_saved'),
+						'msg' => $this->_lang->GET('user.user_not_saved'),
 						'type' => 'error'
 					]]);
 
@@ -200,9 +200,9 @@ class USER extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('user.display_user')
 							],
-							'content' => $this->_lang->GET('user.edit_name') . ': ' . $user['name'] . "\n" .
+							'content' => $this->_lang->GET('user.name') . ': ' . $user['name'] . "\n" .
 								$this->_lang->GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
-								($units ? $this->_lang->GET('user.edit_units') . ': ' . implode(', ', $units) . "\n" : '') .
+								($units ? $this->_lang->GET('user.units') . ': ' . implode(', ', $units) . "\n" : '') .
 								($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
 								(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
 								(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
@@ -215,9 +215,9 @@ class USER extends API {
 							[
 								'type' => 'photo',
 								'attributes' => [
-									'name' => $this->_lang->GET('user.edit_take_photo')
+									'name' => $this->_lang->GET('user.take_photo')
 								],
-								'hint' => $this->_lang->GET('user.edit_take_photo_hint')
+								'hint' => $this->_lang->GET('user.take_photo_hint')
 							],
 						]
 					],
@@ -232,7 +232,7 @@ class USER extends API {
 						[
 							[
 								'type' => 'image',
-								'description' => $this->_lang->GET('user.edit_export_user_image'),
+								'description' => $this->_lang->GET('user.export_user_image'),
 								'attributes' => [
 									'name' => $user['name'] . '_pic',
 									'url' => $user['image']
@@ -244,7 +244,7 @@ class USER extends API {
 					$result['render']['content'][1][1][] = [
 						'type' => 'checkbox',
 						'content' => [
-							$this->_lang->GET('user.edit_reset_photo') => []
+							$this->_lang->GET('user.reset_photo') => []
 						]
 					];
 				}
@@ -313,7 +313,7 @@ class USER extends API {
 				]);
 				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $today) $attributes['class'] = 'red';
@@ -324,7 +324,7 @@ class USER extends API {
 					}
 					$result['render']['content'][0][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $result['render']['content'][0][] = [
@@ -355,7 +355,7 @@ class USER extends API {
 				$permissions = [];
 				$units = [];
 				$user = [
-					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_name')),
+					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name')),
 					'permissions' => '',
 					'units' => '',
 					'token' => '',
@@ -368,7 +368,7 @@ class USER extends API {
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
-						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_name'))
+						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name'))
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
@@ -378,7 +378,7 @@ class USER extends API {
 				}
 		
 				// checked permission levels
-				if ($setpermissions = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_permissions'))){
+				if ($setpermissions = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.permissions'))){
 					foreach(explode(' | ', $setpermissions) as $setpermission){
 						$permissions[] = array_search($setpermission, $this->_lang->_USER['permissions']);
 					}
@@ -386,7 +386,7 @@ class USER extends API {
 				$user['permissions'] = implode(',', $permissions);
 
 				// checked organizational units
-				if ($setunits = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_units'))){
+				if ($setunits = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.units'))){
 					foreach(explode(' | ', $setunits) as $setunit){
 						$units[] = array_search($setunit, $this->_lang->_USER['units']);
 					}
@@ -409,7 +409,7 @@ class USER extends API {
 				}
 
 				// generate order auth
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization')) == $this->_lang->GET('user.edit_order_authorization_generate')){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
 					$orderauths = [];
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
@@ -421,40 +421,40 @@ class USER extends API {
 				}
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_token_renew'))){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
 				// save and convert image or create default
-				if (!(isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name'])) {
+				if (!(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name'])) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES[$this->_lang->PROPERTY('user.edit_take_photo')] = [
+					$_FILES[$this->_lang->PROPERTY('user.take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
+				$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 				UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
 				// add user training
 				$training = [];
-				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training'))){
+				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
 					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
-					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
-					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_experience_points')) ? : 0;
+					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
+					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
+					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? json_encode([
 						'user' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i'),
-						'content' => [$this->_lang->PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation'))]
+						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
 					]): null;
-						if (isset($_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]['tmp_name']) {
-						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
+						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
@@ -516,14 +516,14 @@ class USER extends API {
 					$this->response([
 					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => $this->_lang->GET('user.edit_user_saved', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
 					'response' => [
 						'id' => false,
-						'msg' => $this->_lang->GET('user.edit_user_not_saved'),
+						'msg' => $this->_lang->GET('user.user_not_saved'),
 						'type' => 'error'
 					]]);
 				break;
@@ -542,13 +542,13 @@ class USER extends API {
 				// prepare user-array to update, return error if not found
 				if (!$user) $this->response(null, 406);
 				
-				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, $this->_lang->GET('user.edit_name')));
-				$user['name'] = UTILITY::propertySet($this->_payload, $this->_lang->GET('user.edit_name'));
+				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, $this->_lang->GET('user.name')));
+				$user['name'] = UTILITY::propertySet($this->_payload, $this->_lang->GET('user.name'));
 
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
-						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_name'))
+						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name'))
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
@@ -589,10 +589,10 @@ class USER extends API {
 					}
 				}
 				// generate order auth
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization')) == $this->_lang->GET('user.edit_order_authorization_revoke')){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
 					$user['orderauth'] = '';
 				}
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_order_authorization')) == $this->_lang->GET('user.edit_order_authorization_generate')){
+				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
 					$orderauths = [];
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
@@ -604,49 +604,49 @@ class USER extends API {
 				}
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', $this->_lang->GET('user.edit_token_renew')))){
+				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', $this->_lang->GET('user.token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 				// save and convert image or create default
-				if ((!(isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_reset_photo'))) {
+				if ((!(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES[$this->_lang->PROPERTY('user.edit_take_photo')] = [
+					$_FILES[$this->_lang->PROPERTY('user.take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if (isset($_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.edit_take_photo')]['tmp_name']) {
+				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
-					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
+					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
 					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 					$user['image'] = substr($user['image'], 3);
 				}
 
 				// add user training
 				$training = [];
-				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training'))){
+				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
 					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_date')) ? : $date->format('Y-m-d');
-					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_expires')) ? : '2079-06-06';
-					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_experience_points')) ? : 0;
+					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
+					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
+					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation')) ? json_encode([
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? json_encode([
 						'user' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i'),
-						'content' => [$this->_lang->PROPERTY('user.edit_add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_add_training_evaluation'))]
+						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
 					]): null;
-						if (isset($_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.edit_add_training_document')]['tmp_name']) {
-						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.edit_add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
+						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
 					}
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
 						'values' => $training
 					]);
 				}
 				// delete checked user trainings
-				if ($delete_training = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.edit_delete_training'))){
+				if ($delete_training = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.delete_training'))){
 					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 						'replacements' => [
 							':ids' => $user['id'] ? : 0
@@ -680,21 +680,21 @@ class USER extends API {
 					$this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => $this->_lang->GET('user.edit_user_saved', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user['name']]),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
 					'response' => [
 						'id' => $user['id'],
-						'msg' => $this->_lang->GET('user.edit_user_not_saved'),
+						'msg' => $this->_lang->GET('user.user_not_saved'),
 						'type' => 'error'
 					]]);
 				break;
 
 			case 'GET':
 				$datalist = [];
-				$options = ['...' . $this->_lang->GET('user.edit_existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
+				$options = ['...' . $this->_lang->GET('user.existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
 				$result = [];
 				
 				// prepare existing users lists
@@ -725,7 +725,7 @@ class USER extends API {
 					'app_settings' => '',
 					'skills' => ''
 				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.edit_existing_user_new')) $result['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.existing_user_new')) $result['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// display form for adding a new user with ini related permissions
 				$permissions = [];
@@ -745,37 +745,37 @@ class USER extends API {
 						[
 							'type' => 'text',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_add_training')
+								'name' => $this->_lang->GET('user.add_training')
 							],
 						], [
 							'type' => 'date',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_add_training_date')
+								'name' => $this->_lang->GET('user.add_training_date')
 							],
 						], [
 							'type' => 'date',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_add_training_expires')
+								'name' => $this->_lang->GET('user.add_training_expires')
 							],
 						], [
 							'type' => 'number',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_add_training_experience_points')
+								'name' => $this->_lang->GET('user.add_training_experience_points')
 							],
 						], [
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET("user.edit_add_training_evaluation")
+								'name' => $this->_lang->GET("user.add_training_evaluation")
 							],
 							'content' => [
-								$this->_lang->GET('user.edit_add_training_evaluation_unreasonable') => []
+								$this->_lang->GET('user.add_training_evaluation_unreasonable') => []
 							]
 						], [
 							'type' => 'file',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_add_training_document')
+								'name' => $this->_lang->GET('user.add_training_document')
 							],
-							'hint' => $this->_lang->GET('user.edit_add_training_hint')
+							'hint' => $this->_lang->GET('user.add_training_hint')
 						]
 					]
 				];
@@ -786,7 +786,7 @@ class USER extends API {
 				]);
 				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.edit_display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $row['date']];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $today) $attributes['class'] = 'red';
@@ -797,7 +797,7 @@ class USER extends API {
 					}
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.edit_add_training_expires') . ' ' . $row['expires'],
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $row['expires'],
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $skillmatrix[0][] = [
@@ -809,7 +809,7 @@ class USER extends API {
 					$skillmatrix[0][] = [
 						'type' => 'checkbox',
 						'content' => [
-							$this->_lang->GET('user.edit_delete_training') . '[]' => ['value' => $row['id']]
+							$this->_lang->GET('user.delete_training') . '[]' => ['value' => $row['id']]
 						]
 					];
 				}
@@ -869,7 +869,7 @@ class USER extends API {
 						[
 							'type' => 'select',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_existing_user_select'),
+								'name' => $this->_lang->GET('user.existing_user_select'),
 								'onchange' => "api.user('get', 'user', this.value)"
 							],
 							'content' => $options
@@ -877,7 +877,7 @@ class USER extends API {
 						[
 							'type' => 'search',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_existing_user'),
+								'name' => $this->_lang->GET('user.existing_user'),
 								'list' => 'users',
 								'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
 							]
@@ -886,7 +886,7 @@ class USER extends API {
 						[
 							'type' => 'text',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_name'),
+								'name' => $this->_lang->GET('user.name'),
 								'required' => true,
 								'value' => $user['name'] ? : ''
 							]
@@ -894,36 +894,36 @@ class USER extends API {
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_permissions')
+								'name' => $this->_lang->GET('user.permissions')
 							],
 							'content' => $permissions,
-							'hint' => $this->_lang->GET('user.edit_permissions_hint')
+							'hint' => $this->_lang->GET('user.permissions_hint')
 						],
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_units')
+								'name' => $this->_lang->GET('user.units')
 							],
 							'content' => $units,
-							'hint' => $this->_lang->GET('user.edit_units_hint')
+							'hint' => $this->_lang->GET('user.units_hint')
 						]
 					], [
 						[
 							'type' => 'photo',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_take_photo')
+								'name' => $this->_lang->GET('user.take_photo')
 							],
-							'hint' => $this->_lang->GET('user.edit_take_photo_hint')
+							'hint' => $this->_lang->GET('user.take_photo_hint')
 						],
 					], [
 						[
 							'type' => 'radio',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_order_authorization')
+								'name' => $this->_lang->GET('user.order_authorization')
 							],
 							'content' => [
-								$this->_lang->GET('user.edit_order_authorization_generate') => [],
-								$this->_lang->GET('user.edit_order_authorization_revoke') => []
+								$this->_lang->GET('user.order_authorization_generate') => [],
+								$this->_lang->GET('user.order_authorization_revoke') => []
 							]
 						]
 					], [
@@ -960,20 +960,20 @@ class USER extends API {
 						[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.edit_token')
+								'name' => $this->_lang->GET('user.token')
 							],
 							'content' => [
-								$this->_lang->GET('user.edit_token_renew') => []
+								$this->_lang->GET('user.token_renew') => []
 							]
 						],
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
-								'value' => $this->_lang->GET('user.edit_delete_button'),
+								'value' => $this->_lang->GET('user.delete_button'),
 								'type' => 'button', // apparently defaults to submit otherwise
-								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". $this->_lang->GET('user.edit_delete_confirm_header', [':name' => $user['name']]) ."', options:{".
-									"'".$this->_lang->GET('user.edit_delete_confirm_cancel')."': false,".
-									"'".$this->_lang->GET('user.edit_delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". $this->_lang->GET('user.delete_confirm_header', [':name' => $user['name']]) ."', options:{".
+									"'".$this->_lang->GET('user.delete_confirm_cancel')."': false,".
+									"'".$this->_lang->GET('user.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',
 								'disabled' => $user['id'] < 2
 							]
@@ -989,7 +989,7 @@ class USER extends API {
 							[
 								[
 									'type' => 'image',
-									'description' => $this->_lang->GET('user.edit_export_user_image'),
+									'description' => $this->_lang->GET('user.export_user_image'),
 									'attributes' => [
 										'name' => $user['name'] . '_pic',
 										'url' => $user['image']
@@ -1001,7 +1001,7 @@ class USER extends API {
 						$result['render']['content'][2][1][] = [
 							'type' => 'checkbox',
 							'content' => [
-								$this->_lang->GET('user.edit_reset_photo') => []
+								$this->_lang->GET('user.reset_photo') => []
 							]
 						];
 					}
@@ -1011,7 +1011,7 @@ class USER extends API {
 							[
 								'type' => 'text',
 								'attributes' => [
-									'name' => $this->_lang->GET('user.edit_order_authorization_current'),
+									'name' => $this->_lang->GET('user.order_authorization_current'),
 									'value' => $user['orderauth'],
 									'readonly' => true
 								]
@@ -1024,7 +1024,7 @@ class USER extends API {
 						[
 							[
 								'type' => 'image',
-								'description' => $this->_lang->GET('user.edit_export_qr_token'),
+								'description' => $this->_lang->GET('user.export_qr_token'),
 								'attributes' => [
 								'name' => $user['name'] . '_token',
 								'qrcode' => $user['token']]
@@ -1062,13 +1062,13 @@ class USER extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('user.edit_user_deleted', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.user_deleted', [':name' => $user['name']]),
 						'id' => false,
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('user.edit_user_not_deleted', [':name' => $user['name']]),
+						'msg' => $this->_lang->GET('user.user_not_deleted', [':name' => $user['name']]),
 						'id' => $user['id'],
 						'type' => 'error'
 					]]);
