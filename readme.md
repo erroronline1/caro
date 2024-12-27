@@ -1058,8 +1058,8 @@ Technically the application is being usable on any webserver but this is **not r
 
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
-* Set up api/config.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set pemissions to _install.default.XX-files.
-* [Customize](#customisation) your appropriate language-files (language.XX.json and _install.default.XX)
+* Set up api/config.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set pemissions to _install.default.XX.json-files.
+* [Customize](#customisation) your appropriate language-files (language.XX.json and _install.default.XX.json)
 * Select an installation password for the system user.
 
 ### Installation procedure
@@ -1265,9 +1265,9 @@ Notes:
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
 
 ## Customisation
-* The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.ini for the selected default language prior to the installation process.
+* The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.json for the selected default language prior to the installation process (see _language.md within api-directory).
 * Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-folder) you may occasionally append to but better not reduce
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-directory) you may occasionally append to but better not reduce
     * [permissions] (has no effect without consideration in role management within config.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
@@ -1691,7 +1691,7 @@ Evidences of conformity according to the documents described above:
 * Technical and Organizational Measures: [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
 * UDI Label: **not applicable**
 * Usability Evaluation Report: [Stakeholder requirements](#stakeholder-requirements)
-* User Manual: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en / _install.default.de
+* User Manual: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en.json / _install.default.de.json
 
 [Content](#content)
 
@@ -1749,7 +1749,7 @@ Development
 Verification and Validation
 * Software Test Results
 * List of Known Anomalies: [Useage notes and caveats](#useage-notes-and-caveats)
-* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en / _install.default.de
+* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en.json / _install.default.de.json
 * Usability Test Protocol
 * Usability Test Report: [Stakeholder requirements](#stakeholder-requirements)
 * Clinical Evaluation Report: **not applicable**
@@ -4258,7 +4258,7 @@ I welcome any constructive input on this topic.
     * v2.3.8
     * \> 5k stars
     * \> 950 forks
-    * slightly modified for multi-language integration of applications language model, use regex search `(return|throw)".+?"` to find language chunks at approximately the beginning of the last third of the minified sourcecode to replace with LANG.GET['html5_qrcode.xxx.yyy'] according to language.en.json, language.de.json or [applicable language files](#customisation). Respective chunks can be identified by their english representation within the provided files.
+    * slightly modified for multi-language integration of applications language model
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * v5.0.4

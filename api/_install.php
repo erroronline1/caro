@@ -519,9 +519,8 @@ catch (Exception $e){
 		// add default user
 		$processing[] = $queries['install'][$driver]['insertions']['user'];
 		// add default manual entries according to set up language
-		$language = CONFIG['application']['defaultlanguage'];
-		if ($file = file_exists('_install.default.' . $language) ? '_install.default.' . $language : false){
-			$languagefile = parse_ini_file($file, true);
+		if ($file = file_get_contents('./_install.default.' . CONFIG['application']['defaultlanguage'] . '.json')){
+			$languagefile = json_decode($file, true);
 			foreach($languagefile['defaultmanual'] as $entry){
 				$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
 					':title' => $entry['title'],
