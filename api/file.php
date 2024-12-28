@@ -58,6 +58,7 @@ class FILE extends API {
 	 * responds with content of available file bundles
 	 */
 	public function bundle(){
+		// append filter input for bundle names
 		$result['render'] = [
 			'content' => [
 				[
@@ -78,11 +79,12 @@ class FILE extends API {
 
 		foreach($bundles as $row) {
 			$list = [];
+			// construct file links to external files per bundle
 			foreach (json_decode($row['content'], true) as $file => $path){
 				if (stristr($path, CONFIG['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
-				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'
-			];
+				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'];
 			}
+			// append bundle
 			$result['render']['content'][] = [
 				[
 					'type' => 'links',
@@ -103,7 +105,7 @@ class FILE extends API {
 	 *  | . | | |   | . | | -_|  _| | |  _| -_|  _|
 	 *  |___|___|_|_|___|_|___|_| |_|_|_| |___|_|
 	 *
-	 * filters file bundles according to request string
+	 * filters file bundles according to similar request string
 	 * responds with bundle ids matching request
 	 */
 	public function bundlefilter(){
@@ -133,6 +135,7 @@ class FILE extends API {
 		if (!PERMISSION::permissionFor('filebundles')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				// retrieve bundle properties and unset from payload leaving selected files to ass to bundle
 				$unset = $this->_lang->PROPERTY('file.bundle.existing_bundle_select');
 				unset ($this->_payload->$unset);
 				$unset = $this->_lang->PROPERTY('file.bundle.existing_bundle');
@@ -143,7 +146,7 @@ class FILE extends API {
 				$active = $this->_lang->PROPERTY('file.bundle.bundle_active');
 				$isactive = $this->_payload->$active === $this->_lang->GET('file.bundle.active_bundle') ? 1 : 0;
 				unset ($this->_payload->$active);
-				// unset grouped checkbox submits
+				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
 				foreach($this->_payload as $key => $value){
 					$match = true;
@@ -164,6 +167,8 @@ class FILE extends API {
 					]
 				]);
 				$existingbundle = $existingbundle ? $existingbundle[0] : null;
+
+				// update existing file bundle as there is no version control
 				if ($existingbundle) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_put', [
 						'values' => [
@@ -186,6 +191,7 @@ class FILE extends API {
 							]]);	
 				}
 
+				// post new file bundle
 				if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_post', [
 					'values' => [
 					':name' => $name,
@@ -217,7 +223,13 @@ class FILE extends API {
 					]
 				]);
 				$bundle = $bundle ? $bundle[0] : null;
-				if (!$bundle) $bundle = ['name' => '', 'content' => '', 'active' => null];
+
+				// set up file bundle properties
+				if (!$bundle) $bundle = [
+					'name' => '',
+					'content' => '',
+					'active' => null
+				];
 				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['response'] = ['msg' => $this->_lang->GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
 
 				// prepare existing bundle lists
@@ -227,6 +239,7 @@ class FILE extends API {
 					$options[$row['name']] = $bundle['name'] === $row['name'] ? ['selected' => true] : [];
 				}
 				
+				// append file bundle selection
 				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'file',
@@ -260,22 +273,28 @@ class FILE extends API {
 						]]];
 
 				$files = [];
-				$bundle['content']= json_decode($bundle['content'], true);
+				// resolve preset file bundle content
+				$bundle['content'] = json_decode($bundle['content'], true);
+
+				// prepare available files per folder
 				$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 				foreach ($folders as $folder) {
 					$files[$folder] = UTILITY::listFiles($folder ,'asc');
 				}
+				// append external documents
 				if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
+
 				$filePerSlide = 0;
 				$matches = [];
 				$currentfolder = '';
 				foreach ($files as $folder => $content){
+					// construct folderwise file list
 					foreach ($content as $file){
-						if (preg_match('/^\.\.\//', $file)){
-							$file = ['path' => substr($file, 1), 'file' => pathinfo($file)['basename'], 'folder' => $folder];
-						}
+						// distinguish between uploaded files and linked ressources
+						if (preg_match('/^\.\.\//', $file)) $file = ['path' => substr($file, 1), 'file' => pathinfo($file)['basename'], 'folder' => $folder];
 						else $file = ['path' => $file, 'file' => $file, 'folder' => $folder];
 
+						// group available files to slides as set up in CONFIG
 						if ($currentfolder != $file['folder']) {
 							$matches[] = [];
 							$currentfolder = $file['folder'];
@@ -298,9 +317,13 @@ class FILE extends API {
 						if ($bundle['content'] && in_array($file['path'], array_values($bundle['content']))) $matches[$article][$slide][0]['content'][$file['file']]['checked'] = true;
 					}
 				}
+
+				// append folder
 				foreach ($matches as $folder) {
 					$return['render']['content'][] = $folder;
 				}
+
+				// set up and append file bundle options
 				$isactive = $bundle['active'] ? ['checked' => true] : [];
 				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
 				$return['render']['content'][] = [
@@ -345,7 +368,9 @@ class FILE extends API {
 		if (!PERMISSION::permissionFor('externaldocuments')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				// $_FILES is submitted always even if empty
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name']) {
+					// process provided files 
 					$files = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('file.manager.new_file')], UTILITY::directory('external_documents'));
 					$insertions = [];
 					foreach($files as $file){
@@ -354,6 +379,8 @@ class FILE extends API {
 							':path' => $file
 						];
 					}
+
+					// process provided linkes ressources
 					foreach ($this->_payload as $key => $value){
 						if (preg_match("/^".$this->_lang->PROPERTY('file.external_file.link')."/", $key) && $value && preg_match("/(?:^href=')(.+?)(?:')/", $value, $link)){
 							$insertions[] = [
@@ -362,6 +389,8 @@ class FILE extends API {
 							];
 						}
 					}
+
+					// insert files and ressources to database
 					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('file_external_documents_post'), $insertions);
 					$success = false;
 					foreach ($sqlchunks as $chunk){
@@ -387,6 +416,8 @@ class FILE extends API {
 				}
 				break;
 			case 'PUT':
+				// update availability or regulatory context
+				// this is updated on the fly on selection within the overview
 				switch ($this->_accessible){
 					case '0':
 						$prepare = 'file_external_documents_retire';
@@ -416,6 +447,7 @@ class FILE extends API {
 						];
 						$response = $this->_lang->GET('file.external_file.regulatory_context');
 				}
+				// process prepared database update
 				if ($this->_requestedId && SQLQUERY::EXECUTE($this->_pdo, $prepare, [
 					'values' => $tokens
 				])) $this->response(['response' => [
@@ -428,15 +460,16 @@ class FILE extends API {
 				]]);
 				break;
 			case 'GET':
-				$result = ['render'=>
-				['form' => [
+				$result = ['render'=> ['form' => [
 					'data-usecase' => 'file',
 					'action' => "javascript:api.file('post', 'externalfilemanager')"],
 					'content'=>[]
 				]];
 
+				// retrieve all external documents per database
 				$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get');		
 				if ($files){
+					// append filter input
 					$result['render']['content'][] = [
 						[
 							'type' => 'filtered',
@@ -451,17 +484,22 @@ class FILE extends API {
 					$result['render']['content'][] = [];
 					foreach ($files as $file){
 						if ($file) {
+							// distinguish between uploaded files and linked ressources
 							if (preg_match('/^\.\.\//', $file['path'])){
 								$file['name'] = pathinfo($file['path'])['basename'];
 								$file['path'] = substr($file['path'], 1);
 							}
 							else $file['name'] = $file['path'];
+
+							// resolve regulatory context
 							$regulatory_context = [];
 							$file['regulatory_context'] = explode(',', $file['regulatory_context']);
 							foreach($this->_lang->_USER['regulatory'] as $key => $value){
 								$regulatory_context[$value] = ['value' => $key];
 								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 							}
+
+							// append file, link and options
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
@@ -504,6 +542,8 @@ class FILE extends API {
 					}
 				}
 				else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+
+				// append submission inputs for new files and ressources
 				$result['render']['content'][] = [
 					[
 						'type' => 'link',
@@ -543,19 +583,27 @@ class FILE extends API {
 		if (!PERMISSION::permissionFor('files')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				// overview allows only to create new folder or upload files to a previously selected one
+
+				// sanitize new folder name
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('file.manager.new_folder')));
 				if ($new_folder){
+					// check forbidden names
 					foreach(CONFIG['forbidden']['names'] as $pattern){
 						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
 					}
+					// create new folder if not present
 					$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
 					UTILITY::storeUploadedFiles([], $new_folder);
+
 					$this->response(['response' => [
 						'msg' => $this->_lang->GET('file.manager.new_folder_created', [':name' => $new_folder]),
 						'redirect' => ['filemanager'],
 						'type' => 'success'
 						]]);
 				}
+
+				// store uploaded files to reqested folder
 				$destination = UTILITY::propertySet($this->_payload, 'destination');
 				if (isset($_FILES[$this->_lang->PROPERTY('file.manager.new_file')]) && $_FILES[$this->_lang->PROPERTY('file.manager.new_file')]['tmp_name'] && $destination) {
 					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('file.manager.new_file')], UTILITY::directory('files_documents', [':category' => $destination]));
@@ -571,24 +619,25 @@ class FILE extends API {
 				]]);
 		break;
 			case 'GET':
-				$result = ['render'=>
-					[
-						'form' => [
-							'data-usecase' => 'file',
-							'action' => "javascript:api.file('post', 'filemanager')"
-						],
-						'content'=>[]
-					]
-				];
+				$result = ['render' => [
+					'form' => [
+						'data-usecase' => 'file',
+						'action' => "javascript:api.file('post', 'filemanager')"
+					],
+					'content' => []
+				]];
 
+				// default view lists available custom directories within files_documents
 				if (!$this->_requestedFolder){
 					$result['render']['content'][] = [];
 					$folders = UTILITY::listDirectories(UTILITY::directory('files_documents'),'asc');
 					if ($folders){
 						$content=[];
 						foreach ($folders as $folder){
+							// prepare each folders properties
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
 							$filedate = new DateTime('@' . filemtime($folder), new DateTimeZone(CONFIG['application']['timezone']));
+							// append folder link and delete button
 							array_push($result['render']['content'][0],
 								[
 									'type' => 'links',
@@ -611,6 +660,8 @@ class FILE extends API {
 							);
 						}
 					}
+
+					// append entry point to sharepoint as authorized users can delete files prematurely
 					array_push($result['render']['content'][0],
 						[
 							'type' => 'links',
@@ -620,6 +671,8 @@ class FILE extends API {
 							]
 						]
 					);
+
+					// append input for new folder
 					$result['render']['content'][] = [
 						[
 							'type' => 'text',
@@ -632,9 +685,11 @@ class FILE extends API {
 					];
 				}
 				else {
+					// gather files for requested directory
 					if ($this->_requestedFolder === 'sharepoint') $files = UTILITY::listFiles(UTILITY::directory('sharepoint') ,'asc');
 					else $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
+						// append file filter
 						$result['render']['content'][] = [
 							[
 								'type' => 'filtered',
@@ -649,8 +704,14 @@ class FILE extends API {
 						$result['render']['content'][] = [];
 						foreach ($files as $file){
 							if ($file) {
-								$file = ['path' => substr($file, 1), 'name' => pathinfo($file)['basename']];
+								// set up file properties
+								$file = [
+									'path' => substr($file, 1),
+									'name' => pathinfo($file)['basename']
+								];
 								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(CONFIG['application']['timezone']));
+
+								// append file options
 								array_push($result['render']['content'][1],
 									[
 										'type' => 'links',
@@ -688,7 +749,10 @@ class FILE extends API {
 						}
 					}
 					else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+
+					// sharepoint has no option to add files from this place
 					if (in_array($this->_requestedFolder, ['sharepoint'])) unset ($result['render']['form']);
+					// but any other folder gets one
 					else $result['render']['content'][] = [
 						[
 							'type' => 'hidden',
@@ -704,7 +768,7 @@ class FILE extends API {
 								'multiple' => true,
 								'required' => true
 							],
-								'hint' => $this->_lang->GET('file.manager.no_external_files')
+							'hint' => $this->_lang->GET('file.manager.no_external_files')
 						]
 					];
 				}
@@ -735,6 +799,7 @@ class FILE extends API {
 	 * responds with content of available files for restricted uploads and external documents
 	 */
 	public function files(){
+		// append file filter
 		$result['render'] = [
 		'content' => [
 				[
@@ -750,12 +815,14 @@ class FILE extends API {
 				]
 			]
 		];
+		// gather files by requestedFolder
 		$files = [];
 		if ($this->_requestedFolder && $this->_requestedFolder != 'null') {
 			$folder = UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]);
 			$files[$folder] = UTILITY::listFiles($folder ,'asc');
 		}
 		else {
+			// add external files by default if no folder is requested
 			if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
 			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
 			foreach ($folders as $folder) {
@@ -764,16 +831,17 @@ class FILE extends API {
 		}
 		if ($files){
 			foreach ($files as $folder => $content){
+				// display files and linked ressources by folder
 				$matches = [];
 				foreach ($content as $file){
-					if (preg_match('/^\.\.\//', $file)){
-						$file = ['name' => pathinfo($file)['basename'], 'path' => substr($file, 1)];
-					}
-					else {
-						$file = ['name' => $file, 'path' => $file];
-					}
+					// distinguish between uploaded files and linked ressources
+					if (preg_match('/^\.\.\//', $file))	$file = ['name' => pathinfo($file)['basename'], 'path' => substr($file, 1)];
+					else $file = ['name' => $file, 'path' => $file];
+					
 					$matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 				}
+
+				// append folder
 				$result['render']['content'][]=
 				[
 					[
@@ -840,23 +908,27 @@ class FILE extends API {
 		break;
 			case 'GET':
 				$result = ['render' => [
-						'form' => [
-							'data-usecase' => 'file',
-							'action' => "javascript:api.file('post', 'sharepoint')"
-						],
-						'content'=>[]
-					]
-				];
+					'form' => [
+						'data-usecase' => 'file',
+						'action' => "javascript:api.file('post', 'sharepoint')"
+					],
+					'content'=>[]
+				]];
 
+				// gather sharepoint files
 				$files = UTILITY::listFiles(UTILITY::directory('sharepoint'),'asc');
-				$display=[];
+				$display = [];
 				if ($files){
 					foreach ($files as $file){
+						// prepare file properies and calculate remaining lifespan
 						$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
 						$filetime = filemtime($file['path']);
+
+						// delete expired files
 						if ((time()-$filetime)/3600 > CONFIG['lifespan']['sharepoint']) {
 							UTILITY::delete($file['path']);
 						}
+						// add remaining files
 						else {
 							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
 							$display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
@@ -864,6 +936,7 @@ class FILE extends API {
 					}
 				}
 				if ($display){
+					// append filter and sharepoint files
 					$result['render']['content'][] = [
 						[
 							'type' => 'filtered',
@@ -883,6 +956,8 @@ class FILE extends API {
 					];
 				}
 				else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+
+				// append upload input
 				$result['render']['content'][] = [
 					[
 						'type' => 'file',
