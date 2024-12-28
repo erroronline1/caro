@@ -36,6 +36,7 @@ class MESSAGE extends API {
 	 *  |  _| . |   | | | -_|  _|_ -| .'|  _| | . |   |
 	 *  |___|___|_|_|\_/|___|_| |___|__,|_| |_|___|_|_|
 	 *
+	 * view or delete conversations, overview or per user
 	 */
 	public function conversation(){
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -56,6 +57,8 @@ class MESSAGE extends API {
 						]
 					]);
 					$conversation_content = [];
+
+					// get user info on conversation partner
 					$conversation_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 						'replacements' => [
 							':id' => $this->_conversation,
@@ -63,6 +66,8 @@ class MESSAGE extends API {
 						]
 					]);
 					$conversation_user = $conversation_user ? $conversation_user[0] : null;
+
+					// add up messages to conversation thread
 					foreach($messages as $conversation){
 						$conversation_content[] = [
 							'type' => 'message',
@@ -74,13 +79,14 @@ class MESSAGE extends API {
 							],
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
-								//inline system links won't work otherwise
+								//inline system links won't work otherwise, therefore this property exists for conversation threads
 								'ICON_onpointerup' => "_client.message.newMessage('". $this->_lang->GET('message.forward') ."', '', '" . 
 									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')"
 							]
 						];
 					}
+					// render delete button for conversation thread
 					$result['render']['content'][] = [
 						[
 							'type' => 'deletebutton',
@@ -94,7 +100,11 @@ class MESSAGE extends API {
 							]
 						]
 					];
+
+					// append messages
 					$result['render']['content'][] = $conversation_content;
+
+					// add reply input if not the system user
 					if ($conversation['conversation_user'] != '1' && $conversation_user['name']) {
 						$result['render']['content'][] = [
 							[
@@ -122,6 +132,8 @@ class MESSAGE extends API {
 					$result['data'] = ['message_unseen' => $notifications->messageunseen()];
 				}
 				else {
+					// display "mailbox"
+					// new message to anybody button
 					$result['render']['content'][] = [
 						[
 							'type' => 'button',
@@ -132,13 +144,15 @@ class MESSAGE extends API {
 							]
 						]
 					];
-					// select conversations
+
+					// select conversations for viewing user
 					$conversations = SQLQUERY::EXECUTE($this->_pdo, 'message_get_conversations', [
 						'values' => [
 							':user' => $_SESSION['user']['id']
 						]
 					]);
 					if ($conversations) {
+						// list up all last messages, with unread mark if applicable
 						foreach($conversations as $conversation){
 							// select unseen per conversation
 							$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen_conversations', [
@@ -198,6 +212,7 @@ class MESSAGE extends API {
 	 *  |     | -_|_ -|_ -| .'| . | -_|
 	 *  |_|_|_|___|___|___|__,|_  |___|
 	 *                        |___|
+	 * posts a new message
 	 */
 	public function message(){
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -223,6 +238,7 @@ class MESSAGE extends API {
 							'type' => 'error'
 						]]);
 					}
+				// post a message to each recipient
 				$success = 0;
 				foreach ($recipients as $recipient){
 					if ($recipient['id'] < 2) continue;
@@ -264,19 +280,18 @@ class MESSAGE extends API {
 	 *  |  _| -_| . | |_ -|  _| -_|  _|
 	 *  |_| |___|_  |_|___|_| |___|_|
 	 *          |___|
+	 * display all users grouped by units, permissions, etc.
 	 */
 	public function register(){
 		// prepare existing users lists
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		$result = ['render' => ['content' => []]];
+
 		foreach($users as $user){
-			if ($user['id'] == 1) continue;
-			$mailto =  [
-				'href' => 'javascript:void(0)',
-				'data-type' => 'input',
-				'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
-			];
+			if ($user['id'] == 1) continue; // skip system user
+
+			// sort to groups, units, etc.
 			$groups['name'][] = $user['name'];
 			if ($user['orderauth']) $groups['orderauth'][] = $user['name'];
 			if ($user['units'])
@@ -293,9 +308,13 @@ class MESSAGE extends API {
 		}
 
 		foreach($groups as $group => $content){
+
+			// display name list and order auth-list as a single panel
 			if (in_array($group, ['name', 'orderauth'])){
 				$links = [];
 				ksort($content);
+
+				// assemble message link
 				foreach($content as $user) $links[$user] = [
 					'href' => 'javascript:void(0)',
 					'data-type' => 'input',
@@ -317,10 +336,13 @@ class MESSAGE extends API {
 					]
 				];
 			} else {
+				// display units and permissions as slideable multipanels
 				$panel = [];
 				foreach($content as $sub => $users){
 					$users = array_unique($users);
 					ksort($users);
+
+					// add "message to all users" of the panel
 					$links = [
 						$this->_lang->GET('message.register_message_all') => [
 							'href' => 'javascript:void(0)',
@@ -328,11 +350,15 @@ class MESSAGE extends API {
 							'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => implode(', ', $users)]) ."', '" . implode(', ', $users) . "', '', {}, [])"
 						]
 					];
+
+					// add "message to user"
 					foreach($users as $user) $links[$user] = [
 						'href' => 'javascript:void(0)',
 						'data-type' => 'input',
 						'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) ."', '" . $user . "', '', {}, [])"
 					];
+
+					// append panel
 					$panel[] = [
 						[
 							'type' => 'links',
