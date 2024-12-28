@@ -4318,5 +4318,5 @@ You should have received a copy of the GNU Affero General Public License along w
 # The team
 | Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |
 | --------------- | -------------- | ------------- | ----------------------------- |
-| error 'i have the say here' on line 1 | error on line 1 | error 'fancypants' on line 1 | error 'can you do anything right?' on line 1|
+| error 'i need the kubernetes blockchain ai cloud in orange ASAP' on line 1 | error on line 1 | error 'what do you mean - good practice? i am an artist!' on line 1 | error 'can you do anything right, like at all?' on line 1 |
 | ![productmanager](./media/productmanager.png) | ![developer](./media/developer.png) | ![designer](./media/designer.png) | ![tester](./media/tester.png) |
