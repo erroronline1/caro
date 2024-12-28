@@ -56,7 +56,7 @@ class LANG {
 		$request = explode('.', $request);
 		$languagefile = !$forceDefault ? $this->_USER : $this->_DEFAULT; 
 
-		if ($chunk = self::find($request[0], $request, $languagefile)) {
+		if ($chunk = self::find($request, $languagefile)) {
 			$patterns = [];
 			$replacements = [];
 			foreach($replace as $pattern => $replacement){
@@ -68,12 +68,12 @@ class LANG {
 		return 'undefined language';
 	}
 	// recursively find the language chunk independent of nesting depth
-	private static function find($key, $chain, $lang){
+	private static function find($chain, $lang){
+		$key = array_shift($chain);
 		if (isset($lang[$key])){
 			if (gettype($lang[$key]) === 'array') {
-				$index = array_search($key, $chain) + 1;
-				if (!isset($chain[$index])) return false;
-				return self::find($chain[$index], $chain, $lang[$key]);
+				if (!$chain) return false;
+				return self::find($chain, $lang[$key]);
 			}
 			else return $lang[$key];
 		}

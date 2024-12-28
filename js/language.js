@@ -31,24 +31,26 @@ export class Lang {
 	GET(request, replace = {}) {
 		request = request.split(".");
 
-		let chunk = this.find(request[0], request, this._USER);
+		let chunk = this.find(request, this._USER);
 		if (chunk) {
 			for (const [pattern, replacement] of Object.entries(replace)) {
 				chunk = chunk.replaceAll(pattern, replacement);
 			}
 			return chunk;
 		}
+		console.trace(request, replace);
 		return "undefined or not provided for client";
 	}
 	// recursively find the language chunk independent of nesting depth
-	find(key, chain, lang) {
+	find(chain, lang) {
+		let key = chain.shift();
 		if (lang[key]) {
 			if (typeof lang[key] === "object") {
-				let index = chain.indexOf(key) + 1;
-				if (chain[index] === undefined) return false;
-				return this.find(chain[index], chain, lang[key]);
+				if (!chain) return false;
+				return this.find(chain, lang[key]);
 			} else return lang[key];
 		}
+		else return false;
 	}
 
 	PROPERTY(request, replace = {}) {
