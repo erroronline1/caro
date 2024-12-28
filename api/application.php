@@ -59,6 +59,8 @@ class APPLICATION extends API {
 	 */
 	public function login(){
 		if (!$this->_requestedLogout){
+			// on reload this method is requested by default
+			// get current user and application settings for frontend setup
 			if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login')) && isset($_SESSION['user'])){
 				$this->response([
 					'user' => [
@@ -82,13 +84,15 @@ class APPLICATION extends API {
 					'label' => CONFIG['label']
 				]]);
 			}
-			// select single user based on token
+
+			// select single user based on login token
 			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
 					':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login'))
 				]
 			]);
 			if ($query && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.terms_of_service_accepted'))){
+				// get current user and application settings for frontend setup
 				$result = $query[0];
 				$_SESSION['user'] = $result;
 				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
@@ -118,8 +122,10 @@ class APPLICATION extends API {
 				]]);
 			}
 		}
+		// user not found or logout requested
 		session_unset();
 		session_destroy();
+		// append login screen
 		$response = ['render' =>
 			[
 				'form' => [
@@ -141,12 +147,16 @@ class APPLICATION extends API {
 			'user' => [],
 			'config' => []
 		];
+
+		// prepare term of service with providable permission settings
 		$tos = [];
 		$replacements = [
 			':issue_mail' => CONFIG['application']['issue_mail'],
 			// no use of PERMISSIONS::permissionFor, because this method required a logged in user
 			':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])]))
 		];
+
+		// append terms-of-service slider panels
 		foreach ($this->_lang->_USER['application']['terms_of_service'] as $description => $content){
 			$tos[] = [[
 				'type' => 'textsection',
@@ -157,6 +167,8 @@ class APPLICATION extends API {
 			]];
 		}
 		$response['render']['content'][] = $tos;
+
+		// append tos-acceptance input
 		$response['render']['content'][] = [
 			[
 				'type' => 'checkbox',
@@ -180,19 +192,18 @@ class APPLICATION extends API {
 	 */
 	public function manual(){
 		if (!PERMISSION::permissionFor('appmanual')) $this->response([], 401);
-		$result = [
-			'user' => $_SESSION['user']['name'],
-			'render' => ['content' => []]
-		];
+		$result = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				// prepare entry
 				$permissions = [];
 				$entry = [
 					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.title')),
 					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.content')),
 					'permissions' => '',
 				];
-		
+				
+				// check forbidden names
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
@@ -205,6 +216,7 @@ class APPLICATION extends API {
 				}
 				$entry['permissions'] = implode(',', $permissions);
 
+				// post manual entry
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_post_manual', [
 					'values' => [
 						':title' => $entry['title'],
@@ -227,6 +239,7 @@ class APPLICATION extends API {
 					]]);
 				break;
 			case 'PUT':
+				// prepare entry
 				$permissions = [];
 				$entry = [
 					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.title')),
@@ -234,6 +247,7 @@ class APPLICATION extends API {
 					'permissions' => '',
 				];
 		
+				// check forbidden names
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 				}
@@ -246,6 +260,7 @@ class APPLICATION extends API {
 				}
 				$entry['permissions'] = implode(',', $permissions);
 
+				// update manual entry
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_put_manual', [
 					'values' => [
 						':title' => $entry['title'],
@@ -274,7 +289,9 @@ class APPLICATION extends API {
 						':id' => $this->_requestedManual != 'false' ? $this->_requestedManual : null
 					]
 				]);
-				if (!$query) $entry =[
+
+				// prepare entry properties
+				if (!$query) $entry = [
 					'id' => null,
 					'title' => '',
 					'content' => '',
@@ -282,10 +299,12 @@ class APPLICATION extends API {
 				];
 				else $entry = $query[0];
 
+				// append form
 				$result['render']['form'] = [
 					'data-usecase' => 'manual',
 					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
 
+				// prepare all entries selection
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 				$options = ['...' . $this->_lang->GET('application.manual.new_topic') => (!$this->_requestedManual || $this->_requestedManual === '...' . $this->_lang->GET('application.manual.new_topic')) ? ['selected' => true] : []];
 				foreach ($query as $row){
@@ -294,11 +313,14 @@ class APPLICATION extends API {
 				}
 				ksort($options);
 
+				// set up available permissions, set checked from selected entry
 				$permissions = [];
+				$entry['permissions'] = explode(',', $entry['permissions']);
 				foreach($this->_lang->_USER['permissions'] as $level => $description){
-					$permissions[$description] = in_array($level, explode(',', $entry['permissions'])) ? ['checked' => true] : [];
+					$permissions[$description] = in_array($level, $entry['permissions']) ? ['checked' => true] : [];
 				}
 
+				// append entry form
 				$result['render']['content'] = [
 					[
 						[
@@ -333,6 +355,8 @@ class APPLICATION extends API {
 						]
 					]
 				];
+
+				// append delete button if applicable
 				if ($entry['id']) $result['render']['content'][] = [
 						[
 							'type' => 'deletebutton',
@@ -377,12 +401,17 @@ class APPLICATION extends API {
 	 *  |     | -_|   | | |
 	 *  |_|_|_|___|_|_|___|
 	 *
-	 * respond with menu taking user permissions into account
+	 * respond with menu taking user permissions into account to js assemble_helper.userMenu()
 	 */
 	public function menu(){
 		// get permission based menu items
-		if (!isset($_SESSION['user'])) $this->response(['body' => [$this->_lang->GET('menu.application.header') => [$this->_lang->GET('menu.application.signin') => []]]]);			
+		if (!isset($_SESSION['user'])) $this->response(['body' => [$this->_lang->GET('menu.application.header') => [$this->_lang->GET('menu.application.signin') => []]]]);	// early exit
+
+		//////////////////////////////////
+		// default functions for everyone
+		//////////////////////////////////
 		$menu = [
+			// order here defines frontend order
 			$this->_lang->GET('menu.communication.header') => [
 				$this->_lang->GET('menu.communication.conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
 				$this->_lang->GET('menu.communication.register') => ['onpointerup' => "api.message('get', 'register')"],
@@ -420,10 +449,17 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.tools.image') => ['onpointerup' => "api.tool('get', 'image')"],
 			],
 		];
+
+		//////////////////////////////////
+		// permission based functions
+		//////////////////////////////////
+
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onpointerup' => "api.document('get', 'bundles')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_record')] = ['onpointerup' => "api.document('get', 'documents')"];
-		// make sure risk management comes after documents 
+		
+		// make sure risk management comes after documents so this is an exception
 		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
+
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
 			$menu[$this->_lang->GET('menu.calendar.header')][$this->_lang->GET('menu.calendar.timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
 
@@ -463,6 +499,7 @@ class APPLICATION extends API {
 		$result = ['user' => $_SESSION['user']['name'], 'render' => ['content' => []]];
 		$tiles = [];
 
+		// set up dashboard notifications
 		$notifications = new NOTIFICATION;
 
 		// messages
@@ -617,6 +654,7 @@ class APPLICATION extends API {
 		}
 		if (count($tiles)) $result['render']['content'][] = $tiles;
 
+		// append search function to landing page
 		$searchelements = [
 			[
 				'type' => 'search',
@@ -627,9 +665,12 @@ class APPLICATION extends API {
 				]
 			]
 		];
+
 		if ($this->_search) {
 			require_once('_shared.php');
 			$search = new SHARED($this->_pdo);
+
+			// search records, style like record overview
 			if ($records = $search->recordsearch(['search' => $this->_search])){
 				$matches = [];
 				foreach ($records as $contextkey => $context){
@@ -656,6 +697,7 @@ class APPLICATION extends API {
 				}
 			}
 
+			// search documents
 			if ($documents = $search->documentsearch(['search' => $this->_search])){
 				$matches = [];
 				foreach ($documents as $document){
@@ -668,10 +710,11 @@ class APPLICATION extends API {
 				];
 			}
 
+			// search files
 			if ($files = $search->filesearch(['search' => $this->_search])){
 				$matches = [];
 				foreach ($files as $file){
-					$matches[preg_replace('/.+fileserver\//','', $file)] = ['href' => substr($file, 1), 'target' => '_blank'];
+					$matches[preg_replace('/.+fileserver\//', '', $file)] = ['href' => substr($file, 1), 'target' => '_blank'];
 				}
 				$searchelements[] = [
 					'type' => 'links',
@@ -680,6 +723,7 @@ class APPLICATION extends API {
 				];
 			}
 
+			// inform about lack of results if applicable
 			if (count($searchelements) < 2) $searchelements[] = [
 				'type' => 'textsection',
 				'attributes' => [
@@ -694,6 +738,8 @@ class APPLICATION extends API {
 		$overview = [];
 		$calendar = new CALENDARUTILITY($this->_pdo);
 		$week = $calendar->render('week', 'schedule');
+
+		// add overview to calendar view
 		$overview[] = [
 			'type' => 'calendar',
 			'description' => $week['header'],
@@ -704,11 +750,13 @@ class APPLICATION extends API {
 		$displayevents = $displayabsentmates = '';
 		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
+		// sort events
 		foreach ($thisDaysEvents as $row){
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
 			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
 			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 		}
+		// display todays events
 		if ($displayevents) $overview[] = [
 			'type' => 'textsection',
 			'attributes' => [
@@ -716,6 +764,7 @@ class APPLICATION extends API {
 			],
 			'content' => $displayevents
 		];
+		// display todays absent workmates (sick, vacation, etc.)
 		if ($displayabsentmates) $overview[] = [
 			'type' => 'textsection',
 			'attributes' => [
@@ -724,6 +773,7 @@ class APPLICATION extends API {
 			'content' => $displayabsentmates
 		];
 
+		// add past unclosed events
 		$today->modify('-1 day');
 		$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = [];
@@ -738,11 +788,11 @@ class APPLICATION extends API {
 
 		if ($overview) $result['render']['content'][] = $overview;
 
-		// manual
+		// default add manual to landing page filteres by applicable permission
 		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 		$topics = [];
 		foreach ($query as $row){
-			if (PERMISSION::permissionIn($row['permissions'])) $topics[]=
+			if (PERMISSION::permissionIn($row['permissions'])) $topics[] =
 				[[
 					'type' => 'textsection',
 					'attributes' => [
