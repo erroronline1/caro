@@ -680,6 +680,14 @@ Off duty events are displayed with the scheduled events, but scheduled events ar
 
 Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
 
+For a correct calculation it is neccessary to provide values as *start-date and annual vacation/weekly hours* in the format `yyyy-mm-dd hh`. If entering the calculation during a calendar year, actual remaining annual vacation days have to be the initial value. Then the full annual vacation days can be applied by adding a setting for the next year starting on January 1st. On exiting the calculation another setting sould be applied with the annual vacation days up to the exit date. An example for a three years period starting and ending in summer with 30 days of annual vacation per contract would look like:
+```
+2023-07-01 15
+2024-01-01 30
+2026-01-01 15
+```
+Weekly hours look similar like `2023-07-01 39,5` with allowed decimal values.
+
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
@@ -4076,7 +4084,7 @@ I welcome any constructive input on this topic.
 * O.Arch_7 Das Hintergrundsystem MUSS alle Anfragen der Anwendung über eine vollständig dokumentierte API entgegennehmen. Es DARF KEINE nicht dokumentierten Zugriffsmöglichkeiten enthalten.
     > [Api documentation](#api-documentation)
 * O.Arch_8 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These containan eMail address.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These contain an eMail address.
 * O.Arch_9 Das Hintergrundsystem MUSS so implementiert sein, dass ungewollte Zugriffe über eventuelle Management-Schnittstellen effektiv unterbunden werden. Insbesondere bei externem Hosting (s. Kapitel 2.3.2) und Cloud-Diensten (s. Kapitel 2.3.3) MUSS sichergestellt werden, dass der Betreiber Zugriffsmöglichkeiten zwischen verschiedenen Kunden unterbindet.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
 * O.Arch_10 Dienste, die das Hintergrundsystem zur Verfügung stellt, SOLLEN nur mit den notwendigen Rechten ausgeführt werden. Dienste, die von außen erreichbar sind, DÜRFEN NICHT mit Administrator-, System- bzw. Root-Rechten laufen.

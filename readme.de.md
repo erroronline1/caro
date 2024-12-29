@@ -576,6 +576,14 @@ Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten
 
 Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
 
+Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und jahresurlaub/Wochenarbeitszeit* im Format `yyyy-mm-dd hh` anzugeben. Falls unterjährig in die Berechnung eingestiegen werden soll muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
+```
+2023-07-01 15
+2024-01-01 30
+2026-01-01 15
+```
+Die Wochenarbeitszeit sieht mit `2023-07-01 39,5` ähnlich aus, Dezimalwerte sind erlaubt.
+
 Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
