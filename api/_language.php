@@ -67,7 +67,11 @@ class LANG {
 		}
 		return 'undefined language';
 	}
-	// recursively find the language chunk independent of nesting depth
+	/**
+	 * recursively find the language chunk independent of nesting depth
+	 * @param array $chain exploded request
+	 * @param array $lang LANGUAGEFILE or passed subset
+	 */
 	private static function find($chain, $lang){
 		$key = array_shift($chain);
 		if (isset($lang[$key])){
