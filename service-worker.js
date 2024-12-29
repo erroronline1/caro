@@ -34,12 +34,14 @@ addEventListener("message", async (message) => {
 				cache: "no-cache",
 				body: null,
 			}).then(
+				// resolve
 				async (response) => {
 					return {
 						status: response.status,
 						body: await response.json(),
 					};
 				},
+				// reject
 				() => {
 					return undefined;
 				}
@@ -102,7 +104,7 @@ self.addEventListener("fetch", (event) => {
 			return fetch(event.request)
 				.then(async (fetchedResponse) => {
 					if (event.request.method === "GET") cache.put(event.request, fetchedResponse.clone());
-					//sync-event still marked as experimental as of 01/2024 so sync has to be performed on successful fetch request
+					// sync-event still marked as experimental as of 01/2025 so sync has to be performed on successful fetch request
 					const cachedRequests = await database.all();
 					let successfullyRequested = [];
 					for (const [key, entry] of Object.entries(cachedRequests)) {
@@ -128,6 +130,7 @@ self.addEventListener("fetch", (event) => {
 					// If the network is unavailable, get cached get requests or store post, put, delete
 					if (event.request.method === "GET")
 						return cache.match(event.request).then(
+							// resolve
 							(response) => {
 								cacheResponse = new Response(response.body, {
 									status: 203,
@@ -136,6 +139,7 @@ self.addEventListener("fetch", (event) => {
 								});
 								return cacheResponse;
 							},
+							//reject
 							(error) => {
 								return cacheResponse;
 							}
