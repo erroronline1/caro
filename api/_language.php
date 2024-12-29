@@ -47,10 +47,10 @@ class LANG {
 
 	/**
 	 * returns a language specific chunk
-	 * @param str $request dot separated keys of LANGUAGEFILE
+	 * @param string $request dot separated keys of LANGUAGEFILE
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
-	 * @param str $forceDefault override user setting, especially on logout, otherwise first login attempts may fail
-	 * @return str textchunk with replacements
+	 * @param string $forceDefault override user setting, especially on logout, otherwise first login attempts may fail
+	 * @return string textchunk with replacements
 	 */
 	public function GET($request, $replace = [], $forceDefault = false){
 		$request = explode('.', $request);
@@ -97,9 +97,9 @@ class LANG {
 	
 	/**
 	 * returns a language specific chunk with whitespaces and periods replaced with underscore as in request parameters
-	 * @param str $request dot separated keys of languagefile
+	 * @param string $request dot separated keys of languagefile
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
-	 * @return str textchunk with replacements and whitespaces replaced with underscore as in request parameters
+	 * @return string textchunk with replacements and whitespaces replaced with underscore as in request parameters
 	 */
 	public function PROPERTY($request, $replace = []){
 		return preg_replace('/[\s\.]/', '_', $this->GET($request, $replace));

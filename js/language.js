@@ -30,9 +30,9 @@ export class Lang {
 
 	/**
 	 * returns a language specific chunk
-	 * @param str request dot separated keys of this._USER
-	 * @param object replace replacement key:value pairs to replace :placeholders
-	 * @return str textchunk with replacements
+	 * @param {string} request dot separated keys of this._USER
+	 * @param {object} replace replacement key:value pairs to replace :placeholders
+	 * @return {string} textchunk with replacements
 	 */
 	GET(request, replace = {}) {
 		request = request.split(".");
@@ -49,8 +49,9 @@ export class Lang {
 	}
 	/**
 	 * recursively find the language chunk independent of nesting depth
-	 * @param array chain split request
-	 * @param object lang this._USER or passed subset
+	 * @param {array} chain split request
+	 * @param {object} lang this._USER or passed subset
+	 * @return {string|boolean} found chunk or false
 	 */
 	find(chain, lang) {
 		let key = chain.shift();
@@ -65,9 +66,9 @@ export class Lang {
 
 	/**
 	 * returns a language specific chunk with whitespaces and periods replaced with underscore as in request parameters
-	 * @param str request dot separated keys of this._USER
-	 * @param object replace replacement key:value pairs to replace :placeholders
-	 * @return str textchunk with replacements and whitespaces replaced with underscore as in request parameters
+	 * @param {string} request dot separated keys of this._USER
+	 * @param {object} replace replacement key:value pairs to replace :placeholders
+	 * @return {string} textchunk with replacements and whitespaces replaced with underscore as in request parameters
 	 */
 	PROPERTY(request, replace = {}) {
 		return this.GET(request, replace).replaceAll(/[\s\.]/g, "_");
