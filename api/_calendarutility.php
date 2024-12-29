@@ -55,9 +55,9 @@ class CALENDARUTILITY {
 		$this->_pdo = $pdo;
 		$this->_lang = new LANG();
 
-		$this->_holidays = preg_split('/[^\d-]+/', CONFIG['calendar']['holidays']);
-		$this->_easter_holidays = CONFIG['calendar']['easter_holidays'];
-		$this->_workdays = preg_split('/[^\d-]+/', CONFIG['calendar']['workdays']);
+		$this->_holidays = preg_split('/[^\d-]+/', CONFIG['calendar']['holidays']); // mm-dd, mm-dd, ...
+		$this->_easter_holidays = CONFIG['calendar']['easter_holidays']; // offsets from easter sunday
+		$this->_workdays = preg_split('/[^\d-]+/', CONFIG['calendar']['workdays']); // 1-7 starting on monday
 	}
 
 	/**
@@ -121,7 +121,7 @@ class CALENDARUTILITY {
 	 *  | . | .'| | |_ -|
 	 *  |___|__,|_  |___|
 	 *          |___|
-	 * calculates a calendar view, for given date week starts on monday, month on 1st
+	 * calculates datetime objects for a calendar view, for given date week starts on monday, month on 1st
 	 * 
 	 * @param string $format month|week
 	 * @param string $date yyyy-mm-dd
@@ -130,6 +130,8 @@ class CALENDARUTILITY {
 		$result = [];
 		$date = new DateTime($date ? : 'now', new DateTimeZone(CONFIG['application']['timezone']));
 		$date->setTime(0, 0);
+
+		// prepare dates for requested week
 		if ($format === 'week') {
 			$date->modify('- ' . ($date->format('N') - 1) . ' days');
 			while ($date->format('N') < 7){
@@ -138,6 +140,7 @@ class CALENDARUTILITY {
 			}
 			$result[] = $date;
 		}
+		// prepare dates for requested month
 		elseif ($format === 'month') {
 			$date->modify('first day of this month');
 			if ($date->format('N') > 1){
@@ -151,6 +154,7 @@ class CALENDARUTILITY {
 			}
 			$result[] = $date;
 		}
+
 		// ensure the last day lasts to midnight for time comparisons
 		$last_day = clone $result[count($result) - 1];
 		$last_day->modify('+23 hours')->modify('+59 seconds');
@@ -201,6 +205,7 @@ class CALENDARUTILITY {
 	 */
 	public function dialog($columns = []){
 		if (!isset($columns[':type'])) return;
+
 		// fill up default values
 		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!isset($columns[$str])) $columns[$str] = '';
 		foreach([':id', ':alert'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
@@ -219,27 +224,30 @@ class CALENDARUTILITY {
 		array_splice($users, array_search(1, array_column($users, 'id')), 1);
 		// set self to top 
 		$self = array_splice($users, array_search($_SESSION['user']['id'], array_column($users, 'id')), 1);
-		array_splice($users, 1, 0, $self);
+		array_splice($users, 0, 0, $self);
+		// construct list for affected user selection
 		foreach($users as $user){
 			if ($user === $self) continue;
 			$affected_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
-			if (array_intersect(explode(',', $user['units']), $_SESSION['user']['units'])) $affected_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
+			if (array_intersect(explode(',', $user['units']), $_SESSION['user']['units'])) $affected_unit_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
 			if ($columns[':affected_user_id'] === $user['id'] && !$columns[':organizational_unit']) $columns[':organizational_unit'] = $user['units'];
 		}
 
+		// set up defaults
 		$alert = $span_start = $span_end = null; 
-		$alert = [$this->_lang->GET('calendar.schedule.alert') => $columns[':alert'] ? ['checked' => true] : []];
-		
-		if ($columns[':span_start']) $span_start = new DateTime($columns[':span_start'], new DateTimeZone(CONFIG['application']['timezone']));
-		else $span_start = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+		$alert = [$this->_lang->GET('calendar.schedule.alert') => $columns[':alert'] ? ['checked' => true] : []];		
+		$span_start = new DateTime($columns[':span_start'] ? : 'now', new DateTimeZone(CONFIG['application']['timezone']));
 
+		// assemble by type
 		switch ($columns[':type']){
 			case 'schedule':
+				// set end date to preset of CONFIG default
 				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(CONFIG['application']['timezone']));
 				else {
 					$span_end = clone $span_start;
 					$span_end->modify('+' . CONFIG['calendar']['default_due'] . ' days');
 				}
+				// add inputs
 				$inputs = [
 					[
 						'type' => 'scanner',
@@ -304,14 +312,17 @@ class CALENDARUTILITY {
 				];
 				break;
 			case 'timesheet':
+				// set end date to preset of CONFIG default
 				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone(CONFIG['application']['timezone']));
 				else {
 					$span_end = clone $span_start;
 					$span_end->modify('+1 hour');
 				}
-		
+				
+				// resolve encoded misc information
 				$misc = $columns[':misc'] ? json_decode($columns[':misc'], true) : [];
 				
+				// construct available pto-reasons
 				$ptoselect = [];
 				foreach($this->_lang->_USER['calendar']['timesheet']['pto'] as $subject => $reason){
 					$ptoselect[$reason] = ['value' => $subject];
@@ -320,6 +331,7 @@ class CALENDARUTILITY {
 
 				$inputs = [];
 
+				// conditional adding affected user
 				if (array_intersect(preg_split('/\W+/', CONFIG['permissions']['calendaraddforeigntimesheet']), $_SESSION['user']['permissions'])){
 					$inputs[] = [
 						'type' => 'select',
@@ -354,6 +366,7 @@ class CALENDARUTILITY {
 					$this->_lang->GET('calendar.timesheet.break_time') => true,
 					$this->_lang->GET('calendar.timesheet.homeoffice') => true
 				];
+				// add inputs
 				array_push($inputs, ...[
 					[
 						'type' => 'select',
@@ -417,6 +430,7 @@ class CALENDARUTILITY {
 							]
 						]
 					]);
+				// add homeoffice input if applicable
 				if (isset($_SESSION['user']['app_settings']['homeoffice']) && $_SESSION['user']['app_settings']['homeoffice'])
 					array_splice($inputs, 7, 0, [
 						[
@@ -482,15 +496,17 @@ class CALENDARUTILITY {
 	 *  |   | . | | | . | .'| | |_ -|
 	 *  |_|_|___|_|_|___|__,|_  |___|
 	 *                      |___|
-	 * calculates holidays for given year, according to setup.ini
+	 * calculates holidays for given year, according to CONFIG
 	 * no setting up on construction for possible year overlaps on week rendering
 	 * @param int $year Y
 	 * @return array containing holiday dates for a given year
 	 */
 	public function holidays($year){
+		// apply all public holidays
 		$holidays = $this->_holidays;
 		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
 
+		// apply all holidays depended on easter sunday
 		$easter = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 		$easter->setTimestamp(easter_date($year));
 		foreach($this->_easter_holidays as $day => $offset){
@@ -502,15 +518,15 @@ class CALENDARUTILITY {
 	}
 
 	/**
-	 *                 _               ___               _     _
-	 *   ___ _ _ _____| |_ ___ ___ ___|  _|_ _ _ ___ ___| |_ _| |___ _ _ ___
-	 *  |   | | |     | . | -_|  _| . |  _| | | | . |  _| '_| . | .'| | |_ -|
-	 *  |_|_|___|_|_|_|___|___|_| |___|_| |_____|___|_| |_,_|___|__,|_  |___|
-	 *                                                              |___|
+	 *                 _               ___                           _     _             
+	 *   ___ _ _ _____| |_ ___ ___ ___|  _|___ ___ ___ _ _ _ ___ ___| |_ _| |___ _ _ ___ 
+	 *  |   | | |     | . | -_|  _| . |  _|   | . |   | | | | . |  _| '_| . | .'| | |_ -|
+	 *  |_|_|___|_|_|_|___|___|_| |___|_| |_|_|___|_|_|_____|___|_| |_,_|___|__,|_  |___|
+	 *                                                                          |___|
 	 * @param datetime $start
 	 * @param datetime $end
 	 * 
-	 * @return int number of non-working days within timespan
+	 * @return int number of non-working days within timespan including holidays and CONFIG unselected workdays
 	 */
 	private function numberOfNonWorkdays($start, $end){
 		$start = clone $start; // not passed by value but by reference
@@ -606,6 +622,7 @@ class CALENDARUTILITY {
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
+				// count events relevant to user based on units
 				$events = $this->getDay($day->format('Y-m-d'));
 				$numbers = 0;
 				foreach ($events as $row){
@@ -621,6 +638,8 @@ class CALENDARUTILITY {
 							$numbers++;
 					}	
 				}
+
+				// construct information for day
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
 					'display' => $this->_lang->_USER['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
@@ -628,7 +647,9 @@ class CALENDARUTILITY {
 					'selected' => $date === $day->format('Y-m-d'),
 					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
 				];
+
 				if ($result['header']) continue;
+				// add header information 
 				if ($format === 'week') $result['header'] = $this->_lang->GET('general.calendar_week', [':number' => $day->format('W')]) . ' ' . $day->format('Y');
 				if ($format === 'month') $result['header'] = $this->_lang->_USER['general']['month'][$day->format('n')] . ' ' . $day->format('Y');
 			}
@@ -673,12 +694,14 @@ class CALENDARUTILITY {
 	 * 	]
 	 */
 	public function timesheetSummary($users = [], $from_date = '', $to_date = ''){
+		// construct timespan
 		$datetimezone = new DateTimeZone(CONFIG['application']['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
 		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1970-01-01', $datetimezone);
 		$from_date->modify('first day of this month')->setTime(0, 0);
 		$to_date = gettype($to_date) === 'object' ? $to_date : new DateTime($to_date ? : 'now', $datetimezone);
 		$to_date->modify('last day of this month')->setTime(23, 59, 59);
+
 		$entries = $this->getWithinDateRange($from_date->format('Y-m-d H:i:s'), $to_date->format('Y-m-d H:i:s'));
 		$result = [];
 		// sort result span_start to process user-settings in the right order
@@ -704,6 +727,7 @@ class CALENDARUTILITY {
 				'_initialovertime' => isset($user['app_settings']['initialovertime']) ? floatval(str_replace(',', '.', $user['app_settings']['initialovertime'])) : 0,
 				'_pto' => []
 			];
+
 			// prepare occasionally changing contract settings
 			// create array with start date of changes and applicable value
 			foreach(['weeklyhours', 'annualvacation'] as $setting){
@@ -712,7 +736,9 @@ class CALENDARUTILITY {
 					$settingentries = explode(';', $user['app_settings'][$setting]);
 					natsort($settingentries);
 					foreach($settingentries as $line){
+						// match start date of contract settings, days of annual vacation or weekly hours
 						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+						// append datetime value and contract value
 						$hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
 				} else $hours_vacation[] = ['date' => new DateTime('1970-01-01', $datetimezone), 'value' => 0];
@@ -720,7 +746,8 @@ class CALENDARUTILITY {
 				$users[$row]['timesheet']['_' . $setting] = $hours_vacation;
 			}
 		}
-		$users = array_values($users); // reindex
+		// reindex for users without timetracking have been deleted
+		$users = array_values($users);
 
 		// process actual entries and contribute to user timesheet array
 		foreach ($entries as $entry){
@@ -737,7 +764,9 @@ class CALENDARUTILITY {
 			// get breaks and homeoffice times
 			$misc = json_decode($entry['misc'], true);
 
-			if (!strlen($entry['subject'])) { // aka regular working day
+			if (!strlen($entry['subject'])) {
+				
+				// aka regular working day
 				if ($span_start < $user['timesheet']['_weeklyhours'][0]['date']){
 					// since entries are sorted by date, if dated earlier than the initial applied weeklyhours this can not be applicable
 					continue;
@@ -749,7 +778,8 @@ class CALENDARUTILITY {
 				if (isset($misc['break'])) $hours -= $this->timeStrToFloat($misc['break']);
 				$users[$row]['timesheet']['_performed'] += $hours;
 			} else {
-				// count off duty days
+
+				// off duty days
 				$span_start->setTime(0, 0);
 				$span_end->setTime(23, 59, 59);
 
@@ -758,10 +788,16 @@ class CALENDARUTILITY {
 					// since entries are sorted by date, if dated earlier than the last applied annualvacation this can not be applicable
 					continue;
 				}
+				// all days within time span
 				$days = intval($span_start->diff($span_end)->format('%a')) + 1;
 
+				// create pto subset
 				if (!isset($users[$row]['timesheet'][$entry['subject']])) $users[$row]['timesheet'][$entry['subject']] = 0;
+
+				// reduce days by non working days
 				$days -= $this->numberOfNonWorkdays($span_start, $span_end);
+
+				// add calculated days for current pto event to user subset 
 				$users[$row]['timesheet'][$entry['subject']] += $days;
 
 				// add eligible pto to a dated array for below use
@@ -776,6 +812,7 @@ class CALENDARUTILITY {
 		foreach ($users as $row => $user){
 			// accumulate projected hours for given timespan according to applicable contract settings at the respective time
 			for($i = 0; $i < count($user['timesheet']['_weeklyhours']); $i++){
+				// reassure timespan within contract settings
 				$startdate = $user['timesheet']['_weeklyhours'][$i]['date'];
 				if ($startdate > $to_date) break;
 				if ($i === count($user['timesheet']['_weeklyhours']) - 1) $enddate = clone $to_date;
@@ -785,11 +822,15 @@ class CALENDARUTILITY {
 				}
 				if ($enddate < $from_date) continue;
 				if ($startdate < $from_date) $startdate = clone $from_date;
-
 				$users[$row]['timesheet']['_span_end_weeklyhours'] = $user['timesheet']['_weeklyhours'][$i]['value'];
+
+				// count all days within timespan
 				$daynum = intval($startdate->diff($enddate)->format('%a')) + 1;
+
+				// calculate non working days
 				$holidays = $this->numberOfNonWorkdays($startdate, $enddate);
-				// add reasonable pto to holidays, that are not expected to contribute to projected
+
+				// add reasonable pto to holiday count, that are not expected to contribute to projected
 				foreach($user['timesheet']['_pto'] as $pto){
 					$ptostart = $pto['start'];
 					$ptoend = $pto['end'];
@@ -803,13 +844,18 @@ class CALENDARUTILITY {
 					$ptonum = intval($ptostart->diff($ptoend)->format('%a')) + 1;
 					if ($ptonum) $holidays += $pto['value'] - $ptonum;
 				}
+
+				// calculate projected hours
 				$users[$row]['timesheet']['_projected'] += ($daynum - $holidays) * ($user['timesheet']['_weeklyhours'][$i]['value'] / count($this->_workdays));
 			}
+
+			// calculate overtime 
 			$users[$row]['timesheet']['_overtime'] += $users[$row]['timesheet']['_performed'] - $users[$row]['timesheet']['_projected'];
 
 			// accumulate annual vacation days always from the beginning of tracking according to applicable contract settings at the respective time
 			$users[$row]['timesheet']['_leftvacation'] = $user['timesheet']['_annualvacation'][0]['value'];
 			for($i = 1; $i < count($user['timesheet']['_annualvacation']); $i++){
+				// reassure timespan within contract settings
 				$startdate = $user['timesheet']['_annualvacation'][$i]['date'];
 				if ($startdate > $to_date) break;
 				$enddate = ($i === count($user['timesheet']['_annualvacation']) - 1) ? $to_date : $user['timesheet']['_annualvacation'][$i + 1]['date'];
