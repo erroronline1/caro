@@ -53,6 +53,7 @@ class CSVFILTER extends API {
 				]);
 				$filter = $filter ? $filter[0] : null;
 
+				// check if requested filter is found
 				if (!$filter) $this->response([
 					'response' => [
 						'name' => false,
@@ -61,6 +62,7 @@ class CSVFILTER extends API {
 					]]);
 				$content = json_decode($filter['content'], true);
 
+				// check if input file ist provided
 				$inputfile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]['tmp_name'] : null;
 				if (!$inputfile) $this->response([
 					'response' => [
@@ -68,10 +70,13 @@ class CSVFILTER extends API {
 						'msg' => $this->_lang->GET('csvfilter.use.filter_no_input_file'),
 						'type' => 'error'
 					]]);
+				
+				// set up file settings for csvprocessor
 				$content['filesetting']['source'] = $inputfile;
 				if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 				$content['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
 
+				// check if neccessary compare file is provided 
 				$comparefileindex = 0;
 				foreach($content['filter'] as &$filtertype){
 					if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') {
@@ -87,6 +92,7 @@ class CSVFILTER extends API {
 					}
 				}
 				
+				// process filter
 				$datalist = new Listprocessor($content, [
 					'processedMonth' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.filter_month')),
 					'processedYear' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.filter_year'))
@@ -100,6 +106,8 @@ class CSVFILTER extends API {
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
 					case 'csv':
 						foreach($datalist->_list as $subsetname => $subset){
+							// datalist may contain multiple subsets based on split setting
+							// write each to temp file
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
 							$subsetname = preg_replace(CONFIG['forbidden']['names'][0], '_', $subsetname);
 							$tempFile = UTILITY::directory('tmp') . '/' . time() . $subsetname . '.csv';
@@ -116,6 +124,7 @@ class CSVFILTER extends API {
 								$datalist->_setting['filesetting']['dialect']['escape']);
 							}
 							fclose($file);
+							// provide downloadfile
 							$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])])] = [
 								'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 								'download' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])
@@ -128,12 +137,15 @@ class CSVFILTER extends API {
 						$writer = new XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']); 
 						foreach($datalist->_list as $subsetname => $subset){
+							// datalist may contain multiple subsets based on split setting
+							// write each to xlsx sheet
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
 							$writer->writeSheetRow($subsetname, $datalist->_setting['filesetting']['columns']);
 							foreach ($subset as $line)
 								$writer->writeSheetRow($subsetname, $line);
 						}
 						$writer->writeToFile($tempFile);
+						// provide downloadfile
 						$content['filesetting']['destination'] = preg_replace('/.xls$/', '.xlsx', $content['filesetting']['destination']);
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
 							'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
@@ -152,7 +164,7 @@ class CSVFILTER extends API {
 				$options = ['...' . $this->_lang->GET('csvfilter.use.filter_select') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$return = [];
 
-				// get selected filter
+				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
 					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
 						'values' => [
@@ -167,6 +179,8 @@ class CSVFILTER extends API {
 					]);
 				}
 				$filter = $filter ? $filter[0] : null;
+
+				// set up filter properties
 				if (!$filter) $filter = [
 					'id' => '',
 					'name' => '',
@@ -174,7 +188,7 @@ class CSVFILTER extends API {
 				];
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
-				// prepare existing templates lists
+				// prepare existing filter lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
 				foreach($filters as $key => $row) {
@@ -186,6 +200,7 @@ class CSVFILTER extends API {
 				}
 				ksort($options);
 
+				// append filter selection
 				$return['render'] = [
 					'content' => [
 						[
@@ -213,8 +228,11 @@ class CSVFILTER extends API {
 						]
 					]
 				];
+
 				if ($filter['id']){
 					$content = json_decode($filter['content'], true);
+
+					// add default inputs for filter
 					$additionalform = [
 						[
 							'type' => 'file',
@@ -242,6 +260,8 @@ class CSVFILTER extends API {
 							]
 						]
 					];
+
+					// add inputs for comparison files if applicable
 					foreach($content['filter'] as $filtertype){
 						if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') array_push($additionalform, [
 							'type' => 'file',
@@ -253,7 +273,11 @@ class CSVFILTER extends API {
 							]
 						]);
 					}
+
+					// append all filter inputs
 					array_push($return['render']['content'], $additionalform);
+
+					// append form
 					$return['render']['form'] = [
 						'data-usecase' => 'csvfilter',
 						'action' => "javascript:api.csvfilter('post', 'filter', " . $filter['id'] . ")"
@@ -278,6 +302,7 @@ class CSVFILTER extends API {
 		if (!PERMISSION::permissionFor('csvrules')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				// set up filter properties by payload
 				$filter = [
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
@@ -285,6 +310,7 @@ class CSVFILTER extends API {
 					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden_hidden')? 1 : 0,
 				];
 
+				// early exit
 				if (!trim($filter[':name']) || !trim($filter[':content'])) $this->response([], 400);
 
 				// ensure valid json for filters
@@ -311,10 +337,12 @@ class CSVFILTER extends API {
 						]]);	
 				}
 
+				// check forbidden names
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 				}
 
+				// post filter
 				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
 					'values' => $filter
 				])) $this->response([
@@ -336,7 +364,7 @@ class CSVFILTER extends API {
 				$alloptions = ['...' . $this->_lang->GET('csvfilter.edit.filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$return = [];
 
-				// get selected filter
+				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
 					$filter = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_get_filter', [
 						'values' => [
@@ -351,6 +379,8 @@ class CSVFILTER extends API {
 					]);
 				}
 				$filter = $filter ? $filter[0] : null;
+
+				// set up filter properties
 				if (!$filter) $filter = [
 					'id' => '',
 					'name' => '',
@@ -372,6 +402,8 @@ class CSVFILTER extends API {
 				}
 				ksort($options);
 				ksort($alloptions);
+
+				// append form, filter selection and inputs for adding filter 
 				$return['render'] = [
 					'form' => [
 						'data-usecase' => 'csvfilter',
@@ -434,6 +466,8 @@ class CSVFILTER extends API {
 						]
 					]
 				];
+
+				// append filter toggles
 				if ($filter['id']){
 					$hidden = [
 						'type' => 'radio',
