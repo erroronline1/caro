@@ -27,7 +27,7 @@ export const compose_helper = {
 	 * @param {object} startNode
 	 * @param {int} offset
 	 * @param {int} numberOfElements
-	 * @returns nodes
+	 * @returns {domNodes}]
 	 */
 	cloneMultipleItems: function (startNode, offset = -4, numberOfElements = 4) {
 		// positive offset for nodes after fromNode, negative for previous nodes
@@ -67,14 +67,18 @@ export const compose_helper = {
 
 	/**
 	 * create widget from composer and append to view and newDocumentComponents
-	 * @param {object} parent
-	 * @returns none
+	 * @requires Compose
+	 * @param {domNode} parent composer form for widget
+	 * @event append widget to view
+	 * @event add widget structure to this.newDocumentComponents
 	 */
 	composeNewElementCallback: function (parent) {
 		let sibling = parent.childNodes[0].nextSibling,
 			setTo,
 			elementName,
 			value;
+
+		// define which attribute is assigned the name value, and set default values
 		const setName = {
 				name: ["select", "scanner", "radio", "photo", "file", "signature", "textselection", "checkbox"],
 				description: ["links"],
@@ -85,23 +89,34 @@ export const compose_helper = {
 			element = {
 				attributes: {},
 			};
+
+		// iterate over all nodes of the respective widgets composer form
 		do {
+			// skip nodes
 			if (!["span", "input", "textarea", "header", "select"].includes(sibling.localName)) {
 				sibling = sibling.nextSibling;
 				continue;
 			}
+
+			// get widget type by icon
 			if (sibling.localName === "span") {
 				if (element.type === undefined) element["type"] = sibling.dataset.type;
 				sibling = sibling.nextSibling;
 				continue;
 			}
+
+			// get widget type by header
 			if (sibling.localName === "header") {
 				if (element.type === undefined) element["type"] = sibling.dataset.type;
 				if (!element.attributes) element["attributes"] = { value: buttonValues[sibling.dataset.type] };
 				sibling = sibling.nextSibling;
 				continue;
 			}
+
+			// sanitize widget name
 			elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
+
+			// route values to names, values and attributes
 			value = sibling.value;
 			if (["links", "radio", "select", "checkbox"].includes(element.type)) {
 				if (elementName === api._lang.GET("assemble.compose.component.multilist_name")) {
@@ -199,6 +214,8 @@ export const compose_helper = {
 			}
 			sibling = sibling.nextSibling;
 		} while (sibling);
+
+		// append new widget to dom and update compose_helper.newDocumentComponents
 		if (Object.keys(element).length > 1) {
 			const newElement = new Compose({
 				draggable: true,
@@ -214,7 +231,10 @@ export const compose_helper = {
 
 	/**
 	 * append new text chunk to view and newTextElements. used by texttemplate.php composer
-	 * @param {string} key
+	 * @requires _client, Compose
+	 * @param {string} key referring _client.texttemplate.data
+	 * @event append texttemplate to view
+	 * @event add texttemplate structure to compose_helper.newTextElements
 	 */
 	composeNewTextTemplateCallback: function (key) {
 		const chunk = new Compose({
@@ -239,6 +259,7 @@ export const compose_helper = {
 
 	/**
 	 * add multipart form for component editor for file uploads. used by api.js
+	 * @event adds form domNode
 	 */
 	addComponentMultipartFormToMain: function () {
 		const form = document.createElement("form");
@@ -248,10 +269,11 @@ export const compose_helper = {
 		form.method = "post";
 		document.getElementById("main").insertAdjacentElement("afterbegin", form);
 	},
+
 	/**
-	 * appends or updates a hidden form fields with the components json structure to the editor form. used by api.js
-	 * @param {object} composedComponent
-	 * @returns none
+	 * appends or updates a hidden input for fields with the components json structure to the editor form. used by api.js
+	 * @param {object} composedComponent Assemble syntax
+	 * @event adds domNodes
 	 */
 	addComponentStructureToComponentForm: function (composedComponent) {
 		const cc = document.querySelector("[name=composedComponent]");
@@ -267,17 +289,25 @@ export const compose_helper = {
 	},
 
 	/**
-	 * creates a component by comparing the contents of newDocumentComponents and the actual order from view (after reordering/dragging)
+	 * creates a full component by comparing the contents of newDocumentComponents and the actual order from view (after reordering/dragging)
+	 * widgets not present in view will be skipped on compose_helper.newDocumentComponents
+	 * @requires api, Toast
+	 * @param {bool} raw_import
 	 * @returns object|null
+	 * @event Toast on errors
 	 */
 	composeNewComponent: function (raw_import = false) {
-		// set dragged/dropped order of elements - wohoo, recursion!
 		let isForm = false,
 			componentContent = [],
 			name = document.getElementById("ComponentName").value,
 			approve = document.getElementById("ComponentApprove").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
 
+		/**
+		 * recursively get dragged/dropped order of elements and add to array
+		 * @param {domNode} parent passed node to analyze contents
+		 * @return {array} array of ordered compose_helper.newDocumentComponents
+		 */
 		function nodechildren(parent) {
 			let content = [],
 				container;
@@ -305,6 +335,7 @@ export const compose_helper = {
 			hidden: hidden,
 			approve: approve,
 		};
+		// append form if applicable, aka available inputs
 		if (isForm) answer.form = {};
 		if (raw_import || (name && componentContent)) return answer;
 		new Toast(api._lang.GET("assemble.compose.component.component_not_saved_missing"), "error");
@@ -313,10 +344,13 @@ export const compose_helper = {
 
 	/**
 	 * creates a document fetching the actual order of components (names) from view
+	 * previously imported components not present in view will be ignored
+	 * @requires api, Toast
 	 * @returns object|null
+	 * @event Toast on errors
 	 */
 	composeNewDocument: function () {
-		// set dragged/dropped order of elements
+		// get document order and values
 		const nodes = document.getElementById("main").children,
 			name = document.getElementById("ComponentName").value,
 			alias = document.getElementById("ComponentAlias").value,
@@ -327,6 +361,7 @@ export const compose_helper = {
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
 			permitted_export = document.getElementById("ComponentPermittedExport") ? document.getElementById("ComponentPermittedExport").checked : false;
 		let content = [];
+		// iterate over main node and gather data-name for components
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
@@ -348,7 +383,10 @@ export const compose_helper = {
 
 	/**
 	 * creates a text template by comparing the contents of newTextElements and the actual order from view (after reordering/dragging)
+	 * textcomponents not present in view will be skipped on compose_helper.newTextElements
+	 * @requires api, Toast
 	 * @returns object|null
+	 * @event Toast on errors
 	 */
 	composeNewTextTemplate: function () {
 		// set dragged/dropped order of elements
@@ -356,6 +394,12 @@ export const compose_helper = {
 			language = document.getElementById("TemplateLanguage").value,
 			unit = document.getElementById("TemplateUnit").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
+
+		/**
+		 * recursively get dragged/dropped order of elements and add to array
+		 * @param {domNode} parent passed node to analyze contents
+		 * @return {array} array of ordered compose_helper.newTextElements
+		 */
 		function nodechildren(parent) {
 			let content = [];
 			[...parent.childNodes].forEach((node) => {
@@ -388,7 +432,10 @@ export const compose_helper = {
 
 	/**
 	 * appends a component to view and newDocumentComponents after being fetched by api.js
-	 * @param {object} content
+	 * @requires Compose
+	 * @param {object} content Assemble syntax
+	 * @event append component
+	 * @event update compose_helper.newDocumentComponents
 	 */
 	importComponent: function (content) {
 		compose_helper.newDocumentComponents = {};
@@ -416,10 +463,18 @@ export const compose_helper = {
 	},
 
 	/**
-	 * appends components to view and newDocumentElements after being fetched by api.js
-	 * @param {object} content
+	 * appends document components to view and newDocumentElements after being fetched by api.js
+	 * @requires MetaCompose, api, Toast
+	 * @param {object} content Assemble syntax
+	 * @event append components
+	 * @event update compose_helper.newDocumentComponents
 	 */
 	importDocument: function (content) {
+		/**
+		 * recursively count identify and signaturepad widgets within components
+		 * @param {domNode} element domNode
+		 * @event update compose_helper.componentIdentify, compose_helper.componentSignature
+		 */
 		function lookupIdentify(element) {
 			for (const container of element) {
 				if (container.constructor.name === "Array") {
@@ -430,6 +485,8 @@ export const compose_helper = {
 				}
 			}
 		}
+
+		// append component and make them draggable
 		for (const component of content) {
 			component.draggable = true;
 			let current = new MetaCompose(component);
@@ -438,13 +495,18 @@ export const compose_helper = {
 			compose_helper.newDocumentElements.add(component.name);
 			lookupIdentify(current.content);
 		}
+
+		// alert on forbidden widget count per document
 		if (compose_helper.componentIdentify > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_identify"), "error");
 		if (compose_helper.componentSignature > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_signature"), "error");
 	},
 
 	/**
 	 * appends text chunks to view and newTextElements after being fetched by api.js
-	 * @param {object} chunks
+	 * @requires Compose
+	 * @param {object} chunks Assemble syntax
+	 * @event append chunks
+	 * @event update compose_helper.newTextElements
 	 */
 	importTextTemplate: function (chunks) {
 		compose_helper.newTextElements = {};
@@ -478,6 +540,12 @@ export const compose_helper = {
 		allowDrop: function (evnt) {
 			evnt.preventDefault();
 		},
+		/**
+		 * displays a context menu (right click) on draggable containers to allow for reordering or deleting event target
+		 * @requires api, Dialog
+		 * @param {event} evnt
+		 * @event append context menu to body
+		 */
 		contextMenu: function (evnt) {
 			evnt.preventDefault();
 			evnt.dataTransfer = new DataTransfer();
@@ -487,6 +555,7 @@ export const compose_helper = {
 				button,
 				target,
 				targetClone;
+
 			// determine target:
 			// target is element
 			if (evnt.target.classList.contains("draggableDocumentElement")) target = evnt.target; // draggable element container
@@ -494,10 +563,13 @@ export const compose_helper = {
 			// target is container
 			else if (["main", "section"].includes(evnt.target.parentNode.localName)) target = evnt.target; // draggable div container
 			else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) target = evnt.target.parentNode; // draggable div container content
+
+			// style context menu and position relative to pointer
 			div.classList.add("contextmenu");
 			div.style.left = evnt.clientX + "px";
 			div.style.top = window.scrollY + evnt.clientY - 10 + "px";
 
+			// add close "button"
 			const img = document.createElement("img");
 			img.classList.add("close");
 			img.src = "./media/times.svg";
@@ -506,11 +578,11 @@ export const compose_helper = {
 			};
 			div.append(img);
 
-			// to top
+			// to top option
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.component.context_2top")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_2top")));
 			button.onpointerup = () => {
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
@@ -521,11 +593,11 @@ export const compose_helper = {
 			};
 			div.append(button);
 
-			// one up
+			// one up option
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.component.context_1up")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_1up")));
 			button.onpointerup = () => {
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
@@ -536,11 +608,11 @@ export const compose_helper = {
 			};
 			div.append(button);
 
-			// one down
+			// one down option
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.component.context_1down")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_1down")));
 			button.onpointerup = () => {
 				if (target.nextElementSibling) {
 					targetClone = target.cloneNode(true);
@@ -551,11 +623,11 @@ export const compose_helper = {
 			};
 			div.append(button);
 
-			// to bottom
+			// to bottom option
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.component.context_2bottom")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_2bottom")));
 			button.onpointerup = () => {
 				targetClone = target.cloneNode(true);
 				target.parentNode.append(targetClone);
@@ -568,12 +640,12 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.component.context_delete")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_delete")));
 			let options = {};
 			(options[api._lang.GET("general.cancel_button")] = false),
 				(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
 				(button.onpointerup = () => {
-					new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.component.context_delete"), options: options }).then((confirmation) => {
+					new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose_context_delete"), options: options }).then((confirmation) => {
 						if (confirmation) {
 							compose_helper.dragNdrop.drop_delete(evnt);
 						}
@@ -581,15 +653,22 @@ export const compose_helper = {
 					});
 				});
 			div.append(button);
+
+			// append context menu
 			document.querySelector("body").append(div);
 			return false;
 		},
+
 		drag: function (evnt) {
 			evnt.dataTransfer.setData("text", evnt.target.id);
 			this.stopParentDropEvent = false;
 		},
 		/**
 		 * inserts widgets or section before dropped upon widget or section
+		 * @param {event} evnt
+		 * @param {domNode} droppedUpon node
+		 * @param {bool} allowSections if a dropped element is allowed to create a slider. only allowed for component editor, not documents or textrecommendations
+		 * @event insert dragged element clone, reorder and propapbly nest nodes and delete original
 		 */
 		drop_insert: function (evnt, droppedUpon, allowSections) {
 			evnt.preventDefault();
@@ -601,9 +680,9 @@ export const compose_helper = {
 			//console.log('dragged', draggedElement.id, 'dropped on', droppedUpon.id, 'target', evnt.target);
 			if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
 
-			// dragging single element
+			// dragging single widget
 			if (draggedElement.classList.contains("draggableDocumentElement")) {
-				// dropping on single element
+				// dropping on single widget
 				if (droppedUpon.classList.contains("draggableDocumentElement")) {
 					droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
 				}
@@ -625,7 +704,7 @@ export const compose_helper = {
 				else return;
 				// dropping on self or own container
 				this.stopParentDropEvent = true;
-				// sanitize article on lack of elements
+				// sanitize article on lack of elements if dragged out of article or section
 				if (originParent.children.length < 2) {
 					originParent.parentNode.remove(); // adapt to changes in section creation!
 				}
@@ -661,7 +740,7 @@ export const compose_helper = {
 				!droppedUpon.classList.contains("draggableDocumentElement")
 			) {
 				// avoid recursive multiples
-				// create a multiple article tile if dropped on a tile
+				// create a multiple article tile if dropped on a tile (slider)
 				let container = document.createElement("div"),
 					article = document.createElement("article"),
 					section = document.createElement("section"),
@@ -684,16 +763,25 @@ export const compose_helper = {
 			}
 		},
 		/**
-		 * deletes widget or section if dropped on deletion area
+		 * deletes widget or section if dropped on deletion area or confirmed context menu deletion
+		 * @param {event} evnt
+		 * @event removes event target
+		 * @event updates compose_helper.componentIdentify and compose_helper.componentSignature count
 		 */
 		drop_delete: function (evnt) {
 			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text")),
 				originParent = draggedElement.parentNode;
+
 			// sanitize article on lack of elements
 			if (originParent.parentNode != document.getElementById("main") && originParent.children.length < 2) {
 				originParent.parentNode.remove(); // adapt to changes in section creation!
 			}
-			// enable identifier if previously constructed had been deleted
+
+			/**
+			 * recursively count deleted identifiers or signaturepads within component/document to eventually reenable adding
+			 * @param {domNode} parent domNode
+			 * @event updates compose_helper.componentIdentify and compose_helper.componentSignature count
+			 */
 			function nodechildren(parent) {
 				[...parent.childNodes].forEach((node) => {
 					if (["article", "div"].includes(node.localName)) {
@@ -718,8 +806,12 @@ export const compose_helper = {
 			nodechildren(draggedElement);
 			draggedElement.remove();
 		},
+
 		/**
 		 * populates the respective components editor forms with widgets settings
+		 * @param {event} evnt event
+		 * @event populate components editor form with values
+		 * @see compose_helper.composeNewElementCallback()
 		 */
 		drop_reimport: function (evnt) {
 			// this doesn't make sense for some types but idc. actually impossible for image type, so this is a exit case
@@ -727,6 +819,7 @@ export const compose_helper = {
 			let targetform = evnt.target;
 			if (targetform.constructor.name !== "HTMLFormElement") targetform = targetform.parentNode;
 			const targettype = targetform.children[1].dataset.type;
+
 			if (Object.keys(compose_helper.newFormComponents).includes(draggedElement.id)) {
 				const importable = compose_helper.newFormComponents[draggedElement.id];
 
@@ -804,6 +897,13 @@ export const compose_helper = {
 		},
 	},
 
+	/**
+	 * make an element draggable (widget, component, textchunk)
+	 * @param {domNode} element to make draggable
+	 * @param {bool} insertionArea for articles to have a hr handle to insert other element before the article
+	 * @param {bool} allowSections if a dropped element is allowed to create a slider. only allowed for component editor, not documents or textrecommendations
+	 * @returns {domNode} altered element
+	 */
 	create_draggable: function (element, insertionArea = true, allowSections = true) {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
@@ -821,11 +921,23 @@ export const compose_helper = {
 		}
 		return element;
 	},
+
+	/**
+	 * adds drop event to delete dragged upon nodes
+	 * @param {domNode} element to make a trash area for deletion
+	 * @event add events
+	 */
 	composer_add_trash: function (element) {
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
 		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
 		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_delete(event)");
 	},
+
+	/**
+	 * adds drop event for reimport to widget creation forms
+	 * @param {domNode} element to allow reimport event
+	 * @event add events
+	 */
 	composer_component_document_reimportable: function (element) {
 		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
 		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
@@ -834,6 +946,12 @@ export const compose_helper = {
 };
 
 export class Compose extends Assemble {
+	/**
+	 * creates composer specific forms for widget and document creation
+	 * @requires api, Assemble
+	 * @param {object} setup Assemble syntax
+	 * @see Assemble
+	 */
 	constructor(setup) {
 		super(setup);
 		this.composer = this.createDraggable = setup.draggable;
@@ -841,25 +959,34 @@ export class Compose extends Assemble {
 		this.generatedElementIDs = [];
 	}
 
+	/**
+	 * OVERRIDING PARENT METHOD for specific use
+	 * recursively processes one panel, with slides if nested accordingly and instatiates the contained widget elements
+	 * @param {array|object} elements render instructions for single panel
+	 * @returns {domNodes}
+	 *
+	 * @example content to exist of three nestings
+	 * ```json
+	 * 	[ panel article>section
+	 * 		[ slide article
+	 * 			{ element },
+	 * 			{ element }
+	 * 		],
+	 * 		[ slide article
+	 * 			...
+	 * 		],
+	 * 	],
+	 * ```
+	 * @example or two nestings
+	 * ```json
+	 *
+	 * 	[ panel article
+	 * 		{ element },
+	 * 		{ element }
+	 * 	]
+	 * ```
+	 */
 	processPanel(elements) {
-		// overriding parent method
-		/**
-		 * content to exist of three nestings
-		 * [ panel article>section
-		 * 		[ slide article
-		 * 			{ element },
-		 * 			{ element }
-		 * 		],
-		 * 		[ slide article
-		 *		...],
-		 * ],
-		 *
-		 * or two nestings
-		 * [ panel article
-		 * 		{ element },
-		 * 		{ element }
-		 * ]
-		 */
 		let content = [],
 			widget;
 		if (elements.constructor.name === "Array") {
@@ -927,6 +1054,11 @@ export class Compose extends Assemble {
 		return content;
 	}
 
+	/**
+	 * OVERRIDING PARENT METHOD for having to add draggable containers
+	 * iterates over this.content and gathers panels
+	 * @returns {domNodes} all assembled panels
+	 */
 	processContent() {
 		let assembledPanels = new Set();
 		this.content.forEach((panel) => {
@@ -967,6 +1099,15 @@ export class Compose extends Assemble {
 	 *
 	 */
 
+	/**
+	 * creates editor to add a calendar button
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_calendarbutton"
+	 * 	}
+	 */
 	compose_calendarbutton() {
 		let result = [...this.br()];
 		this.currentElement = {
@@ -988,6 +1129,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add a checkbox list
+	 * @see this.compose_multilist()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_checkbox"
+	 * 	}
+	 */
 	compose_checkbox() {
 		return this.compose_multilist({
 			type: "checkbox",
@@ -995,6 +1145,28 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates the input elements to general settings to a whole component or document
+	 * @param {object} std available options and presets
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_component",
+	 * 		"value": "A cool component name",
+	 * 		"hint": "something cool about this component",
+	 * 		"hidden": null,
+	 * 		"approve": {
+	 * 			"hint": "please approve of this component",
+	 * 			"name": "component approval",
+	 * 			"content": {
+	 * 				"organizational unit 1": [],
+	 * 				"organizational unit 2": [],
+	 * 				"organizational unit 3": [],
+	 * 			},
+	 * 		}
+	 * 	}
+	 */
 	compose_component(
 		std = {
 			name: api._lang.GET("assemble.compose.component.component_name"),
@@ -1026,6 +1198,8 @@ export class Compose extends Assemble {
 			regulatory_context = this.currentElement.regulatory_context,
 			permitted_export = this.currentElement.permitted_export,
 			restricted_access = this.currentElement.restricted_access;
+
+		// input for component / document name
 		this.currentElement = {
 			type: "text",
 			hint: this.currentElement.hint,
@@ -1038,6 +1212,8 @@ export class Compose extends Assemble {
 			},
 		};
 		result = result.concat(...this.text());
+
+		// input for document alias
 		if (alias) {
 			this.currentElement = {
 				type: "text",
@@ -1051,6 +1227,8 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.text());
 		}
+
+		// input for document context
 		if (context) {
 			this.currentElement = {
 				type: "select",
@@ -1064,6 +1242,8 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.select());
 		}
+
+		// toggle for document permitted export
 		if (permitted_export) {
 			permitted_export.content[Object.keys(permitted_export.content)[0]]["id"] = "ComponentPermittedExport";
 			this.currentElement = {
@@ -1073,6 +1253,8 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.checkbox());
 		}
+
+		// input for documents restricted access
 		if (restricted_access) {
 			this.currentElement = {
 				type: "checkbox2text",
@@ -1085,6 +1267,8 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.checkbox2text());
 		}
+
+		// input for documents rgulatory context
 		if (regulatory_context) {
 			this.currentElement = {
 				type: "checkbox2text",
@@ -1096,6 +1280,8 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.checkbox2text());
 		}
+
+		// selection for approval of units supervisor beside other set permissions
 		if (approve) {
 			this.currentElement = {
 				type: "select",
@@ -1109,6 +1295,8 @@ export class Compose extends Assemble {
 			};
 			result = result.concat(...this.select());
 		}
+
+		// prefilling all inputs from selected component / document
 		if (prefilled) {
 			const options = {};
 			options[api._lang.GET("assemble.edit_visible")] = !(hidden && Object.keys(hidden).length)
@@ -1116,20 +1304,22 @@ export class Compose extends Assemble {
 						checked: true,
 				  }
 				: {};
-			options[api._lang.GET("assemble.edit_hidden")] = (hidden && Object.keys(hidden).length)
-				? {
-						checked: true,
-						"data-hiddenradio": "ComponentHidden",
-				  }
-				: {
-						"data-hiddenradio": "ComponentHidden",
-				  };
+			options[api._lang.GET("assemble.edit_hidden")] =
+				hidden && Object.keys(hidden).length
+					? {
+							checked: true,
+							"data-hiddenradio": "ComponentHidden",
+					  }
+					: {
+							"data-hiddenradio": "ComponentHidden",
+					  };
 			this.currentElement = {
 				type: "radio",
 				hint:
 					std.hidden.hint +
-					((hidden && Object.keys(hidden).length)
-						? " " + api._lang.GET("assemble.edit_hidden_set", {
+					(hidden && Object.keys(hidden).length
+						? " " +
+						  api._lang.GET("assemble.edit_hidden_set", {
 								":name": hidden.name,
 								":date": hidden.date,
 						  })
@@ -1152,6 +1342,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add a date input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_date"
+	 * 	}
+	 */
 	compose_date() {
 		return this.compose_input({
 			type: "date",
@@ -1159,6 +1358,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add an email input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_email"
+	 * 	}
+	 */
 	compose_email() {
 		return this.compose_input({
 			type: "email",
@@ -1166,6 +1374,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a file input
+	 * @see this.compose_simpleElement()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_file"
+	 * 	}
+	 */
 	compose_file() {
 		return this.compose_simpleElement({
 			type: "file",
@@ -1174,6 +1391,58 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates the input elements to general settings to a whole document
+	 * @see this.compose_component()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_document",
+	 * 		"value": "A cool document name",
+	 * 		"alias": "fancy form definition",
+	 * 		"context": {
+	 * 			"name": "select context",
+	 * 			"content" : {
+	 * 				"...": [],
+	 * 				"casedocumentation": [],
+	 * 				"incident": [],
+	 * 				...
+	 * 			}
+	 * 		},
+	 * 		"hint": "something cool about this document",
+	 * 		"hidden": null,
+	 * 		"approve": {
+	 * 			"hint": "please approve of this component",
+	 * 			"name": "component approval",
+	 * 			"content": {
+	 * 				"organizational unit 1": [],
+	 * 				"organizational unit 2": [],
+	 * 				"organizational unit 3": [],
+	 * 			},
+	 * 		},
+	 * 		"regulatory_context": {
+	 * 			"iso 1": [],
+	 * 			"iso 2": [],
+	 * 			...
+	 * 		},
+	 * 		"permitted_export": {
+	 * 			"hint": "please take into account that...",
+	 * 			"content": {
+	 * 				"export permitted": []
+	 * 			}
+	 * 		},
+	 * 		"restricted_access": {
+	 * 			"description": "not everybody to use this",
+	 * 			"hint": "please take into account that...",
+	 * 			"content": {
+	 * 				"permission group a": [],
+	 * 				"permission group b": [],
+	 * 				"permission group c": [],
+	 * 				...
+	 * 			}
+	 * 		}
+	 * 	}
+	 */
 	compose_document() {
 		return this.compose_component({
 			name: api._lang.GET("assemble.compose.document.document_label"),
@@ -1197,9 +1466,24 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a document access button
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_documentbutton"
+	 * 		"content": {
+	 * 			"Document A": [],
+	 * 			"Document B": [],
+	 * 			"Process Instruction": [],
+	 * 			...
+	 * 		}
+	 * 	}
+	 */
 	compose_documentbutton() {
 		let result = [...this.br()],
-		document = this.currentElement.content;
+			document = this.currentElement.content;
 
 		this.currentElement = {
 			type: "textsection",
@@ -1242,6 +1526,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add an image to a conponent
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_image"
+	 * 	}
+	 */
 	compose_image() {
 		let result = [];
 		this.currentElement = {
@@ -1268,6 +1561,11 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add inputs like text, number, date, etc.
+	 * @param {object} type {type: string, description: string, multiple: bool}
+	 * @returns {domNodes}
+	 */
 	compose_input(type) {
 		let result = [];
 		this.currentElement = {
@@ -1310,6 +1608,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add a link input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_link"
+	 * 	}
+	 */
 	compose_link() {
 		return this.compose_input({
 			type: "link",
@@ -1318,6 +1625,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a checkbox list
+	 * @see this.compose_multilist()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_multilist"
+	 * 	}
+	 */
 	compose_links() {
 		return this.compose_multilist({
 			type: "links",
@@ -1325,6 +1641,11 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add multiple items like link lists, checkboxes, selections, etc.
+	 * @param {object} type {type: string, description: string, multiple: bool, required: bool}
+	 * @returns {domNodes}
+	 */
 	compose_multilist(type) {
 		let result = [];
 		this.currentElement = {
@@ -1350,7 +1671,7 @@ export class Compose extends Assemble {
 				required: true,
 			},
 		};
-		if (type.type==="links") result = result.concat(...this.text());
+		if (type.type === "links") result = result.concat(...this.text());
 		else result = result.concat(...this.textarea());
 		this.currentElement = {
 			attributes: {
@@ -1388,6 +1709,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add a number input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_number"
+	 * 	}
+	 */
 	compose_number() {
 		return this.compose_input({
 			type: "number",
@@ -1396,6 +1726,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a photo input
+	 * @see this.compose_simpleElement()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_photo"
+	 * 	}
+	 */
 	compose_photo() {
 		return this.compose_simpleElement({
 			type: "photo",
@@ -1404,6 +1743,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a product selection input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_productselection"
+	 * 	}
+	 */
 	compose_productselection() {
 		return this.compose_input({
 			type: "productselection",
@@ -1412,6 +1760,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a radio input list
+	 * @see this.compose_multilist()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_radio"
+	 * 	}
+	 */
 	compose_radio() {
 		return this.compose_multilist({
 			type: "radio",
@@ -1420,6 +1777,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a range input
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_range"
+	 * 	}
+	 */
 	compose_range() {
 		let result = [];
 		this.currentElement = {
@@ -1472,6 +1838,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add or retrieve components from or to json Assemble syntax
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_raw"
+	 * 	}
+	 */
 	compose_raw() {
 		let result = [];
 		this.currentElement = {
@@ -1513,6 +1888,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add a scanner
+	 * @see this.compose_simpleElement()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_scanner"
+	 * 	}
+	 */
 	compose_scanner() {
 		return this.compose_simpleElement({
 			type: "scanner",
@@ -1521,6 +1905,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a select list
+	 * @see this.compose_multilist()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_select"
+	 * 	}
+	 */
 	compose_select() {
 		return this.compose_multilist({
 			type: "select",
@@ -1530,6 +1923,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a signature pad
+	 * @see this.compose_simpleElement()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_signature"
+	 * 	}
+	 */
 	compose_signature() {
 		return this.compose_simpleElement({
 			type: "signature",
@@ -1539,6 +1941,11 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add simple items like scanner, signature pad, etc.
+	 * @param {object} type {type: string, hint: string, multiple: bool, required: bool}
+	 * @returns {domNodes}
+	 */
 	compose_simpleElement(type) {
 		let result = [];
 		this.currentElement = {
@@ -1594,6 +2001,15 @@ export class Compose extends Assemble {
 		return result;
 	}
 
+	/**
+	 * creates editor to add a tel input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_tel"
+	 * 	}
+	 */
 	compose_tel() {
 		return this.compose_input({
 			type: "tel",
@@ -1602,6 +2018,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a text input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_text"
+	 * 	}
+	 */
 	compose_text() {
 		return this.compose_input({
 			type: "text",
@@ -1610,6 +2035,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a textarea input
+	 * @see this.compose_input()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_textarea"
+	 * 	}
+	 */
 	compose_textarea() {
 		return this.compose_input({
 			type: "textarea",
@@ -1617,6 +2051,15 @@ export class Compose extends Assemble {
 		});
 	}
 
+	/**
+	 * creates editor to add a textsection
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_textsection"
+	 * 	}
+	 */
 	compose_textsection() {
 		let result = [];
 		this.currentElement = {
@@ -1647,11 +2090,20 @@ export class Compose extends Assemble {
 }
 
 export class MetaCompose extends Assemble {
+	/**
+	 * creates composer specific forms for document creation
+	 * @requires api, Assemble
+	 * @param {object} setup Assemble syntax
+	 * @see Assemble
+	 */
 	constructor(setup) {
 		delete setup.form;
 		super(setup);
 		this.setup = setup;
 	}
+	/**
+	 * makes assembled and inserted elements draggable and assigns names to container
+	 */
 	processAfterInsertion2() {
 		this.processAfterInsertion();
 		if (this.setup.draggable) compose_helper.create_draggable(this.section, true, false);
