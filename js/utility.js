@@ -20,6 +20,12 @@ const _serviceWorker = {
 	worker: null,
 	permission: null,
 	notif: {
+		/**
+		 * updates styleable data-for=userMenu for calendar menu
+		 * @requires api
+		 * @param {object} data containing calendar_uncompletedevents
+		 * @event sets querySelector attribute data-notification
+		 */
 		calendar_uncompletedevents: function (data) {
 			let notif;
 			if ("calendar_uncompletedevents" in data) {
@@ -29,6 +35,13 @@ const _serviceWorker = {
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			}
 		},
+
+		/**
+		 * updates styleable data-for=userMenu for records menu
+		 * @requires api
+		 * @param {object} data containing document_approval
+		 * @event sets querySelector attribute data-notification
+		 */
 		document_approval: function (data) {
 			let notif;
 			if ("document_approval" in data) {
@@ -38,7 +51,15 @@ const _serviceWorker = {
 				if (notif) notif.setAttribute("data-notification", data.document_approval);
 			}
 		},
+
 		interval: null,
+
+		/**
+		 * updates styleable data-for=userMenu for communication menu
+		 * @requires api
+		 * @param {object} data containing message_unseen
+		 * @event sets querySelector attribute data-notification
+		 */
 		message_unseen: function (data) {
 			if ("message_unseen" in data) {
 				let notif;
@@ -48,6 +69,13 @@ const _serviceWorker = {
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			}
 		},
+
+		/**
+		 * updates styleable data-for=userMenu for purchase menu
+		 * @requires api
+		 * @param {object} data containing order_prepared, order_unprocessed, consumables_pendingincorporation
+		 * @event sets querySelector attribute data-notification
+		 */
 		order_unprocessed_consumables_pendingincorporation: function (data) {
 			let notif;
 			if ("order_prepared" in data || "order_unprocessed" in data || "consumables_pendingincorporation" in data) {
@@ -74,6 +102,13 @@ const _serviceWorker = {
 			}
 		},
 	},
+
+	/**
+	 * shows notification on new messages and updates data-for data-notification
+	 * @requires api
+	 * @param {string} message containing message_unnotified and others
+	 * @event shows notification and updates notifs data-for data-notification
+	 */
 	onMessage: function (message) {
 		const data = message.data;
 		if (!Object.keys(data).length) {
@@ -97,15 +132,31 @@ const _serviceWorker = {
 		this.notif.calendar_uncompletedevents(data);
 		this.notif.document_approval(data);
 	},
+
+	/**
+	 * disables submit buttons if post and put queries have to be stored due to connectivity loss
+	 * @event disables submit buttons
+	 */
 	onPostCache: function () {
 		const buttons = document.querySelectorAll("[type=submit]");
 		for (const element of buttons) {
 			element.disabled = true;
 		}
 	},
+
+	/**
+	 * triggers serviceWorkers message event listener - possible future use
+	 * @param {string} message serviceWorker request
+	 *
+	 */
 	postMessage: function (message) {
 		this.worker.active.postMessage(message);
 	},
+
+	/**
+	 * register the serviceWorker
+	 * @event serviceWorker registration
+	 */
 	register: async function () {
 		if ("serviceWorker" in navigator) {
 			this.worker = await navigator.serviceWorker.register("./service-worker.js");
@@ -122,6 +173,11 @@ const _serviceWorker = {
 			});
 		} else throw new Error("No Service Worker support!");
 	},
+
+	/**
+	 * request permission to send notifications
+	 * @event request permission
+	 */
 	requestNotificationPermission: async function () {
 		const permission = await window.Notification.requestPermission();
 		// value of permission can be 'granted', 'default', 'denied'
@@ -132,6 +188,13 @@ const _serviceWorker = {
 			throw new Error("Permission not granted for Notification");
 		}
 	},
+
+	/**
+	 * show system notification
+	 * @param {string} title
+	 * @param {string} body
+	 * @event show system notification
+	 */
 	showLocalNotification: function (title, body) {
 		const options = {
 			body: body,
@@ -144,12 +207,23 @@ const _serviceWorker = {
 
 const _client = {
 	application: {
+		/**
+		 * hide menu on touch event outside of menu
+		 * @param {event} event => void
+		 */
 		clearMenu: (event) => {
 			const inputs = document.getElementsByName("userMenu");
 			for (const input of inputs) {
 				input.checked = false;
 			}
 		},
+
+		/**
+		 * converts an object to formdata
+		 * @requires _
+		 * @param {object} dialogData
+		 * @returns {object} FormData
+		 */
 		dialogToFormdata: (dialogData = {}) => {
 			let formdata;
 			if (!Object.keys(dialogData).length) {
@@ -163,6 +237,15 @@ const _client = {
 			}
 			return formdata;
 		},
+
+		/**
+		 * requests
+		 * @requires api
+		 * @param {string} value
+		 * @param {bool} appendDate
+		 * @param {object} othervalues {_type: string} for label size options passed from server-CONFIG
+		 * @event post request
+		 */
 		postLabelSheet: (value, appendDate = null, othervalues = {}) => {
 			const formdata = new FormData();
 			formdata.append(api._lang.GET("record.create_identifier"), value);
@@ -171,6 +254,13 @@ const _client = {
 			}
 			api.record("post", "identifier", appendDate, formdata);
 		},
+
+		/**
+		 * copies value of inputs or content of paragraphs to clipboard
+		 * @requires api, Toast
+		 * @param {domNode} node
+		 * @event navigator.clipboard.writeText()
+		 */
 		toClipboard: (node) => {
 			if (["HTMLInputElement", "HTMLTextAreaElement"].includes(node.constructor.name)) {
 				node.select();
@@ -180,6 +270,12 @@ const _client = {
 			} else navigator.clipboard.writeText(node); // passed string
 			new Toast(api._lang.GET("general.copied_to_clipboard"), "info");
 		},
+
+		/**
+		 * toggles application to fullscreen
+		 * @event fullscreen toggle
+		 * @event icon update
+		 */
 		toggleFullScreen: () => {
 			let image,
 				imageelement = document.querySelector("header>div:nth-of-type(1)");
@@ -194,6 +290,11 @@ const _client = {
 		},
 	},
 	calendar: {
+		/**
+		 * creates FormData from a calendar form for new events
+		 * @requires api
+		 * @param {object} data Dialog response
+		 */
 		createFormData: (data) => {
 			window.calendarFormData = new FormData();
 			units = [];
@@ -203,11 +304,13 @@ const _client = {
 			}
 			if (units.length) window.calendarFormData.append(api._lang.GET("calendar.schedule.organizational_unit"), units.join(","));
 		},
+
+		/**
+		 * toggles inputs visibility on conditional request
+		 * @param {string} names json stringified {'input name' : required bool}
+		 * @param {bool} display
+		 */
 		setFieldVisibilityByNames: (names = "", display = true) => {
-			/**
-			 * @param string names json stringified {'input name' : required bool}
-			 * @param bool display
-			 */
 			names = JSON.parse(names);
 			let fields;
 			for (const [name, required] of Object.entries(names)) {
@@ -236,13 +339,23 @@ const _client = {
 		},
 	},
 	message: {
+		/**
+		 * returns a message modal dialog
+		 * @requires api, Dialog
+		 * @param {string} dialogheader optional
+		 * @param {string} recipient optional preset
+		 * @param {string} message optional preset
+		 * @param {object} options send, abort
+		 * @param {string, array} datalist possible recipients
+		 * @event Dialog and eventually resolved post request
+		 */
 		newMessage: (dialogheader = "", recipient = "", message = "", options = {}, datalist = []) => {
-			//returns a message modal dialog
 			if (!Object.keys(options)) {
 				options[api._lang.GET("order.add_information_cancel")] = false;
 				options[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
 			}
 
+			// add required fields
 			const body = [
 				{
 					type: "hidden",
@@ -260,6 +373,8 @@ const _client = {
 					},
 				},
 			];
+
+			// add datalist and set recipient type to text instead of hidden
 			if (datalist.length) {
 				if (typeof datalist === "string") datalist = datalist.split(",");
 				body[0].type = "text";
@@ -272,6 +387,8 @@ const _client = {
 					},
 				});
 			}
+
+			// fire dialog, resolve with post request
 			new Dialog({
 				type: "input",
 				header: dialogheader,
@@ -288,9 +405,15 @@ const _client = {
 		},
 	},
 	order: {
+		/**
+		 * insert nodes with product data
+		 * order to be taken into account in order.php "productsearch" method as well!
+		 * cart-content has a twin within order.php "order"-get method
+		 * @requires api, Assemble
+		 * @param  {...any} data
+		 * @event insert domNodes
+		 */
 		addProduct: (...data) => {
-			// order to be taken into account in order.php "productsearch" method as well!
-			// cart-content has a twin within order.php "order"-get method
 			if ([...data].length < 6) data = ["", ...data];
 			else data = [...data];
 			const autidem = {};
@@ -376,6 +499,13 @@ const _client = {
 				};
 			new Assemble(cart).initializeSection(nodes[nodes.length - 3]);
 		},
+
+		/**
+		 * render approved orders on the client side to reduce payload for transmission from the server side
+		 * @requires api, _client Dialog, Assemble
+		 * @param {object} data containing data-array, approval-array
+		 * @event inserts domNodes
+		 */
 		approved: (data = undefined) => {
 			if (!data) return;
 			let content = [],
@@ -385,6 +515,8 @@ const _client = {
 				buttons = {},
 				links = {},
 				labels = [];
+
+			// construct filter checkboxes with events
 			filter[api._lang.GET("order.order.unprocessed")] = { checked: true, onchange: "_client.order.filter()" };
 			filter[api._lang.GET("order.order.ordered")] = { onchange: '_client.order.filter("ordered")' };
 			filter[api._lang.GET("order.order.partially_received")] = { onchange: '_client.order.filter("partially_received")' };
@@ -392,7 +524,6 @@ const _client = {
 			filter[api._lang.GET("order.order.partially_delivered")] = { onchange: '_client.order.filter("partially_delivered")' };
 			filter[api._lang.GET("order.order.delivered")] = { onchange: '_client.order.filter("delivered")' };
 			filter[api._lang.GET("order.order.archived")] = { onchange: '_client.order.filter("archived")' };
-
 			content.push([
 				{
 					type: "radio",
@@ -411,6 +542,8 @@ const _client = {
 					},
 				},
 			]);
+
+			// iterate over orders and construct Assemble syntax
 			for (const element of data.order) {
 				// reinstatiate with order id for filtering
 				collapsible = [{ type: "hidden", description: "filter", attributes: { "data-filtered": element.id } }];
@@ -434,7 +567,7 @@ const _client = {
 					},
 				});
 
-				// display approval signature
+				// display approval signature, reuse approval signatures if applicable from frugal provided approval array
 				if (element.approval != null)
 					collapsible.push({
 						type: "image",
@@ -464,7 +597,7 @@ const _client = {
 							},
 						});
 					}
-
+					// copy- and label-option
 					collapsible.push({
 						type: "text_copy",
 						attributes: {
@@ -499,16 +632,17 @@ const _client = {
 						},
 						hint: api._lang.GET("order.copy_or_labelsheet"),
 					});
+
+					// display qrcode
+					collapsible.push({
+						type: "image",
+						attributes: {
+							imageonly: {},
+							qrcode: element.commission,
+							class: "order2dcode",
+						},
+					});
 				}
-				// display qrcode
-				collapsible.push({
-					type: "image",
-					attributes: {
-						imageonly: {},
-						qrcode: element.commission,
-						class: "order2dcode",
-					},
-				});
 
 				collapsible.push({
 					type: "br",
@@ -519,6 +653,8 @@ const _client = {
 					buttons = {};
 					buttons[api._lang.GET("general.ok_button")] = true;
 					labels = [];
+
+					// construct label options
 					if (api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true") {
 						labels = [
 							{
@@ -565,6 +701,7 @@ const _client = {
 						}
 					}
 
+					// copy- and label-option
 					collapsible.push({
 						type: "text_copy",
 						attributes: {
@@ -604,7 +741,7 @@ const _client = {
 						hint: api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true" ? api._lang.GET("order.copy_or_labelsheet") : api._lang.GET("order.copy_value"),
 					});
 
-					// display barcode
+					// display barcode or qr-code
 					if (element.barcode && Boolean(Number(api._settings.config.application.order_gtin_barcode)))
 						collapsible.push({
 							type: "image",
@@ -690,15 +827,17 @@ const _client = {
 							_client.message.newMessage(
 								api._lang.GET("order.message_orderer", { ":orderer": "element.orderer" }),
 								"element.orderer",
-								api._lang.GET("order.message", {
-									":quantity": "element.quantity",
-									":unit": "element.unit",
-									":number": "element.ordernumber",
-									":name": "element.name",
-									":vendor": "element.vendor",
-									":info": "element.information" || "",
-									":commission": "element.commission",
-								}).replace("\\n", "\n"),
+								api._lang
+									.GET("order.message", {
+										":quantity": "element.quantity",
+										":unit": "element.unit",
+										":number": "element.ordernumber",
+										":name": "element.name",
+										":vendor": "element.vendor",
+										":info": "element.information" || "",
+										":commission": "element.commission",
+									})
+									.replace("\\n", "\n"),
 								buttons
 							);
 						}
@@ -746,7 +885,8 @@ const _client = {
 					});
 				}
 
-				// append state
+				// append states
+				// assemble state toggles
 				let states = {};
 				for (const [state, attributes] of Object.entries(element.state)) {
 					states[api._lang.GET("order.order." + state)] = {};
@@ -755,6 +895,7 @@ const _client = {
 					if (!attributes.disabled && !states[api._lang.GET("order.order." + state)].onchange)
 						states[api._lang.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
+				// conditional customizing
 				if (states[api._lang.GET("order.order.partially_received")] && !states[api._lang.GET("order.order.partially_received")].disabled) {
 					buttons = {};
 					buttons[api._lang.GET("order.add_information_cancel")] = false;
@@ -783,6 +924,7 @@ const _client = {
 						.toString()
 						._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]);
 				}
+				// conditional customizing
 				if (element.disapprove && element.organizationalunit) {
 					buttons = {};
 					buttons[api._lang.GET("order.disapprove_message_cancel")] = false;
@@ -815,6 +957,7 @@ const _client = {
 							._replaceArray(["element.organizationalunit", "element.id", "buttons"], [element.organizationalunit, element.id, JSON.stringify(buttons)]),
 					};
 				}
+				// conditional customizing
 				if (element.cancel) {
 					buttons = {};
 					buttons[api._lang.GET("order.cancellation_message_cancel")] = false;
@@ -847,6 +990,7 @@ const _client = {
 							._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
 					};
 				}
+				// conditional customizing
 				if (element.return) {
 					buttons = {};
 					buttons[api._lang.GET("order.return_message_cancel")] = false;
@@ -946,7 +1090,7 @@ const _client = {
 					});
 				}
 
-				// create order
+				// create order container
 				order = [
 					{
 						type: "collapsible",
@@ -995,7 +1139,7 @@ const _client = {
 							},
 						});
 				}
-				// append sample check state
+				// append options to add product to database
 				if (element.addproduct) {
 					order.push({
 						type: "button",
@@ -1020,6 +1164,12 @@ const _client = {
 			document.getElementById("main").replaceChildren(render.initializeSection());
 			render.processAfterInsertion();
 		},
+
+		/**
+		 * filter orders by order processing state
+		 * @param {string} type to display, hide all others
+		 * @event hiding or displaying approved orders
+		 */
 		filter: (type = undefined) => {
 			document.querySelectorAll("[data-ordered]").forEach((article) => {
 				article.parentNode.parentNode.style.display = "none";
@@ -1054,6 +1204,13 @@ const _client = {
 				if (article) article.style.display = "block";
 			});
 		},
+
+		/**
+		 * handles Dialog form data for incorporation and posts results
+		 * @param {object} formdata from Dialog
+		 * @param {int} productid
+		 * @event create FormData and submit post request
+		 */
 		performIncorporation: (formdata, productid) => {
 			const check = [],
 				submit = new FormData();
@@ -1069,6 +1226,13 @@ const _client = {
 				api.purchase("post", "incorporation", productid, submit);
 			} else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 		},
+
+		/**
+		 * handles Dialog form data for sample checks and posts results
+		 * @param {object} formdata from Dialog
+		 * @param {int} productid
+		 * @event create FormData and submit post request
+		 */
 		performSampleCheck: (formdata, productid) => {
 			const check = [];
 			for (const [key, value] of Object.entries(formdata)) {
@@ -1084,6 +1248,11 @@ const _client = {
 		},
 	},
 	record: {
+		/**
+		 * filter records by case state
+		 * @param {string} casestate to display, hide all others
+		 * @event hiding or displaying records
+		 */
 		casestatefilter: (casestate) => {
 			document.querySelectorAll("article>a").forEach((anchor) => {
 				anchor.style.display = casestate ? "none" : "block";
@@ -1096,6 +1265,11 @@ const _client = {
 	},
 	texttemplate: {
 		data: null,
+		/**
+		 * update a texttemplate with provided placeholders and selected chunks
+		 * @requires api
+		 * @event update output container value
+		 */
 		update: () => {
 			const replacements = {},
 				genii = document.getElementsByName(api._lang.GET("texttemplate.use.person")),
@@ -1127,6 +1301,11 @@ const _client = {
 			}
 			document.getElementById("texttemplate").value = output;
 		},
+		/**
+		 * import placeholders for use within texttemplates as selected during use. currently used within consumables.php for transmission of vendor data to purchase specific text recommendations
+		 * @param {string} elements json.stringified object with key: value pairs
+		 * @event updates inputs with provided element values
+		 */
 		import: (elements = "") => {
 			try {
 				elements = JSON.parse(elements);
@@ -1146,6 +1325,11 @@ const _client = {
 	},
 	tool: {
 		stlviewer: null,
+		/**
+		 * init stl viewer with selected file
+		 * @param {string} file
+		 * @event stl viewer initialisation
+		 */
 		initStlViewer: function (file) {
 			if (file === "../null") return;
 			const canvas = document.getElementById("stlviewer_canvas");
@@ -1162,12 +1346,12 @@ const _client = {
 	},
 };
 
-// scroll indicator
+// scroll indicator for vertical distance
 window.addEventListener("scroll", function () {
 	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
 	document.querySelector("header>div:last-of-type").style.width = percentScrolled + "%";
 });
-// menu clearing
+// menu clearing event listener
 window.addEventListener("pointerup", _client.application.clearMenu);
 
 // add useragent to html tag to apply specific css attributes
