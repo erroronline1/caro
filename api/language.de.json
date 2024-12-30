@@ -211,7 +211,7 @@
 				"field_hint": "Optionale Hinweise",
 				"required": "erforderlich",
 				"texttemplate": "ergänze Schaltfläche um Textvorschläge zu nutzen",
-				"multiple": "mehrfachauswahl",
+				"multiple": "Mehrfachauswahl",
 				"context_identify": "Identifikator",
 				"missing_identifier": "In diesem Zusammenhang wird ein Identifikationfeld benötigt. Bitte ergänze eine Komponente mit einem Identifikator!",
 				"text": "Füge ein einfaches Textfeld hinzu",
