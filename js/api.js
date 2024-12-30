@@ -72,6 +72,7 @@ export const api = {
 			return true;
 		},
 	},
+
 	/**
 	 *                 _
 	 *   ___ ___ ___ _| |
@@ -142,7 +143,7 @@ export const api = {
 	 *  | | . | .'| . | |   | . | |  _| .'|  _| . |  _|
 	 *  |_|___|__,|___|_|_|_|___|_|___|__,|_| |___|_|
 	 *
-	 * ui feedback on accuring requests that are expected to take longer
+	 * ui feedback on occuring requests that are expected to take longer
 	 * @param {any} toggle initiates inidicator, undefined|null|false disables all
 	 * @returns none
 	 */
@@ -286,10 +287,12 @@ export const api = {
 				payload = _.getInputs("[data-usecase=login]", true);
 
 				successFn = async function (data) {
+					// import server side settings
 					await api.application("get", "language");
 					await api.application("get", "menu");
 					api._settings.user = data.user || {};
 					api._settings.config = data.config || {};
+
 					if (data.user) _serviceWorker.register();
 					else {
 						clearInterval(_serviceWorker.notif.interval);
@@ -299,6 +302,8 @@ export const api = {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
 						render.processAfterInsertion();
+
+						// replace "please sign in" with user name for landing page
 						let signin = api._lang.GET("menu.application.signin"),
 							greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 						api.update_header(
@@ -308,6 +313,8 @@ export const api = {
 						);
 						return;
 					}
+
+					// update application menu icon with user image
 					if (api._settings.user.image) {
 						let applicationLabel;
 						while (!applicationLabel) {
@@ -319,6 +326,8 @@ export const api = {
 						applicationLabel.style.backgroundSize = "cover";
 						applicationLabel.style.borderRadius = "50%";
 					}
+
+					// override css properties with user settings
 					if (api._settings.user.app_settings) {
 						for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
 							switch (key) {
@@ -351,16 +360,21 @@ export const api = {
 							}
 						}
 					}
+
+					// retrieve landing page
 					api.application("get", "start");
 				};
 				break;
 			case "menu":
 				successFn = function (data) {
+					// construct backend provided application menu
 					assemble_helper.userMenu(data.render);
 				};
 				break;
 			case "start":
 				successFn = function (data) {
+					// replace "please sign in" with user name for landing page
+					// duplicate of login for selection of landing page from menu
 					let signin = api._lang.GET("menu.application.signin"),
 						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 					if (data.user) greeting = " " + data.user;
@@ -1032,7 +1046,7 @@ export const api = {
 							payload = JSON.parse(request[2]);
 							delete request[2];
 						}
-					//no break intentional
+						// no break intentional
 					default:
 						successFn = function (data) {
 							if (data.render) {
