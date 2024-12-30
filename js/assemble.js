@@ -34,6 +34,12 @@ const VOIDVALUES = ["", "..."];
 
 export const assemble_helper = {
 	getNextElementID: getNextElementID,
+
+	/**
+	 * creates and "clicks" a link containing the canvas content within an png.image
+	 * @param {string} id 
+	 * @param {string} name 
+	 */
 	exportCanvas: function (id, name) {
 		document.getElementById(id).toBlob(
 			function (blob) {
@@ -48,11 +54,18 @@ export const assemble_helper = {
 			1
 		);
 	},
+
+	/**
+	 * creates the application menu
+	 * @param {object} content render data return from api
+	 */
 	userMenu: function (content) {
 		if (!content) return;
 		const menu = document.querySelector("nav"),
 			elements = [],
 			icons = {};
+		
+		// set up icons css property
 		icons[api._lang.GET("menu.application.header")] = "url('./media/bars.svg')";
 		icons[api._lang.GET("menu.communication.header")] = "url('./media/comment.svg')";
 		icons[api._lang.GET("menu.records.header")] = "url('./media/file-signature.svg')";
@@ -62,28 +75,35 @@ export const assemble_helper = {
 		icons[api._lang.GET("menu.tools.header")] = "url('./media/tools.svg')";
 
 		let label, div, input, div2, button, span;
+		// iterate over main categories
 		for (const [group, items] of Object.entries(content)) {
 			label = document.createElement("label");
 			div = document.createElement("div");
 
+			// set up label and notification element
 			label.htmlFor = "userMenu" + group;
 			label.style.maskImage = label.style.webkitMaskImage = icons[group];
 			div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
 			div.setAttribute("data-notification", 0);
 			div.append(label);
 
+			// set up radio input for css checked condition
 			input = document.createElement("input");
 			input.type = "radio";
 			input.name = "userMenu";
 			input.id = "userMenu" + group;
 
+			// set up div containing subsets of category
 			div2 = document.createElement("div");
 			div2.classList.add("options");
 			span = document.createElement("span");
 			span.append(document.createTextNode(group));
 			div2.append(span);
 			div2.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
+
+			// iterate over subset
 			for (const [description, attributes] of Object.entries(items)) {
+				// create button to access subsets action
 				if ("onpointerup" in attributes) {
 					button = document.createElement("button");
 					for (const [attribute, value] of Object.entries(attributes)) {
@@ -95,7 +115,9 @@ export const assemble_helper = {
 					button.setAttribute("data-notification", 0);
 					button.appendChild(document.createTextNode(description));
 					div2.append(button);
-				} else {
+				}
+				// create description element
+				else {
 					span = document.createElement("span");
 					span.append(document.createTextNode(description));
 					div2.append(span);
@@ -106,6 +128,7 @@ export const assemble_helper = {
 			elements.push(div2);
 		}
 		menu.replaceChildren(...elements);
+		// trigger notifications 
 		_serviceWorker.postMessage("getnotifications");
 	},
 };
@@ -138,7 +161,6 @@ export class Dialog {
 	 * new Dialog({type:'input', header:'fill out assembled form', render: [assemble_content], options:{'abort': false, 'submit': {'value': true, class: 'reducedCTA'}}}).then(response => {
 	 *  	if (Object.keys(response)) console.log('these are the results of the form:', response);
 	 * 	});
-	 *
 	 */
 	constructor(options = {}) {
 		this.type = options.type || null;
@@ -152,23 +174,31 @@ export class Dialog {
 
 		let dialog = document.getElementById("modal");
 		if (this.type) {
+			// define output dialog
 			if (this.type === "input") modal = "inputmodal";
 			if (this.type === "input2") {
 				modal = "inputmodal2";
 				this.type = "input";
 			}
+
+			// assemble render data
 			if (this.type === "input") {
 				if (this.render.content === undefined) this.render = { content: this.render };
 				this.assemble = new Assemble(this.render);
 			}
+
+			// refer to output dialog
 			dialog = document.getElementById(modal);
 
+			// create form
 			const form = document.createElement("form");
 			if (this.type === "message") {
 				form.dataset.usecase = "message";
 				this.type = "input";
 			}
 			form.method = "dialog";
+
+			// append close button
 			const img = document.createElement("img");
 			img.classList.add("close");
 			img.src = "./media/times.svg";
@@ -178,6 +208,8 @@ export class Dialog {
 				document.getElementById(modal).close();
 			};
 			form.append(img);
+
+			// append provided icon, header and content-string if applicable
 			if (this.header || this.render || this.icon) {
 				const header = document.createElement("header");
 				if (this.icon) {
@@ -198,12 +230,17 @@ export class Dialog {
 				}
 				form.append(header);
 			}
+
+			// append select buttons if applicable 
 			if (this.type === "select") form.style.display = "flex";
 			for (const element of this[this.type]()) {
 				if (element) form.append(element);
 			}
 			dialog.replaceChildren(form);
+
+			// append scanner if applicable
 			if (this.type === "scanner") {
+				// create scanner
 				const scanner = {
 					canvas: this.scannerElements.canvas,
 					output: this.scannerElements.output,
@@ -219,7 +256,11 @@ export class Dialog {
 						useBarCodeDetectorIfSupported: true,
 					}),
 				};
-
+				/**
+				 * report success and port result to defined output container
+				 * @param {string} decodedText 
+				 * @param {*} decodedResult 
+				 */
 				function scanSuccess(decodedText, decodedResult) {
 					scanner.output.value = decodedText;
 					scanner.button.removeAttribute("disabled");
@@ -230,12 +271,18 @@ export class Dialog {
 				scanner.scanner.render(scanSuccess);
 			}
 			if (this.assemble) this.assemble.processAfterInsertion();
+
 			return new Promise((resolve, reject) => {
 				dialog.showModal();
 				dialog.onclose = resolve;
 			}).then((response) => {
 				let result;
 
+				/**
+				 * recursive value getter for nested rendered form
+				 * @param {node} parent 
+				 * @returns {object} key:value pairs of input names and values if present
+				 */
 				function getValues(parent) {
 					let result = {};
 					parent.childNodes.forEach((node) => {
@@ -252,6 +299,7 @@ export class Dialog {
 					return result;
 				}
 
+				// return dialog-form response 
 				switch (this.type) {
 					case "select":
 						result = response.target.returnValue;
@@ -273,6 +321,11 @@ export class Dialog {
 		dialog.close();
 	}
 
+	/**
+	 * returns textnodes with linebreak-nodes from string containing \n or &lt;br&gt;
+	 * @param {string} string 
+	 * @returns {domNodes}
+	 */
 	linebreak(string) {
 		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
@@ -284,12 +337,20 @@ export class Dialog {
 		return result;
 	}
 
+	/**
+	 * @returns {domNodes} default confirmation button
+	 */
 	alert() {
 		const button = document.createElement("button");
 		button.value = true;
 		button.append(document.createTextNode(api._lang.GET("general.ok_button")));
 		return [button];
 	}
+
+	/**
+	 * @requires {object} this.options
+	 * @returns {domNodes} confirmation option buttons of provided this.options
+	 */
 	confirm() {
 		const buttons = [];
 		let button;
@@ -307,12 +368,21 @@ export class Dialog {
 		}
 		return buttons;
 	}
+
+	/**
+	 * @requires {object} this.assemble, this.options
+	 * @returns {domNodes} rendered inputs and this.confirm()
+	 */
 	input() {
 		let result = [...this.assemble.initializeSection(null, null, "iCanHasNodes")];
 		if (Object.keys(this.options).length) result = result.concat(this.confirm());
 		else result = result.concat(this.alert());
 		return result;
 	}
+
+	/**
+	 * @returns {domNodes} default scanner
+	 */
 	scanner() {
 		const div = document.createElement("div"),
 			input = document.createElement("input"),
@@ -332,6 +402,11 @@ export class Dialog {
 		};
 		return [div, input, button];
 	}
+
+	/**
+	 * @requires {object} this.options
+	 * @returns {domNodes} select buttons with pseudo optgroups if provided sorted and length > 12
+	 */
 	select() {
 		const buttons = document.createElement("div");
 		let button,
@@ -360,10 +435,10 @@ export class Dialog {
 
 export class Toast {
 	/**
-	 *
-	 * @param str message
-	 * @param str type success|error|info
-	 * @param int duration in milliseconds
+	 * displays a toast message for defined time
+	 * @param {string} message
+	 * @param {string} type success|error|info
+	 * @param {int} duration in milliseconds
 	 *
 	 * new Toast('message', 'success')
 	 *
@@ -393,6 +468,10 @@ export class Toast {
 			this.countdown();
 		} else this.toast.close();
 	}
+	/**
+	 * updates reversed progress bar and closes toast on timeout
+	 * @param {int} percent 
+	 */
 	countdown(percent = 100) {
 		const countdowndiv = document.querySelector("#toast > div");
 		countdowndiv.style.width = percent + "%";
@@ -405,15 +484,16 @@ export class Toast {
 }
 
 export class Assemble {
-	/* 
-	assembled forms and screen elements.
-	deepest nesting of input object is three levels
-	form:null or {attributes} / nothing creates just a div e.g. just for text and links
-	content:[ see this.processContent() ]
-
-	elements are assembled by default but can be assigned common html attributes
-	names are mandatory for input elements
-	*/
+	/** 
+	 * assembled forms and screen elements.
+	 * deepest nesting of input object is three levels
+	 * form:null or {attributes} / nothing creates just a div e.g. just for text and links
+	 * content:[ see this.processContent() ]
+	 *
+	 * elements are assembled by default but can be assigned common html attributes
+	 * names are mandatory for input elements
+	 * @param {object} setup render object
+	 */
 	constructor(setup) {
 		this.content = setup.content;
 		this.form = setup.form;
@@ -426,13 +506,15 @@ export class Assemble {
 	}
 	/**
 	 *
-	 * @param {*domNode} nextSibling inserts before node, used by utility.js order_client
-	 * @param {*domNode} formerSibling inserts after node, used on multiple photo or scanner type
-	 * @param {*any} returnOnlyNodes return nodes without container, used by Dialog
+	 * @param {domNode} nextSibling inserts before node, used by utility.js order_client
+	 * @param {domNode} formerSibling inserts after node, used on multiple photo or scanner type
+	 * @param {any} returnOnlyNodes return nodes without container, used by Dialog
 	 * @returns container or nodes
 	 */
 	initializeSection(nextSibling = null, formerSibling = null, returnOnlyNodes = null) {
 		if (typeof nextSibling === "string") nextSibling = document.querySelector(nextSibling);
+
+		// set up default form and submit button
 		if (this.form && !nextSibling && !returnOnlyNodes) {
 			this.section = document.createElement("form");
 			this.section.method = "post";
@@ -450,8 +532,10 @@ export class Assemble {
 		} else if (this.composer === "elementClone") this.section = formerSibling.parentNode;
 		else if (!this.composer) this.section = document.createElement("div");
 
+		// create content
 		this.assembledPanels = this.processContent();
 
+		// return assembled panels or append before or after requested node
 		if (!(nextSibling || formerSibling || returnOnlyNodes || this.composer)) {
 			this.section.append(...this.assembledPanels);
 			return this.section;
@@ -475,6 +559,12 @@ export class Assemble {
 		}
 	}
 
+	/**
+	 * initiate scroll events after insertion to access rendered nodes and process number of sections
+	 * add trash article if applicable
+	 * initialize signature pad if applicable
+	 * populate canvases for barcodes, qr-codes or images if applicable
+	 */
 	processAfterInsertion() {
 		const scrollables = document.querySelectorAll("section");
 		for (const section of scrollables) {
@@ -542,24 +632,31 @@ export class Assemble {
 		}
 	}
 
+	/**
+	 * recursively processes one panel, with slides if nested accordingly and instatiates the contained widget elements
+	 * @param {array|object} elements render instructions for single panel
+	 * @returns {domNodes}
+	 * 
+	 * content to exist of three nestings
+	 * 
+	 * 	[ panel article>section
+	 * 		[ slide article
+	 * 			{ element },
+	 * 			{ element }
+	 * 		],
+	 * 		[ slide article
+	 * 			...
+	 * 		],
+	 * 	],
+	 * 
+	 * or two nestings
+	 * 
+	 * 	[ panel article
+	 * 		{ element },
+	 * 		{ element }
+	 * 	]
+	 */
 	processPanel(elements) {
-		/**
-		 * content to exist of three nestings
-		 * [ panel article>section
-		 * 		[ slide article
-		 * 			{ element },
-		 * 			{ element }
-		 * 		],
-		 * 		[ slide article
-		 *		...],
-		 * ],
-		 *
-		 * or two nestings
-		 * [ panel article
-		 * 		{ element },
-		 * 		{ element }
-		 * ]
-		 */
 		let content = [],
 			widget;
 		if (elements.constructor.name === "Array") {
@@ -600,6 +697,11 @@ export class Assemble {
 		return content;
 	}
 
+	/**
+	 * iterates over content and gathers panels
+	 * @requires {object} this.content
+	 * @returns {domNodes} all assembled panels
+	 */
 	processContent() {
 		let assembledPanels = new Set();
 		this.content.forEach((panel) => {
@@ -626,6 +728,12 @@ export class Assemble {
 		return assembledPanels;
 	}
 
+	/**
+	 * constructs slider navigation and position indicators
+	 * @param {string} sectionID 
+	 * @param {int} length 
+	 * @returns {domNodes} navigation buttons and slide indicators
+	 */
 	slider(sectionID, length) {
 		if (length < 2) return;
 		const indicators = document.createElement("div"),
@@ -634,6 +742,7 @@ export class Assemble {
 		indicators.classList = "sectionindicator";
 		indicators.id = sectionID + "indicator";
 
+		// navigate left button
 		toleft.addEventListener("pointerup", function (e) {
 			document.getElementById(sectionID).scrollBy({
 				top: 0,
@@ -645,6 +754,8 @@ export class Assemble {
 		toleft.classList.add("inlinebutton");
 		toleft.type = "button";
 		indicators.appendChild(toleft);
+
+		// indicator circles of length with pointerenter event
 		for (let i = 0; i < length; i++) {
 			let indicator = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
 				circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -663,6 +774,8 @@ export class Assemble {
 			});
 			indicators.appendChild(indicator);
 		}
+
+		// navigate right button
 		toright.addEventListener("pointerup", function (e) {
 			document.getElementById(sectionID).scrollBy({
 				top: 0,
@@ -674,11 +787,15 @@ export class Assemble {
 		toright.classList.add("inlinebutton");
 		toright.type = "button";
 		indicators.appendChild(toright);
+
 		return indicators;
 	}
 
+	/**
+	 * event handler for horizontal scrolling of multiple panels, updating slider position indicators
+	 * @param {event} e 
+	 */
 	sectionScroller(e) {
-		/* event handler for horizontal scrolling of multiple panels */
 		setTimeout(() => {
 			if (!e.target.attributes.id) return;
 			let indicator = document.getElementById(e.target.attributes.id.value + "indicator");
@@ -693,13 +810,18 @@ export class Assemble {
 		}, 300);
 	}
 
+	/**
+	 * check input fields for presence of required content, prepare atypical form content or report missing values
+	 * @param {event} event 
+	 * @returns none after submit event or content update
+	 */
 	prepareForm(event) {
-		/* check input fields for presence of required content */
 		const signature = document.getElementById("signaturecanvas"),
 			requiredsignature = document.querySelector("[data-required=required]"),
 			required = document.querySelectorAll("[required]");
 		let missing_required = false;
 
+		// check signature
 		if (signature) {
 			if (signaturePad.isEmpty()) {
 				if (signature == requiredsignature) {
@@ -717,6 +839,8 @@ export class Assemble {
 				document.getElementById("SIGNATURE").files = section.files;
 			}
 		}
+
+		// check regular inputs
 		for (const element of required) {
 			if (element.validity.valueMissing && element.form === event.target.form) {
 				if (["file", "checkbox", "radio"].includes(element.type)) element.nextElementSibling.classList.add("input_required_alert");
@@ -731,6 +855,8 @@ export class Assemble {
 				missing_required = true;
 			} else if (element.nextElementSibling) element.nextElementSibling.classList.remove("input_required_alert");
 		}
+
+		// submit form after confirmation if applicable
 		if (!missing_required) {
 			if (!event.target.form.dataset.confirm) {
 				event.target.form.submit();
@@ -804,6 +930,11 @@ export class Assemble {
 		});
 	}
 
+	/**
+	 * add icon before widgets
+	 * @requires {object} this.currentElement.type, ~.multiple, ~.[data-filtered]
+	 * @returns {domNodes} br, span with styleable data-type
+	 */
 	icon() {
 		const br = document.createElement("br"),
 			span = document.createElement("span");
@@ -815,6 +946,11 @@ export class Assemble {
 		return [br, span];
 	}
 
+	/**
+	 * add header based on description
+	 * @requires {object} this.currentElement.description, ~.type, ~.required
+	 * @returns {domNodes} header with styleable data-type and data-required if applicable
+	 */
 	header() {
 		if (!this.currentElement.description) return [];
 		let header = document.createElement("header");
@@ -835,6 +971,10 @@ export class Assemble {
 		return [header];
 	}
 
+	/**
+	 * @requires {object} this.currentElement.hint
+	 * @returns {domNodes} div
+	 */
 	hint() {
 		if (!this.currentElement.hint) return [];
 		let div = document.createElement("div");
@@ -849,6 +989,12 @@ export class Assemble {
 		return [div];
 	}
 
+	/**
+	 * adds attributes to a node (name, id, events, etc)
+	 * @param {object} setup html attributes
+	 * @param {node} node 
+	 * @returns {domNode} with set attributes
+	 */
 	apply_attributes(setup, node) {
 		for (let [key, attribute] of Object.entries(setup)) {
 			if (EVENTS.includes(key)) {
@@ -872,6 +1018,11 @@ export class Assemble {
 		return node;
 	}
 
+	/**
+	 * returns textnodes with linebreak-nodes from string containing \n or &lt;br&gt;
+	 * @param {string} string 
+	 * @returns {domNodes}
+	 */
 	linebreak(string) {
 		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
@@ -883,6 +1034,13 @@ export class Assemble {
 		return result;
 	}
 
+	/**
+	 * adds a number to names if same is already present
+	 * @requires {object} this.names
+	 * @param {string} name 
+	 * @param {*} dontnumerate 
+	 * @returns name with count number if applicable
+	 */
 	names_numerator(name, dontnumerate = undefined) {
 		// consider record.php exportdocument-method too on changing
 		if (dontnumerate || [...name.matchAll(/\[\]/g)].length) return name;
@@ -903,26 +1061,39 @@ export class Assemble {
 	 *
 	 */
 
+	/**
+	 * @returns {domNodes} br 
+	 */
 	br() {
 		return [document.createElement("br")];
 	}
 
+	/**
+	 * creates a button
+	 * @requires this.currentElement
+	 * @returns {domNodes} button, hint if applicable, encapsulated if applicable
+	 * 
+	 * 	{
+	 * 		type: 'button',
+	 * 		hint: 'this button does this or that'
+	 * 		attributes: {
+	 * 			value: 'this is displayed on the button',
+	 *			onpointerdown: 'alert("hello")'
+	 *		}
+	 * 	}
+	 */
 	button() {
-		/*{
-			type: 'button',
-			hint: 'this button does this or that'
-			attributes: {
-				value: 'this is displayed on the button',
-				onpointerdown: 'alert("hello")'
-			}
-		}*/
 		let button = document.createElement("button"),
 			imagealigned = false;
 		button.id = getNextElementID();
+
+		// write into button
 		if (this.currentElement.attributes.value !== undefined) {
 			button.append(...this.linebreak(this.currentElement.attributes.value));
 			delete this.currentElement.attributes.value;
 		}
+
+		// apply attributes
 		if (this.currentElement.attributes !== undefined) {
 			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
 				imagealigned = true;
@@ -930,7 +1101,11 @@ export class Assemble {
 			}
 			button = this.apply_attributes(this.currentElement.attributes, button);
 		}
+
+		// bind to form if applicable
 		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
+
+		// embed in styleable container to prevent from 100% width
 		if (imagealigned) {
 			const container = document.createElement("div");
 			container.classList.add("imagealigned");
@@ -940,18 +1115,25 @@ export class Assemble {
 		return [button, ...this.hint()];
 	}
 
+	/**
+	 * displays a calendar view with tiles calling calendar api
+	 * @requires {object} this.currentElement
+	 * @returns {domNodes} header, calendar view
+	 * 
+	 * 	{
+	 * 		type: 'calendar',
+	 * 		content: [
+	 * 			null,
+	 * 			{
+	 * 				date: 'Y-m-d',
+	 * 				display: 'whatever text, weekday, day, number of appointments
+	 * 			}, ...
+	 * 		],
+	 * 		api: schedule|timesheet
+	 * 	}
+	 */
 	calendar() {
-		/*{
-			type: 'calendar',
-			content: [
-				null,
-				{
-					date: 'Y-m-d',
-					display: 'whatever text, weekday, day, number of appointments
-				}, ...
-			],
-			api: schedule|timesheet
-		} */
+
 		let cal = [],
 			daytile,
 			apicall = this.currentElement.api;
@@ -977,6 +1159,11 @@ export class Assemble {
 		return [...this.header(), ...cal];
 	}
 
+	/**
+	 * creates a calendar button to add a new event
+	 * @requires this.currentElement
+	 * @returns {domNodes} br, button
+	 */
 	calendarbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "calendarbutton";
@@ -984,28 +1171,37 @@ export class Assemble {
 		return [...this.br(), ...this.button()];
 	}
 
+	/**
+	 * empty method but neccessary for styling reasons (icon)
+	 */
 	cart() {
-		// empty method but neccessary for styling reasons (icon)
 	}
 
+	/**
+	 * creates checkboxes or radio inputs
+	 * @requires this.currentElement
+	 * @param {*} radio if it rather be radio inputs than checkbox by default
+	 * @returns {domNodes} header if applicable, inputs and labels, hint if applicable, br
+	 * 
+	 * 	{
+	 *		type: 'checkbox', or 'radio'
+	 *		attributes:{
+	 *			name: 'checkboxes or radio', // grouping name for checkboxes, formerly description
+	 *		}
+	 *		inline: boolean, // displays only the inputs, can be omitted
+	 *		numeration: anything resulting in true to prevent enumeration
+	 *		content: {
+	 *			'Checkbox 1': {
+	 *				optional attributes
+	 *			},
+	 *			'Checkbox 2': {
+	 *				optional attributes
+	 *			}
+	 *		},
+	 *		hint: 'this selection is for...'
+	 * 	}
+	 */
 	checkbox(radio = null) {
-		/*{
-			type: 'checkbox', or 'radio'
-			attributes:{
-				name: 'checkboxes or radio', // grouping name for checkboxes, formerly description
-			}
-			inline: boolean, // displays only the inputs, can be omitted
-			numeration: anything resulting in true to prevent enumeration
-			content: {
-				'Checkbox 1': {
-					optional attributes
-				},
-				'Checkbox 2': {
-					optional attributes
-				}
-			},
-			hint: 'this selection is for...'
-		}*/
 		this.currentElement.description = this.currentElement.attributes && this.currentElement.attributes.name ? this.currentElement.attributes.name.replace(/\[\]/g, "") : null;
 		const result = [],
 			radioname = this.currentElement.attributes && this.currentElement.attributes.name ? this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration) : null; // keep same name for current article
@@ -1037,6 +1233,14 @@ export class Assemble {
 		return [...result, ...this.hint(), document.createElement("br")];
 	}
 
+	/**
+	 * creates a text typed input with onpointerup modal with checkbox selection
+	 * 
+	 * requires additional options property on this.currentElement containing an options object
+	 * 
+	 * {'name':{value:str|int, checked: bool}}
+	 * @requires this.currentElement
+	*/
 	checkbox2text() {
 		// returns a text typed input with onpointerup modal with checkbox selection
 		// requires additional options property on this.currentElement containing an options object
@@ -1044,19 +1248,28 @@ export class Assemble {
 		return this.input("checkbox2text");
 	}
 
+	/**
+	 * creates a textarea with numbered lines
+	 * @requires this.currentElement
+	 * @returns {domNodes}
+	 */
 	code() {
 		this.currentElement.editor = true;
 		return this.textarea();
 	}
 
+	/**
+	 * initially collapsed by default, extended if attributes.class = "extended"
+	 * @required this.currentElement
+	 * @returns encapsulated content widgets
+	 * 
+	 * 	{
+	 * 		type: 'collapsible',
+	 * 		attributes : {eg. dataset values for filtering}, 
+	 * 		content: [array of any defined types] 
+	 * 	}
+	 */
 	collapsible() {
-		/*
-		initially collapsed by default, extended if attributes.class = "extended"
-		{
-			type: 'collapsible',
-			attributes : {}, eg. dataset values for filtering
-			content: [] array of any defined type
-		} */
 		let div = document.createElement("div"),
 			img = document.createElement("img");
 		img.classList.add("close");
@@ -1075,6 +1288,11 @@ export class Assemble {
 		return [div];
 	}
 
+	/**
+	 * creates a datalist
+	 * @requires this.currentElement
+	 * @returns {domNodes} datalist, labels if applicable (for range)
+	 */
 	datalist() {
 		let datalist = document.createElement("datalist");
 		let option, labels, label;
@@ -1110,29 +1328,51 @@ export class Assemble {
 		return [datalist];
 	}
 
+	/**
+	 * creates a date input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	date() {
 		return this.input("date");
 	}
 
+	/**
+	 * creates a delete button (styled)
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	deletebutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "deletebutton";
 		return this.button();
 	}
 
+	/**
+	 * creates a email input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	email() {
 		return this.input("email");
 	}
 
+	/**
+	 * creates a file input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 * 
+	 * 	{
+	 * 		type: 'file',
+	 * 		attributes: {
+	 * 			name: 'file upload',
+	 * 			multiple: true
+	 * 		}
+	 * 		hint: 'this file serves as...'
+	 * 	}
+	 */
 	file() {
-		/*{
-			type: 'file',
-			attributes: {
-				name: 'file upload',
-				multiple: true
-			}
-			hint: 'this file serves as...'
-		}*/
+		/**/
 		let input = document.createElement("input"),
 			label = document.createElement("button"),
 			button = document.createElement("button");
@@ -1185,11 +1425,21 @@ export class Assemble {
 		return [...this.header(), input, label, button, ...this.hint()];
 	}
 
+	/**
+	 * creates a styled search input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	filtered() {
 		// filter appears to be reserved
 		return this.input("search");
 	}
 
+	/**
+	 * creates a document button (styled)
+	 * @requires this.currentElement
+	 * @returns {domNodes} br, button
+	 */
 	documentbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "documentbutton";
@@ -1197,15 +1447,21 @@ export class Assemble {
 		return [...this.br(), ...this.button()];
 	}
 
+	/**
+	 * creates a hidden input
+	 * @requires this.currentElement
+	 * @returns {domNodes}
+	 * 
+	 * {
+	 * 		type: 'hidden',
+	 * 		numeration: anything resulting in true to prevent enumeration
+	 * 		attributes: {
+	 * 			name: 'name',
+	 * 			value: '3.14'}
+	 * 		}
+	 * 	}
+	 */
 	hidden() {
-		/*{
-			type: 'hidden',
-			numeration: anything resulting in true to prevent enumeration
-			attributes: {
-				name: 'name',
-				value: '3.14'}
-			}
-		}*/
 		let input = document.createElement("input");
 		input.type = "hidden";
 		input.id = getNextElementID();
@@ -1215,27 +1471,41 @@ export class Assemble {
 		return [input];
 	}
 
+	/**
+	 * @returns {domNodes} hr
+	 */
 	hr() {
 		return [document.createElement("hr")];
 	}
 
+	/**
+	 * creates an identify scanner
+	 * @required this.currentElement
+	 * @returns scanner
+	 */
 	identify() {
 		this.currentElement.attributes.name = "IDENTIFY_BY_" + this.currentElement.attributes.name;
 		return this.scanner();
 	}
 
+	/**
+	 * creates an image canvas for barcodes, qr-code or images
+	 * @requires this.currentElement
+	 * @returns {domNodes} header, canvas, downloadbutton
+	 * 
+	 * 	{
+	 * 		type: 'image',
+	 * 		description:'export image' (e.g.),
+	 * 		attributes:{
+	 * 			name: 'exportname', // atypical use of generic attributes on this one
+	 * 			qrcode: 'e.g. token', // for display of a qrcode with this value
+	 * 			barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
+	 * 			url: 'base64 encoded string || url' // for display of an image
+	 * 			imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
+	 * 		}
+	 * 	}
+	 */
 	image() {
-		/*{
-			type: 'image',
-			description:'export image' (e.g.),
-			attributes:{
-				name: 'exportname', // atypical use of generic attributes on this one
-				qrcode: 'e.g. token', // for display of a qrcode with this value
-				barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
-				url: 'base64 encoded string || url' // for display of an image
-				imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
-			}
-		} */
 		let result = [];
 		const canvas = document.createElement("canvas");
 		let disabled = true;
@@ -1289,15 +1559,22 @@ export class Assemble {
 		return result;
 	}
 
+	/**
+	 * creates an input of type
+	 * @requires this.currentElement
+	 * @param {string} type 
+	 * @returns {domNodes} icon, input, label, hint
+	 * 
+	 * 	{
+	 * 		type: 'text',
+	 * 		hint: 'please provide information about...',
+	 * 		numeration: anything resulting in true to prevent enumeration
+	 * 		attributes: {
+	 * 			name: 'variable name' // will be used as an accessible placeholder
+	 * 		}
+	 * 	}
+	 */
 	input(type) {
-		/*{
-			type: 'text',
-			hint: 'please provide information about...',
-			numeration: anything resulting in true to prevent enumeration
-			attributes: {
-				name: 'variable name' // will be used as an accessible placeholder
-			}
-		}*/
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
 			hint = this.hint(),
@@ -1400,26 +1677,37 @@ export class Assemble {
 		return [...this.icon(), input, label, ...hint];
 	}
 
+	/**
+	 * creates a styled link input whose value is about to be wrapped
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	link() {
 		return this.input("text");
 	}
 
+	/**
+	 * creates a set of links
+	 * @requires this.currentElement
+	 * @returns {domNodes} header, anchors, hint
+	 * 
+	 * 	{
+	 * 		type: 'links',
+	 * 		description:'links',
+	 * 		content: {
+	 * 			'Link 1': {
+	 * 				href: '#'
+	 * 			},
+	 * 			'Link 2': {
+	 * 				href: '#',
+	 * 				onpointerdown: 'alert(\'hello\')'
+	 * 			}
+	 * 		},
+	 * 		hint: 'these links serve the purpose of...'
+	 * 		data-filtered: any
+	 * 	}
+	 */
 	links() {
-		/*{
-			type: 'links',
-			description:'links',
-			content: {
-				'Link 1': {
-					href: '#'
-				},
-				'Link 2': {
-					href: '#',
-					onpointerdown: 'alert(\'hello\')'
-				}
-			},
-			hint: 'these links serve the purpose of...'
-			data-filtered: any
-		}*/
 		let result = [...this.header()];
 		if (this.currentElement.attributes !== undefined) result.push(...this.hidden()); // applying data-filtered for css rules
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
@@ -1433,22 +1721,28 @@ export class Assemble {
 		return [...result, ...this.hint()];
 	}
 
+	/**
+	 * creates a message display
+	 * @requires this.currentElement
+	 * @returns {domNodes} div containing message
+	 * 
+	 * 	{
+	 * 		type: 'message',
+	 * 		content: {
+	 * 			img: str profile-picture url,
+	 * 			user: str name
+	 * 			text: str well... text,
+	 * 			date: str timestamp,
+	 * 			unseen: null|int styled like notifications for conversations overview
+	 * 		},
+	 * 		attributes:{
+	 * 			onpointerup
+	 * 			class: right, conversation,
+	 * 			ICON_onpointerup: event only applies to user icon
+	 * 		}
+	 * 	}
+	 */
 	message() {
-		/*{
-			type: 'message',
-			content: {
-				img: str profile-picture url,
-				user: str name
-				text: str well... text,
-				date: str timestamp,
-				unseen: null|int
-			},
-			attributes:{
-				onpointerup
-				class: right, conversation,
-				ICON_onpointerup: event only applies to user icon
-			}
-		} */
 		let message, icondiv, icon, p, date, unseen, onpointerup_forward;
 		message = document.createElement("div");
 
@@ -1525,6 +1819,10 @@ export class Assemble {
 		return [message];
 	}
 
+	/**
+	 * created a default view for no database content
+	 * @returns {domNodes} img, span
+	 */
 	nocontent() {
 		const img = document.createElement("div");
 		const span = document.createElement("span");
@@ -1534,19 +1832,30 @@ export class Assemble {
 		return [img, span];
 	}
 
+	/**
+	 * creates a number input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	number() {
 		return this.input("number");
 	}
 
+	/**
+	 * creates a photo upload or file upload for desktops
+	 * @requires this.currentElement
+	 * @returns {domNodes} header, input, img, button, resetbutton, hint
+	 * 
+	 *  {
+	 * 		type: 'photo',
+	 * 		attributes: {
+	 * 			name: 'photo upload',
+	 * 			multiple: true|undefined
+	 * 		}
+	 * 		hint: 'this photo serves as...'
+	 * 	}
+	 */
 	photo() {
-		/*{
-			type: 'photo',
-			attributes: {
-				name: 'photo upload',
-				multiple: true|undefined
-			}
-			hint: 'this photo serves as...'
-		}*/
 		let input = document.createElement("input"),
 			button = document.createElement("button"),
 			img = document.createElement("img"),
@@ -1619,16 +1928,22 @@ export class Assemble {
 		return [...this.header(), input, img, button, multiple ? addbutton : [], resetbutton, ...hint];
 	}
 
+	/**
+	 * creates a product selection input type text with button to open up an api product search
+	 * @requires this.currentElement
+	 * @returns {domNodes} icon, input, button, label, hint
+	 * 
+	 *  {
+	 * 		type: 'productselection',
+	 * 		hint: 'somethingsomething...',
+	 * 		numeration: anything resulting in true to prevent enumeration
+	 * 		attributes: {
+	 * 			name: 'variable name' // will be used as an accessible placeholder
+	 * 			multiple: bool // on changing the input field another appends
+	 * 		}
+	 * 	}
+	 */
 	productselection() {
-		/*{
-			type: 'productselection',
-			hint: 'somethingsomething...',
-			numeration: anything resulting in true to prevent enumeration
-			attributes: {
-				name: 'variable name' // will be used as an accessible placeholder
-				multiple: bool // on changing the input field another appends
-			}
-		}*/
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
 			button = document.createElement("button"),
@@ -1710,21 +2025,32 @@ export class Assemble {
 		return [...this.icon(), input, button, label, ...hint];
 	}
 
+	/**
+	 * creates radio inputs
+	 * @requires this.currentElement
+	 * @returns {domNodes} header if applicable, inputs and labels, hint if applicable, br
+	 */
 	radio() {
 		return this.checkbox("radioinstead");
 	}
 
+	/**
+	 * creates a range input with default datalist if not provided otherwise
+	 * @requires this.currentElement
+	 * @returns {domNodes} header, input, hint
+	 * 
+	 *  {
+	 * 		type: 'range',
+	 * 		attributes: {
+	 * 			name: 'range',
+	 * 			min: 0,
+	 * 			max: 100,
+	 * 			step: 5
+	 * 		}
+	 * 		hint: 'from 0 to 100 in 20 steps'
+	 * 	}
+	 */
 	range() {
-		/*{
-			type: 'range',
-			attributes: {
-				name: 'range',
-				min: 0,
-				max: 100,
-				step: 5
-			}
-			hint: 'from 0 to 100 in 20 steps'
-		}*/
 		let input = document.createElement("input"),
 			hint = this.hint();
 		input.type = "range";
@@ -1752,13 +2078,19 @@ export class Assemble {
 		return [...this.header(), input, ...hint];
 	}
 
+	/**
+	 * creates a scanner input with scanner dialog
+	 * @requires this.currentElement
+	 * @returns {domNodes} icon, input, label, hint, additional buttons if applicable
+	 * 
+	 *  {
+	 * 		type: 'scanner',
+	 * 		description:'access credentials' (e.g.),
+	 * 		attributes:{name: 'input name', type:'password', multiple: true|undefined} // type: to override e.g. for logins, multiple: to clone after successful import
+	 * 		destination: elementId // force output to other input, e.g. search
+	 * 	}
+	 */
 	scanner() {
-		/*{
-			type: 'scanner',
-			description:'access credentials' (e.g.),
-			attributes:{name: 'input name', type:'password', multiple: true|undefined} // type: to override e.g. for logins, multiple: to clone after successful import
-			destination: elementId // force output to other input, e.g. search
-		} */
 		let result = [],
 			input,
 			inputid,
@@ -1862,29 +2194,40 @@ export class Assemble {
 		return result;
 	}
 
+	/**
+	 * creates a search input
+	 * @requires this.currentElement
+	 * @returns {domNodes}
+	 */
 	search() {
 		return this.input("search");
 	}
 
+	/**
+	 * creates a select input with dialog modal, optgpoups by default id content sorted and > 12
+	 * @requires this.currentElement
+	 * @returns {domNodes} icon, select, label, hint
+	 * 
+	 * 	{
+	 * 		type: 'select',
+	 * 		hint: 'this is a list',
+	 * 		numeration: anything resulting in true to prevent enumeration
+	 * 		content: {
+	 * 			'entry one': {
+	 * 				value: '1'
+	 * 			},
+	 * 			'entry two': {
+	 * 				value: '2',
+	 * 				selected: true
+	 * 			}
+	 * 		}
+	 * 		attributes: {
+	 * 			name: 'variable name'
+	 * 			multiple: bool // another one will be appended if selection has value, not a classic multiple selection though
+	 * 		},
+	 * 	}
+	 */
 	select() {
-		/*{
-			type: 'select',
-			hint: 'this is a list',
-			numeration: anything resulting in true to prevent enumeration
-			content: {
-				'entry one': {
-					value: '1'
-				},
-				'entry two': {
-					value: '2',
-					selected: true
-				}
-			}
-			attributes: {
-				name: 'variable name'
-				multiple: bool // another one will be appended if selection has value, not a classic multiple selection though
-			},
-		}*/
 		const groups = {};
 		let select = document.createElement("select"),
 			label = document.createElement("label"),
@@ -1975,15 +2318,22 @@ export class Assemble {
 		return [...icon, select, label, ...hint];
 	}
 
+	/**
+	 * creates a signaturePad
+	 * @requires this.currentElement
+	 * @returns {domNodes}
+	 * 
+	 * 	{
+	 * 		type: 'signature',
+	 * 		attributes: {
+	 * 			name: 'signature',
+	 * 			required: optional boolean
+	 * 		},
+	 * 		hint: 'this signature is for...'
+	 * 	}
+	 */
 	signature() {
-		/*{
-			type: 'signature',
-			attributes: {
-				name: 'signature',
-				required: optional boolean
-			},
-			hint: 'this signature is for...'
-		} */
+		/* */
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		let result = [...this.header()];
 		const canvas = document.createElement("canvas");
@@ -2006,17 +2356,28 @@ export class Assemble {
 		return result;
 	}
 
+	/**
+	 * creates an stlviever div
+	 * @requires this.currentElement
+	 * @returns {domNode} div
+	 * 
+	 * 	{
+	 * 		type: 'stlviewer',
+	 * 		description:'viewstl' (e.g.),
+	 * 	}
+	 */
 	stlviewer() {
-		/*{
-			type: 'stlviewer',
-			description:'viewstl' (e.g.),
-		} */
 		const div = document.createElement("div");
 		div.id = "stlviewer_canvas";
 		div.classList = "stlviewer";
 		return div;
 	}
 
+	/**
+	 * creates a submit button (styled) for other contexts than general form submission
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	submitbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "submitbutton";
@@ -2024,31 +2385,53 @@ export class Assemble {
 		return this.button();
 	}
 
+	/**
+	 * creates a tel input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	tel() {
 		return this.input("tel");
 	}
 
+	/**
+	 * creates a text input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	text() {
 		return this.input("text");
 	}
 
+	/**
+	 * creates a text input whose content is SUPPOSED to be inserted into clipboard
+	 * not by default though, because this is used as a cta as well
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	text_copy() {
 		return this.input("text");
 	}
 
+	/**
+	 * creates a textarea with optional access to texttemplates by api request
+	 * @requires this.currentElement
+	 * @returns {domNodes}
+	 * 
+	 * 	{
+	 * 		type: 'textarea',
+	 * 		hint: 'enter a lot of text',
+	 * 		texttemplates: true or undefined to add a button opening text templates within a modal
+	 * 		numeration: anything resulting in true to prevent enumeration
+	 * 		editor: anything resulting in true to add line numbers
+	 * 		attributes: {
+	 * 			name:'somename'
+	 * 			rows:8,
+	 * 			value:'values can be passed with this pseudo attribute'
+	 * 		}
+	 * 	}
+	 */
 	textarea() {
-		/*{
-			type: 'textarea',
-			hint: 'enter a lot of text',
-			texttemplates: true or undefined to add a button opening text templates within a modal
-			numeration: anything resulting in true to prevent enumeration
-			editor: anything resulting in true to add line numbers
-			attributes: {
-				name:'somename'
-				rows:8,
-				value:'values can be passed with this pseudo attribute'
-			}
-		}*/
 		let textarea = document.createElement("textarea"),
 			label;
 		const hint = this.hint();
@@ -2092,21 +2475,33 @@ export class Assemble {
 		return [...this.icon(), label, textarea, ...hint];
 	}
 
+	/**
+	 * creates a textarea whose content will be inserted into clipboard
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	textarea_copy() {
 		this.currentElement.attributes.onpointerup = "_client.application.toClipboard(this)";
 		return this.textarea();
 	}
 
+	/**
+	 * creates an informative text paragraph
+	 * @requires this.currentElement
+	 * @returns {domNodes} header, paragraph, hint, occasionally encapsulated for styling reasons to not be 100% width
+	 * 
+	 * 	{
+	 * 		type: 'textsection',
+	 * 		content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
+	 * 		linkedcontent: may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>
+	 * 		attributes: {
+	 * 			attribute: value, // applies to header
+	 * 			name: 'very informative', content of header, former description
+	 * 		}
+	 * 	}
+	 */
 	textsection() {
-		/* {
-			type: 'textsection',
-			content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
-			linkedcontent: may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>
-			attributes: {
-				attribute: value, // applies to header
-				name: 'very informative', content of header, former description
-			}
-		}*/
+		/* */
 		let result = [],
 			p,
 			content,
@@ -2181,12 +2576,18 @@ export class Assemble {
 		return result;
 	}
 
+	/**
+	 * create a styled tile with provided content
+	 * @required this.currentElement
+	 * @returns encapsulated content widgets
+	 * 
+	 * 	{
+	 * 		type: 'tile',
+	 * 		attributes : {eg. dataset values for filtering}, 
+	 * 		content: [array of any defined type] 
+	 * 	}
+	 */
 	tile() {
-		/*{
-			type: 'tile',
-			attributes : {}, eg. dataset values for filtering
-			content: [] array of any defined type
-		} */
 		let article = document.createElement("article");
 		if (this.currentElement.attributes !== undefined) article = this.apply_attributes(this.currentElement.attributes, article);
 		for (const element of this.currentElement.content) {
@@ -2196,12 +2597,19 @@ export class Assemble {
 		return [article];
 	}
 
+	/**
+	 * creates a time input
+	 * @requires this.currentElement
+	 * @returns {domNodes} 
+	 */
 	time() {
 		return this.input("time");
 	}
 
+	/**
+	 * empty method but necessary to display the delete-area for composer or other future use
+	 */
 	trash() {
-		// empty method but necessary to display the delete-area for composer or other future use
 		return [...this.icon(), document.createTextNode(this.currentElement.description)];
 	}
 }
