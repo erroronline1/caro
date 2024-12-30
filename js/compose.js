@@ -960,8 +960,8 @@ export class Compose extends Assemble {
 	}
 
 	/**
-	 * OVERRIDING PARENT METHOD for specific use
 	 * recursively processes one panel, with slides if nested accordingly and instatiates the contained widget elements
+	 * @override adding draggable container
 	 * @param {array|object} elements render instructions for single panel
 	 * @returns {domNodes}
 	 *
@@ -1055,8 +1055,8 @@ export class Compose extends Assemble {
 	}
 
 	/**
-	 * OVERRIDING PARENT METHOD for having to add draggable containers
 	 * iterates over this.content and gathers panels
+	 * @override for having to add draggable containers
 	 * @returns {domNodes} all assembled panels
 	 */
 	processContent() {
