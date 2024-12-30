@@ -58,7 +58,7 @@ export const assemble_helper = {
 
 	/**
 	 * creates the application menu
-	 * @requires api 
+	 * @requires api
 	 * @param {object} content render data return from api
 	 * @event insertion of menu nodes to menu container
 	 */
@@ -67,7 +67,7 @@ export const assemble_helper = {
 		const menu = document.querySelector("nav"),
 			elements = [],
 			icons = {};
-		
+
 		// set up icons css property
 		icons[api._lang.GET("menu.application.header")] = "url('./media/bars.svg')";
 		icons[api._lang.GET("menu.communication.header")] = "url('./media/comment.svg')";
@@ -131,7 +131,7 @@ export const assemble_helper = {
 			elements.push(div2);
 		}
 		menu.replaceChildren(...elements);
-		// trigger notifications 
+		// trigger notifications
 		_serviceWorker.postMessage("getnotifications");
 	},
 };
@@ -236,7 +236,7 @@ export class Dialog {
 				form.append(header);
 			}
 
-			// append select buttons if applicable 
+			// append select buttons if applicable
 			if (this.type === "select") form.style.display = "flex";
 			for (const element of this[this.type]()) {
 				if (element) form.append(element);
@@ -263,7 +263,7 @@ export class Dialog {
 				};
 				/**
 				 * report success and port result to defined output container
-				 * @param {string} decodedText 
+				 * @param {string} decodedText
 				 * @param {*} decodedResult
 				 * @event update output container
 				 */
@@ -286,7 +286,7 @@ export class Dialog {
 
 				/**
 				 * recursive value getter for nested rendered form
-				 * @param {node} parent 
+				 * @param {node} parent
 				 * @returns {object} key:value pairs of input names and values if present
 				 */
 				function getValues(parent) {
@@ -297,7 +297,7 @@ export class Dialog {
 							if (node.dataset.wrap && node.value) {
 								node.value = node.dataset.wrap.replace("___", node.value);
 							}
-		
+
 							if (["checkbox", "radio"].includes(node.type) && node.checked === true) result[node.name] = node.value;
 							else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
 						} else result = { ...result, ...getValues(node) };
@@ -305,7 +305,7 @@ export class Dialog {
 					return result;
 				}
 
-				// return dialog-form response 
+				// return dialog-form response
 				switch (this.type) {
 					case "select":
 						result = response.target.returnValue;
@@ -329,7 +329,7 @@ export class Dialog {
 
 	/**
 	 * returns textnodes with linebreak-nodes from string containing \n or &lt;br&gt;
-	 * @param {string} string 
+	 * @param {string} string
 	 * @returns {domNodes}
 	 */
 	linebreak(string) {
@@ -476,7 +476,7 @@ export class Toast {
 	}
 	/**
 	 * updates reversed progress bar and closes toast on timeout
-	 * @param {int} percent 
+	 * @param {int} percent
 	 */
 	countdown(percent = 100) {
 		const countdowndiv = document.querySelector("#toast > div");
@@ -490,7 +490,7 @@ export class Toast {
 }
 
 export class Assemble {
-	/** 
+	/**
 	 * assembled forms and screen elements.
 	 * deepest nesting of input object is three levels
 	 * form:null or {attributes} / nothing creates just a div e.g. just for text and links
@@ -645,7 +645,7 @@ export class Assemble {
 	 * recursively processes one panel, with slides if nested accordingly and instatiates the contained widget elements
 	 * @param {array|object} elements render instructions for single panel
 	 * @returns {domNodes}
-	 * 
+	 *
 	 * @example content to exist of three nestings
 	 * ```json
 	 * 	[ panel article>section
@@ -660,7 +660,7 @@ export class Assemble {
 	 * ```
 	 * @example or two nestings
 	 * ```json
-	 * 
+	 *
 	 * 	[ panel article
 	 * 		{ element },
 	 * 		{ element }
@@ -740,8 +740,8 @@ export class Assemble {
 
 	/**
 	 * constructs slider navigation and position indicators
-	 * @param {string} sectionID 
-	 * @param {int} length 
+	 * @param {string} sectionID
+	 * @param {int} length
 	 * @returns {domNodes} navigation buttons and slide indicators
 	 */
 	slider(sectionID, length) {
@@ -803,7 +803,7 @@ export class Assemble {
 
 	/**
 	 * event handler for horizontal scrolling of multiple panels, updating slider position indicators
-	 * @param {event} e 
+	 * @param {event} e
 	 * @event setTimeout
 	 */
 	sectionScroller(e) {
@@ -823,7 +823,7 @@ export class Assemble {
 
 	/**
 	 * check input fields for presence of required content, prepare atypical form content or report missing values
-	 * @param {event} event 
+	 * @param {event} event
 	 * @returns none after submit event or content update
 	 */
 	prepareForm(event) {
@@ -1001,7 +1001,7 @@ export class Assemble {
 	/**
 	 * adds attributes to a node (name, id, events, etc.)
 	 * @param {object} setup html attributes
-	 * @param {node} node 
+	 * @param {node} node
 	 * @returns {domNode} with set attributes
 	 */
 	apply_attributes(setup, node) {
@@ -1029,7 +1029,7 @@ export class Assemble {
 
 	/**
 	 * returns textnodes with linebreak-nodes from string containing \n or &lt;br&gt;
-	 * @param {string} string 
+	 * @param {string} string
 	 * @returns {domNodes}
 	 */
 	linebreak(string) {
@@ -1045,8 +1045,8 @@ export class Assemble {
 
 	/**
 	 * adds a number to names if same is already present, stores within this.names
-	 * @param {string} name 
-	 * @param {*} dontnumerate 
+	 * @param {string} name
+	 * @param {*} dontnumerate
 	 * @returns name with count number if applicable
 	 */
 	names_numerator(name, dontnumerate = undefined) {
@@ -1070,7 +1070,7 @@ export class Assemble {
 	 */
 
 	/**
-	 * @returns {domNodes} br 
+	 * @returns {domNodes} br
 	 */
 	br() {
 		return [document.createElement("br")];
@@ -1174,8 +1174,8 @@ export class Assemble {
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
-     * 		"type": "calendarbutton"
-     * 	}
+	 * 		"type": "calendarbutton"
+	 * 	}
 	 * ```
 	 */
 	calendarbutton() {
@@ -1188,8 +1188,7 @@ export class Assemble {
 	/**
 	 * empty method but neccessary for styling reasons (icon)
 	 */
-	cart() {
-	}
+	cart() {}
 
 	/**
 	 * creates checkboxes or radio inputs
@@ -1267,7 +1266,7 @@ export class Assemble {
 	 * 		}
 	 * 	}
 	 * ```
-	*/
+	 */
 	checkbox2text() {
 		return this.input("checkbox2text");
 	}
@@ -1299,8 +1298,8 @@ export class Assemble {
 	 * ```json
 	 * 	{
 	 * 		"type": "collapsible",
-	 * 		"attributes" : {"eg.": "dataset values for filtering"}, 
-	 * 		"content": ["array of any defined types"] 
+	 * 		"attributes" : {"eg.": "dataset values for filtering"},
+	 * 		"content": ["array of any defined types"]
 	 * 	}
 	 * ```
 	 */
@@ -1374,7 +1373,7 @@ export class Assemble {
 
 	/**
 	 * creates a date input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -1391,7 +1390,7 @@ export class Assemble {
 
 	/**
 	 * creates a delete button (styled)
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -1411,7 +1410,7 @@ export class Assemble {
 
 	/**
 	 * creates a email input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -1428,7 +1427,7 @@ export class Assemble {
 
 	/**
 	 * creates a file input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -1496,7 +1495,7 @@ export class Assemble {
 
 	/**
 	 * creates a styled search input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -1523,7 +1522,7 @@ export class Assemble {
 	 * 			"value": "{selected document title} anzeigen",
 	 * 			"onpointerup": "api.record('get', 'displayonly', '{selected document title}')"
 	 * 		}
-     * 	}
+	 * 	}
 	 * ```
 	 */
 	documentbutton() {
@@ -1655,7 +1654,7 @@ export class Assemble {
 
 	/**
 	 * creates an input of type
-	 * @param {string} type 
+	 * @param {string} type
 	 * @returns {domNodes} icon, input, label, hint
 	 * @example this.currentElement
 	 * ```json
@@ -1773,7 +1772,7 @@ export class Assemble {
 
 	/**
 	 * creates a styled link input whose value is about to be wrapped
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -1943,7 +1942,7 @@ export class Assemble {
 
 	/**
 	 * creates a number input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -2510,7 +2509,7 @@ export class Assemble {
 
 	/**
 	 * creates a submit button (styled) for other contexts than general form submission
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -2531,7 +2530,7 @@ export class Assemble {
 
 	/**
 	 * creates a tel input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -2548,7 +2547,7 @@ export class Assemble {
 
 	/**
 	 * creates a text input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -2566,7 +2565,7 @@ export class Assemble {
 	/**
 	 * creates a text input whose content is SUPPOSED to be inserted into clipboard
 	 * not by default though, because this is used as a cta as well
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
@@ -2752,8 +2751,8 @@ export class Assemble {
 	 * @example ```json
 	 * 	{
 	 * 		type: 'tile',
-	 * 		attributes : {eg. dataset values for filtering}, 
-	 * 		content: [array of any defined type] 
+	 * 		attributes : {eg. dataset values for filtering},
+	 * 		content: [array of any defined type]
 	 * 	}
 	 * ```
 	 */
@@ -2769,7 +2768,7 @@ export class Assemble {
 
 	/**
 	 * creates a time input
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
