@@ -37,8 +37,9 @@ export const assemble_helper = {
 
 	/**
 	 * creates and "clicks" a link containing the canvas content within an png.image
-	 * @param {string} id 
-	 * @param {string} name 
+	 * @param {string} id canvas id
+	 * @param {string} name filename
+	 * @event download ignition for an image file
 	 */
 	exportCanvas: function (id, name) {
 		document.getElementById(id).toBlob(
@@ -57,7 +58,9 @@ export const assemble_helper = {
 
 	/**
 	 * creates the application menu
+	 * @requires api 
 	 * @param {object} content render data return from api
+	 * @event insertion of menu nodes to menu container
 	 */
 	userMenu: function (content) {
 		if (!content) return;
@@ -135,32 +138,34 @@ export const assemble_helper = {
 
 export class Dialog {
 	/**
-	 *
+	 * @requires api, Html5QrcodeScanner, Assemble
 	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}} options
 	 * @returns promise, prepared answer on resolve according to type
-	 *
+	 * @example ```js
 	 * new Dialog({options}).then(response => {
 	 * 		doSomethingWithButtonValue(response);
 	 * 	});
-	 *
+	 * ```
 	 * select and scanner will be implemented by Assemble
 	 *
 	 * options with boolean values true|false as well as 'true'|'false' return selected booleans not strings. other strings will be returned as such.
-	 *
+	 * @example ```js
 	 * new Dialog({type:'alert', header:'acknowledge this!', render:'infotext'})
-	 *
+	 * ```
+	 * @example ```js
 	 * new Dialog({type:'confirm', header:'confirm this', options:{'abort': false, 'yes, i agree': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {
 	 *  	if (confirmation) huzzah());
 	 * 	});
-	 *
+	 * ```
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
 	 * multiple articles and sections are NOT supported due to simplified query selector
 	 * THIS IS FOR SIMPLE INPUTS ONLY
-	 *
+	 * @example ```js
 	 * new Dialog({type:'input', header:'fill out assembled form', render: [assemble_content], options:{'abort': false, 'submit': {'value': true, class: 'reducedCTA'}}}).then(response => {
 	 *  	if (Object.keys(response)) console.log('these are the results of the form:', response);
 	 * 	});
+	 * ```
 	 */
 	constructor(options = {}) {
 		this.type = options.type || null;
@@ -259,7 +264,8 @@ export class Dialog {
 				/**
 				 * report success and port result to defined output container
 				 * @param {string} decodedText 
-				 * @param {*} decodedResult 
+				 * @param {*} decodedResult
+				 * @event update output container
 				 */
 				function scanSuccess(decodedText, decodedResult) {
 					scanner.output.value = decodedText;
@@ -338,6 +344,7 @@ export class Dialog {
 	}
 
 	/**
+	 * default "OK" button
 	 * @returns {domNodes} default confirmation button
 	 */
 	alert() {
@@ -348,8 +355,8 @@ export class Dialog {
 	}
 
 	/**
-	 * @requires {object} this.options
-	 * @returns {domNodes} confirmation option buttons of provided this.options
+	 * buttons according to this.options
+	 * @returns {domNodes} confirmation option buttons
 	 */
 	confirm() {
 		const buttons = [];
@@ -370,8 +377,8 @@ export class Dialog {
 	}
 
 	/**
-	 * @requires {object} this.assemble, this.options
-	 * @returns {domNodes} rendered inputs and this.confirm()
+	 * Assemble rendered inputs and this.confirm()
+	 * @returns {domNodes} inputs and confirmations
 	 */
 	input() {
 		let result = [...this.assemble.initializeSection(null, null, "iCanHasNodes")];
@@ -404,8 +411,8 @@ export class Dialog {
 	}
 
 	/**
-	 * @requires {object} this.options
-	 * @returns {domNodes} select buttons with pseudo optgroups if provided sorted and length > 12
+	 * select modal buttons with pseudo optgroups if provided sorted and length > 12 based on this.options
+	 * @returns {domNodes} select buttons with pseudo optgroups
 	 */
 	select() {
 		const buttons = document.createElement("div");
@@ -439,8 +446,7 @@ export class Toast {
 	 * @param {string} message
 	 * @param {string} type success|error|info
 	 * @param {int} duration in milliseconds
-	 *
-	 * new Toast('message', 'success')
+	 * @example new Toast('message', 'success')
 	 *
 	 * duration is a bit fuzzy, idk why
 	 *
@@ -492,6 +498,7 @@ export class Assemble {
 	 *
 	 * elements are assembled by default but can be assigned common html attributes
 	 * names are mandatory for input elements
+	 * @requires api, _client, JsBarcode, QrCreator, SignaturePad
 	 * @param {object} setup render object
 	 */
 	constructor(setup) {
@@ -504,8 +511,8 @@ export class Assemble {
 		this.names = setup.names || {};
 		this.composer = setup.composer;
 	}
+
 	/**
-	 *
 	 * @param {domNode} nextSibling inserts before node, used by utility.js order_client
 	 * @param {domNode} formerSibling inserts after node, used on multiple photo or scanner type
 	 * @param {any} returnOnlyNodes return nodes without container, used by Dialog
@@ -560,10 +567,11 @@ export class Assemble {
 	}
 
 	/**
-	 * initiate scroll events after insertion to access rendered nodes and process number of sections
-	 * add trash article if applicable
-	 * initialize signature pad if applicable
-	 * populate canvases for barcodes, qr-codes or images if applicable
+	 * initialize events after insertion to access rendered nodes
+	 * @event scroll events to process number of sections
+	 * @event add trash drag events
+	 * @event initialize signature pad
+	 * @event populate canvases for barcodes, qr-codes or images if applicable
 	 */
 	processAfterInsertion() {
 		const scrollables = document.querySelectorAll("section");
@@ -572,6 +580,7 @@ export class Assemble {
 			section.dispatchEvent(new Event("scroll"));
 		}
 
+		// inititalize drag events
 		const trash = document.querySelector("[data-type=trash");
 		if (trash) compose_helper.composer_add_trash(trash.parentNode);
 
@@ -637,8 +646,8 @@ export class Assemble {
 	 * @param {array|object} elements render instructions for single panel
 	 * @returns {domNodes}
 	 * 
-	 * content to exist of three nestings
-	 * 
+	 * @example content to exist of three nestings
+	 * ```json
 	 * 	[ panel article>section
 	 * 		[ slide article
 	 * 			{ element },
@@ -648,13 +657,15 @@ export class Assemble {
 	 * 			...
 	 * 		],
 	 * 	],
-	 * 
-	 * or two nestings
+	 * ```
+	 * @example or two nestings
+	 * ```json
 	 * 
 	 * 	[ panel article
 	 * 		{ element },
 	 * 		{ element }
 	 * 	]
+	 * ```
 	 */
 	processPanel(elements) {
 		let content = [],
@@ -698,8 +709,7 @@ export class Assemble {
 	}
 
 	/**
-	 * iterates over content and gathers panels
-	 * @requires {object} this.content
+	 * iterates over this.content and gathers panels
 	 * @returns {domNodes} all assembled panels
 	 */
 	processContent() {
@@ -794,6 +804,7 @@ export class Assemble {
 	/**
 	 * event handler for horizontal scrolling of multiple panels, updating slider position indicators
 	 * @param {event} e 
+	 * @event setTimeout
 	 */
 	sectionScroller(e) {
 		setTimeout(() => {
@@ -931,8 +942,7 @@ export class Assemble {
 	}
 
 	/**
-	 * add icon before widgets
-	 * @requires {object} this.currentElement.type, ~.multiple, ~.[data-filtered]
+	 * add icon before widgets based on this.currentElement.type, ~.multiple, ~.[data-filtered]
 	 * @returns {domNodes} br, span with styleable data-type
 	 */
 	icon() {
@@ -947,8 +957,7 @@ export class Assemble {
 	}
 
 	/**
-	 * add header based on description
-	 * @requires {object} this.currentElement.description, ~.type, ~.required
+	 * add header based on this.currentElement.description, ~.type, ~.required
 	 * @returns {domNodes} header with styleable data-type and data-required if applicable
 	 */
 	header() {
@@ -972,7 +981,7 @@ export class Assemble {
 	}
 
 	/**
-	 * @requires {object} this.currentElement.hint
+	 * returns a styleable div based on this.currentElement.hint
 	 * @returns {domNodes} div
 	 */
 	hint() {
@@ -990,7 +999,7 @@ export class Assemble {
 	}
 
 	/**
-	 * adds attributes to a node (name, id, events, etc)
+	 * adds attributes to a node (name, id, events, etc.)
 	 * @param {object} setup html attributes
 	 * @param {node} node 
 	 * @returns {domNode} with set attributes
@@ -1035,8 +1044,7 @@ export class Assemble {
 	}
 
 	/**
-	 * adds a number to names if same is already present
-	 * @requires {object} this.names
+	 * adds a number to names if same is already present, stores within this.names
 	 * @param {string} name 
 	 * @param {*} dontnumerate 
 	 * @returns name with count number if applicable
@@ -1070,17 +1078,18 @@ export class Assemble {
 
 	/**
 	 * creates a button
-	 * @requires this.currentElement
 	 * @returns {domNodes} button, hint if applicable, encapsulated if applicable
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'button',
-	 * 		hint: 'this button does this or that'
-	 * 		attributes: {
-	 * 			value: 'this is displayed on the button',
-	 *			onpointerdown: 'alert("hello")'
+	 * 		"type": "button",
+	 * 		"hint": "this button does this or that",
+	 * 		"attributes": {
+	 * 			"value": "this is displayed on the button",
+	 *			"onpointerup": "alert('hello')"
 	 *		}
 	 * 	}
+	 * ```
 	 */
 	button() {
 		let button = document.createElement("button"),
@@ -1117,23 +1126,23 @@ export class Assemble {
 
 	/**
 	 * displays a calendar view with tiles calling calendar api
-	 * @requires {object} this.currentElement
 	 * @returns {domNodes} header, calendar view
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'calendar',
-	 * 		content: [
+	 * 		"type": "calendar",
+	 * 		"content": [
 	 * 			null,
 	 * 			{
-	 * 				date: 'Y-m-d',
-	 * 				display: 'whatever text, weekday, day, number of appointments
+	 * 				"date": "Y-m-d",
+	 * 				"display": "whatever text, weekday, day, number of appointments"
 	 * 			}, ...
 	 * 		],
-	 * 		api: schedule|timesheet
+	 * 		"api": "schedule|timesheet"
 	 * 	}
+	 * ```
 	 */
 	calendar() {
-
 		let cal = [],
 			daytile,
 			apicall = this.currentElement.api;
@@ -1160,9 +1169,14 @@ export class Assemble {
 	}
 
 	/**
-	 * creates a calendar button to add a new event
-	 * @requires this.currentElement
+	 * creates a calendar button to add a new calendarevent, pointer-event is defined by the backend though
 	 * @returns {domNodes} br, button
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+     * 		"type": "calendarbutton"
+     * 	}
+	 * ```
 	 */
 	calendarbutton() {
 		// to style it properly by adding data-type to article container
@@ -1179,26 +1193,26 @@ export class Assemble {
 
 	/**
 	 * creates checkboxes or radio inputs
-	 * @requires this.currentElement
 	 * @param {*} radio if it rather be radio inputs than checkbox by default
 	 * @returns {domNodes} header if applicable, inputs and labels, hint if applicable, br
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 *		type: 'checkbox', or 'radio'
-	 *		attributes:{
-	 *			name: 'checkboxes or radio', // grouping name for checkboxes, formerly description
+	 *		"type": "checkbox|radio"
+	 *		"attributes":{
+	 *			"name": "checkboxes or radio, serves as grouping name for checkboxes too",
 	 *		}
-	 *		inline: boolean, // displays only the inputs, can be omitted
-	 *		numeration: anything resulting in true to prevent enumeration
-	 *		content: {
-	 *			'Checkbox 1': {
-	 *				optional attributes
+	 *		"inline": "boolean displays only the inputs, can be omitted"
+	 *		"numeration": "anything resulting in true to prevent enumeration"
+	 *		"content": {
+	 *			"Checkbox 1": {
+	 *				"attribute": "optional"
 	 *			},
-	 *			'Checkbox 2': {
-	 *				optional attributes
+	 *			"Checkbox 2": {
+	 *				"attribute": "optional"
 	 *			}
 	 *		},
-	 *		hint: 'this selection is for...'
+	 *		"hint": "this selection is for..."
 	 * 	}
 	 */
 	checkbox(radio = null) {
@@ -1235,23 +1249,43 @@ export class Assemble {
 
 	/**
 	 * creates a text typed input with onpointerup modal with checkbox selection
-	 * 
 	 * requires additional options property on this.currentElement containing an options object
-	 * 
-	 * {'name':{value:str|int, checked: bool}}
-	 * @requires this.currentElement
+	 * @return {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "checkbox2text",
+	 * 		"attributes": {
+	 * 			"name": "Selected modal checkbox names are chained comma separated, onblur",
+	 * 		},
+	 * 		"hint": "Makes selections comprehensible while providing a single payload object. As seen in document manager.",
+	 * 		"content": {
+	 * 			"One": { "value": "1" },
+	 * 			"Two": { "value": 2, "checked": true },
+	 * 			"Three": { "value": "Three" },
+	 * 			'name': {'value':'str|int', 'checked': 'bool'}
+	 * 		}
+	 * 	}
+	 * ```
 	*/
 	checkbox2text() {
-		// returns a text typed input with onpointerup modal with checkbox selection
-		// requires additional options property on this.currentElement containing an options object
-		// {'name':{value:str|int, checked: bool}}
 		return this.input("checkbox2text");
 	}
 
 	/**
 	 * creates a textarea with numbered lines
-	 * @requires this.currentElement
 	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "code",
+	 * 		"hint": "cool line numers 8)",
+	 * 		"attributes": {
+	 * 			"name": "code_editor",
+	 * 			"id": "_code_editor",
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	code() {
 		this.currentElement.editor = true;
@@ -1260,14 +1294,15 @@ export class Assemble {
 
 	/**
 	 * initially collapsed by default, extended if attributes.class = "extended"
-	 * @required this.currentElement
 	 * @returns encapsulated content widgets
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'collapsible',
-	 * 		attributes : {eg. dataset values for filtering}, 
-	 * 		content: [array of any defined types] 
+	 * 		"type": "collapsible",
+	 * 		"attributes" : {"eg.": "dataset values for filtering"}, 
+	 * 		"content": ["array of any defined types"] 
 	 * 	}
+	 * ```
 	 */
 	collapsible() {
 		let div = document.createElement("div"),
@@ -1290,8 +1325,17 @@ export class Assemble {
 
 	/**
 	 * creates a datalist
-	 * @requires this.currentElement
 	 * @returns {domNodes} datalist, labels if applicable (for range)
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "datalist",
+	 * 		"attributes": {
+	 * 			"id": "text_datalist",
+	 * 		},
+	 * 		"content": ["A", "textinput", "with", "a", "datalist"]
+	 * 	}
+	 * ```
 	 */
 	datalist() {
 		let datalist = document.createElement("datalist");
@@ -1330,8 +1374,16 @@ export class Assemble {
 
 	/**
 	 * creates a date input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "date",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	date() {
 		return this.input("date");
@@ -1339,8 +1391,17 @@ export class Assemble {
 
 	/**
 	 * creates a delete button (styled)
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "deletebutton",
+	 * 		"attributes": {
+	 * 			"value": "yeet that!",
+	 *			"onpointerdown": "some.deletion.event()"
+	 *		}
+	 * 	}
+	 * ```
 	 */
 	deletebutton() {
 		// to style it properly by adding data-type to article container
@@ -1350,8 +1411,16 @@ export class Assemble {
 
 	/**
 	 * creates a email input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "email",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	email() {
 		return this.input("email");
@@ -1359,16 +1428,16 @@ export class Assemble {
 
 	/**
 	 * creates a file input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'file',
-	 * 		attributes: {
-	 * 			name: 'file upload',
-	 * 			multiple: true
-	 * 		}
-	 * 		hint: 'this file serves as...'
+	 * 		"type": "file",
+	 * 		"attributes": {
+	 * 			"name": "file upload",
+	 * 			"multiple": true
+	 * 		},
+	 * 		"hint": "this file serves as..."
 	 * 	}
 	 */
 	file() {
@@ -1427,8 +1496,16 @@ export class Assemble {
 
 	/**
 	 * creates a styled search input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "filtered",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	filtered() {
 		// filter appears to be reserved
@@ -1437,8 +1514,17 @@ export class Assemble {
 
 	/**
 	 * creates a document button (styled)
-	 * @requires this.currentElement
 	 * @returns {domNodes} br, button
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "documentbutton",
+	 * 		"attributes": {
+	 * 			"value": "{selected document title} anzeigen",
+	 * 			"onpointerup": "api.record('get', 'displayonly', '{selected document title}')"
+	 * 		}
+     * 	}
+	 * ```
 	 */
 	documentbutton() {
 		// to style it properly by adding data-type to article container
@@ -1449,15 +1535,15 @@ export class Assemble {
 
 	/**
 	 * creates a hidden input
-	 * @requires this.currentElement
 	 * @returns {domNodes}
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * {
-	 * 		type: 'hidden',
-	 * 		numeration: anything resulting in true to prevent enumeration
-	 * 		attributes: {
-	 * 			name: 'name',
-	 * 			value: '3.14'}
+	 * 		"type": "hidden",
+	 * 		"numeration": "anything resulting in true to prevent enumeration"
+	 * 		"attributes": {
+	 * 			"name": "name",
+	 * 			"value": 3.14}
 	 * 		}
 	 * 	}
 	 */
@@ -1480,8 +1566,16 @@ export class Assemble {
 
 	/**
 	 * creates an identify scanner
-	 * @required this.currentElement
 	 * @returns scanner
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "identify",
+	 * 		"attributes": {
+	 * 			"name": "identifier",
+	 * 			"required": true
+	 * 		}
+	 * 	}
 	 */
 	identify() {
 		this.currentElement.attributes.name = "IDENTIFY_BY_" + this.currentElement.attributes.name;
@@ -1490,18 +1584,18 @@ export class Assemble {
 
 	/**
 	 * creates an image canvas for barcodes, qr-code or images
-	 * @requires this.currentElement
 	 * @returns {domNodes} header, canvas, downloadbutton
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'image',
-	 * 		description:'export image' (e.g.),
-	 * 		attributes:{
-	 * 			name: 'exportname', // atypical use of generic attributes on this one
-	 * 			qrcode: 'e.g. token', // for display of a qrcode with this value
-	 * 			barcode: {value:'e.g. token', format: see documentation}, // for display of a barcode with this value
-	 * 			url: 'base64 encoded string || url' // for display of an image
-	 * 			imageonly: {inline styles overriding .imagecanvas} || undefined // flag to display without download button
+	 * 		"type": "image",
+	 * 		"description":"export image",
+	 * 		"attributes":{
+	 * 			"name": "exportname atypical use of generic attributes on this one",
+	 * 			"qrcode": "e.g. token for display of a qrcode with this value",
+	 * 			"barcode": {"value":"e.g. tokenfor display of a barcode with this value", "format": "see documentation"},
+	 * 			"url": "base64 encoded string|url",
+	 * 			"imageonly": {"inline styles": "overriding .imagecanvas"}|undefined
 	 * 		}
 	 * 	}
 	 */
@@ -1561,16 +1655,16 @@ export class Assemble {
 
 	/**
 	 * creates an input of type
-	 * @requires this.currentElement
 	 * @param {string} type 
 	 * @returns {domNodes} icon, input, label, hint
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'text',
-	 * 		hint: 'please provide information about...',
-	 * 		numeration: anything resulting in true to prevent enumeration
-	 * 		attributes: {
-	 * 			name: 'variable name' // will be used as an accessible placeholder
+	 * 		"type": "{type}",
+	 * 		"hint": "please provide information about...",
+	 * 		"numeration": "anything resulting in true to prevent enumeration"
+	 * 		"attributes": {
+	 * 			"name": "variable name will be used as an accessible placeholder"
 	 * 		}
 	 * 	}
 	 */
@@ -1679,8 +1773,16 @@ export class Assemble {
 
 	/**
 	 * creates a styled link input whose value is about to be wrapped
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "link",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	link() {
 		return this.input("text");
@@ -1688,23 +1790,23 @@ export class Assemble {
 
 	/**
 	 * creates a set of links
-	 * @requires this.currentElement
 	 * @returns {domNodes} header, anchors, hint
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'links',
-	 * 		description:'links',
-	 * 		content: {
-	 * 			'Link 1': {
-	 * 				href: '#'
+	 * 		"type": "links",
+	 * 		"description": "link list",
+	 * 		"content": {
+	 * 			"Link 1": {
+	 * 				"href": "#"
 	 * 			},
-	 * 			'Link 2': {
-	 * 				href: '#',
-	 * 				onpointerdown: 'alert(\'hello\')'
+	 * 			"Link 2": {
+	 * 				"href": #"",
+	 * 				"onpointerup": "alert('hello')"
 	 * 			}
 	 * 		},
-	 * 		hint: 'these links serve the purpose of...'
-	 * 		data-filtered: any
+	 * 		"hint": "these links serve the purpose of..."
+	 * 		"data-filtered": any
 	 * 	}
 	 */
 	links() {
@@ -1723,22 +1825,22 @@ export class Assemble {
 
 	/**
 	 * creates a message display
-	 * @requires this.currentElement
 	 * @returns {domNodes} div containing message
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'message',
-	 * 		content: {
-	 * 			img: str profile-picture url,
-	 * 			user: str name
-	 * 			text: str well... text,
-	 * 			date: str timestamp,
-	 * 			unseen: null|int styled like notifications for conversations overview
+	 * 		"type": "message",
+	 * 		"content": {
+	 * 			"img": "str profile-picture url",
+	 * 			"user": "str name",
+	 * 			"text": "str well... text",
+	 * 			"date": "str timestamp",
+	 * 			"unseen": "null|int styled like notifications for conversations overview"
 	 * 		},
-	 * 		attributes:{
-	 * 			onpointerup
-	 * 			class: right, conversation,
-	 * 			ICON_onpointerup: event only applies to user icon
+	 * 		"attributes":{
+	 * 			"onpointerup" : "event applies to whole container",
+	 * 			"class": "right, conversation",
+	 * 			"ICON_onpointerup": "event only applies to user icon"
 	 * 		}
 	 * 	}
 	 */
@@ -1822,6 +1924,13 @@ export class Assemble {
 	/**
 	 * created a default view for no database content
 	 * @returns {domNodes} img, span
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "nocontent",
+	 * 		"content": "why are there tally marks on my arm?"
+	 * 	}
+	 * ```
 	 */
 	nocontent() {
 		const img = document.createElement("div");
@@ -1834,8 +1943,16 @@ export class Assemble {
 
 	/**
 	 * creates a number input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "number",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	number() {
 		return this.input("number");
@@ -1843,17 +1960,18 @@ export class Assemble {
 
 	/**
 	 * creates a photo upload or file upload for desktops
-	 * @requires this.currentElement
 	 * @returns {domNodes} header, input, img, button, resetbutton, hint
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 *  {
-	 * 		type: 'photo',
-	 * 		attributes: {
-	 * 			name: 'photo upload',
-	 * 			multiple: true|undefined
+	 * 		"type": "photo",
+	 * 		"attributes": {
+	 * 			"name": "photo upload",
+	 * 			"multiple": true|undefined
 	 * 		}
-	 * 		hint: 'this photo serves as...'
+	 * 		"hint": "this photo serves as..."
 	 * 	}
+	 * ```
 	 */
 	photo() {
 		let input = document.createElement("input"),
@@ -1930,18 +2048,19 @@ export class Assemble {
 
 	/**
 	 * creates a product selection input type text with button to open up an api product search
-	 * @requires this.currentElement
 	 * @returns {domNodes} icon, input, button, label, hint
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 *  {
-	 * 		type: 'productselection',
-	 * 		hint: 'somethingsomething...',
-	 * 		numeration: anything resulting in true to prevent enumeration
-	 * 		attributes: {
-	 * 			name: 'variable name' // will be used as an accessible placeholder
-	 * 			multiple: bool // on changing the input field another appends
+	 * 		"type": "productselection",
+	 * 		"hint": "somethingsomething"...,
+	 * 		"numeration": "anything resulting in true to prevent enumeration",
+	 * 		"attributes": {
+	 * 			"name": "variable name will be used as an accessible placeholder",
+	 * 			"multiple": "bool on changing the input field another appends"
 	 * 		}
 	 * 	}
+	 * ```
 	 */
 	productselection() {
 		let input = document.createElement("input"),
@@ -2027,8 +2146,8 @@ export class Assemble {
 
 	/**
 	 * creates radio inputs
-	 * @requires this.currentElement
 	 * @returns {domNodes} header if applicable, inputs and labels, hint if applicable, br
+	 * @example see this.checkbox()
 	 */
 	radio() {
 		return this.checkbox("radioinstead");
@@ -2036,19 +2155,20 @@ export class Assemble {
 
 	/**
 	 * creates a range input with default datalist if not provided otherwise
-	 * @requires this.currentElement
 	 * @returns {domNodes} header, input, hint
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 *  {
-	 * 		type: 'range',
-	 * 		attributes: {
-	 * 			name: 'range',
-	 * 			min: 0,
-	 * 			max: 100,
-	 * 			step: 5
-	 * 		}
-	 * 		hint: 'from 0 to 100 in 20 steps'
+	 * 		"type": "range",
+	 * 		"attributes": {
+	 * 			"name": "range",
+	 * 			"min": 0,
+	 * 			"max": 100,
+	 * 			"step": 5
+	 * 		},
+	 * 		"hint": "from 0 to 100 in 20 steps"
 	 * 	}
+	 * ```
 	 */
 	range() {
 		let input = document.createElement("input"),
@@ -2080,15 +2200,20 @@ export class Assemble {
 
 	/**
 	 * creates a scanner input with scanner dialog
-	 * @requires this.currentElement
 	 * @returns {domNodes} icon, input, label, hint, additional buttons if applicable
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 *  {
-	 * 		type: 'scanner',
-	 * 		description:'access credentials' (e.g.),
-	 * 		attributes:{name: 'input name', type:'password', multiple: true|undefined} // type: to override e.g. for logins, multiple: to clone after successful import
-	 * 		destination: elementId // force output to other input, e.g. search
+	 * 		"type": "scanner",
+	 * 		"description": "access credentials",
+	 * 		"attributes":{
+	 * 			"name": "input name",
+	 * 			"type": "password, default text override e.g. for logins",
+	 * 			"multiple": "true|undefined, to clone after successful import"
+	 * 		},
+	 * 		"destination": "elementId force output to other input, e.g. search"
 	 * 	}
+	 * ```
 	 */
 	scanner() {
 		let result = [],
@@ -2196,8 +2321,16 @@ export class Assemble {
 
 	/**
 	 * creates a search input
-	 * @requires this.currentElement
 	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "search",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	search() {
 		return this.input("search");
@@ -2205,27 +2338,28 @@ export class Assemble {
 
 	/**
 	 * creates a select input with dialog modal, optgpoups by default id content sorted and > 12
-	 * @requires this.currentElement
 	 * @returns {domNodes} icon, select, label, hint
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'select',
-	 * 		hint: 'this is a list',
-	 * 		numeration: anything resulting in true to prevent enumeration
-	 * 		content: {
-	 * 			'entry one': {
-	 * 				value: '1'
+	 * 		"type": "select",
+	 * 		"hint": "this is a list",
+	 * 		"numeration": "anything resulting in true to prevent enumeration",
+	 * 		"content": {
+	 * 			"entry one": {
+	 * 				"value": 1
 	 * 			},
-	 * 			'entry two': {
-	 * 				value: '2',
-	 * 				selected: true
+	 * 			"entry two": {
+	 * 				"value": "2",
+	 * 				"selected": true
 	 * 			}
-	 * 		}
-	 * 		attributes: {
-	 * 			name: 'variable name'
-	 * 			multiple: bool // another one will be appended if selection has value, not a classic multiple selection though
+	 * 		},
+	 * 		"attributes": {
+	 * 			"name": "variable name",
+	 * 			"multiple": "bool another one will be appended if selection has value, not a classic multiple selection though"
 	 * 		},
 	 * 	}
+	 * ```
 	 */
 	select() {
 		const groups = {};
@@ -2320,20 +2454,20 @@ export class Assemble {
 
 	/**
 	 * creates a signaturePad
-	 * @requires this.currentElement
 	 * @returns {domNodes}
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'signature',
-	 * 		attributes: {
-	 * 			name: 'signature',
-	 * 			required: optional boolean
+	 * 		"type": "signature",
+	 * 		"attributes": {
+	 * 			"name": "signature",
+	 * 			"required": "optional boolean"
 	 * 		},
-	 * 		hint: 'this signature is for...'
+	 * 		"hint": "this signature is for..."
 	 * 	}
+	 * ```
 	 */
 	signature() {
-		/* */
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		let result = [...this.header()];
 		const canvas = document.createElement("canvas");
@@ -2357,14 +2491,15 @@ export class Assemble {
 	}
 
 	/**
-	 * creates an stlviever div
-	 * @requires this.currentElement
+	 * creates an stlviewer div
 	 * @returns {domNode} div
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'stlviewer',
-	 * 		description:'viewstl' (e.g.),
+	 * 		"type": "stlviewer",
+	 * 		"description": "viewstl"
 	 * 	}
+	 * ```
 	 */
 	stlviewer() {
 		const div = document.createElement("div");
@@ -2375,8 +2510,17 @@ export class Assemble {
 
 	/**
 	 * creates a submit button (styled) for other contexts than general form submission
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "submitbutton",
+	 * 		"attributes": {
+	 * 			"value": "save that!",
+	 *			"onpointerdown": "some.submission.event()"
+	 *		}
+	 * 	}
+	 * ```
 	 */
 	submitbutton() {
 		// to style it properly by adding data-type to article container
@@ -2387,8 +2531,16 @@ export class Assemble {
 
 	/**
 	 * creates a tel input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "tel",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	tel() {
 		return this.input("tel");
@@ -2396,8 +2548,16 @@ export class Assemble {
 
 	/**
 	 * creates a text input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "text",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	text() {
 		return this.input("text");
@@ -2406,8 +2566,17 @@ export class Assemble {
 	/**
 	 * creates a text input whose content is SUPPOSED to be inserted into clipboard
 	 * not by default though, because this is used as a cta as well
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "text_copy",
+	 * 		"attributes": {
+	 * 			"name": "variable name",
+	 * 			"onpointerup": "_client.application.toClipboard(this)"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	text_copy() {
 		return this.input("text");
@@ -2415,21 +2584,22 @@ export class Assemble {
 
 	/**
 	 * creates a textarea with optional access to texttemplates by api request
-	 * @requires this.currentElement
 	 * @returns {domNodes}
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'textarea',
-	 * 		hint: 'enter a lot of text',
-	 * 		texttemplates: true or undefined to add a button opening text templates within a modal
-	 * 		numeration: anything resulting in true to prevent enumeration
-	 * 		editor: anything resulting in true to add line numbers
-	 * 		attributes: {
-	 * 			name:'somename'
-	 * 			rows:8,
-	 * 			value:'values can be passed with this pseudo attribute'
+	 * 		"type": "textarea",
+	 * 		"hint": "enter a lot of text",
+	 * 		"texttemplates": "true or undefined to add a button opening text templates within a modal",
+	 * 		"numeration": "anything resulting in true to prevent enumeration",
+	 * 		"editor": "anything resulting in true to add line numbers",
+	 * 		"attributes": {
+	 * 			"name": "somename",
+	 * 			"rows": 8,
+	 * 			"value": "values can be passed with this pseudo attribute"
 	 * 		}
 	 * 	}
+	 * ```
 	 */
 	textarea() {
 		let textarea = document.createElement("textarea"),
@@ -2477,8 +2647,8 @@ export class Assemble {
 
 	/**
 	 * creates a textarea whose content will be inserted into clipboard
-	 * @requires this.currentElement
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
+	 * @example see this.textarea()
 	 */
 	textarea_copy() {
 		this.currentElement.attributes.onpointerup = "_client.application.toClipboard(this)";
@@ -2487,21 +2657,20 @@ export class Assemble {
 
 	/**
 	 * creates an informative text paragraph
-	 * @requires this.currentElement
 	 * @returns {domNodes} header, paragraph, hint, occasionally encapsulated for styling reasons to not be 100% width
-	 * 
+	 * @example this.currentElement
+	 * ```json
 	 * 	{
-	 * 		type: 'textsection',
-	 * 		content: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'
-	 * 		linkedcontent: may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>
-	 * 		attributes: {
-	 * 			attribute: value, // applies to header
-	 * 			name: 'very informative', content of header, former description
+	 * 		"type": "textsection",
+	 * 		"content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
+	 * 		"linkedcontent": "may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>"
+	 * 		"attributes": {
+	 * 			"name": "very informative, content of header, former description"
+	 * 			"otherattribute": "value applies to header"
 	 * 		}
 	 * 	}
 	 */
 	textsection() {
-		/* */
 		let result = [],
 			p,
 			content,
@@ -2580,12 +2749,13 @@ export class Assemble {
 	 * create a styled tile with provided content
 	 * @required this.currentElement
 	 * @returns encapsulated content widgets
-	 * 
+	 * @example ```json
 	 * 	{
 	 * 		type: 'tile',
 	 * 		attributes : {eg. dataset values for filtering}, 
 	 * 		content: [array of any defined type] 
 	 * 	}
+	 * ```
 	 */
 	tile() {
 		let article = document.createElement("article");
@@ -2599,15 +2769,23 @@ export class Assemble {
 
 	/**
 	 * creates a time input
-	 * @requires this.currentElement
 	 * @returns {domNodes} 
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "time",
+	 * 		"attributes": {
+	 * 			"name": "variable name"
+	 * 		}
+	 * 	}
+	 * ```
 	 */
 	time() {
 		return this.input("time");
 	}
 
 	/**
-	 * empty method but necessary to display the delete-area for composer or other future use
+	 * feature poor method but necessary to display the delete-area for composer or possibly other future use
 	 */
 	trash() {
 		return [...this.icon(), document.createTextNode(this.currentElement.description)];
