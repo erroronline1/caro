@@ -226,18 +226,18 @@ class RECORD extends API {
 
 		// prefill identify if passed, prepare calendar button if part of the document
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		function setidentifier($element, $identify, $calendar){
+		function setidentifier($element, $identify, $calendar, $_lang){
 			$content = [];
 			foreach($element as $subs){
 				if (!isset($subs['type'])){
-					$content[] = setidentifier($subs, $identify, $calendar);
+					$content[] = setidentifier($subs, $identify, $calendar, $_lang);
 				}
 				else {
 					if ($subs['type'] === 'identify'){
 						$subs['attributes']['value'] = $identify;
 					}
 					if ($subs['type'] === 'calendarbutton'){
-						$subs['attributes']['value'] = $this->_lang->GET('calendar.schedule.new');
+						$subs['attributes']['value'] = $_lang->GET('calendar.schedule.new');
 						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
 					}
 					if (in_array($subs['type'], [
@@ -268,7 +268,7 @@ class RECORD extends API {
 			if ($component){
 				$has_components = true;
 				$component['content'] = json_decode($component['content'], true);
-				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar));
+				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar, $this->_lang));
 			}
 		}
 		if (!$has_components) array_push($return['render']['content'], [[
