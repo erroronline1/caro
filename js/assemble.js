@@ -2147,7 +2147,7 @@ export class Assemble {
 	/**
 	 * creates radio inputs
 	 * @returns {domNodes} header if applicable, inputs and labels, hint if applicable, br
-	 * @example see this.checkbox()
+	 * @see this.checkbox()
 	 */
 	radio() {
 		return this.checkbox("radioinstead");
@@ -2648,7 +2648,7 @@ export class Assemble {
 	/**
 	 * creates a textarea whose content will be inserted into clipboard
 	 * @returns {domNodes}
-	 * @example see this.textarea()
+	 * @see this.textarea()
 	 */
 	textarea_copy() {
 		this.currentElement.attributes.onpointerup = "_client.application.toClipboard(this)";
