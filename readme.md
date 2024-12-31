@@ -4315,7 +4315,7 @@ All libraries are embedded locally to avoid web requests and ensure availability
 # License
 [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
 
-Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
+Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation,  either version 3 of the License, or any later version.
 

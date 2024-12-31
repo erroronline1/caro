@@ -1600,7 +1600,7 @@ Eine Auflistung der verwendeten Bibliotheken liegt in der englischsprachigen Bes
 # Lizenz
 [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
 
-Copyright (C) 2023-2024 error on line 1 (dev@erroronline.one)
+Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
 
 Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU Affero General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder jeder späteren Version.
 
