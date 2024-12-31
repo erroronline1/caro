@@ -36,8 +36,7 @@
 	<link rel="manifest" href="./site.webmanifest" />
 	<title>CARO</title>
 </head>
-<script src="./js/import.js" type="module"></script>
-<script src="./js/utility.js" type="text/javascript"></script>
+<script src="./js/initializeCARO.js" type="module"></script>
 <script src="./libraries/erroronline1.js" type="text/javascript"></script>
 <script src="./libraries/html5-qrcode.min.mod.js" type="text/javascript"></script>
 <script src="./libraries/JsBarcode.all.min.js" type="text/javascript"></script>
@@ -65,11 +64,6 @@
 	<dialog id="inputmodal"></dialog>
 	<dialog id="modal"></dialog>
 	<dialog id="toast"></dialog>
-	<script>
-		window.addEventListener("load", async () => {
-			await _serviceWorker.register();
-		});
-	</script>
 </body>
 
 </html>
