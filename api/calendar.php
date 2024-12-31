@@ -643,7 +643,7 @@ class CALENDAR extends API {
 								'type' => 'textsection',
 								'attributes' => [
 									'data-type' => 'calendar',
-									'name' => $this->_lang->GET('calendar.events_assigned_units_uncompleted')
+									'name' => $this->_lang->GET('calendar.schedule.events_assigned_units_uncompleted')
 								]
 							]
 						];
@@ -1053,7 +1053,7 @@ class CALENDAR extends API {
 								'type' => 'textsection',
 								'attributes' => [
 									'data-type' => 'calendar',
-									'name' => $this->_lang->GET('calendar.events_assigned_units_uncompleted')
+									'name' => $this->_lang->GET('calendar.schedule.events_assigned_units_uncompleted')
 								]
 							]
 						];

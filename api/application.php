@@ -760,7 +760,7 @@ class APPLICATION extends API {
 		if ($displayevents) $overview[] = [
 			'type' => 'textsection',
 			'attributes' => [
-					'name' => $this->_lang->GET('calendar.events_assigned_units')
+					'name' => $this->_lang->GET('calendar.schedule.events_assigned_units')
 			],
 			'content' => $displayevents
 		];
@@ -782,7 +782,7 @@ class APPLICATION extends API {
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',
-			'description' => $this->_lang->GET('calendar.events_assigned_units_uncompleted'),
+			'description' => $this->_lang->GET('calendar.schedule.events_assigned_units_uncompleted'),
 			'content' => $uncompleted
 		];
 
