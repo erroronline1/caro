@@ -299,7 +299,7 @@ export const _client = {
 		 */
 		createFormData: (data) => {
 			window.calendarFormData = new FormData();
-			units = [];
+			let units = [];
 			for (const [key, value] of Object.entries(data)) {
 				if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
 				else window.calendarFormData.append(key, value);
