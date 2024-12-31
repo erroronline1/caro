@@ -16,7 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const _serviceWorker = {
+import { Assemble, Dialog, Toast } from "./assemble.js";
+
+export const _serviceWorker = {
 	worker: null,
 	permission: null,
 	notif: {
@@ -205,7 +207,7 @@ const _serviceWorker = {
 	},
 };
 
-const _client = {
+export const _client = {
 	application: {
 		/**
 		 * hide menu on touch event outside of menu
@@ -1345,15 +1347,3 @@ const _client = {
 		},
 	},
 };
-
-// scroll indicator for vertical distance
-window.addEventListener("scroll", function () {
-	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
-	document.querySelector("header>div:last-of-type").style.width = percentScrolled + "%";
-});
-// menu clearing event listener
-window.addEventListener("pointerup", _client.application.clearMenu);
-
-// add useragent to html tag to apply specific css attributes
-if (navigator.userAgent.toLowerCase().includes("safari")) document.documentElement.setAttribute("data-useragent", "safari");
-if (navigator.userAgent.toLowerCase().includes("chrome")) document.documentElement.removeAttribute("data-useragent");

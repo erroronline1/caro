@@ -16,8 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { assemble_helper, Dialog, Toast } from "./assemble.js";
-import { compose_helper } from "./compose.js";
+import { Assemble, assemble_helper, Dialog, Toast } from "./assemble.js";
+import { Compose, compose_helper } from "./compose.js";
 import { Lang } from "../js/language.js";
 
 export const api = {

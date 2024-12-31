@@ -16,6 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { Dialog, Toast, Assemble } from "../js/assemble.js";
+
 //test assembling
 //api.getForms('qr', 'template', 'qr');
 
