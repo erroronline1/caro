@@ -153,6 +153,14 @@
 			"505": "HTTP Version nicht unterstützt",
 			"507": "Unzureichender Speicherplatz"
 		},
+		"info": {
+			"license": "Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n \nDieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU Affero General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder jeder späteren Version. Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU Affero General Public License. Sie sollten ein Exemplar der GNU Affero General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>.",
+			"license_header": "CARO - Cloud Assisted Records and Operations",
+			"lines": ":code Zeilen Code, :documentation Zeilen Dokumentation\nvon denen die meisten mehrfach geändert wurden",
+			"lines_header": "Liebevoll zusammengestellte Zeilen",
+			"source": "https://github.com/erroronline1/caro",
+			"source_header": "Quelle"
+		},
 		"login": "Anmeldung",
 		"manual": {
 			"content": "Inhalt",
@@ -691,6 +699,7 @@
 	"menu": {
 		"application": {
 			"header": "Anwendung",
+			"info": "Info",
 			"manual_manager": "Anleitungen verwalten",
 			"signin": "Bitte melde dich an",
 			"signout_user": ":name abmelden",
@@ -1282,7 +1291,8 @@
 		"user_not_deleted": "Der Nutzer :name konnte nicht gelöscht werden",
 		"user_not_saved": "Der nutzer konnte nicht gespeichert werde",
 		"user_saved": "Der Nutzer :name wurde gespeichert",
-		"welcome_message": "Hallo :name,\nwillkommen in der :appname. Hier eine kurze Zusammenfassung:\nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo und bei der Produktsicherheit unterstützt dich :prrc. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.\nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.\nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"	},
+		"welcome_message": "Hallo :name,\nwillkommen in der :appname. Hier eine kurze Zusammenfassung:\nDeine Ansprechpartner für deine Bereiche sind :supervisor, in Fragen des QM :qmo und bei der Produktsicherheit unterstützt dich :prrc. Eine Auflistung findest Du jederzeit auch unter dem Menüpunkt :register\n\nBei :landingpage findest Du eine kurze Anleitung für deine verfügbaren Funktionen.\nWenn Du wissen willst, welche Einstellungen für Dich gelten kannst du das unter dem Menüpunkt :profile einsehen. Hier kannst auch ein paar eigene Optionen einstellen.\n\nBei Fragen zur App kannst Du dich gerne an :admin wenden.\nIch hoffe die App vereinfacht Dir die Arbeit, viel Erfolg!"
+	},
 	"regulatory": {
 		"iso134854_1_1": "13485 4.1.1 Allgemeine Anforderungen an das Qualitätsmanagementsystem",
 		"iso134854_1_2": "13485 4.1.2 Prozessfestlegung",

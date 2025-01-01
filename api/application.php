@@ -37,6 +37,61 @@ class APPLICATION extends API {
 	}
 
 	/**
+	 *   _     ___     
+	 *  |_|___|  _|___ 
+	 *  | |   |  _| . |
+	 *  |_|_|_|_| |___|
+	 *
+	 * display application info 
+	 */
+	public function info(){
+		$lines = ['frontend' => 0,'backend' => 0, 'code' => 0, 'documentation' => 0];
+		foreach (['../', '../js', '../api', '../templates'] as $dir){
+			foreach (scandir($dir) as $file){
+				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json'])) continue;
+				foreach(file($dir.'/'.$file) as $row){
+					if (in_array(pathinfo($file)['extension'], ['php','ini','json'])){
+						$lines['backend']++;
+						$lines['code']++;
+					}
+					if (in_array(pathinfo($file)['extension'], ['js','html','css'])){
+						$lines['frontend']++;
+						$lines['code']++;
+					}
+					if (in_array(pathinfo($file)['extension'], ['md'])){
+						$lines['documentation']++;				
+					}
+				}
+			}
+		}
+
+		$response = ['render' => ['content' => [
+			[
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('application.info.license_header')
+				],
+				'content' => $this->_lang->GET('application.info.license')
+			],
+			[
+				'type' => 'links',
+				'description' => $this->_lang->GET('application.info.source_header'),
+				'content' => [
+					$this->_lang->GET('application.info.source') => ['target' => '_blank']
+				]
+			],
+			[
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('application.info.lines_header')
+				],
+				'content' => $this->_lang->GET('application.info.lines', [':code' => $lines['code'], ':documentation' => $lines['documentation']])
+			],
+		]]];
+		$this->response($response);
+
+	}
+	/**
 	 *   _
 	 *  | |___ ___ ___ _ _ ___ ___ ___
 	 *  | | .'|   | . | | | .'| . | -_|
@@ -482,6 +537,9 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
 		if (PERMISSION::permissionFor('csvrules')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
 		if (PERMISSION::permissionFor('audits')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
+
+		// make sure info comes last so this is an exception
+		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onpointerup' => "api.application('get', 'info')"];
 
 		$this->response(['render' => $menu, 'user' => $_SESSION['user']['name']]);
 	}

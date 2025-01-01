@@ -278,6 +278,14 @@ export const api = {
 		request.splice(0, 0, "application");
 		let successFn, payload;
 		switch (request[1]) {
+			case "info":
+				successFn = function (data) {
+					api.update_header(api._lang.GET("menu.application.info"));
+					const render = new Assemble(data.render);
+					document.getElementById("main").replaceChildren(render.initializeSection());
+					render.processAfterInsertion();
+				};
+				break;
 			case "language":
 				successFn = async function (data) {
 					api._lang._USER = data.data;

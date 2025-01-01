@@ -114,6 +114,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
+* rendertest function to hide header and menu for documentation screenshots
+* _stresstest install default vendors, port defined "vendor filter.md" parts to json, apply same warning as for document import
 
 #### purchase considerations
 
@@ -2012,7 +2014,21 @@ graph TD;
 
 > GET ./api/api.php/application/language
 
-Retrieves an object with language chunks, processed by ./js/language.js
+Returns general application information
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[{"type":"textsection","attributes":{"name":"CARO - Cloud Assisted Records and Operations"},"content":"Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and\/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful,....
+```
+
+> GET ./api/api.php/application/language
+
+Retrieves an object with language chunks, similar to language.XX.json, slightly reduced by properties definetively not used by frontend,  processed by ./js/language.js
 
 Parameters
 | Name | Data Type | Required | Description |
