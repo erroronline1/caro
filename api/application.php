@@ -177,9 +177,11 @@ class APPLICATION extends API {
 				]]);
 			}
 		}
-		// user not found or logout requested
-		session_unset();
-		session_destroy();
+		// user not found is handled by api as well, destroy if logout requested, condition important to avoid errors on session timeout
+		if ($_SESSION){
+			session_unset();
+			session_destroy();
+		}
 		// append login screen
 		$response = ['render' =>
 			[
