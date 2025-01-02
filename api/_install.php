@@ -20,7 +20,7 @@
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
-define('CONFIG', parse_ini_file('setup.ini', true));
+require_once('_config.php');
 define('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
 
 $pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password']);

@@ -4,3 +4,4 @@ fileserver
 *.log
 *.pdf
 assets
+*.env

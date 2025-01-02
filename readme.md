@@ -1052,7 +1052,7 @@ Technically the application is being usable on any webserver but this is **not r
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime according to [config.CONFIG[limits][idle_logout]](#runtime-variables)
+* php.ini session.gc_maxlifetime according to [CONFIG[limits][idle_logout]](#runtime-variables)
 * php.ini enable extensions:
     * gd
     * gettext
@@ -1066,7 +1066,7 @@ Technically the application is being usable on any webserver but this is **not r
 
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
-* Set up api/config.ini, especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set pemissions to _install.default.XX.json-files.
+* Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set pemissions to _install.default.XX.json-files.
 * [Customize](#customisation) your appropriate language-files (language.XX.json and _install.default.XX.json)
 * Select an installation password for the system user.
 
@@ -1077,6 +1077,9 @@ Technically the application is being usable on any webserver but this is **not r
 
 ## Runtime variables
 Some variables can be edited during runtime. This applies for all *values* of language.XX.json files and some settings in config.ini. These options are mostly considered critical for the applications stability, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
+
+### Environment settings
+You can add a **config.env**-file being a structural clone of config.ini. Settings within config.env will override config.ini settings. This way you can set up different environments, e.g several development environments and production. On development changes it is self explanatory to keep all files up to date manually. All mentions of the config.ini-file always refer to the config.env-file as well.
 
 ```
 ; general application settings

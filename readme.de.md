@@ -967,7 +967,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 
 ### Anwendungseinrichtung
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
-* Konfiguration von api/config.ini, insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in _install.default.XX.json-Dateien.
+* Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in _install.default.XX.json-Dateien.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.json und _install.default.XX.json)
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
@@ -978,6 +978,9 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 
 ## Laufzeitvariablen
 Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der config.ini. Diese Optionen werden in großen Teilen als kritisch für die Anwendungsstabilität betrachtet und sind daher nicht für eine einfache Anpassung über die Nutzeroberfläche vorgesehen; statt dessen mit Bedacht und moderatem Aufwand.
+
+### Umgebungseinstellungen
+Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklären diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnnung der config.ini-Datei betreffen immer auch die config.env-Datei.
 
 ```
 ; general application settings
