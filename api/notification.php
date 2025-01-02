@@ -75,7 +75,7 @@ class NOTIFICATION extends API {
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
-			$reminders = $calendar->search($this->_lang->GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
+			$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
 			$open = false;
 			foreach($reminders as $reminder){
 				if (!$reminder['closed']) $open = true;
@@ -88,7 +88,7 @@ class NOTIFICATION extends API {
 					':author_id' => 1,
 					':affected_user_id' => 1,
 					':organizational_unit' => 'admin,office',
-					':subject' => $this->_lang->GET('calendar.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
+					':subject' => $this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
 					':misc' => '',
 					':closed' => '',
 					':alert' => 1
