@@ -23,7 +23,7 @@ if (is_file('config.env')){
 	$envconfig = parse_ini_file('config.env', true);
 
 	/**
-	 * recursively overwrite default config.ini parameters with environment settings
+	 * recursively overwrite and append default config.ini parameters with environment settings
 	 * @param array $config starting with $defaultconfig
 	 * @param array $env starting with $envconfig
 	 */
