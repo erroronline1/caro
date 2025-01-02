@@ -982,6 +982,8 @@ Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft a
 ### Umgebungseinstellungen
 Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklären diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnnung der config.ini-Datei betreffen immer auch die config.env-Datei.
 
+In den Umgebugseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen Umgebungsbezogen ergänzt werden. Nich alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden.
+
 ```
 ; general application settings
 [application]

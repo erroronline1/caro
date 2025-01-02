@@ -1081,6 +1081,8 @@ Some variables can be edited during runtime. This applies for all *values* of la
 ### Environment settings
 You can add a **config.env**-file being a structural clone of config.ini. Settings within config.env will override config.ini settings. This way you can set up different environments, e.g several development environments and production. On development changes it is self explanatory to keep all files up to date manually. All mentions of the config.ini-file always refer to the config.env-file as well.
 
+Using the config.env-file you can also append labels, forbidden names, hide_offduty_reasons, easter-related holidays and SQL-settings related to your environment. Not all settings have to be present, on missing parameters within the environment settings the default ini-settings will take place. By default env.files are ignored in version control; if you set the production-server as upstream you'll have to provide the file manually.
+
 ```
 ; general application settings
 [application]
