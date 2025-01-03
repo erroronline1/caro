@@ -1091,7 +1091,7 @@ class DOCUMENT extends API {
 				]],
 				[[
 					'type' => 'trash',
-					'description' => $this->_lang->GET('assemble.edit_trash')
+					'description' => $this->_lang->GET('assemble.compose.edit_trash')
 				]]
 			]
 		];
@@ -1826,7 +1826,7 @@ class DOCUMENT extends API {
 				], [
 					[
 						'type' => 'trash',
-						'description' => $this->_lang->GET('assemble.edit_trash')
+						'description' => $this->_lang->GET('assemble.compose.edit_trash')
 					]
 				]
 			]
