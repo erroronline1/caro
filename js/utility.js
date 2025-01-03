@@ -17,6 +17,7 @@
  */
 
 import { Assemble, Dialog, Toast } from "./assemble.js";
+import { compose_helper } from "./compose.js";
 
 export const _serviceWorker = {
 	worker: null,
@@ -208,6 +209,10 @@ export const _serviceWorker = {
 };
 
 export const _client = {
+	// import due to calling from inline events prerendered by backend api into this object being in global scope anyway
+	Dialog: Dialog,
+	Toast: Toast,
+
 	application: {
 		/**
 		 * hide menu on touch event outside of menu

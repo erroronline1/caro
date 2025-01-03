@@ -93,7 +93,7 @@ class MESSAGE extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('message.delete'),
 								'type' => 'button',
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
+								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
 									"'".$this->_lang->GET('message.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', " . $conversation['conversation_user'] . ", 'inbox')})"

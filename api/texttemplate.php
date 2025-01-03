@@ -516,7 +516,7 @@ class TEXTTEMPLATE extends API {
 									'value' => $this->_lang->GET('texttemplate.template.save'),
 									'type' => 'button',
 									'data-type' => 'submitbutton',
-									'onpointerup' => "new Dialog({type: 'confirm', header: '" .
+									'onpointerup' => "new _client.Dialog({type: 'confirm', header: '" .
 										$this->_lang->GET("texttemplate.template.save") .
 										"', options:{" .
 										"'" .

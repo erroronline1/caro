@@ -895,7 +895,7 @@ class RECORD extends API {
 					if ($row['id'] > 1 && $row['id'] !== $_SESSION['user']['id']) $datalist[] = $row['name'];
 				}
 				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', this.dataset.casestate, this.checked);"
-					. " new Dialog({type: 'input', header: '" . $this->_lang->GET('record.casestate_change_message') . "', render: JSON.parse('"
+					. " new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.casestate_change_message') . "', render: JSON.parse('"
 					. json_encode([
 						[
 							'type' => 'checkbox',
@@ -1006,7 +1006,7 @@ class RECORD extends API {
 								'title' => $this->_lang->GET('record.export'),
 								'data-type' => 'download',
 								'class' => 'inlinebutton',
-								'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
+								'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
 								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
 								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
 								"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
@@ -1070,7 +1070,7 @@ class RECORD extends API {
 						foreach ($this->_lang->_USER['record']['type'] as $record_type => $description){
 							$options[$description] = ['value' => $record_type];
 						}						
-						$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
+						$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
 							[[
 								'type' => 'radio',
 								'attributes' => [
@@ -1112,7 +1112,7 @@ class RECORD extends API {
 						'attributes' => [
 							'data-type' => 'merge',
 							'value' => $this->_lang->GET('record.reidentify'),
-							'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
+							'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
 								[
 									[
 										'type' => 'scanner',
@@ -1188,7 +1188,7 @@ class RECORD extends API {
 									'title' => $this->_lang->GET('record.export'),
 									'value' => $this->_lang->GET('record.export'),
 									'data-type' => 'download',
-									'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
+									'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
 									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'fullexport\', \'" . $this->_requestedID . "\')'}},".
 									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
 									"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
@@ -1213,7 +1213,7 @@ class RECORD extends API {
 						foreach(PERMISSION::pending('complaintclosing', $content['closed']) as $position){
 							$approvalposition[$this->_lang->GET('permissions.' . $position)] = [
 								'value' => $position,
-								'onchange' => "if (this.checked) new Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.complaint_mark_as_closed_info') . "', options:{".
+								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.complaint_mark_as_closed_info') . "', options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('record.mark_as_closed') . ' ' . $this->_lang->GET('permissions.' . $position) ."': {value: true, class: 'reducedCTA'},".
 								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
@@ -1224,7 +1224,7 @@ class RECORD extends API {
 						foreach(PERMISSION::pending('recordsclosing', $content['closed']) as $position){
 							$approvalposition[$this->_lang->GET('permissions.' . $position)] = [
 								'value' => $position,
-								'onchange' => "if (this.checked) new Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.mark_as_closed_info') . "', options:{".
+								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.mark_as_closed_info') . "', options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('record.mark_as_closed') . ' ' . $this->_lang->GET('permissions.' . $position) . "': {value: true, class: 'reducedCTA'},".
 								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
@@ -1425,7 +1425,7 @@ class RECORD extends API {
 						'attributes' => [
 							'data-type' => 'merge',
 							'value' => $this->_lang->GET('record.reidentify'),
-							'onpointerup' => "new Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
+							'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
 								[
 									[
 										'type' => 'scanner',

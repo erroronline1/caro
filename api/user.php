@@ -1001,7 +1001,7 @@ class USER extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('user.delete_button'),
 								'type' => 'button', // apparently defaults to submit otherwise
-								'onpointerup' => $user['id'] ? "new Dialog({type: 'confirm', header: '". $this->_lang->GET('user.delete_confirm_header', [':name' => $user['name']]) ."', options:{".
+								'onpointerup' => $user['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.delete_confirm_header', [':name' => $user['name']]) ."', options:{".
 									"'".$this->_lang->GET('user.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('user.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',

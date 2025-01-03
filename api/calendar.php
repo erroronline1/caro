@@ -764,7 +764,7 @@ class CALENDAR extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.schedule.delete'),
-						'onpointerup' => "new Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . " " . $row['subject'] . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+						'onpointerup' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . " " . $row['subject'] . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
 							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];
@@ -1198,7 +1198,7 @@ class CALENDAR extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.schedule.delete'),
-						'onpointerup' => "new Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+						'onpointerup' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
 							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];

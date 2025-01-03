@@ -420,7 +420,7 @@ class APPLICATION extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('application.manual.delete'),
 								'type' => 'button',
-								'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('application.manual.delete_confirm') ."', options: {".
+								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('application.manual.delete_confirm') ."', options: {".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
 									"}}).then(confirmation => {if (confirmation) api.application('delete', 'manual', " . $entry['id'] . ")})"

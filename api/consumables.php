@@ -1266,7 +1266,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'value' => $this->_lang->GET('consumables.product.delete'),
 									'type' => 'button', // apparently defaults to submit otherwise
-									'onpointerup' => $product['id'] ? "new Dialog({type: 'confirm', header: '". $this->_lang->GET('consumables.product.delete_confirm_header', [':name' => $product['article_name']]) ."', options:{".
+									'onpointerup' => $product['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('consumables.product.delete_confirm_header', [':name' => $product['article_name']]) ."', options:{".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_cancel')."': false,".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
 										"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'product', " . $product['id'] . ")})" : ""
@@ -1340,7 +1340,7 @@ class CONSUMABLES extends API {
 		if (gettype($substring) === 'array') $substring = implode(',', $substring);
 		return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
 			"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
-			"new Dialog({type: '" . $type . "', header: '" . $this->_lang->GET('consumables.product.batch', [':percent' => CONFIG['likeliness']['consumables_article_no_similarity']]) . 
+			"new _client.Dialog({type: '" . $type . "', header: '" . $this->_lang->GET('consumables.product.batch', [':percent' => CONFIG['likeliness']['consumables_article_no_similarity']]) . 
 			"', render: [{type: 'checkbox', content: similarproducts}], options:{".
 			"'".$this->_lang->GET('consumables.product.delete_confirm_cancel')."': false,".
 			"'".$this->_lang->GET('consumables.product.batch_confirm')."': {value: true, class: 'reducedCTA'}".

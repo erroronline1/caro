@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-//import relevant functions and set global scope
+// import relevant functions and set global scope
 
 // main modules
 import { api } from "./api.js";
@@ -25,10 +25,7 @@ import { _serviceWorker, _client } from "./utility.js";
 window._serviceWorker = _serviceWorker;
 window._client = _client;
 
-// import due to calling from inline events prerendered by backend api
-import { Dialog, Toast } from "./assemble.js";
-window.Dialog = Dialog;
-window.Toast = Toast;
+// necessary import due to calling from inline events prerendered by backend api
 import { compose_helper } from "./compose.js";
 window.compose_helper = compose_helper;
 

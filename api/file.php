@@ -651,7 +651,7 @@ class FILE extends API {
 									'attributes' => [
 										'value' => $this->_lang->GET('file.manager.delete_folder'),
 										'type' => 'button',
-										'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $foldername]) ."', options:{".
+										'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $foldername]) ."', options:{".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
 											"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $foldername . "')})"
@@ -738,7 +738,7 @@ class FILE extends API {
 											'value' => $this->_lang->GET('file.manager.delete_file'),
 											'type' => 'button',
 											'data-filtered' => $file['path'],
-											'onpointerup' => "new Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $file['name']]) ."', options:{".
+											'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $file['name']]) ."', options:{".
 												"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
 												"'".$this->_lang->GET('file.manager.delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
 												"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"

@@ -292,7 +292,7 @@ class RISK extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('risk.delete_button'),
 							'type' => 'button', // apparently defaults to submit otherwise
-							'onpointerup' => $risk['id'] ? "new Dialog({type: 'confirm', header: '". $this->_lang->GET('risk.delete_confirm_header') ."', options:{".
+							'onpointerup' => $risk['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('risk.delete_confirm_header') ."', options:{".
 								"'".$this->_lang->GET('risk.delete_cancel')."': false,".
 								"'".$this->_lang->GET('risk.delete_confirm')."': {value: true, class: 'reducedCTA'},".
 								"}}).then(confirmation => {if (confirmation) api.risk('delete', 'risk', ". $risk['id'] . ")})" : ''
