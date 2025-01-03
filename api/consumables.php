@@ -1502,6 +1502,10 @@ class CONSUMABLES extends API {
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
 					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')) . $this->_currentdate->format('Ymd')
 				];
+				// tidy up unused properties
+				foreach($vendor['info'] as $key => $value){
+					if (!$value) unset($vendor['info'][$key]);
+				}
 				
 				// check forbidden names
 				foreach(CONFIG['forbidden']['names'] as $pattern){
@@ -1520,7 +1524,7 @@ class CONSUMABLES extends API {
 					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_currentdate->format('Ymd')]);
 				}
 
-				// unset all payload variables leaving vendor evaluation inputs
+				// unset all beckend defined payload variables leaving vendor evaluation inputs
 				foreach ([...array_values($vendor_info),
 					'consumables.vendor.edit_existing_vendors',
 					'consumables.vendor.edit_existing_vendors_search',
@@ -1599,6 +1603,10 @@ class CONSUMABLES extends API {
 				$vendor['active'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? 1 : 0;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
+				// tidy up unused properties
+				foreach($vendor['info'] as $key => $value){
+					if (!$value) unset($vendor['info'][$key]);
+				}
 				$vendor['certificate'] = json_decode($vendor['certificate'], true);
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
@@ -1629,6 +1637,11 @@ class CONSUMABLES extends API {
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
 				}
 
+				// tidy up unused properties
+				foreach($vendor['pricelist'] as $key => $value){
+					if (!$value) unset($vendor['pricelist'][$key]);
+				}
+
 				// tidy up consumable products database if inactive
 				if (!$vendor['active']){
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
@@ -1639,7 +1652,7 @@ class CONSUMABLES extends API {
 					$vendor['pricelist']['validity'] = '';
 				}
 
-				// unset all payload variables leaving vendor evaluation inputs
+				// unset all beckend defined payload variables leaving vendor evaluation inputs
 				foreach ([...array_values($vendor_info),
 					'consumables.vendor.edit_existing_vendors',
 					'consumables.vendor.edit_existing_vendors_search',
@@ -1952,7 +1965,7 @@ class CONSUMABLES extends API {
 									'type' => 'date',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.certificate_validity'),
-										'value' => $vendor['certificate']['validity'] ? : '',
+										'value' => isset($vendor['certificate']['validity']) ? $vendor['certificate']['validity'] : '',
 										'id' => 'vendor_certificate_validity'
 									]
 								]
@@ -1978,7 +1991,7 @@ class CONSUMABLES extends API {
 									'type' => 'code',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.pricelist_filter'),
-										'value' => $vendor['pricelist']['filter'] ? : '',
+										'value' => isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : '',
 										'placeholder' => $this->filtersample
 									]
 								]
@@ -2027,7 +2040,7 @@ class CONSUMABLES extends API {
 					];
 
 					// add pricelist info if provided
-					if ($vendor['pricelist']['validity']) array_splice($result['render']['content'][4], 0, 0,
+					if (isset($vendor['pricelist']['validity'])) array_splice($result['render']['content'][4], 0, 0,
 						[[
 							[
 								'type' => 'textsection',
