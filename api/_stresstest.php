@@ -43,9 +43,10 @@ class STRESSTEST{
 	public $_caleandarentries = 20000;
 	public $_recordentries = 20000;
 	public $_orderentries = 1000;
-	public $_template = '../templates/documents.de.json';
+	public $_documenttemplate = '../templates/documents.de.json';
 	public $_autopermission = true;
 	public $_author = "Caro App";
+	public $_vendortemplate = '../templates/vendors.de.json';
 
 	public function __construct($method){
 		$options = [
@@ -229,13 +230,12 @@ class STRESSTEST{
 	}
 
 	public function installDocuments(){
-		if (!realpath($this->_template)) {
-			echo $this->_template . ' file not found';
+		if (!realpath($this->_documenttemplate)) {
+			echo $this->_documenttemplate . ' file not found';
 			return;
 		}
 
-		$parameters = [];
-		$documents = file_get_contents(realpath($this->_template));
+		$documents = file_get_contents(realpath($this->_documenttemplate));
 		$documents = json_decode($documents, true);
 		$matches = 0;
 
@@ -247,7 +247,7 @@ class STRESSTEST{
 			];
 		}
 		foreach ($documents as $document){
-			if (isset($document['name'])) {
+			if (isset($document['name']) && $document['name']) {
 				if (gettype($document['content']) === 'array') $document['content'] = json_encode($document['content']);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => [
@@ -268,7 +268,7 @@ class STRESSTEST{
 							':approval' => json_encode($permissions),
 							':id' => $this->_pdo->lastInsertId()
 						]
-						]);
+					]);
 				}
 			}
 		}
@@ -276,8 +276,8 @@ class STRESSTEST{
 	}
 
 	public function deleteDocuments(){
-		if (!realpath($this->_template)) {
-			echo $this->_template . ' file not found';
+		if (!realpath($this->_documenttemplate)) {
+			echo $this->_documenttemplate . ' file not found';
 			return;
 		}
 
@@ -285,7 +285,7 @@ class STRESSTEST{
 		$DBdocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$DBbundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 
-		$documents = file_get_contents(realpath($this->_template));
+		$documents = file_get_contents(realpath($this->_documenttemplate));
 		$documents = json_decode($documents, true);
 		$matches = 0;
 		foreach([...$DBcomponents, ...$DBdocuments, ...$DBbundles] as $dbdocument){
@@ -312,6 +312,76 @@ class STRESSTEST{
 			}
 		}
 		echo $matches . ' components and documents according to template file deleted';
+	}
+
+	public function installVendors(){
+		if (!realpath($this->_vendortemplate)) {
+			echo $this->_vendortemplate . ' file not found';
+			return;
+		}
+
+		$vendors = file_get_contents(realpath($this->_vendortemplate));
+		$vendors = json_decode($vendors, true);
+		$matches = 0;
+		$DBvendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+
+		foreach ($vendors as $vendor){
+			if (isset($vendor['name']) && $vendor['name'] && !in_array($vendor['name'], array_column($DBvendors, 'name'))) {
+				$vendordata = [
+					'name' => $vendor['name'],
+					'active' => 1,
+					'info' => $vendor['info'],
+					'certificate' => [],
+					'pricelist' => ['filter' => $vendor['pricelist']],
+					'immutable_fileserver'=> preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $this->_currentdate->format('Ymd'),
+					'evaluation' => ''
+				];
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
+					'values' => [
+						':name' => $vendordata['name'],
+						':active' => $vendordata['active'],
+						':info' => json_encode($vendordata['info']),
+						':certificate' => json_encode($vendordata['certificate']),
+						':pricelist' => json_encode($vendordata['pricelist']),
+						':immutable_fileserver' => $vendordata['immutable_fileserver'],
+						':evaluation' => $vendordata['evaluation']
+					]
+				])){
+					$matches++;
+				}
+			}
+		}
+		echo $matches . ' vendors installed, please check the application for performance and remember you may have to do vendor evaluation on each! Only vendors with novel names have been added. THIS DOES NOT APPLY FOR DELETION IF NAME AND INFO ARE THE SAME AS IN THE TEMPLATE!';
+	}
+
+	public function deleteVendors(){
+		if (!realpath($this->_vendortemplate)) {
+			echo $this->_vendortemplate . ' file not found';
+			return;
+		}
+
+		$DBvendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+
+		$vendors = file_get_contents(realpath($this->_vendortemplate));
+		$vendors = json_decode($vendors, true);
+		$matches = 0;
+		foreach($DBvendors as $dbvendor){
+			foreach($vendors as $vendor){
+				if (
+					isset($vendor['name']) &&
+					$dbvendor['name'] === $vendor['name'] &&
+					json_decode($dbvendor['info'], true) === $vendor['info']
+				){
+					$deletion = [
+						'mysql' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbvendor['id'],
+						'sqlsrv' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbvendor['id']
+					];
+					$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
+					$matches++;
+				}
+			}
+		}
+		echo $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the immutable_fileserver directories, head over directly to the file system and don\'t mess up production server!';
 	}
 }
 

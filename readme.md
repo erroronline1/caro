@@ -114,7 +114,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-* _stresstest install default vendors, port defined "vendor filter.md" parts to json, apply same warning as for document import
 
 #### purchase considerations
 
@@ -1954,6 +1953,8 @@ During development following outcomes could be noted:
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
 The stresstest also allows for injection of documents and components according to templates/documents.xx.json. Deletion of documents and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing. **Deleting documents and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested.**
+
+Same applies to vendors. These can be set up in templates/vendors.xx.json. Only vendors with novel names will be added. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.***
 
 Variables for the stress test can be adjusted within the top class variables in the sourcecode.
 
