@@ -1,0 +1,28 @@
+[
+	{
+		"name": "Sample Company Ltd.",
+		"info":{
+			"purchase_info": "Pricelist import: edit the CSV as follows: ...",
+			"infotext":"",
+			"mail":"spam@saco.email",
+			"phone":"",
+			"address":"Off the Track 5, 54321 Failvillage",
+			"sales_representative":"John Knowitall",
+			"customer_id":"76513"
+		},
+		"pricelist":{}
+	},
+	{
+		"name": "",
+		"info":{
+			"purchase_info": "",
+			"infotext":"",
+			"mail":"",
+			"phone":"",
+			"address":"",
+			"sales_representative":"",
+			"customer_id":""
+		},
+		"pricelist":{}
+	}
+]
