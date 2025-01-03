@@ -114,7 +114,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-* rendertest function to hide header and menu for documentation screenshots
 * _stresstest install default vendors, port defined "vendor filter.md" parts to json, apply same warning as for document import
 
 #### purchase considerations

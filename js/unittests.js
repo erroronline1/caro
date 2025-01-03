@@ -918,3 +918,17 @@ export function rendertest(element) {
 	document.getElementById("main").replaceChildren(render.initializeSection());
 	render.processAfterInsertion();
 }
+
+export function screenshot() {
+	const body = document.querySelector("body"),
+		nav = document.querySelector("body>nav"),
+		main = document.querySelector("main");
+	const nav2 = nav.cloneNode(true);
+	main.style.marginBottom = "1.5em";
+	nav2.style.position = "unset";
+	nav2.style.margin = "0 0 -1em -1em";
+	nav2.style.width = "calc(100% + 1.9em)";
+	body.append(nav2);
+	nav.remove();
+	return "reload to return to normal";
+}
