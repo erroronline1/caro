@@ -1501,7 +1501,7 @@ class CONSUMABLES extends API {
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
-					'immutable_fileserver'=> UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')) . $this->_currentdate->format('Ymd')
+					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_currentdate->format('Ymd')
 				];
 				// tidy up unused properties
 				foreach($vendor['info'] as $key => $value){
