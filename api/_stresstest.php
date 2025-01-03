@@ -239,6 +239,12 @@ class STRESSTEST{
 		$documents = json_decode($documents, true);
 		$matches = 0;
 
+		$DBcomponents = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
+		$DBdocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$DBbundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+
+		$DBall = [...$DBcomponents, ...$DBdocuments, ...$DBbundles];
+
 		$permissions = [];
 		foreach (preg_split('/\W+/', CONFIG['permissions']['documentapproval']) as $permission){
 			$permissions[$permission] = [
@@ -247,7 +253,7 @@ class STRESSTEST{
 			];
 		}
 		foreach ($documents as $document){
-			if (isset($document['name']) && $document['name']) {
+			if (isset($document['name']) && $document['name'] && !in_array($document['name'], array_column($DBall, 'name'))) {
 				if (gettype($document['content']) === 'array') $document['content'] = json_encode($document['content']);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => [
@@ -272,7 +278,7 @@ class STRESSTEST{
 				}
 			}
 		}
-		echo $matches . ' components and documents according to template file inserted, please check the application for performance and remember you have to approve each to take effect!';
+		echo $matches . ' components, documents and bundles with novel names according to template file inserted, please check the application for performance' . (!$this->_autopermission ? ' and remember you have to approve each to take effect' : '' ) . '!';
 	}
 
 	public function deleteDocuments(){
