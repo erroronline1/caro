@@ -44,7 +44,6 @@ export class Lang {
 			}
 			return chunk;
 		}
-		console.trace(request, replace);
 		return "undefined or not provided for client";
 	}
 	/**
