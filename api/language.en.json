@@ -612,6 +612,7 @@
 			"pricelist_update": "Import pricelist",
 			"pricelist_update_error": ", but pricelist has not been imported, match filter with file.",
 			"pricelist_validity": "Last pricelist import on",
+			"purchase_info": "Information (purchase only)",
 			"sales_representative": "Sales representative",
 			"samplecheck_interval": "MDR §14 Sample check interval in days",
 			"samplecheck_interval_reusable": "MDR §14 Sample check on same product in days",

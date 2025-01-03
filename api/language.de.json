@@ -612,6 +612,7 @@
 			"pricelist_update": "Preisliste importieren",
 			"pricelist_update_error": ", aber die Preisliste konnte nicht importiert werden. Bitte gleiche den Filter mit der Datei ab.",
 			"pricelist_validity": "Letzter Preislistenimport am",
+			"purchase_info": "Informationen (nur für den Einkauf)",
 			"sales_representative": "Vertreter",
 			"samplecheck_interval": "MDR §14 Stichprobenintervall in Tagen",
 			"samplecheck_interval_reusable": "MDR §14 Stichprobenintervall für das gleiche Produkt in Tagen",
