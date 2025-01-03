@@ -1470,6 +1470,7 @@ class CONSUMABLES extends API {
 		// dynamic vendor info fields with storage key and lang-property value
 		// only defined once here, audit.php and on output form (GET) for typing ?
 		$vendor_info = [
+			'purchase_info' => 'consumables.vendor.purchase_info',
 			'infotext' => 'consumables.vendor.info',
 			'mail' => 'consumables.vendor.mail',
 			'phone' => 'consumables.vendor.phone',
@@ -1832,7 +1833,7 @@ class CONSUMABLES extends API {
 									'name' => $vendor['name']
 								],
 								'content' => implode(" \n", array_filter(array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info']), Fn($value) => boolval($value))) .
-									(isset($vendor['certificate']['validity']) ? " \n" . $this->_lang->GET('consumables.vendor.certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
+									(isset($vendor['certificate']['validity']) && $vendor['certificate']['validity'] ? " \n" . $this->_lang->GET('consumables.vendor.certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
 									" \n" . $this->_lang->GET('consumables.product.information_products_available', [':available' => $available])
 							],[
 								'type' => 'radio',
@@ -1845,6 +1846,18 @@ class CONSUMABLES extends API {
 								]
 							]
 						];
+
+						// add mailto
+						if (isset($vendor['info']['mail']) && $vendor['info']['mail'])
+							array_splice($result['render']['content'][1], 1, 0,
+								[[[
+									'type' => 'links',
+									'description' => $this->_lang->GET('consumables.vendor.mail'),
+									'content' => [
+										$vendor['info']['mail'] => ['href' => 'mailto:' . $vendor['info']['mail']]
+									]
+								]]]
+							);
 
 						// append certificates if applicable
 						if ($certificates) $result['render']['content'][1][] = [
@@ -1948,6 +1961,14 @@ class CONSUMABLES extends API {
 										'id' => 'vendor_customer_id'
 									]
 								], [
+									'type' => 'textarea',
+									'attributes' => [
+										'name' => $this->_lang->GET('consumables.vendor.purchase_info'),
+										'value' => isset($vendor['info']['purchase_info']) ? $vendor['info']['purchase_info']: '',
+										'rows' => 8
+									],
+									'hint' => $this->_lang->GET('consumables.vendor.info_hint')
+								], [
 									'type' => 'radio',
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.active')
@@ -2003,6 +2024,18 @@ class CONSUMABLES extends API {
 						'action' => $vendor['id'] ? "javascript:api.purchase('put', 'vendor', '" . $vendor['id'] . "')" : "javascript:api.purchase('post', 'vendor')",
 						'data-confirm' => true
 					]];
+
+					// add mailto
+					if (isset($vendor['info']['mail']) && $vendor['info']['mail'])
+						array_splice($result['render']['content'][1][0], 3, 0,
+							[[[
+								'type' => 'links',
+								'description' => $this->_lang->GET('consumables.vendor.mail'),
+								'content' => [
+									$vendor['info']['mail'] => ['href' => 'mailto:' . $vendor['info']['mail']]
+								]
+							]]]
+						);
 
 					// add pricelist upload form
 					if ($vendor['id'] && $vendor['active'] == 1)
