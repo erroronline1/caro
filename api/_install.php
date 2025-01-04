@@ -21,14 +21,34 @@ ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 require_once('_config.php');
-define('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
+if (isset($_SERVER['PATH_INFO'])) define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
+else define ('REQUEST', null);
 
-$pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password']);
+$driver = CONFIG['sql']['use'];
+
+$pdo = new PDO( CONFIG['sql'][$driver]['driver'] . ':' . CONFIG['sql'][$driver]['host'] . ';' . CONFIG['sql'][$driver]['database']. ';' . CONFIG['sql'][$driver]['charset'], CONFIG['sql'][$driver]['user'], CONFIG['sql'][$driver]['password']);
+
+$lang = CONFIG['application']['defaultlanguage'];
+$currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+$documentsjson = realpath('../templates/documents.' . $lang . '.json');
+$vendorsjson = realpath('../templates/vendors.' . $lang . '.json');
+$matches = 0;
+$processing = [];
 
 $queries = [
 	'precheck' => [
-		'mysql' => "SELECT * FROM caro_manual LIMIT 1",
-		'sqlsrv' => "SELECT TOP 1 * FROM caro_manual"
+		'user' => [
+			'mysql' => "SELECT * FROM caro_user LIMIT 1",
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_user"
+		],
+		'document_datalist' => [
+			'mysql' => "SELECT * FROM caro_documents ORDER BY name ASC, date DESC",
+			'sqlsrv' => "SELECT * FROM caro_documents ORDER BY name ASC, date DESC"
+		],
+		'vendor_datalist' => [
+			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",
+			'sqlsrv' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC"
+		],
 	],
 	'install' => [
 		'mysql' => [
@@ -261,8 +281,10 @@ $queries = [
 				,
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . REQUEST[0] . "', '', 'media/favicon/ios/256.png', '', '');",
+				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . (REQUEST ? REQUEST[0] : 1234) . "', '', 'media/favicon/ios/256.png', '', '');",
 				'manual' => "INSERT INTO `caro_manual` (`id`, `title`, `content`, `permissions`) VALUES (NULL, ':title', ':content', ':permissions');",
+				'documents' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
+				'vendors' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)",
 			]
 		]
 		,
@@ -497,45 +519,133 @@ $queries = [
 				,
 				],
 			'insertions' => [
-				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . REQUEST[0] . "', '', 'media/favicon/ios/256.png', '', '');",
+				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . (REQUEST ? REQUEST[0] : 1234) . "', '', 'media/favicon/ios/256.png', '', '');",
 				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
+				'documents' => "INSERT INTO caro_documents (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
+				'vendors' => "INSERT INTO caro_consumables_vendors (active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)"
 			]
 		]
 	]
 ];
 
-$driver = CONFIG['sql'][CONFIG['sql']['use']]['driver'];
+if (isset(REQUEST[0])){
+	switch (REQUEST[0]){
+		case 'documents':
+			if ($documentsjson){
+				// get templates
+				$documents = file_get_contents($documentsjson);
+				$documents = json_decode($documents, true);
+				// gather possibly existing entries
+				$DBall = $pdo->query($queries['precheck']['document_datalist'][$driver])->fetchAll();
 
-$devupdate = false;
-try {
-	if ($devupdate) throw new ErrorException('force update');
-	$statement = $pdo->query($queries['precheck'][$driver]);
-	echo "databases already installed.";
-}
-catch (Exception $e){
-	$processing = $queries['install'][$driver]['tables'];
+				foreach ($documents as $document){
+					// documents are only transferred if the name is not already taken
+					if (isset($document['name']) && $document['name'] && !in_array($document['name'], array_column($DBall, 'name'))) {
+						if (gettype($document['content']) === 'array') $document['content'] = json_encode($document['content']);
+						$processing[] = strtr($queries['install'][$driver]['insertions']['documents'], [
+								':name' => $pdo->quote($document['name']),
+								':alias' => $pdo->quote($document['alias']),
+								':context' => $pdo->quote($document['context']),
+								':unit' => $pdo->quote($document['unit']),
+								':author' => $pdo->quote($document['author']),
+								':content' => $pdo->quote($document['content']),
+								':regulatory_context' => $pdo->quote($document['regulatory_context'] ? : ''),
+								':permitted_export' => $document['permitted_export'] ? $pdo->quote($document['permitted_export']) : 'NULL',
+								':restricted_access' =>  $document['restricted_access'] ? $pdo->quote($document['restricted_access']) : 'NULL'
+							]
+						);
+					}
+				}
+				// execute stack
+				foreach ($processing as $command){
+					echo $command . '<br />';
+					$statement = $pdo->query($command);
+					$matches++;
+				}
+				echo '<br />' . $matches . ' components, documents and bundles with novel names according to template file inserted. This did save you the effort of assembling, you still have to approve each to take effect!<br />';
+			}
+			if ($vendorsjson) echo '<br /><a href="./vendors">Install vendors from ../templates/vendors.' . $lang . '.json</a><br />';
+			echo '<br /><a href="../../index.html">Exit</a>';
+			die();
+			break;
+		case 'vendors':
+			if ($vendorsjson) {
+				// get templates
+				$vendors = file_get_contents($vendorsjson);
+				$vendors = json_decode($vendors, true);
+				// gather possibly existing entries
+				$DBall = $pdo->query($queries['precheck']['vendor_datalist'][$driver])->fetchAll();
 
-	if (!$devupdate) {
-		// add default user
-		$processing[] = $queries['install'][$driver]['insertions']['user'];
-		// add default manual entries according to set up language
-		if ($file = file_get_contents('./_install.default.' . CONFIG['application']['defaultlanguage'] . '.json')){
-			$languagefile = json_decode($file, true);
-			foreach($languagefile['defaultmanual'] as $entry){
-				$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
-					':title' => $entry['title'],
-					':content' => $entry['content'],
-					':permissions' => $entry['permissions']
-				]);
+				foreach ($vendors as $vendor){
+					// vendors are only transferred if the name is not already taken
+					if (isset($vendor['name']) && $vendor['name'] && !in_array($vendor['name'], array_column($DBall, 'name'))) {
+						$processing[] = strtr($queries['install'][$driver]['insertions']['vendors'], [
+								':name' => $pdo->quote($vendor['name']),
+								':active' => $pdo->quote(1),
+								':info' => $pdo->quote(json_encode($vendor['info'])),
+								':certificate' => $pdo->quote(json_encode([])),
+								':pricelist' => $pdo->quote(json_encode(['filter' => $vendor['pricelist']])),
+								':immutable_fileserver' => $pdo->quote(preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $currentdate->format('Ymd')),
+								':evaluation' => ''
+							]
+						);
+					}
+				}
+				// execute stack
+				foreach ($processing as $command){
+					echo $command . '<br />';
+					$statement = $pdo->query($command);
+					$matches++;
+				}
+				echo '<br />' . $matches . ' vendors with novel names according to template file installed, remember you may have to do vendor evaluation and most definetely pricelist imports on each!<br />';
 			}
-			foreach ($processing as $command){
-				echo $command . "\n";
-				$statement = $pdo->query($command);
+			if ($documentsjson) echo '<br /><a href="./documents">Install documents from ../templates/documents.' . $lang . '.json</a><br />';
+			echo '<br /><a href="../../index.html">Exit</a>';
+			die();
+			break;
+		default:
+			try {
+				// if table is not found this will lead to an exception
+				$statement = $pdo->query($queries['precheck']['user'][$driver]);
+				echo "Databases already installed.<br />";
 			}
-		}
+			catch (Exception $e){
+				// add tables to stack
+				$processing[] = $queries['install'][$driver]['tables'];
+				// add default user
+				$processing[] = $queries['install'][$driver]['insertions']['user'];
+				// add default manual entries according to set up language
+				if ($file = file_get_contents('./_install.default.' . CONFIG['application']['defaultlanguage'] . '.json')){
+					$languagefile = json_decode($file, true);
+					foreach($languagefile['defaultmanual'] as $entry){
+						$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
+							':title' => $pdo->quote($entry['title']),
+							':content' => $pdo->quote($entry['content']),
+							':permissions' => $pdo->quote($entry['permissions'])
+						]);
+					}
+				}
+				// execute stack
+				foreach ($processing as $command){
+					echo $command . '<br />';
+					$statement = $pdo->query($command);
+				}
+			}
+			if ($documentsjson) echo '<a href="./documents">Install documents from ../templates/documents.' . $lang . '.json</a><br />';
+			if ($vendorsjson) echo '<a href="./vendors">Install vendors from ../templates/vendors.' . $lang . '.json</a><br />';
+			echo '<br /><a href="../../index.html">Exit</a>';
 	}
-} 
+}
+else {
+	echo nl2br(<<<'END'
+Please adhere to the documentation and provide a parameter:
 
-header("Location: ../index.html");
-die();
+The installation of the application requires an initial custom login token. Please start the installation process with ./_install.php/*your_selected_installation_password*
+ 
+
+END);
+	if ($documentsjson || $vendorsjson) echo 'After a successful installation you can decide to install from the provided template files:<br />';
+	if ($documentsjson) echo './_install.php/documents<br />';
+	if ($vendorsjson) echo './_install.php/vendors<br />';
+}
 ?>
