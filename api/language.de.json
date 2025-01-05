@@ -188,7 +188,7 @@
 	},
 	"assemble": {
 		"approve": {
-			"alert": "Following documents have been approved with new content. Please make sure to dispose of outdated prints!\n:documents",
+			"alert": "Folgende Dokumente wurden mit einem neuen Inhalt freigegeben. Bitte veraltete Ausdrucke entsorgen!\n:documents",
 			"approved": "freigegeben",
 			"as_select": "Freigabe in deiner Rolle als",
 			"completed": "Dieses Element ist vollständig freigegeben und kann nun verwendet werden.",
@@ -305,11 +305,11 @@
 				"textsection_description": "Gib eine Informationsbeschreibung an",
 				"texttemplate": "ergänze Schaltfläche um Textvorschläge zu nutzen"
 			},
-			"compose_context_1down": "eins weiter runter",
-			"compose_context_1up": "eins weiter hoch",
-			"compose_context_2bottom": "ganz nach unten verschieben",
-			"compose_context_2top": "ganz nach oben verschieben",
-			"compose_context_delete": "löschen",
+			"context_1down": "eins weiter runter",
+			"context_1up": "eins weiter hoch",
+			"context_2bottom": "ganz nach unten verschieben",
+			"context_2top": "ganz nach oben verschieben",
+			"context_delete": "löschen",
 			"document": {
 				"add_component": "Nach Namen suchen",
 				"document": "Dokument speichern",

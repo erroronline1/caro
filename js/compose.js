@@ -542,7 +542,7 @@ export const compose_helper = {
 		},
 		/**
 		 * displays a context menu (right click) on draggable containers to allow for reordering or deleting event target
-		 * @requires api, Dialog
+		 * @requires api, _client
 		 * @param {event} evnt
 		 * @event append context menu to body
 		 */
@@ -582,7 +582,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_2top")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2top")));
 			button.onpointerup = () => {
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
@@ -597,7 +597,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_1up")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1up")));
 			button.onpointerup = () => {
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
@@ -612,7 +612,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_1down")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1down")));
 			button.onpointerup = () => {
 				if (target.nextElementSibling) {
 					targetClone = target.cloneNode(true);
@@ -627,7 +627,7 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_2bottom")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2bottom")));
 			button.onpointerup = () => {
 				targetClone = target.cloneNode(true);
 				target.parentNode.append(targetClone);
@@ -640,12 +640,12 @@ export const compose_helper = {
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose_context_delete")));
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_delete")));
 			let options = {};
 			(options[api._lang.GET("general.cancel_button")] = false),
 				(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
 				(button.onpointerup = () => {
-					new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose_context_delete"), options: options }).then((confirmation) => {
+					new _client.Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.context_delete"), options: options }).then((confirmation) => {
 						if (confirmation) {
 							compose_helper.dragNdrop.drop_delete(evnt);
 						}
@@ -1173,7 +1173,7 @@ export class Compose extends Assemble {
 			description: api._lang.GET("assemble.compose.component.component"),
 			list: "components",
 			action:
-				"new Dialog({type: 'confirm', header: '" +
+				"new _client.Dialog({type: 'confirm', header: '" +
 				api._lang.GET("assemble.compose.component.component") +
 				"', options:{" +
 				"'" +
@@ -1299,12 +1299,12 @@ export class Compose extends Assemble {
 		// prefilling all inputs from selected component / document
 		if (prefilled) {
 			const options = {};
-			options[api._lang.GET("assemble.edit_visible")] = !(hidden && Object.keys(hidden).length)
+			options[api._lang.GET("assemble.compose.edit_visible")] = !(hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 				  }
 				: {};
-			options[api._lang.GET("assemble.edit_hidden")] =
+			options[api._lang.GET("assemble.compose.edit_hidden")] =
 				hidden && Object.keys(hidden).length
 					? {
 							checked: true,
@@ -1449,7 +1449,7 @@ export class Compose extends Assemble {
 			description: api._lang.GET("assemble.compose.document.document"),
 			list: "documents",
 			action:
-				"new Dialog({type: 'confirm', header: '" +
+				"new _client.Dialog({type: 'confirm', header: '" +
 				api._lang.GET("assemble.compose.document.document") +
 				"', options:{" +
 				"'" +
@@ -1867,7 +1867,7 @@ export class Compose extends Assemble {
 						try {
 							compose_helper.importComponent({ content: JSON.parse(document.getElementById("_compose_raw").value) });
 						} catch (e) {
-							new Dialog({ type: "alert", header: api._lang.GET("assemble.compose.component.raw"), render: api._lang.GET("assemble.compose.component.raw_json_error") });
+							new _client.Dialog({ type: "alert", header: api._lang.GET("assemble.compose.component.raw"), render: api._lang.GET("assemble.compose.component.raw_json_error") });
 						}
 				}.toString(),
 			},

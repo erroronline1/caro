@@ -44,10 +44,10 @@ class DOCUMENT extends API {
 		if (!PERMISSION::permissionFor('documentapproval')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				$approveas = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.approve.as_select'));
+				$approveas = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.approve.as_select'));
 				if (!$approveas) $this->response([ // early exit
 					'response' => [
-						'msg' => $this->_lang->GET('assemble.compose.approve.not_saved'),
+						'msg' => $this->_lang->GET('assemble.approve.not_saved'),
 						'type' => 'error'
 					]]);
 				$approveas = explode(' | ', $approveas);
@@ -104,12 +104,12 @@ class DOCUMENT extends API {
 						if ($documents){
 							// send to all users
 							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-							$this->alertUserGroup(['user' => array_column($users, 'name')], preg_replace(['/\r/'], [''], $this->_lang->GET('assemble.compose.approve.alert', [':documents' => implode("\n", $documents)], true)));
+							$this->alertUserGroup(['user' => array_column($users, 'name')], preg_replace(['/\r/'], [''], $this->_lang->GET('assemble.approve.alert', [':documents' => implode("\n", $documents)], true)));
 						}
 					}
 					$this->response([
 						'response' => [
-							'msg' => $this->_lang->GET('assemble.compose.approve.saved') . "<br />". ($pending_approvals ? $this->_lang->GET('assemble.compose.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.compose.approve.completed')),
+							'msg' => $this->_lang->GET('assemble.approve.saved') . "<br />". ($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.approve.completed')),
 							'type' => 'success',
 							'reload' => 'approval',
 						],
@@ -117,7 +117,7 @@ class DOCUMENT extends API {
 					}
 				else $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('assemble.compose.approve.not_saved'),
+						'msg' => $this->_lang->GET('assemble.approve.not_saved'),
 						'type' => 'error'
 					]]);
 				break;
@@ -127,7 +127,7 @@ class DOCUMENT extends API {
 				// prepare all unapproved elements
 				$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-				$unapproved = ['forms' => [], 'components' => []];
+				$unapproved = ['documents' => [], 'components' => []];
 				$return = ['render'=> ['content' => [[]]]]; // default first nesting
 				$hidden = [];
 				foreach(array_merge($components, $documents) as $element){
@@ -159,7 +159,7 @@ class DOCUMENT extends API {
 					$return['render']['content'][0][] = [
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('assemble.compose.approve.component_select'),
+							'name' => $this->_lang->GET('assemble.approve.component_select'),
 							'onchange' => "api.document('get', 'approval', this.value)"
 						],
 						'content' => $componentselection
@@ -173,7 +173,7 @@ class DOCUMENT extends API {
 					[
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('assemble.compose.approve.document_select'),
+							'name' => $this->_lang->GET('assemble.approve.document_select'),
 							'onchange' => "api.document('get', 'approval', this.value)"
 						],
 						'content' => $documentselection
@@ -184,7 +184,7 @@ class DOCUMENT extends API {
 						'type' => 'hr'
 					]
 				];
-				else $this->response(['render' => ['content' => $this->noContentAvailable($this->_lang->GET('assemble.compose.approve.no_approvals'))]]);
+				else $this->response(['render' => ['content' => $this->noContentAvailable($this->_lang->GET('assemble.approve.no_approvals'))]]);
 
 				// display selected element for review
 				if ($this->_requestedID){
@@ -229,7 +229,7 @@ class DOCUMENT extends API {
 							$cmpnnt = $this->latestApprovedName('document_component_get_by_name', $component);
 							if ($cmpnnt) {
 								if (!PERMISSION::fullyapproved('documentapproval', $cmpnnt['approval'])){
-									$alert .= $this->_lang->GET('assemble.compose.approve.document_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
+									$alert .= $this->_lang->GET('assemble.approve.document_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
 								}
 								array_push($return['render']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
 							}
@@ -258,7 +258,7 @@ class DOCUMENT extends API {
 								'type' => 'checkbox',
 								'content' => $approvalposition,
 								'attributes' => [
-									'name' => $this->_lang->GET('assemble.compose.approve.as_select')
+									'name' => $this->_lang->GET('assemble.approve.as_select')
 								]
 							]
 						]
@@ -269,7 +269,7 @@ class DOCUMENT extends API {
 							[
 								'type' => 'button',
 								'attributes' => [
-									'value' => $this->_lang->GET('assemble.edit_existing'),
+									'value' => $this->_lang->GET('assemble.compose.edit_existing'),
 									'type' => 'button',
 									'onpointerup' => "api.document('get', '" . ($approve['context'] === 'component' ? 'component' : 'document') . "_editor', " . $approve['id'] . ")"
 								]
@@ -787,7 +787,7 @@ class DOCUMENT extends API {
 				])) {
 					// alert userGroups for approval
 					$component_id = $this->_pdo->lastInsertId();
-					$message = $this->_lang->GET('assemble.compose.approve.component_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
+					$message = $this->_lang->GET('assemble.approve.component_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
 					foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
 						if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
 						else $this->alertUserGroup(['permission' => [$permission]], $message);
@@ -912,7 +912,7 @@ class DOCUMENT extends API {
 				$componentdatalist[] = $row['name'];
 				$options[$row['unit']][$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.compose.approve.approved') : $this->_lang->GET('assemble.compose.approve.unapproved');
+			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
 			$hidden_set = $row['hidden'] ? ' - ' . $this->_lang->GET('assemble.edit_hidden') : '';
 			$alloptions[$row['unit']][$row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
@@ -1084,7 +1084,7 @@ class DOCUMENT extends API {
 					'type' => 'compose_component',
 					'value' => $component['name'],
 					'hint' => ($component['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
-						($pending_approvals ? $this->_lang->GET('assemble.compose.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.compose.approve.completed')) . '\n \n' .
+						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.approve.completed')) . '\n \n' .
 						($dependeddocuments ? $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(',', $dependeddocuments)]) : ''),
 					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : null,
 					'approve' => $approve
@@ -1503,7 +1503,7 @@ class DOCUMENT extends API {
 					]
 				])) {
 						$document_id = $this->_pdo->lastInsertId();
-						$message = $this->_lang->GET('assemble.compose.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
+						$message = $this->_lang->GET('assemble.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
 						foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
@@ -1603,7 +1603,7 @@ class DOCUMENT extends API {
 				$documentdatalist[] = $row['name'];
 				$documentoptions[$row['unit']][$row['name']] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
-			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.compose.approve.approved') : $this->_lang->GET('assemble.compose.approve.unapproved');
+			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
 			$hidden_set = $row['hidden'] ? ' - ' . $this->_lang->GET('assemble.edit_hidden') : '';
 			$alloptions[$row['unit']][$row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
@@ -1616,7 +1616,7 @@ class DOCUMENT extends API {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!isset($componentoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('documentapproval', $row['approval'])) {
 				$componentdatalist[] = $row['name'];
-				$componentoptions[$row['unit']][$row['name'] . ' - ' . $this->_lang->GET('assemble.compose.approve.approved')] = ['value' => $row['id']];
+				$componentoptions[$row['unit']][$row['name'] . ' - ' . $this->_lang->GET('assemble.approve.approved')] = ['value' => $row['id']];
 			}
 		}
 
@@ -1813,7 +1813,7 @@ class DOCUMENT extends API {
 							'hint' => $this->_lang->GET('assemble.compose.document.document_context_hint')
 						],
 						'hint' => ($document['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => substr($document['date'], 0, -3)]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
-						($pending_approvals ? $this->_lang->GET('assemble.compose.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.compose.approve.completed')) . '\n \n' .
+						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.approve.completed')) . '\n \n' .
 						($dependedbundles ? $this->_lang->GET('assemble.compose.document.document_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
 						($dependedcomponents ? $this->_lang->GET('assemble.compose.document.document_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
 						,
@@ -1915,12 +1915,12 @@ class DOCUMENT extends API {
 					], [
 						'type' => 'filtered',
 						'attributes' => [
-							'name' => $this->_lang->GET('assemble.document_filter'),
+							'name' => $this->_lang->GET('assemble.compose.document_filter'),
 							'list' => 'documents',
 							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}",
 							'onblur' => "api.document('get', 'documentfilter', this.value); return false;",
 						],
-						'hint' => $this->_lang->GET('assemble.document_filter_hint')
+						'hint' => $this->_lang->GET('assemble.compose.document_filter_hint')
 					]
 				]
 			]];
