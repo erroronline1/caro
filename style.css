@@ -83,10 +83,11 @@ header {
 }
 
 body > header {
-	margin: 0;
-	max-width: none;
+	margin: -1em;
+	width: calc(100% + 1.9em);
+	padding:.25em;
 	min-height: 4.4em;
-	position: fixed;
+	position: sticky;
 	top: 0;
 	left: 0;
 	backdrop-filter: blur(10px);
@@ -173,7 +174,7 @@ body > header {
 }
 
 main {
-	margin: 5em auto 0;
+	margin: 2em auto 0;
 	width: 100%;
 	max-width: 50em;
 	margin-bottom: 6em;
