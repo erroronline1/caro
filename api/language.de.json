@@ -1020,6 +1020,7 @@
 		"measure_damage": "Schaden nach Maßnahme",
 		"measure_probability": "Wahrscheinlichkeit nach Maßnahme",
 		"measure_remainder": "Verbleibende Maßnahmen sofern zutreffend",
+		"new": "neues Risiko",
 		"preset_process": ["Allgemein", "Prothetik untere Extremität", "Prothetik obere Extremität", "Orthetik untere Extremität", "Orthetik obere Extremität", "Einlagen", "Rumpforthesen", "Schaumstofflagerungen", "Ohnhänderhilfen"],
 		"preset_risk": [
 			"1 Gefährdungen durch Energien und beitragende Faktoren 1.1 Elektrizität",

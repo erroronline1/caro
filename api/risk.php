@@ -121,10 +121,9 @@ class RISK extends API {
 				foreach($risk_datalist as $row){
 					$processes[] = $row['process'];
 					$risks[] = $row['risk'];
-					if (!isset($select[$row['process']])) $select[$row['process']] = [];
-					$select[$row['process']][$row['risk'] . ': ' . $row['cause']] = ['value' => $row['id']];
+					if (!isset($select[$row['process']])) $select[$row['process']] = [$this->_lang->GET('risk.new') => ['value' => '0']];
+					$select[$row['process']][$row['risk'] . ': ' . $row['cause']] = ['value' => strval($row['id'])];
 				}
-
 
 				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
 					'values' => [
@@ -159,7 +158,6 @@ class RISK extends API {
 
 				$selection = [];
 				foreach ($select as $key => $values){
-					ksort($values);
 					$selection[] = [[
 						'type' => 'select',
 						'attributes' => [

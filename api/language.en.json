@@ -1020,6 +1020,7 @@
 		"measure_damage": "Post measure damage",
 		"measure_probability": "Post measure probability",
 		"measure_remainder": "Remaining measures if reasonable",
+		"new": "New risk",
 		"preset_process": ["General", "Lower extemity prosthetics", "Upper extremity prosthetics", "Lower extremity orthotics", "Upper extremity orthotics", "Insoles", "Trunk orthotics", "Foam beddings", "Aids"],
 		"preset_risk": [
 			"1 Gefährdungen durch Energien und beitragende Faktoren 1.1 Elektrizität",
