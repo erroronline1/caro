@@ -26,31 +26,42 @@ var_dump($lines);
 echo '<br />', $lines['code']+$lines['documentation'], ' lines, ', $byte, ' byte, ', $files, ' files<br />';
 
 //phpinfo();
-
-/*
-$sim = [
-	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'müller, liese *10.11.2012 oberschenkelorthese 2023-05-02 08:23'],
-	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'müller, liese *10.11.2012 dafo 2023-05-02 08:23'],
-	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'doe, jane *05.03.1958 dafo 2024-02-23 11:44'],
-	['müller, liese *10.11.2012 unterschenkelorthese 2024-10-13 21:12', 'doe, jane *05.03.1958 mieder 2025-02-23 11:44']
+die();
+require_once('_config.php');
+$driver = CONFIG['sql']['use'];
+$pdo = new PDO( CONFIG['sql'][$driver]['driver'] . ':' . CONFIG['sql'][$driver]['host'] . ';' . CONFIG['sql'][$driver]['database']. ';' . CONFIG['sql'][$driver]['charset'], CONFIG['sql'][$driver]['user'], CONFIG['sql'][$driver]['password']);
+$queries = [
+	'install' => [
+		'mysql' => [
+			'insertions' => [
+				'manual' => "INSERT INTO caro_manual (id, title, content, permissions) VALUES (NULL, :title, :content, :permissions);",
+			]
+		],
+		'sqlsrv' => [
+			'insertions' => [
+				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (:title, :content, :permissions);",
+			]
+		]
+	]
 ];
 
-foreach ($sim as $set){
-
-	$possibledate = [substr($set[0], -16), substr($set[1], -16)];
-	try {
-		new DateTime($possibledate[0]);
-		$set[0] = substr($set[0], 0, -16);
-		new DateTime($possibledate[1]);
-		$set[1] = substr($set[1], 0, -16);
-
+$pdo->query('TRUNCATE TABLE caro_manual');
+if ($file = file_get_contents('./_install.default.en.json')){
+	$languagefile = json_decode($file, true);
+	foreach($languagefile['defaultmanual'] as $entry){
+		$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
+			':title' => $pdo->quote($entry['title']),
+			':content' => $pdo->quote($entry['content']),
+			':permissions' => $pdo->quote($entry['permissions'])
+		]);
 	}
-	catch (Exception $e){
-	}
-
-	similar_text($set[0], $set[1], $percent);
-	var_dump($set, $percent, '<br />');
 }
-*/
+// execute stack
+foreach ($processing as $command){
+	echo $command . '<br />';
+	$statement = $pdo->query($command);
+}
+
+
 
 ?>
