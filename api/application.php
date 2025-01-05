@@ -462,7 +462,10 @@ class APPLICATION extends API {
 	 */
 	public function menu(){
 		// get permission based menu items
-		if (!isset($_SESSION['user'])) $this->response(['body' => [$this->_lang->GET('menu.application.header') => [$this->_lang->GET('menu.application.signin') => []]]]);	// early exit
+		if (!isset($_SESSION['user'])) $this->response(['render' => [$this->_lang->GET('menu.application.header') => [
+			$this->_lang->GET('menu.application.signin') => ['onpointerup' => "api.application('get', 'login')"],
+			$this->_lang->GET('menu.application.info') => ['onpointerup' => "api.application('get', 'info')"]
+			]]]);	// early exit
 
 		//////////////////////////////////
 		// default functions for everyone
