@@ -108,24 +108,24 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-
-#### purchase considerations
 * complete vendor templates
-
-#### application considerations
+* provide text recommendation templates
+* more document templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
+* review selecting first risk from selection. possibly type error on id selection?
+* review composer deletion context without dragging first
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
 Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
-![landing page screenshot](http://toh.erroronline.one/caro/landing%20page.png)
+![dashboard screenshot](http://toh.erroronline.one/caro/dashboard.png)
 
 ## Necessary infrastructure 
 You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
@@ -259,7 +259,7 @@ Documents can contain a digital signature pad. Please note this is not legally d
 * Use a calendar-button within surveillance documents to immediately set the next due date while handling the current documentation.
 * Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
 
-![sample document screenshot](http://toh.erroronline.one/caro/sample%20form.png)
+![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements.png)
 
 [Content](#content)
 
@@ -299,8 +299,6 @@ Users can have multiple assigned organizational units and permissions.
 
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
 
-Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
-
 ![user screenshot](http://toh.erroronline.one/caro/user.png)
 
 ```mermaid
@@ -334,6 +332,10 @@ graph TD;
     permission-->|units|units(("see content based
     on units"))
 ```
+
+Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
+
+![user screenshot](http://toh.erroronline.one/caro/profile.png)
 
 [Content](#content)
 
@@ -434,7 +436,7 @@ Documents can be exported as an editable PDF in hopefully rare scenarios where a
 
 Documents can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
 
-![document composer screenshot](http://toh.erroronline.one/caro/documents.png)
+![document composer screenshot](http://toh.erroronline.one/caro/document%20manager.png)
 
 ```mermaid
 graph TD;
@@ -523,11 +525,11 @@ Form fields declared as multiple will only show up in document exports if they h
 
 Screen document
 
-![screen document](http://toh.erroronline.one/caro/form%20screen.png)
+![screen document](http://toh.erroronline.one/caro/document%20screen.png)
 
 Exported document
 
-![exported document](http://toh.erroronline.one/caro/form%20export.png)
+![exported document](http://toh.erroronline.one/caro/document%20export.png)
 
 [Content](#content)
 

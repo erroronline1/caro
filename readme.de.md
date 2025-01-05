@@ -52,7 +52,7 @@ Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 1
 
 Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln anstelle von Sonderanfertigungen, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
 
-![landing page screenshot](http://toh.erroronline.one/caro/landing%20page%20de.png)
+![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de.png)
 
 ## Erforderliche Infrastruktur 
 Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Dokumenten oder Textvorschlägen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
@@ -187,7 +187,7 @@ Dokumente können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beac
 * Ein Kalender-Element kann in die Überwachungs-Dokumente eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
 * Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden.
 
-![sample form screenshot](http://toh.erroronline.one/caro/sample%20form%20de.png)
+![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -227,9 +227,7 @@ Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Ber
 
 Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden.
 
-Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds und individuelle Anwendungeinstellungen können an dieser Stelle ebenfalls vorgenommen werden.
-
-![user screenshot](http://toh.erroronline.one/caro/profile%20de.png)
+![user screenshot](http://toh.erroronline.one/caro/user%20de.png)
 
 ```mermaid
 graph TD;
@@ -265,6 +263,10 @@ graph TD;
     Bereichen einsehen"))
 ```
 
+Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihrem Profil einsehen. Eine Änderung des Profilbilds und individuelle Anwendungeinstellungen können an dieser Stelle ebenfalls vorgenommen werden.
+
+![user screenshot](http://toh.erroronline.one/caro/profile%20de.png)
+
 [Übersicht](#übersicht)
 
 ### Anleitung
@@ -276,7 +278,7 @@ Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenhe
 ### Unterhaltungen
 Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
 
-![conversation screenshot](http://toh.erroronline.one/caro/conversation.png)
+![conversation screenshot](http://toh.erroronline.one/caro/conversation%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -310,7 +312,7 @@ Bei der Erstellung von Textvorschlägen können die Textbausteine individuell so
 
 Der erzeugte Text wird durch Druck oder Klick auf das Ausgabefeld in die Zwischenablage eingefügt.
 
-![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation.png)
+![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20de.png)
 
 ```mermaid
 graph TD;
@@ -366,7 +368,7 @@ Dokumente können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fäl
 
 Dokumente können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche).
 
-![document composer screenshot](http://toh.erroronline.one/caro/forms.png)
+![document composer screenshot](http://toh.erroronline.one/caro/document%20manager%20de.png)
 
 ```mermaid
 graph TD;
@@ -444,11 +446,11 @@ Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporte
 
 Bildschirmformular
 
-![screen document](http://toh.erroronline.one/caro/form%20screen.png)
+![screen document](http://toh.erroronline.one/caro/document%20screen%20de.png)
 
 Exportiertes Dokument
 
-![exported document](http://toh.erroronline.one/caro/form%20export.png)
+![exported document](http://toh.erroronline.one/caro/document%20export%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -477,7 +479,7 @@ Falls Aufzeichnungen Daten aus eingeschränkt zugänglichen Dokumenten enthalten
 
 Alle Änderungen an Aufzeichnungen (Reidentifizierung, Aufzeichnungstyp, Fallstatus) werden ebenfalls aufgezeichnet.
 
-![screen record summary](http://toh.erroronline.one/caro/record%20screen.png)
+![screen record summary](http://toh.erroronline.one/caro/record%20screen%20de.png)
 
 ```mermaid
 graph TD;
@@ -534,11 +536,11 @@ graph TD;
 
 Exportierte vollständige Aufzeichnung
 
-![exported full record](http://toh.erroronline.one/caro/record%20full%20summary.png)
+![exported full record](http://toh.erroronline.one/caro/record%20full%20summary%20de.png)
 
 Exportierte reduzierte Aufzeichnung
 
-![exported reduced summary](http://toh.erroronline.one/caro/record%20reduced%20summary.png)
+![exported reduced summary](http://toh.erroronline.one/caro/record%20reduced%20summary%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -549,7 +551,7 @@ Dabei werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit u
 
 Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#audit) exportiert werden. Einträge speichern den Nutzernamen und das Datum der letzten Änderung. 
 
-![risk screenshot](http://toh.erroronline.one/caro/risks.png)
+![risk screenshot](http://toh.erroronline.one/caro/risks%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -586,7 +588,7 @@ Die Wochenarbeitszeit sieht mit `2023-07-01 39,5` ähnlich aus, Dezimalwerte sin
 
 Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
-![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
+![calendar screenshot](http://toh.erroronline.one/caro/calendar%20de.png)
 
 ```mermaid
 graph TD;
@@ -665,7 +667,7 @@ Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen,
 
 Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werden. Daher erhalten diese Dateien eine besondere Beachtung und sollen mit entsprechenden Eintragungen in Bezug auf die Einführung, den regulatorischen Zusammenhang, mögliche Außerbetriebnahme und dem Nutzernamen der letzten Entscheidung erfasst werden. Im Sinne einer durchgängigen Dokumentation können diese Dateien nicht gelöscht, sondern nur unzugänglich gemacht werden. Insbesondere in Bezug auf Schnittstellen können auch Netzwerkressourcen als Quelle angegeben werden.
 
-![files screenshot](http://toh.erroronline.one/caro/files.png)
+![files screenshot](http://toh.erroronline.one/caro/files%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -693,7 +695,7 @@ Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bear
 
 Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [config.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
 
-![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager.png)
+![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20de.png)
 
 ```mermaid
 graph TD;
@@ -903,7 +905,7 @@ Das Modul stellt einen strukturierten Excel-Export der Bestellstatistiken zur Ve
 
 Ferner enthält das Modul die Möglichkeit der Schulungsbewertung. Bewertungen können angepasst werden.
 
-![audit screenshot](http://toh.erroronline.one/caro/audit.png)
+![audit screenshot](http://toh.erroronline.one/caro/audit%20de.png)
 
 [Übersicht](#übersicht)
 
