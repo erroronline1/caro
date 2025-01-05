@@ -1535,7 +1535,8 @@ class CONSUMABLES extends API {
 					'consumables.vendor.certificate_validity',
 					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.certificate_update',
-					'consumables.vendor.documents_update'
+					'consumables.vendor.documents_update',
+					'consumables.vendor.message_vendor_select_special_attention_products'
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
 				}
@@ -1663,7 +1664,8 @@ class CONSUMABLES extends API {
 					'consumables.vendor.certificate_validity',
 					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.certificate_update',
-					'consumables.vendor.documents_update'
+					'consumables.vendor.documents_update',
+					'consumables.vendor.message_vendor_select_special_attention_products'
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
 				}
