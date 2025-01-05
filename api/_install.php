@@ -282,7 +282,7 @@ $queries = [
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . (REQUEST ? REQUEST[0] : 1234) . "', '', 'media/favicon/ios/256.png', '', '');",
-				'manual' => "INSERT INTO `caro_manual` (`id`, `title`, `content`, `permissions`) VALUES (NULL, ':title', ':content', ':permissions');",
+				'manual' => "INSERT INTO caro_manual (id, title, content, permissions) VALUES (NULL, :title, :content, :permissions);",
 				'documents' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
 				'vendors' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)",
 			]
@@ -520,7 +520,7 @@ $queries = [
 				],
 			'insertions' => [
 				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . (REQUEST ? REQUEST[0] : 1234) . "', '', 'media/favicon/ios/256.png', '', '');",
-				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (':title', ':content', ':permissions');",
+				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (:title, :content, :permissions);",
 				'documents' => "INSERT INTO caro_documents (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
 				'vendors' => "INSERT INTO caro_consumables_vendors (active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)"
 			]
