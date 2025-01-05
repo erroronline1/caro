@@ -49,13 +49,8 @@
 		},
 		{
 			"title": "Calendar",
-			"content": "Add events to the calendar to schedule the workflow for a given unit. The landing page gives a brief summary for the current week.",
+			"content": "Add events to the calendar to schedule the workflow for a given unit. The landing page gives a brief summary for the current week.\nIf you have a personified account that is set up for this, you can keep track of your working hours and holidays. Your unit will stay informed if you are not available.",
 			"permissions": "user,group"
-		},
-		{
-			"title": "Timesheets",
-			"content": "If your account is set up for this, you can keep track of your working hours and holidays. Your unit will stay informed if you are not available.",
-			"permissions": "user"
 		},
 		{
 			"title": "Files",
@@ -64,7 +59,7 @@
 		},
 		{
 			"title": "Manage Files and Bundles",
-			"content": "It is an administrative task to provide files and bundles. Files can be grouped by custom folders. Beware on deletion of folders: all contents will be deleted as well!\nTip: you can create and upload link-files to access intranet content!\nOn configuring bundles just select the desired files, create a name and mark the bundle as active. Inactive bundles will not be displayed to users without administative privileges.",
+			"content": "It is an administrative task to provide files and bundles. Files can be grouped by custom folders. Beware on deletion of folders: all contents will be deleted as well!\nOn configuring bundles just select the desired files, create a name and mark the bundle as active. Inactive bundles will not be displayed to users without administative privileges.",
 			"permissions": "office,ceo,qmo"
 		},
 		{
@@ -89,7 +84,7 @@
 		},
 		{
 			"title": "Audit",
-			"content": "Available data from the application can be summarized here and mostly being exportable as records within audits.",
+			"content": "Available data from the application can be summarized here and mostly being exportable as records within audits.\nYou can do the training evaluation here and revoke sample checks.\nAlso you will find the tool to insert trainings for several users at once here.",
 			"permissions": "ceo,qmo,prrc"
 		}
 	]
