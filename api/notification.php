@@ -71,7 +71,7 @@ class NOTIFICATION extends API {
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach ($vendors as $vendor){
 			$certificate = json_decode($vendor['certificate'], true);
-			if ($certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(CONFIG['application']['timezone']));
+			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(CONFIG['application']['timezone']));
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.

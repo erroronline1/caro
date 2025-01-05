@@ -1616,6 +1616,7 @@ class AUDIT extends API {
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$lastchecks = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_last_checked');
 		$vendor_info = [
+			'purchase_info' => 'consumables.vendor.purchase_info',
 			'infotext' => 'consumables.vendor.info',
 			'mail' => 'consumables.vendor.mail',
 			'phone' => 'consumables.vendor.phone',
@@ -1643,11 +1644,12 @@ class AUDIT extends API {
 					$vendor['info'] = array_filter($vendor['info'], function($value){return $value;});
 					$info .= implode(" \n", array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) . "\n";
 				}
+				$vendor['pricelist'] = isset($vendor['pricelist']) ? $vendor['pricelist'] : [];
 				$pricelist = json_decode($vendor['pricelist'], true);
-				if ($pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
+				if (isset($pricelist['validity']) && $pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
 				if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
 				$certificate = json_decode($vendor['certificate'], true);
-				if ($certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
+				if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				if ($vendor['evaluation']){
 					$vendor['evaluation'] = json_decode($vendor['evaluation'], true);
 					$info .= $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']]) . "\n";
