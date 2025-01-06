@@ -1,7 +1,7 @@
 # Important notices on customizing language files
 
-## _install.default.XX.json
-_install.default.XX.json stores default database entries that are made during installation, so these can as well be prepared in the set up default language. Crop, extend and change to your needs in advance to installation. This file is only used once at this procedure.
+## templates/manual.XX.json
+templates/manual.XX.json stores default database entries that are made during installation, so these can as well be prepared in the set up default language. Crop, extend and change to your needs in advance to installation. This file is only used once at this procedure.
 
 ### defaultmanual
 All keys are hardcoded. Despite the order given here, entries will be sorted by title ascending.
