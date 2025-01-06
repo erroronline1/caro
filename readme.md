@@ -112,12 +112,19 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * provide text recommendation templates
 * review submission of chunks, maybe filter in advance which are necessary according to requested template
 * more document templates
+* review database column types use more of NULL
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
+* text templates quite broken!!!
+    * check for unique names on chunks, texts and templates
+    * consider sorting to units within manager
+    * review creation of undefined placeholder inputs for uniqueness
+    * review input names for checkboxes
+    * there is some issue with _utility.texttemplate.update()
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1044,13 +1051,13 @@ Technically the application is being usable on any webserver but this is **not r
 
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
-* Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to _install.default.XX.json-files.
-* [Customize](#customisation) your appropriate language-files (language.XX.json and _install.default.XX.json)
+* Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to templates/manual.XX.json-files.
+* [Customize](#customisation) your appropriate language-files (language.XX.json and templates/manual.XX.json)
 * Optional: edit applicable templates/documents.XX.json and templates/vendors.XX.json with the selected default language option for a swift availability upon launch. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
 * Select an installation password for the system user.
 
 ### Installation procedure
-* Run api/_install.php/*your_selected_installation_password*, choose to install documents and vendors - no worries, in case of a rerun nothing serious will happen. Documents and vendors are installed only if the names are not already taken.
+* Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install documents, manual, text-templates and vendors - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
@@ -1257,7 +1264,7 @@ Notes:
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
 
 ## Customisation
-* The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the _install.default.XX.json for the selected default language prior to the installation process (see _language.md within api-directory).
+* The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the templates/manual.XX.json for the selected default language prior to the installation process (see _language.md within api-directory).
 * Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
 * Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-directory) you may occasionally append to but better not reduce
     * [permissions] (has no effect without consideration in role management within config.ini)
@@ -1683,7 +1690,7 @@ Evidences of conformity according to the documents described above:
 * Technical and Organizational Measures: [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
 * UDI Label: **not applicable**
 * Usability Evaluation Report: [Stakeholder requirements](#stakeholder-requirements)
-* User Manual: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en.json / _install.default.de.json
+* User Manual: [this document](#caro---cloud-assisted-records-and-operations), templates/manual.en.json / templates/manual.de.json
 
 [Content](#content)
 
@@ -1741,7 +1748,7 @@ Development
 Verification and Validation
 * Software Test Results
 * List of Known Anomalies: [Useage notes and caveats](#useage-notes-and-caveats)
-* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), _install.default.en.json / _install.default.de.json
+* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), templates/manual.en.json / templates/manual.de.json
 * Usability Test Protocol
 * Usability Test Report: [Stakeholder requirements](#stakeholder-requirements)
 * Clinical Evaluation Report: **not applicable**

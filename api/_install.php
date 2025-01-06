@@ -21,39 +21,12 @@ ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 require_once('_config.php');
-if (isset($_SERVER['PATH_INFO'])) define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
-else define ('REQUEST', null);
+@define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
+require_once('_sqlinterface.php');
 
-$driver = CONFIG['sql']['use'];
-
-$pdo = new PDO( CONFIG['sql'][$driver]['driver'] . ':' . CONFIG['sql'][$driver]['host'] . ';' . CONFIG['sql'][$driver]['database']. ';' . CONFIG['sql'][$driver]['charset'], CONFIG['sql'][$driver]['user'], CONFIG['sql'][$driver]['password']);
-
-$lang = CONFIG['application']['defaultlanguage'];
-$currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-$documentsjson = realpath('../templates/documents.' . $lang . '.json');
-$vendorsjson = realpath('../templates/vendors.' . $lang . '.json');
-$matches = 0;
-$processing = [];
-
-$queries = [
-	'precheck' => [
-		'user' => [
-			'mysql' => "SELECT * FROM caro_user LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_user"
-		],
-		'document_datalist' => [
-			'mysql' => "SELECT * FROM caro_documents ORDER BY name ASC, date DESC",
-			'sqlsrv' => "SELECT * FROM caro_documents ORDER BY name ASC, date DESC"
-		],
-		'vendor_datalist' => [
-			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",
-			'sqlsrv' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC"
-		],
-	],
-	'install' => [
-		'mysql' => [
-			'tables' => [
-				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
+define('DEFAULTSQL', [
+	'install_tables' => [
+		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`span_start` datetime NOT NULL," .
@@ -67,7 +40,7 @@ $queries = [
 				"	`alert` tinyint NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_checks` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -76,7 +49,7 @@ $queries = [
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_approved_orders` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -94,7 +67,7 @@ $queries = [
 				"	`notified_delivered` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_order_statistics` (" .
 				"	`order_id` int NOT NULL," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -104,13 +77,13 @@ $queries = [
 				"	`ordertype` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`order_id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_prepared_orders` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_products` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`vendor_id` int NOT NULL," .
@@ -129,7 +102,7 @@ $queries = [
 				"	`last_order` datetime NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_vendors` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`active` tinyint(1) NOT NULL," .
@@ -141,17 +114,17 @@ $queries = [
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_csvfilter` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," . // not text COLLATE utf8mb4_unicode_ci to avoid messing up any almost comprehensible structure
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"   `hidden` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_file_bundles` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -161,7 +134,7 @@ $queries = [
 				"	`active` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_file_external_documents` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`path` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -171,7 +144,7 @@ $queries = [
 				"	`retired` datetime NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				"  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_documents` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -188,7 +161,7 @@ $queries = [
 				"	`restricted_access` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_manual` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`title` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -196,7 +169,7 @@ $queries = [
 				"	`permissions` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_messages` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
@@ -208,7 +181,7 @@ $queries = [
 				"	`seen` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_records` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`context` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -223,7 +196,7 @@ $queries = [
 				"	`notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_risks` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`process` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -240,7 +213,7 @@ $queries = [
 				"	`last_edit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_texttemplates` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -253,7 +226,7 @@ $queries = [
 				"   `hidden` tinyint NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_user` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -266,7 +239,7 @@ $queries = [
 				"	`skills` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-				,
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_user_training` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
@@ -277,20 +250,8 @@ $queries = [
 				"	`file_path` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
-				,
-				],
-			'insertions' => [
-				'user' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (NULL, '" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . (REQUEST ? REQUEST[0] : 1234) . "', '', 'media/favicon/ios/256.png', '', '');",
-				'manual' => "INSERT INTO caro_manual (id, title, content, permissions) VALUES (NULL, :title, :content, :permissions);",
-				'documents' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
-				'vendors' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)",
-			]
-		]
-		,
-		'sqlsrv' => [
-			'tables' => [
-				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+		'sqlsrv' => "IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
 				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	type varchar(MAX) NOT NULL," .
@@ -304,7 +265,7 @@ $queries = [
 				"	closed varchar(MAX) NOT NULL," .
 				"	alert tinyint NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_checks', N'U') IS NULL " .
 				"CREATE TABLE caro_checks (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -313,7 +274,7 @@ $queries = [
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_consumables_approved_orders', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_approved_orders (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -331,7 +292,7 @@ $queries = [
 				"	notified_received int NULL DEFAULT NULL," .
 				"	notified_delivered int NULL DEFAULT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_consumables_order_statistics', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_order_statistics (" .
 				"	id int NOT NULL IDENTITY PRIMARY KEY," .
@@ -342,13 +303,13 @@ $queries = [
 				"	received smalldatetime NULL DEFAULT NULL," .
 				"	ordertype varchar(MAX) NOT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_prepared_orders (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	order_data varchar(MAX) NOT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_consumables_products', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_products (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -367,7 +328,7 @@ $queries = [
 				"	special_attention tinyint NULL DEFAULT NULL," .
 				"	last_order smalldatetime NULL DEFAULT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_vendors (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -379,7 +340,7 @@ $queries = [
 				"	immutable_fileserver varchar(MAX) NOT NULL," .
 				"	evaluation varchar(MAX) NOT NULL," .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
 				"CREATE TABLE caro_csvfilter (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -389,7 +350,7 @@ $queries = [
 				"	content varchar(MAX) NOT NULL," .
 				"	hidden tinyint NOT NULL" .
 				");" 
-				,
+				.
 				"IF OBJECT_ID(N'caro_file_bundles', N'U') IS NULL " .
 				"CREATE TABLE caro_file_bundles (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -399,7 +360,7 @@ $queries = [
 				"	content varchar(MAX) NOT NULL," .
 				"	active tinyint NOT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .
 				"CREATE TABLE caro_file_external_documents (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -409,7 +370,7 @@ $queries = [
 				"	activated smalldatetime NULL DEFAULT NULL" .
 				"	retired smalldatetime NULL DEFAULT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_documents', N'U') IS NULL " .
 				"CREATE TABLE caro_documents (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -426,7 +387,7 @@ $queries = [
 				"	permitted_export tinyint NULL DEFAULT NULL," .
 				"	restricted_access varchar(MAX) NULL DEFAULT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
 				"CREATE TABLE caro_manual (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -434,7 +395,7 @@ $queries = [
 				"	content varchar(MAX) NOT NULL," .
 				"	permissions varchar(MAX) NOT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_messages', N'U') IS NULL " .
 				"CREATE TABLE caro_messages (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -446,7 +407,7 @@ $queries = [
 				"	notified tinyint NULL DEFAULT NULL," .
 				"	seen tinyint NULL DEFAULT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
 				"CREATE TABLE caro_records (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -461,7 +422,7 @@ $queries = [
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .
 				"CREATE TABLE caro_risks (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -478,7 +439,7 @@ $queries = [
 				"	measure_remainder varchar(MAX) NOT NULL," .
 				"	last_edit varchar(MAX) NOT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
 				"CREATE TABLE caro_texttemplates (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -491,7 +452,7 @@ $queries = [
 				"	type varchar(MAX) NOT NULL," .
 				"	hidden tinyint NOT NULL" .
 				");" 
-				,
+				.
 				"IF OBJECT_ID(N'dbo.caro_user', N'U') IS NULL " .
 				"CREATE TABLE caro_user (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -504,7 +465,7 @@ $queries = [
 				"	app_settings varchar(MAX) NOT NULL," .
 				"	skills varchar(MAX) NOT NULL" .
 				");"
-				,
+				.
 				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NULL " .
 				"CREATE TABLE caro_user_training (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -516,136 +477,308 @@ $queries = [
 				"	file_path varchar(MAX) NULL DEFAULT NULL," .
 				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
 				");"
-				,
-				],
-			'insertions' => [
-				'user' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings) VALUES ('" . CONFIG['system']['caroapp'] . "', 'admin', '', '" . (REQUEST ? REQUEST[0] : 1234) . "', '', 'media/favicon/ios/256.png', '', '');",
-				'manual' => "INSERT INTO caro_manual (title, content, permissions) VALUES (:title, :content, :permissions);",
-				'documents' => "INSERT INTO caro_documents (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
-				'vendors' => "INSERT INTO caro_consumables_vendors (active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)"
-			]
-		]
+		],
+
 	]
-];
+);
 
-if (isset(REQUEST[0])){
-	switch (REQUEST[0]){
-		case 'documents':
-			if ($documentsjson){
-				// get templates
-				$documents = file_get_contents($documentsjson);
-				$documents = json_decode($documents, true);
-				// gather possibly existing entries
-				$DBall = $pdo->query($queries['precheck']['document_datalist'][$driver])->fetchAll();
+class INSTALL {
+	/**
+	 * preset database connection
+	 */
+	public $_pdo;
+	
+	/**
+	 * current date with correct timezone
+	 */
+	public $_currentdate;
 
-				foreach ($documents as $document){
-					// documents are only transferred if the name is not already taken
-					if (isset($document['name']) && $document['name'] && !in_array($document['name'], array_column($DBall, 'name'))) {
-						if (gettype($document['content']) === 'array') $document['content'] = json_encode($document['content']);
-						$processing[] = strtr($queries['install'][$driver]['insertions']['documents'], [
-								':name' => $pdo->quote($document['name']),
-								':alias' => $pdo->quote($document['alias']),
-								':context' => $pdo->quote($document['context']),
-								':unit' => $pdo->quote($document['unit']),
-								':author' => $pdo->quote($document['author']),
-								':content' => $pdo->quote($document['content']),
-								':regulatory_context' => $pdo->quote($document['regulatory_context'] ? : ''),
-								':permitted_export' => $document['permitted_export'] ? $pdo->quote($document['permitted_export']) : 'NULL',
-								':restricted_access' =>  $document['restricted_access'] ? $pdo->quote($document['restricted_access']) : 'NULL'
-							]
-						);
-					}
-				}
-				// execute stack
-				foreach ($processing as $command){
-					echo $command . '<br />';
-					$statement = $pdo->query($command);
-					$matches++;
-				}
-				echo '<br />' . $matches . ' components, documents and bundles with novel names according to template file inserted. This did save you the effort of assembling, you still have to approve each to take effect!<br />';
-			}
-			if ($vendorsjson) echo '<br /><a href="./vendors">Install vendors from ../templates/vendors.' . $lang . '.json</a><br />';
-			echo '<br /><a href="../../index.html">Exit</a>';
-			die();
-			break;
-		case 'vendors':
-			if ($vendorsjson) {
-				// get templates
-				$vendors = file_get_contents($vendorsjson);
-				$vendors = json_decode($vendors, true);
-				// gather possibly existing entries
-				$DBall = $pdo->query($queries['precheck']['vendor_datalist'][$driver])->fetchAll();
+	/**
+	 * current settings
+	 */
+	private $_defaultUser = CONFIG['system']['caroapp'];
+	private $_defaultLanguage = CONFIG['application']['defaultlanguage'];
+	private $_pdoDriver = CONFIG['sql']['use'];
 
-				foreach ($vendors as $vendor){
-					// vendors are only transferred if the name is not already taken
-					if (isset($vendor['name']) && $vendor['name'] && !in_array($vendor['name'], array_column($DBall, 'name'))) {
-						$processing[] = strtr($queries['install'][$driver]['insertions']['vendors'], [
-								':name' => $pdo->quote($vendor['name']),
-								':active' => $pdo->quote(1),
-								':info' => $pdo->quote(json_encode($vendor['info'])),
-								':certificate' => $pdo->quote(json_encode([])),
-								':pricelist' => $pdo->quote(json_encode(['filter' => $vendor['pricelist']])),
-								':immutable_fileserver' => $pdo->quote(preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $currentdate->format('Ymd')),
-								':evaluation' => ''
-							]
-						);
-					}
-				}
-				// execute stack
-				foreach ($processing as $command){
-					echo $command . '<br />';
-					$statement = $pdo->query($command);
-					$matches++;
-				}
-				echo '<br />' . $matches . ' vendors with novel names according to template file installed, remember you may have to do vendor evaluation and most definetely pricelist imports on each!<br />';
+	public function __construct($method){
+		$options = [
+			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
+			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
+		];
+		$this->_pdo = new PDO( CONFIG['sql'][$this->_pdoDriver]['driver'] . ':' . CONFIG['sql'][$this->_pdoDriver]['host'] . ';' . CONFIG['sql'][$this->_pdoDriver]['database']. ';' . CONFIG['sql'][$this->_pdoDriver]['charset'], CONFIG['sql'][$this->_pdoDriver]['user'], CONFIG['sql'][$this->_pdoDriver]['password'], $options);
+		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
+		if ($dbsetup) $this->_pdo->exec($dbsetup);
+
+		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+
+		if (method_exists($this, $method)) {
+			echo '<a href="../_install.php">back</a><br />';
+			$this->{$method}();
+		}
+		else {
+			foreach(get_class_vars(get_class($this)) as $varName => $varValue){
+				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
+					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
-			if ($documentsjson) echo '<br /><a href="./documents">Install documents from ../templates/documents.' . $lang . '.json</a><br />';
-			echo '<br /><a href="../../index.html">Exit</a>';
-			die();
-			break;
-		default:
-			try {
-				// if table is not found this will lead to an exception
-				$statement = $pdo->query($queries['precheck']['user'][$driver]);
-				echo "Databases already installed.<br />";
+			echo '<br />Please adhere to the manual for initial database setup, request _install.php/installDatabase/*your_selected_installation_password*<br /><br />';
+			foreach(get_class_methods($this) as $methodName){
+				if (!in_array($methodName, [
+					'__construct',
+					'executeSQL',
+					'importJSON'
+					])) echo '<a href="./_install.php/' . $methodName . '">' . $methodName . '</a><br />';
 			}
-			catch (Exception $e){
-				// add tables to stack
-				$processing[] = $queries['install'][$driver]['tables'];
-				// add default user
-				$processing[] = $queries['install'][$driver]['insertions']['user'];
-				// add default manual entries according to set up language
-				if ($file = file_get_contents('./_install.default.' . CONFIG['application']['defaultlanguage'] . '.json')){
-					$languagefile = json_decode($file, true);
-					foreach($languagefile['defaultmanual'] as $entry){
-						$processing[] = strtr($queries['install'][$driver]['insertions']['manual'], [
-							':title' => $pdo->quote($entry['title']),
-							':content' => $pdo->quote($entry['content']),
-							':permissions' => $pdo->quote($entry['permissions'])
-						]);
-					}
-				}
-				// execute stack
-				foreach ($processing as $command){
-					echo $command . '<br />';
-					$statement = $pdo->query($command);
-				}
-			}
-			if ($documentsjson) echo '<a href="./documents">Install documents from ../templates/documents.' . $lang . '.json</a><br />';
-			if ($vendorsjson) echo '<a href="./vendors">Install vendors from ../templates/vendors.' . $lang . '.json</a><br />';
-			echo '<br /><a href="../../index.html">Exit</a>';
+			echo '<br /><a href="../../index.html">exit</a>';
+		}
 	}
-}
-else {
-	echo nl2br(<<<'END'
-Please adhere to the documentation and provide a parameter:
 
-The installation of the application requires an initial custom login token. Please start the installation process with ./_install.php/*your_selected_installation_password*
- 
+	/**
+	 * execute sql chunks, return success or display exception
+	 * @param array $sqlchunks
+	 * @return bool
+	 */
+	private function executeSQL($sqlchunks){
+		$counter = 0;
+		foreach ($sqlchunks as $chunk){
+			try {
+				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $counter++;
+			}
+			catch (Exception $e) {
+				echo '<br /><pre>[X]' . $e . '\n' . $chunk . '\n</pre>';
+				die();
+			}
+		}
+		return $counter;
+	}
 
-END);
-	if ($documentsjson || $vendorsjson) echo 'After a successful installation you can decide to install from the provided template files:<br />';
-	if ($documentsjson) echo './_install.php/documents<br />';
-	if ($vendorsjson) echo './_install.php/vendors<br />';
+	/**
+	 * imports a json file, returns array or message if not found or defective
+	 */
+	private function importJSON($file){
+		if (($path = realpath($file)) === false) {
+			echo '[X] ' . $file . ' not found<br />';
+			die();
+		}
+		$json = file_get_contents($path);
+		if ($json = json_decode($json, true)) return $json;
+		echo '[X] ' . $file . ' is defective and could not be properly parsed.<br />';
+		die();
+	}
+
+	/**
+	 * installs tables and default user if not already present
+	 */
+	public function installDatabase(){
+		try {
+			// if table is not found this will lead to an exception
+			$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+				'replacements' => [
+					':id' => 1,
+					':name' => $this->_defaultUser
+				]
+			]);
+			echo "[!] Databases already installed.<br />";
+		}
+		catch (Exception $e){
+			if (!$statement = $this->_pdo->query(DEFAULTSQL['install_tables'][$this->_pdoDriver])){
+				echo '[X] There has been an error installing the databases!<br />';
+				die();
+			}
+			echo '[*] Databases installed.<br />';
+
+			if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
+				'values' => [
+					':name' => $this->_defaultUser,
+					':permissions' => 'admin',
+					':units' => '',
+					':token' => REQUEST[1],
+					':orderauth' => '',
+					':image' => 'media/favicon/ios/256.png',
+					':app_settings' => '',
+					':skills' => ''
+				]
+			])) echo "[*] Default user has been installed.<br />";
+			else echo "[X] There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?<br />";
+		}
+	}
+
+	/**
+	 * installs documents by novel name
+	 */
+	public function installDocuments(){
+		$file = '../templates/documents.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist'),
+			...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
+			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
+		];
+
+		$insertions = $names = [];
+		foreach ($json as $entry){
+			// documents are only transferred if the name is not already taken
+			$forbidden = false;
+			if (isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) {
+				foreach(CONFIG['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
+						echo '[X] The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '<br />';
+						$forbidden = true;
+						continue;
+					}
+				}
+				if (in_array($entry['name'], $names)) {
+					echo '[X] Multiple occurences of the name are not allowed<br />';
+					continue;
+				}
+				$names[] = $entry['name'];
+				$insertions[] = [
+					':name' => $pdo->quote($entry['name']),
+					':alias' => $pdo->quote($entry['alias']),
+					':context' => $pdo->quote($entry['context']),
+					':unit' => $pdo->quote($entry['unit']),
+					':author' => $pdo->quote($entry['author']),
+					':content' => $pdo->quote(gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content']),
+					':regulatory_context' => $pdo->quote($entry['regulatory_context'] ? : ''),
+					':permitted_export' => $entry['permitted_export'] ? $pdo->quote($entry['permitted_export']) : 'NULL',
+					':restricted_access' => $entry['restricted_access'] ? $pdo->quote($entry['restricted_access']) : 'NULL'
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('document_post'), $insertions)))
+			echo '<br />[*]novel entries by name from ' . $file . ' have been installed.<br />';
+		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+	}
+
+	/**
+	 * installt manual entries by novel title
+	 */
+	public function installManual(){
+		$file = '../templates/manual.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual'),
+		];
+
+		$insertions = $names = [];
+		foreach ($json as $entry){
+			// documents are only transferred if the title is not already taken
+			$forbidden = false;
+			if (isset($entry['title']) && $entry['title'] && !in_array($entry['title'], array_column($DBall, 'title'))) {
+				foreach(CONFIG['forbidden']['title'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)){
+						echo '[X] The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '<br />';
+						$forbidden = true;
+						continue;
+					}
+				}
+				if (in_array($entry['title'], $names)) {
+					echo '[X] Multiple occurences of the title are not allowed<br />';
+					continue;
+				}
+				$names[] = $entry['title'];
+				$insertions[] = [
+					':title' => $pdo->quote($entry['title']),
+					':content' => $pdo->quote($entry['content']),
+					':permissions' => $pdo->quote($entry['permissions'])
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('application_post_manual'), $insertions)))
+			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
+		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+		}
+
+	/**
+	 * installs texttemplates by novel name
+	 */
+	public function installTexttemplates(){
+		$file = '../templates/texttemplates.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist'),
+		];
+
+		$insertions = $names = [];
+		foreach ($json as $entry){
+			// documents are only transferred if the name is not already taken
+			$forbidden = false;
+			if (isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) {
+				foreach(CONFIG['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
+						echo '[X] The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '<br />';
+						$forbidden = true;
+						continue;
+					}
+				}
+				if (in_array($entry['name'], $names)) {
+					echo '[X] Multiple occurences of the name are not allowed<br />';
+					continue;
+				}
+				$names[] = $entry['name'];
+				$insertions[] = [
+					':name' => $pdo->quote($entry['name']),
+					':unit' => $pdo->quote($entry['unit']),
+					':author' => $pdo->quote($entry['author']),
+					':content' => $pdo->quote(gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content']),
+					':language' => $pdo->quote($entry['language']),
+					':type' =>$pdo->quote($entry['type']),
+					':hidden' => 0
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
+			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
+		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+		}
+
+	/**
+	 * installt vendors by novel name
+	 */
+	public function installVendors(){
+		$file = '../templates/vendors.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
+		];
+
+		$insertions = $names = [];
+		foreach ($json as $entry){
+			// documents are only transferred if the name is not already taken
+			$forbidden = false;
+			if (isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) {
+				foreach(CONFIG['forbidden']['names'] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
+						echo '[X] The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '<br />';
+						$forbidden = true;
+						continue;
+					}
+				}
+				if (in_array($entry['name'], $names)) {
+					echo '[X] Multiple occurences of the name are not allowed<br />';
+					continue;
+				}
+				$names[] = $entry['name'];
+				$insertions[] = [
+					':name' => $pdo->quote($vendor['name']),
+					':active' => $pdo->quote(1),
+					':info' => $pdo->quote(json_encode($vendor['info'])),
+					':certificate' => $pdo->quote(json_encode([])),
+					':pricelist' => $pdo->quote(json_encode(['filter' => $vendor['pricelist']])),
+					':immutable_fileserver' => $pdo->quote(preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $currentdate->format('Ymd')),
+					':evaluation' => ''
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_vendor'), $insertions)))
+			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
+		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+		}
 }
+
+$install = new INSTALL(REQUEST[0]);
+exit();
 ?>
