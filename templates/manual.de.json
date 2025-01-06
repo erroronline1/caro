@@ -1,0 +1,90 @@
+[
+	{
+		"_LICENSE": "CARO - Cloud Assisted Records and Operations Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one) This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>."
+	},
+	{
+		"title": ".CARO App",
+		"content": "Die CARO App soll dich bei unserem Qualitätsmanagementsystem und den Arbeitsabläufen unterstützen.\nDu kannst deine Informationen einsehen, dein Foto und einige Einstellungen ändern. Dein Foto ist für alle Nutzer der Anwendung sichtbar, zum Beispiel bei der Nutzung des Nachrichtensystems.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Bearbeitung von Nutzern und der Anleitung",
+		"content": "Bearbeite, lösche oder füge neue Nutzer hinzu und weise Berechtigungen oder Bereiche zu. Token können erneuert werden, aber informiere ggf. auch die Nutzer darüber. Token können nicht manuell angelegt werden.\nDer QR-Code kann gescannt werden. Der Scanner erlaubt auch das Auslesen des exportieren Bildes.\nDie Anleitung kann an das Verständnis der Nutzer angepasst werden. Dies ist eine rein administrative Aufgabe.",
+		"permissions": "qmo,ceo"
+	},
+	{
+		"title": "Konversationen",
+		"content": "Du kannst einfach Nachrichten an andere Nutzer schreiben. Während die Anwendung geöffnet ist werden diese darüber informiert.\nSobald du eine Konversation öffnest werden alle Nachrichten als gelesen markiert. Du kannst auf Nachrichten Antworten oder diese Weiterleiten. Lösche bisweilen um Ordnung zu behalten.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Verzeichnis",
+		"content": "Aus dem nach Bereichen und Berechtigungen gruppierten Verzeichnis kannst du jeden Nutzer direkt anschreiben. Außerdem ist es eine aufgeräumte Übersicht.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Textvorschläge",
+		"content": "Du kannst die vorbereiteten Texte nutzen um Zeit zu sparen. Mit nur wenigen Optionen sind die Vorschläge schnell angepasst.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Bearbeitung von Textvorschlägen",
+		"content": "Definiere Textblöcke und verwende sie mehrfach, gruppiere und sortiere sie nach Belieben um die Mitarbeiter bei einer zügigen und einheitlichen Formulierung zu unterstützen.",
+		"permissions": "qmo,ceo"
+	},
+	{
+		"title": "Aufzeichungen",
+		"content": "Dokumentiere alle Maßnahmen die du bei der Herstellung unserer Hilfsmittel durchführst. Übernimm Einträge von anderen Bereichen, wenn du sie brauchen kannst. Achte nur auf den korrekten Identifikator.",
+		"permissions": "user"
+	},
+	{
+		"title": "Risikomanagement",
+		"content": "Wirf einen Blick in des Risikomanagement, wenn du Sorgen um die Sicherheit und Gesundheit der Patienten hast.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Bearbeitung von Dokumenten",
+		"content": "Erstelle wiederverwendbare Dokumentenkomponenten und stelle Dokumente durch die Auswahl und das Herumschieben der Komponenten zusammen.\nDokumente haben einige Optionen um den Zugang einzuschränken und die Erfüllung regulatorischer Anforderungen zu prüfen. Es können auch Pakete erstellt werden um zu prüfen ob alles berücksichtigt wurde.\nKomponenten und Dokumente müssen allerdings freigegeben werden.",
+		"permissions": "supervisor,qmo,ceo"
+	},
+	{
+		"title": "Kalender",
+		"content": "Füge Ereignisse zum Kalender hinzu um die Arbeit für einen Bereich zu planen. Die Startseite gibt eine kurze Zusammenfassung für die aktuelle Woche.\nWenn Du einen persönlichen Account hast welcher dafür vorbereitet ist kannst du deine Arbeitszeit und Urlaubstage erfassen. Dein Bereich weiß dann auch wann du nicht verfügbar bis.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Dateien",
+		"content": "Die Verwaltung kann Dateien in ein oder mehreren Verzeichnissen zur Verfügung stellen. Es kann auch Pakete geben, die Dateien zu einem Thema bündeln.\nDer offene Sharepoint kann im Gegensatz dazu von allen Nutzern befüllt werden. Aber Achtung: Dateien haben hier nur eine begrenzte Lebensdauer und werden anschließend automatisch gelöscht.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Bearbeitung von Dateien und Paketen",
+		"content": "Es ist Verwaltungsaufgabe Dateien und Pakete bereitzustellen. Dateien können in Ordnern gruppiert werden. Bei der Löschung von Ordern wird der gesamte Inhalt gelöscht!\nBei der Erstellung von Pakten müssen nur die entsprechenden Dateien ausgewählt werden, ein Paketname ausgewählt und das Paket als erreichbar markiert werden. Unerreichbare Pakete werden nicht angezeigt.",
+		"permissions": "office,ceo,qmo"
+	},
+	{
+		"title": "Bestellungen",
+		"content": "Du kannst Artikel direkt von hier aus bestellen. Durchsuche die Datenbank, und füge die Artikel zur Bestellung hinzu. Fülle die erforderlichen Felder im Formular aus. Ohne eine Bestellfreigabe wird die Bestellung als vorbereitet gespeichert und kann noch bearbeitet oder später freigegeben werden.\nFreigegebene Bestellungen sollen alle Informationen für den Einkauf enthalten. Der Einkauf sollte Artikel als bestellt markieren, damit du und deine Kollegen über den Fortschritt informiert bleiben. Bei Problemen können Bestellungen auch wieder als Vorbereitet zurückgestuft werden.\nNur dein Bereich kann Artikel als erhalten kennzeichnen. Bestellungen werden nach einiger Zeit gelöscht. Wichtige Bestellungen können archiviert werden um das zu verhindern. Trotzdem: halte auch deinen digitalen Arbeitsplatz für dich und die Kollegen sauber.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Lieferanten und Produkte",
+		"content": "Du kannst die Lieferanten und Produkte und möglicherweise beigefügte Dokumente einsehen. Manche berechtigte Kollegen können die Aliasbezeichnung anpassen. Bei den Produkten steht auch ob sie ein Haltbarkeitdsatum oder Hautkontakt haben. Persönliche Nutzer sind dazu aufgefordert Produkteinführungen und Stichprobenprüfungen durchzuführen.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Bearbeitung von Lieferanten und Produkten",
+		"content": "Der Einkauf kann Lieferanten hinzufügen und bearbeiten. Es können unterschiedliche Dokumente hinzugefügt werden, falls das notwendig ist. Mit dem Import der Preisliste werden die Artikel bestellbar. Um Preislisten zu importieren müssen geeignete CSV-Dateien vorbereitet werden oder sein. Ein Filter muss fomuliert werden. Dabei kann ein Programmierer helfen. Wenn ein Lieferant als inaktiv gekennzeichnet wird, werden alle Produkte gelöscht.\nAuch Produkte können bearbeitet und Dokumente angefügt werden. Wenn Dokumente einmal angefügt werden kann das Produkt nicht mehr gelöscht werden und wird ggf. basierend auf seiner Artikelnummer aktualisiert.",
+		"permissions": "ceo,qmo,purchase,prrc"
+	},
+	{
+		"title": "Werkzeuge",
+		"content": "Du kannst QR-Codes und Barcodes erstellen. Es können dabei spezielle Formate vorbereitet sein. Du kannst solche Codes auch scannen um ihnen ihre Geheimnisse zu entlocken.\nDer STL-Betrachter zeigt Dateien an, die bereitgestellt wurden oder im Sharepoint liegen.\nEs gibt ein paar grundlegende Rechenoptionen für wiederkehrende Aufgaben der Produktion.\nBilder können skaliert oder mit einem Wasserzeichen versehen werden, z.B. für Vorträge.",
+		"permissions": "user,group"
+	},
+	{
+		"title": "Audit",
+		"content": "Verfügbare Daten aus der Anwendung können hier zusammengefasst und weitestgehend als Nachweisdokumente für Audits exportiert werden.\nHier können auch Schulungsbewertungen durchgeführt werden und Stichprobenprüfungen widerrufen werden.\nBerechtigte Nutzer können Schulungen für mehrere Nutzer gleichzeitig eintragen.",
+		"permissions": "ceo,qmo,prrc"
+	}
+]
