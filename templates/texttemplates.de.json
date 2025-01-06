@@ -1,0 +1,265 @@
+[
+	{
+		"comment": "following are common replacements #################################################################################################"
+	},
+	{
+		"type": "replacement",
+		"name": "DER_PATIENT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "der Patient\ndie Patientin\nder Patient\nder Patient\ndie Patientin\nder Patient\nDu\nSie",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "DEN_PATIENTEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "den Patienten\nder Patientin\nden Patienten\nden Patienten\nder Patientin\nden Patienten\nDich\nSie",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "DEM_PATIENTEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "dem Patienten\nder Patientin\ndem Patienten\ndem Patienten\nder Patientin\ndem Patienten\nDir\nIhnen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "DES_PATIENTEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "des Patienten\nder Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\nvon Dir\nvon Ihnen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "OG_PATIENT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "der oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nDu\nSie",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "SEINE",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "seine\nihre\nseine\nseine\nihre\nseine\nDeine\nIhre",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "SEINER",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "seiner\nihrer\nseiner\nseiner\nihrer\nseiner\nDeiner\nIhrer",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "SEINEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "seinen\nihren\nseinen\nseinen\nihren\nseinen\nDeinen\nIhren",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "SEINEM",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "seinem\nihrem\nseinem\nseinem\nihrem\nseinem\nDeinem\nIhrem",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "SEINES",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "seines\nihres\nseines\nseines\nihres\nseines\nDeines\nIhres",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "IHR_VERSICHERTER",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Ihr Versicherter\nIhre Versicherte\nIhr Versicherter\nIhr Versicherter\nIhre Versicherte\nIhr Versicherter\nDu\nSie",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "IHREN_VERSICHERTEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Ihren Versicherten\nIhrer Versicherten\nIhren Versicherten\nIhren Versicherten\nIhrer Versicherten\nIhren Versicherten\nDich\nSie",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "IHRES_VERSICHERTEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Ihres Versicherten\nIhrer Versicherten\nIhres Versicherten\nIhres Versicherten\nIhrer Versicherten\nIhres Versicherten\nvon Dir\nvon Ihnen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "SEHR_GEEHRTER",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Lieber\nLiebe\n\nSehr geehrter Herr\nSehr geehrte Frau\nSehr geehrte\nLieber\nSehr geehrter",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "HERR",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "\n\n\nHerr\nFrau\n\n\n",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "HERRN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "\n\n\nHerrn\nFrau\n\n\n",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "ERHAELT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "erhält\nerhält\nerhält\nerhält\nerhält\nerhält\nerhältst\nerhalten",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "BESTÄTIGT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "bestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigst\nbestätigen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "WURDE",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "wurde\nwurde\nwurde\nwurde\nwurde\nwurde\nwurdest\nwurden",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "IST",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ist\nist\nist\nist\nist\nist\nbist\nsind",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "KANN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "kann\nkann\nkann\nkann\nkann\nkann\nkannst\nkönnen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "SCHICKEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "\n\n\n\n\n\nschicke\nschicken Sie",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "NUTZER",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Nutzer\nNutzerin\nNutzer\nNutzer\nNutzerin\nNutzer\nNutzer\nNutzer",
+		"language": "de"
+	},
+	{
+		"comment": "following are common texts and templates #################################################################################################"
+	},
+	{
+		"type": "text",
+		"name": "Versandschreiben_Empfangsbestätigung",
+		"unit": "common",
+		"author": "Caro App",
+		"content": ":SEHR_GEERTER :Name,\n\nanbei :ERHAELT :DER_PATIENT ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :SEINEM Kostenträger benötigen wir :SEINE Unterschrift, bzw. :SEINES gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTAETIGT :DER_PATIENT den ordnungsgemäßen Erhalt\n• :SEINES orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DER_PATIENT\n• in die Handhabung, Funktionsweise und die Risiken :SEINES Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST, soweit :DER_PATIENT dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Versandschreiben_Empfangsbestätigung_Leihschuhe",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Falls Leihschuhe zur Verfügung gestellt wurden, :SCHICKEN diese bitte auch ausreichend frankiert an uns zurück.",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Versandschreiben_Empfangsbestätigung_Schlusssatz",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Für Rückfragen stehen wir :DEM_PATIENTEN selbstverständlich gerne zur Verfügung.\nIm Voraus vielen Dank für die Bemühungen und :DES_PATIENTEN Verständnis.\n\nMit freundlichen Grüßen",
+		"language": "de"
+	},
+	{
+		"type": "template",
+		"name": "Versandschreiben Empfangsbestätigung",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "[[\":Versandschreiben_Empfangsbestätigung\",\":Versandschreiben_Empfangsbestätigung_Leihschuhe\",\":Versandschreiben_Empfangsbestätigung_Schlusssatz\"]]",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Besuchsbestätigung",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Besuchsbestätigung für :HERRN :Name\n\n:SEHR_GEEHRTER :Name,\n\nhiermit bestätigen wir :DEM_PATIENTEN den Besuch für :Anlass :SEINER :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen",
+		"language": "de"
+	},
+	{
+		"type": "template",
+		"name": "Besuchsbestätigung",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "[[\":Besuchsbestätigung\"]]",
+		"language": "de"
+	}
+	,
+	{
+		"type": "text",
+		"name": "Flughafenbescheinigung deutsch",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Bescheinigung für :HERRN :Name über die Nutzung :Hilfsmittel\n\nSehr geehrte Damen und Herren,\n\n:HERR :Name, geboren am :Geburtsdatum, :IST :NUTZER von :Hilfsmittel im täglichen Gebrauch. Es können Komponenten aus Metall enthalten sein, welche von Metalldetektoren, wie sie z.B. an Flughafen eingesetzt werden, erkannt werden können.\n\nMit freundlichen Grüßen",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Flughafenbescheinigung englisch",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Attestation for :Name of use of :Hilfsmittel\n\nDear Madam or Sir,\n\n :Name, born :Geburtsdatum, makes use of :Hilfsmittel on a daily basis. Metal and synthetic materials are contained that may trigger metal  detectors, e.g. as used in airports.\n\nWith kind regards",
+		"language": "de"
+	},
+	{
+		"type": "template",
+		"name": "Flughafenbescheinigung",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "[[\":Flughafenbescheinigung deutsch\"],[\":Flughafenbescheinigung englisch\"]]",
+		"language": "de"
+	}
+]
