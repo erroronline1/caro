@@ -588,20 +588,19 @@ class TEXTTEMPLATE extends API {
 			$this->response($result);		
 		}
 
-		foreach($templates as $key => $row) {
+		foreach($templates as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if ($row['type'] !== 'template' && !in_array($row['name'], $hidden)) {
-				// prepare in case of template request
-				// set up array for strtr on content
-				if ($row['type']==='text' && !isset($texts[':' . $row['name']])) $texts[':' . $row['name']] = $row['content'] . ' ';
-				// set up array with valid replacements
-				if ($row['type']==='replacement' && !isset($replacements[':' . $row['name']])) $replacements[':' . $row['name']] = $row['content'];
-				// skip for datalist and options 
-				continue;
-			}
-			if ($row['type'] !== 'template') continue;
 			if (!in_array($row['name'], $hidden)) {
-				if (!in_array($row['unit'], $options)) $options[$row['unit']] = ['...' => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
+				if ($row['type'] !== 'template') {
+					// prepare in case of template request
+					// set up array for strtr on content
+					if ($row['type']==='text' && !isset($texts[':' . $row['name']])) $texts[':' . $row['name']] = $row['content'] . ' ';
+					// set up array with valid replacements
+					if ($row['type']==='replacement' && !isset($replacements[':' . $row['name']])) $replacements[':' . $row['name']] = $row['content'];
+					// skip for datalist and options 
+					continue;
+				}
+				if (!in_array($row['unit'], array_keys($options))) $options[$row['unit']] = ['...' => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				if (!isset($options[$row['unit']][$row['name'] . ' (' . $row['language'] . ')'])){
 					$templatedatalist[] = $row['name'];
 					$options[$row['unit']][$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
