@@ -548,6 +548,7 @@ export const compose_helper = {
 		 */
 		contextMenu: function (evnt) {
 			evnt.preventDefault();
+
 			evnt.dataTransfer = new DataTransfer();
 			evnt.dataTransfer.setData("text", evnt.target.id);
 			for (const element of document.querySelectorAll(".contextmenu")) element.remove();
@@ -769,8 +770,12 @@ export const compose_helper = {
 		 * @event updates compose_helper.componentIdentify and compose_helper.componentSignature count
 		 */
 		drop_delete: function (evnt) {
-			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text")),
-				originParent = draggedElement.parentNode;
+			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
+			if (!draggedElement) {
+				new _client.Toast(api._lang.GET('assemble.compose.context_delete_error'),'error');
+				return;
+			}
+			const originParent = draggedElement.parentNode;
 
 			// sanitize article on lack of elements
 			if (originParent.parentNode != document.getElementById("main") && originParent.children.length < 2) {

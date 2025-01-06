@@ -310,6 +310,7 @@
 			"context_2bottom": "ganz nach unten verschieben",
 			"context_2top": "ganz nach oben verschieben",
 			"context_delete": "löschen",
+			"context_delete_error":"Das Element konnte nicht identifiziert werden. Bewege den Zeiger zum Beispiel mitten auf die Fläche oder den Balken über der Fläche.",
 			"document": {
 				"add_component": "Nach Namen suchen",
 				"document": "Dokument speichern",

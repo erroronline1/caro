@@ -310,6 +310,7 @@
 			"context_2bottom": "move to bottom",
 			"context_2top": "move to top",
 			"context_delete": "delete",
+			"context_delete_error":"The element could not be identified. Try moving the cursor to the center of the area or the bar above the area.",
 			"document": {
 				"add_component": "Search name",
 				"document": "Save document",
@@ -743,7 +744,7 @@
 			"documents_manage_approval": "Approve document",
 			"documents_manage_bundles": "Manage document bundles",
 			"documents_manage_components": "Manage components",
-			"documents_manage_documents": "Manage document",
+			"documents_manage_documents": "Manage documents",
 			"header": "Records",
 			"record_bundles": "Document bundles",
 			"record_create_identifier": "Create identifier label sheet",
