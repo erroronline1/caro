@@ -218,7 +218,7 @@
 		"name": "Versandschreiben Empfangsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "[[\":Versandschreiben_Empfangsbestätigung\",\":Versandschreiben_Empfangsbestätigung_Leihschuhe\",\":Versandschreiben_Empfangsbestätigung_Schlusssatz\"]]",
+		"content": [[":Versandschreiben_Empfangsbestätigung", ":Versandschreiben_Empfangsbestätigung_Leihschuhe", ":Versandschreiben_Empfangsbestätigung_Schlusssatz"]],
 		"language": "de"
 	},
 	{
@@ -234,10 +234,9 @@
 		"name": "Besuchsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "[[\":Besuchsbestätigung\"]]",
+		"content": [[":Besuchsbestätigung"]],
 		"language": "de"
-	}
-	,
+	},
 	{
 		"type": "text",
 		"name": "Flughafenbescheinigung deutsch",
@@ -259,7 +258,7 @@
 		"name": "Flughafenbescheinigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "[[\":Flughafenbescheinigung deutsch\"],[\":Flughafenbescheinigung englisch\"]]",
+		"content": [[":Flughafenbescheinigung deutsch"], [":Flughafenbescheinigung englisch"]],
 		"language": "de"
 	}
 ]
