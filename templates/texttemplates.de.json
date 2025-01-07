@@ -4,34 +4,34 @@
 	},
 	{
 		"type": "replacement",
-		"name": "DER_PATIENT",
+		"name": "DIE_PATIENTIN_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "der Patient\ndie Patientin\nder Patient\nder Patient\ndie Patientin\nder Patient\nDu\nSie",
+		"content": "die Patientin\nder Patient\nder Patient\ndie Patientinder Patient\n\nder Patient\nDu\nSie",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "DEN_PATIENTEN",
+		"name": "DER_PATIENTIN_AKKUSATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "den Patienten\nder Patientin\nden Patienten\nden Patienten\nder Patientin\nden Patienten\nDich\nSie",
+		"content": "der Patientin\nden Patienten\nden Patienten\nder Patientinden Patienten\n\nden Patienten\nDich\nSie",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "DEM_PATIENTEN",
+		"name": "DER_PATIENTIN_DATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "dem Patienten\nder Patientin\ndem Patienten\ndem Patienten\nder Patientin\ndem Patienten\nDir\nIhnen",
+		"content": "der Patientin\ndem Patienten\ndem Patienten\nder Patientin\ndem Patienten\ndem Patienten\nDir\nIhnen",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "DES_PATIENTEN",
+		"name": "DER_PATIENTIN_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "des Patienten\nder Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\nvon Dir\nvon Ihnen",
+		"content": "der Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\ndes Patienten\ndein\nIhr",
 		"language": "de"
 	},
 	{
@@ -39,95 +39,95 @@
 		"name": "OG_PATIENT",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "der oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nDu\nSie",
+		"content": "die oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\nDu\nSie",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "SEINE",
+		"name": "IHRE_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "seine\nihre\nseine\nseine\nihre\nseine\nDeine\nIhre",
+		"content": "ihre\nseine\nseine\nihre\nseine\nseine\nDeine\nIhre",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "SEINER",
+		"name": "IHRER_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "seiner\nihrer\nseiner\nseiner\nihrer\nseiner\nDeiner\nIhrer",
+		"content": "ihrer\nseiner\nseiner\nihrer\nseiner\nseiner\nDeiner\nIhrer",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "SEINEN",
+		"name": "IHREN_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "seinen\nihren\nseinen\nseinen\nihren\nseinen\nDeinen\nIhren",
+		"content": "ihren\nseinen\nseinen\nihren\nseinen\nseinen\nDeinen\nIhren",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "SEINEM",
+		"name": "IHREM_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "seinem\nihrem\nseinem\nseinem\nihrem\nseinem\nDeinem\nIhrem",
+		"content": "ihrem\nseinem\nseinem\nihrem\nseinem\nseinem\nDeinem\nIhrem",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "SEINES",
+		"name": "IHRES_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "seines\nihres\nseines\nseines\nihres\nseines\nDeines\nIhres",
+		"content": "ihres\nseines\nseines\nihres\nseines\nseines\nDeines\nIhres",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "IHR_VERSICHERTER",
+		"name": "IHRE_VERSICHERTE_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Ihr Versicherter\nIhre Versicherte\nIhr Versicherter\nIhr Versicherter\nIhre Versicherte\nIhr Versicherter\nDu\nSie",
+		"content": "Ihre Versicherte\nIhr Versicherter\nIhr Versicherter\nIhre Versicherte\nIhr Versicherter\nIhr Versicherter\nDu\nSie",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "IHREN_VERSICHERTEN",
+		"name": "IHRER_VERSICHERTEN_DATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Ihren Versicherten\nIhrer Versicherten\nIhren Versicherten\nIhren Versicherten\nIhrer Versicherten\nIhren Versicherten\nDich\nSie",
+		"content": "Ihrer Versicherten\nIhren Versicherten\nIhren Versicherten\nIhrer Versicherten\nIhren Versicherten\nIhren Versicherten\nDich\nSie",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "IHRES_VERSICHERTEN",
+		"name": "IHRER_VERSICHERTEN_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Ihres Versicherten\nIhrer Versicherten\nIhres Versicherten\nIhres Versicherten\nIhrer Versicherten\nIhres Versicherten\nvon Dir\nvon Ihnen",
+		"content": "Ihrer Versicherten\nIhres Versicherten\nIhres Versicherten\nIhrer Versicherten\nIhres Versicherten\nIhres Versicherten\nvon Dir\nvon Ihnen",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "SEHR_GEEHRTER",
+		"name": "SEHR_GEEHRTE",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Lieber\nLiebe\n\nSehr geehrter Herr\nSehr geehrte Frau\nSehr geehrte\nLieber\nSehr geehrter",
+		"content": "Liebe\nLieber\n\nSehr geehrte Frau\nSehr geehrter Herr\nSehr geehrte\nLiebe\nSehr geehrte",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "HERR",
+		"name": "FRAU_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "\n\n\nHerr\nFrau\n\n\n",
+		"content": "\n\n\nFrau\nHerr\n\n\n",
 		"language": "de"
 	},
 	{
 		"type": "replacement",
-		"name": "HERRN",
+		"name": "FRAU_AKKUSATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "\n\n\nHerrn\nFrau\n\n\n",
+		"content": "\n\n\nFrau\nHerrn\n\n\n",
 		"language": "de"
 	},
 	{
@@ -180,10 +180,10 @@
 	},
 	{
 		"type": "replacement",
-		"name": "NUTZER",
+		"name": "NUTZERIN",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Nutzer\nNutzerin\nNutzer\nNutzer\nNutzerin\nNutzer\nNutzer\nNutzer",
+		"content": "Nutzerin\nNutzer\nNutzer\nNutzerin\nNutzer\nNutzer\nNutzer\nNutzer",
 		"language": "de"
 	},
 	{
@@ -194,7 +194,7 @@
 		"name": "Versandschreiben_Empfangsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": ":SEHR_GEERTER :Name,\n\nanbei :ERHAELT :DER_PATIENT ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :SEINEM Kostenträger benötigen wir :SEINE Unterschrift, bzw. :SEINES gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTAETIGT :DER_PATIENT den ordnungsgemäßen Erhalt\n• :SEINES orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DER_PATIENT\n• in die Handhabung, Funktionsweise und die Risiken :SEINES Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST, soweit :DER_PATIENT dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück",
+		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHAELT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n",
 		"language": "de"
 	},
 	{
@@ -202,7 +202,7 @@
 		"name": "Versandschreiben_Empfangsbestätigung_Leihschuhe",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Falls Leihschuhe zur Verfügung gestellt wurden, :SCHICKEN diese bitte auch ausreichend frankiert an uns zurück.",
+		"content": "Falls Leihschuhe zur Verfügung gestellt wurden, :SCHICKEN auch diese bitte ausreichend frankiert an uns zurück.",
 		"language": "de"
 	},
 	{
@@ -210,7 +210,7 @@
 		"name": "Versandschreiben_Empfangsbestätigung_Schlusssatz",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Für Rückfragen stehen wir :DEM_PATIENTEN selbstverständlich gerne zur Verfügung.\nIm Voraus vielen Dank für die Bemühungen und :DES_PATIENTEN Verständnis.\n\nMit freundlichen Grüßen",
+		"content": "Für Rückfragen stehen wir :DER_PATIENTIN_DATIV selbstverständlich gerne zur Verfügung.\nIm Voraus vielen Dank für die Bemühungen und :DER_PATIENTIN_GENITIV Verständnis.\n\nMit freundlichen Grüßen",
 		"language": "de"
 	},
 	{
@@ -226,7 +226,7 @@
 		"name": "Besuchsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Besuchsbestätigung für :HERRN :Name\n\n:SEHR_GEEHRTER :Name,\n\nhiermit bestätigen wir :DEM_PATIENTEN den Besuch für :Anlass :SEINER :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen",
+		"content": "Besuchsbestätigung für :FRAU_AKKUSATIV :Name\n\n:SEHR_GEEHRTE :Name,\n\nhiermit bestätigen wir :DER_PATIENTIN_DATIV den Besuch für :Anlass :IHRES_GENITIV :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen",
 		"language": "de"
 	},
 	{
@@ -242,7 +242,7 @@
 		"name": "Flughafenbescheinigung deutsch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Bescheinigung für :HERRN :Name über die Nutzung :Hilfsmittel\n\nSehr geehrte Damen und Herren,\n\n:HERR :Name, geboren am :Geburtsdatum, :IST :NUTZER von :Hilfsmittel im täglichen Gebrauch. Es können Komponenten aus Metall enthalten sein, welche von Metalldetektoren, wie sie z.B. an Flughafen eingesetzt werden, erkannt werden können.\n\nMit freundlichen Grüßen",
+		"content": "Bescheinigung für :FRAU_AKKUSATIV :Name über die Nutzung :Hilfsmittel\n\nSehr geehrte Damen und Herren,\n\n:FRAU_NOMINATIV :Name, geboren am :Geburtsdatum, :IST :NUTZERIN von :Hilfsmittel im täglichen Gebrauch. Es können Komponenten aus Metall enthalten sein, welche von Metalldetektoren, wie sie z.B. an Flughafen eingesetzt werden, erkannt werden können.\n\nMit freundlichen Grüßen",
 		"language": "de"
 	},
 	{
@@ -250,7 +250,7 @@
 		"name": "Flughafenbescheinigung englisch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Attestation for :Name of use of :Hilfsmittel\n\nDear Madam or Sir,\n\n :Name, born :Geburtsdatum, makes use of :Hilfsmittel on a daily basis. Metal and synthetic materials are contained that may trigger metal  detectors, e.g. as used in airports.\n\nWith kind regards",
+		"content": "Attestation for :Name of use of :Hilfsmittel\n\nDear Madam or Sir,\n\n:Name, born :Geburtsdatum, makes use of :Hilfsmittel on a daily basis. Metal and synthetic materials are contained that may trigger metal  detectors, e.g. as used in airports.\n\nWith kind regards",
 		"language": "de"
 	},
 	{
