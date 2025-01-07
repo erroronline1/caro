@@ -120,7 +120,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
 * text templates quite broken!!!
-    * check for unique names on chunks, texts and templates
     * consider sorting to units within manager
     * review creation of undefined placeholder inputs for uniqueness
     * review input names for checkboxes
