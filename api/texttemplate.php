@@ -59,11 +59,9 @@ class TEXTTEMPLATE extends API {
 
 				// check forbidden names
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
-				foreach(CONFIG['forbidden']['names'] as $pattern){
+				foreach([...CONFIG['forbidden']['names'], '/[^\w\d]/m'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 				}
-				preg_match("/[^\w\d]/m", $chunk[':name'], $matches);
-				if ($matches) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
