@@ -31,7 +31,7 @@
 		"name": "DER_PATIENTIN_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "der Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\ndes Patienten\ndein\nIhr",
+		"content": "der Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\ndes Patienten\nDein\nIhr",
 		"language": "de"
 	},
 	{
@@ -48,6 +48,15 @@
 		"unit": "common",
 		"author": "Caro App",
 		"content": "ihre\nseine\nseine\nihre\nseine\nseine\nDeine\nIhre",
+		"language": "de"
+	},
+
+	{
+		"type": "replacement",
+		"name": "IHR_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ihr\nsein\nsein\nihr\nsein\nsein\nDein\nIhr",
 		"language": "de"
 	},
 	{
@@ -132,7 +141,7 @@
 	},
 	{
 		"type": "replacement",
-		"name": "ERHAELT",
+		"name": "ERHÄLT",
 		"unit": "common",
 		"author": "Caro App",
 		"content": "erhält\nerhält\nerhält\nerhält\nerhält\nerhält\nerhältst\nerhalten",
@@ -180,6 +189,54 @@
 	},
 	{
 		"type": "replacement",
+		"name": "MACHT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "macht\nmacht\nmacht\nmacht\nmacht\nmacht\nmachst\nmachen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "HAT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "hat\nhat\nhat\nhat\nhat\nhat\nhast\nhaben",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "LEBT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "lebt\nlebt\nlebt\nlebt\nlebt\nlebt\nlebst\nleben",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "NIMMT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "nimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmst\nnehmen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "WILL",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "will\nwill\nwill\nwill\nwill\nwill\nwillst\nwollen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
+		"name": "REIST",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "reist\nreist\nreist\nreist\nreist\nreist\nreist\nreisen",
+		"language": "de"
+	},
+	{
+		"type": "replacement",
 		"name": "NUTZERIN",
 		"unit": "common",
 		"author": "Caro App",
@@ -194,7 +251,7 @@
 		"name": "Versandschreiben_Empfangsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHAELT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n",
+		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n",
 		"language": "de"
 	},
 	{
@@ -259,6 +316,66 @@
 		"unit": "common",
 		"author": "Caro App",
 		"content": [[":Flughafenbescheinigung deutsch"], [":Flughafenbescheinigung englisch"]],
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Fragenkatalog_Einleitung_deutsch",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"content": ":SEHR_GEEHRTE :Name,\n\num ein Versorgungskonzept zu erstellen, benötigen wir zusätzliche Informationen. Bitte erschrecken Sie nicht angesichts der Vielzahl an Fragen, aber wir benötigen möglichst genaue Angaben zu den Lebensumständen, dem Gesundheitszustand und dem Zustand des Stumpfes. Auf Grundlage dieser Informationen bemühen wir uns ein Versorgungskonzept zu erstellen, welches den Erwartungen zu entsprechen versucht und neben dem Nutzen auch die Nachhaltigkeit und Zuverlässigkeit der Versorgung berücksichtigt.\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Fragenkatalog_Lebensumstände_deutsch",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"content": "Fragen zu den allgemeinen Lebensumständen:\n\nWie alt :IST :DIE_PATIENTIN_NOMINATIV?\nWie aktiv :IST :DIE_PATIENTIN_NOMINATIV?\nWas :MACHT :DIE_PATIENTIN_NOMINATIV beruflich?\nWas :HAT :DIE_PATIENTIN_NOMINATIV für Hobbies?\nIn welcher Umwelt :LEBT :DIE_PATIENTIN_NOMINATIV (Stadt, Land, trocken, feucht)?\n:IST :DIE_PATIENTIN_NOMINATIV auf Hilfe angewiesen oder besteht eine selbstständige Lebensführung?\nErmöglicht die lokale Infrastruktur im Falle einer funktionellen Prothese Reparaturen?\n\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Fragenkatalog_Gesundheitszustand_deutsch",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"content": "Fragen zum Gesundheitszustand:\n\nWie ist :DER_PATIENTIN_GENITIV allgemeine Gesundheitszustand?\nWie und wann kam es zur Amputation?\nIst der Stumpf reizlos, die Wunden verheilt, die Schwellungen abgeklungen?\nFindet oder fand eine Kompressionstherapie zur Stumpfformung statt?\nGibt es Empfindungsstörungen, reduziertes oder überempfindliches Gefühl?\nGibt es auffälliges Narbengewebe, Spalthautdeckung oder tiefe Narbeneinzüge?\nIst das Unterhautgewebe eher weich oder eher fest?\n:HAT :DIE_PATIENTIN_NOMINATIV Phantomschmerzen oder andere Schmerzsymptomatiken?\nIst eine Muskelaktivität erkennbar, die Beuge- und Streckmuskeln separat aktivierbar?\nGibt es Einschränkungen der angrenzenden Gelenke (Handgelenk, Ellenbogen, Schulter, Wirbelsäule) oder der Gegenseite?\nSind noch andere orthopädische Hilfsmittel in Gebrauch (z.B. Beinprothesen, Orthesen, etc.)?\nSind Material- oder Lebensmittelallergien bekannt?\n:NIMMT :DIE_PATIENTIN_NOMINATIV Medikamente?\n\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Fragenkatalog_Versorgungsplanung_deutsch",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"content": "Fragen zur Versorgungsplanung:\n\nGab oder gibt es eine aktuelle Versorgung und wie ist diese aufgebaut?\nWelchen Umfang hat die Hand der erhaltenen Seite im Knöchelbereich, wie lang ist der Mittelfinger?\nWie lang ist der Unterarmstumpf gemessen von der Ellenbeuge aus, wie lang die andere Seite bis zur ausgestreckten Daumenspitze?\nWie lang ist der Oberarmstumpf gemessen von der Achselfalte aus, wie lang die andere Seite bis zur Spitze des abgewinkelten Ellenbogens?\nWie Groß :IST :DIE_PATIENTIN_NOMINATIV?\nWelche Erwartungen bestehen gegenüber der Versorgung?\nWas :WILL :DIE_PATIENTIN_NOMINATIV mit der Prothese machen, wie und wofür soll sie eingesetzt werden?\nWie hoch ist der Anspruch an das kosmetische Erscheinungsbild?\nWer übernimmt die Kosten? Gibt es ein Preislimit?\n\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Fragenkatalog_Versorgungsablauf_deutsch",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"content": "Fragen zum Versorgungsablauf:\n\n:KANN :DIE_PATIENTIN_NOMINATIV auf deutsch oder englisch kommunizieren?\n:REIST :DIE_PATIENTIN_NOMINATIV alleine oder in Begleitung?\nIst es :DER_PATIENTIN_DATIV möglich in unser Haus zu kommen und dort eventuell mehrere Wochen oder Monate zu bleiben, bzw. mehrfach anzureisen?\nManche Prothesenkomponenten könnten eine jährliche Inspektion gemäß Garantiebestimmungen erfordern. Ist es :DER_PATIENTIN_DATIV möglich, einen solchen Termin auf jährlicher Basis wahrzunehmen, wobei die Inspektion einige Wochen in Anspruch nehmen kann?",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Fragenkatalog_Schlusssatz_deutsch",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"content": "Zudem benötigen wir aktuelle Fotos aus unterschiedlichen Ansichten und, wenn vorhanden, Röntgenbilder. Bitte nennen Sie uns auch ein Geburtsdatum damit wir ordnungsgemäß einen Fall anlegen können. Nach Zusendung der erforderlichen Informationen bemühen wir uns schnellstmöglich um die Erstellung eines Versorgungskonzepts.\n\nBei weiteren Fragen stehen wir Ihnen gerne zur Verfügung.",
+		"language": "de"
+	},
+	{
+		"type": "template",
+		"name": "Fragenkatalog deutsch",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"content": [
+			[":Fragenkatalog_Einleitung_deutsch"],
+			[":Fragenkatalog_Lebensumstände_deutsch", ":Fragenkatalog_Gesundheitszustand_deutsch", ":Fragenkatalog_Versorgungsplanung_deutsch", ":Fragenkatalog_Versorgungsablauf_deutsch"],
+			[":Fragenkatalog_Schlusssatz_deutsch"]
+		],
 		"language": "de"
 	}
 ]
