@@ -639,10 +639,23 @@ class TEXTTEMPLATE extends API {
 
 			// match and replace placeholders and add paragraph linebreaks
 			$content = '';
+			
+			// invert first forbidden names to allowed
+			$pattern = substr_replace(CONFIG['forbidden']['names'][0], '', 2, 1);
+			// add colon
+			$pattern = substr_replace($pattern, ':', 1, 0);
+			// add multiplier
+			$pattern = substr_replace($pattern, '+?', -1, 0);
+			// add match not capture
+			$patternend = substr_replace(CONFIG['forbidden']['names'][0], '?:', 1, 0);
+			// unset literals
+			$patternend = preg_replace('/\\\./m', '', $patternend);
+			// readd
+			$patternend = substr_replace($patternend, '\\w\\d', -2, 0);
 			foreach(json_decode($template['content']) as $paragraph){
 				foreach($paragraph as $chunk){
 					$add = $texts[$chunk];
-					preg_match_all('/(:[\w\d]+?)(?:\W|$)/m', $add, $placeholders);
+					preg_match_all('/' . $pattern . $patternend . '/m', $add, $placeholders);
 					foreach($placeholders[1] as $ph){
 						if (!isset($replacements[$ph])) array_push($undefined, $ph);
 					}
@@ -651,18 +664,22 @@ class TEXTTEMPLATE extends API {
 				$content .= "\n\n";
 				$texts[$paragraph[count($paragraph)-1]] .= "\n\n";
 			}
+
 			// add input fields for undefined placeholders
 			foreach ($undefined as $placeholder) {
 				$inputs[] = [
 					'type' => 'text',
 					'attributes' => [
 						'name' => $this->_lang->GET('texttemplate.use.fill_placeholder') . ' ' . $placeholder,
-						'id' => preg_replace('/\W/', '', $placeholder),
+						'id' => $placeholder,
 						'data-usecase' => 'undefinedplaceholder',
 						'data-loss' => 'prevent'
 					]
 				];
 			}
+			// array values for keys are represented as string otherwise, array unique to prevent repetitive inputs for multiple same undefined placeholders
+			$inputs = array_values(array_unique($inputs, SORT_REGULAR));
+
 			// import button (values from passed document-element-ids)
 			// $this->_clientimport as json-string with ':placeholder' : 'inputid' pairs
 			if($this->_clientimport && $undefined){
@@ -686,7 +703,7 @@ class TEXTTEMPLATE extends API {
 			foreach (json_decode($template['content']) as $block){
 				$useblocks = [];
 				foreach($block as $key => $value){
-					$useblocks[preg_replace('/\W/', '', $value)] = ['checked' => true, 'data-usecase' => 'useblocks', 'data-loss' => 'prevent'];
+					$useblocks[substr($value, 1)] = ['checked' => true, 'data-usecase' => 'useblocks', 'data-loss' => 'prevent'];
 				}
 				if (count($useblocks)) $inputs[] = [
 					'type' => 'checkbox',

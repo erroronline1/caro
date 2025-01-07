@@ -1298,7 +1298,7 @@ export const _client = {
 				if (block.checked) {
 					blockcontent = _client.texttemplate.data.blocks[":" + block.name.replaceAll(/\(.*?\)/g, "")];
 					for (const input of placeholder) {
-						if (input.value) blockcontent = blockcontent.replaceAll(":" + input.id, input.value);
+						if (input.value) blockcontent = blockcontent.replaceAll(input.id, input.value);
 					}
 					for (const [key, replacement] of Object.entries(replacements)) {
 						blockcontent = blockcontent.replaceAll(key, replacement[selectedgenus]);
