@@ -135,6 +135,7 @@ class SQLQUERY {
 			foreach($items as $item){
 				foreach ($item as &$replace){
 					if ($replace === '') $replace = "''";
+					elseif (gettype($replace) === null || strtoupper($replace) === 'NULL') $replace = 'NULL';
 					elseif (gettype($replace) === 'string') $replace = $_pdo->quote($replace);
 				}
 				$item = strtr($values, $item);
@@ -354,8 +355,8 @@ class SQLQUERY {
 				. "prod.checked IS NOT NULL ORDER BY prod.checked"
 		],
 		'consumables_get_product_units' => [
-			'mysql' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC",
-			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products GROUP BY article_unit ORDER BY article_unit ASC"
+			'mysql' => "SELECT article_unit FROM caro_consumables_products WHERE article_unit IS NOT NULL GROUP BY article_unit ORDER BY article_unit ASC",
+			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products WHERE article_unit IS NOT NULL GROUP BY article_unit ORDER BY article_unit ASC"
 		],
 		'consumables_get_products_by_vendor_id' => [
 			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE dist.id IN (:ids) AND prod.vendor_id = dist.id",
