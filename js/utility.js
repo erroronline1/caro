@@ -1322,7 +1322,7 @@ export const _client = {
 			const converted_elements = {};
 			// convert element keys to valid placeholder ids
 			for (const [key, value] of Object.entries(elements)) {
-				converted_elements[key.replace(/\W/gm, "")] = value;
+				converted_elements[key] = value;
 			}
 			const placeholder = document.querySelectorAll("[data-usecase=undefinedplaceholder]");
 			for (const input of placeholder) {
