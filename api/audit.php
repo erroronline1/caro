@@ -1655,7 +1655,7 @@ class AUDIT extends API {
 				$pricelist = json_decode($vendor['pricelist'], true);
 				if (isset($pricelist['validity']) && $pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
 				if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
-				$certificate = json_decode($vendor['certificate'], true);
+				$certificate = json_decode($vendor['certificate'] ? : '', true);
 				if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				if ($vendor['evaluation']){
 					$vendor['evaluation'] = json_decode($vendor['evaluation'], true);

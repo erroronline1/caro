@@ -128,7 +128,7 @@ class CONSUMABLES extends API {
 			'download' => pathinfo($tempFile)['basename']
 		];
 		// create stupid filter for export files if none is provided
-		$vendor['pricelist'] = $vendor['pricelist'] ? json_decode($vendor['pricelist'], true): [];
+		$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 		$filter = isset($vendor['pricelist']['filter']) && json_decode($vendor['pricelist']['filter'], true) ? json_decode($vendor['pricelist']['filter'], true) : [
 			'filesettings' => [
 				'headerrowindex' => 0,
@@ -1406,26 +1406,26 @@ class CONSUMABLES extends API {
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_pricelist_import'),
 				[
 					':id' => $remainder[$update]['id'],
-					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
-					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
-					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
-					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : null,
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : null,
-					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : null,
-					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : null
+					':article_name' => $pricelist->_list[1][$index]['article_name'] ? $this->_pdo->quote($pricelist->_list[1][$index]['article_name']) : 'NULL',
+					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']) : 'NULL',
+					':article_ean' => $pricelist->_list[1][$index]['article_ean'] ? $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']) : 'NULL',
+					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 'NULL',
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 'NULL',
+					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 'NULL',
+					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				]) . '; ');
 			}
 
 			// insert replacements
 			$insertions = [];
 			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
-				$insertions[]=[
+				$insertions[] = [
 					':vendor_id' => $vendorID,
-					':article_no' => $pricelist->_list[1][$index]['article_no'],
-					':article_name' => $pricelist->_list[1][$index]['article_name'],
+					':article_no' => $pricelist->_list[1][$index]['article_no'] ? : null,
+					':article_name' => $pricelist->_list[1][$index]['article_name'] ? : null,
 					':article_alias' => null,
-					':article_unit' => $pricelist->_list[1][$index]['article_unit'],
-					':article_ean' => $pricelist->_list[1][$index]['article_ean'],
+					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? : null,
+					':article_ean' => $pricelist->_list[1][$index]['article_ean'] ? : null,
 					':active' => 1,
 					':protected' => null,
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : null,
@@ -1497,16 +1497,13 @@ class CONSUMABLES extends API {
 				 */
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
-					'active' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? 1 : 0,
-					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info),
+					'active' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? 1 : null,
+					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
-					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_currentdate->format('Ymd')
+					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_currentdate->format('Ymd'),
+					'evaluation' => null
 				];
-				// tidy up unused properties
-				foreach($vendor['info'] as $key => $value){
-					if (!$value) unset($vendor['info'][$key]);
-				}
 				
 				// check forbidden names
 				foreach(CONFIG['forbidden']['names'] as $pattern){
@@ -1514,7 +1511,7 @@ class CONSUMABLES extends API {
 				}
 
 				// ensure valid json for filters
-				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if (isset($vendor['pricelist']['filter']) && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
@@ -1562,18 +1559,31 @@ class CONSUMABLES extends API {
 							'type' => 'error'
 						]]);
 				}
-				$vendor['evaluation'] = $evaluation;
-				$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
-				$vendor['evaluation']['_date'] = $this-_currentdate->format('Y-m-d');
+				if ($vendor['evaluation'] = $evaluation){
+					$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
+					$vendor['evaluation']['_date'] = $this-_currentdate->format('Y-m-d');
+				}
+				else $vendor['evaluation'] = null;
+
+				// tidy up unused properties
+				foreach($vendor['info'] as $key => $value){
+					if (!$value) unset($vendor['info'][$key]);
+				}
+				foreach($vendor['certificate'] as $key => $value){
+					if (!$value) unset($vendor['certificate'][$key]);
+				}
+				foreach($vendor['pricelist'] as $key => $value){
+					if (!$value) unset($vendor['pricelist'][$key]);
+				}
 
 				// save vendor to database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
 					'values' => [
 						':name' => $vendor['name'],
 						':active' => $vendor['active'],
-						':info' => json_encode($vendor['info']),
-						':certificate' => json_encode($vendor['certificate']),
-						':pricelist' => json_encode($vendor['pricelist']),
+						':info' => $vendor['info'] ? json_encode($vendor['info']) : null,
+						':certificate' => $vendor['certificate'] ? json_encode($vendor['certificate']) : null,
+						':pricelist' => $vendor['pricelist'] ? json_encode($vendor['pricelist']) : null,
 						':immutable_fileserver' => $vendor['immutable_fileserver'],
 						':evaluation' => $vendor['evaluation']
 					]
@@ -1602,16 +1612,12 @@ class CONSUMABLES extends API {
 				if (!$vendor) $this->response(null, 406);
 
 				// update vendor data
-				$vendor['active'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? 1 : 0;
+				$vendor['active'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? 1 : null;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
-				// tidy up unused properties
-				foreach($vendor['info'] as $key => $value){
-					if (!$value) unset($vendor['info'][$key]);
-				}
-				$vendor['certificate'] = json_decode($vendor['certificate'], true);
+				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'));
-				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
+				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'));
 				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['mdr14_sample_interval'];
 				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['mdr14_sample_reusable'];
@@ -1622,7 +1628,7 @@ class CONSUMABLES extends API {
 				}
 
 				// ensure valid json for filters
-				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if (isset($vendor['pricelist']['filter']) && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
@@ -1639,11 +1645,6 @@ class CONSUMABLES extends API {
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
 				}
 
-				// tidy up unused properties
-				foreach($vendor['pricelist'] as $key => $value){
-					if (!$value) unset($vendor['pricelist'][$key]);
-				}
-
 				// tidy up consumable products database if inactive
 				if (!$vendor['active']){
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
@@ -1651,7 +1652,7 @@ class CONSUMABLES extends API {
 							':id' => $vendor['id']
 							]
 					]);
-					$vendor['pricelist']['validity'] = '';
+					unset ($vendor['pricelist']['validity']);
 				}
 
 				// unset all beckend defined payload variables leaving vendor evaluation inputs
@@ -1695,21 +1696,35 @@ class CONSUMABLES extends API {
 				$vendor_evaluation_copy = $vendor['evaluation'];
 				if (isset($vendor_evaluation_copy['_author'])) unset($vendor_evaluation_copy['_author'], $vendor_evaluation_copy['_date']);
 				if ($vendor_evaluation_copy != $evaluation) {
-					$vendor['evaluation'] = $evaluation;
-					$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
-					$vendor['evaluation']['_date'] = $this->_currentdate->format('Y-m-d');
+					if ($vendor['evaluation'] = $evaluation){
+						$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
+						$vendor['evaluation']['_date'] = $this->_currentdate->format('Y-m-d');
+					}
+					else $vendor['evaluation'] = null;
 				}
 			
+				// tidy up unused properties
+				foreach($vendor['info'] as $key => $value){
+					if (!$value) unset($vendor['info'][$key]);
+				}
+				foreach($vendor['certificate'] as $key => $value){
+					if (!$value) unset($vendor['certificate'][$key]);
+				}
+				// tidy up unused properties
+				foreach($vendor['pricelist'] as $key => $value){
+					if (!$value) unset($vendor['pricelist'][$key]);
+				}
+
 				// update vendor
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_vendor', [
 					'values' => [
 						':id' => $vendor['id'],
 						':active' => $vendor['active'],
 						':name' => $vendor['name'],
-						':info' => json_encode($vendor['info']),
-						':certificate' => json_encode($vendor['certificate']),
-						':pricelist' => json_encode($vendor['pricelist']),
-						':evaluation' => json_encode($vendor['evaluation'])
+						':info' => $vendor['info'] ? json_encode($vendor['info']) : null,
+						':certificate' => $vendor['certificate'] ? json_encode($vendor['certificate']) : null,
+						':pricelist' => $vendor['pricelist'] ? json_encode($vendor['pricelist']) : null,
+						':evaluation' => $vendor['evaluation'] ? json_encode($vendor['evaluation']) : null
 					]
 				]) !== false) $this->response([
 					'response' => [
@@ -1741,19 +1756,19 @@ class CONSUMABLES extends API {
 				if (!$vendor) $vendor = [
 					'id' => null,
 					'name' => '',
-					'active' => 0,
-					'info' => '',
-					'certificate' => '{"validity":""}',
-					'pricelist' => '{"validity":"", "filter": ""}',
-					'evaluation' => ''
+					'active' => null,
+					'info' => null,
+					'certificate' => null,
+					'pricelist' => null,
+					'evaluation' => null
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . $this->_lang->GET('consumables.vendor.edit_existing_vendors_new') && !$vendor['id'])
 					$result['response'] = ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// resolve objects
-				$vendor['info'] = json_decode($vendor['info'], true) ? : [];
-				$vendor['certificate'] = json_decode($vendor['certificate'], true);
-				$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
+				$vendor['info'] = json_decode($vendor['info'] ? : '', true) ? : [];
+				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
+				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 				$isactive = $vendor['active'] ? ['checked' => true] : [];
 				$isinactive = !$vendor['active'] ? ['checked' => true] : [];
 
@@ -1866,7 +1881,7 @@ class CONSUMABLES extends API {
 								'type' => 'links',
 								'description' => $this->_lang->GET('consumables.vendor.certificate_download'),
 								'content' => $certificates,
-								'hint' => $vendor['certificate']['validity'] ? $this->_lang->GET('consumables.vendor.certificate_validity') . $vendor['certificate']['validity'] : false
+								'hint' => isset($vendor['certificate']['validity']) ? $this->_lang->GET('consumables.vendor.certificate_validity') . $vendor['certificate']['validity'] : false
 							];
 		
 						// append documents if applicable

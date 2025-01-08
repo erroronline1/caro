@@ -105,13 +105,13 @@ define('DEFAULTSQL', [
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_vendors` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`active` tinyint(1) NOT NULL," .
+				"	`active` tinyint(1) NULL DEFAULT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`info` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`certificate` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`pricelist` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`certificate` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`pricelist` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`evaluation` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
@@ -332,13 +332,13 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_vendors (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	active tinyint NOT NULL," .
+				"	active tinyint NULL DEFAULT NULL," .
 				"	name varchar(MAX) NOT NULL," .
-				"	info varchar(MAX) NOT NULL," .
-				"	certificate varchar(MAX) NOT NULL," .
-				"	pricelist varchar(MAX) NOT NULL," .
+				"	info varchar(MAX) NULL DEFAULT NULL," .
+				"	certificate varchar(MAX) NULL DEFAULT NULL," .
+				"	pricelist varchar(MAX) NULL DEFAULT NULL," .
 				"	immutable_fileserver varchar(MAX) NOT NULL," .
-				"	evaluation varchar(MAX) NOT NULL," .
+				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
