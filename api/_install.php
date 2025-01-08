@@ -33,10 +33,10 @@ define('DEFAULTSQL', [
 				"	`span_end` datetime NOT NULL," .
 				"	`author_id` int NOT NULL," .
 				"	`affected_user_id` int NULL DEFAULT NULL," .
-				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`misc` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`closed` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`subject` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`misc` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`alert` tinyint NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -259,10 +259,10 @@ define('DEFAULTSQL', [
 				"	span_end smalldatetime NOT NULL," .
 				"	author_id int NOT NULL," .
 				"	affected_user_id int NULL DEFAULT NULL," .
-				"	organizational_unit varchar(MAX) NOT NULL," .
-				"	subject varchar(MAX) NOT NULL," .
-				"	misc varchar(MAX) NOT NULL," .
-				"	closed varchar(MAX) NOT NULL," .
+				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
+				"	subject varchar(MAX) NULL DEFAULT NULL," .
+				"	misc varchar(MAX) NULL DEFAULT NULL," .
+				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	alert tinyint NULL" .
 				");"
 				.

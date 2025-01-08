@@ -444,9 +444,9 @@ class CALENDAR extends API {
 					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.organizational_unit')),
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.content')),
-					':misc' => '',
-					':closed' => '',
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : 0
+					':misc' => null,
+					':closed' => null,
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.schedule.error_missing'), 'type' => 'error']]);
 
@@ -486,9 +486,9 @@ class CALENDAR extends API {
 					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.organizational_unit')),
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.content')),
-					':misc' => '',
-					':closed' => '',
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : 0
+					':misc' => null,
+					':closed' => null,
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : numfmt_get_locale
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.schedule.error_missing'), 'type' => 'error']]);
 
@@ -635,6 +635,7 @@ class CALENDAR extends API {
 				if ($pastEvents) {
 					$uncompleted = [];
 					foreach ($pastEvents as $id => $row){
+						if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 						if (in_array($row, $thisDaysEvents) || $row['type'] !== 'schedule' || !array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || $row['closed']) unset($pastEvents[$id]);
 					}
 					if ($pastEvents){
@@ -690,6 +691,7 @@ class CALENDAR extends API {
 		foreach($dbevents as $row){
 			$date = new DateTime($row['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
 			$due = new DateTime($row['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
+			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			if (!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || $row['type'] !== 'schedule' ) continue; // skip not schedule and not user unit affecting
 
 			// construct event information
@@ -809,13 +811,13 @@ class CALENDAR extends API {
 					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00',
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
-					':organizational_unit' => '',
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_exemption')) ? : '',
-					':misc' => '',
-					':closed' => '',
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : 0
+					':organizational_unit' => null,
+					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_exemption')) ? : null,
+					':misc' => null,
+					':closed' => null,
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
 				];
-				if ($event[':subject'] === 'regular') $event[':subject'] = '';
+				if ($event[':subject'] === 'regular') $event[':subject'] = null;
 
 				// construct daily information
 				$misc = $event[':subject'] ? [] : [
@@ -865,11 +867,11 @@ class CALENDAR extends API {
 					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00',
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
-					':organizational_unit' => '',
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_exemption')) ? : '',
-					':misc' => '',
-					':closed' => '',
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : 0
+					':organizational_unit' => null,
+					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_exemption')) ? : null,
+					':misc' => null,
+					':closed' => null,
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
 				];
 				if ($event[':subject'] === 'regular') $event[':subject'] = '';
 
@@ -968,6 +970,7 @@ class CALENDAR extends API {
 				// gather events for requested date
 				$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 				foreach ($thisDaysEvents as $id => $row){
+					if (!$row['affected_user_units']) $row['affected_user_units'] = ''; 
 					$row['affected_user_units'] = explode(',', $row['affected_user_units']);
 					if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
 
@@ -1100,6 +1103,7 @@ class CALENDAR extends API {
 		foreach($dbevents as $row){
 			$date = new DateTime($row['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
 			$due = new DateTime($row['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
+			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			$row['organizational_unit'] = explode(',', $row['organizational_unit']);
 			if ($row['type'] !== 'timesheet'
 				|| !($row['affected_user_id'] === $_SESSION['user']['id']

@@ -97,8 +97,8 @@ class CALENDARUTILITY {
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
 				[
 					':id' => $this->_pdo->quote($entry['id']),
-					':closed' => $this->_pdo->quote($close ? json_encode($close) : ''),
-					':alert' => $alert === null ? $entry['alert'] : intval($alert)
+					':closed' => $close ? $this->_pdo->quote(json_encode($close)) : null,
+					':alert' => $alert === null ? $entry['alert'] : (intval($alert) ? 1 : null)
 				]
 			));
 		}
@@ -195,11 +195,11 @@ class CALENDARUTILITY {
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
 	 * 	':affected_user_id' => int | null,
-	 * 	':organizational_unit' => str,
-	 * 	':subject' => str,
-	 * 	':misc' => str (e.g. json_encoded whatnot),
-	 * 	':closed' => str (e.g. json_encoded when, by whom),
-	 * 	':alert' => int 1|0
+	 * 	':organizational_unit' => str | null,
+	 * 	':subject' => str | null,
+	 * 	':misc' => str (e.g. json_encoded whatnot) | null,
+	 * 	':closed' => str (e.g. json_encoded when, by whom) | null,
+	 * 	':alert' => int 1 | null
 	 * 	]
 	 * @return string dialog script
 	 */
@@ -556,11 +556,11 @@ class CALENDARUTILITY {
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
 	 * 	':affected_user_id' => int | null,
-	 * 	':organizational_unit' => str,
-	 * 	':subject' => str,
-	 * 	':misc' => str (e.g. json_encoded whatnot),
-	 * 	':closed' => str (e.g. json_encoded when, by whom),
-	 * 	':alert' => int 1|0
+	 * 	':organizational_unit' => str | null,
+	 * 	':subject' => str | null,
+	 * 	':misc' => str (e.g. json_encoded whatnot) | null,
+	 * 	':closed' => str (e.g. json_encoded when, by whom) | null,
+	 * 	':alert' => int 1 | null
 	 * 	]
 	 * @return int|bool insert id
 	 */
@@ -585,11 +585,11 @@ class CALENDARUTILITY {
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
 	 * 	':affected_user_id' => int | null,
-	 * 	':organizational_unit' => str,
-	 * 	':subject' => str,
-	 * 	':misc' => str (e.g. json_encoded whatnot),
-	 * 	':closed' => str (e.g. json_encoded when, by whom),
-	 * 	':alert' => int 1|0
+	 * 	':organizational_unit' => str | null,
+	 * 	':subject' => str | null,
+	 * 	':misc' => str (e.g. json_encoded whatnot) | null,
+	 * 	':closed' => str (e.g. json_encoded when, by whom) | null,
+	 * 	':alert' => int 1 | null
 	 * 	]
 	 * @return int affected rows
 	 */
@@ -626,6 +626,7 @@ class CALENDARUTILITY {
 				$events = $this->getDay($day->format('Y-m-d'));
 				$numbers = 0;
 				foreach ($events as $row){
+					if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 					$row['affected_user_units'] = $row['affected_user_units'] ? : $row['organizational_unit'];
 					switch ($type){
 						case 'schedule':
