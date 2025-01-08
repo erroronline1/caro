@@ -633,15 +633,15 @@ class INSTALL {
 				}
 				$names[] = $entry['name'];
 				$insertions[] = [
-					':name' => $pdo->quote($entry['name']),
-					':alias' => $pdo->quote($entry['alias']),
-					':context' => $pdo->quote($entry['context']),
-					':unit' => $pdo->quote($entry['unit']),
-					':author' => $pdo->quote($entry['author']),
-					':content' => $pdo->quote(gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content']),
-					':regulatory_context' => $pdo->quote($entry['regulatory_context'] ? : ''),
-					':permitted_export' => $entry['permitted_export'] ? $pdo->quote($entry['permitted_export']) : 'NULL',
-					':restricted_access' => $entry['restricted_access'] ? $pdo->quote($entry['restricted_access']) : 'NULL'
+					':name' => $entry['name'],
+					':alias' => $entry['alias'],
+					':context' => $entry['context'],
+					':unit' => $entry['unit'],
+					':author' => $entry['author'],
+					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content'],
+					':regulatory_context' => $entry['regulatory_context'] ? : '',
+					':permitted_export' => $entry['permitted_export'] ? $entry['permitted_export'] : 'NULL',
+					':restricted_access' => $entry['restricted_access'] ? $entry['restricted_access'] : 'NULL'
 				];
 			}
 		}
@@ -679,9 +679,9 @@ class INSTALL {
 				}
 				$names[] = $entry['title'];
 				$insertions[] = [
-					':title' => $pdo->quote($entry['title']),
-					':content' => $pdo->quote($entry['content']),
-					':permissions' => $pdo->quote($entry['permissions'])
+					':title' => $entry['title'],
+					':content' => $entry['content'],
+					':permissions' => $entry['permissions']
 				];
 			}
 		}
@@ -701,30 +701,46 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist'),
 		];
 
-		$insertions = $names = [];
+		// allowed pattern
+		// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
+		// unset types and escaped literals
+		$allowed = preg_replace('/\\\./m', '', CONFIG['forbidden']['names'][0]);
+		// readd some types
+		$allowed = substr_replace($allowed, '\\w\\d', -2, 0);
+		// add multiplier
+		$allowed = substr_replace($allowed, '+?', -1, 0);
+
+		$insertions = [];
+		$names = [
+			'template' => [],
+			'text' => [],
+			'replacement' => []
+		];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
 			$forbidden = false;
 			if (isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) {
-				foreach(CONFIG['forbidden']['names'] as $pattern){
+				$patterns = $entry['type'] === 'template' ? CONFIG['forbidden']['names'] : [...CONFIG['forbidden']['names'], $allowed];
+				foreach($patterns as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
 						echo '[X] The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '<br />';
 						$forbidden = true;
 						continue;
 					}
 				}
-				if (in_array($entry['name'], $names)) {
-					echo '[X] Multiple occurences of the name are not allowed<br />';
+				$used = $entry['type'] === 'template' ? $names['template'] : [...$names['text'], ...$names['replacement']];
+				if (in_array($entry['name'], $names[$entry['type']])) {
+					echo '[X] Multiple occurences of the name ' . $entry['name'] . ' for placeholders are not allowed<br />';
 					continue;
 				}
-				$names[] = $entry['name'];
+				$names[$entry['type']][] = $entry['name'];
 				$insertions[] = [
-					':name' => $pdo->quote($entry['name']),
-					':unit' => $pdo->quote($entry['unit']),
-					':author' => $pdo->quote($entry['author']),
-					':content' => $pdo->quote(gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content']),
-					':language' => $pdo->quote($entry['language']),
-					':type' =>$pdo->quote($entry['type']),
+					':name' => $entry['name'],
+					':unit' => $entry['unit'],
+					':author' => $entry['author'],
+					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content'],
+					':language' => $entry['language'],
+					':type' => $entry['type'],
 					':hidden' => 0
 				];
 			}
@@ -763,12 +779,12 @@ class INSTALL {
 				}
 				$names[] = $entry['name'];
 				$insertions[] = [
-					':name' => $pdo->quote($vendor['name']),
-					':active' => $pdo->quote(1),
-					':info' => $pdo->quote(json_encode($vendor['info'])),
-					':certificate' => $pdo->quote(json_encode([])),
-					':pricelist' => $pdo->quote(json_encode(['filter' => $vendor['pricelist']])),
-					':immutable_fileserver' => $pdo->quote(preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $currentdate->format('Ymd')),
+					':name' => $vendor['name'],
+					':active' => 1,
+					':info' => json_encode($vendor['info']),
+					':certificate' => json_encode([]),
+					':pricelist' => json_encode(['filter' => $vendor['pricelist']]),
+					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $currentdate->format('Ymd'),
 					':evaluation' => ''
 				];
 			}
