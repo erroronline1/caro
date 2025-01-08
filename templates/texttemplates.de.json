@@ -248,7 +248,7 @@
 	},
 	{
 		"type": "text",
-		"name": "Versandschreiben_Empfangsbestätigung",
+		"name": "Versandschreiben_Empfangsbestätigung_Einleitung",
 		"unit": "common",
 		"author": "Caro App",
 		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST_, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n",
@@ -275,7 +275,7 @@
 		"name": "Versandschreiben Empfangsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": [[":Versandschreiben_Empfangsbestätigung", ":Versandschreiben_Empfangsbestätigung_Leihschuhe", ":Versandschreiben_Empfangsbestätigung_Schlusssatz"]],
+		"content": [[":Versandschreiben_Empfangsbestätigung_Einleitung", ":Versandschreiben_Empfangsbestätigung_Leihschuhe", ":Versandschreiben_Empfangsbestätigung_Schlusssatz"]],
 		"language": "de"
 	},
 	{
