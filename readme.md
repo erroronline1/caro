@@ -110,7 +110,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
 * complete vendor templates
 * provide text recommendation templates
-* review submission of chunks, maybe filter in advance which are necessary according to requested template
 * more document templates
 * risk templates
 * review database column types use more of NULL
@@ -997,12 +996,6 @@ Furthermore the module contains the option for training evaluation. Evaluations 
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
-* Optional templates/* with the selected default language option to 
-    * documents.XX.json
-    * vendors.XX.json
-    * manual.XX.json
-    * risks.XX.json
-    * texttemplates.XX.json
 
 Tested server environments:
 * Apache [Uniform Server Zero XV](https://unidocumentserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
@@ -1053,11 +1046,20 @@ Technically the application is being usable on any webserver but this is **not r
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to templates/manual.XX.json-files.
 * [Customize](#customisation) your appropriate language-files (language.XX.json and templates/manual.XX.json)
-* Optional: edit applicable [templates](#prerequisites) with the selected default language option for a swift availability upon launch. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
 * Select an installation password for the system user.
 
+*Optional*
+
+If you are comfortable enough with text editing JSON-files to modify the language file and template-manual you can prepare
+* documents.XX.json
+* vendors.XX.json
+* risks.XX.json
+* texttemplates.XX.json
+
+within the template directory too for a swift availability upon launch. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
+
 ### Installation procedure
-* Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#prerequisites) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
+* Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
@@ -1945,6 +1947,8 @@ The stresstest also allows for injection of documents and components according t
 Same applies to vendors. These can be set up in templates/vendors.XX.json. Only vendors with novel names will be added. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.***
 
 Variables for the stress test can be adjusted within the top class variables in the sourcecode.
+
+Optional insertions from [template](#application-setup) documents can be done with the [installer](#installation-procedure). This method doesn't allow for deletion though but applies plausability checks on names. Afterwards you can check the application for behaviour handling these data within their respective modules.
 
 [Content](#content)
 
