@@ -1150,7 +1150,8 @@
 			},
 			"unit": "Likely used by"
 		},
-		"error_forbidden_name": "The name :name is not allowed please use another!",
+		"error_forbidden_name": "The name :name is not allowed, please use another!",
+		"error_name_taken": "The name ist already taken or part of an existing name, please use another!",
 		"system": {
 			"CID": "Purchase system prepared customer id",
 			"ECR": "Purchase system prepared certificate expiration",

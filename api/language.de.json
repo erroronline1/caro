@@ -1151,6 +1151,7 @@
 			"unit": "Typischerweise verwendet von"
 		},
 		"error_forbidden_name": "Der Name :name ist nicht zulässig, bitte versuche etwas anderes!",
+		"error_name_taken": "Der Name ist bereits in Verwendung oder Teil eines bestehenden Namens, bitte versuche etwas anderes!",
 		"system": {
 			"CID": "Einkauf System vorbereitete Kundennummer",
 			"ECR": "Einkauf System vorbereiteter Zertifikatsablauf",

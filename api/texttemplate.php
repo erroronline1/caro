@@ -71,16 +71,18 @@ class TEXTTEMPLATE extends API {
 					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $chunk[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 				}
 
-				// put hidden attribute if anything else remains the same
-				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
-					'values' => [
-						':name' => $chunk[':name']
-					]
-				]);
-				foreach($exists as $row => $entry){
-					if ($entry['type'] === 'template') unset($exists[$row]);
+				$exists = null;
+				$all = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
+				foreach($all as $entry){
+					if ($entry['type'] === 'template') continue;
+					if ($entry['name'] !== $chunk[':name'] && (str_starts_with($entry['name'], $chunk[':name']) || str_starts_with($chunk[':name'], $entry['name']))) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_name_taken'), 'type' => 'error']]);
+					if($entry['name'] == $chunk[':name']){
+						$exists = $entry;
+						break;
+					}
 				}
-				$exists = $exists ? array_values($exists)[0] : null;
+
+				// put hidden attribute if anything else remains the same
 				if ($exists && $exists['content'] === $chunk[':content'] && $exists['language'] === $chunk[':language'] && $exists['type'] === $chunk[':type']) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
 						'values' => [
