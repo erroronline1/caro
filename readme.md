@@ -103,14 +103,13 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * recall option (how?)
 * post-market surveillance (how?)
 * post-market evaluation (how?)
-* product lifespans -> transfer to product manuals? (how?)
 * statistics on documentation entries
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-* complete vendor templates
-* provide text recommendation templates
-* more document templates
+* vendor templates
+* text recommendation templates
+* document templates (especially regulatory issues)
 * risk templates
 * review database column types use more of NULL
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
