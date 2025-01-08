@@ -165,7 +165,7 @@
 	},
 	{
 		"type": "replacement",
-		"name": "IST",
+		"name": "IST_",
 		"unit": "common",
 		"author": "Caro App",
 		"content": "ist\nist\nist\nist\nist\nist\nbist\nsind",
@@ -197,7 +197,7 @@
 	},
 	{
 		"type": "replacement",
-		"name": "HAT",
+		"name": "HAT_",
 		"unit": "common",
 		"author": "Caro App",
 		"content": "hat\nhat\nhat\nhat\nhat\nhat\nhast\nhaben",
@@ -251,7 +251,7 @@
 		"name": "Versandschreiben_Empfangsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n",
+		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST_, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n",
 		"language": "de"
 	},
 	{
@@ -296,15 +296,15 @@
 	},
 	{
 		"type": "text",
-		"name": "Flughafenbescheinigung deutsch",
+		"name": "Flughafenbescheinigung_deutsch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Bescheinigung für :FRAU_AKKUSATIV :Name über die Nutzung :Hilfsmittel\n\nSehr geehrte Damen und Herren,\n\n:FRAU_NOMINATIV :Name, geboren am :Geburtsdatum, :IST :NUTZERIN von :Hilfsmittel im täglichen Gebrauch. Es können Komponenten aus Metall enthalten sein, welche von Metalldetektoren, wie sie z.B. an Flughafen eingesetzt werden, erkannt werden können.\n\nMit freundlichen Grüßen",
+		"content": "Bescheinigung für :FRAU_AKKUSATIV :Name über die Nutzung :Hilfsmittel\n\nSehr geehrte Damen und Herren,\n\n:FRAU_NOMINATIV :Name, geboren am :Geburtsdatum, :IST_ :NUTZERIN von :Hilfsmittel im täglichen Gebrauch. Es können Komponenten aus Metall enthalten sein, welche von Metalldetektoren, wie sie z.B. an Flughafen eingesetzt werden, erkannt werden können.\n\nMit freundlichen Grüßen",
 		"language": "de"
 	},
 	{
 		"type": "text",
-		"name": "Flughafenbescheinigung englisch",
+		"name": "Flughafenbescheinigung_englisch",
 		"unit": "common",
 		"author": "Caro App",
 		"content": "Attestation for :Name of use of :Hilfsmittel\n\nDear Madam or Sir,\n\n:Name, born :Geburtsdatum, makes use of :Hilfsmittel on a daily basis. Metal and synthetic materials are contained that may trigger metal  detectors, e.g. as used in airports.\n\nWith kind regards",
@@ -315,7 +315,7 @@
 		"name": "Flughafenbescheinigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": [[":Flughafenbescheinigung deutsch"], [":Flughafenbescheinigung englisch"]],
+		"content": [[":Flughafenbescheinigung_deutsch"], [":Flughafenbescheinigung_englisch"]],
 		"language": "de"
 	},
 	{
@@ -331,7 +331,7 @@
 		"name": "Fragenkatalog_Lebensumstände_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Fragen zu den allgemeinen Lebensumständen:\n\nWie alt :IST :DIE_PATIENTIN_NOMINATIV?\nWie aktiv :IST :DIE_PATIENTIN_NOMINATIV?\nWas :MACHT :DIE_PATIENTIN_NOMINATIV beruflich?\nWas :HAT :DIE_PATIENTIN_NOMINATIV für Hobbies?\nIn welcher Umwelt :LEBT :DIE_PATIENTIN_NOMINATIV (Stadt, Land, trocken, feucht)?\n:IST :DIE_PATIENTIN_NOMINATIV auf Hilfe angewiesen oder besteht eine selbstständige Lebensführung?\nErmöglicht die lokale Infrastruktur im Falle einer funktionellen Prothese Reparaturen?\n\n",
+		"content": "Fragen zu den allgemeinen Lebensumständen:\n\nWie alt :IST_ :DIE_PATIENTIN_NOMINATIV?\nWie aktiv :IST_ :DIE_PATIENTIN_NOMINATIV?\nWas :MACHT :DIE_PATIENTIN_NOMINATIV beruflich?\nWas :HAT_ :DIE_PATIENTIN_NOMINATIV für Hobbies?\nIn welcher Umwelt :LEBT :DIE_PATIENTIN_NOMINATIV (Stadt, Land, trocken, feucht)?\n:IST_ :DIE_PATIENTIN_NOMINATIV auf Hilfe angewiesen oder besteht eine selbstständige Lebensführung?\nErmöglicht die lokale Infrastruktur im Falle einer funktionellen Prothese Reparaturen?\n\n",
 		"language": "de"
 	},
 	{
@@ -339,7 +339,7 @@
 		"name": "Fragenkatalog_Gesundheitszustand_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Fragen zum Gesundheitszustand:\n\nWie ist :DER_PATIENTIN_GENITIV allgemeine Gesundheitszustand?\nWie und wann kam es zur Amputation?\nIst der Stumpf reizlos, die Wunden verheilt, die Schwellungen abgeklungen?\nFindet oder fand eine Kompressionstherapie zur Stumpfformung statt?\nGibt es Empfindungsstörungen, reduziertes oder überempfindliches Gefühl?\nGibt es auffälliges Narbengewebe, Spalthautdeckung oder tiefe Narbeneinzüge?\nIst das Unterhautgewebe eher weich oder eher fest?\n:HAT :DIE_PATIENTIN_NOMINATIV Phantomschmerzen oder andere Schmerzsymptomatiken?\nIst eine Muskelaktivität erkennbar, die Beuge- und Streckmuskeln separat aktivierbar?\nGibt es Einschränkungen der angrenzenden Gelenke (Handgelenk, Ellenbogen, Schulter, Wirbelsäule) oder der Gegenseite?\nSind noch andere orthopädische Hilfsmittel in Gebrauch (z.B. Beinprothesen, Orthesen, etc.)?\nSind Material- oder Lebensmittelallergien bekannt?\n:NIMMT :DIE_PATIENTIN_NOMINATIV Medikamente?\n\n",
+		"content": "Fragen zum Gesundheitszustand:\n\nWie ist :DER_PATIENTIN_GENITIV allgemeine Gesundheitszustand?\nWie und wann kam es zur Amputation?\nIst der Stumpf reizlos, die Wunden verheilt, die Schwellungen abgeklungen?\nFindet oder fand eine Kompressionstherapie zur Stumpfformung statt?\nGibt es Empfindungsstörungen, reduziertes oder überempfindliches Gefühl?\nGibt es auffälliges Narbengewebe, Spalthautdeckung oder tiefe Narbeneinzüge?\nIst das Unterhautgewebe eher weich oder eher fest?\n:HAT_ :DIE_PATIENTIN_NOMINATIV Phantomschmerzen oder andere Schmerzsymptomatiken?\nIst eine Muskelaktivität erkennbar, die Beuge- und Streckmuskeln separat aktivierbar?\nGibt es Einschränkungen der angrenzenden Gelenke (Handgelenk, Ellenbogen, Schulter, Wirbelsäule) oder der Gegenseite?\nSind noch andere orthopädische Hilfsmittel in Gebrauch (z.B. Beinprothesen, Orthesen, etc.)?\nSind Material- oder Lebensmittelallergien bekannt?\n:NIMMT :DIE_PATIENTIN_NOMINATIV Medikamente?\n\n",
 		"language": "de"
 	},
 	{
@@ -347,7 +347,7 @@
 		"name": "Fragenkatalog_Versorgungsplanung_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Fragen zur Versorgungsplanung:\n\nGab oder gibt es eine aktuelle Versorgung und wie ist diese aufgebaut?\nWelchen Umfang hat die Hand der erhaltenen Seite im Knöchelbereich, wie lang ist der Mittelfinger?\nWie lang ist der Unterarmstumpf gemessen von der Ellenbeuge aus, wie lang die andere Seite bis zur ausgestreckten Daumenspitze?\nWie lang ist der Oberarmstumpf gemessen von der Achselfalte aus, wie lang die andere Seite bis zur Spitze des abgewinkelten Ellenbogens?\nWie Groß :IST :DIE_PATIENTIN_NOMINATIV?\nWelche Erwartungen bestehen gegenüber der Versorgung?\nWas :WILL :DIE_PATIENTIN_NOMINATIV mit der Prothese machen, wie und wofür soll sie eingesetzt werden?\nWie hoch ist der Anspruch an das kosmetische Erscheinungsbild?\nWer übernimmt die Kosten? Gibt es ein Preislimit?\n\n",
+		"content": "Fragen zur Versorgungsplanung:\n\nGab oder gibt es eine aktuelle Versorgung und wie ist diese aufgebaut?\nWelchen Umfang hat die Hand der erhaltenen Seite im Knöchelbereich, wie lang ist der Mittelfinger?\nWie lang ist der Unterarmstumpf gemessen von der Ellenbeuge aus, wie lang die andere Seite bis zur ausgestreckten Daumenspitze?\nWie lang ist der Oberarmstumpf gemessen von der Achselfalte aus, wie lang die andere Seite bis zur Spitze des abgewinkelten Ellenbogens?\nWie Groß :IST_ :DIE_PATIENTIN_NOMINATIV?\nWelche Erwartungen bestehen gegenüber der Versorgung?\nWas :WILL :DIE_PATIENTIN_NOMINATIV mit der Prothese machen, wie und wofür soll sie eingesetzt werden?\nWie hoch ist der Anspruch an das kosmetische Erscheinungsbild?\nWer übernimmt die Kosten? Gibt es ein Preislimit?\n\n",
 		"language": "de"
 	},
 	{
