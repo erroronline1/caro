@@ -924,6 +924,7 @@ Ferner enthält das Modul die Möglichkeit der Schulungsbewertung. Bewertungen k
     * documents.XX.json
     * vendors.XX.json
     * manual.XX.json
+    * risks.XX.json
     * texttemplates.XX.json
 
 Getestete Serverumgebungen:
@@ -975,7 +976,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
 * Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in templates/manual.XX.json-Dateien.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.json und templates/manual.XX.json)
-* Optional: Anpassung sachgemäßer template/documents.XX.json und template/vendors.XX.json in der gewählten Standardsprache für eine schnellere Verfügbarkait nach dem Start. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
+* Optional: Anpassung sachgemäßer [Templates](#voraussetzungen) in der gewählten Standardsprache für eine schnellere Verfügbarkait nach dem Start. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
 ### Installation

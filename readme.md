@@ -112,6 +112,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * provide text recommendation templates
 * review submission of chunks, maybe filter in advance which are necessary according to requested template
 * more document templates
+* risk templates
 * review database column types use more of NULL
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
@@ -998,10 +999,11 @@ Furthermore the module contains the option for training evaluation. Evaluations 
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
-* Optional templates/* with the selected default language option:
+* Optional templates/* with the selected default language option to 
     * documents.XX.json
     * vendors.XX.json
     * manual.XX.json
+    * risks.XX.json
     * texttemplates.XX.json
 
 Tested server environments:
@@ -1053,7 +1055,7 @@ Technically the application is being usable on any webserver but this is **not r
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to templates/manual.XX.json-files.
 * [Customize](#customisation) your appropriate language-files (language.XX.json and templates/manual.XX.json)
-* Optional: edit applicable templates/documents.XX.json and templates/vendors.XX.json with the selected default language option for a swift availability upon launch. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
+* Optional: edit applicable [templates](#prerequisites) with the selected default language option for a swift availability upon launch. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
 * Select an installation password for the system user.
 
 ### Installation procedure

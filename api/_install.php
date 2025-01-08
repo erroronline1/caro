@@ -691,6 +691,43 @@ class INSTALL {
 		}
 
 	/**
+	 * installs risks by novel process+risk+cause
+	 */
+	public function installRisks(){
+		$file = '../templates/risks.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [];
+		foreach(SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist') as $row){
+			$DBall[] = $row['process'].$row['risk'].$row['cause'];
+		}
+
+		foreach ($json as $entry){
+			// risks are only transferred if process+risk+cause is not already taken
+			$forbidden = false;
+			if (isset($entry['process']) && isset($entry['risk']) && isset($entry['cause']) && !in_array($entry['process'].$entry['risk'].$entry['cause'], $DBall)) {
+				$insertions[] = [
+					':process' => $entry['process'],
+					':risk' => $entry['risk'],
+					':cause' => $entry['cause'],
+					':effect' => isset($entry['effect']) ? $entry['effect'] : '',
+					':probability' => isset($entry['probability']) ? $entry['probability'] : 4,
+					':damage' => isset($entry['damage']) ? $entry['damage'] : 4,
+					':measure' => isset($entry['measure']) ? $entry['measure'] : '',
+					':measure_probability' => isset($entry['measure_probability']) ? $entry['measure_probability'] : 4,
+					':measure_damage' => isset($entry['measure_damage']) ? $entry['measure_damage'] : 4,
+					':risk_benefit' => isset($entry['risk_benefit']) ? $entry['risk_benefit'] : '',
+					':measure_remainder' => isset($entry['measure_remainder']) ? $entry['measure_remainder'] : '',
+					':last_edit' => json_encode(['user' => $this->_defaultUser, 'date' => $this->_currentdate->format('Y-m-d H:i')])
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
+			echo '<br />[*] novel entries by process+risk+cause from ' . $file . ' have been installed.<br />';
+		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+	}
+
+	/**
 	 * installs texttemplates by novel name
 	 */
 	public function installTexttemplates(){
@@ -749,7 +786,7 @@ class INSTALL {
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
 			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
 		else echo '[!] there were no novelties to install from '. $file . '.<br />';
-		}
+	}
 
 	/**
 	 * installt vendors by novel name
