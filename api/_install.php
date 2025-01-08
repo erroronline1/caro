@@ -731,7 +731,7 @@ class INSTALL {
 				$used = $entry['type'] === 'template' ? $names['template'] : [...$names['text'], ...$names['replacement']];
 				foreach($used as $name){
 					if (str_starts_with($entry['name'], $name) || str_starts_with($name, $entry['name']))
-					echo '[X] Multiple occurences of the name ' . $entry['name'] . ' or parts of it for placeholders are not allowed<br />';
+					echo '[X] ' . $entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed<br />';
 					continue;
 				}
 				$names[$entry['type']][] = $entry['name'];
