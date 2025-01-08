@@ -303,20 +303,28 @@
 		"language": "de"
 	},
 	{
+		"type": "template",
+		"name": "Flughafenbescheinigung deutsch",
+		"unit": "common",
+		"author": "Caro App",
+		"content": [[":Flughafenbescheinigung_deutsch"]],
+		"language": "de"
+	},
+	{
 		"type": "text",
 		"name": "Flughafenbescheinigung_englisch",
 		"unit": "common",
 		"author": "Caro App",
 		"content": "Attestation for :Name of use of :Hilfsmittel\n\nDear Madam or Sir,\n\n:Name, born :Geburtsdatum, makes use of :Hilfsmittel on a daily basis. Metal and synthetic materials are contained that may trigger metal  detectors, e.g. as used in airports.\n\nWith kind regards",
-		"language": "de"
+		"language": "en"
 	},
 	{
 		"type": "template",
-		"name": "Flughafenbescheinigung",
+		"name": "Flughafenbescheinigung englisch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": [[":Flughafenbescheinigung_deutsch"], [":Flughafenbescheinigung_englisch"]],
-		"language": "de"
+		"content": [[":Flughafenbescheinigung_englisch"]],
+		"language": "en"
 	},
 	{
 		"type": "text",
