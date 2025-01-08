@@ -99,6 +99,9 @@ class SQLQUERY {
 
 	/**
 	 * creates packages of well prepared sql queries to handle sql package size
+	 * 
+	 * MASKING HAS TO BE DONE BEFOREHAND
+	 * 
 	 * @param array $chunks packages so far
 	 * @param string $query next sql query
 	 * @return array $chunks extended packages so far
@@ -118,9 +121,6 @@ class SQLQUERY {
 	/**
 	 * creates packages of sql INSERTIONS to handle sql package size
 	 * e.g. for multiple inserts
-	 * 
-	 * MASKING HAS TO BE DONE BEFOREHAND
-	 * 
 	 * @param string $query sql query
 	 * @param array $items named array to replace query by strtr have to be sanitized and masked
 	 * @return array $chunks extended packages so far
