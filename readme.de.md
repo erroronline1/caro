@@ -9,7 +9,6 @@
     * [Extras](#extras)
     * [Datenintegrität](#datenintegrität)
     * [Tips](#tips)
-
 * [Module](#module)
     * [Anwendung](#anwendung)
         * [Nutzer](#nutzer)
@@ -921,7 +920,11 @@ Ferner enthält das Modul die Möglichkeit der Schulungsbewertung. Bewertungen k
     * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzwerkverbindung) (Cache, indexedDB) beim Beenden
     * Druckerzugang für alle Endgeräte
 * Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
-* Optional: template/documents.XX.json und template/vendors.XX.json in der gewählten Standardsprache
+* Optional templates/* in der gewählten Standardsprache:
+    * documents.XX.json
+    * vendors.XX.json
+    * manual.XX.json
+    * texttemplates.XX.json
 
 Getestete Serverumgebungen:
 * Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
@@ -976,7 +979,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
 ### Installation
-* Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*, Wahl Dokumente, Anleitung, Textvorschläge und Lieferanten zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind.
+* Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*, Wahl [Templates](#voraussetzungen) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind.
 * Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
 * Eine Installation als Progressive Web App (PWA) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 

@@ -999,7 +999,11 @@ Furthermore the module contains the option for training evaluation. Evaluations 
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
-* Optional: templates/documents.XX.json and templates/vendors.XX.json with the selected default language option
+* Optional templates/* with the selected default language option:
+    * documents.XX.json
+    * vendors.XX.json
+    * manual.XX.json
+    * texttemplates.XX.json
 
 Tested server environments:
 * Apache [Uniform Server Zero XV](https://unidocumentserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
@@ -1054,7 +1058,7 @@ Technically the application is being usable on any webserver but this is **not r
 * Select an installation password for the system user.
 
 ### Installation procedure
-* Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install documents, manual, text-templates and vendors - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
+* Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#prerequisites) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
