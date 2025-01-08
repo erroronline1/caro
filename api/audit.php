@@ -986,6 +986,13 @@ class AUDIT extends API {
 					'name' => $risk['process']
 				],
 			]];
+			
+			// fallback for occasional level changes in languagefile
+			$risk['probability'] = min($risk['probability'], count($this->_lang->_USER['risk']['probabilities']));
+			$risk['damage'] = min($risk['damage'], count($this->_lang->_USER['risk']['damages']));
+			$risk['measure_probability'] = min($risk['measure_probability'], count($this->_lang->_USER['risk']['probabilities']));
+			$risk['measure_damage'] = min($risk['measure_damage'], count($this->_lang->_USER['risk']['damages']));
+			
 			$process = $risk['process'];
 			$last_edit = json_decode($risk['last_edit'], true);
 			$issues[count($issues)-1][] = [

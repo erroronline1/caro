@@ -145,6 +145,13 @@ class RISK extends API {
 					'measure_remainder' => '',
 					'last_edit' => ''
 				];
+				
+				// fallback for occasional level changes in languagefile
+				$risk['probability'] = min($risk['probability'], count($this->_lang->_USER['risk']['probabilities']));
+				$risk['damage'] = min($risk['damage'], count($this->_lang->_USER['risk']['damages']));
+				$risk['measure_probability'] = min($risk['measure_probability'], count($this->_lang->_USER['risk']['probabilities']));
+				$risk['measure_damage'] = min($risk['measure_damage'], count($this->_lang->_USER['risk']['damages']));
+
 				$probabilities = $measure_probabilities = $damages = $measure_damages = [];
 				foreach($this->_lang->_USER['risk']['probabilities'] as $index => $description){
 					$probabilities[$description] = $risk['probability'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
