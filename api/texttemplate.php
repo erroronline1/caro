@@ -59,8 +59,16 @@ class TEXTTEMPLATE extends API {
 
 				// check forbidden names
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
-				foreach([...CONFIG['forbidden']['names'], '/[^\w\d]/m'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $chunk[':name']]), 'type' => 'error']]);
+				// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
+				// unset types and escaped literals
+				$pattern = preg_replace('/\\\./m', '', CONFIG['forbidden']['names'][0]);
+				// readd some types
+				$pattern = substr_replace($pattern, '\\w\\d', -2, 0);
+				// add multiplier
+				$pattern = substr_replace($pattern, '+?', -1, 0);
+
+				foreach([...CONFIG['forbidden']['names'], $pattern] as $pattern){
+					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $chunk[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 				}
 
 				// put hidden attribute if anything else remains the same
@@ -69,7 +77,10 @@ class TEXTTEMPLATE extends API {
 						':name' => $chunk[':name']
 					]
 				]);
-				$exists = $exists ? $exists[0] : null;
+				foreach($exists as $row => $entry){
+					if ($entry['type'] === 'template') unset($exists[$row]);
+				}
+				$exists = $exists ? array_values($exists)[0] : null;
 				if ($exists && $exists['content'] === $chunk[':content'] && $exists['language'] === $chunk[':language'] && $exists['type'] === $chunk[':type']) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
 						'values' => [
@@ -329,7 +340,10 @@ class TEXTTEMPLATE extends API {
 						':name' => $template[':name']
 					]
 				]);
-				$exists = $exists ? $exists[0] : null;
+				foreach($exists as $row => $entry){
+					if ($entry['type'] !== 'template') unset($exists[$row]);
+				}
+				$exists = $exists ? array_values($exists)[0] : null;
 				if ($exists && $exists['content'] === $template[':content']) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
 						'values' => [
@@ -346,7 +360,7 @@ class TEXTTEMPLATE extends API {
 				}
 				//check forbidden names
 				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]), 'type' => 'error']]);
+					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 				}
 				// else post new template
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
@@ -640,22 +654,30 @@ class TEXTTEMPLATE extends API {
 			// match and replace placeholders and add paragraph linebreaks
 			$content = '';
 			
+			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
+			// add match not capture
+			$delimiter = substr_replace(CONFIG['forbidden']['names'][0], '?:', 1, 0);
+			// unset types and escaped literals
+			$delimiter = preg_replace('/\\\./m', '', $delimiter);
+			// readd some types
+			$delimiter = substr_replace($delimiter, '\\w\\d', -2, 0);
+
+			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 			// invert first forbidden names to allowed
 			$pattern = substr_replace(CONFIG['forbidden']['names'][0], '', 2, 1);
 			// add colon
 			$pattern = substr_replace($pattern, ':', 1, 0);
+			// unset types and escaped literals
+			$pattern = preg_replace('/\\\./m', '', $pattern);
+			// readd some types
+			$pattern = substr_replace($pattern, '\\w\\d', -2, 0);
 			// add multiplier
 			$pattern = substr_replace($pattern, '+?', -1, 0);
-			// add match not capture
-			$patternend = substr_replace(CONFIG['forbidden']['names'][0], '?:', 1, 0);
-			// unset literals
-			$patternend = preg_replace('/\\\./m', '', $patternend);
-			// readd
-			$patternend = substr_replace($patternend, '\\w\\d', -2, 0);
+
 			foreach(json_decode($template['content']) as $paragraph){
 				foreach($paragraph as $chunk){
 					$add = $texts[$chunk];
-					preg_match_all('/' . $pattern . $patternend . '/m', $add, $placeholders);
+					preg_match_all('/' . $pattern . $delimiter . '/m', $add, $placeholders);
 					foreach($placeholders[1] as $ph){
 						if (!isset($replacements[$ph])) array_push($undefined, $ph);
 					}
