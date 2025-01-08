@@ -736,17 +736,20 @@ class TEXTTEMPLATE extends API {
 			// add multiplier
 			$pattern = substr_replace($pattern, '+?', -1, 0);
 
+			$usedreplacements = $usedtexts = [];
 			foreach(json_decode($template['content']) as $paragraph){
 				foreach($paragraph as $chunk){
 					$add = isset($texts[$chunk]) ? $texts[$chunk] : $chunk . "\n";
 					preg_match_all('/' . $pattern . $delimiter . '/m', $add, $placeholders);
 					foreach($placeholders[1] as $ph){
 						if (!isset($replacements[$ph])) array_push($undefined, $ph);
+						else $usedreplacements[$ph] = $replacements[$ph]; // reassign to reduce payload
 					}
 					$content .= $add;
+					if (isset($texts[$chunk])) $usedtexts[$chunk] = $texts[$chunk];  // reassign to reduce payload
 				}
 				$content .= "\n\n";
-				$texts[$paragraph[count($paragraph)-1]] .= "\n\n";
+				$usedtexts[$paragraph[count($paragraph)-1]] .= "\n\n";
 			}
 
 			// add input fields for undefined placeholders
@@ -828,7 +831,7 @@ class TEXTTEMPLATE extends API {
 				]
 			];
 			// append data for frontent processing
-			$return['data'] = ['blocks' => $texts, 'replacements' => $replacements];
+			$return['data'] = ['blocks' => $usedtexts, 'replacements' => $usedreplacements];
 		}
 		$this->response($return);
 	}
