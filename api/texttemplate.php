@@ -678,7 +678,7 @@ class TEXTTEMPLATE extends API {
 
 			foreach(json_decode($template['content']) as $paragraph){
 				foreach($paragraph as $chunk){
-					$add = $texts[$chunk];
+					$add = isset($texts[$chunk]) ? $texts[$chunk] : $chunk . "\n";
 					preg_match_all('/' . $pattern . $delimiter . '/m', $add, $placeholders);
 					foreach($placeholders[1] as $ph){
 						if (!isset($replacements[$ph])) array_push($undefined, $ph);
