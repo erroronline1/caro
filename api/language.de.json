@@ -310,7 +310,7 @@
 			"context_2bottom": "ganz nach unten verschieben",
 			"context_2top": "ganz nach oben verschieben",
 			"context_delete": "löschen",
-			"context_delete_error":"Das Element konnte nicht identifiziert werden. Bewege den Zeiger zum Beispiel mitten auf die Fläche oder den Balken über der Fläche.",
+			"context_delete_error": "Das Element konnte nicht identifiziert werden. Bewege den Zeiger zum Beispiel mitten auf die Fläche oder den Balken über der Fläche.",
 			"document": {
 				"add_component": "Nach Namen suchen",
 				"document": "Dokument speichern",
@@ -1122,7 +1122,7 @@
 	},
 	"texttemplate": {
 		"chunk": {
-			"all": "Beliebigen Textabschnitt bearbeiten",
+			"all": "Beliebigen Textabschnitt von :unit bearbeiten",
 			"content": "Inhalt",
 			"content_hint": "Typ Ersetzungen: halte dich für personalisierte Ersetzungen an die erforderliche Struktur, jede Formulierung in einer neuen Zeile: : :genus\nTyp Text: Jeder undefinierte :PLATZHALTER erzeugt automatisch ein Eingabefeld.",
 			"dependencies": "Der Textabschnitt mit diesem Namen wir von folgenden Textabschnitten oder Textvorlagen genutzt: :templates",
@@ -1140,7 +1140,7 @@
 			"new": "Neuer Textabschnitt",
 			"not_saved": "Der Textabschnitt konnte nicht gespeichert werden.",
 			"saved": "Der Textabschnitt :name wurde gespeichert.",
-			"select": "Neueste Textabschnitte bearbeiten",
+			"select": "Neueste Textabschnitte von :unit bearbeiten",
 			"type": "Typ",
 			"type_replacement": "Ersatz",
 			"type_text": "Text",
@@ -1158,7 +1158,7 @@
 			"PRD": "Einkauf System vorbereitete Produktliste"
 		},
 		"template": {
-			"all": "Beliebige Textvorlage bearbeiten",
+			"all": "Beliebige Textvorlage von :unit bearbeiten",
 			"edit_template": "Nach Namen suchen",
 			"error_template_not_found": "Die Textvorlage :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
 			"hidden": "Textvorlage verbergen",
@@ -1166,7 +1166,7 @@
 			"hidden_hint": "Verborgene Textvorlagen werden in der Auswahl neuester Textvorlagen nicht angezeigt und sind für Nutzer nicht erreichbar.",
 			"hidden_visible": "Verfügbar",
 			"insert_default": "Auswahl",
-			"insert_name": "Füge einen Textabschnitt ein",
+			"insert_name": "Füge einen Textabschnitt von :unit ein",
 			"language": "Sprache",
 			"name": "Name",
 			"new": "Neue Textvorlage",
@@ -1174,7 +1174,7 @@
 			"not_saved_missing": "Die Textvorlage konnte nicht gespeichert werden, bitte gib einen Namen, die Sprache und einen Inhalt an!",
 			"save": "Textvorlage speichern",
 			"saved": "Die Textvorlage :name wurde gespeichert.",
-			"select": "Neueste Textvorlage bearbeiten"
+			"select": "Neueste Textvorlage von :unit bearbeiten"
 		},
 		"use": {
 			"blocks": "Genutzte Abschnitte innerhalb eines Absatzes",

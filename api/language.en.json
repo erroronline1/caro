@@ -310,7 +310,7 @@
 			"context_2bottom": "move to bottom",
 			"context_2top": "move to top",
 			"context_delete": "delete",
-			"context_delete_error":"The element could not be identified. Try moving the cursor to the center of the area or the bar above the area.",
+			"context_delete_error": "The element could not be identified. Try moving the cursor to the center of the area or the bar above the area.",
 			"document": {
 				"add_component": "Search name",
 				"document": "Save document",
@@ -1122,7 +1122,7 @@
 	},
 	"texttemplate": {
 		"chunk": {
-			"all": "Edit any chunk",
+			"all": "Edit any chunk for :unit",
 			"content": "Content",
 			"content_hint": "Type replacement: for personalized chunks please adhere to syntax, each within a new line: :genus\nType text: within text chunks any undefined :PLACEHOLDER will generate an input field.",
 			"dependencies": "The current chunk by this name is used by following chunks or templates: :templates",
@@ -1140,7 +1140,7 @@
 			"new": "New chunk",
 			"not_saved": "Chunk could not be saved.",
 			"saved": "The chunk named :name has been saved.",
-			"select": "Edit latest chunk",
+			"select": "Edit latest chunk for :unit",
 			"type": "Type",
 			"type_replacement": "Replacement",
 			"type_text": "Text",
@@ -1158,7 +1158,7 @@
 			"PRD": "Purchase system prepared product list"
 		},
 		"template": {
-			"all": "Edit any template",
+			"all": "Edit any template for :unit",
 			"edit_template": "Search name",
 			"error_template_not_found": "Template :name could not be found in database, please try something else.",
 			"hidden": "Hide template",
@@ -1166,7 +1166,7 @@
 			"hidden_hint": "Hidden templates are not displayed within the selection of latest chunks above and unreachable for users.",
 			"hidden_visible": "visible",
 			"insert_default": "Select",
-			"insert_name": "Insert text-block",
+			"insert_name": "Insert text-block from :unit",
 			"language": "Language",
 			"name": "Name",
 			"new": "New template",
@@ -1174,7 +1174,7 @@
 			"not_saved_missing": "Template could not been saved, please provide a name, language and content!",
 			"save": "Save template",
 			"saved": "The template named :name has been saved.",
-			"select": "Edit latest template"
+			"select": "Edit latest template for :unit"
 		},
 		"use": {
 			"blocks": "Use textsection within paragraph",
