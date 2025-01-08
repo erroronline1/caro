@@ -87,16 +87,16 @@ define('DEFAULTSQL', [
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_products` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`vendor_id` int NOT NULL," .
-				"	`article_no` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`article_no` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`article_name` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`active` tinyint NULL DEFAULT NULL," .
 				"	`protected` tinyint NULL DEFAULT NULL," .
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
 				"	`checked` datetime NULL DEFAULT NULL," .
-				"	`incorporated` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`incorporated` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`has_expiry_date` tinyint NULL DEFAULT NULL," .
 				"	`special_attention` tinyint NULL DEFAULT NULL," .
 				"	`last_order` datetime NULL DEFAULT NULL," .
@@ -314,16 +314,16 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_consumables_products (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	vendor_id int NOT NULL," .
-				"	article_no varchar(MAX) NOT NULL," .
-				"	article_name varchar(MAX) NOT NULL," .
-				"	article_alias varchar(MAX) NOT NULL," .
-				"	article_unit varchar(MAX) NOT NULL," .
-				"	article_ean varchar(MAX) NOT NULL," .
+				"	article_no varchar(MAX) NULL DEFAULT NULL," .
+				"	article_name varchar(MAX) NULL DEFAULT NULL," .
+				"	article_alias varchar(MAX) NULL DEFAULT NULL," .
+				"	article_unit varchar(MAX) NULL DEFAULT NULL," .
+				"	article_ean varchar(MAX) NULL DEFAULT NULL," .
 				"	active tinyint NULL DEFAULT NULL," .
 				"	protected tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked smalldatetime NULL DEFAULT NULL," .
-				"	incorporated varchar(MAX) NOT NULL," .
+				"	incorporated varchar(MAX) NULL DEFAULT NULL," .
 				"	has_expiry_date tinyint NULL DEFAULT NULL," .
 				"	special_attention tinyint NULL DEFAULT NULL," .
 				"	last_order smalldatetime NULL DEFAULT NULL" .

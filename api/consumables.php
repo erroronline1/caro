@@ -528,8 +528,8 @@ class CONSUMABLES extends API {
 		$links = [];
 		$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
 		foreach($allproducts as $product) {
-			if ($product['incorporated'] === '') continue;
-			$product['incorporated'] = json_decode($product['incorporated'], true);
+			if ($product['incorporated']) continue;
+			$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 			if (isset($product['incorporated']['_denied'])) continue;
 			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onpointerup' => "api.purchase('get', 'product', " . $product['id'] . ")"];
 		}
@@ -572,16 +572,16 @@ class CONSUMABLES extends API {
 					'id' => null,
 					'vendor_id' => null,
 					'vendor_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) !== $this->_lang->GET('consumables.product.vendor_select_default') ? UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor')),
-					'article_no' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : '',
-					'article_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')),
-					'article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : '',
-					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : '',
-					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : '',
-					'active' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? 1 : 0,
-					'protected' => 0,
-					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : 0,
-					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : 0,
-					'special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : 0,
+					'article_no' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : null,
+					'article_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null,
+					'article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null,
+					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
+					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
+					'active' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? 1 : null,
+					'protected' => null,
+					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
+					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
+					'special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null,
 				];
 
 				// validate vendor
@@ -640,17 +640,17 @@ class CONSUMABLES extends API {
 				if (!$product) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// hand over payload to product properties
-				$product['article_alias'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : '';
+				$product['article_alias'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null;
 				if (!PERMISSION::permissionFor('productslimited')){
 					$product['vendor_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) !== $this->_lang->GET('consumables.product.vendor_select_default') ? UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor'));
-					$product['article_no'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : '';
-					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name'));
-					$product['article_unit'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : '';
-					$product['article_ean'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : '';
-					$product['active'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? 1 : 0;
-					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : 0;
-					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : 0;
-					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : 0;
+					$product['article_no'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : null;
+					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null;
+					$product['article_unit'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null;
+					$product['article_ean'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null;
+					$product['active'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? 1 : null;
+					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null;
+					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
+					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
 				}
 
 				// handle incorporation options that have not yet been approved
@@ -659,7 +659,7 @@ class CONSUMABLES extends API {
 						$incorporation = explode(', ', $incorporation);
 						if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $product['incorporated'] = '';
 						else {
-							$product['incorporated'] = json_decode($product['incorporated'], true);
+							$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 							$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 							foreach($this->_lang->_USER['permissions'] as $permission => $translation){
 								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
@@ -743,13 +743,13 @@ class CONSUMABLES extends API {
 						':vendor_id' => $product['vendor_id'],
 						':article_no' => $product['article_no'],
 						':article_name' => $product['article_name'],
-						':article_alias' => $product['article_alias'] ? : '',
+						':article_alias' => $product['article_alias'] ? : null,
 						':article_unit' => $product['article_unit'],
 						':article_ean' => $product['article_ean'],
 						':active' => $product['active'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
-						':incorporated' => $product['incorporated'] ? : '',
+						':incorporated' => $product['incorporated'] ? : null,
 						':has_expiry_date' => $product['has_expiry_date'],
 						':special_attention' => $product['special_attention'],
 					]
@@ -796,8 +796,8 @@ class CONSUMABLES extends API {
 					'article_unit' => UTILITY::propertySet($this->_payload, 'article_unit') ? : '',
 					'article_ean' => '',
 					'active' => 1,
-					'protected' => 0,
-					'trading_good' => 0,
+					'protected' => null,
+					'trading_good' => null,
 					'incorporated' => '',
 					'has_expiry_date' => '',
 					'special_attention' => '',
@@ -955,8 +955,8 @@ class CONSUMABLES extends API {
 						}
 
 						// inform about incorporation state
-						if ($product['incorporated'] !== '') {					
-							$product['incorporated'] = json_decode($product['incorporated'], true);
+						if ($product['incorporated']) {					
+							$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 							$incorporationState = '';
 							if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 							elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
@@ -1210,8 +1210,8 @@ class CONSUMABLES extends API {
 					}
 
 					// add incorporation state
-					if ($product['incorporated'] !== '') {					
-						$product['incorporated'] = json_decode($product['incorporated'], true);
+					if ($product['incorporated']) {					
+						$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 						$incorporationState = '';
 						if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
@@ -1409,10 +1409,10 @@ class CONSUMABLES extends API {
 					':article_name' => $this->_pdo->quote($pricelist->_list[1][$index]['article_name']),
 					':article_unit' => $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']),
 					':article_ean' => $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']),
-					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
-					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
-					':incorporated' => $this->_pdo->quote($remainder[$update]['incorporated'])
+					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : null,
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : null,
+					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : null,
+					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : null
 				]) . '; ');
 			}
 
@@ -1423,15 +1423,15 @@ class CONSUMABLES extends API {
 					':vendor_id' => $vendorID,
 					':article_no' => $pricelist->_list[1][$index]['article_no'],
 					':article_name' => $pricelist->_list[1][$index]['article_name'],
-					':article_alias' => '',
+					':article_alias' => null,
 					':article_unit' => $pricelist->_list[1][$index]['article_unit'],
 					':article_ean' => $pricelist->_list[1][$index]['article_ean'],
 					':active' => 1,
-					':protected' => 0,
-					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 0,
-					':incorporated' => '',
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 0,
-					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 0,
+					':protected' => null,
+					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : null,
+					':incorporated' => null,
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : null,
+					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));

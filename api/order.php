@@ -331,11 +331,11 @@ class ORDER extends API {
 				foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention') as $product) {
 					$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
 					if ($product['special_attention']) $special_attention[] = $product['id'];
-					if ($product['incorporated'] === '') {
+					if (!$product['incorporated']) {
 						$unincorporated[] = $product['id'];
 						continue;
 					}
-					$product['incorporated'] = json_decode($product['incorporated'], true);
+					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 					if (isset($product['incorporated']['_denied'])) {
 						$incorporationdenied[] = $product['id'];
 						continue;

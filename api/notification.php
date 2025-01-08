@@ -222,8 +222,8 @@ class NOTIFICATION extends API {
 		if (PERMISSION::permissionFor('incorporation')){
 			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
 			foreach($allproducts as $product) {
-				if ($product['incorporated'] === '') continue;
-				$product['incorporated'] = json_decode($product['incorporated'], true);
+				if (!$product['incorporated']) continue;
+				$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 				if (isset($product['incorporated']['_denied'])) continue;
 				elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $unapproved++;
 			}

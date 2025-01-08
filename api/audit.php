@@ -524,7 +524,7 @@ class AUDIT extends API {
 		$unincorporated = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
 		foreach($unincorporated as $id => $row){
 			if (!$row['incorporated']) continue;
-			$row['incorporated'] = json_decode($row['incorporated'], true);
+			$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
 			if (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) continue;
 			$incorporated[] = $row;
 			unset($unincorporated[$id]);
