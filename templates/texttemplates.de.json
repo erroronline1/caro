@@ -377,5 +377,67 @@
 			[":Fragenkatalog_Schlusssatz_deutsch"]
 		],
 		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Lieferanten_Einleitung",
+		"unit": "office",
+		"author": "Caro App",
+		"content": "Sehr geehrte Damen und Herren,\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Lieferanten_Konformität",
+		"unit": "office",
+		"author": "Caro App",
+		"content": "um eine Konformität der von uns gelieferten orthopädischen Hilfsmittel jederzeit bescheinigen zu können, müssen wir die erforderlichen Zertifikate und Dokumente im Rahmen unseres Qualitätsmanagementsystems vorhalten.\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Lieferanten_Biokompatibilität",
+		"unit": "office",
+		"author": "Caro App",
+		"content": "Wir benötigen von Ihnen die aktuellen Dokumente betreffend\n\n- Biokompatibilitätsnachweise nach ISO 10993,\n- Konformitätserklärungen nach ISO 13485,\n- Berichte über die Prüfung der Zytotoxizität und Karzerogenität von akkreditierten Prüflaboren oder\n- im Einzelfall ein ÖkoTex100-Zertifikat.\n\nfür die von Ihnen bezogenen Produkte oder deren Varianten:\n\n:PRD\n\nSofern Sie die Erklärungen / Berichte nicht selbst ausgeben akzeptieren wir auch die Erklärungen / Berichte Ihrer Lieferanten mit einer Erklärung von Ihnen dass es sich bei Ihrem Handelsnamen um das entsprechende Produkt handelt. Beachten Sie bitte, dass sich jeder Ihrer Kunden über eine Aktualität der Unterlagen von nicht älter als 5 Jahren freut.\n\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Lieferanten_Zertifikat",
+		"unit": "office",
+		"author": "Caro App",
+		"content": "Uns ist aufgefallen dass Ihr Zertifkat am :ECR abgelaufen ist und freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats.\n",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Lieferanten_Preisliste",
+		"unit": "office",
+		"author": "Caro App",
+		"content": "Bitte übermitteln Sie uns Ihre aktuellen Preislisten bevorzugt als Excel-Tabelle.",
+		"language": "de"
+	},
+	{
+		"type": "text",
+		"name": "Lieferanten_Abschluss",
+		"unit": "office",
+		"author": "Caro App",
+		"content": "Unsere Kundennummer lautet :CID. Wir freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats per eMail.\n",
+		"language": "de"
+	},
+	{
+		"type": "template",
+		"name": "Lieferanten Zertifikate - Nachweise - Preislisten",
+		"unit": "office",
+		"author": "Caro App",
+		"content": [
+			[":Lieferanten_Einleitung"],
+			[":Lieferanten_Konformität", ":Lieferanten_Biokompatibilität", ":Lieferanten_Zertifikat"],
+			[":Lieferanten_Preisliste"],
+			[":Lieferanten_Abschluss"]
+		],
+		"language": "de"
 	}
+
 ]
