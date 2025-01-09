@@ -174,14 +174,14 @@ class NOTIFICATION extends API {
 
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
-			if (!$event['organizational_unit']) $event['organizational_unit'] = ''; 
+			if (!$event['organizational_unit']) continue; 
 			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'])], $this->_lang->GET('calendar.schedule.alert_message', [':content' => (isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
 		}
 
 		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = 0;
 		foreach ($events as $row){
-			if (!$event['organizational_unit']) $event['organizational_unit'] = ''; 
+			if (!$row['organizational_unit']) continue; 
 			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && $row['type'] !== 'timesheet' && !$row['closed']) $uncompleted++;
 		}
 		return $uncompleted;
