@@ -1224,12 +1224,20 @@ export class Assemble {
 				input = document.createElement("input");
 			input.id = getNextElementID();
 			if (radio) {
+				if ("class" in attributes) {
+					label.classList = attributes.class;
+					delete attributes.class;
+				}
 				label.classList.add("radio");
 				input = this.apply_attributes(this.currentElement.attributes, input); // e.g. for required
 				input.type = "radio";
 				input.name = radioname;
 				input.value = checkbox;
 			} else {
+				if ("class" in attributes) {
+					label.classList = attributes.class;
+					delete attributes.class;
+				}
 				label.classList.add("checkbox");
 				input.type = "checkbox";
 				input.dataset.grouped = this.currentElement.description;

@@ -833,7 +833,7 @@ class CONSUMABLES extends API {
 
 				// set up property toggles and apply dialog selecting similar product if any
 				$isactive = $product['active'] ? ['checked' => true] : [];
-				$isinactive = !$product['active'] ? ['checked' => true] : [];
+				$isinactive = !$product['active'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = $this->selectSimilarDialog('_batchactive', $similarproducts, '1');
 				
 				$regulatoryoptions = [
@@ -1770,7 +1770,7 @@ class CONSUMABLES extends API {
 				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
 				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 				$isactive = $vendor['active'] ? ['checked' => true] : [];
-				$isinactive = !$vendor['active'] ? ['checked' => true] : [];
+				$isinactive = !$vendor['active'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 
 				// prepare existing vendor lists
 				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');

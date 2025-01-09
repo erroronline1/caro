@@ -535,7 +535,7 @@ class DOCUMENT extends API {
 						],
 						'content' => [
 							$this->_lang->GET('assemble.compose.bundle.hidden_visible') => ['checked' => true],
-							$this->_lang->GET('assemble.compose.bundle.hidden_hidden') => []
+							$this->_lang->GET('assemble.compose.bundle.hidden_hidden') => ['class' => 'red']
 						],
 						'hint' => $this->_lang->GET('assemble.compose.bundle.hidden_hint')
 					];
@@ -589,7 +589,7 @@ class DOCUMENT extends API {
 				], [
 					'type' => 'filtered',
 					'attributes' => [
-						'name' => $this->_lang->GET('assemble.document_filter'),
+						'name' => $this->_lang->GET('assemble.compose.document_filter'),
 						'list' => 'bundles',
 						'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value); return false;}",
 						'onblur' => "api.document('get', 'bundles', this.value); return false;",

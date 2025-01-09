@@ -325,7 +325,7 @@ class TEXTTEMPLATE extends API {
 						],
 						'content' => [
 							$this->_lang->GET('texttemplate.chunk.hidden_visible') => ['checked' => true],
-							$this->_lang->GET('texttemplate.chunk.hidden_hidden') => []
+							$this->_lang->GET('texttemplate.chunk.hidden_hidden') => ['class' => 'red']
 						],
 						'hint' => $this->_lang->GET('texttemplate.chunk.hidden_hint')
 					];
@@ -618,7 +618,7 @@ class TEXTTEMPLATE extends API {
 						],
 						'content' => [
 							$this->_lang->GET('texttemplate.template.hidden_visible') => ['checked' => true],
-							$this->_lang->GET('texttemplate.template.hidden_hidden') => ['data-hiddenradio'=>'ComponentHidden']
+							$this->_lang->GET('texttemplate.template.hidden_hidden') => ['data-hiddenradio' => 'ComponentHidden', 'class' => 'red']
 						],
 						'hint' => $this->_lang->GET('texttemplate.template.hidden_hint')
 					];

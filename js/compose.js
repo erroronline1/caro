@@ -772,7 +772,7 @@ export const compose_helper = {
 		drop_delete: function (evnt) {
 			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
 			if (!draggedElement) {
-				new _client.Toast(api._lang.GET('assemble.compose.context_delete_error'),'error');
+				new _client.Toast(api._lang.GET("assemble.compose.context_delete_error"), "error");
 				return;
 			}
 			const originParent = draggedElement.parentNode;
@@ -1317,6 +1317,7 @@ export class Compose extends Assemble {
 					  }
 					: {
 							"data-hiddenradio": "ComponentHidden",
+							class: "red",
 					  };
 			this.currentElement = {
 				type: "radio",

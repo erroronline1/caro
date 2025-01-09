@@ -476,7 +476,7 @@ class CSVFILTER extends API {
 						],
 						'content' => [
 							$this->_lang->GET('csvfilter.edit.filter_hidden_visible') => ['checked' => true],
-							$this->_lang->GET('csvfilter.edit.filter_hidden_hidden') => []
+							$this->_lang->GET('csvfilter.edit.filter_hidden_hidden') => ['class' => 'red']
 						],
 						'hint' => $this->_lang->GET('csvfilter.edit.filter_hidden_hint')
 					];

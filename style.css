@@ -85,7 +85,7 @@ header {
 body > header {
 	margin: -1em;
 	width: calc(100% + 1.9em);
-	padding:.25em;
+	padding: 0.25em;
 	min-height: 4.4em;
 	position: sticky;
 	top: 0;
@@ -591,9 +591,22 @@ input:checked + .checkbox::before {
 	border-color: var(--article);
 }
 
-input:checked + .radio {
+input:checked + .checkbox.red,
+input:checked + .checkbox.red::before {
+	background-color: var(--red);
 	color: var(--article);
+	border-color: var(--article);
+}
+
+input:checked + .radio {
 	background-color: var(--green);
+	color: var(--article);
+	border-color: var(--article);
+}
+
+input:checked + .radio.red {
+	background-color: var(--red);
+	color: var(--article);
 	border-color: var(--article);
 }
 
