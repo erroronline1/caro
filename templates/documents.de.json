@@ -1310,6 +1310,12 @@
 						"attributes": {
 							"name": "Meldung nicht erfolgt weil"
 						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "BfArM Rückmeldung erhalten am"
+						}
 					}
 				],
 				[
@@ -1335,6 +1341,20 @@
 						"type": "file",
 						"attributes": {
 							"name": "Dateien"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Abschluss"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Abschluss Stellungnahme, Folgemaßnahme"
 						}
 					}
 				]
@@ -1484,7 +1504,7 @@
 		"author": "Caro App",
 		"regulatory_context": "iso134858_2_2,iso134858_2_3",
 		"permitted_export": null,
-		"restricted_access": null,
+		"restricted_access": "prrc,qmo,ceo",
 		"content": "identifikator,vorkommnismeldung"
 	},
 	{
@@ -2123,7 +2143,7 @@
 						}
 					},
 					{
-						"type": "formbutton",
+						"type": "documentbutton",
 						"attributes": {
 							"value": "Armierungsplan Prothetik II anzeigen",
 							"onpointerup": "api.record('get','displayonly', 'Armierungsplan Prothetik II')"
