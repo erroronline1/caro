@@ -1216,10 +1216,10 @@ class DOCUMENT extends API {
 					if (in_array($subs['type'], ['image', 'links'])) {
 						$name = $subs['description'];
 					}
-					if (in_array($subs['type'], ['documentbutton'])) {
+					elseif (in_array($subs['type'], ['documentbutton'])) {
 						$name = $subs['attributes']['value'];
 					}
-					if (in_array($subs['type'], ['calendarbutton'])) {
+					elseif (in_array($subs['type'], ['calendarbutton'])) {
 						$name = $_lang->GET('assemble.render.export_element.' . $subs['type']);
 					}
 					else $name = $subs['attributes']['name'];
@@ -1285,8 +1285,8 @@ class DOCUMENT extends API {
 						$content['content'][$name] = ['type' => 'textsection', 'value' => $_lang->GET('assemble.render.export_element.' . $subs['type'])];
 					}
 					elseif ($subs['type'] === 'links'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
-						foreach(array_keys($subs['content']) as $link) $content['content'][$name]['value'] .= $link . "\n";
+						$content['content'][$name] = ['type' => 'links', 'value' => []];
+						foreach(array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
 					}
 					elseif ($subs['type'] === 'documentbutton'){
 						$content['content'][$_lang->GET('assemble.render.export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];

@@ -279,6 +279,22 @@ class PDF{
 						$pdf->TextField($key, 133, $height['multiline'], ['multiline' => true, 'lineWidth' => 0, 'borderStyle' => 'none'], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
 						$pdf->Ln($height['multiline'] + max([1, $nameLines]) * 5);
 						break;
+					case 'links':
+						if ($value['value']) { // print value for missing field values on some systems
+							$pdf->SetFont('helvetica', 'I', $height['font']); // font size
+							foreach($value['value'] as $link){
+								if ($link) {
+									// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+									$pdf->writeHTMLCell(140, 4, 60, $pdf->GetY(), '<a href="' . $link . '" target="_blank">' . $link . '</a>', 0, 1, 0, true, '', true);
+								}
+							}
+							$pdf->SetFont('helvetica', '', $height['font']); // font size
+							break;
+						}
+						$pdf->SetFontSize(0); // variable font size
+						$pdf->TextField($key, 133, $height['default'], [], ['v' => $value['value'], 'dv' => $value['value']], 65, $pdf->GetY() + 4);
+						$pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
+						break;
 					default:
 						if ($value['value']) { // print value for missing field values on some systems
 							$pdf->SetFont('helvetica', 'I', $height['font']); // font size
