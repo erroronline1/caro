@@ -223,7 +223,7 @@ define('DEFAULTSQL', [
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`language` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"   `hidden` tinyint NOT NULL," .
+				"   `hidden` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -450,7 +450,7 @@ define('DEFAULTSQL', [
 				"	content varchar(MAX) NOT NULL," .
 				"	language varchar(MAX) NOT NULL," .
 				"	type varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL" .
+				"	hidden tinyint NULL DEFAULT NULL" .
 				");" 
 				.
 				"IF OBJECT_ID(N'dbo.caro_user', N'U') IS NULL " .

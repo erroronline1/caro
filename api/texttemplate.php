@@ -54,7 +54,7 @@ class TEXTTEMPLATE extends API {
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.content')),
 					':language' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.language')),
 					':type' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.type')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.hidden')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden_hidden')? 1 : 0,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.hidden')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden_hidden')? 1 : null,
 				];
 
 				// check forbidden names
@@ -358,7 +358,7 @@ class TEXTTEMPLATE extends API {
 					':content' => json_encode($this->_payload->content),
 					':language' => UTILITY::propertySet($this->_payload, 'language'),
 					':type' => 'template',
-					':hidden' => $this->_payload->hidden ? 1 : 0,
+					':hidden' => $this->_payload->hidden ? 1 : null,
 				];
 
 				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);
