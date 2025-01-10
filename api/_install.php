@@ -121,7 +121,7 @@ define('DEFAULTSQL', [
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"   `hidden` tinyint NOT NULL," .
+				"   `hidden` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -348,7 +348,7 @@ define('DEFAULTSQL', [
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	hidden tinyint NOT NULL" .
+				"	hidden tinyint NULL DEFAULT NULL" .
 				");" 
 				.
 				"IF OBJECT_ID(N'caro_file_bundles', N'U') IS NULL " .

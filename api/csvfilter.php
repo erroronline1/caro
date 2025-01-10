@@ -307,7 +307,7 @@ class CSVFILTER extends API {
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_content')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden_hidden')? 1 : 0,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden_hidden')? 1 : null,
 				];
 
 				// early exit
