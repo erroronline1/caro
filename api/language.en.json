@@ -156,8 +156,8 @@
 		"info": {
 			"license": "Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n \nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.",
 			"license_header": "CARO - Cloud Assisted Records and Operations",
-			"lines": ":code lines of code, :documentation lines of documentation\nmost of which have been edited several times",
-			"lines_header": "Affectionate crafted Lines",
+			"lines": ":code lines of code\n:documentation lines of documentation\n:configuration lines of configuration",
+			"lines_header": "Affectionate crafted",
 			"source": "https://github.com/erroronline1/caro",
 			"source_header": "Source"
 		},

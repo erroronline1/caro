@@ -45,15 +45,20 @@ class APPLICATION extends API {
 	 * display application info 
 	 */
 	public function info(){
-		$lines = ['frontend' => 0,'backend' => 0, 'code' => 0, 'documentation' => 0];
+		$lines = ['frontend' => 0, 'backend' => 0, 'code' => 0, 'documentation' => 0, 'configuration' => 0];
 		foreach (['../', '../js', '../api', '../templates'] as $dir){
 			foreach (scandir($dir) as $file){
 				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json'])) continue;
 				foreach(file($dir.'/'.$file) as $row){
-					if (in_array(pathinfo($file)['extension'], ['php','ini','json'])){
+					if (in_array(pathinfo($file)['extension'], ['php','ini'])){
 						$lines['backend']++;
 						$lines['code']++;
 					}
+					if (in_array(pathinfo($file)['extension'], ['json'])){
+						$lines['backend']++;
+						$lines['configuration']++;
+					}
+
 					if (in_array(pathinfo($file)['extension'], ['js','html','css'])){
 						$lines['frontend']++;
 						$lines['code']++;
@@ -85,7 +90,7 @@ class APPLICATION extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('application.info.lines_header')
 				],
-				'content' => $this->_lang->GET('application.info.lines', [':code' => $lines['code'], ':documentation' => $lines['documentation']])
+				'content' => $this->_lang->GET('application.info.lines', [':code' => $lines['code'], ':documentation' => $lines['documentation'], ':configuration' => $lines['configuration']])
 			],
 		]]];
 		$this->response($response);
