@@ -1434,10 +1434,10 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => implode(',', $this->_payload->content),
-								':hidden' => boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : NULL,
+								':hidden' => boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => implode(',', $regulatory_context),
-								':permitted_export' => $this->_payload->permitted_export ? : 0,
+								':permitted_export' => $this->_payload->permitted_export ? : null,
 								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
 								':id' => $exists['id'],
 							]
@@ -1463,10 +1463,10 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' =>  boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : NULL,
+								':hidden' =>  boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => implode(',', $regulatory_context),
-								':permitted_export' => $this->_payload->permitted_export ? : 0,
+								':permitted_export' => $this->_payload->permitted_export ? : null,
 								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
 								':id' => $exists['id'],
 							]
@@ -1498,7 +1498,7 @@ class DOCUMENT extends API {
 						':author' => $_SESSION['user']['name'],
 						':content' => implode(',', $this->_payload->content),
 						':regulatory_context' => implode(',', $regulatory_context),
-						':permitted_export' => $this->_payload->permitted_export ? : 0,
+						':permitted_export' => $this->_payload->permitted_export ? : null,
 						':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL
 					]
 				])) {

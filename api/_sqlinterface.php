@@ -444,8 +444,8 @@ class SQLQUERY {
 
 
 		'document_post' => [
-			'mysql' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)",
-			'sqlsrv' => "INSERT INTO caro_documents (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, 0, '', :regulatory_context, :permitted_export, :restricted_access)"
+			'mysql' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, NULL, '', :regulatory_context, :permitted_export, :restricted_access)",
+			'sqlsrv' => "INSERT INTO caro_documents (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, NULL, '', :regulatory_context, :permitted_export, :restricted_access)"
 		],
 		'document_put' => [
 			'mysql' => "UPDATE caro_documents SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access WHERE id = :id",
