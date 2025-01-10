@@ -629,7 +629,7 @@ Exported reduced record summary
 ### Risk management
 The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals.
 
-You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables).
+You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels.
 
 Entries are not persistent but can be exported if desired through the [audit module](#audit). Available entries store and display the user name and date of the last edit. 
 

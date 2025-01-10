@@ -546,7 +546,7 @@ Exportierte reduzierte Aufzeichnung
 ### Risikomanagement
 Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org).
 
-Dabei werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [config.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt.
+Dabei werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [config.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt. Die Schwelle ist das Produkt aus Wahrscheinlichkeit x Schaden gemäß der jeweiligen Positionen in den Auflistungen der Sprachdateien für risk.probabilities und risk.damages. Diese Methode ist der praktischste Weg einer algorithmischen Verarbeitung und Hervorhebung des Akzeptanzbereichs.
 
 Die Einträge können gelöscht werden, aber auch durch das [Audit-Modul](#audit) exportiert werden. Einträge speichern den Nutzernamen und das Datum der letzten Änderung. 
 
