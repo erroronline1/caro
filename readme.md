@@ -116,6 +116,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests (frontend)
 * audit risk export as csv/xlsx? translate risks with languagefile
 * search risks for keywords
+* stresstest extends install, reuse adding methods, pass autoapprove
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
