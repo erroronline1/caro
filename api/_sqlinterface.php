@@ -264,12 +264,12 @@ class SQLQUERY {
 
 
 		'consumables_post_vendor' => [
-			'mysql' => "INSERT INTO caro_consumables_vendors (id, active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)",
-			'sqlsrv' => "INSERT INTO caro_consumables_vendors (active, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( :active, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)"
+			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :hidden, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)",
+			'sqlsrv' => "INSERT INTO caro_consumables_vendors (hidden, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( :hidden, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)"
 		],
 		'consumables_put_vendor' => [
-			'mysql' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_vendors SET active = :active, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id"
 		],
 		'consumables_get_vendor_datalist' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",
@@ -281,12 +281,12 @@ class SQLQUERY {
 		],
 
 		'consumables_post_product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, active, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :active, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, hidden, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :hidden, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, hidden, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :hidden, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)"
 		],
 		'consumables_put_product' => [
-			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, active = :active, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, hidden = :hidden, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, hidden = :hidden, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id"
 		],
 		'consumables_put_product_pricelist_import' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id",
@@ -391,18 +391,18 @@ class SQLQUERY {
 		],
 		'csvfilter_get_latest_by_name' => [
 			'mysql' => "SELECT * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_csvfilter WHERE name= :name ORDER BY id DESC"
+			'sqlsrv' => "SELECT TOP 1 * FROM caro_csvfilter WHERE name = :name ORDER BY id DESC"
 		],
 
 
 
 		'file_bundles_post' => [
-			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, author, content, active) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :active)",
-			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, author, content, active) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :active)"
+			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
+			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
 		],
 		'file_bundles_put' => [
-			'mysql' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, active = :active WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, active = :active WHERE id = :id"
+			'mysql' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, hidden = :hidden WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, hidden = :hidden WHERE id = :id"
 		],
 		'file_bundles_datalist' => [
 			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
@@ -413,8 +413,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
 		],
 		'file_bundles_get_active' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE active = 1 GROUP BY name",
-			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE active = 1 GROUP BY name) ORDER BY name"
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE hidden IS NOT NULL GROUP BY name",
+			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE hidden IS NOT NULL GROUP BY name) ORDER BY name"
 		],
 		'file_external_documents_get' => [
 			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",
@@ -535,8 +535,8 @@ class SQLQUERY {
 
 
 		'order_get_product_search' => [
-			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1",
-			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.active = 1 AND prod.active = 1"
+			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.hidden IS NULL AND prod.hidden IS NULL",
+			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id AND dist.hidden IS NULL AND prod.hidden IS NULL"
 		],
 		'order_post_prepared_order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",

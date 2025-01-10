@@ -92,7 +92,7 @@ define('DEFAULTSQL', [
 				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`active` tinyint NULL DEFAULT NULL," .
+				"	`hidden` tinyint NULL DEFAULT NULL," .
 				"	`protected` tinyint NULL DEFAULT NULL," .
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
 				"	`checked` datetime NULL DEFAULT NULL," .
@@ -105,7 +105,7 @@ define('DEFAULTSQL', [
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_vendors` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`active` tinyint(1) NULL DEFAULT NULL," .
+				"	`hidden` tinyint(1) NULL DEFAULT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`certificate` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
@@ -131,7 +131,7 @@ define('DEFAULTSQL', [
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`active` tinyint NOT NULL," .
+				"	`hidden` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -319,7 +319,7 @@ define('DEFAULTSQL', [
 				"	article_alias varchar(MAX) NULL DEFAULT NULL," .
 				"	article_unit varchar(MAX) NULL DEFAULT NULL," .
 				"	article_ean varchar(MAX) NULL DEFAULT NULL," .
-				"	active tinyint NULL DEFAULT NULL," .
+				"	hidden tinyint NULL DEFAULT NULL," .
 				"	protected tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked smalldatetime NULL DEFAULT NULL," .
@@ -332,7 +332,7 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .
 				"CREATE TABLE caro_consumables_vendors (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	active tinyint NULL DEFAULT NULL," .
+				"	hidden tinyint NULL DEFAULT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	info varchar(MAX) NULL DEFAULT NULL," .
 				"	certificate varchar(MAX) NULL DEFAULT NULL," .
@@ -358,7 +358,7 @@ define('DEFAULTSQL', [
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	active tinyint NOT NULL" .
+				"	hidden tinyint NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_file_external_documents', N'U') IS NULL " .

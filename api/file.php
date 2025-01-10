@@ -143,9 +143,9 @@ class FILE extends API {
 				$save_name = $this->_lang->PROPERTY('file.bundle.save_bundle');
 				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
-				$active = $this->_lang->PROPERTY('file.bundle.bundle_active');
-				$isactive = $this->_payload->$active === $this->_lang->GET('file.bundle.active_bundle') ? 1 : 0;
-				unset ($this->_payload->$active);
+				$hidden = $this->_lang->PROPERTY('file.bundle.bundle_active');
+				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.active_bundle') ? 1 : null;
+				unset ($this->_payload->$hidden);
 				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
 				foreach($this->_payload as $key => $value){
@@ -175,7 +175,7 @@ class FILE extends API {
 						':author' => $_SESSION['user']['name'],
 						':content' => json_encode($this->_payload),
 						':id' => $existingbundle['id'],
-						':active' => $isactive
+						':hidden' => $hidden
 						]
 					])) $this->response([
 							'response' => [
@@ -197,7 +197,7 @@ class FILE extends API {
 					':name' => $name,
 					':author' => $_SESSION['user']['name'],
 					':content' => json_encode($this->_payload),
-					':active' => $isactive
+					':hidden' => $hidden
 					]
 				])) $this->response([
 						'response' => [
@@ -228,7 +228,7 @@ class FILE extends API {
 				if (!$bundle) $bundle = [
 					'name' => '',
 					'content' => '',
-					'active' => null
+					'hidden' => null
 				];
 				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['response'] = ['msg' => $this->_lang->GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
 
@@ -324,8 +324,6 @@ class FILE extends API {
 				}
 
 				// set up and append file bundle options
-				$isactive = $bundle['active'] ? ['checked' => true] : [];
-				$isinactive = !$bundle['active'] ? ['checked' => true] : [];
 				$return['render']['content'][] = [
 					[
 						'type' => 'text',
@@ -341,8 +339,8 @@ class FILE extends API {
 							'name' => $this->_lang->GET('file.bundle.bundle_active')
 						],
 						'content'=>[
-							$this->_lang->GET('file.bundle.active_bundle') => $isactive,
-							$this->_lang->GET('file.bundle.inactive_bundle') => $isinactive,
+							$this->_lang->GET('file.bundle.active_bundle') => !$bundle['hidden'] ? ['checked' => true] : [],
+							$this->_lang->GET('file.bundle.inactive_bundle') => $bundle['hidden'] ? ['checked' => true] : [],
 						]
 					]
 				];

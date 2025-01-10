@@ -577,7 +577,7 @@ class CONSUMABLES extends API {
 					'article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null,
 					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
 					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
-					'active' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? 1 : null,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? null : 1,
 					'protected' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
@@ -608,7 +608,7 @@ class CONSUMABLES extends API {
 						':article_alias' => $product['article_alias'],
 						':article_unit' => $product['article_unit'],
 						':article_ean' => $product['article_ean'],
-						':active' => $product['active'],
+						':hidden' => $product['hidden'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
 						':has_expiry_date' => $product['has_expiry_date'],
@@ -647,7 +647,7 @@ class CONSUMABLES extends API {
 					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null;
 					$product['article_unit'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null;
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null;
-					$product['active'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? 1 : null;
+					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? null : 1;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null;
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
@@ -697,10 +697,10 @@ class CONSUMABLES extends API {
 					$ids = explode(',', $batchactive);
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
-							':value' => $product['active'],
+							':value' => $product['hidden'],
 						],
 						'replacements' => [
-							':field' => 'active',
+							':field' => 'hidden',
 							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
 						]
 					]);
@@ -746,7 +746,7 @@ class CONSUMABLES extends API {
 						':article_alias' => $product['article_alias'] ? : null,
 						':article_unit' => $product['article_unit'],
 						':article_ean' => $product['article_ean'],
-						':active' => $product['active'],
+						':hidden' => $product['hidden'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
 						':incorporated' => $product['incorporated'] ? : null,
@@ -795,7 +795,7 @@ class CONSUMABLES extends API {
 					'article_alias' => '',
 					'article_unit' => UTILITY::propertySet($this->_payload, 'article_unit') ? : '',
 					'article_ean' => '',
-					'active' => 1,
+					'hidden' => null,
 					'protected' => null,
 					'trading_good' => null,
 					'incorporated' => '',
@@ -832,8 +832,8 @@ class CONSUMABLES extends API {
 				}
 
 				// set up property toggles and apply dialog selecting similar product if any
-				$isactive = $product['active'] ? ['checked' => true] : [];
-				$isinactive = !$product['active'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
+				$isactive = !$product['hidden'] ? ['checked' => true] : [];
+				$isinactive = $product['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = $this->selectSimilarDialog('_batchactive', $similarproducts, '1');
 				
 				$regulatoryoptions = [
@@ -1406,9 +1406,9 @@ class CONSUMABLES extends API {
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_pricelist_import'),
 				[
 					':id' => $remainder[$update]['id'],
-					':article_name' => $pricelist->_list[1][$index]['article_name'] ? $this->_pdo->quote($pricelist->_list[1][$index]['article_name']) : 'NULL',
-					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? $this->_pdo->quote($pricelist->_list[1][$index]['article_unit']) : 'NULL',
-					':article_ean' => $pricelist->_list[1][$index]['article_ean'] ? $this->_pdo->quote($pricelist->_list[1][$index]['article_ean']) : 'NULL',
+					':article_name' => $pricelist->_list[1][$index]['article_name'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_name'])) : 'NULL',
+					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_unit'])) : 'NULL',
+					':article_ean' => $pricelist->_list[1][$index]['article_ean'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_ean'])) : 'NULL',
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 'NULL',
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 'NULL',
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 'NULL',
@@ -1421,12 +1421,12 @@ class CONSUMABLES extends API {
 			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$insertions[] = [
 					':vendor_id' => $vendorID,
-					':article_no' => $pricelist->_list[1][$index]['article_no'] ? : null,
-					':article_name' => $pricelist->_list[1][$index]['article_name'] ? : null,
+					':article_no' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_no']) ? : null,
+					':article_name' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_name']) ? : null,
 					':article_alias' => null,
-					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? : null,
-					':article_ean' => $pricelist->_list[1][$index]['article_ean'] ? : null,
-					':active' => 1,
+					':article_unit' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_unit']) ? : null,
+					':article_ean' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_ean']) ? : null,
+					':hidden' => null,
 					':protected' => null,
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : null,
 					':incorporated' => null,
@@ -1497,7 +1497,7 @@ class CONSUMABLES extends API {
 				 */
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
-					'active' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? 1 : null,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? null : 1,
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
@@ -1580,7 +1580,7 @@ class CONSUMABLES extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
 					'values' => [
 						':name' => $vendor['name'],
-						':active' => $vendor['active'],
+						':hidden' => $vendor['hidden'],
 						':info' => $vendor['info'] ? json_encode($vendor['info']) : null,
 						':certificate' => $vendor['certificate'] ? json_encode($vendor['certificate']) : null,
 						':pricelist' => $vendor['pricelist'] ? json_encode($vendor['pricelist']) : null,
@@ -1612,7 +1612,7 @@ class CONSUMABLES extends API {
 				if (!$vendor) $this->response(null, 406);
 
 				// update vendor data
-				$vendor['active'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? 1 : null;
+				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? null : 1;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
 				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
@@ -1646,7 +1646,7 @@ class CONSUMABLES extends API {
 				}
 
 				// tidy up consumable products database if inactive
-				if (!$vendor['active']){
+				if ($vendor['hidden']){
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
 						'values' => [
 							':id' => $vendor['id']
@@ -1719,7 +1719,7 @@ class CONSUMABLES extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_vendor', [
 					'values' => [
 						':id' => $vendor['id'],
-						':active' => $vendor['active'],
+						':hidden' => $vendor['hidden'],
 						':name' => $vendor['name'],
 						':info' => $vendor['info'] ? json_encode($vendor['info']) : null,
 						':certificate' => $vendor['certificate'] ? json_encode($vendor['certificate']) : null,
@@ -1756,7 +1756,7 @@ class CONSUMABLES extends API {
 				if (!$vendor) $vendor = [
 					'id' => null,
 					'name' => '',
-					'active' => null,
+					'hidden' => null,
 					'info' => null,
 					'certificate' => null,
 					'pricelist' => null,
@@ -1769,8 +1769,8 @@ class CONSUMABLES extends API {
 				$vendor['info'] = json_decode($vendor['info'] ? : '', true) ? : [];
 				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
 				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
-				$isactive = $vendor['active'] ? ['checked' => true] : [];
-				$isinactive = !$vendor['active'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
+				$isactive = !$vendor['hidden'] ? ['checked' => true] : [];
+				$isinactive = $vendor['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 
 				// prepare existing vendor lists
 				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
@@ -1839,7 +1839,7 @@ class CONSUMABLES extends API {
 						// count available products for this vendor
 						$available = 0;
 						foreach($vendorproducts as $product){
-							if ($product['active']) $available++;
+							if (!$product['hidden']) $available++;
 						}
 
 						// render information on vendor
@@ -2055,7 +2055,7 @@ class CONSUMABLES extends API {
 						);
 
 					// add pricelist upload form
-					if ($vendor['id'] && $vendor['active'] == 1)
+					if ($vendor['id'] && !$vendor['hidden'])
 						array_splice($result['render']['content'][4], 0, 0,
 							[[[
 								'type' => 'file',
