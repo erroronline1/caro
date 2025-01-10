@@ -646,7 +646,7 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('document_post'), $insertions)))
-			echo '<br />[*]novel entries by name from ' . $file . ' have been installed.<br />';
+			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
 		else echo '[!] there were no novelties to install from '. $file . '.<br />';
 	}
 
@@ -705,7 +705,7 @@ class INSTALL {
 		foreach ($json as $entry){
 			// risks are only transferred if process+risk+cause is not already taken
 			$forbidden = false;
-			if (isset($entry['process']) && $entry['process'] && isset($entry['risk']) && $entry['risk'] && isset($entry['cause']) && $entry['cause'] && !in_array($entry['process'].$entry['risk'].$entry['cause'], $DBall)) {
+			if (isset($entry['process']) && $entry['process'] && isset($entry['risk']) && $entry['risk'] && isset($entry['cause']) && !in_array($entry['process'].$entry['risk'].$entry['cause'], $DBall)) {
 				$insertions[] = [
 					':process' => $entry['process'],
 					':risk' => $entry['risk'],
