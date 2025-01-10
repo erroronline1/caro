@@ -17,25 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-ini_set('display_errors', 1); error_reporting(E_ALL);
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: text/html; charset=UTF-8');
-require_once('_config.php');
-@define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
-require_once('_sqlinterface.php');
+require_once('_install.php');
 
-
-class STRESSTEST{
-	/**
-	 * preset database connection
-	 */
-	public $_pdo;
-	
-	/**
-	 * current date with correct timezone
-	 */
-	public $_currentdate;
-
+class STRESSTEST extends INSTALL{
 	/**
 	 * identifying prefixes for creation and safe deletion, default values
 	 */
@@ -43,21 +27,21 @@ class STRESSTEST{
 	public $_caleandarentries = 20000;
 	public $_recordentries = 20000;
 	public $_orderentries = 1000;
-	public $_documenttemplate = '../templates/documents.de.json';
 	public $_autopermission = true;
-	public $_author = "Caro App";
-	public $_vendortemplate = '../templates/vendors.de.json';
 
-	public function __construct($method){
-		$options = [
-			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
-			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
-		];
-		$this->_pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
-		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
-		if ($dbsetup) $this->_pdo->exec($dbsetup);
+	// optional overrides of parent properties
+	public $_defaultUser = "Caro App";
+	public $_defaultLanguage = 'de';
 
-		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+	public function __construct(){
+		parent::__construct();
+	}
+
+	/**
+	 * display stresstest navigation
+	 * overrides parent method
+	 */
+	public function navigation($method){
 		if (method_exists($this, $method)) {
 			echo '<a href="../_stresstest.php">back</a><br />';
 			$this->{$method}();
@@ -68,12 +52,26 @@ class STRESSTEST{
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
 			echo '<br />';
-			foreach(get_class_methods($this) as $methodName){
-				if ($methodName !== '__construct') echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br />';
+			$methods = get_class_methods($this);
+			sort($methods);
+			foreach($methods as $methodName){
+				if (!in_array($methodName, [
+					'__construct',
+					'navigation',
+					'executeSQL',
+					'importJSON',
+					'installDatabase'
+					])) echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br />';
 			}
+
+			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION';
+			echo '<br /><br /><a href="../../index.html">exit</a>';
 		}
 	}
 
+	/**
+	 * installs calendar events with prefix
+	 */
 	public function createCalendarEvents(){
 		$this->_currentdate->modify('-12 month');
 		for ($i = 0; $i < $this->_caleandarentries; $i++){
@@ -93,10 +91,13 @@ class STRESSTEST{
 				]
 			]);
 		}
-		echo $i. ' schedule entries done, please check the application for performance';
+		echo '[*] ' . $i. ' schedule entries done, please check the application for performance';
 	}
 
-	public function deleteCalendarEvents(){
+	/**
+	 * deletes all calendar events with prefix
+	 */
+	public function removeCalendarEvents(){
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			'values' => [
 				':subject' => $this->_prefix
@@ -109,9 +110,12 @@ class STRESSTEST{
 				]
 			]);
 		}
-		echo count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted';
+		echo '[*] ' . count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted';
 	}
 
+	/**
+	 * installs records with prefix
+	 */
 	public function createRecords(){
 		$this->_currentdate->modify('-12 month');
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
@@ -133,7 +137,7 @@ class STRESSTEST{
 			shuffle($documents);
 			foreach($documents as $document){
 				$current_record[] = [
-					'author' => $this->_author,
+					'author' => $this->_defaultUser,
 					'date' => $this->_currentdate->format('Y-m-d H:i:s'),
 					'document' => $document['id'],
 					'content' => json_encode($content)
@@ -167,18 +171,24 @@ class STRESSTEST{
 				]
 			]);
 		}
-		echo $i. ' records done, please check the application for performance';
+		echo '[*] ' . $i. ' records done, please check the application for performance';
 	}
 
-	public function deleteRecords(){
+	/**
+	 * deletes all calendar events with prefix
+	 */
+	public function removeRecords(){
 		$deletion = [
 			'mysql' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'",
 			'sqlsrv' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'"
 		];
 		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
-		echo $del . ' entries with prefix ' . $this->_prefix . ' deleted';
+		echo '[*] ' . $del . ' entries with prefix ' . $this->_prefix . ' deleted';
 	}
 
+	/**
+	 * installs approved orders with prefix
+	 */
 	public function createOrders(){
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -199,7 +209,7 @@ class STRESSTEST{
 						'barcode_label' => $product['article_ean'],
 						'vendor_label' => $product['vendor_name'],
 						'commission' => 'wolfgang' . $this->_prefix . random_int(1, $this->_orderentries),
-						'orderer' => $this->_author
+						'orderer' => $this->_defaultUser
 					]
 				),
 				':organizational_unit' => 'prosthetics2',
@@ -217,85 +227,65 @@ class STRESSTEST{
 				die();
 			}
 		}
-		echo $i. ' orders done, please check the application for performance';
+		echo '[*] ' . $i. ' orders done, please check the application for performance';
 	}
 
-	public function deleteOrders(){
+	/**
+	 * deletes all calendar events with prefix
+	 */
+	public function removeOrders(){
 		$deletion = [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'"
 		];
 		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
-		echo $del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted';
+		echo '[*] ' . $del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted';
 	}
 
-	public function installDocuments(){
-		if (!realpath($this->_documenttemplate)) {
-			echo $this->_documenttemplate . ' file not found';
-			return;
-		}
-
-		$documents = file_get_contents(realpath($this->_documenttemplate));
-		$documents = json_decode($documents, true);
-		$matches = 0;
-
-		$DBcomponents = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
-		$DBdocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-		$DBbundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
-
-		$DBall = [...$DBcomponents, ...$DBdocuments, ...$DBbundles];
-
-		$permissions = [];
-		foreach (preg_split('/\W+/', CONFIG['permissions']['documentapproval']) as $permission){
-			$permissions[$permission] = [
-				'name' => $this->_author,
-				'date' => $this->_currentdate->format("Y-m-d H:i")
-			];
-		}
-		foreach ($documents as $document){
-			if (isset($document['name']) && $document['name'] && !in_array($document['name'], array_column($DBall, 'name'))) {
-				if (gettype($document['content']) === 'array') $document['content'] = json_encode($document['content']);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-					'values' => [
-						':name' => $document['name'],
-						':alias' => $document['alias'],
-						':context' => $document['context'],
-						':unit' => $document['unit'],
-						':author' => $document['author'],
-						':content' => $document['content'],
-						':regulatory_context' => $document['regulatory_context'],
-						':permitted_export' => $document['permitted_export'],
-						':restricted_access' => $document['restricted_access']
-					]
-				])){
-					$matches++;
-					if ($this->_autopermission) SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
-						'values' => [
-							':approval' => json_encode($permissions),
-							':id' => $this->_pdo->lastInsertId()
-						]
-					]);
-				}
+	/**
+	 * approves all documents and components
+	 */
+	public function approveDocuments(){
+		if ($this->_autopermission) {
+			$permissions = [];
+			foreach (preg_split('/\W+/', CONFIG['permissions']['documentapproval']) as $permission){
+				$permissions[$permission] = [
+					'name' => $this->_defaultUser,
+					'date' => $this->_currentdate->format("Y-m-d H:i")
+				];
 			}
+			$DBall = [
+				...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
+				...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist')
+			];
+			foreach($DBall as $row){
+				SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
+					'values' => [
+						':approval' => json_encode($permissions),
+						':id' => $row['id']
+					]
+				]);
+			}
+			echo '[*] all documents in the database have been approved';
 		}
-		echo $matches . ' components, documents and bundles with novel names according to template file inserted, please check the application for performance' . (!$this->_autopermission ? ' and remember you have to approve each to take effect' : '' ) . '!';
+		else echo '[X] autopermission has not been enabled';
 	}
 
-	public function deleteDocuments(){
-		if (!realpath($this->_documenttemplate)) {
-			echo $this->_documenttemplate . ' file not found';
-			return;
-		}
+	/**
+	 * deletes all documents, components and bundles according to template file
+	 */
+	public function removeDocuments(){
+		$file = '../templates/documents.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
 
-		$DBcomponents = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
-		$DBdocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-		$DBbundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
-
-		$documents = file_get_contents(realpath($this->_documenttemplate));
-		$documents = json_decode($documents, true);
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
+			...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist'),
+			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
+		];
 		$matches = 0;
-		foreach([...$DBcomponents, ...$DBdocuments, ...$DBbundles] as $dbdocument){
-			foreach($documents as $document){
+		foreach($DBall as $dbdocument){
+			foreach($json as $document){
 				if (
 					isset($document['name']) &&
 					$dbdocument['name'] === $document['name'] &&
@@ -317,62 +307,80 @@ class STRESSTEST{
 				}
 			}
 		}
-		echo $matches . ' components and documents according to template file deleted';
+		echo '[*] ' . $matches . ' components and documents according to template file deleted';
 	}
 
-	public function installVendors(){
-		if (!realpath($this->_vendortemplate)) {
-			echo $this->_vendortemplate . ' file not found';
-			return;
-		}
+	/**
+	 * deletes all manual entries according to template file
+	 */
+	public function removeManual(){
+		$file = '../templates/manual.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
 
-		$vendors = file_get_contents(realpath($this->_vendortemplate));
-		$vendors = json_decode($vendors, true);
+		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
+
 		$matches = 0;
-		$DBvendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-
-		foreach ($vendors as $vendor){
-			if (isset($vendor['name']) && $vendor['name'] && !in_array($vendor['name'], array_column($DBvendors, 'name'))) {
-				$vendordata = [
-					'name' => $vendor['name'],
-					'active' => 1,
-					'info' => $vendor['info'],
-					'certificate' => [],
-					'pricelist' => ['filter' => $vendor['pricelist']],
-					'immutable_fileserver'=> preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $this->_currentdate->format('Ymd'),
-					'evaluation' => ''
-				];
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
-					'values' => [
-						':name' => $vendordata['name'],
-						':active' => $vendordata['active'],
-						':info' => json_encode($vendordata['info']),
-						':certificate' => json_encode($vendordata['certificate']),
-						':pricelist' => json_encode($vendordata['pricelist']),
-						':immutable_fileserver' => $vendordata['immutable_fileserver'],
-						':evaluation' => $vendordata['evaluation']
-					]
-				])){
-					$matches++;
+		foreach($DBall as $dbmanual){
+			foreach($json as $manual){
+				if (
+					isset($manual['title']) &&
+					$dbmanual['title'] === $manual['title'] &&
+					$dbmanual['content'] === $manual['content'] &&
+					$dbmanual['permissions'] === $manual['permissions']
+				){
+					if (SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', ['values'=> [':id' => $dbmanual['id']]]))
+						$matches++;
 				}
 			}
 		}
-		echo $matches . ' vendors installed, please check the application for performance and remember you may have to do vendor evaluation on each! Only vendors with novel names have been added. THIS DOES NOT APPLY FOR DELETION IF NAME AND INFO ARE THE SAME AS IN THE TEMPLATE!';
+		echo '[*] ' . $matches . ' manual entries according to template file deleted.';
 	}
 
-	public function deleteVendors(){
-		if (!realpath($this->_vendortemplate)) {
-			echo $this->_vendortemplate . ' file not found';
-			return;
-		}
+	/**
+	 * deletes all text templates according to template file
+	 */
+	public function removeTexttemplates(){
+		$file = '../templates/texttemplates.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
 
-		$DBvendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 
-		$vendors = file_get_contents(realpath($this->_vendortemplate));
-		$vendors = json_decode($vendors, true);
 		$matches = 0;
-		foreach($DBvendors as $dbvendor){
-			foreach($vendors as $vendor){
+		foreach($DBall as $dbtexts){
+			foreach($json as $texts){
+				if (
+					isset($texts['type']) &&
+					$dbtexts['type'] === $texts['type'] &&
+					$dbtexts['name'] === $texts['name'] &&
+					$dbtexts['unit'] === $texts['unit'] &&
+					$dbtexts['author'] === $texts['author'] &&
+					$dbtexts['author'] === $texts['author'] &&
+					$dbtexts['language'] === $texts['language']
+				){
+					$deletion = [
+						'mysql' => "DELETE FROM caro_texttemplates WHERE id = " . $dbtexts['id'],
+						'sqlsrv' => "DELETE FROM caro_texttemplates WHERE id = " . $dbtexts['id']
+					];
+					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+						$matches++;
+				}
+			}
+		}
+		echo '[*] ' . $matches . ' manual entries according to template file deleted.';
+	}
+
+	/**
+	 * deletes all vendors according to template file
+	 */
+	public function removeVendors(){
+		$file = '../templates/vendors.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
+
+		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+
+		$matches = 0;
+		foreach($DBall as $dbvendor){
+			foreach($json as $vendor){
 				if (
 					isset($vendor['name']) &&
 					$dbvendor['name'] === $vendor['name'] &&
@@ -382,15 +390,17 @@ class STRESSTEST{
 						'mysql' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbvendor['id'],
 						'sqlsrv' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbvendor['id']
 					];
-					$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
-					$matches++;
+					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+						$matches++;
 				}
 			}
 		}
-		echo $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the immutable_fileserver directories, head over directly to the file system and don\'t mess up production server!';
+		echo '[*] ' . $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the immutable_fileserver directories, head over directly to the file system and don\'t mess up production server!';
 	}
+
 }
 
-$stresstest = new STRESSTEST(REQUEST[0]);
+$stresstest = new STRESSTEST();
+$stresstest->navigation(REQUEST[0]);
 exit();
 ?>

@@ -109,9 +109,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
 * vendor templates
 * text recommendation templates
-* document templates (especially regulatory issues)
+* document templates
 * risk templates
-* review database column types use more of NULL
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend) 
 * refactor risk management for improved compliance to iso 14971
@@ -130,7 +129,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
         * no deletion of risks, only append for regulatory compliance
         * add proof of implementation by checkbox2text documents
     * *Identification of characteristics related to safety* how to implement?
-* stresstest extends install, reuse adding methods, pass autoapprove
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1067,13 +1065,13 @@ Technically the application is being usable on any webserver but this is **not r
 
 *Optional*
 
-If you are comfortable enough with text editing JSON-files to modify the language file and template-manual you can prepare
+If you are comfortable enough with text editing JSON-files to modify the language file and template-manual you further can prepare
 * documents.XX.json
 * vendors.XX.json
 * risks.XX.json
 * texttemplates.XX.json
 
-within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
+within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro/tree/master/templates) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
 
 ### Installation procedure
 * Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
@@ -1960,13 +1958,11 @@ During development following outcomes could be noted:
 * 1k approved orders process in about 1s on the server side and 3s on the client side on 155k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
-The stresstest also allows for injection of documents and components according to templates/documents.XX.json. Deletion of documents and components is possible as long as the column values are identical, regardless of approvals. It is not advised to use this in production as an installation method unless you *really* know what you are doing. **Deleting documents and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested.**
+As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on [template files](#application-setup) as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script must be removed from the production server once being tested, before going public.**
 
-Same applies to vendors. These can be set up in templates/vendors.XX.json. Only vendors with novel names will be added. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.***
+Same applies to vendors. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.***
 
 Variables for the stress test can be adjusted within the top class variables in the sourcecode.
-
-Optional insertions from [template](#application-setup) documents can be done with the [installer](#installation-procedure). This method doesn't allow for deletion though but applies plausability checks on names. Afterwards you can check the application for behaviour handling these data within their respective modules.
 
 [Content](#content)
 

@@ -494,13 +494,13 @@ class INSTALL {
 	public $_currentdate;
 
 	/**
-	 * current settings
+	 * current settings for install
 	 */
-	private $_defaultUser = CONFIG['system']['caroapp'];
-	private $_defaultLanguage = CONFIG['application']['defaultlanguage'];
-	private $_pdoDriver = CONFIG['sql']['use'];
+	public $_defaultUser = CONFIG['system']['caroapp'];
+	public $_defaultLanguage = CONFIG['application']['defaultlanguage'];
+	public $_pdoDriver = CONFIG['sql']['use'];
 
-	public function __construct($method){
+	public function __construct(){
 		$options = [
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
@@ -510,7 +510,12 @@ class INSTALL {
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
 		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+	}
 
+	/**
+	 * display install navigation
+	 */
+	public function navigation($method){
 		if (method_exists($this, $method)) {
 			echo '<a href="../_install.php">back</a><br />';
 			$this->{$method}();
@@ -521,9 +526,12 @@ class INSTALL {
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
 			echo '<br />Please adhere to the manual for initial database setup, request _install.php/installDatabase/*your_selected_installation_password*<br /><br />';
-			foreach(get_class_methods($this) as $methodName){
+			$methods = get_class_methods($this);
+			sort($methods);
+			foreach($methods as $methodName){
 				if (!in_array($methodName, [
 					'__construct',
+					'navigation',
 					'executeSQL',
 					'importJSON'
 					])) echo '<a href="./_install.php/' . $methodName . '">' . $methodName . '</a><br />';
@@ -535,26 +543,32 @@ class INSTALL {
 	/**
 	 * execute sql chunks, return success or display exception
 	 * @param array $sqlchunks
-	 * @return bool
+	 * @return int
 	 */
-	private function executeSQL($sqlchunks){
+	public function executeSQL($sqlchunks){
 		$counter = 0;
 		foreach ($sqlchunks as $chunk){
 			try {
-				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $counter++;
+				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) {
+					echo '<br /> [*] <code>' . $chunk . '</code>';
+					$counter++;
+				}
 			}
 			catch (Exception $e) {
-				echo '<br /><pre>[X]' . $e . '\n' . $chunk . '\n</pre>';
+				echo '<br />[X] ' . $e . '<br /><code>' . $chunk . '</code>';
 				die();
 			}
 		}
+		echo "<br />";
 		return $counter;
 	}
 
 	/**
 	 * imports a json file, returns array or message if not found or defective
+	 * @param string $file filepath to template file
+	 * @return array parsed json
 	 */
-	private function importJSON($file){
+	public function importJSON($file){
 		if (($path = realpath($file)) === false) {
 			echo '[X] ' . $file . ' not found<br />';
 			die();
@@ -651,7 +665,7 @@ class INSTALL {
 	}
 
 	/**
-	 * installt manual entries by novel title
+	 * installs manual entries by novel title
 	 */
 	public function installManual(){
 		$file = '../templates/manual.' . $this->_defaultLanguage . '.json';
@@ -666,7 +680,7 @@ class INSTALL {
 			// documents are only transferred if the title is not already taken
 			$forbidden = false;
 			if (isset($entry['title']) && $entry['title'] && !in_array($entry['title'], array_column($DBall, 'title'))) {
-				foreach(CONFIG['forbidden']['title'] as $pattern){
+				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)){
 						echo '[X] The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '<br />';
 						$forbidden = true;
@@ -789,7 +803,7 @@ class INSTALL {
 	}
 
 	/**
-	 * installt vendors by novel name
+	 * installs vendors by novel name
 	 */
 	public function installVendors(){
 		$file = '../templates/vendors.' . $this->_defaultLanguage . '.json';
@@ -833,6 +847,10 @@ class INSTALL {
 		}
 }
 
-$install = new INSTALL(REQUEST[0]);
-exit();
+// check requesting script as stresstest extends install
+if (basename($_SERVER["SCRIPT_FILENAME"]) === basename(__FILE__)){
+	$install = new INSTALL();
+	$install->navigation(REQUEST[0]);
+	exit();
+}
 ?>
