@@ -1193,6 +1193,155 @@
 		}
 	},
 	{
+		"name": "vorkommnismeldung",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Vorkommnis"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Meldende Person",
+							"required": true
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Datum der Meldung",
+							"required": true
+						}
+					},
+					{
+						"type": "tel",
+						"attributes": {
+							"name": "Telefonnummer"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ort des Vorkommnisses",
+							"required": true
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Datum des Vorkommnisses",
+							"required": true
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Beschreibung des Geschehens",
+							"required": true
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Gesundheitliche Auswirkungen",
+							"required": true
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Produkt"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Produktbezeichnung, Artikelnummer",
+							"required": true
+						}
+					},
+					{
+						"type": "scanner",
+						"attributes": {
+							"name": "Charge/Lot, UDI, SN, Lieferdatum",
+							"required": true
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Meldung"
+						}
+					},
+					{
+						"type": "links",
+						"description": "BfArM Meldungsformulare",
+						"content": {
+							"https://www.bfarm.de/SharedDocs/Formulare/DE/Medizinprodukte/mir_formular.pdf?__blob=publicationFile": [],
+							"https://www.bfarm.de/SharedDocs/Formulare/DE/Medizinprodukte/caVorkommnismeldungen-sonstige-Inverkehrbringer-PDF.pdf?__blob=publicationFile": [],
+							"https://www.imdrf.org/working-groups/adverse-event-terminology": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": { "name": "Meldung erfolgt" },
+						"content": {
+							"ja, Meldung erfolgt": [],
+							"nein, Meldung nicht erfolgt (Begründung erforderlich)": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Meldung nicht erfolgt weil"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Sonstiges"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Anmerkungen"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Fotos"
+						}
+					},
+					{
+						"type": "file",
+						"attributes": {
+							"name": "Dateien"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"comment": "following are common forms #################################################################################################"
 	},
 	{
@@ -1326,6 +1475,17 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "lieferantenbewertung"
+	},
+	{
+		"name": "Vorkommnismeldung",
+		"alias": "",
+		"context": "incident",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "iso134858_2_2,iso134858_2_3",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "identifikator,vorkommnismeldung"
 	},
 	{
 		"comment": "following are prosthetics ii components #################################################################################################"
@@ -3523,6 +3683,5 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik II,Maßblatt Prothetik II,Versorgungsplanung Prothetik II,Kunststofffertigungsauftrag Prothetik II,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik II,Abgabeprotokoll Prothetik II,Gebrauchsanweisung Prothetik II,Empfangsbestätigung"
-
 	}
 ]
