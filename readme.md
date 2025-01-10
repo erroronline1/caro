@@ -113,9 +113,23 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * risk templates
 * review database column types use more of NULL
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* unittests (frontend)
-* audit risk export as csv/xlsx? translate risks with languagefile
-* search risks for keywords
+* unittests (frontend) 
+* refactor risk management for improved compliance to iso 14971
+    * search risks for keywords, display risks as textsection for unapproved users, matching search
+    * drop risk.presets
+    * process datalist according to grouped db entries
+    * audit:
+        * fetch risks and match with database, higlight all unaccounted risks per process (not applicable are accounted for)
+        * reversed view: fetch processes, list accounted risks
+        * additional risk export as xlsx with processwise sheets and riskwise sheets
+        * select latest date for display/export like documents
+    * manager interface for risks:
+        * checkbox2text for risks required unless...
+        * not applicable option
+        * cause explains non-applicability?
+        * no deletion of risks, only append for regulatory compliance
+        * add proof of implementation by checkbox2text documents
+    * *Identification of characteristics related to safety* how to implement?
 * stresstest extends install, reuse adding methods, pass autoapprove
 
 #### issues
@@ -225,7 +239,7 @@ Application support legend:
 | ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | MPDG §83 Medical device consultants| yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register. | [Users](#users) |
-| ISO 14971 Risk Management | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br />&bull; Items of appedix E are prepared for use by default. | [Risk management](#risk-management) |
+| ISO 14971 Risk Management | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br />&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default. | [Risk management](#risk-management) |
 | SGB 5 §33 Additional Costs | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR Art. 14 Sample check | yes, structural | &bull; Sample check is implemented. Set up a respective document, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents), [Importing vendor pricelists](#importing-vendor-pricelists) |
 | MDR Art. 61 Clinical evaluation | structural | &bull; *describe within documents with the "Case documentation"-context* | |
@@ -629,7 +643,7 @@ Exported reduced record summary
 [Content](#content)
 
 ### Risk management
-The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals.
+The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals. Identified risks, that may have to be taken into account for any process are defined within the [language file](#customisation) (also see [here](#runtime-variables)).
 
 You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels.
 
@@ -998,6 +1012,7 @@ Furthermore the module contains the option for training evaluation. Evaluations 
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
+* Occasionally adminstrative access to the server for updates of [language files](#customisation) during runtime.
 
 Tested server environments:
 * Apache [Uniform Server Zero XV](https://unidocumentserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
@@ -1066,7 +1081,7 @@ within the template directory too for a swift availability upon launch. Structur
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.XX.json files and some settings in config.ini. These options are mostly considered critical for the applications stability, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
+Some variables can be edited during runtime. This applies for all *values* of language.XX.json files and some settings in config.ini. These options are mostly considered critical for the applications stability and regulatory compliance, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
 
 ### Environment settings
 You can add a **config.env**-file being a structural clone of config.ini. Settings within config.env will override config.ini settings. This way you can set up different environments, e.g several development environments and production. On development changes it is self explanatory to keep all files up to date manually. All mentions of the config.ini-file always refer to the config.env-file as well.
@@ -1278,6 +1293,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
     * [calendar][timesheet_pto]
     * [calendar][timesheet_signature]
     * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
+    * [risks] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements or new identified risks)
 
 If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
