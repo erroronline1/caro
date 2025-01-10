@@ -54,7 +54,7 @@ class TEXTTEMPLATE extends API {
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.content')),
 					':language' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.language')),
 					':type' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.type')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.hidden')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden_hidden')? 1 : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.availability')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden')? 1 : null,
 				];
 
 				// check forbidden names
@@ -321,15 +321,15 @@ class TEXTTEMPLATE extends API {
 					$hidden = [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('texttemplate.chunk.hidden')
+							'name' => $this->_lang->GET('texttemplate.chunk.availability')
 						],
 						'content' => [
-							$this->_lang->GET('texttemplate.chunk.hidden_visible') => ['checked' => true],
-							$this->_lang->GET('texttemplate.chunk.hidden_hidden') => ['class' => 'red']
+							$this->_lang->GET('texttemplate.chunk.available') => ['checked' => true],
+							$this->_lang->GET('texttemplate.chunk.hidden') => ['class' => 'red']
 						],
-						'hint' => $this->_lang->GET('texttemplate.chunk.hidden_hint')
+						'hint' => $this->_lang->GET('texttemplate.chunk.availability_hint')
 					];
-					if ($chunk['hidden']) $hidden['content'][$this->_lang->GET('texttemplate.chunk.hidden_hidden')]['checked'] = true;
+					if ($chunk['hidden']) $hidden['content'][$this->_lang->GET('texttemplate.chunk.hidden')]['checked'] = true;
 					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . $this->_lang->GET('texttemplate.chunk.dependencies', [':templates' => implode(', ', $dependedtemplates)]);
 					array_push($return['render']['content'][1], $hidden);
 				}
@@ -614,15 +614,15 @@ class TEXTTEMPLATE extends API {
 					$hidden = [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('texttemplate.template.hidden')
+							'name' => $this->_lang->GET('texttemplate.template.availability')
 						],
 						'content' => [
-							$this->_lang->GET('texttemplate.template.hidden_visible') => ['checked' => true],
-							$this->_lang->GET('texttemplate.template.hidden_hidden') => ['data-hiddenradio' => 'ComponentHidden', 'class' => 'red']
+							$this->_lang->GET('texttemplate.template.available') => ['checked' => true],
+							$this->_lang->GET('texttemplate.template.hidden') => ['data-hiddenradio' => 'ComponentHidden', 'class' => 'red']
 						],
-						'hint' => $this->_lang->GET('texttemplate.template.hidden_hint')
+						'hint' => $this->_lang->GET('texttemplate.template.availability_hint')
 					];
-					if ($template['hidden']) $hidden['content'][$this->_lang->GET('texttemplate.template.hidden_hidden')]['checked'] = true;
+					if ($template['hidden']) $hidden['content'][$this->_lang->GET('texttemplate.template.hidden')]['checked'] = true;
 					array_push($return['render']['content'][1], $hidden);
 				}
 				if ($template['name']) $return['header'] = $template['name'];

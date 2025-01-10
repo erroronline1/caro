@@ -307,7 +307,7 @@ class CSVFILTER extends API {
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_content')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden_hidden')? 1 : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? 1 : null,
 				];
 
 				// early exit
@@ -472,15 +472,15 @@ class CSVFILTER extends API {
 					$hidden = [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('csvfilter.edit.filter_hidden')
+							'name' => $this->_lang->GET('csvfilter.edit.filter_availability')
 						],
 						'content' => [
-							$this->_lang->GET('csvfilter.edit.filter_hidden_visible') => ['checked' => true],
-							$this->_lang->GET('csvfilter.edit.filter_hidden_hidden') => ['class' => 'red']
+							$this->_lang->GET('csvfilter.edit.filter_available') => ['checked' => true],
+							$this->_lang->GET('csvfilter.edit.filter_hidden') => ['class' => 'red']
 						],
-						'hint' => $this->_lang->GET('csvfilter.edit.filter_hidden_hint')
+						'hint' => $this->_lang->GET('csvfilter.edit.filter_availability_hint')
 					];
-					if ($filter['hidden']) $hidden['content'][$this->_lang->GET('csvfilter.edit.filter_hidden_hidden')]['checked'] = true;
+					if ($filter['hidden']) $hidden['content'][$this->_lang->GET('csvfilter.edit.filter_hidden')]['checked'] = true;
 					array_push($return['render']['content'][1], $hidden);
 				}
 				$this->response($return);

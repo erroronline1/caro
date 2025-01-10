@@ -143,8 +143,8 @@ class FILE extends API {
 				$save_name = $this->_lang->PROPERTY('file.bundle.save_bundle');
 				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
-				$hidden = $this->_lang->PROPERTY('file.bundle.bundle_active');
-				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.active_bundle') ? 1 : null;
+				$hidden = $this->_lang->PROPERTY('file.bundle.availability');
+				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.available') ? 1 : null;
 				unset ($this->_payload->$hidden);
 				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
@@ -336,11 +336,11 @@ class FILE extends API {
 					[
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('file.bundle.bundle_active')
+							'name' => $this->_lang->GET('file.bundle.availability')
 						],
 						'content'=>[
-							$this->_lang->GET('file.bundle.active_bundle') => !$bundle['hidden'] ? ['checked' => true] : [],
-							$this->_lang->GET('file.bundle.inactive_bundle') => $bundle['hidden'] ? ['checked' => true] : [],
+							$this->_lang->GET('file.bundle.available') => !$bundle['hidden'] ? ['checked' => true] : [],
+							$this->_lang->GET('file.bundle.hidden') => $bundle['hidden'] ? ['checked' => true] : [],
 						]
 					]
 				];

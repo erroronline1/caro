@@ -339,7 +339,7 @@ class DOCUMENT extends API {
 							':unit' => $bundle[':unit'],
 							':author' => $exists['author'],
 							':content' => $exists['content'],
-							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.hidden')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden_hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 							':approval' => $exists['approval'],
 							':regulatory_context' => '',
 							':permitted_export' => null,
@@ -531,17 +531,17 @@ class DOCUMENT extends API {
 					$hidden = [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('assemble.compose.bundle.hidden')
+							'name' => $this->_lang->GET('assemble.compose.bundle.availability')
 						],
 						'content' => [
-							$this->_lang->GET('assemble.compose.bundle.hidden_visible') => ['checked' => true],
-							$this->_lang->GET('assemble.compose.bundle.hidden_hidden') => ['class' => 'red']
+							$this->_lang->GET('assemble.compose.bundle.available') => ['checked' => true],
+							$this->_lang->GET('assemble.compose.bundle.hidden') => ['class' => 'red']
 						],
-						'hint' => $this->_lang->GET('assemble.compose.bundle.hidden_hint')
+						'hint' => $this->_lang->GET('assemble.compose.bundle.availability_hint')
 					];
 					if ($bundle['hidden']) {
 						$bundle['hidden'] = json_decode($bundle['hidden'], true);
-						$hidden['content'][$this->_lang->GET('assemble.compose.bundle.hidden_hidden')]['checked'] = true;
+						$hidden['content'][$this->_lang->GET('assemble.compose.bundle.hidden')]['checked'] = true;
 						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $bundle['hidden']['date']]);
 					}
 					array_push($return['render']['content'][1], $hidden);

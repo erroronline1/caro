@@ -577,7 +577,7 @@ class CONSUMABLES extends API {
 					'article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null,
 					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
 					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? null : 1,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.available') ? null : 1,
 					'protected' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
@@ -647,7 +647,7 @@ class CONSUMABLES extends API {
 					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null;
 					$product['article_unit'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null;
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null;
-					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.active')) === $this->_lang->GET('consumables.product.isactive') ? null : 1;
+					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.available') ? null : 1;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null;
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
@@ -935,11 +935,11 @@ class CONSUMABLES extends API {
 							[
 								'type' => 'radio',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.active')
+									'name' => $this->_lang->GET('consumables.product.availability')
 								],
 								'content' => [
-									$this->_lang->GET('consumables.product.isactive') => $isactive,
-									$this->_lang->GET('consumables.product.isinactive') => $isinactive
+									$this->_lang->GET('consumables.product.available') => $isactive,
+									$this->_lang->GET('consumables.product.hidden') => $isinactive
 								]
 							]
 						];
@@ -1158,12 +1158,12 @@ class CONSUMABLES extends API {
 							[
 								'type' => 'radio',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.active')
+									'name' => $this->_lang->GET('consumables.product.availability')
 								],
 								'hint' => $this->_lang->GET('consumables.product.similar_hint'),
 								'content' => [
-									$this->_lang->GET('consumables.product.isactive') => $isactive,
-									$this->_lang->GET('consumables.product.isinactive') => $isinactive
+									$this->_lang->GET('consumables.product.available') => $isactive,
+									$this->_lang->GET('consumables.product.hidden') => $isinactive
 								]
 							], [
 								'type' => 'hidden',
@@ -1497,7 +1497,7 @@ class CONSUMABLES extends API {
 				 */
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? null : 1,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.available') ? null : 1,
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
@@ -1527,8 +1527,8 @@ class CONSUMABLES extends API {
 					'consumables.vendor.edit_existing_vendors',
 					'consumables.vendor.edit_existing_vendors_search',
 					'consumables.vendor.name',
-					'consumables.vendor.active',
-					'consumables.vendor.isactive',
+					'consumables.vendor.availability',
+					'consumables.vendor.available',
 					'consumables.vendor.certificate_validity',
 					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.certificate_update',
@@ -1612,7 +1612,7 @@ class CONSUMABLES extends API {
 				if (!$vendor) $this->response(null, 406);
 
 				// update vendor data
-				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.active')) === $this->_lang->GET('consumables.vendor.isactive') ? null : 1;
+				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.available') ? null : 1;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
 				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
@@ -1660,8 +1660,8 @@ class CONSUMABLES extends API {
 					'consumables.vendor.edit_existing_vendors',
 					'consumables.vendor.edit_existing_vendors_search',
 					'consumables.vendor.name',
-					'consumables.vendor.active',
-					'consumables.vendor.isactive',
+					'consumables.vendor.availability',
+					'consumables.vendor.available',
 					'consumables.vendor.certificate_validity',
 					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.certificate_update',
@@ -1855,11 +1855,11 @@ class CONSUMABLES extends API {
 							],[
 								'type' => 'radio',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.active')
+									'name' => $this->_lang->GET('consumables.vendor.availability')
 								],
 								'content' => [
-									$this->_lang->GET('consumables.vendor.isactive') => $isactive,
-									$this->_lang->GET('consumables.vendor.isinactive') => $isinactive
+									$this->_lang->GET('consumables.vendor.available') => $isactive,
+									$this->_lang->GET('consumables.vendor.hidden') => $isinactive
 								]
 							]
 						];
@@ -1988,11 +1988,11 @@ class CONSUMABLES extends API {
 								], [
 									'type' => 'radio',
 									'attributes' => [
-										'name' => $this->_lang->GET('consumables.vendor.active')
+										'name' => $this->_lang->GET('consumables.vendor.availability')
 									],
 									'content' => [
-										$this->_lang->GET('consumables.vendor.isactive') => $isactive,
-										$this->_lang->GET('consumables.vendor.isinactive') => $isinactive
+										$this->_lang->GET('consumables.vendor.available') => $isactive,
+										$this->_lang->GET('consumables.vendor.hidden') => $isinactive
 									]
 								]
 							],

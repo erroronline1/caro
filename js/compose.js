@@ -1189,8 +1189,8 @@ export class Compose extends Assemble {
 				"': {value: true, class: 'reducedCTA'}," +
 				"}}).then(confirmation => {if (confirmation) api.document('post', 'component')})",
 			hidden: {
-				name: api._lang.GET("assemble.compose.component.component_hidden"),
-				hint: api._lang.GET("assemble.compose.component.component_hidden_hint"),
+				name: api._lang.GET("assemble.compose.component.availability"),
+				hint: api._lang.GET("assemble.compose.component.availability_hint"),
 			},
 		}
 	) {
@@ -1304,7 +1304,7 @@ export class Compose extends Assemble {
 		// prefilling all inputs from selected component / document
 		if (prefilled) {
 			const options = {};
-			options[api._lang.GET("assemble.compose.edit_visible")] = !(hidden && Object.keys(hidden).length)
+			options[api._lang.GET("assemble.compose.edit_available")] = !(hidden && Object.keys(hidden).length)
 				? {
 						checked: true,
 				  }
@@ -1466,8 +1466,8 @@ export class Compose extends Assemble {
 				"': {value: true, class: 'reducedCTA'}," +
 				"}}).then(confirmation => {if (confirmation) api.document('post', 'document')})",
 			hidden: {
-				name: api._lang.GET("assemble.compose.document.document_hidden"),
-				hint: api._lang.GET("assemble.compose.document.document_hidden_hint"),
+				name: api._lang.GET("assemble.compose.document.availability"),
+				hint: api._lang.GET("assemble.compose.document.availability_hint"),
 			},
 		});
 	}
