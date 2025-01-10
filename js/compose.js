@@ -125,7 +125,7 @@ export const compose_helper = {
 					else if (value && setTo === "description") element.description = value;
 					else return;
 				}
-				if (elementName === api._lang.GET("assemble.compose_multilist_add_item") && value) {
+				if (elementName === api._lang.GET("assemble.compose.component.multilist_add_item") && value) {
 					if (element.content === undefined) element.content = {};
 					element.content[value] = {};
 				}
@@ -858,7 +858,7 @@ export const compose_helper = {
 								if (setTo === "name") sibling.value = importable.attributes.name;
 								else if (setTo === "description") sibling.value = importable.description;
 							}
-							if (elementName === api._lang.GET("assemble.compose_multilist_add_item")) {
+							if (elementName === api._lang.GET("assemble.compose.component.multilist_add_item")) {
 								let deletesibling = sibling.nextSibling;
 								while (deletesibling.nextElementSibling.constructor.name !== "HTMLButtonElement") {
 									deletesibling.nextElementSibling.remove();
