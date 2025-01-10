@@ -115,6 +115,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests (frontend)
 * audit risk export as csv/xlsx? translate risks with languagefile
+* search risks for keywords
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1056,7 +1057,7 @@ If you are comfortable enough with text editing JSON-files to modify the languag
 * risks.XX.json
 * texttemplates.XX.json
 
-within the template directory too for a swift availability upon launch. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
+within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
 
 ### Installation procedure
 * Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
