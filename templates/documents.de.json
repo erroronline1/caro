@@ -3697,7 +3697,7 @@
 		"name": "Versorgungsdokumentation Prothetik II",
 		"alias": "",
 		"context": "bundle",
-		"unit": "",
+		"unit": "prosthetics2",
 		"author": "Caro App",
 		"regulatory_context": "",
 		"permitted_export": null,
