@@ -2023,7 +2023,7 @@ graph TD;
 
 ## Application endpoints
 
-> GET ./api/api.php/application/language
+> GET ./api/api.php/application/info
 
 Returns general application information
 
@@ -3456,28 +3456,14 @@ Sample response
 
 ### Risk endpoints
 
-> DELETE ./api/api.php/risk/risk
-
-Deletes a risk.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | database id for risk |
-
-Sample response
-```
-{"response":{"msg":"The risk entry has been deleted","id":false,"type":"success"}}
-```
-
-> GET ./api/api.php/risk/risk/{id}
+> GET ./api/api.php/risk/risk/{id|type}
 
 Returns a form to add or edit a risk.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | database id for risk |
+| {id|type} | path parameter | optional | database id or type for appending |
 
 Sample response
 ```

@@ -226,4 +226,5 @@
 04.01.25;4;"code maintenance, documentation"
 05.01.25;3;"code maintenance, templates"
 06.01.25;3;"templates, install routine"
-08.01.25;2;"database type maintenance
+08.01.25;2;"database type maintenance"
+10.01.25;7;"stress-test, risk-api"

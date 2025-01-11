@@ -199,18 +199,22 @@ define('DEFAULTSQL', [
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_risks` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`process` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`risk` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`cause` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`effect` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`probability` int NOT NULL," .
-				"	`damage` int NOT NULL," .
+				"	`relevance` tinyint NULL," .
+				"	`cause` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`effect` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`probability` int NULL," .
+				"	`damage` int NULL," .
 				"	`measure` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`measure_probability` int NOT NULL," .
-				"	`measure_damage` int NOT NULL," .
-				"	`risk_benefit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`measure_remainder` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`last_edit` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`measure_probability` int NULL," .
+				"	`measure_damage` int NULL," .
+				"	`risk_benefit` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`measure_remainder` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`proof` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -426,18 +430,22 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .
 				"CREATE TABLE caro_risks (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
+				"	type varchar(MAX) NOT NULL," .
 				"	process varchar(MAX) NOT NULL," .
 				"	risk varchar(MAX) NOT NULL," .
+				"	relevance tinyint NULL," .
 				"	cause varchar(MAX) NOT NULL," .
-				"	effect varchar(MAX) NOT NULL," .
-				"	probability int NOT NULL," .
-				"	damage int NOT NULL," .
+				"	effect varchar(MAX) NULL," .
+				"	probability int NULL," .
+				"	damage int NULL," .
 				"	measure varchar(MAX) NOT NULL," .
-				"	measure_probability int NOT NULL," .
-				"	measure_damage int NOT NULL," .
-				"	risk_benefit varchar(MAX) NOT NULL," .
-				"	measure_remainder varchar(MAX) NOT NULL," .
-				"	last_edit varchar(MAX) NOT NULL" .
+				"	measure_probability int NULL," .
+				"	measure_damage int NULL," .
+				"	risk_benefit varchar(MAX) NULL," .
+				"	measure_remainder varchar(MAX)  NULL," .
+				"	proof varchar(MAX) NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NOT NULL," .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
