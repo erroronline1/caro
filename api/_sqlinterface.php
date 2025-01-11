@@ -687,8 +687,8 @@ class SQLQUERY {
 			'sqlsrv' => "INSERT INTO caro_risks (type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) VALUES (:type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author)"
 		],
 		'risk_put' => [
-			'mysql' => "UPDATE caro_risks SET risk = :risk, proof = :proof WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_risks SET risk = :risk, proof = :proof WHERE id = :id"
+			'mysql' => "UPDATE caro_risks SET risk = :risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = :proof, hidden = :hidden WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_risks SET risk = :risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = :proof, hidden = :hidden WHERE id = :id"
 		],
 		'risk_datalist' => [
 			'mysql' => "SELECT * FROM caro_risks ORDER BY process, risk, cause, effect",
