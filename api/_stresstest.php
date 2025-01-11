@@ -337,6 +337,39 @@ class STRESSTEST extends INSTALL{
 	}
 
 	/**
+	 * deletes all risk entries according to template file
+	 */
+	public function removeRisks(){
+		$file = '../templates/risks.' . $this->_defaultLanguage . '.json';
+		$json = $this->importJSON($file);
+
+		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+
+		$matches = 0;
+		foreach($DBall as $dbrisk){
+			foreach($json as $risk){
+				if (
+					isset($risk['type']) &&
+					$dbrisk['type'] === $risk['type'] &&
+					$dbrisk['process'] === $risk['process'] &&
+					($dbrisk['risk'] === $risk['risk'] || (!$dbrisk['risk'] && !$risk['risk'])) &&
+					($dbrisk['cause'] === $risk['cause'] || (!$dbrisk['cause'] && !$risk['cause'])) &&
+					($dbrisk['measure'] === $risk['measure'] || (!$dbrisk['measure'] && !$risk['measure'])) &&
+					$dbrisk['author'] === $risk['author']
+				){
+					$deletion = [
+						'mysql' => "DELETE FROM caro_risks WHERE id = " . $dbrisk['id'],
+						'sqlsrv' => "DELETE FROM caro_risks WHERE id = " . $dbrisk['id']
+					];
+					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+						$matches++;
+				}
+			}
+		}
+		echo '[*] ' . $matches . ' risk entries according to template file deleted.';
+	}
+
+	/**
 	 * deletes all text templates according to template file
 	 */
 	public function removeTexttemplates(){

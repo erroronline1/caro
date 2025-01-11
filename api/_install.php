@@ -434,7 +434,7 @@ define('DEFAULTSQL', [
 				"	process varchar(MAX) NOT NULL," .
 				"	risk varchar(MAX) NOT NULL," .
 				"	relevance tinyint NULL," .
-				"	cause varchar(MAX) NOT NULL," .
+				"	cause varchar(MAX) NULL," .
 				"	effect varchar(MAX) NULL," .
 				"	probability int NULL," .
 				"	damage int NULL," .
@@ -442,7 +442,7 @@ define('DEFAULTSQL', [
 				"	measure_probability int NULL," .
 				"	measure_damage int NULL," .
 				"	risk_benefit varchar(MAX) NULL," .
-				"	measure_remainder varchar(MAX)  NULL," .
+				"	measure_remainder varchar(MAX) NULL," .
 				"	proof varchar(MAX) NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
@@ -713,7 +713,7 @@ class INSTALL {
 		}
 
 	/**
-	 * installs risks by novel process+risk+cause
+	 * installs risks by novel process+risk+cause+measure
 	 */
 	public function installRisks(){
 		$file = '../templates/risks.' . $this->_defaultLanguage . '.json';
@@ -721,31 +721,91 @@ class INSTALL {
 		// gather possibly existing entries
 		$DBall = [];
 		foreach(SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist') as $row){
-			$DBall[] = $row['process'].$row['risk'].$row['cause'];
+			$DBall[] = $row['process'].$row['risk'].$row['cause'].$row['measure'];
 		}
+		$insertions = [];
 
 		foreach ($json as $entry){
-			// risks are only transferred if process+risk+cause is not already taken
-			$forbidden = false;
-			if (isset($entry['process']) && $entry['process'] && isset($entry['risk']) && $entry['risk'] && isset($entry['cause']) && !in_array($entry['process'].$entry['risk'].$entry['cause'], $DBall)) {
-				$insertions[] = [
-					':process' => $entry['process'],
-					':risk' => $entry['risk'],
-					':cause' => $entry['cause'],
-					':effect' => isset($entry['effect']) ? $entry['effect'] : '',
-					':probability' => isset($entry['probability']) ? $entry['probability'] : 4,
-					':damage' => isset($entry['damage']) ? $entry['damage'] : 4,
-					':measure' => isset($entry['measure']) ? $entry['measure'] : '',
-					':measure_probability' => isset($entry['measure_probability']) ? $entry['measure_probability'] : 4,
-					':measure_damage' => isset($entry['measure_damage']) ? $entry['measure_damage'] : 4,
-					':risk_benefit' => isset($entry['risk_benefit']) ? $entry['risk_benefit'] : '',
-					':measure_remainder' => isset($entry['measure_remainder']) ? $entry['measure_remainder'] : '',
-					':last_edit' => json_encode(['user' => $this->_defaultUser, 'date' => $this->_currentdate->format('Y-m-d H:i')])
-				];
+			// risks are only transferred if process+risk+cause+measure is not already taken
+			$valid = true;
+
+			if (isset($entry['type'])) {
+				// validity check, match with risk.php
+				switch($entry['type']){
+					case 'characteristic': // implement further cases if suitable, according to languagefile
+						foreach($entry as $key => $value){
+							if (in_array($key, [
+								'effect',
+								'probability',
+								'damage',
+								'measure_probability',
+								'measure_damage',
+								'risk_benefit',
+								'measure_remainder',
+								'proof'
+								])) continue;
+							if (isset($entry['relevance']) && $entry['relevance'] === 0 && in_array($key, [
+								'risk',
+								'cause'
+								])) continue;								
+							if (!$value && $value !== 0) {
+								$valid = false;
+								echo var_dump($value) . ' for ' . $key . ' is not allowed!';
+								break;
+							}
+						}		
+						break;
+					default: //risk
+					foreach($entry as $key => $value){
+						if (in_array($key, [
+							'cause',
+							'measure_remainder',
+							'proof'
+							])) continue;
+						if (isset($entry['relevance']) && $entry['relevance'] === 0 && in_array($key, [
+							'effect',
+							'probability',
+							'damage',
+							'measure',
+							'measure_probability',
+							'measure_damage',
+							'risk_benefit'
+						])) continue;								
+						if (!$value && $value !== 0) {
+							$valid = false;
+							echo var_dump($value) . ' for ' . $key . ' is not allowed!';
+							break;
+						}
+					}		
+					break;
+				}
+
+				if ($valid){
+					if (!in_array($entry['process'].$entry['risk'].$entry['cause'].$entry['measure'], $DBall))
+					$insertions[] = [
+						':type' => $entry['type'],
+						':process' => $entry['process'],
+						':risk' => $entry['risk'],
+						':relevance' => isset($entry['relevance']) ? $entry['relevance'] : 1,
+						':cause' => $entry['cause'],
+						':effect' => isset($entry['effect']) ? $entry['effect'] : null,
+						':probability' => isset($entry['probability']) ? $entry['probability'] : 4,
+						':damage' => isset($entry['damage']) ? $entry['damage'] : 4,
+						':measure' => isset($entry['measure']) ? $entry['measure'] : '',
+						':measure_probability' => isset($entry['measure_probability']) ? $entry['measure_probability'] : 4,
+						':measure_damage' => isset($entry['measure_damage']) ? $entry['measure_damage'] : 4,
+						':risk_benefit' => isset($entry['risk_benefit']) ? $entry['risk_benefit'] : null,
+						':measure_remainder' => isset($entry['measure_remainder']) ? $entry['measure_remainder'] : null,
+						':proof' => null,
+						':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser
+					];
+					continue;
+				}
 			}
+			echo '<br />[X] the following dataset is invalid and will not been installed:<br><code>' . json_encode($entry) . '</code><br />';
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('risk_post'), $insertions)))
-			echo '<br />[*] novel entries by process+risk+cause from ' . $file . ' have been installed.<br />';
+			echo '<br />[*] novel entries by process+risk+cause+measure from ' . $file . ' have been installed.<br />';
 		else echo '[!] there were no novelties to install from '. $file . '.<br />';
 	}
 
