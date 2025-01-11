@@ -60,7 +60,8 @@ class STRESSTEST extends INSTALL{
 					'navigation',
 					'executeSQL',
 					'importJSON',
-					'installDatabase'
+					'installDatabase',
+					'printError'
 					])) echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br />';
 			}
 
@@ -268,7 +269,7 @@ class STRESSTEST extends INSTALL{
 			}
 			echo '[*] all documents in the database have been approved';
 		}
-		else echo '[X] autopermission has not been enabled';
+		else $this->printError('autopermission has not been enabled');
 	}
 
 	/**

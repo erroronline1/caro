@@ -541,11 +541,21 @@ class INSTALL {
 					'__construct',
 					'navigation',
 					'executeSQL',
-					'importJSON'
+					'importJSON',
+					'printError'
 					])) echo '<a href="./_install.php/' . $methodName . '">' . $methodName . '</a><br />';
 			}
 			echo '<br /><a href="../../index.html">exit</a>';
 		}
+	}
+
+	/**
+	 * unifies display of errors
+	 * @param string $message to display
+	 * @param string|array $item entry item from source
+	 */
+	public function printError($message = '', $item = []){
+		echo '<br />[X] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? json_encode($item) : $item) . '</code>' : '') . '<br />';
 	}
 
 	/**
@@ -563,7 +573,7 @@ class INSTALL {
 				}
 			}
 			catch (Exception $e) {
-				echo '<br />[X] ' . $e . '<br /><code>' . $chunk . '</code>';
+				$this->printError($e, $chunk);
 				die();
 			}
 		}
@@ -578,12 +588,12 @@ class INSTALL {
 	 */
 	public function importJSON($file){
 		if (($path = realpath($file)) === false) {
-			echo '[X] ' . $file . ' not found<br />';
+			$this->printError($file . ' not found');
 			die();
 		}
 		$json = file_get_contents($path);
 		if ($json = json_decode($json, true)) return $json;
-		echo '[X] ' . $file . ' is defective and could not be properly parsed.<br />';
+		$this->printError($file . ' is defective and could not be properly parsed.');
 		die();
 	}
 
@@ -603,7 +613,7 @@ class INSTALL {
 		}
 		catch (Exception $e){
 			if (!$statement = $this->_pdo->query(DEFAULTSQL['install_tables'][$this->_pdoDriver])){
-				echo '[X] There has been an error installing the databases!<br />';
+				$this->printError('There has been an error installing the databases!');
 				die();
 			}
 			echo '[*] Databases installed.<br />';
@@ -619,8 +629,8 @@ class INSTALL {
 					':app_settings' => '',
 					':skills' => ''
 				]
-			])) echo "[*] Default user has been installed.<br />";
-			else echo "[X] There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?<br />";
+			])) echo '[*] Default user has been installed.<br />';
+			else $this->printError('There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?');
 		}
 	}
 
@@ -640,30 +650,40 @@ class INSTALL {
 		$insertions = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
-			$forbidden = false;
-			if (isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) {
+			if (!(
+				isset($entry['name']) && $entry['name'] &&
+				isset($entry['context']) && $entry['context'] &&
+				isset($entry['unit']) && $entry['unit'] &&
+				isset($entry['unit']) && $entry['unit'] &&
+				isset($entry['content']) && $entry['content']
+				)){
+				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				continue;
+			}
+
+			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						echo '[X] The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '<br />';
-						$forbidden = true;
+						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern, $entry);
 						continue;
 					}
 				}
 				if (in_array($entry['name'], $names)) {
-					echo '[X] Multiple occurences of the name are not allowed<br />';
+					$this->printError('Multiple occurences of the name are not allowed', $entry);
 					continue;
 				}
+
 				$names[] = $entry['name'];
 				$insertions[] = [
 					':name' => $entry['name'],
-					':alias' => $entry['alias'],
+					':alias' => isset($entry['alias']) ? $entry['alias'] : '',
 					':context' => $entry['context'],
 					':unit' => $entry['unit'],
-					':author' => $entry['author'],
+					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
 					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content'],
 					':regulatory_context' => $entry['regulatory_context'] ? : '',
-					':permitted_export' => $entry['permitted_export'] ? $entry['permitted_export'] : 'NULL',
-					':restricted_access' => $entry['restricted_access'] ? $entry['restricted_access'] : 'NULL'
+					':permitted_export' => $entry['permitted_export'] ? $entry['permitted_export'] : null,
+					':restricted_access' => $entry['restricted_access'] ? $entry['restricted_access'] : null
 				];
 			}
 		}
@@ -686,19 +706,27 @@ class INSTALL {
 		$insertions = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the title is not already taken
-			$forbidden = false;
+			if (!(
+				isset($entry['title']) && $entry['title'] &&
+				isset($entry['content']) && $entry['content'] &&
+				isset($entry['permissions']) && $entry['permissions']
+				)){
+				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				continue;
+			}
+
 			if (isset($entry['title']) && $entry['title'] && !in_array($entry['title'], array_column($DBall, 'title'))) {
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)){
-						echo '[X] The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '<br />';
-						$forbidden = true;
+						$this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern, $entry);
 						continue;
 					}
 				}
 				if (in_array($entry['title'], $names)) {
-					echo '[X] Multiple occurences of the title are not allowed<br />';
+					$this->printError('Multiple occurences of the title are not allowed', $entry);
 					continue;
 				}
+
 				$names[] = $entry['title'];
 				$insertions[] = [
 					':title' => $entry['title'],
@@ -802,7 +830,7 @@ class INSTALL {
 					continue;
 				}
 			}
-			echo '<br />[X] the following dataset is invalid and will not been installed:<br><code>' . json_encode($entry) . '</code><br />';
+			$this->printError('The following dataset is invalid and will not been installed:', $entry);
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('risk_post'), $insertions)))
 			echo '<br />[*] novel entries by process+risk+cause+measure from ' . $file . ' have been installed.<br />';
@@ -837,31 +865,41 @@ class INSTALL {
 		];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
-			$forbidden = false;
-			if (isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) {
+			if (!(
+				isset($entry['type']) && $entry['type'] &&
+				isset($entry['name']) && $entry['name'] &&
+				isset($entry['unit']) && $entry['unit'] &&
+				isset($entry['content']) && $entry['content'] &&
+				isset($entry['type']) && $entry['type']
+				)){
+				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				continue;
+			}
+
+			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				$patterns = $entry['type'] === 'template' ? CONFIG['forbidden']['names'] : [...CONFIG['forbidden']['names'], $allowed];
 				foreach($patterns as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						echo '[X] The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '<br />';
-						$forbidden = true;
+						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern, $entry);
 						continue;
 					}
 				}
 				$used = $entry['type'] === 'template' ? $names['template'] : [...$names['text'], ...$names['replacement']];
 				foreach($used as $name){
 					if (str_starts_with($entry['name'], $name) || str_starts_with($name, $entry['name']))
-					echo '[X] ' . $entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed<br />';
+					$this->printError($entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed', $entry);
 					continue;
 				}
+
 				$names[$entry['type']][] = $entry['name'];
 				$insertions[] = [
 					':name' => $entry['name'],
 					':unit' => $entry['unit'],
-					':author' => $entry['author'],
+					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
 					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content'],
-					':language' => $entry['language'],
+					':language' => isset($entry['language']) ? $entry['language'] : $this->_defaultLanguage,
 					':type' => $entry['type'],
-					':hidden' => 0
+					':hidden' => null
 				];
 			}
 		}
@@ -884,28 +922,33 @@ class INSTALL {
 		$insertions = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
-			$forbidden = false;
-			if (isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) {
+			if (!(
+				isset($entry['name']) && $entry['name']
+				)){
+				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				continue;
+			}
+			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						echo '[X] The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '<br />';
-						$forbidden = true;
+						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern, $entry);
 						continue;
 					}
 				}
 				if (in_array($entry['name'], $names)) {
-					echo '[X] Multiple occurences of the name are not allowed<br />';
+					$this->printError('Multiple occurences of the name are not allowed', $entry);
 					continue;
 				}
+
 				$names[] = $entry['name'];
 				$insertions[] = [
 					':name' => $vendor['name'],
 					':active' => 1,
-					':info' => json_encode($vendor['info']),
+					':info' => isset($vendor['info']) && gettype($vendor['info']) === 'array' ? json_encode($vendor['info']) : null,
 					':certificate' => json_encode([]),
-					':pricelist' => json_encode(['filter' => $vendor['pricelist']]),
+					':pricelist' => isset($vendor['pricelist']) && gettype($vendor['info']) === 'pricelist' ? json_encode(['filter' => $vendor['pricelist']]) : null,
 					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $currentdate->format('Ymd'),
-					':evaluation' => ''
+					':evaluation' => null
 				];
 			}
 		}
