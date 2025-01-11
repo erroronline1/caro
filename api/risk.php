@@ -61,12 +61,25 @@ class RISK extends API {
 				];
 
 				if (!$risk[':type']) $this->response([], 417);
+
+				// convert values to languagefile keys for risks
+				$risks_converted = [];
+				if ($risk[':risk']) {
+					$rsks = explode(', ', $risk[':risk']);
+					foreach($rsks as $rsk){
+						$risks_converted[] = array_search($rsk, $this->_lang->_USER['risks']); 
+					}
+					$risk[':risk'] = implode(',', $risks_converted);
+				}
+
+				// WHY NO INPUT REQUIRED? because it would be unreasonable to implement frontend conditions for this module
+				// as risk management is a pita regulatory requirement once set up rarely beneficial
 				switch($risk[':type']){
 					case 'characteristic': // implement further cases if suitable, according to languagefile
 						// override with specific payload property
 						$risk[':measure'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.type.characteristic')) ? : null;
 						$risk[':risk'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_related')) ? : null;
-						// check if neccessary values have been provided
+						// check if neccessary values have been provided, match with _install.php
 						foreach($risk as $key => $value){
 							if (in_array($key, [
 								':effect',
@@ -78,17 +91,31 @@ class RISK extends API {
 								':measure_remainder',
 								':proof'
 								])) continue;
-							if (!$value) $this->response([], 417);
+							if (isset($risk[':relevance']) && $risk[':relevance'] === 0 && in_array($key, [
+								':risk',
+								':cause'
+								])) continue;
+							if (!$value && $value !== 0) $this->response([], 417);
 						}		
 						break;
 					default: // risks
-						// check if neccessary values have been provided
+						// check if neccessary values have been provided, match with _install.php
 						foreach($risk as $key => $value){
 							if (in_array($key, [
 								':measure_remainder',
 								':proof'
 								])) continue;
-							if (!$value) $this->response([], 417);
+							if (isset($risk[':relevance']) && $risk[':relevance'] === 0 && in_array($key, [
+								':cause',
+								':effect',
+								':probability',
+								':damage',
+								':measure',
+								':measure_probability',
+								':measure_damage',
+								':risk_benefit'
+							])) continue;								
+							if (!$value && $value !== 0) $this->response([], 417);
 						}		
 						break;
 				}
@@ -109,7 +136,7 @@ class RISK extends API {
 				break;
 			case 'PUT':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
-				$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+
 				$risk = [
 					':id' => intval($this->_requestedID),
 					':relevance' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.relevance')),
@@ -132,6 +159,8 @@ class RISK extends API {
 				break;
 			case 'GET':
 				$processes = $select = [];
+
+				// set up risk selection according to language file
 				$risks = [];
 				foreach($this->_lang->_USER['risks'] as $key => $translation){
 					$risks[$translation] = ['value' => $key];
@@ -143,9 +172,21 @@ class RISK extends API {
 					$processes[] = $row['process'];
 					if (!isset($select[$row['type']])) $select[$row['type']] = [];
 					if (!isset($select[$row['type']][$row['process']])) $select[$row['type']][$row['process']] = ['...' => []];
-					$select[$row['type']][$row['process']][$row['risk'] . ': ' . $row['cause']] = ['value' => strval($row['id'])];
+					switch($row['type']){
+						case 'characteristic': // implement further cases if suitable, according to languagefile
+							$select[$row['type']][$row['process']][$row['measure'] . ': ' . $row['cause']] = ['value' => strval($row['id'])];
+							break;
+						default: // risk
+							$display = [];
+							foreach(explode(',', $row['risk'] ? : '') as $selectedrisk){
+								if (isset($this->_lang->_USER['risks'][$selectedrisk])) $display[]=$this->_lang->_USER['risks'][$selectedrisk];
+							}
+							$select[$row['type']][$row['process']][implode(', ', $display) . ': ' . $row['cause']] = ['value' => strval($row['id'])];
+							break;
+					}
 				}
 
+				// get requested risk or set up properties
 				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
 					'values' => [
 						':id' => intval($this->_requestedID)
@@ -170,10 +211,17 @@ class RISK extends API {
 					'date' => null,
 					'author' => null
 				];
+				// on button press for new the type is submitted instead of the int risk id
+				if (intval($this->_requestedID) != $this->_requestedID) $risk['type'] = $this->_requestedID;
+
+				// preselect risk selection according to database response
+				foreach(explode(',', $risk['risk'] ? : '') as $selectedrisk){
+					if (isset($this->_lang->_USER['risks'][$selectedrisk]) && isset($risks[$this->_lang->_USER['risks'][$selectedrisk]])) $risks[$this->_lang->_USER['risks'][$selectedrisk]]['checked'] = true;
+				}
 
 				$result['render'] = ['content' => []];
 
-				// render selection
+				// render selection of types and their content, one selection per process
 				$selection = [];
 				foreach ($this->_lang->_USER['risk']['type'] as $type => $translation){
 					$typeselection = [
@@ -207,13 +255,6 @@ class RISK extends API {
 				if ($selection) $result['render']['content'][] = $selection;
 
 				// render form according to type
-
-				if (intval($this->_requestedID) != $this->_requestedID) $risk['type'] = $this->_requestedID;
-				
-				foreach(explode(', ', $risk['risk'] ? : '') as $selectedrisk){
-					if (isset($risks[$selectedrisk])) $risks[$selectedrisk]['checked'] = true;
-				}
-
 				switch($risk['type']){
 					case 'characteristic': // implement further cases if suitable, according to languagefile
 						if (PERMISSION::permissionFor('riskmanagement')) {
@@ -450,7 +491,6 @@ class RISK extends API {
 					}
 					break;
 				}
-
 
 				$this->response($result);
 				break;
