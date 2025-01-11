@@ -568,7 +568,7 @@ class INSTALL {
 		foreach ($sqlchunks as $chunk){
 			try {
 				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) {
-					echo '<br /> [*] <code>' . $chunk . '</code>';
+					echo '<br /> [*] Success:<br /><code>' . $chunk . '</code><br />';
 					$counter++;
 				}
 			}
@@ -942,13 +942,13 @@ class INSTALL {
 
 				$names[] = $entry['name'];
 				$insertions[] = [
-					':name' => $vendor['name'],
-					':active' => 1,
-					':info' => isset($vendor['info']) && gettype($vendor['info']) === 'array' ? json_encode($vendor['info']) : null,
+					':name' => $entry['name'],
+					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? json_encode($entry['info']) : null,
 					':certificate' => json_encode([]),
-					':pricelist' => isset($vendor['pricelist']) && gettype($vendor['info']) === 'pricelist' ? json_encode(['filter' => $vendor['pricelist']]) : null,
-					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', $vendor['name']) . $currentdate->format('Ymd'),
-					':evaluation' => null
+					':pricelist' => isset($entry['pricelist']) && gettype($entry['info']) === 'pricelist' ? json_encode(['filter' => $entry['pricelist']]) : null,
+					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', $entry['name']) . $this->_currentdate->format('Ymd'),
+					':evaluation' => null,
+					':hidden' => null
 				];
 			}
 		}
