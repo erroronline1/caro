@@ -36,7 +36,7 @@ class SQLQUERY {
 	 * MASKING HAS TO BE DONE BEFOREHAND
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
-	 * @param string $query either defined within queries below or prepared chunkified
+	 * @param string $query either defined within queries below or prepared raw queries
 	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries
 	 * 
 	 * @return false|int|array sql result not executed|affectedRows|selection
@@ -45,21 +45,13 @@ class SQLQUERY {
 		// retrive query matching sql driver, else process raw query
 		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 		
-		// substitute NULL values, int values and mask/sanitize values
+		// substitute NULL values and sanitize values
 		if (isset($parameters['values'])){
 			foreach ($parameters['values'] as $key => $value){
-				if ($value === null || $value === false) {
+				if (gettype($value) === 'NULL' || $value === false) {
 					$query = strtr($query, [$key => 'NULL']);
 					unset($parameters['values'][$key]);
 				}
-				/*else if (strval(intval($value)) === $value) {
-					$query = strtr($query, [$key => intval($value)]);
-					unset($parameters['values'][$key]);
-				}
-				else if (strval(floatval($value)) === $value) {
-					$query = strtr($query, [$key => floatval($value)]);
-					unset($parameters['values'][$key]);
-				}*/
 				else $parameters['values'][$key] = trim($value);
 			}
 		} else $parameters['values'] = [];
@@ -134,8 +126,8 @@ class SQLQUERY {
 			$chunkeditems = [];
 			foreach($items as $item){
 				foreach ($item as &$replace){
-					if ($replace === '') $replace = "''";
-					elseif (gettype($replace) === null || strtoupper($replace) === 'NULL') $replace = 'NULL';
+					if (gettype($replace) === 'NULL' || ($replace && strtoupper($replace) === 'NULL')) $replace = 'NULL';
+					elseif ($replace === '') $replace = "''";
 					elseif (gettype($replace) === 'string') $replace = $_pdo->quote($replace);
 				}
 				$item = strtr($values, $item);
