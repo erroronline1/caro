@@ -215,6 +215,7 @@ define('DEFAULTSQL', [
 				"	`proof` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`hiden` tinyint NULL DEFAULT NULL NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -446,6 +447,7 @@ define('DEFAULTSQL', [
 				"	proof varchar(MAX) NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
+				"	hidden tinyint NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
