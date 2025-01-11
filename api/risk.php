@@ -139,9 +139,28 @@ class RISK extends API {
 
 				$risk = [
 					':id' => intval($this->_requestedID),
-					':relevance' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.relevance')),
+					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')) ? : null,
 					':proof' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.proof')) ? : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.available') ? null : 1,
+					':probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.probability'))) ? : null,
+					':damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.damage'))) ? : null,
+					':measure_probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_probability'))) ? : null,
+					':measure_damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_damage'))) ? : null,
 				];
+				if (!$risk[':risk']) { // characteristic
+					$risk[':risk'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_related')) ? : null;
+				}
+
+				// convert values to languagefile keys for risks
+				$risks_converted = [];
+				if ($risk[':risk']) {
+					$rsks = explode(', ', $risk[':risk']);
+					foreach($rsks as $rsk){
+						$risks_converted[] = array_search($rsk, $this->_lang->_USER['risks']); 
+					}
+					$risk[':risk'] = implode(',', $risks_converted);
+				}
+				
 				if (SQLQUERY::EXECUTE($this->_pdo, 'risk_put', [
 					'values' => $risk
 				])) $this->response([
@@ -209,7 +228,8 @@ class RISK extends API {
 					'measure_remainder' => null,
 					'proof' => null,
 					'date' => null,
-					'author' => null
+					'author' => null,
+					'hidden' => null
 				];
 				// on button press for new the type is submitted instead of the int risk id
 				if (intval($this->_requestedID) != $this->_requestedID) $risk['type'] = $this->_requestedID;
@@ -253,6 +273,9 @@ class RISK extends API {
 					$selection[] = $typeselection;
 				}
 				if ($selection) $result['render']['content'][] = $selection;
+
+				$isactive = !$risk['hidden'] ? ['checked' => true] : [];
+				$isinactive = $risk['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 
 				// render form according to type
 				switch($risk['type']){
@@ -319,6 +342,33 @@ class RISK extends API {
 									'content' => $risks
 								]
 							];
+
+							// disable non editable inputs and append hidden option
+							if ($risk['id']){
+								$last = count($result['render']['content']) - 1;
+								foreach([3, 4, 5, 6] as $index){
+									if (isset($result['render']['content'][$last][$index]['content'])){
+										foreach ($result['render']['content'][$last][$index]['content'] as $key => $value){
+											$result['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
+										}
+									}
+									else {
+										unset ($result['render']['content'][$last][$index]['attributes']['onpointerup']);
+										unset ($result['render']['content'][$last][$index]['attributes']['onpointerdown']);
+										$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
+									}
+								}
+								$result['render']['content'][$last][] = [
+									'type' => 'radio',
+									'attributes' => [
+										'name' => $this->_lang->GET('risk.availability')
+									],
+									'content' => [
+										$this->_lang->GET('risk.available') => $isactive,
+										$this->_lang->GET('risk.hidden') => $isinactive
+									]
+								];
+							}
 						}
 						break;
 					default: // risk
@@ -488,6 +538,33 @@ class RISK extends API {
 								'content' => $insertdocument 
 							]
 						];
+
+						// disable non editable inputs and append hidden option
+						if ($risk['id']){
+							$last = count($result['render']['content']) - 1;
+							foreach([3, 5, 6, 8, 12, 13, 15] as $index){
+								if (isset($result['render']['content'][$last][$index]['content'])){
+									foreach ($result['render']['content'][$last][$index]['content'] as $key => $value){
+										$result['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
+									}
+								}
+								else {
+									unset ($result['render']['content'][$last][$index]['attributes']['onpointerup']);
+									unset ($result['render']['content'][$last][$index]['attributes']['onpointerdown']);
+									$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
+								}
+							}
+							$result['render']['content'][$last][] = [
+								'type' => 'radio',
+								'attributes' => [
+									'name' => $this->_lang->GET('risk.availability')
+								],
+								'content' => [
+									$this->_lang->GET('risk.available') => $isactive,
+									$this->_lang->GET('risk.hidden') => $isinactive
+								]
+							];
+						}
 					}
 					break;
 				}
