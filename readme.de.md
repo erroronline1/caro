@@ -1074,7 +1074,7 @@ order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
 order_approved_archived = 512 ; Plant eine Überprüfung der archivierten Bestellungen um aufzuräumen
 qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` oder `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
 record_image = 2048 ; maximale Pixel für längste Seite
-risk_acceptance_level = 2 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
+risk_acceptance_level = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
 user_image = 256 ; maximale Pixel für längste Seite
 
 ; Berechtigungen gemäß der in den Sprachdateien aufgeführten permissions
