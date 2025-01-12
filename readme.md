@@ -115,20 +115,16 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests (frontend) 
 * refactor risk management for improved compliance to iso 14971
     * search risks for keywords, display risks as textsection for unapproved users, matching search
-    * drop risk.presets
-    * process datalist according to grouped db entries
     * audit:
         * fetch risks and match with database, higlight all unaccounted risks per process (not applicable are accounted for)
         * reversed view: fetch processes, list accounted risks
         * additional risk export as xlsx with processwise sheets and riskwise sheets
         * select latest date for display/export like documents
     * manager interface for risks:
-        * checkbox2text for risks required unless...
-        * not applicable option
-        * cause explains non-applicability?
         * no deletion of risks, only append for regulatory compliance
-        * add proof of implementation by checkbox2text documents
     * *Identification of characteristics related to safety* how to implement?
+* hidden select options
+    * outdated marked as hidden as well?
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1164,7 +1160,7 @@ order_approvalsignature_image = 2048 ; max pixels on longer side
 order_approved_archived = 512 ; schedules a review to delete unused archived orders to free up space
 qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
 record_image = 2048 ; max pixels on longer side
-risk_acceptance_level = 2 ; product of probability times damage to be highlighted 
+risk_acceptance_level = 4 ; product of probability times damage to be highlighted 
 user_image = 256 ; max pixels on longer side
 
 ; permissions based of and matching language.XX.json permissions
