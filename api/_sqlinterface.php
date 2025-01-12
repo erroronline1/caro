@@ -397,8 +397,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, hidden = :hidden WHERE id = :id"
 		],
 		'file_bundles_datalist' => [
-			'mysql' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT name FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
+			'mysql' => "SELECT name, hidden FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
+			'sqlsrv' => "SELECT name, hidden FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
 		],
 		'file_bundles_get' => [
 			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",

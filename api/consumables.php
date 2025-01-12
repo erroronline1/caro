@@ -854,9 +854,11 @@ class CONSUMABLES extends API {
 
 				foreach($vendor as $key => $row) {
 					$datalist[] = $row['name'];
-					$options[$row['name']] = [];
-					if ($row['name'] === $product['vendor_name']) $options[$row['name']]['selected'] = true;
-					$vendors[$row['name']] = ['value' => $row['id']];
+					$display = $row['name'];
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$options[$display] = [];
+					if ($row['name'] === $product['vendor_name']) $options[$display]['selected'] = true;
+					$vendors[$display] = ['value' => $row['id']];
 					if ($row['name'] === $product['vendor_name']) $product['vendor_id'] = $row['id']; 
 				}
 				ksort($options);
@@ -1776,8 +1778,10 @@ class CONSUMABLES extends API {
 				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				foreach($vendorlist as $key => $row) {
 					$datalist[] = $row['name'];
-					$options[$row['name']] = [];
-					if ($row['name'] == $vendor['name']) $options[$row['name']]['selected'] = true;
+					$display = $row['name'];
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$options[$display] = ['value' => $row['name']];
+					if ($row['name'] == $vendor['name']) $options[$display]['selected'] = true;
 				}
 				ksort($options);
 				

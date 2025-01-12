@@ -193,16 +193,18 @@ class RISK extends API {
 					if (!isset($select[$row['type']][$row['process']])) $select[$row['type']][$row['process']] = ['...' => []];
 					switch($row['type']){
 						case 'characteristic': // implement further cases if suitable, according to languagefile
-							$select[$row['type']][$row['process']][$row['measure'] . ': ' . $row['cause']] = ['value' => strval($row['id'])];
+							$display = $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
 							break;
 						default: // risk
 							$display = [];
 							foreach(explode(',', $row['risk'] ? : '') as $selectedrisk){
-								if (isset($this->_lang->_USER['risks'][$selectedrisk])) $display[]=$this->_lang->_USER['risks'][$selectedrisk];
+								if (isset($this->_lang->_USER['risks'][$selectedrisk])) $display[] = $this->_lang->_USER['risks'][$selectedrisk];
 							}
-							$select[$row['type']][$row['process']][implode(', ', $display) . ': ' . $row['cause']] = ['value' => strval($row['id'])];
+							$display = implode(', ', $display) . ($row['cause'] ? ': ' . $row['cause'] : '');
 							break;
 					}
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$select[$row['type']][$row['process']][$display] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
 				}
 
 				// get requested risk or set up properties

@@ -398,7 +398,10 @@ class CSVFILTER extends API {
 						$filterdatalist[] = $row['name'];
 						$options[$row['name'] ] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
-					$alloptions[$row['name']. ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					
+					$display = $row['name']. ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$alloptions[$display] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 				ksort($options);
 				ksort($alloptions);

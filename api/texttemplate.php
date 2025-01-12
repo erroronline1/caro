@@ -170,7 +170,10 @@ class TEXTTEMPLATE extends API {
 						$options[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						if ($row['type'] === 'replacement') $insertreplacement[$this->_lang->GET('units.' . $row['unit']) . ' '. $row['name'] . ' (' . $row['language'] . ')'] = ['value' => ':' . $row['name']];
 					}
-					$alloptions[$row['unit']][$display . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+
+					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$alloptions[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
 				// one selection per unit
@@ -456,7 +459,9 @@ class TEXTTEMPLATE extends API {
 							$templatedatalist[] = $row['name'];
 							$options[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-						$alloptions[$row['unit']][$display . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
+						if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+						$alloptions[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					if ($row['type'] === 'text'){
 						if (!isset($chunks[':' . $row['name']]) && !in_array($row['name'], $hidden)) {

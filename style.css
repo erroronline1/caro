@@ -1185,6 +1185,9 @@ section > div > hr {
 	fill: var(--foreground);
 }
 
+s{
+	text-decoration-style: double;
+}
 /*************************** icons and cursors ******************************/
 
 div.nocontent {

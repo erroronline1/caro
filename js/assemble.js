@@ -418,11 +418,13 @@ export class Dialog {
 		const buttons = document.createElement("div");
 		let button,
 			firststring,
+			hidden,
 			optgroup,
-			value,
+			strike,
 			useoptgroup = JSON.stringify(Object.keys(this.options)) === JSON.stringify(Object.keys(this.options).sort());
-		Object.keys(this.options).forEach((option) => {
-			value = this.options[option];
+		for (let [option, value] of Object.entries(this.options)) {
+			hidden = option.match(/(?:^~)(.+?)(?:~$)/gm);
+			option = option.replace(/(?:^~)(.+?)(?:~$)/gm, "$1");
 			if (Object.entries(this.options).length > 12 && firststring !== option.substring(0, 1) && useoptgroup) {
 				firststring = option.substring(0, 1);
 				optgroup = document.createElement("h3");
@@ -432,10 +434,14 @@ export class Dialog {
 			}
 			button = document.createElement("button");
 			button.classList.add("discreetButton");
-			button.append(...this.linebreak(option));
+			if (hidden) {
+				strike = document.createElement("s");
+				strike.append(...this.linebreak(option));
+				button.append(strike);
+			} else button.append(...this.linebreak(option));
 			button.value = value;
 			buttons.append(button);
-		});
+		}
 		return [buttons];
 	}
 }

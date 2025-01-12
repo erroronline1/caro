@@ -424,7 +424,9 @@ class DOCUMENT extends API {
 							$bundledatalist[] = $row['name'];
 							$options[$row['name']] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-						$alloptions[$row['name'] . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)])] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					$display = $row['name'] . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]);
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$alloptions[$display] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 				ksort($options);
 				ksort($alloptions);
@@ -912,9 +914,11 @@ class DOCUMENT extends API {
 				$componentdatalist[] = $row['name'];
 				$options[$row['unit']][$row['name']] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
+
 			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
-			$hidden_set = $row['hidden'] ? ' - ' . $this->_lang->GET('assemble.edit_hidden') : '';
-			$alloptions[$row['unit']][$row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved;
+			if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+			$alloptions[$row['unit']][$display] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
 		// delete empty selections, order the rest and create remaining selections by unit for easier access
@@ -1603,9 +1607,11 @@ class DOCUMENT extends API {
 				$documentdatalist[] = $row['name'];
 				$documentoptions[$row['unit']][$row['name']] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 			}
+			
 			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
-			$hidden_set = $row['hidden'] ? ' - ' . $this->_lang->GET('assemble.edit_hidden') : '';
-			$alloptions[$row['unit']][$row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved . $hidden_set] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved;
+			if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+			$alloptions[$row['unit']][$display] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
 
 		// prepare existing component list of fully approved

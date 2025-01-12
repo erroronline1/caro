@@ -254,6 +254,23 @@ class UTILITY {
 	}
 
 	/**
+	 *   _   _   _   _                 _   _         
+	 *  | |_|_|_| |_| |___ ___ ___ ___| |_|_|___ ___ 
+	 *  |   | | . | . | -_|   | . | . |  _| | . |   |
+	 *  |_|_|_|___|___|___|_|_|___|  _|_| |_|___|_|_|
+	 *                            |_|
+	 * returns an altered option for selections
+	 * it ain't much but is honest work by having the same pattern over the whole api
+	 * adjust frontent assemble/dialog accordingly to return the correct values
+	 * 
+	 * @param string $string input
+	 * @return string output
+	 */
+	public static function hiddenOption($string){
+		return '~' . $string . '~';
+	}
+
+	/**
 	 *   _ _     _     _ _             _           _
 	 *  | |_|___| |_ _| |_|___ ___ ___| |_ ___ ___|_|___ ___
 	 *  | | |_ -|  _| . | |  _| -_|  _|  _| . |  _| | -_|_ -|

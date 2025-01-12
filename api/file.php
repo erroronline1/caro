@@ -236,7 +236,9 @@ class FILE extends API {
 				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
 				foreach($bundles as $row) {
 					$datalist[] = $row['name'];
-					$options[$row['name']] = $bundle['name'] === $row['name'] ? ['selected' => true] : [];
+					$display = $row['name'];
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$options[$display] = $bundle['name'] === $row['name'] ? ['value' => $row['name'], 'selected' => true] : ['value' => $row['name']];
 				}
 				
 				// append file bundle selection
