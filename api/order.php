@@ -692,6 +692,7 @@ class ORDER extends API {
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				$vendors[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 				foreach($vendor as $key => $row) {
+					if ($row['hidden']) continue;
 					$datalist[] = $row['name'];
 					$vendors[$row['name']] = ['value' => $row['id']];
 				}
