@@ -19,7 +19,7 @@
 /*
 this module helps to compose and edit documents according to the passed simplified object notation. it makes use of the assemble library.
 */
-import { getNextElementID, Assemble } from "./assemble.js";
+import { getNextElementID, Assemble, Toast } from "./assemble.js";
 
 export const compose_helper = {
 	/**
@@ -67,7 +67,7 @@ export const compose_helper = {
 
 	/**
 	 * create widget from composer and append to view and newDocumentComponents
-	 * @requires Compose
+	 * @requires Compose, api
 	 * @param {domNode} parent composer form for widget
 	 * @event append widget to view
 	 * @event add widget structure to this.newDocumentComponents
@@ -116,6 +116,15 @@ export const compose_helper = {
 			// sanitize widget name
 			elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
 
+			// check if new elements name is allowed
+			if (element.attributes.name) {
+				for (const pattern of api._settings.config.forbidden.names) {
+					if (element.attributes.name.match(new RegExp(pattern, "g"))) {
+						new Toast(api._lang.GET("assemble.compose.error_forbidden_name", { ":name": element.attributes.name }) + " " + pattern, "error");
+						return;
+					}
+				}
+			}
 			// route values to names, values and attributes
 			value = sibling.value;
 			if (["links", "radio", "select", "checkbox"].includes(element.type)) {
@@ -1600,8 +1609,8 @@ export class Compose extends Assemble {
 				name: api._lang.GET("assemble.compose.component.multiple"),
 			};
 		if (type.type === "textarea")
-			this.currentElement.content[api._lang.GET("assemble.component.texttemplate")] = {
-				name: api._lang.GET("assemble.component.texttemplate"),
+			this.currentElement.content[api._lang.GET("assemble.compose.component.texttemplate")] = {
+				name: api._lang.GET("assemble.compose.component.texttemplate"),
 			};
 		result = result.concat(...this.br(), ...this.checkbox());
 		this.currentElement = {

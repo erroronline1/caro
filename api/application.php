@@ -141,7 +141,8 @@ class APPLICATION extends API {
 					'limits' => [
 						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
 					],
-					'label' => CONFIG['label']
+					'label' => CONFIG['label'],
+					'forbidden' => CONFIG['forbidden']
 				]]);
 			}
 
@@ -178,7 +179,8 @@ class APPLICATION extends API {
 					'limits' => [
 						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
 					],
-					'label' => CONFIG['label']
+					'label' => CONFIG['label'],
+					'forbidden' => CONFIG['forbidden']
 				]]);
 			}
 		}
