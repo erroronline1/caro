@@ -267,7 +267,7 @@ class UTILITY {
 	 * @return string output
 	 */
 	public static function hiddenOption($string){
-		return '~' . $string . '~';
+		return $string . ' [X]';
 	}
 
 	/**

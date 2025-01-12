@@ -418,13 +418,9 @@ export class Dialog {
 		const buttons = document.createElement("div");
 		let button,
 			firststring,
-			hidden,
 			optgroup,
-			strike,
 			useoptgroup = JSON.stringify(Object.keys(this.options)) === JSON.stringify(Object.keys(this.options).sort());
 		for (let [option, value] of Object.entries(this.options)) {
-			hidden = option.match(/(?:^~)(.+?)(?:~$)/gm);
-			option = option.replace(/(?:^~)(.+?)(?:~$)/gm, "$1");
 			if (Object.entries(this.options).length > 12 && firststring !== option.substring(0, 1) && useoptgroup) {
 				firststring = option.substring(0, 1);
 				optgroup = document.createElement("h3");
@@ -434,11 +430,15 @@ export class Dialog {
 			}
 			button = document.createElement("button");
 			button.classList.add("discreetButton");
-			if (hidden) {
-				strike = document.createElement("s");
-				strike.append(...this.linebreak(option));
-				button.append(strike);
-			} else button.append(...this.linebreak(option));
+			if (option.match(/\[X\]$/gm)) button.classList.add("strike"); // according to backend UTILITY::hiddenOption()
+			button.append(...this.linebreak(option));
+			/**
+			 * i tried a lot, but a valid value has to be provided by the backend. regarding hidden/stroke button options
+			 * altering the value by replacing regex even within Assemble.select() returns no value on clicking
+			 * even though the value is set correct within the inspected code and unaltered buttons return properly
+			 * if no value is set by the backend and the value is assigned the option by Assemble.select() everything
+			 * works as expected. i have no explanation. 
+			 */
 			button.value = value;
 			buttons.append(button);
 		}
@@ -2383,7 +2383,7 @@ export class Assemble {
 			multiple,
 			selectElementClone,
 			hint,
-			element,
+			attributes,
 			elements;
 		if (this.currentElement.attributes.multiple) {
 			multiple = true;
@@ -2409,10 +2409,10 @@ export class Assemble {
 			Object.keys(this.currentElement.content)
 				.sort()
 				.forEach((key) => {
-					element = this.currentElement.content[key];
-					if (groups[key[0]] === undefined) groups[key[0]] = [[key, element]];
-					else groups[key[0]].push([key, element]);
-					selectModal[key] = element.value || key;
+					attributes = this.currentElement.content[key];
+					if (groups[key[0]] === undefined) groups[key[0]] = [[key, attributes]];
+					else groups[key[0]].push([key, attributes]);
+					selectModal[key] = attributes.value || key;
 				});
 			Object.keys(groups)
 				.sort()

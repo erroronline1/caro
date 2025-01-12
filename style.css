@@ -720,6 +720,11 @@ button {
 		float: right;
 		width: fit-content;
 	}
+
+	&.strike {
+		text-decoration: line-through;
+		text-decoration-style: double;
+	}
 }
 
 input[type="range"] {
@@ -1185,9 +1190,6 @@ section > div > hr {
 	fill: var(--foreground);
 }
 
-s{
-	text-decoration-style: double;
-}
 /*************************** icons and cursors ******************************/
 
 div.nocontent {
