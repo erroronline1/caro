@@ -177,7 +177,7 @@ class RISK extends API {
 					]]);
 				break;
 			case 'GET':
-				$processes = $select = [];
+				$processes = $measure = $select = [];
 
 				// set up risk selection according to language file
 				$risks = [];
@@ -189,6 +189,7 @@ class RISK extends API {
 				$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 				foreach($risk_datalist as $row){
 					$processes[] = $row['process'];
+					$measure[] = $row['process'];
 					if (!isset($select[$row['type']])) $select[$row['type']] = [];
 					if (!isset($select[$row['type']][$row['process']])) $select[$row['type']][$row['process']] = ['...' => []];
 					switch($row['type']){
@@ -206,6 +207,11 @@ class RISK extends API {
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$select[$row['type']][$row['process']][$display] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
 				}
+
+				$processes = array_unique($processes);
+				sort($processes);
+				$measure = array_unique($measure);
+				sort($measure);
 
 				// get requested risk or set up properties
 				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
@@ -297,9 +303,15 @@ class RISK extends API {
 									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 								], [
 									'type' => 'datalist',
-									'content' => array_values(array_unique($processes)),
+									'content' => array_values($processes),
 									'attributes' => [
 										'id' => 'processes'
+									]
+								], [
+									'type' => 'datalist',
+									'content' => array_values($measure),
+									'attributes' => [
+										'id' => 'measure'
 									]
 								], [
 									'type' => 'hidden',
@@ -318,6 +330,7 @@ class RISK extends API {
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.type.characteristic'),
+										'list' => 'measure',
 										'value' => $risk['measure'] ? : '',
 									]
 								], [
@@ -421,7 +434,7 @@ class RISK extends API {
 								'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 							], [
 								'type' => 'datalist',
-								'content' => array_values(array_unique($processes)),
+								'content' => array_values($processes),
 								'attributes' => [
 									'id' => 'processes'
 								]
