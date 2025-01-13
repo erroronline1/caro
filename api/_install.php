@@ -649,6 +649,35 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
 		];
 
+		/**
+		 * recursively verify input names for not being forbidden
+		 * @param array $elements
+		 * @return bool
+		 * 
+		 * also see frontend compose_helper.importComponent()
+		 */
+		function containsForbidden($elements) {
+			$forbidden = false;
+			foreach($elements as $element) {
+				if (array_is_list($element)) {
+					$forbidden = containsForbidden($element);
+				} else {					
+					if (isset($element['type']) && $element['type'] !== 'textsection'
+						&& isset($element['attributes']) && isset($element['attributes']['name'])){
+						foreach(CONFIG['forbidden']['names'] as $pattern) {
+							preg_match('/' . $pattern. '/', $element['attributes']['name'], $match);
+							if ($match) {
+								$forbidden = ['name' => $element['attributes']['name'], 'pattern' => $pattern];
+								break;
+							}
+						}
+						if ($forbidden) break;
+					}
+				}
+			}
+			return $forbidden;
+		}
+		
 		$insertions = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
@@ -673,6 +702,12 @@ class INSTALL {
 				if (in_array($entry['name'], $names)) {
 					$this->printError('Multiple occurences of the name are not allowed', $entry);
 					continue;
+				}
+				if ($entry['context'] === 'component' && $entry['content']){
+					if ($forbidden = containsForbidden($entry['content'])){
+						$this->printError('The component ' . $entry['name'] . ' contains a forbidden input name: ' . $forbidden['name']. ' is not allowed by matching ' . $forbidden['pattern'], $entry);
+						continue;
+					}
 				}
 
 				$names[] = $entry['name'];
