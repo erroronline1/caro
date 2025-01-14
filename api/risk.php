@@ -472,6 +472,7 @@ class RISK extends API {
 									'name' => $this->_lang->GET('risk.cause'),
 									'value' => $risk['cause'] ? : '',
 									'rows' => 4,
+									'oninput' => '_client.application.textareaAutocomplete(this,null)'
 								]
 							], [
 								'type' => 'br'
