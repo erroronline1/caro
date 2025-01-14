@@ -177,41 +177,7 @@ class RISK extends API {
 					]]);
 				break;
 			case 'GET':
-				$processes = $measure = $select = [];
-
-				// set up risk selection according to language file
-				$risks = [];
-				foreach($this->_lang->_USER['risks'] as $key => $translation){
-					$risks[$translation] = ['value' => $key];
-				}
-
-				// gather all processes and sort database entries according to type and process to selects
-				$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
-				foreach($risk_datalist as $row){
-					$processes[] = $row['process'];
-					$measure[] = $row['process'];
-					if (!isset($select[$row['type']])) $select[$row['type']] = [];
-					if (!isset($select[$row['type']][$row['process']])) $select[$row['type']][$row['process']] = ['...' => []];
-					switch($row['type']){
-						case 'characteristic': // implement further cases if suitable, according to languagefile
-							$display = $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
-							break;
-						default: // risk
-							$display = [];
-							foreach(explode(',', $row['risk'] ? : '') as $selectedrisk){
-								if (isset($this->_lang->_USER['risks'][$selectedrisk])) $display[] = $this->_lang->_USER['risks'][$selectedrisk];
-							}
-							$display = implode(', ', $display) . ($row['cause'] ? ': ' . $row['cause'] : '');
-							break;
-					}
-					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
-					$select[$row['type']][$row['process']][$display] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
-				}
-
-				$processes = array_unique($processes);
-				sort($processes);
-				$measure = array_unique($measure);
-				sort($measure);
+				$processes = $measure = $risk_benefit = $measure_remainder = $select = [];
 
 				// get requested risk or set up properties
 				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
@@ -241,6 +207,46 @@ class RISK extends API {
 				];
 				// on button press for new the type is submitted instead of the int risk id
 				if (intval($this->_requestedID) != $this->_requestedID) $risk['type'] = $this->_requestedID;
+
+				// set up risk selection according to language file
+				$risks = [];
+				foreach($this->_lang->_USER['risks'] as $key => $translation){
+					$risks[$translation] = ['value' => $key];
+				}
+
+				// gather all processes and sort database entries according to type and process to selects
+				$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+				foreach($risk_datalist as $row){
+					$processes[] = $row['process'];
+					if ($risk['type'] ===  $row['type']) $measure[] = $row['measure'];
+					$risk_benefit[] = $row['risk_benefit'];
+					$measure_remainder[] = $row['measure_remainder'];
+					if (!isset($select[$row['type']])) $select[$row['type']] = [];
+					if (!isset($select[$row['type']][$row['process']])) $select[$row['type']][$row['process']] = ['...' => []];
+					switch($row['type']){
+						case 'characteristic': // implement further cases if suitable, according to languagefile
+							$display = $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
+							break;
+						default: // risk
+							$display = [];
+							foreach(explode(',', $row['risk'] ? : '') as $selectedrisk){
+								if (isset($this->_lang->_USER['risks'][$selectedrisk])) $display[] = $this->_lang->_USER['risks'][$selectedrisk];
+							}
+							$display = implode(', ', $display) . ($row['cause'] ? ': ' . $row['cause'] : '');
+							break;
+					}
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$select[$row['type']][$row['process']][$display] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
+				}
+
+				$processes = array_filter(array_unique($processes), fn($v) => boolval($v));
+				sort($processes);
+				$measure = array_filter(array_unique($measure), fn($v) => boolval($v));
+				sort($measure);
+				$risk_benefit = array_filter(array_unique($risk_benefit), fn($v) => boolval($v));
+				sort($risk_benefit);
+				$measure_remainder = array_filter(array_unique($measure_remainder), fn($v) => boolval($v));
+				sort($measure_remainder);
 
 				// preselect risk selection according to database response
 				foreach(explode(',', $risk['risk'] ? : '') as $selectedrisk){
@@ -439,6 +445,24 @@ class RISK extends API {
 									'id' => 'processes'
 								]
 							], [
+								'type' => 'datalist',
+								'content' => array_values($measure),
+								'attributes' => [
+									'id' => 'measure'
+								]
+							], [
+								'type' => 'datalist',
+								'content' => array_values($risk_benefit),
+								'attributes' => [
+									'id' => 'risk_benefit'
+								]
+							], [
+								'type' => 'datalist',
+								'content' => array_values($measure_remainder),
+								'attributes' => [
+									'id' => 'measure_remainder'
+								]
+							], [
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => '_type',
@@ -471,8 +495,7 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.cause'),
 									'value' => $risk['cause'] ? : '',
-									'rows' => 4,
-									'oninput' => '_client.application.textareaAutocomplete(this,null)'
+									'rows' => 4
 								]
 							], [
 								'type' => 'br'
@@ -509,6 +532,7 @@ class RISK extends API {
 									'name' => $this->_lang->GET('risk.measure'),
 									'value' => $risk['measure'] ? : '',
 									'rows' => 4,
+									'onkeyup' => "_client.application.textareaAutocomplete(event, 'measure')"
 								]
 							], [
 								'type' => 'br'
@@ -536,6 +560,7 @@ class RISK extends API {
 									'name' => $this->_lang->GET('risk.risk_benefit'),
 									'value' => $risk['risk_benefit'] ? : '',
 									'rows' => 4,
+									'onkeyup' => "_client.application.textareaAutocomplete(event, 'risk_benefit')"
 								]
 							], [
 								'type' => 'br'
@@ -544,7 +569,8 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.measure_remainder'),
 									'value' => $risk['measure_remainder'] ? : '',
-									'rows' => 4
+									'rows' => 4,
+									'onkeyup' => "_client.application.textareaAutocomplete(event, 'measure_remainder')"
 								]
 							], [
 								'type' => 'checkbox2text',

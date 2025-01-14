@@ -263,27 +263,24 @@ export const _client = {
 		},
 
 		/**
-		 * adds a *simple* autocomplete option for textareas
-		 * use with attribute oninput =_client.application.textareaAutocomplete(this, document.getelementById(''datalistid'))
-		 * appends another line if the input so far matches one of the options.
+		 * adds a *simple* autocomplete option for textareas with keyup event listener
+		 * use with attribute onkeyup =_client.application.textareaAutocomplete(event, 'datalistid')
+		 * appends rest of match if the input so far matches one of the datalist options.
 		 * @param {node} element
-		 * @param {node} datalist
+		 * @param {node|string} datalist
 		 */
-		textareaAutocomplete: (element, datalist) => {
-			if (!element.value || !datalist) return;
-			let lines = element.value.match(/^.+?$/gm),
-				cPos = element.selectionStart;
-			if (lines.length > 1) {
-				lines = lines.slice(0, -1).join("\n");
-			} else return;
-			for (const option of datalist) {
+		textareaAutocomplete: (event, datalist) => {
+			if (!event.target.value || !datalist || event.key.length > 2) return;
+			let cPos = event.target.selectionStart;
+			if (typeof datalist === "string") datalist = document.getElementById(datalist);
+			for (const option of datalist.childNodes) {
 				// append possible result
-				if (lines !== option && option.startsWith(lines)) {
-					element.value = lines + "\n" + option;
+				if (event.target.value !== option.value && option.value.toLowerCase().startsWith(event.target.value.toLowerCase())) {
+					event.target.value = event.target.value.substring(0, event.target.selectionStart) + option.value.substring(event.target.selectionStart);
 					break;
-				} else element.value = lines;
+				}
 			}
-			element.selectionStart = element.selectionEnd = cPos;
+			event.target.selectionStart = cPos;
 		},
 
 		/**
