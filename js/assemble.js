@@ -29,7 +29,7 @@ export function getNextElementID() {
 	return "elementID" + ++ElementID;
 }
 
-const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup"];
+const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown"];
 const VOIDVALUES = ["", "..."];
 
 export const assemble_helper = {
@@ -437,7 +437,7 @@ export class Dialog {
 			 * altering the value by replacing regex even within Assemble.select() returns no value on clicking
 			 * even though the value is set correct within the inspected code and unaltered buttons return properly
 			 * if no value is set by the backend and the value is assigned the option by Assemble.select() everything
-			 * works as expected. i have no explanation. 
+			 * works as expected. i have no explanation.
 			 */
 			button.value = value;
 			buttons.append(button);
