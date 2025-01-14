@@ -270,32 +270,20 @@ export const _client = {
 		 * @param {node} datalist
 		 */
 		textareaAutocomplete: (element, datalist) => {
-			let options;
-			if (!datalist) return;
-			for (const option in datalist){
-				if (option.value) options.push(option.value);
+			if (!element.value || !datalist) return;
+			let lines = element.value.match(/^.+?$/gm),
+				cPos = element.selectionStart;
+			if (lines.length > 1) {
+				lines = lines.slice(0, -1).join("\n");
+			} else return;
+			for (const option of datalist) {
+				// append possible result
+				if (lines !== option && option.startsWith(lines)) {
+					element.value = lines + "\n" + option;
+					break;
+				} else element.value = lines;
 			}
-			element.addEventListener(
-				"input",
-				function (e) {
-					if (!e.target.value) return;
-					let lines = e.target.value.match(/^.+?$/gm),
-						cPos = e.target.selectionStart;
-					if (lines.length > 1) {
-						lines = lines.slice(0, -1).join("\n");
-					}
-					for (const option of options) {
-						// append possible result
-						if (lines !== option && option.startsWith(lines)) {
-							e.target.value = lines + "\n" + option;
-							break;
-						}
-						else e.target.value = lines;
-					}
-					e.target.selectionStart = e.target.selectionEnd = cPos;
-				},
-				false
-			);
+			element.selectionStart = element.selectionEnd = cPos;
 		},
 
 		/**
