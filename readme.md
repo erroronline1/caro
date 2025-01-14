@@ -123,7 +123,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * manager interface for risks:
         * no deletion of risks, only append for regulatory compliance
     * *Identification of characteristics related to safety* how to implement?
-* recursively check field names for forbidden patterns on raw import and template install
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue

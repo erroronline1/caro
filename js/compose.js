@@ -447,6 +447,38 @@ export const compose_helper = {
 	 * @event update compose_helper.newDocumentComponents
 	 */
 	importComponent: function (content) {
+		/**
+		 * recursively verify input names for not being forbidden
+		 * @param {object} elements object
+		 * @return bool
+		 *
+		 * also see backend _install.php
+		 */
+		function containsForbidden(elements) {
+			let forbidden = false;
+			for (const element of elements) {
+				if (element.constructor.name === "Array") {
+					forbidden = containsForbidden(element);
+				} else {
+					if (element.type && element.type !== "textsection" && element.attributes && element.attributes.name) {
+						for (const pattern of api._settings.config.forbidden.names) {
+							if (element.attributes.name.match(new RegExp(pattern, "g"))) {
+								forbidden = { name: element.attributes.name, pattern: pattern };
+								break;
+							}
+						}
+						if (forbidden) break;
+					}
+				}
+			}
+			return forbidden;
+		}
+		const forbidden = containsForbidden(content.content);
+		if (forbidden) {
+			new _client.Dialog({ type: "alert", header: api._lang.GET("assemble.compose.component.raw"), render: api._lang.GET("assemble.compose.error_forbidden_name", { ":name": forbidden.name }) + " " + forbidden.pattern });
+			return;
+		}
+
 		compose_helper.newDocumentComponents = {};
 		const newElements = new Compose({
 			draggable: true,

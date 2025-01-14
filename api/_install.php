@@ -544,7 +544,9 @@ class INSTALL {
 					'navigation',
 					'executeSQL',
 					'importJSON',
-					'printError'
+					'printError',
+					'printSuccess',
+					'printWarning'
 					])) echo '<a href="./_install.php/' . $methodName . '">' . $methodName . '</a><br />';
 			}
 			echo '<br /><a href="../../index.html">exit</a>';
@@ -561,6 +563,24 @@ class INSTALL {
 	}
 
 	/**
+	 * unifies display of success
+	 * @param string $message to display
+	 * @param string|array $item entry item from source
+	 */
+	public function printSuccess($message = '', $item = []){
+		echo '<br />[*] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? json_encode($item) : $item) . '</code>' : '') . '<br />';
+	}
+
+	/**
+	 * unifies display of warnings
+	 * @param string $message to display
+	 * @param string|array $item entry item from source
+	 */
+	public function printWarning($message = '', $item = []){
+		echo '<br />[!] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? json_encode($item) : $item) . '</code>' : '') . '<br />';
+	}
+
+	/**
 	 * execute sql chunks, return success or display exception
 	 * @param array $sqlchunks
 	 * @return int
@@ -570,7 +590,7 @@ class INSTALL {
 		foreach ($sqlchunks as $chunk){
 			try {
 				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) {
-					echo '<br /> [*] Success:<br /><code>' . $chunk . '</code><br />';
+					$this->printSuccess('Success:', $chunk);
 					$counter++;
 				}
 			}
@@ -611,14 +631,14 @@ class INSTALL {
 					':name' => $this->_defaultUser
 				]
 			]);
-			echo "[!] Databases already installed.<br />";
+			$this->printWarning('Databases already installed.');
 		}
 		catch (Exception $e){
 			if (!$statement = $this->_pdo->query(DEFAULTSQL['install_tables'][$this->_pdoDriver])){
 				$this->printError('There has been an error installing the databases!');
 				die();
 			}
-			echo '[*] Databases installed.<br />';
+			$this->printSuccess('Databases installed.');
 
 			if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
 				'values' => [
@@ -631,7 +651,7 @@ class INSTALL {
 					':app_settings' => '',
 					':skills' => ''
 				]
-			])) echo '[*] Default user has been installed.<br />';
+			])) $this->printSuccess('Default user has been installed.');
 			else $this->printError('There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?');
 		}
 	}
@@ -649,6 +669,35 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
 		];
 
+		/**
+		 * recursively verify input names for not being forbidden
+		 * @param array $elements
+		 * @return bool
+		 * 
+		 * also see frontend compose_helper.importComponent()
+		 */
+		function containsForbidden($elements) {
+			$forbidden = false;
+			foreach($elements as $element) {
+				if (array_is_list($element)) {
+					$forbidden = containsForbidden($element);
+				} else {					
+					if (isset($element['type']) && $element['type'] !== 'textsection'
+						&& isset($element['attributes']) && isset($element['attributes']['name'])){
+						foreach(CONFIG['forbidden']['names'] as $pattern) {
+							preg_match('/' . $pattern. '/', $element['attributes']['name'], $match);
+							if ($match) {
+								$forbidden = ['name' => $element['attributes']['name'], 'pattern' => $pattern];
+								break;
+							}
+						}
+						if ($forbidden) break;
+					}
+				}
+			}
+			return $forbidden;
+		}
+		
 		$insertions = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
@@ -659,20 +708,26 @@ class INSTALL {
 				isset($entry['unit']) && $entry['unit'] &&
 				isset($entry['content']) && $entry['content']
 				)){
-				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				$this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern, $entry);
+						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 						continue;
 					}
 				}
 				if (in_array($entry['name'], $names)) {
-					$this->printError('Multiple occurences of the name are not allowed', $entry);
+					$this->printError('Multiple occurences of the name are not allowed' . '. This item will be skipped:', $entry);
 					continue;
+				}
+				if ($entry['context'] === 'component' && $entry['content']){
+					if ($forbidden = containsForbidden($entry['content'])){
+						$this->printError('The component ' . $entry['name'] . ' contains a forbidden input name: ' . $forbidden['name']. ' is not allowed by matching ' . $forbidden['pattern'] . '. This item will be skipped:', $entry);
+						continue;
+					}
 				}
 
 				$names[] = $entry['name'];
@@ -690,8 +745,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('document_post'), $insertions)))
-			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
-		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+			$this->printSuccess('novel entries by name from ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
 	}
 
 	/**
@@ -713,19 +768,19 @@ class INSTALL {
 				isset($entry['content']) && $entry['content'] &&
 				isset($entry['permissions']) && $entry['permissions']
 				)){
-				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				$this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 
 			if (isset($entry['title']) && $entry['title'] && !in_array($entry['title'], array_column($DBall, 'title'))) {
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)){
-						$this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern, $entry);
+						$this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 						continue;
 					}
 				}
 				if (in_array($entry['title'], $names)) {
-					$this->printError('Multiple occurences of the title are not allowed', $entry);
+					$this->printError('Multiple occurences of the title are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -738,8 +793,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('application_post_manual'), $insertions)))
-			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
-		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+			$this->printSuccess('novel entries by name from ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
 		}
 
 	/**
@@ -832,13 +887,12 @@ class INSTALL {
 					continue;
 				}
 			}
-			$this->printError('The following dataset is invalid and will not been installed:', $entry);
+			$this->printError('The following dataset is invalid and will be skipped:', $entry);
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('risk_post'), $insertions)))
-			echo '<br />[*] novel entries by process+risk+cause+measure from ' . $file . ' have been installed.<br />';
-		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+			$this->printSuccess('novel entries by process+risk+cause+measure ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
 	}
-
 	/**
 	 * installs texttemplates by novel name
 	 */
@@ -874,7 +928,7 @@ class INSTALL {
 				isset($entry['content']) && $entry['content'] &&
 				isset($entry['type']) && $entry['type']
 				)){
-				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				$this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 
@@ -882,14 +936,14 @@ class INSTALL {
 				$patterns = $entry['type'] === 'template' ? CONFIG['forbidden']['names'] : [...CONFIG['forbidden']['names'], $allowed];
 				foreach($patterns as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern, $entry);
+						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 						continue;
 					}
 				}
 				$used = $entry['type'] === 'template' ? $names['template'] : [...$names['text'], ...$names['replacement']];
 				foreach($used as $name){
 					if (str_starts_with($entry['name'], $name) || str_starts_with($name, $entry['name']))
-					$this->printError($entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed', $entry);
+					$this->printError($entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -906,8 +960,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
-			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
-		else echo '[!] there were no novelties to install from '. $file . '.<br />';
+			$this->printSuccess('novel entries by name ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
 	}
 
 	/**
@@ -927,18 +981,18 @@ class INSTALL {
 			if (!(
 				isset($entry['name']) && $entry['name']
 				)){
-				$this->printError('The following dataset is invalid and will not been installed:', $entry);
+				$this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				foreach(CONFIG['forbidden']['names'] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern, $entry);
+						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 						continue;
 					}
 				}
 				if (in_array($entry['name'], $names)) {
-					$this->printError('Multiple occurences of the name are not allowed', $entry);
+					$this->printError('Multiple occurences of the name are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -955,9 +1009,9 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_vendor'), $insertions)))
-			echo '<br />[*] novel entries by name from ' . $file . ' have been installed.<br />';
-		else echo '[!] there were no novelties to install from '. $file . '.<br />';
-		}
+			$this->printSuccess('novel entries by name ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
+	}
 }
 
 // check requesting script as stresstest extends install
