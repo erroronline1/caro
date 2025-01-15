@@ -254,6 +254,8 @@ class RISK extends API {
 				foreach($datalist as $data => &$values){
 					$values = array_filter($values, fn($v) => boolval($v));
 					ksort($values);
+					// for sanitation of template files:
+					//var_dump($data, array_values($values));
 				}
 
 				// preselect risk selection according to database response
