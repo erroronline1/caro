@@ -367,7 +367,7 @@ class RISK extends API {
 							// disable non editable inputs and append hidden option
 							if ($risk['id']){
 								$last = count($result['render']['content']) - 1;
-								foreach([3, 4, 5, 6] as $index){
+								foreach([4, 5, 6, 7] as $index){
 									if (isset($result['render']['content'][$last][$index]['content'])){
 										foreach ($result['render']['content'][$last][$index]['content'] as $key => $value){
 											$result['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
@@ -584,7 +584,7 @@ class RISK extends API {
 						// disable non editable inputs and append hidden option
 						if ($risk['id']){
 							$last = count($result['render']['content']) - 1;
-							foreach([3, 5, 6, 8, 12, 13, 15] as $index){
+							foreach([6, 8, 9, 11, 15, 16, 18] as $index){
 								if (isset($result['render']['content'][$last][$index]['content'])){
 									foreach ($result['render']['content'][$last][$index]['content'] as $key => $value){
 										$result['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
