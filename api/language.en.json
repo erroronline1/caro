@@ -1300,7 +1300,8 @@
 		"mdr83": "MDR Art. 83 Post-market surveillance system",
 		"mdr_annex1": "MDR annex 1 General safety and performance requirements",
 		"mdr_annex4": "MDR annex 4 Declaration of conformity",
-		"mdr_annex14": "MDR annex 14 Clinical evaluation and post-market surveillance"
+		"mdr_annex14": "MDR annex 14 Clinical evaluation and post-market surveillance",
+		"mpbetreibv": "Medical Device Operator Ordinance"
 	},
 	"risks": {
 		"dgihv_1": "1 Risks by energy",
