@@ -177,7 +177,7 @@ class RISK extends API {
 					]]);
 				break;
 			case 'GET':
-				$processes = $measure = $risk_benefit = $measure_remainder = $select = [];
+				$datalist = $select = [];
 
 				// get requested risk or set up properties
 				$risk = SQLQUERY::EXECUTE($this->_pdo, 'risk_get', [
@@ -217,10 +217,21 @@ class RISK extends API {
 				// gather all processes and sort database entries according to type and process to selects
 				$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 				foreach($risk_datalist as $row){
-					$processes[] = $row['process'];
-					if ($risk['type'] ===  $row['type']) $measure[] = $row['measure'];
-					$risk_benefit[] = $row['risk_benefit'];
-					$measure_remainder[] = $row['measure_remainder'];
+					// provide datalists with unique values and the most recent letter cases
+					foreach(['process', 'measure', 'risk_benefit', 'measure_remainder'] as $data){
+						if (!isset($datalist[$data])) $datalist[$data] = [];
+						$row[$data] = trim($row[$data] ? : '');
+						if (!$row[$data]) continue;
+						switch($data){
+							case 'measure':
+								if ($risk['type'] ===  $row['type']) $datalist[$data][strtolower($row[$data])] = $row[$data];
+								break;
+							default:
+								$datalist[$data][strtolower($row[$data])] = $row[$data];
+								break;
+						}
+					}
+
 					if (!isset($select[$row['type']])) $select[$row['type']] = [];
 					if (!isset($select[$row['type']][$row['process']])) $select[$row['type']][$row['process']] = ['...' => []];
 					switch($row['type']){
@@ -239,14 +250,11 @@ class RISK extends API {
 					$select[$row['type']][$row['process']][$display] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
 				}
 
-				$processes = array_filter(array_unique($processes), fn($v) => boolval($v));
-				sort($processes);
-				$measure = array_filter(array_unique($measure), fn($v) => boolval($v));
-				sort($measure);
-				$risk_benefit = array_filter(array_unique($risk_benefit), fn($v) => boolval($v));
-				sort($risk_benefit);
-				$measure_remainder = array_filter(array_unique($measure_remainder), fn($v) => boolval($v));
-				sort($measure_remainder);
+				// sanitize datalists
+				foreach($datalist as $data => &$values){
+					$values = array_filter($values, fn($v) => boolval($v));
+					ksort($values);
+				}
 
 				// preselect risk selection according to database response
 				foreach(explode(',', $risk['risk'] ? : '') as $selectedrisk){
@@ -309,13 +317,13 @@ class RISK extends API {
 									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 								], [
 									'type' => 'datalist',
-									'content' => array_values($processes),
+									'content' => array_values($datalist['process']),
 									'attributes' => [
 										'id' => 'processes'
 									]
 								], [
 									'type' => 'datalist',
-									'content' => array_values($measure),
+									'content' => array_values($datalist['measure']),
 									'attributes' => [
 										'id' => 'measure'
 									]
@@ -440,25 +448,25 @@ class RISK extends API {
 								'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 							], [
 								'type' => 'datalist',
-								'content' => array_values($processes),
+								'content' => array_values($datalist['process']),
 								'attributes' => [
 									'id' => 'processes'
 								]
 							], [
 								'type' => 'datalist',
-								'content' => array_values($measure),
+								'content' => array_values($datalist['measure']),
 								'attributes' => [
 									'id' => 'measure'
 								]
 							], [
 								'type' => 'datalist',
-								'content' => array_values($risk_benefit),
+								'content' => array_values($datalist['risk_benefit']),
 								'attributes' => [
 									'id' => 'risk_benefit'
 								]
 							], [
 								'type' => 'datalist',
-								'content' => array_values($measure_remainder),
+								'content' => array_values($datalist['measure_remainder']),
 								'attributes' => [
 									'id' => 'measure_remainder'
 								]
