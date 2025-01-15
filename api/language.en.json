@@ -384,7 +384,8 @@
 			"reset": "Reset",
 			"scan_button": "Scan a Code",
 			"scan_multiple": "Another scan option will appear after success or input.",
-			"select_multiple": "Another selection will apper after input."
+			"select_multiple": "Another selection will apper after input.",
+			"textarea_autocomplete": "Press the Alt-key to toggle through provided options."
 		}
 	},
 	"audit": {
@@ -1009,7 +1010,7 @@
 		"acceptance_level_above": "Above the defined acceptance level",
 		"acceptance_level_below": "Below the defined acceptance level",
 		"author": "created by :author on :date",
-		"availability" : "Applicability",
+		"availability": "Applicability",
 		"available": "valid",
 		"cause": "Cause",
 		"damage": "Damage",
@@ -1031,8 +1032,8 @@
 		"process": "Process",
 		"proof": "Proof",
 		"relevance": "Relevant",
-		"relevance_no":"no",
-		"relevance_yes":"yes",
+		"relevance_no": "no",
+		"relevance_yes": "yes",
 		"risk": "Risk",
 		"risk_benefit": "Risk-benefit assessment",
 		"risk_related": "Risk related",

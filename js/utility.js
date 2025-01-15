@@ -263,42 +263,6 @@ export const _client = {
 		},
 
 		/**
-		 * adds a *simple* autocomplete option for textareas with keyup event listener
-		 * use with attribute onkeyup =_client.application.textareaAutocomplete(event, 'datalistid')
-		 * appends rest of match if the input so far matches one of the datalist options.
-		 * use Alt to navigate within results for being the most unintrusive key
-		 * has to be provided with lowercase unique entries!
-		 * @param {node} element
-		 * @param {node|string} datalist
-		 */
-		textareaAutocomplete: (event, datalist) => {
-			if (!event.target.value || !datalist || (event.key.length > 2 && !["Alt"].includes(event.key))) return;
-			if (event.key === "Alt") event.preventDefault();
-			let cPos = event.target.selectionStart,
-				matches = [],
-				matchesLC = [],
-				index = 0,
-				typed = event.target.value.substring(0, event.target.selectionStart);
-			if (typeof datalist === "string") datalist = document.getElementById(datalist);
-			// gather possible matches
-			for (const option of datalist.childNodes) {
-				if (option.value.toLowerCase().startsWith(typed.toLowerCase())) {
-					matches.push(option.value);
-					matchesLC.push(option.value.toLowerCase());
-				}
-			}
-			if (matches.length) {
-				// navigate through matches with alt key
-				index = matchesLC.indexOf(event.target.value.toLowerCase());
-				if (index > -1 && event.key === "Alt") index++;
-				// failsave if length == 1 or out of bound
-				if (!matches[index]) index = 0;
-				event.target.value = typed + matches[index].substring(event.target.selectionStart);
-			}
-			event.target.selectionStart = cPos;
-		},
-
-		/**
 		 * copies value of inputs or content of paragraphs to clipboard
 		 * @requires api, Toast
 		 * @param {domNode} node

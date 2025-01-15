@@ -453,24 +453,6 @@ class RISK extends API {
 									'id' => 'processes'
 								]
 							], [
-								'type' => 'datalist',
-								'content' => array_values($datalist['measure']),
-								'attributes' => [
-									'id' => 'measure'
-								]
-							], [
-								'type' => 'datalist',
-								'content' => array_values($datalist['risk_benefit']),
-								'attributes' => [
-									'id' => 'risk_benefit'
-								]
-							], [
-								'type' => 'datalist',
-								'content' => array_values($datalist['measure_remainder']),
-								'attributes' => [
-									'id' => 'measure_remainder'
-								]
-							], [
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => '_type',
@@ -539,9 +521,9 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.measure'),
 									'value' => $risk['measure'] ? : '',
-									'rows' => 4,
-									'onkeyup' => "_client.application.textareaAutocomplete(event, 'measure')"
-								]
+									'rows' => 4
+								],
+								'autocomplete' => array_values($datalist['measure'])
 							], [
 								'type' => 'br'
 							], [
@@ -567,9 +549,9 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.risk_benefit'),
 									'value' => $risk['risk_benefit'] ? : '',
-									'rows' => 4,
-									'onkeyup' => "_client.application.textareaAutocomplete(event, 'risk_benefit')"
-								]
+									'rows' => 4
+								],
+								'autocomplete' => array_values($datalist['risk_benefit'])
 							], [
 								'type' => 'br'
 							], [
@@ -577,9 +559,9 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.measure_remainder'),
 									'value' => $risk['measure_remainder'] ? : '',
-									'rows' => 4,
-									'onkeyup' => "_client.application.textareaAutocomplete(event, 'measure_remainder')"
-								]
+									'rows' => 4
+								],
+								'autocomplete' => array_values($datalist['measure_remainder'])
 							], [
 								'type' => 'checkbox2text',
 								'attributes' => [
@@ -592,7 +574,7 @@ class RISK extends API {
 						// disable non editable inputs and append hidden option
 						if ($risk['id']){
 							$last = count($result['render']['content']) - 1;
-							foreach([6, 8, 9, 11, 15, 16, 18] as $index){
+							foreach([3, 5, 6, 8, 12, 13, 17] as $index){
 								if (isset($result['render']['content'][$last][$index]['content'])){
 									foreach ($result['render']['content'][$last][$index]['content'] as $key => $value){
 										$result['render']['content'][$last][$index]['content'][$key]['disabled'] = true;

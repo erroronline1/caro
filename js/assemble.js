@@ -2610,14 +2610,14 @@ export class Assemble {
 	 * 			"name": "somename",
 	 * 			"rows": 8,
 	 * 			"value": "values can be passed with this pseudo attribute"
-	 * 		}
+	 * 		},
+	 * 		"autocomplete": [...string values]
 	 * 	}
 	 * ```
 	 */
 	textarea() {
 		let textarea = document.createElement("textarea"),
 			label;
-		const hint = this.hint();
 		textarea.id = getNextElementID();
 		textarea.autocomplete = "off";
 		if (this.currentElement.attributes.name !== undefined) {
@@ -2654,8 +2654,44 @@ export class Assemble {
 			div.append(document.createElement("br"));
 			textarea = div;
 		}
-		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...hint, ...this.button(), ...this.br()];
-		return [...this.icon(), label, textarea, ...hint];
+
+		if (this.currentElement.autocomplete) {
+			/**
+			 * adds a *simple* autocomplete option for textareas with keyup event listener
+			 * appends rest of match if the input so far matches one of the datalist options.
+			 * use Alt to navigate within results for being the most unintrusive key
+			 * has to be provided with lowercase unique entries!
+			 */
+			let autocomplete = this.currentElement.autocomplete;
+			textarea.addEventListener("keyup", (event) => {
+				if (!event.target.value || (event.key.length > 2 && !["Alt"].includes(event.key))) return;
+				if (event.key === "Alt") event.preventDefault();
+				let cPos = event.target.selectionStart,
+					matches = [],
+					matchesLC = [],
+					index = 0,
+					typed = event.target.value.substring(0, event.target.selectionStart);
+				// gather possible matches
+				for (const option of autocomplete) {
+					if (option.toLowerCase().startsWith(typed.toLowerCase())) {
+						matches.push(option);
+						matchesLC.push(option.toLowerCase());
+					}
+				}
+				if (matches.length) {
+					// navigate through matches with alt key
+					index = matchesLC.indexOf(event.target.value.toLowerCase());
+					if (index > -1 && event.key === "Alt") index++;
+					// failsave if length == 1 or out of bound
+					if (!matches[index]) index = 0;
+					event.target.value = typed + matches[index].substring(event.target.selectionStart);
+				}
+				event.target.selectionStart = cPos;
+			});
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.render.textarea_autocomplete") : api._lang.GET("assemble.render.textarea_autocomplete");
+		}
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...this.hint(), ...this.button(), ...this.br()];
+		return [...this.icon(), label, textarea, ...this.hint()];
 	}
 
 	/**

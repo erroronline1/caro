@@ -567,6 +567,20 @@ export function rendertest(element) {
 						hint: "As comparison",
 					},
 					{
+						type: "textarea",
+						attributes: {
+							name: "Text with autocomplete",
+							rows: 3,
+						},
+						hint:"Start typing \"lorem ipsum\".",
+						autocomplete: [
+							"Lorem ipsum dolor sit amet, version one",
+							"Lorem ipsum dolor sit amet, version two",
+							"Lorem ipsum dolor sit amet, version three",
+							"Lorem ipsum dolor sit amet, version four",
+						],
+					},
+					{
 						type: "checkbox",
 						inline: true,
 						content: {
@@ -781,6 +795,20 @@ export function rendertest(element) {
 							rows: 3,
 						},
 						hint: "Als Vergleich",
+					},
+					{
+						type: "textarea",
+						attributes: {
+							name: "Texteingabe mit automatischer Vervollständigung",
+							rows: 3,
+						},
+						hint:"Starte mit \"lorem ipsum\".",
+						autocomplete: [
+							"Lorem ipsum dolor sit amet, Version Eins",
+							"Lorem ipsum dolor sit amet, Version Zwei",
+							"Lorem ipsum dolor sit amet, Version Drei",
+							"Lorem ipsum dolor sit amet, Version Vier",
+						],
 					},
 					{
 						type: "checkbox",
