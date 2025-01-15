@@ -112,18 +112,20 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * document templates
 * risk templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* unittests (frontend) 
+* unittests
 * refactor risk management for improved compliance to iso 14971
     * search risks for keywords, display risks as textsection for unapproved users, matching search
     * audit:
-        * fetch risks and match with database, higlight all unaccounted risks per process (not applicable are accounted for)
+        * fetch risks and match with characteristics, higlight all unaccounted risks per process (not applicable are accounted for)
         * reversed view: fetch processes, list accounted risks
-        * additional risk export as xlsx with processwise sheets and riskwise sheets
+        * risk export as xlsx with processwise characteristics-sheets, and processwise sheets
         * select latest date for display/export like documents
     * manager interface for risks:
         * no deletion of risks, only append for regulatory compliance
+        * hidden datatype text with date and user hiding, like documents
     * *Identification of characteristics related to safety* how to implement?
     * sanitize identical contents of template file
+* consider widely hidden datatype text with date and user hiding, like documents
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -659,9 +661,9 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records).
 
-Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined authorized users only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined authorized users for full access only.
+Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined authorized users only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined authorized users for full access only. User settings allow for entering weekly hours to calculate properly. Timetracking happens based on trust, while employees record their working hours manually.
 
-This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. User settings allow for entering weekly hours to calculate properly.
+This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. Records correspond to established methods type- and scopewise, improve security on sensible data accessible only by a restricted user group and simplify calculations for honest tracked data.
 
 Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
 
@@ -1945,7 +1947,7 @@ Other libraries rely on dynamic data and have to be tested in development runtim
 * xlsxwriter: generate orders and export the order statistic from the audit-module
 
 ## Stress test and performance
-Can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. **The script still should be removed from the production server once being tested.**
+Some stress tests can be performed with ./api/_stresstest.php. 20000 calendar-events or records / record contributions and 1000 orders can be created at a time to review the applications performance on increasing workload. With a cryptic prefix the entries are identifyable and can be deleted. **The script still should be removed from the production server once being tested.**
 
 During development following outcomes could be noted:
 * 100k distributed records perform well, landing page loads in about 3s.
@@ -1953,11 +1955,11 @@ During development following outcomes could be noted:
 * 1k approved orders process in about 1s on the server side and 3s on the client side on 155k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
-As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on [template files](#application-setup) as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script must be removed from the production server once being tested, before going public.**
+Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script must be removed from the production server once being tested, before going public.**
 
 Same applies to vendors. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.***
 
-Variables for the stress test can be adjusted within the top class variables in the sourcecode.
+Variables for _stresstest.php can be adjusted within the top class variables in the sourcecode.
 
 [Content](#content)
 
