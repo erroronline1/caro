@@ -3892,7 +3892,7 @@
 		"measure_probability": 2,
 		"measure_damage": 2,
 		"risk_benefit": "Das Restrisiko einer generellen Sturzgefahr muss akzeptiert werden, da andernfalls keine Versorgung erfolgen kann.",
-		"measure_remainder": "Das Restrisiko einer generellen Sturzgefahr muss akzeptiert werden, da andernfalls keine Versorgung erfolgen kann.",
+		"measure_remainder": null,
 		"author": "CARO App"
 	},
 	{
