@@ -267,6 +267,7 @@ export const _client = {
 		 * use with attribute onkeyup =_client.application.textareaAutocomplete(event, 'datalistid')
 		 * appends rest of match if the input so far matches one of the datalist options.
 		 * use Alt to navigate within results for being the most unintrusive key
+		 * has to be provided with lowercase unique entries!
 		 * @param {node} element
 		 * @param {node|string} datalist
 		 */
@@ -289,15 +290,9 @@ export const _client = {
 			if (matches.length) {
 				// navigate through matches with alt key
 				index = matchesLC.indexOf(event.target.value.toLowerCase());
-				if (event.key === "Alt") index++;
+				if (index > -1 && event.key === "Alt") index++;
 				// failsave if length == 1 or out of bound
 				if (!matches[index]) index = 0;
-
-				//////////////////////////
-				// at some point it stops going forward
-				//////////////////////////
-				console.log(matchesLC, event.target.value.toLowerCase(), typed, index);
-
 				event.target.value = typed + matches[index].substring(event.target.selectionStart);
 			}
 			event.target.selectionStart = cPos;
