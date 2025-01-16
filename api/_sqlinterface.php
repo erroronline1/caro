@@ -355,12 +355,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) IN (:ids) AND prod.vendor_id = dist.id"
 		],
 		'consumables_delete_all_unprotected_products' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias IS NULL AND checked IS NULL AND incorporated IS NULL AND protected IS NULL AND last_order IS NULL",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND article_alias IS NULL AND checked IS NULL AND incorporated IS NULL AND protected IS NULL AND last_order IS NULL"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL AND last_order IS NULL",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL AND last_order IS NULL"
 		],
 		'consumables_delete_unprotected_product' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias IS NULL AND checked IS NULL AND incorporated IS NULL AND protected IS NULL",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND article_alias IS NULL AND checked IS NULL AND incorporated IS NULL AND protected IS NULL"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL"
 		],
 
 

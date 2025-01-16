@@ -1300,7 +1300,8 @@
 		"mdr83": "MDR Art. 83 Nachbeobachtung",
 		"mdr_annex1": "MDR Anhang 1 Grundlegende Sicherheits- und Leistungsanforderungen",
 		"mdr_annex4": "MDR Anhang 4 Konformitätserklärung",
-		"mdr_annex14": "MDR Anhang 14 Klinische Bewertung und Nachbeobachtung"
+		"mdr_annex14": "MDR Anhang 14 Klinische Bewertung und Nachbeobachtung",
+		"mpbetreibv": "Medizinproduktebetreiberverordnung"
 	},
 	"risks": {
 		"dgihv_1": "1 Gefährdungen durch Energien",

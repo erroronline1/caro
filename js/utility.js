@@ -17,7 +17,6 @@
  */
 
 import { Assemble, Dialog, Toast } from "./assemble.js";
-import { compose_helper } from "./compose.js";
 
 export const _serviceWorker = {
 	worker: null,
