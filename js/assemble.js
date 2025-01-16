@@ -2659,13 +2659,14 @@ export class Assemble {
 			/**
 			 * adds a *simple* autocomplete option for textareas with keyup event listener
 			 * appends rest of match if the input so far matches one of the datalist options.
-			 * use Alt to navigate within results for being the most unintrusive key
+			 * use Alt and AltGr to navigate within results for being the most unintrusive key
 			 * has to be provided with lowercase unique entries!
 			 */
 			let autocomplete = this.currentElement.autocomplete;
 			textarea.addEventListener("keyup", (event) => {
-				if (!event.target.value || (event.key.length > 2 && !["Alt"].includes(event.key))) return;
-				if (event.key === "Alt") event.preventDefault();
+				console.log(event.key);
+				if (!event.target.value || (event.key.length > 2 && !["Alt", "AltGraph"].includes(event.key))) return;
+				if (["Alt", "AltGraph"].includes(event.key)) event.preventDefault();
 				let cPos = event.target.selectionStart,
 					matches = [],
 					matchesLC = [],
@@ -2681,9 +2682,13 @@ export class Assemble {
 				if (matches.length) {
 					// navigate through matches with alt key
 					index = matchesLC.indexOf(event.target.value.toLowerCase());
-					if (index > -1 && event.key === "Alt") index++;
-					// failsave if length == 1 or out of bound
-					if (!matches[index]) index = 0;
+					if (index > -1 && ["Alt", "AltGraph"].includes(event.key)) {
+						if (event.key === "Alt") index++;
+						if (event.key === "AltGraph") index--;
+						// out of bound
+						if (index > matches.length - 1) index = 0;
+						if (index < 0) index = matches.length - 1;
+					} else index = 0; // fallback
 					event.target.value = typed + matches[index].substring(event.target.selectionStart);
 				}
 				event.target.selectionStart = cPos;
