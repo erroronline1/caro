@@ -2664,7 +2664,6 @@ export class Assemble {
 			 */
 			let autocomplete = this.currentElement.autocomplete;
 			textarea.addEventListener("keyup", (event) => {
-				console.log(event.key);
 				if (!event.target.value || (event.key.length > 2 && !["Alt", "AltGraph"].includes(event.key))) return;
 				if (["Alt", "AltGraph"].includes(event.key)) event.preventDefault();
 				let cPos = event.target.selectionStart,
