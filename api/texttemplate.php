@@ -362,10 +362,10 @@ class TEXTTEMPLATE extends API {
 					':name' => UTILITY::propertySet($this->_payload, 'name'),
 					':unit' => UTILITY::propertySet($this->_payload, 'unit') ? : array_key_first($this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
-					':content' => json_encode($this->_payload->content),
+					':content' => UTILITY::propertySet($this->_payload, 'content'),
 					':language' => UTILITY::propertySet($this->_payload, 'language'),
 					':type' => 'template',
-					':hidden' => $this->_payload->hidden ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 				];
 
 				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);
@@ -632,7 +632,7 @@ class TEXTTEMPLATE extends API {
 						'hint' => $this->_lang->GET('texttemplate.template.availability_hint')
 					];
 					if ($template['hidden']) {
-						$hidden['content'][$this->_lang->GET('texttemplate.chunk.hidden')]['checked'] = true;
+						$hidden['content'][$this->_lang->GET('texttemplate.template.hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($template['hidden'], true);
 						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
 					}

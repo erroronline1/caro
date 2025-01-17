@@ -424,7 +424,7 @@ export const api = {
 			default:
 				return;
 		}
-		await api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+		await api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 
 	/**
@@ -508,7 +508,7 @@ export const api = {
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 
 	/**
@@ -575,7 +575,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 
 	/**
@@ -869,7 +869,7 @@ export const api = {
 				};
 				break;
 		}
-		api.send(method, request, successFn, null, payload, composedComponent || ["bundle", "export"].includes(request[1]) || method === "put");
+		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 
 	/**
@@ -1054,7 +1054,7 @@ export const api = {
 							payload = JSON.parse(request[2]);
 							delete request[2];
 						}
-						// no break intentional
+					// no break intentional
 					default:
 						successFn = function (data) {
 							if (data.render) {
@@ -1126,7 +1126,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 
 	/**
@@ -1370,7 +1370,7 @@ export const api = {
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 
 	/**
@@ -1445,7 +1445,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post" && request[1] !== "template");
+		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 
 	/**
@@ -1551,6 +1551,6 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post" || method === "put");
+		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
 	},
 };

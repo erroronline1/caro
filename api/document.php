@@ -544,7 +544,7 @@ class DOCUMENT extends API {
 					if ($bundle['hidden']) {
 						$bundle['hidden'] = json_decode($bundle['hidden'], true);
 						$hidden['content'][$this->_lang->GET('assemble.compose.bundle.hidden')]['checked'] = true;
-						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $bundle['hidden']['date']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.compose.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $bundle['hidden']['date']]);
 					}
 					array_push($return['render']['content'][1], $hidden);
 				}
@@ -1391,6 +1391,8 @@ class DOCUMENT extends API {
 				// check for identifier if context makes it mandatory
 				// do this in advance of updating in case of selecting such a context
 				$this->_payload->context = substr($this->_payload->context, -2) === ' *' ? substr($this->_payload->context, 0, -2) : $this->_payload->context; // unset marking
+				$this->_payload->content = json_decode($this->_payload->content, true);
+
 				if (in_array($this->_payload->context, array_keys($this->_lang->_USER['documentcontext']['identify']))){
 					$hasidentifier = false;
 					foreach($this->_payload->content as $component){
@@ -1438,10 +1440,10 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => implode(',', $this->_payload->content),
-								':hidden' => boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => implode(',', $regulatory_context),
-								':permitted_export' => $this->_payload->permitted_export ? : null,
+								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
 								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
 								':id' => $exists['id'],
 							]
@@ -1467,10 +1469,10 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' =>  boolval(intval($this->_payload->hidden)) ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => implode(',', $regulatory_context),
-								':permitted_export' => $this->_payload->permitted_export ? : null,
+								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
 								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
 								':id' => $exists['id'],
 							]
@@ -1670,8 +1672,6 @@ class DOCUMENT extends API {
 				'content' => $components
 			];
 		}
-
-
 
 		// check for bundle dependencies
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');

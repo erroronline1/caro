@@ -368,24 +368,25 @@ export const compose_helper = {
 			regulatory_context = document.getElementById("ComponentRegulatoryContext").value,
 			restricted_access = document.getElementById("ComponentRestrictedAccess").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
-			permitted_export = document.getElementById("ComponentPermittedExport") ? document.getElementById("ComponentPermittedExport").checked : false;
+			permitted_export = document.getElementById("ComponentPermittedExport") ? document.getElementById("ComponentPermittedExport").checked : false,
+			data = new FormData();
 		let content = [];
 		// iterate over main node and gather data-name for components
 		for (let i = 0; i < nodes.length; i++) {
 			if (nodes[i].dataset && nodes[i].dataset.name) content.push(nodes[i].dataset.name);
 		}
-		if (name && context && context !== "0" && content.length)
-			return {
-				name: name,
-				alias: alias,
-				context: context,
-				content: content,
-				hidden: hidden,
-				approve: approve,
-				regulatory_context: regulatory_context,
-				permitted_export: permitted_export,
-				restricted_access: restricted_access,
-			};
+		if (name && context && context !== "0" && content.length) {
+			data.append("name", name);
+			data.append("alias", alias);
+			data.append("context", context);
+			data.append("content", JSON.stringify(content));
+			data.append("hidden", hidden);
+			data.append("approve", approve);
+			data.append("regulatory_context", regulatory_context);
+			data.append("permitted_export", permitted_export);
+			data.append("restricted_access", restricted_access);
+			return data;
+		}
 		new Toast(api._lang.GET("assemble.compose.document.document_not_saved_missing"), "error");
 		return null;
 	},
@@ -402,7 +403,8 @@ export const compose_helper = {
 		const name = document.getElementById("TemplateName").value,
 			language = document.getElementById("TemplateLanguage").value,
 			unit = document.getElementById("TemplateUnit").value,
-			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false;
+			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
+			data = new FormData();
 
 		/**
 		 * recursively get dragged/dropped order of elements and add to array
@@ -427,14 +429,14 @@ export const compose_helper = {
 			return content;
 		}
 		const templateContent = nodechildren(document.querySelector("main"));
-		if (name && language && templateContent.length)
-			return {
-				name: name,
-				unit: unit,
-				language: language,
-				content: templateContent,
-				hidden: hidden,
-			};
+		if (name && language && templateContent.length) {
+			data.append("name", name);
+			data.append("language", language);
+			data.append("unit", unit);
+			data.append("content", JSON.stringify(templateContent));
+			data.append("hidden", hidden);
+			return data;
+		}
 		new Toast(api._lang.GET("assemble.edit_template_not_saved_missing"), "error");
 		return null;
 	},
@@ -1355,6 +1357,7 @@ export class Compose extends Assemble {
 					? {
 							checked: true,
 							"data-hiddenradio": "ComponentHidden",
+							class: "red",
 					  }
 					: {
 							"data-hiddenradio": "ComponentHidden",
@@ -1366,7 +1369,7 @@ export class Compose extends Assemble {
 					std.hidden.hint +
 					(hidden && Object.keys(hidden).length
 						? " " +
-						  api._lang.GET("assemble.edit_hidden_set", {
+						  api._lang.GET("assemble.compose.edit_hidden_set", {
 								":name": hidden.name,
 								":date": hidden.date,
 						  })
