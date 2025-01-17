@@ -190,7 +190,22 @@ class SQLQUERY {
 			'mysql' => "DELETE FROM caro_manual WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_manual WHERE id = :id"
 		],
-
+		'application_post_session' => [
+			'mysql' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)",
+			'sqlsrv' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
+		],
+		'application_get_session_fingerprint' => [
+			'mysql' => "SELECT user_id, SHA2(CONCAT(id, user_id), 256) AS fingerprint FROM caro_sessions WHERE id = :id AND user_id = :user_id",
+			'sqlsrv' => "SELECT user_id, LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT( LOWER(id), LOWER(CONVERT(VARCHAR(100), user_id, 2)))), 2)) AS fingerprint FROM caro_sessions WHERE id = :id AND user_id = :user_id"
+		],
+		'application_get_user_from_fingerprint_checksum' => [
+			'mysql' => "SELECT caro_user.* FROM caro_sessions LEFT JOIN caro_user ON caro_sessions.user_id = caro_user.id WHERE SHA2(CONCAT(SHA2(CONCAT(caro_sessions.id, caro_sessions.user_id), 256), :checksum) = :hash",
+			'sqlsrv' => "SELECT caro_user.* FROM caro_sessions LEFT JOIN caro_user ON caro_sessions.user_id = caro_user.id WHERE LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT(LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT( LOWER(caro_sessions.id), LOWER(CONVERT(VARCHAR(100), caro_sessions.user_id, 2)))), 2)), :checksum)), 2)) = :hash"
+		],
+		'application_delete_session' => [
+			'mysql' => "DELETE FROM caro_sessions WHERE date < :date",
+			'sqlsrv' => "DELETE FROM caro_sessions WHERE date < :date"
+		],
 
 
 		'calendar_post' => [
@@ -739,10 +754,6 @@ class SQLQUERY {
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id IN (:id) OR name IN (:name)",
 			'sqlsrv' => "SELECT * FROM caro_user WHERE CONVERT(VARCHAR, id) IN (:id) OR name IN (:name)"
-		],
-		'user_get_cached' => [
-			'mysql' => "SELECT * FROM caro_user WHERE SHA2(CONCAT(SHA2(id, 256), :checksum), 256) = :hash",
-			'sqlsrv' => "SELECT * FROM caro_user WHERE LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT(LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONVERT(VARCHAR, id)), 2)), :checksum)), 2)) = :hash"
 		],
 		'user_get_orderauth' => [
 			'mysql' => "SELECT * FROM caro_user WHERE orderauth = :orderauth",

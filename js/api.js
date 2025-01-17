@@ -92,7 +92,7 @@ export const api = {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
 		api.loadindicator(true);
-		if (api._settings.user && api._settings.user.cached_identity && ["post", "put"].includes(method) && payload instanceof FormData) {
+		if (api._settings.user && api._settings.user.fingerprint && ["post", "put"].includes(method) && payload instanceof FormData) {
 			let sanitizedpayload = Object.fromEntries(payload);
 			for (const [key, value] of Object.entries(sanitizedpayload)) {
 				// remove file keys for being shifted to $_FILES within the stream
@@ -110,7 +110,7 @@ export const api = {
 				type: "application/json",
 			});
 			//console.log(payload, sanitizedpayload, b.size);
-			payload.append("_user_cache", await _.sha256(api._settings.user.cached_identity + b.size.toString()));
+			payload.append("_user_post_validation", await _.sha256(api._settings.user.fingerprint + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
 			.then(async (data) => {

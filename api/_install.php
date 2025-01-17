@@ -232,6 +232,13 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
+				"CREATE TABLE IF NOT EXISTS `caro_sessions` (" .
+				"	`id` text COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE," .
+				"	`user_id` int NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_user` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -259,7 +266,7 @@ define('DEFAULTSQL', [
 		'sqlsrv' => "IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
 				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	type varchar(MAX) NOT NULL," .
+				"	type varchar(255) NOT NULL," .
 				"	span_start smalldatetime NOT NULL," .
 				"	span_end smalldatetime NOT NULL," .
 				"	author_id int NOT NULL," .
@@ -274,7 +281,7 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_checks', N'U') IS NULL " .
 				"CREATE TABLE caro_checks (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	type varchar(MAX) NOT NULL," .
+				"	type varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL" .
@@ -284,7 +291,7 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_consumables_approved_orders (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	order_data varchar(MAX) NOT NULL," .
-				"	organizational_unit varchar(MAX) NOT NULL," .
+				"	organizational_unit varchar(255) NOT NULL," .
 				"	approval varchar(MAX) NOT NULL," .
 				"	approved smalldatetime NOT NULL," .
 				"	ordered smalldatetime NULL DEFAULT NULL," .
@@ -293,7 +300,7 @@ define('DEFAULTSQL', [
 				"	partially_delivered smalldatetime NULL DEFAULT NULL," .
 				"	delivered smalldatetime NULL DEFAULT NULL," .
 				"	archived smalldatetime NULL DEFAULT NULL," .
-				"	ordertype varchar(MAX) NOT NULL," .
+				"	ordertype varchar(255) NOT NULL," .
 				"	notified_received int NULL DEFAULT NULL," .
 				"	notified_delivered int NULL DEFAULT NULL" .
 				");"
@@ -306,7 +313,7 @@ define('DEFAULTSQL', [
 				"	ordered smalldatetime NULL DEFAULT NULL," .
 				"	partially_received smalldatetime NULL DEFAULT NULL," .
 				"	received smalldatetime NULL DEFAULT NULL," .
-				"	ordertype varchar(MAX) NOT NULL" .
+				"	ordertype varchar(255) NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_prepared_orders', N'U') IS NULL " .
@@ -321,9 +328,9 @@ define('DEFAULTSQL', [
 				"	vendor_id int NOT NULL," .
 				"	article_no varchar(MAX) NULL DEFAULT NULL," .
 				"	article_name varchar(MAX) NULL DEFAULT NULL," .
-				"	article_alias varchar(MAX) NULL DEFAULT NULL," .
-				"	article_unit varchar(MAX) NULL DEFAULT NULL," .
-				"	article_ean varchar(MAX) NULL DEFAULT NULL," .
+				"	article_alias varchar(255) NULL DEFAULT NULL," .
+				"	article_unit varchar(255) NULL DEFAULT NULL," .
+				"	article_ean varchar(255) NULL DEFAULT NULL," .
 				"	hidden tinyint NULL DEFAULT NULL," .
 				"	protected tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
@@ -349,7 +356,7 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
 				"CREATE TABLE caro_csvfilter (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	name varchar(MAX) NOT NULL," .
+				"	name varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
@@ -381,8 +388,8 @@ define('DEFAULTSQL', [
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	name varchar(MAX) NOT NULL," .
 				"	alias varchar(MAX) NOT NULL," .
-				"	context varchar(MAX) NOT NULL," .
-				"	unit varchar(MAX) NULL DEFAULT NULL," .
+				"	context varchar(255) NOT NULL," .
+				"	unit varchar(255) NULL DEFAULT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
@@ -396,7 +403,7 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_manual', N'U') IS NULL " .
 				"CREATE TABLE caro_manual (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	title varchar(MAX) NOT NULL," .
+				"	title varchar(255) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	permissions varchar(MAX) NOT NULL" .
 				");"
@@ -416,9 +423,9 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_records', N'U') IS NULL " .
 				"CREATE TABLE caro_records (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	context varchar(MAX) NOT NULL," .
+				"	context varchar(255) NOT NULL," .
 				"	case_state varchar(MAX) NULL DEFAULT NULL," .
-				"	record_type varchar(MAX) NULL DEFAULT NULL," .
+				"	record_type varchar(255) NULL DEFAULT NULL," .
 				"	identifier varchar(MAX) NOT NULL," .
 				"	last_user int NOT NULL," .
 				"	last_touch smalldatetime NOT NULL," .
@@ -431,7 +438,7 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .
 				"CREATE TABLE caro_risks (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	type varchar(MAX) NOT NULL," .
+				"	type varchar(255) NOT NULL," .
 				"	process varchar(MAX) NOT NULL," .
 				"	risk varchar(MAX) NOT NULL," .
 				"	relevance tinyint NULL," .
@@ -450,16 +457,24 @@ define('DEFAULTSQL', [
 				"	hidden tinyint NULL DEFAULT NULL" .
 				");"
 				.
+				"IF OBJECT_ID(N'caro_sessions', N'U') IS NULL " .
+				"CREATE TABLE caro_sessions (" .
+				"	id varchar(1024) NOT NULL," .
+				"	user_id int NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"   CONSTRAINT AK_id UNIQUE(id)" .
+				");" 
+				.
 				"IF OBJECT_ID(N'caro_texttemplates', N'U') IS NULL " .
 				"CREATE TABLE caro_texttemplates (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	name varchar(MAX) NOT NULL," .
-				"	unit varchar(MAX) NOT NULL," .
+				"	name varchar(255) NOT NULL," .
+				"	unit varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	language varchar(MAX) NOT NULL," .
-				"	type varchar(MAX) NOT NULL," .
+				"	language varchar(255) NOT NULL," .
+				"	type varchar(255) NOT NULL," .
 				"	hidden tinyint NULL DEFAULT NULL" .
 				");" 
 				.
@@ -470,7 +485,7 @@ define('DEFAULTSQL', [
 				"	permissions varchar(MAX) NOT NULL," .
 				"	units varchar(MAX) NOT NULL," .
 				"	token varchar(MAX) NOT NULL," .
-				"	orderauth varchar(MAX) NOT NULL," .
+				"	orderauth varchar(255) NOT NULL," .
 				"	image varchar(MAX) NOT NULL," .
 				"	app_settings varchar(MAX) NOT NULL," .
 				"	skills varchar(MAX) NOT NULL" .

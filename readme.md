@@ -126,6 +126,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * *Identification of characteristics related to safety* how to implement?
     * sanitize identical contents of template file
 * consider widely hidden datatype text with date and user hiding, like documents
+* display logins for users based on caro_sessions-db
+* delete sessions after config time
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue

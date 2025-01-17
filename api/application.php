@@ -126,7 +126,7 @@ class APPLICATION extends API {
 					'user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
-					'cached_identity' => hash('sha256', $_SESSION['user']['id']),
+					'fingerprint' => $this->session_get_fingerprint(),
 					'permissions' => [
 						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
 					]
@@ -160,11 +160,14 @@ class APPLICATION extends API {
 				$_SESSION['user']['units'] = explode(',', $result['units']);
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
+
+				$this->session_set();
+
 				$this->response([
 					'user' => [
 					'image' => $_SESSION['user']['image'],
 					'app_settings' => $_SESSION['user']['app_settings'],
-					'cached_identity' => hash('sha256', $_SESSION['user']['id']),
+					'fingerprint' => $this->session_get_fingerprint(),
 					'permissions' => [
 						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
 					]

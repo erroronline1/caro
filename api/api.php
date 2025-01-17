@@ -90,57 +90,54 @@ class API {
 			session_destroy();
 		}
 		// check if a registered user with valid token is logged in
-		if (isset($_SESSION['user'])){
-			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+		if (isset($_SESSION['user']['token'])){
+			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 				'values' => [
 					':token' => $_SESSION['user']['token']
 				]
 			]);
-			if ($query){
+			if ($user){
 				// valid user IS logged in
 				// renew session timeout except for defined requests
 				if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
 
 				//update user setting for each request
-				$result = $query[0];
+				$result = $user[0];
 				$_SESSION['user'] = $result;
 				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
 				$_SESSION['user']['units'] = explode(',', $result['units']);
 				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
 				$_SESSION['user']['image'] = './' . $result['image'];
+
 				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
 				if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])
 					&& isset(REQUEST[1]) && REQUEST[1] !== 'login'
-					&& $_user_cache = UTILITY::propertySet($this->_payload, '_user_cache')
 				){
-					unset ($this->_payload->_user_cache);
-					// sanitize arrays from payload as checksum can't handle these from client side
-					$payload = json_decode(json_encode($this->_payload), true);
-					foreach ($payload as $key => $value){
-						if ($value && gettype($value) === 'array') unset($payload[$key]);
-					}
-					//var_dump(json_encode($payload));
-					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
-						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-						}, json_encode($payload) );
-					$payload = preg_replace(['/\\\\r|\\\\n|\\\\t/', '/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is somehow not resolved properly on the backend
-					//var_dump(strlen($payload), $payload);
-					$query = SQLQUERY::EXECUTE($this->_pdo, 'user_get_cached', [
-						'values' => [
-							':checksum' => strlen($payload),
-							':hash' => $_user_cache
-						]
-					]);
-					if ($query){
-						$result = $query[0];
-						//update user setting for each request
-						$_SESSION['user'] = $result;
-						$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
-						$_SESSION['user']['units'] = explode(',', $result['units']);
-						$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
-						$_SESSION['user']['image'] = './' . $result['image'];
-					}
-					else $this->response([strlen($payload), $payload], 401);
+					// post and put MUST have _user_post_validation payload
+					if (($_user_post_validation = UTILITY::propertySet($this->_payload, '_user_post_validation')) !== false) {
+						unset ($this->_payload->_user_post_validation);
+						// sanitize arrays from payload as checksum can't handle these from client side
+						$payload = json_decode(json_encode($this->_payload), true);
+						foreach ($payload as $key => $value){
+							if ($value && gettype($value) === 'array') unset($payload[$key]);
+						}
+						//var_dump(json_encode($payload));
+						$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+							return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+							}, json_encode($payload) );
+						$payload = preg_replace(['/\\\\r|\\\\n|\\\\t/', '/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is somehow not resolved properly on the backend
+						//var_dump(strlen($payload), $payload);
+
+						if ($user = $this->session_get_user_from_fingerprint_checksum($_user_post_validation, strlen($payload))){
+							//update user setting for each request
+							$_SESSION['user'] = $user;
+							$_SESSION['user']['permissions'] = explode(',', $user['permissions']);
+							$_SESSION['user']['units'] = explode(',', $user['units']);
+							$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+							$_SESSION['user']['image'] = './' . $user['image'];
+						}
+						else $this->response([strlen($payload), $payload], 401);
+					} else $this->response([], 401);
 				}
 			}
 			else {
@@ -292,6 +289,68 @@ class API {
 	}
 
 	/**
+	 * executes the called api method
+	 * no return
+	 */
+	public function processApi(){
+		$func = strtolower($this->_requestedMethod);
+		if(method_exists($this, $func))
+			$this->$func();
+		else
+			$this->response([], 404); // If the method not exist within this class, response would be "Page not found".
+	}
+
+	/**
+	 * get a session fingerprint for session user
+	 */
+	public function session_get_fingerprint(){
+		if (isset($_SESSION['user']['id']))
+			if ($fingerprint = SQLQUERY::EXECUTE($this->_pdo, 'application_get_session_fingerprint', [
+				'values' => [
+					':id' => session_id(),
+					':user_id' => $_SESSION['user']['id']
+				]
+			])) return $fingerprint ? $fingerprint[0]['fingerprint'] : null;
+		return null;
+	}
+
+	public function session_get_user_from_fingerprint_checksum($hash, $checksum){
+		if ($user = SQLQUERY::EXECUTE($this->_pdo, 'application_get_user_from_fingerprint_checksum', [
+				'values' => [
+					':checksum' => $checksum,
+					':hash' => $hash
+				]
+			])) return $user ? $user[0] : null;
+		return null;
+	}
+
+	/**
+	 * store a valid user session
+	 */
+	public function session_set(){
+		try{
+			SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
+				'values' => [
+					':id' => session_id(),
+					':user_id' => $_SESSION['user']['id']
+				]
+			]);
+		}
+		catch (Exception $e){
+
+		}
+	}
+
+	/**
+	 * sets document headers in advance of output stream
+	 * no return
+	 */
+	private function set_headers(){
+		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
+		header("Content-Type:application/json; charset=utf-8");
+	}
+
+	/**
 	 * api response and final exiting method executions
 	 * @param array|string $data what should be responded
 	 * @param int $status optional override for error cases
@@ -312,28 +371,6 @@ class API {
 		echo $data;
 		exit;
 	}
-
-	/**
-	 * executes the called api method
-	 * no return
-	 */
-	public function processApi(){
-		$func = strtolower($this->_requestedMethod);
-		if(method_exists($this, $func))
-			$this->$func();
-		else
-			$this->response([], 404); // If the method not exist within this class, response would be "Page not found".
-	}
-
-	/**
-	 * sets document headers in advance of output stream
-	 * no return
-	 */
-	private function set_headers(){
-		header("HTTP/1.1 ".$this->_httpResponse." ".$this->get_status_message());
-		header("Content-Type:application/json; charset=utf-8");
-	}
-
 }
 
 if (in_array(REQUEST[0], ['application', 'audit', 'calendar', 'consumables', 'csvfilter', 'file', 'document', 'message', 'notification', 'order', 'record', 'risk', 'texttemplate', 'tool', 'user'])) require_once(REQUEST[0] . '.php');
