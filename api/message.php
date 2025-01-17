@@ -41,6 +41,7 @@ class MESSAGE extends API {
 	public function conversation(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
+				$datalist = [];
 				$result = ['render' => ['content' => []]];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
