@@ -104,9 +104,9 @@ class API {
 				//update user setting for each request
 				$result = $user[0];
 				$_SESSION['user'] = $result;
-				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
-				$_SESSION['user']['units'] = explode(',', $result['units']);
-				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
+				$_SESSION['user']['permissions'] = explode(',', $result['permissions'] ? : '');
+				$_SESSION['user']['units'] = explode(',', $result['units'] ? : '');
+				$_SESSION['user']['app_settings'] = json_decode($result['app_settings'] ? : '', true);
 				$_SESSION['user']['image'] = './' . $result['image'];
 
 				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
@@ -131,9 +131,9 @@ class API {
 						if ($user = $this->session_get_user_from_fingerprint_checksum($_user_post_validation, strlen($payload))){
 							//update user setting for each request
 							$_SESSION['user'] = $user;
-							$_SESSION['user']['permissions'] = explode(',', $user['permissions']);
-							$_SESSION['user']['units'] = explode(',', $user['units']);
-							$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+							$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
+							$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
+							$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
 							$_SESSION['user']['image'] = './' . $user['image'];
 						}
 						else $this->response([strlen($payload), $payload], 401);
