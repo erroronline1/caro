@@ -144,7 +144,7 @@ class FILE extends API {
 				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
 				$hidden = $this->_lang->PROPERTY('file.bundle.availability');
-				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.available') ? 1 : null;
+				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.hidden') ?json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
 				unset ($this->_payload->$hidden);
 				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
@@ -326,6 +326,11 @@ class FILE extends API {
 				}
 
 				// set up and append file bundle options
+				$hidden = null;
+				if ($bundle['hidden']) {
+					$hiddenproperties = json_decode($bundle['hidden'], true);
+					$hidden = $this->_lang->GET('file.manager.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+				}
 				$return['render']['content'][] = [
 					[
 						'type' => 'text',
@@ -340,10 +345,11 @@ class FILE extends API {
 						'attributes' => [
 							'name' => $this->_lang->GET('file.bundle.availability')
 						],
-						'content'=>[
+						'content' => [
 							$this->_lang->GET('file.bundle.available') => !$bundle['hidden'] ? ['checked' => true] : [],
 							$this->_lang->GET('file.bundle.hidden') => $bundle['hidden'] ? ['checked' => true] : [],
-						]
+						],
+						'hint' => $hidden
 					]
 				];
 				if ($bundle['name']) $return['header'] = $bundle['name'];

@@ -141,7 +141,7 @@ class RISK extends API {
 					':id' => intval($this->_requestedID),
 					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')) ? : null,
 					':proof' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.proof')) ? : null,
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.available') ? null : 1,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 					':probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.probability'))) ? : null,
 					':damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.damage'))) ? : null,
 					':measure_probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_probability'))) ? : null,
@@ -389,6 +389,12 @@ class RISK extends API {
 										$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
 									}
 								}
+
+								$hidden = null;
+								if ($risk['hidden']) {
+									$hiddenproperties = json_decode($risk['hidden'], true);
+									$hidden = $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+								}
 								$result['render']['content'][$last][] = [
 									'type' => 'radio',
 									'attributes' => [
@@ -397,7 +403,8 @@ class RISK extends API {
 									'content' => [
 										$this->_lang->GET('risk.available') => $isactive,
 										$this->_lang->GET('risk.hidden') => $isinactive
-									]
+									],
+									'hint' => $hidden
 								];
 							}
 						}
@@ -588,6 +595,11 @@ class RISK extends API {
 									$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
 								}
 							}
+							$hidden = null;
+							if ($risk['hidden']) {
+								$hiddenproperties = json_decode($risk['hidden'], true);
+								$hidden = $this->_lang->GET('risk.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+							}
 							$result['render']['content'][$last][] = [
 								'type' => 'radio',
 								'attributes' => [
@@ -596,7 +608,8 @@ class RISK extends API {
 								'content' => [
 									$this->_lang->GET('risk.available') => $isactive,
 									$this->_lang->GET('risk.hidden') => $isinactive
-								]
+								],
+								'hint' => $hidden
 							];
 						}
 					}

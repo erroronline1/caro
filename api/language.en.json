@@ -556,6 +556,7 @@
 			"documents_download": "View probably related documents",
 			"documents_update": "Add documents",
 			"documents_update_hint": "Once documents are added, the product can not be deleted, just deactivated.",
+			"edit_hidden_set": "Deactivated on :date by :name",
 			"error_product_not_found": "Product :name could not be found in database, please try something else.",
 			"expiry_date": "Has an expiry date",
 			"filter_vendors": "Filter vendors",
@@ -592,6 +593,7 @@
 			"edit_existing_vendors": "Edit existing vendor",
 			"edit_existing_vendors_new": "New vendor",
 			"edit_existing_vendors_search": "Search by name",
+			"edit_hidden_set": "Hidden on :date by :name",
 			"error_vendor_forbidden_name": "The name :name is not allowed, please use another.",
 			"error_vendor_not_found": "Vendor :name could not be found in database, please try something else or set up new vendor.",
 			"hidden": "inactive, delete products",
@@ -623,6 +625,7 @@
 	},
 	"csvfilter": {
 		"edit": {
+			"edit_hidden_set": "Hidden on :date by :name",
 			"error_filter_not_found": "Filter :name could not be found in database, please try something else.",
 			"error_forbidden_name": "The name :name is not allowed please use another!",
 			"filter": "Search name",
@@ -686,6 +689,7 @@
 			"delete_file_confirmation_ok": "Yes, delete",
 			"delete_folder": "Delete folder and all of its content",
 			"deleted_file": ":file has been permanently deleted",
+			"edit_hidden_set": "Hidden on :date by :name",
 			"error": "An error occured, please try again.",
 			"folder_header": "Folder created on :date",
 			"new_file": "Upload one or several new files",
@@ -1019,6 +1023,7 @@
 		"delete_cancel": "No, thank you!",
 		"delete_confirm": "Yes, delete risk",
 		"delete_confirm_header": "Permanently delete risk entry?",
+		"edit_hidden_set": "Marked as invalid on :date by :name",
 		"effect": "Effect",
 		"hidden": "invalid",
 		"last_edit": "Last edit: :user on :date",
@@ -1076,6 +1081,7 @@
 		},
 		"error_forbidden_name": "The name :name is not allowed, please use another!",
 		"error_name_taken": "The name ist already taken or part of an existing name, please use another!",
+		"edit_hidden_set": "Hidden on :date by :name",
 		"system": {
 			"CID": "Purchase system prepared customer id",
 			"ECR": "Purchase system prepared certificate expiration",

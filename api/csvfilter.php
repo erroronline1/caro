@@ -307,7 +307,7 @@ class CSVFILTER extends API {
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_content')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? 1 : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 				];
 
 				// early exit
@@ -483,7 +483,11 @@ class CSVFILTER extends API {
 						],
 						'hint' => $this->_lang->GET('csvfilter.edit.filter_availability_hint')
 					];
-					if ($filter['hidden']) $hidden['content'][$this->_lang->GET('csvfilter.edit.filter_hidden')]['checked'] = true;
+					if ($filter['hidden']) {
+						$hidden['content'][$this->_lang->GET('csvfilter.edit.filter_hidden')]['checked'] = true;
+						$hiddenproperties = json_decode($filter['hidden'], true);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('csvfilter.edit.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+					}
 					array_push($return['render']['content'][1], $hidden);
 				}
 				$this->response($return);

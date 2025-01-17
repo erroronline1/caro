@@ -577,7 +577,7 @@ class CONSUMABLES extends API {
 					'article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null,
 					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
 					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.available') ? null : 1,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 					'protected' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
@@ -647,7 +647,7 @@ class CONSUMABLES extends API {
 					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null;
 					$product['article_unit'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null;
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null;
-					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.available') ? null : 1;
+					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null;
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
@@ -870,6 +870,12 @@ class CONSUMABLES extends API {
 					$datalist_unit[] = $row['article_unit'];
 				}
 
+				$hidden = null;
+				if ($product['hidden']) {
+					$hiddenproperties = json_decode($product['hidden'], true);
+					$hidden = $this->_lang->GET('consumables.product.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+				}
+
 				// switch between display- and edit mode 
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')) {
 					// standard user view
@@ -917,7 +923,6 @@ class CONSUMABLES extends API {
 						foreach($regulatoryoptions as &$option){
 							$option['disabled'] = true;
 						}
-
 						// display available product information
 						$result['render']['content'][] = [
 							[
@@ -942,7 +947,8 @@ class CONSUMABLES extends API {
 								'content' => [
 									$this->_lang->GET('consumables.product.available') => $isactive,
 									$this->_lang->GET('consumables.product.hidden') => $isinactive
-								]
+								],
+								'hint' => $hidden
 							]
 						];
 
@@ -1166,7 +1172,8 @@ class CONSUMABLES extends API {
 								'content' => [
 									$this->_lang->GET('consumables.product.available') => $isactive,
 									$this->_lang->GET('consumables.product.hidden') => $isinactive
-								]
+								],
+								'hint' => $hidden
 							], [
 								'type' => 'hidden',
 								'attributes' => [
@@ -1499,7 +1506,7 @@ class CONSUMABLES extends API {
 				 */
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.available') ? null : 1,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
@@ -1614,7 +1621,7 @@ class CONSUMABLES extends API {
 				if (!$vendor) $this->response(null, 406);
 
 				// update vendor data
-				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.available') ? null : 1;
+				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
 				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
@@ -1805,6 +1812,12 @@ class CONSUMABLES extends API {
 						':ids' => intval($vendor['id'])
 					]
 				]);
+
+				$hidden = null;
+				if ($vendor['hidden']) {
+					$hiddenproperties = json_decode($vendor['hidden'], true);
+					$hidden = $this->_lang->GET('consumables.vendor.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+				}
 
 				// switch between display- and edit mode 
 				if (!PERMISSION::permissionFor('products')) {
@@ -1997,7 +2010,8 @@ class CONSUMABLES extends API {
 									'content' => [
 										$this->_lang->GET('consumables.vendor.available') => $isactive,
 										$this->_lang->GET('consumables.vendor.hidden') => $isinactive
-									]
+									],
+									'hint' => $hidden
 								]
 							],
 							...$evaluationdocument,
