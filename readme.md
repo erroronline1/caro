@@ -126,8 +126,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * *Identification of characteristics related to safety* how to implement?
     * sanitize identical contents of template file
 * consider widely hidden datatype text with date and user hiding, like documents
-* display logins for users based on caro_sessions-db
-* delete sessions after config time
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -4196,7 +4194,7 @@ I welcome any constructive input on this topic.
 * O.Auth_7 Das Hintergrundsystem MUSS jede Anfrage gemäß des Rechte- und Rollenkonzeptes (vgl.O.Auth_1) authentifizieren und autorisieren.
     > Every request matches the session and user permissions.
 * O.Auth_8 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche Anmeldevorgänge informieren zu lassen.
-    > This is not reasonable for the application used within a closed environment.
+    > The user can view their login history e.g. to spot deviations from work schedule.
 * O.Auth_9 Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren.
     > This is not reasonable for the application used within a closed environment and on shared devices.
 * O.Auth_10 Das Hintergrundsystem MUSS die Anwendungssitzung nach einer angemessenen Zeit, in der sie nicht aktiv verwendet wurde (idle time) beenden und eine erneute Authentisierung fordern.

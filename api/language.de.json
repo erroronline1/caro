@@ -1191,6 +1191,7 @@
 		"permissions": "Berechtigungen",
 		"permissions_hint": "Wähle entweder Mitarbeiter ODER Gruppe. Gruppen-Anmeldungen haben keinen Zugriff auf Zeiterfassung, das Ausfüllen von Aufzeichnungen, Produkteinführung oder Stichproben.",
 		"reset_photo": "Profilbild zurücksetzen",
+		"sessions": "Anmeldungen der letzten :days Tage",
 		"settings": "Anwendungseinstellungen",
 		"settings_annual_vacation": "Jahresurlaub in Tagen",
 		"settings_annual_vacation_hint": "YYYY-MM-DD Tage in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung und der Resturlaub zu diesem Datum empfohlen. Frühere Kalendereinträge werden nicht mit berechnet.",

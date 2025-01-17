@@ -206,6 +206,10 @@ class SQLQUERY {
 			'mysql' => "DELETE FROM caro_sessions WHERE date < :date",
 			'sqlsrv' => "DELETE FROM caro_sessions WHERE date < CONVERT(SMALLDATETIME, :date, 120)"
 		],
+		'application_get_user_sessions' => [
+			'mysql' => "SELECT * FROM caro_sessions WHERE user_id = :user_id ORDER BY date DESC",
+			'sqlsrv' => "SELECT * FROM caro_sessions WHERE user_id = :user_id ORDER BY date DESC"
+		],
 
 
 		'calendar_post' => [

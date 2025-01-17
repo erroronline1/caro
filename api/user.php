@@ -205,24 +205,107 @@ class USER extends API {
 						}
 					}
 				}
-				$result['render'] = ['content' => [
+
+				// predictable data
+				$user_data = [
+					[
 						[
-							['type' => 'textsection',
+							'type' => 'collapsible',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.display_user')
+								'class' => "em16"
 							],
-							'content' => $this->_lang->GET('user.name') . ': ' . $user['name'] . "\n" .
-								$this->_lang->GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
-								($units ? $this->_lang->GET('user.units') . ': ' . implode(', ', $units) . "\n" : '') .
-								($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
-								(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
-								(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
-								(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
-								(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
-								(isset($timesheet_stats['_leftvacation']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
-								($skillmatrix ? " \n" . $skillmatrix : '')
+							'content' => [
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('user.display_user')
+									],
+									'content' => $this->_lang->GET('user.name') . ': ' . $user['name'] . "\n" .
+										$this->_lang->GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
+										($units ? $this->_lang->GET('user.units') . ': ' . implode(', ', $units) . "\n" : '') .
+										($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
+										(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
+										(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
+										(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
+										(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
+										(isset($timesheet_stats['_leftvacation']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
+										($skillmatrix ? " \n" . $skillmatrix : '')
+								]
 							]
-						],[
+						]
+					]
+				];
+
+				// append user training with expiry info 
+				$alltrainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+					'replacements' => [
+						':ids' => $user['id'] ? : 0
+					]
+				]);
+				$usertrainings = [];
+				foreach ($alltrainings as $row){
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					if ($row['expires']){
+						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
+						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
+						else {
+							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
+							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
+						}
+					}
+					$usertrainings[] = [
+						'type' => 'textsection',
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $row['expires'],
+						'attributes' => $attributes
+					];
+					if ($row['file_path']) $usertrainings[] = [
+						'type' => 'links',
+						'content' => [
+							$row['file_path'] => ['href' => $row['file_path']]
+						]
+					];
+				}
+				if ($usertrainings) $user_data[] = [
+						[
+							'type' => 'collapsible',
+							'attributes' => [
+								'class' => "em16"
+							],
+							'content' => $usertrainings
+						]
+					];
+
+				// append user sessions
+				$usersessions = SQLQUERY::EXECUTE($this->_pdo, 'application_get_user_sessions', [
+					'values' => [
+						':user_id' => $user['id'] ? : 0
+					]
+				]);
+				$sessions = [];
+				foreach($usersessions as $session){
+					$sessions[] = $session['date'];
+				}
+				if ($sessions) $user_data[] = [
+					[
+						'type' => 'collapsible',
+						'attributes' => [
+							'class' => "em16"
+						],
+						'content' => [
+							[
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.sessions', [':days' => CONFIG['lifespan']['sessions']])
+								],
+								'content' => implode("\n", $sessions)
+							]
+						]
+					]
+				];
+
+				$result['render'] = ['content' => [
+						$user_data,
+						[
 							[
 								'type' => 'photo',
 								'attributes' => [
@@ -316,35 +399,6 @@ class USER extends API {
 					'content' => $primary_casestates
 				];
 
-				// append user training with expiry info 
-				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-					'replacements' => [
-						':ids' => $user['id'] ? : 0
-					]
-				]);
-				$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
-				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $row['date']];
-					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
-						if ($expire < $today) $attributes['class'] = 'red';
-						else {
-							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $today) $attributes['class'] = 'orange';
-						}
-					}
-					$result['render']['content'][0][] = [
-						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $row['expires'],
-						'attributes' => $attributes
-					];
-					if ($row['file_path']) $result['render']['content'][0][] = [
-						'type' => 'links',
-						'content' => [
-							$row['file_path'] => ['href' => $row['file_path']]
-						]
-					];
-				}
 
 				$this->response($result);
 				break;
