@@ -233,10 +233,9 @@ define('DEFAULTSQL', [
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_sessions` (" .
-				"	`id` text COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE," .
+				"	`id` text(1024) COLLATE utf8mb4_unicode_ci NOT NULL UNIQUE," .
 				"	`user_id` int NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
+				"	`date` datetime NOT NULL" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_user` (" .
@@ -542,7 +541,7 @@ class INSTALL {
 	 */
 	public function navigation($method){
 		if (method_exists($this, $method)) {
-			echo '<a href="../_install.php">back</a><br />';
+			echo '<a href="' . (isset(REQUEST[1]) ? '../': '') . '../_install.php">back</a><br />';
 			$this->{$method}();
 		}
 		else {
@@ -564,7 +563,7 @@ class INSTALL {
 					'printWarning'
 					])) echo '<a href="./_install.php/' . $methodName . '">' . $methodName . '</a><br />';
 			}
-			echo '<br /><a href="../../index.html">exit</a>';
+			echo '<br /><a href="../index.html">exit</a>';
 		}
 	}
 
@@ -653,6 +652,7 @@ class INSTALL {
 				$this->printError('There has been an error installing the databases!');
 				die();
 			}
+			$statement->closeCursor();
 			$this->printSuccess('Databases installed.');
 
 			if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
