@@ -319,13 +319,13 @@ class RISK extends API {
 									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 								], [
 									'type' => 'datalist',
-									'content' => array_values($datalist['process']),
+									'content' => isset($datalist['process']) ? array_values($datalist['process']) : [],
 									'attributes' => [
 										'id' => 'processes'
 									]
 								], [
 									'type' => 'datalist',
-									'content' => array_values($datalist['measure']),
+									'content' => isset($datalist['measure']) ? array_values($datalist['measure']) : [],
 									'attributes' => [
 										'id' => 'measure'
 									]
@@ -457,7 +457,7 @@ class RISK extends API {
 								'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 							], [
 								'type' => 'datalist',
-								'content' => array_values($datalist['process']),
+								'content' => isset($datalist['process']) ? array_values($datalist['process']) : [],
 								'attributes' => [
 									'id' => 'processes'
 								]
@@ -532,7 +532,7 @@ class RISK extends API {
 									'value' => $risk['measure'] ? : '',
 									'rows' => 4
 								],
-								'autocomplete' => array_values($datalist['measure'])
+								'autocomplete' => isset($datalist['measure']) ? array_values($datalist['measure']) : null
 							], [
 								'type' => 'br'
 							], [
@@ -560,7 +560,7 @@ class RISK extends API {
 									'value' => $risk['risk_benefit'] ? : '',
 									'rows' => 4
 								],
-								'autocomplete' => array_values($datalist['risk_benefit'])
+								'autocomplete' => isset($datalist['risk_benefit']) ? array_values($datalist['risk_benefit']) : null
 							], [
 								'type' => 'br'
 							], [
@@ -570,7 +570,7 @@ class RISK extends API {
 									'value' => $risk['measure_remainder'] ? : '',
 									'rows' => 4
 								],
-								'autocomplete' => array_values($datalist['measure_remainder'])
+								'autocomplete' => isset($datalist['measure_remainder']) ? array_values($datalist['measure_remainder']) : null
 							], [
 								'type' => 'checkbox2text',
 								'attributes' => [
