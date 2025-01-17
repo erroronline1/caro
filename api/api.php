@@ -327,9 +327,17 @@ class API {
 	}
 
 	/**
-	 * store a valid user session
+	 * store a valid user session, delete outdated
 	 */
 	public function session_set(){
+		$deldate = clone ($this->_currentdate);
+		$deldate->modify('-' . CONFIG['lifespan']['sessions'] . ' days');
+		SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
+			'values' => [
+				':date' => $deldate->format('Y-m-d H:i:s')
+			]
+		]);
+
 		SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
 			'values' => [
 				':id' => session_id(),

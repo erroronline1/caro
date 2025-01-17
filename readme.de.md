@@ -1052,6 +1052,7 @@ open_record_reminder = 30 ; Tage nach denen per Nachricht and nicht abgeschlosse
 order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
 order_undelivered = 3 ; Tage, nach denen Bereiche daran erinnert werden Auslieferungen zu merkieren oder sich nach dem Sachstand zu erkundigen
 order_unreceived = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen
+sessions = 93 ; Tage, nach denen Session-Fingerabdrücke gelöscht und Offline-Fallbacks für Beiträge ungültig werden
 sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
 tmp =  24 ; Stunden nach denen Dateien gelöscht werden
 training_evaluation = 62 ; Tage bis an eine Evaluierung erinnert wird

@@ -1141,6 +1141,7 @@ open_record_reminder = 30 ; DAYS after unclosed records are reminded of via mess
 order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
 order_undelivered = 3 ; DAYS, after these unit members will be reminded to mark as delivered or enquire delivery
 order_unreceived = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping
+sessions = 93 ; DAYS, after these session fingerprints will be deleted, offline fallbacks for contributing become invalid
 sharepoint =  48 ; HOURS, after these files will be deleted
 tmp =  24 ; HOURS, after these files will be deleted
 training_evaluation = 62 ; DAYS until supervisors are reminded to evaluate

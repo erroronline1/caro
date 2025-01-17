@@ -202,9 +202,9 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_user.* FROM caro_sessions LEFT JOIN caro_user ON caro_sessions.user_id = caro_user.id WHERE SHA2(CONCAT(SHA2(CONCAT(caro_sessions.id, caro_sessions.user_id), 256), :checksum) = :hash",
 			'sqlsrv' => "SELECT caro_user.* FROM caro_sessions LEFT JOIN caro_user ON caro_sessions.user_id = caro_user.id WHERE LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT(LOWER(CONVERT(VARCHAR(100), HASHBYTES('SHA2_256', CONCAT( LOWER(caro_sessions.id), LOWER(CONVERT(VARCHAR(100), caro_sessions.user_id, 2)))), 2)), :checksum)), 2)) = :hash"
 		],
-		'application_delete_session' => [
+		'application_delete_sessions' => [
 			'mysql' => "DELETE FROM caro_sessions WHERE date < :date",
-			'sqlsrv' => "DELETE FROM caro_sessions WHERE date < :date"
+			'sqlsrv' => "DELETE FROM caro_sessions WHERE date < CONVERT(SMALLDATETIME, :date, 120)"
 		],
 
 
