@@ -70,7 +70,7 @@ class NOTIFICATION extends API {
 		// schedule certificate request
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach ($vendors as $vendor){
-			$certificate = json_decode($vendor['certificate'], true);
+			$certificate = json_decode($vendor['certificate'] ? : '', true);
 			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(CONFIG['application']['timezone']));
 			else continue;
 			if ($validity > $today) continue;
