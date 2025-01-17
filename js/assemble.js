@@ -993,7 +993,6 @@ export class Assemble {
 		for (let [key, attribute] of Object.entries(setup)) {
 			if (EVENTS.includes(key)) {
 				if (attribute) {
-					console.log(attribute);
 					// strip anonymous function wrapping, tabs and linebreaks if applicable
 					if (typeof attribute === "function") attribute = attribute.toString();
 					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|\t{1,}|\n/gm, " ").slice(0, -1);
