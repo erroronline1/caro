@@ -36,27 +36,6 @@ export const assemble_helper = {
 	getNextElementID: getNextElementID,
 
 	/**
-	 * creates and "clicks" a link containing the canvas content within an png.image
-	 * @param {string} id canvas id
-	 * @param {string} name filename
-	 * @event download ignition for an image file
-	 */
-	exportCanvas: function (id, name) {
-		document.getElementById(id).toBlob(
-			function (blob) {
-				const blobUrl = URL.createObjectURL(blob),
-					link = document.createElement("a"); // Or maybe get it from the current document
-				link.href = blobUrl;
-				link.download = name + ".png";
-				link.click();
-				URL.revokeObjectURL(blobUrl);
-			},
-			"image/png",
-			1
-		);
-	},
-
-	/**
 	 * creates the application menu
 	 * @requires api
 	 * @param {object} content render data return from api
@@ -1014,6 +993,7 @@ export class Assemble {
 		for (let [key, attribute] of Object.entries(setup)) {
 			if (EVENTS.includes(key)) {
 				if (attribute) {
+					console.log(attribute);
 					// strip anonymous function wrapping, tabs and linebreaks if applicable
 					if (typeof attribute === "function") attribute = attribute.toString();
 					if (attribute.startsWith("function")) attribute = attribute.replace(/^function.*?\(\).*?\{|\t{1,}|\n/gm, " ").slice(0, -1);
@@ -1653,12 +1633,31 @@ export class Assemble {
 		if (!this.currentElement.attributes.imageonly) {
 			// this tile does not process attributes, therefore they can be reassigned
 			// escape \ for fakepath to avoid SyntaxError: malformed Unicode character escape sequence for filenames starting with u or other supposed control characters during new image type creation within composer
+			const create_virtual_link_and_click = {
+				name: this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, "\\\\fakepath\\\\"),
+				canvas_id: canvas.id,
+				fn: () => {
+					document.getElementById("canvas_id").toBlob(
+						function (blob) {
+							const blobUrl = URL.createObjectURL(blob),
+								link = document.createElement("a");
+							link.href = blobUrl;
+							link.download = "name" + ".png";
+							link.click();
+							URL.revokeObjectURL(blobUrl);
+						},
+						"image/png",
+						1
+					);
+				},
+			};
+
 			this.currentElement.attributes = {
 				value: this.currentElement.description,
 				type: "button",
 				class: "inlinebutton",
 				"data-type": this.currentElement.type,
-				onpointerup: "assemble_helper.exportCanvas('" + canvas.id + "', '" + this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, "\\\\fakepath\\\\") + "')",
+				onpointerup: create_virtual_link_and_click.fn.toString().replace("name", create_virtual_link_and_click.name).replace("canvas_id", create_virtual_link_and_click.canvas_id),
 			};
 			if (disabled) this.currentElement.attributes.disabled = true;
 			result = result.concat(this.button());
