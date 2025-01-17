@@ -181,7 +181,7 @@
 					{
 						"type": "checkbox",
 						"attributes": {
-							"name": "Weiterleitung persönlicher Daten an andere Mit-/Weiterversorger"
+							"name": "Weiterleitung persönlicher Daten an andere Mit- oder Weiterversorger"
 						},
 						"content": {
 							"Ich erteile durch meine Unterschrift mein - im Einzelfall widerrufliches - Einverständnis, dass alle für den Mit-/Weiterversorger meines Hilfsmittels notwendigen personenbezogenen Daten an diesen weitergeleitet werden dürfen.": []
@@ -421,7 +421,7 @@
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "enthaltene Miet-/Leihkomponenten"
+							"name": "enthaltene Miet- oder Leihkomponenten"
 						}
 					},
 					{
@@ -446,7 +446,7 @@
 					{
 						"type": "date",
 						"attributes": {
-							"name": "Rückgabe der Miet-/ Leihteile bis"
+							"name": "Rückgabe der Miet- oder Leihteile bis"
 						}
 					},
 					{
@@ -555,7 +555,7 @@
 					{
 						"type": "radio",
 						"attributes": {
-							"name": "Abdruck / Maßnahme"
+							"name": "Abdruck oder Maßnahme"
 						},
 						"content": {
 							"Gipsabdruck": [],
@@ -644,7 +644,7 @@
 						"type": "scanner",
 						"description": "Barcode oder UDI-Code scannen",
 						"attributes": {
-							"name": "Passteil / Material",
+							"name": "Passteil oder Material",
 							"multiple": true
 						},
 						"hint": "Die Informationen können auch eingegeben werden."
@@ -890,7 +890,7 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Patient / Anwender",
+							"name": "Patient oder Anwender",
 							"required": true
 						},
 						"hint": "Name, Geburtsdatum"
@@ -898,7 +898,7 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Hilfsmittel / Verordnungstext",
+							"name": "Hilfsmittel oder Verordnungstext",
 							"required": true
 						}
 					},
@@ -1064,7 +1064,7 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Ausstellungsdatum/Version der Gebrauchsanweisung"
+							"name": "Ausstellungsdatum oder Version der Gebrauchsanweisung"
 						}
 					},
 					{
@@ -1154,13 +1154,13 @@
 					{
 						"type": "range",
 						"attributes": {
-							"name": "Qualität der Produkte/Dienstleistungen"
+							"name": "Qualität der Produkte oder Dienstleistungen"
 						}
 					},
 					{
 						"type": "range",
 						"attributes": {
-							"name": "kurze Lieferzeit/Pünktlichkeit"
+							"name": "kurze Lieferzeit oder Pünktlichkeit"
 						}
 					},
 					{
@@ -1276,7 +1276,7 @@
 					{
 						"type": "scanner",
 						"attributes": {
-							"name": "Charge/Lot, UDI, SN, Lieferdatum",
+							"name": "Charge oder Lot, UDI, SN, Lieferdatum",
 							"required": true
 						}
 					}
@@ -1556,7 +1556,7 @@
 						"attributes": {
 							"name": "betroffener Bereich"
 						},
-						"hint": "lang = distales Drittel \nmittellang = mittleres Drittel \nkurz = proximales Drittel \nultrakurz = proximale 15%"
+						"hint": "lang = distales Drittel \nmittellang = mittleres Drittel \nkurz = proximales Drittel \nultrakurz = proximale 15 Prozent"
 					},
 					{
 						"type": "text",
@@ -1722,7 +1722,7 @@
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "Zusätzliche Läsionen / Druckstellen"
+							"name": "Zusätzliche Läsionen oder Druckstellen"
 						}
 					},
 					{
@@ -1834,7 +1834,7 @@
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "Therapieziel / Patientenerwartung"
+							"name": "Therapieziel oder Patientenerwartung"
 						}
 					},
 					{
@@ -2023,7 +2023,7 @@
 					{
 						"type": "text",
 						"attributes": {
-							"name": "Umfangsmaß / Höhe",
+							"name": "Umfangsmaß oder Höhe",
 							"multiple": true
 						}
 					}
@@ -2032,7 +2032,7 @@
 					{
 						"type": "number",
 						"attributes": {
-							"name": "geplante maximale Reduzierung in %"
+							"name": "geplante maximale Reduzierung in Prozent"
 						}
 					},
 					{
@@ -2079,7 +2079,7 @@
 					{
 						"type": "checkbox",
 						"attributes": {
-							"name": "Polster / Inlet"
+							"name": "Polster oder Inlet"
 						},
 						"content": {
 							"komplett": [],
