@@ -189,8 +189,10 @@ class APPLICATION extends API {
 		}
 		// user not found is handled by api as well, destroy if logout requested, condition important to avoid errors on session timeout
 		if ($_SESSION){
-			session_unset();
+			$params = session_get_cookie_params();
+			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 			session_destroy();
+			session_write_close();
 		}
 		// append login screen
 		$response = ['render' =>

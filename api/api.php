@@ -141,8 +141,10 @@ class API {
 				}
 			}
 			else {
-				session_unset();
+				$params = session_get_cookie_params();
+				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 				session_destroy();
+				session_write_close();
 			}
 		}
 	}
@@ -328,17 +330,12 @@ class API {
 	 * store a valid user session
 	 */
 	public function session_set(){
-		try{
-			SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
-				'values' => [
-					':id' => session_id(),
-					':user_id' => $_SESSION['user']['id']
-				]
-			]);
-		}
-		catch (Exception $e){
-
-		}
+		SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
+			'values' => [
+				':id' => session_id(),
+				':user_id' => $_SESSION['user']['id']
+			]
+		]);
 	}
 
 	/**
