@@ -125,8 +125,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * *Identification of characteristics related to safety* how to implement?
     * sanitize identical contents of template file
 
-* current name filter issue on importing document components? wtf?
-
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
 * force form submission by passing and validating value on submit button?
@@ -1122,7 +1120,7 @@ dialect["escape"] = ""
 
 ;forbidden names as regex-patterns
 [forbidden]
-names[] = "([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, MUST BE THE FIRST ITEM, serves for export filenames as well
+names[] = "([^,\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, MUST BE THE FIRST ITEM, serves for export filenames as well
 names[] = "^.{0,3}$" ; less than 4 characters
 
 ; immutable hardcoded reserved keywords
