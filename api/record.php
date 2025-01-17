@@ -1265,7 +1265,7 @@ class RECORD extends API {
 		$data = $search->recordsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
 
 		if (!$data) {
-			$result['render']['content'] = $this->noContentAvailable($this->_lang->GET('message.no_messages'));
+			$result['render']['content'] = $this->noContentAvailable($this->_lang->GET('record.no_records'));
 			$this->response($result);
 		}
 
@@ -1366,7 +1366,7 @@ class RECORD extends API {
 					]
 				]);
 			}
-			else array_push($content, $this->noContentAvailable($this->_lang->GET('message.no_messages')));
+			else array_push($content, $this->noContentAvailable($this->_lang->GET('record.no_records')));
 		}
 
 		$result['render']['content'] = $content;

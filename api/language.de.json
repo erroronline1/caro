@@ -753,8 +753,8 @@
 			"header": "Aufzeichnungen",
 			"record_bundles": "Dokumentenpakete",
 			"record_create_identifier": "Erstelle einen Aufkleberbogen mit Identifikatoren",
-			"record_record": "Dokument",
-			"record_summary": "Dokumentation",
+			"record_record": "Dokumente",
+			"record_summary": "Dokumentationen",
 			"risk_management": "Risikomanagement"
 		},
 		"tools": {
@@ -979,6 +979,7 @@
 		"match_bundles_default": "Auswahl",
 		"match_bundles_hint": "Prüfe ob alle Dokumente dieses Pakets berücksichtigt wurden. Du kannst direkt von hier aus fortfahren, falls etwas fehlt.",
 		"mine": "Meine Bereiche",
+		"no_records": "Dokumentationen",
 		"pseudodocument_casedocumentation": "Fall Status",
 		"recommended_continue": "Möchtest du mit einem der folgenden Dokumente fortfahren?",
 		"reidentify": "Vergib einen neuen Identifikator oder führe mit einer anderen Aufzeichnung zusammen",

@@ -754,7 +754,7 @@
 			"record_bundles": "Document bundles",
 			"record_create_identifier": "Create identifier label sheet",
 			"record_record": "Documents",
-			"record_summary": "Record summary",
+			"record_summary": "Record summaries",
 			"risk_management": "Risk management"
 		},
 		"tools": {
@@ -979,6 +979,7 @@
 		"match_bundles_default": "Select",
 		"match_bundles_hint": "Check if all forms for this bundle have been taken into account. You may add directly from here if any is missing.",
 		"mine": "My units",
+		"no_records": "records",
 		"pseudodocument_casedocumentation": "Case state",
 		"recommended_continue": "Would you like to proceed with one of the following documents?",
 		"reidentify": "Set a new identifier or merge with another record",

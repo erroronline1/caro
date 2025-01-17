@@ -436,7 +436,7 @@ class RISK extends API {
 						// prepare available documents lists
 						// get latest approved by name
 						$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-						$hidden = [];
+						$hidden = $insertdocument = [];
 						$selecteddocuments = explode(', ', $risk['proof'] ? : '');
 						foreach($documents as $key => $row) {
 							if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
