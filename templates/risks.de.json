@@ -950,7 +950,7 @@
 	{
 		"type": "characteristic",
 		"process": "Prothetik untere Extremität",
-		"risk": "dhihv_3",
+		"risk": "dgihv_3",
 		"relevance": 1,
 		"cause": "Zur Reinigung sollen geeignete Mittel verwendet werden (siehe Gebrauchsanweisung)",
 		"effect": null,
@@ -2938,7 +2938,7 @@
 	{
 		"type": "risk",
 		"process": "Prothetik untere Extremität",
-		"risk": "dgihv0",
+		"risk": "dgihv_5_10",
 		"relevance": 1,
 		"cause": "Arretierungsstift zu kurz; Verschlusssystem defekt",
 		"effect": "Sturzgefahr durch Distales Verschlusssystem greift nicht",
@@ -8073,7 +8073,7 @@
 	{
 		"type": "risk",
 		"process": "Orthetik Rumpf",
-		"risk": "7_2",
+		"risk": "dgihv7_2",
 		"relevance": 1,
 		"cause": "Nichteinhaltung von Kontrollterminen / Wartung",
 		"effect": "indikationsbedingte Versorgung evtl. nicht gegeben, Verringerung der Benutzbarkeit",
