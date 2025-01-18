@@ -952,10 +952,10 @@ export function screenshot() {
 		nav = document.querySelector("body>nav"),
 		main = document.querySelector("main");
 	const nav2 = nav.cloneNode(true);
-	main.style.marginBottom = "1.5em";
+	main.style.marginBottom = "1.5rem";
 	nav2.style.position = "unset";
-	nav2.style.margin = "0 0 -1em -1em";
-	nav2.style.width = "calc(100% + 1.9em)";
+	nav2.style.margin = "0 0 -1rem -1rem";
+	nav2.style.width = "calc(100% + 1.9rem)";
 	body.append(nav2);
 	nav.remove();
 	return "reload to return to normal";
