@@ -241,11 +241,7 @@ class RISK extends API {
 							$display = $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
 							break;
 						default: // risk
-							$display = [];
-							foreach(explode(',', $row['risk'] ? : '') as $selectedrisk){
-								if (isset($this->_lang->_USER['risks'][$selectedrisk])) $display[] = $this->_lang->_USER['risks'][$selectedrisk];
-							}
-							$display = implode(', ', $display) . ($row['cause'] ? ': ' . $row['cause'] : '');
+							$display = ($row['cause'] ? : '') . ($row['cause'] && $row['effect'] ? ': ': '') . ($row['effect'] ? : '');
 							break;
 					}
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
