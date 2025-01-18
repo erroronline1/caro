@@ -647,11 +647,15 @@ html[data-useragent*="safari"] body {
 	opacity: 1;
 	background-color: var(--article);
 
-	& + textarea,
-	& + .editor {
+	& + textarea {
 		margin-left: 1.75em;
 		margin-top: -1.5em;
 	}
+	& + .editor {
+		margin-left: 2.25em;
+		margin-top: -1.85em;
+	}
+
 }
 
 .editor {
@@ -671,16 +675,16 @@ html[data-useragent*="safari"] body {
 		padding: 0;
 		border: 0;
 		margin: 0;
-		min-width: 500px;
+		min-width: 500em;
 		outline: none;
 		resize: none;
-		height: 9999px;
+		height: calc(1.5em * 1000); /* about 1000 lines of 1.5 line-height should suffice*/
 	}
 
 	.line-numbers {
-		width: 20px;
+		width: 2em;
 		text-align: right;
-		height: 9999px;
+		height: calc(1.5em * 1000);
 		line-height: inherit;
 	}
 
