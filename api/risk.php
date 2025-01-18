@@ -672,70 +672,72 @@ class RISK extends API {
 							];
 						}
 					}
-					if ($risk['id'] && !$risk['hidden']){
-						$result['render']['content'][] = [
-							[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->_USER['risk']['type'][$risk['type']]
-								],
-								'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
-							],[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('risk.process'),
-								],
-								'content' => $risk['process'] ? : '',
-							], [
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('risk.risk_related'),
-								],
-								'content' => implode("\n", array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
-							], [
-								'type' => 'radio',
-								'attributes' => [
-									'name' => $this->_lang->GET('risk.relevance'),
-								],
-								'content' => [
-									$this->_lang->GET('risk.relevance_yes') => $risk['relevance'] === 1 ? ['checked' => true, 'value' => 1, 'disabled' => true] : ['value' => 1, 'disabled' => true], 
-									$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => 0, 'class' => 'red', 'disabled' => true] : ['value' => 0, 'class' => 'red', 'disabled' => true],
-							]
-							], [
-								'type' => 'textsection',
-								'content' => ($risk['cause'] ? $this->_lang->GET('risk.cause') . ': ' . $risk['cause'] . "\n" : '') .
-									($risk['effect'] ? $this->_lang->GET('risk.effect') . ': ' . $risk['effect'] . "\n" : '') .
-									$this->_lang->GET('risk.probability') . ': ' . $this->_lang->_USER['risk']['probabilities'][$risk['probability'] - 1] . "\n" .
-									$this->_lang->GET('risk.damage') . ': ' . $this->_lang->_USER['risk']['damages'][$risk['damage'] - 1] . "\n"
-							], [
-								'type' => 'textsection',
-								'attributes' => [
-									'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-									'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+					else {
+						if ($risk['id'] && !$risk['hidden']){
+							$result['render']['content'][] = [
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->_USER['risk']['type'][$risk['type']]
+									],
+									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
+								],[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('risk.process'),
+									],
+									'content' => $risk['process'] ? : '',
+								], [
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('risk.risk_related'),
+									],
+									'content' => implode("\n", array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
+								], [
+									'type' => 'radio',
+									'attributes' => [
+										'name' => $this->_lang->GET('risk.relevance'),
+									],
+									'content' => [
+										$this->_lang->GET('risk.relevance_yes') => $risk['relevance'] === 1 ? ['checked' => true, 'value' => 1, 'disabled' => true] : ['value' => 1, 'disabled' => true], 
+										$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => 0, 'class' => 'red', 'disabled' => true] : ['value' => 0, 'class' => 'red', 'disabled' => true],
 								]
-							], [
-								'type' => 'textsection',
-								'content' => ($risk['measure'] ? $this->_lang->GET('risk.measure') . ': ' . $risk['measure'] . "\n" : '') .
-									$this->_lang->GET('risk.measure_probability') . ': ' . $this->_lang->_USER['risk']['probabilities'][$risk['measure_probability'] - 1] . "\n" .
-									$this->_lang->GET('risk.measure_damage') . ': ' . $this->_lang->_USER['risk']['damages'][$risk['measure_damage'] - 1] . "\n"
-							], [
-								'type' => 'textsection',
-								'attributes' => [
-									'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
-									'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+								], [
+									'type' => 'textsection',
+									'content' => ($risk['cause'] ? $this->_lang->GET('risk.cause') . ': ' . $risk['cause'] . "\n" : '') .
+										($risk['effect'] ? $this->_lang->GET('risk.effect') . ': ' . $risk['effect'] . "\n" : '') .
+										$this->_lang->GET('risk.probability') . ': ' . $this->_lang->_USER['risk']['probabilities'][$risk['probability'] - 1] . "\n" .
+										$this->_lang->GET('risk.damage') . ': ' . $this->_lang->_USER['risk']['damages'][$risk['damage'] - 1] . "\n"
+								], [
+									'type' => 'textsection',
+									'attributes' => [
+										'class' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
+										'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+									]
+								], [
+									'type' => 'textsection',
+									'content' => ($risk['measure'] ? $this->_lang->GET('risk.measure') . ': ' . $risk['measure'] . "\n" : '') .
+										$this->_lang->GET('risk.measure_probability') . ': ' . $this->_lang->_USER['risk']['probabilities'][$risk['measure_probability'] - 1] . "\n" .
+										$this->_lang->GET('risk.measure_damage') . ': ' . $this->_lang->_USER['risk']['damages'][$risk['measure_damage'] - 1] . "\n"
+								], [
+									'type' => 'textsection',
+									'attributes' => [
+										'class' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? 'red' : 'green',
+										'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
+									]
+								], [
+									'type' => 'textsection',
+									'content' => ($risk['risk_benefit'] ? $this->_lang->GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] . "\n" : '') .
+										($risk['measure_remainder'] ? $this->_lang->GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] . "\n" : '')
+								], [
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('risk.proof'),
+									],
+									'linkedcontent' => implode("\n", array_values(array_map(fn($d) => $d ? '<a href="javascript:api.record(\'get\', \'document\', \'' . $d . '\')">' . $d . '</a>': null, explode(', ', $risk['proof'] ? : ''))))
 								]
-							], [
-								'type' => 'textsection',
-								'content' => ($risk['risk_benefit'] ? $this->_lang->GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] . "\n" : '') .
-									($risk['measure_remainder'] ? $this->_lang->GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] . "\n" : '')
-							], [
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('risk.proof'),
-								],
-								'linkedcontent' => implode("\n", array_values(array_map(fn($d) => $d ? '<a href="javascript:api.record(\'get\', \'document\', \'' . $d . '\')">' . $d . '</a>': null, explode(', ', $risk['proof'] ? : ''))))
-							]
-						];
+							];
+						}
 					}
 					break;
 				}
