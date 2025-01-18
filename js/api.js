@@ -1345,10 +1345,27 @@ export const api = {
 			},
 			title = {
 				risk: api._lang.GET("menu.records.risk_management"),
+				search: api._lang.GET("risk.search"),
 			};
 		switch (method) {
 			case "get":
-				switch (request[3]) {
+				switch (request[1]) {
+					case "search":
+						if (!request[2]) {
+							api.risk("get", "risk");
+							return;
+						}
+						successFn = function (data) {
+							let list = document.querySelector("hr").previousElementSibling;
+							if (list.previousElementSibling) list.remove();
+							if (data.render.content) {
+								const render = new Assemble(data.render);
+								render.initializeSection("hr");
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
 					default:
 						successFn = function (data) {
 							if (data.render) {

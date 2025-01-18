@@ -23,12 +23,13 @@ class RISK extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_search = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
-		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedID = $this->_search = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -261,7 +262,21 @@ class RISK extends API {
 					if (isset($this->_lang->_USER['risks'][$selectedrisk]) && isset($risks[$this->_lang->_USER['risks'][$selectedrisk]])) $risks[$this->_lang->_USER['risks'][$selectedrisk]]['checked'] = true;
 				}
 
-				$result['render'] = ['content' => []];
+				$result['render'] = ['content' => [
+					[
+						[
+							'type' => 'search',
+							'attributes' => [
+								'name' => $this->_lang->GET('risk.search'),
+								'onkeypress' => "if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}",
+								]
+						]
+					],[
+						[
+							'type' => 'hr'
+						]
+					]
+				]];
 
 				// render selection of types and their content, one selection per process
 				$selection = [];
@@ -447,7 +462,7 @@ class RISK extends API {
 										'attributes' => [
 											'name' => $this->_lang->GET('risk.risk_related'),
 										],
-										'content' => implode("\n", array_values(array_map(fn($r)=> $r ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
+										'content' => implode("\n", array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
 									]
 								];
 							}
@@ -676,7 +691,7 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.risk_related'),
 								],
-								'content' => implode("\n", array_values(array_map(fn($r)=> $r ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
+								'content' => implode("\n", array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
 							], [
 								'type' => 'radio',
 								'attributes' => [
@@ -724,10 +739,23 @@ class RISK extends API {
 					}
 					break;
 				}
-
 				$this->response($result);
 				break;
 		}
+	}
+
+	/**
+	 *                       _   
+	 *   ___ ___ ___ ___ ___| |_ 
+	 *  |_ -| -_| .'|  _|  _|   |
+	 *  |___|___|__,|_| |___|_|_|
+	 * 
+	 */
+	public function search(){
+		require_once('_shared.php');
+		$search = new SHARED($this->_pdo);
+		$result = ['render' => ['content' => $search->risksearch(['search' => $this->_search])]];
+		$this->response($result);
 	}
 }
 ?>

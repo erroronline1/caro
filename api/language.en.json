@@ -1045,6 +1045,8 @@
 		"risk_related": "Risk related",
 		"risk_save_error": "There has been an error saving, please try again.",
 		"risk_saved": "The risk management entry has been saved",
+		"search":"Search",
+		"search_result":"Matches for this search for \":search\"",
 		"type": {
 			"risk": "Risk",
 			"characteristic": "Characteristic related to safety"

@@ -1045,6 +1045,8 @@
 		"risk_related": "Risikobezug",
 		"risk_save_error": "Es trat ein Fehler bei der Speicherung auf, bitte versuche es erneut.",
 		"risk_saved": "Der Eintrag im Risikomanagement wurde gespeichert",
+		"search":"Suche",
+		"search_result":"Ergebnisse für die Suche nach \":search\"",
 		"type": {
 			"risk": "Risiko",
 			"characteristic": "Eigenschaft mit Auswirkungen auf die Sicherheit"

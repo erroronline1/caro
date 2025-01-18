@@ -211,6 +211,77 @@ class SHARED {
 		return $contexts;
 	}
 	
+	/**
+	 *       _     _                       _   
+	 *   ___|_|___| |_ ___ ___ ___ ___ ___| |_ 
+	 *  |  _| |_ -| '_|_ -| -_| .'|  _|  _|   |
+	 *  |_| |_|___|_,_|___|___|__,|_| |___|_|_|
+	 *  
+	 * returns risk tiles based on search
+	 * @param array $parameter named array, currently with search string
+	 * 
+	 * @return array render content
+	 */
+	public function risksearch($parameter = []){
+		$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+		$productsPerSlide = 0;
+		$matches = [[]];
+		foreach($risk_datalist as $row){
+			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
+			$row['risk'] = implode(' ', array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
+			if (stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search'])){
+
+				$article = intval(count($matches) - 1);
+				if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+					$matches[$article][] = [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('risk.search_result', [':search' => $parameter['search']])
+							],
+						]
+					];
+				}
+				$slide = intval(count($matches[$article]) - 1);	
+				switch ($row['type']){
+					case 'characteristic': // implement further cases if suitable, according to languagefile
+						$content = $row['process'] . ': ' . $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
+						break;
+					default: // risk
+						$content = $row['process'] . ': ' . ($row['cause'] ? : '') . ($row['cause'] && $row['effect'] ? ': ': '') . ($row['effect'] ? : '');
+						break;
+				}
+				if ($row['hidden']) $content .= ' [X]';
+				$matches[$article][$slide][] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onpointerup' => "api.risk('get', 'risk', " . $row['id'] . ")",
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->_USER['risk']['type'][$row['type']],
+								'class' => $row['relevance'] ? 'green' : 'red'
+							],
+							'content' => $content
+						]
+					]
+				];
+			}
+		}
+		if (!$matches[0]) $matches[0][] = [
+			[
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('risk.search_result', [':search' => $parameter['search']])
+				],
+			]
+		];
+		$content = $matches;
+		return $content;
+	}
+
     /**
 	 *                 _         _                       _
 	 *   ___ ___ ___ _| |_ _ ___| |_ ___ ___ ___ ___ ___| |_
@@ -321,13 +392,14 @@ class SHARED {
 									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
 								],
 								'content' => [
-									['type' => 'textsection',
-									'attributes' => [
-										'name' => $incorporationState
-									],
-									'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
-								]
-							];
+									[
+										'type' => 'textsection',
+										'attributes' => [
+											'name' => $incorporationState
+										],
+										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
+									]
+								];
 					}
 				}
 				if (!$matches[0]) $matches[0][] = [

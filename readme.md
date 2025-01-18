@@ -114,14 +114,11 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * refactor risk management for improved compliance to iso 14971
-    * search risks for keywords, display risks as textsection for unapproved users, matching search
     * audit:
         * fetch risks and match with characteristics, higlight all unaccounted risks per process (not applicable are accounted for)
         * reversed view: fetch processes, list accounted risks
         * risk export as xlsx with processwise characteristics-sheets, and processwise sheets
         * select latest date for display/export like documents
-    * manager interface for risks:
-        * no deletion of risks, only append for regulatory compliance
     * *Identification of characteristics related to safety* how to implement?
     * sanitize identical contents of template file
 
@@ -3494,6 +3491,20 @@ Parameters
 Sample response
 ```
 {"response":{"msg":"The edited risk has been saved","id":2,"type":"success"}}
+```
+
+> GET ./api/api.php/risk/search/{search}
+
+Returns risks matching {search}
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | required | search term for article_no, article_name, article_alias, article_ean |
+
+Sample response
+```
+{"render":{"content":[[[{"type":"textsection","attributes":{"name":"Ergebnisse f\u00fcr die Suche druck"}},{"type":"tile","attributes":{"onpointerup":"api.risk('get', 'risk', 2)"},"content":[{"type":"textsection","attributes":{"name":"Risiko","class":"green"},"content":"CAD: unzureichende Passgenauigkeit nach digitaler\/additiver Modellerstellung: Druckstellen"}]},{"type":"tile","attributes":{"onpointerup":"api.risk('get', 'risk', 455)"},"content":[{"type":"textsection","attributes":{"name":"Risiko","class":"green"},"content":"Einlagen: Einlagen f\u00fcr die verwendeten Schuhe zu gro\u00df \/ zu klein: Druckstellen an Phalangen"}]},....
 ```
 
 [Content](#content)
