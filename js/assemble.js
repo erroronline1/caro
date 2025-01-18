@@ -1025,6 +1025,7 @@ export class Assemble {
 			result.push(document.createTextNode(match[1]));
 			result.push(document.createElement("br"));
 		}
+		result.pop(); // drop last br
 		return result;
 	}
 
