@@ -431,6 +431,11 @@
 		"record_export": "Export record as PDF",
 		"record_export_xlsx": "Export record as XLSX",
 		"regulatory_warning_content": "This regulatory issue has no assigned documents!",
+		"risk_export_column":{
+			"acceptancelevel":"Acceptance level",
+			"author": "Author",
+			"measureacceptancelevel":"Acceptance level afterwards"
+		},
 		"risk_issues": {
 			"assignmenterror": "Following risks or characteristics for :process have an assignment error. Please revise:",
 			"characteristic": "Risks are described for :process, but no fitting characteristics:",

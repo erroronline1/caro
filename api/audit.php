@@ -964,7 +964,6 @@ class AUDIT extends API {
 	 */
 	private function risks(){
 		$content = $issues = [];
-		$noissues = false;
 
 		$this->_requestedDate = $this->_requestedDate ? : $this->_currentdate->format('Y-m-d');
 		$this->_requestedTime = $this->_requestedTime ? : $this->_currentdate->format('H:i:59');
@@ -1007,8 +1006,7 @@ class AUDIT extends API {
 			else {
 				// compare key beginnings to match main risk groups according to languagefile
 				foreach ($properties['characteristic'] as $risk){
-					$properties['risk'] = array_filter($properties['risk'], fn($v)=> !str_starts_with($v, $risk));
-				
+					$properties['risk'] = array_filter($properties['risk'], fn($v)=> !str_starts_with($v, $risk));				
 				}
 				if ($properties['risk']){ // remaining if not filtered out completely
 					$missing[$process]['risk'] = array_diff($properties['characteristic'], $properties['risk']); // all required but not present risks
@@ -1037,7 +1035,6 @@ class AUDIT extends API {
 		}
 		if (!$issues) {
 			$issues = $this->noContentAvailable($this->_lang->GET('audit.risk_issues_none'))[0];
-			$noissues = true;
 		}
 
 		// add export button
@@ -1067,16 +1064,11 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
 			]
 		];
-		if ($noissues){
-			//disable export button
-			$content[count($content) - 1][3]['attributes']['disabled'] = true;
-			unset($content[count($content) - 1][3]['attributes']['onpointerup']);
-		}
 
 		$content[] = [
 			'type' => 'textsection',
@@ -1103,17 +1095,100 @@ class AUDIT extends API {
 			'title' => $this->_lang->GET('audit.checks_type.risks'),
 			'date' => $this->_currentdate->format('y-m-d H:i')
 		];
+		$downloadfiles = [];
 
+		// render issue list for pdf export
 		$issues = $this->risks();
 		foreach($issues as $issue){
 			if (!isset($issue['type'])) continue;
 			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['content']) ? $issue['content'] : ' ';	
 		}
+		if (count($summary['content']) > 1){
+			$downloadfiles[$this->_lang->GET('audit.risk_issues_none')] = [
+				'href' => PDF::auditPDF($summary)
+			];
+		}
 
-		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => PDF::auditPDF($summary)
-		];
+		// create risk dump as xlsx, sheetwise processes
+
+		// prepare existing risks lists
+		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+
+		// gathering and distributing entry properties
+		$entries = [];
+
+		foreach($risks as $risk){
+			if ($risk['date'] >= $this->_requestedDate . ' ' . $this->_requestedTime) continue;
+			if ($risk['hidden']) {
+				$risk['hidden'] = json_decode($risk['hidden'], true);
+				if ($risk['hidden']['date'] <= $this->_requestedDate . ' ' . $this->_requestedTime)
+					continue;
+			}
+
+			// translate
+			$risk['risk'] = implode("\n", array_values(array_map(fn($r)=> isset($this->_lang->_DEFAULT['risks'][$r]) ? $this->_lang->_DEFAULT['risks'][$r] : $r, explode(',', $risk['risk'] ? : ''))));
+			$risk['relevance'] = $risk['relevance'] ? $this->_lang->GET('risk.relevance_yes', [], true) : $this->_lang->GET('risk.relevance_no', [], true);
+
+			// sort to process and type, consider form fields and names within GET RISK->risk() as well
+			if (!isset($entries[$risk['process']])) $entries[$risk['process']] = [];
+			if (!isset($entries[$risk['process']][$this->_lang->_DEFAULT['risk']['type'][$risk['type']]])) $entries[$risk['process']][$this->_lang->_DEFAULT['risk']['type'][$risk['type']]] = [];
+			switch($risk['type']){
+				case 'characteristic': // implement further cases if suitable, according to languagefile
+					$entries[$risk['process']][$this->_lang->_DEFAULT['risk']['type'][$risk['type']]][] = [
+						$this->_lang->GET('risk.type.characteristic', [], true) => $risk['measure'] ? : '',
+						$this->_lang->GET('risk.relevance', [], true) => $risk['relevance'],
+						$this->_lang->GET('risk.cause', [], true) => $risk['cause'] ? : '',
+						$this->_lang->GET('risk.risk_related', [], true) => $risk['risk'],
+						$this->_lang->GET('audit.risk_export_column.author', [], true) => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']], true) : ''
+					];
+					break;
+				default: //risks
+					$entries[$risk['process']][$this->_lang->_DEFAULT['risk']['type'][$risk['type']]][] = [
+						$this->_lang->GET('risk.risk_related', [], true) => $risk['risk'],
+						$this->_lang->GET('risk.relevance', [], true) => $risk['relevance'],
+						$this->_lang->GET('risk.cause', [], true) => $risk['cause'] ? : '',
+						$this->_lang->GET('risk.effect', [], true) => $risk['effect'] ? : '',
+						$this->_lang->GET('risk.probability', [], true) => $this->_lang->_DEFAULT['risk']['probabilities'][min($risk['probability'], count($this->_lang->_DEFAULT['risk']['probabilities'])) - 1],
+						$this->_lang->GET('risk.damage', [], true) => $this->_lang->_DEFAULT['risk']['probabilities'][min($risk['damage'], count($this->_lang->_DEFAULT['risk']['damages'])) - 1],
+						$this->_lang->GET('audit.risk_export_column.acceptancelevel', [], true) => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above', [], true) : $this->_lang->GET('risk.acceptance_level_below', [], true),
+						$this->_lang->GET('risk.measure', [], true) => $risk['measure'] ? : '',
+						$this->_lang->GET('risk.measure_probability', [], true) => $this->_lang->_DEFAULT['risk']['probabilities'][min($risk['measure_probability'], count($this->_lang->_DEFAULT['risk']['probabilities'])) - 1],
+						$this->_lang->GET('risk.measure_damage', [], true) => $this->_lang->_DEFAULT['risk']['probabilities'][min($risk['measure_damage'], count($this->_lang->_DEFAULT['risk']['damages'])) - 1],
+						$this->_lang->GET('audit.risk_export_column.measureacceptancelevel', [], true) => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above', [], true) : $this->_lang->GET('risk.acceptance_level_below', [], true),
+						$this->_lang->GET('risk.risk_benefit', [], true) => $risk['risk_benefit'] ? : '',
+						$this->_lang->GET('risk.measure_remainder', [], true) => $risk['measure_remainder'] ? : '',
+						$this->_lang->GET('risk.proof', [], true) => $risk['proof'] ? implode("\n", explode(', ', $risk['proof'])): '',
+						$this->_lang->GET('audit.risk_export_column.author', [], true) => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']], true) : ''
+					];
+			}
+		}
+		if ($entries){
+			$tempFile = UTILITY::directory('tmp') . '/' . $summary['filename'] . '_' . time() . '.xlsx';
+			$writer = new XLSXWriter();
+			$writer->setAuthor($_SESSION['user']['name']); 
+			foreach($entries as $process => $types){
+				foreach ($types as $type => $lines){
+					// write each to xlsx sheet
+					$sheetname = '';
+					preg_match_all('/\w+/', $process . ' ' . $type, $words);
+					foreach($words[0] as $word){
+						$sheetname .= substr($word, 0, 1) . preg_replace('/[\Waeiou]/i', '', substr($word, 1));
+					}
+					$writer->writeSheetRow($sheetname, [$process, $type]);
+					$writer->writeSheetRow($sheetname, []);
+
+					$writer->writeSheetRow($sheetname, array_keys($lines[0]));
+					foreach ($lines as $line)
+						$writer->writeSheetRow($sheetname, array_values($line));				
+				}
+			}
+			$writer->writeToFile($tempFile);
+
+			// provide downloadfile			
+			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
+				'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']
+			];
+		}
 
 		$body = [];
 		array_push($body, 
