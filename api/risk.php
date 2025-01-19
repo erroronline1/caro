@@ -221,18 +221,11 @@ class RISK extends API {
 					if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 
 					// provide datalists with unique values and the most recent letter cases
-					foreach(['process', 'measure', 'risk_benefit', 'measure_remainder'] as $data){
+					foreach(['cause', 'effect', 'process', 'measure', 'risk_benefit', 'measure_remainder'] as $data){
 						if (!isset($datalist[$data])) $datalist[$data] = [];
 						$row[$data] = trim($row[$data] ? : '');
 						if (!$row[$data]) continue;
-						switch($data){
-							case 'measure':
-								if ($risk['type'] ===  $row['type']) $datalist[$data][strtolower($row[$data])] = $row[$data];
-								break;
-							default:
-								$datalist[$data][strtolower($row[$data])] = $row[$data];
-								break;
-						}
+						if ($risk['type'] === $row['type']) $datalist[$data][strtolower($row[$data])] = $row[$data];
 					}
 
 					if (!isset($select[$row['type']])) $select[$row['type']] = [];
@@ -314,7 +307,7 @@ class RISK extends API {
 				$isactive = !$risk['hidden'] ? ['checked' => true] : [];
 				$isinactive = $risk['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 
-				// render form according to type
+				// render form according to type, consider form fields and names within AUDIT->exportrisks() as well
 				switch($risk['type']){
 					case 'characteristic': // implement further cases if suitable, according to languagefile
 						if (PERMISSION::permissionFor('riskmanagement')) {
@@ -377,7 +370,8 @@ class RISK extends API {
 										'name' => $this->_lang->GET('risk.cause'),
 										'value' => $risk['cause'] ? : '',
 										'rows' => 4,
-									]
+									],
+									'autocomplete' => isset($datalist['cause']) ? array_values($datalist['cause']) : null
 								], [
 									'type' => 'checkbox2text',
 									'attributes' => [
@@ -554,7 +548,8 @@ class RISK extends API {
 									'name' => $this->_lang->GET('risk.cause'),
 									'value' => $risk['cause'] ? : '',
 									'rows' => 4
-								]
+								],
+								'autocomplete' => isset($datalist['cause']) ? array_values($datalist['cause']) : null
 							], [
 								'type' => 'br'
 							], [
@@ -563,7 +558,8 @@ class RISK extends API {
 									'name' => $this->_lang->GET('risk.effect'),
 									'value' => $risk['effect'] ? : '',
 									'rows' => 4,
-								]
+								],
+								'autocomplete' => isset($datalist['effect']) ? array_values($datalist['effect']) : null
 							], [
 								'type' => 'br'
 							], [
