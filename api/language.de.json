@@ -437,6 +437,8 @@
 			"risk": "Für folgende Eigenschaften des Prozesses :process sind die Risiken unvollständig erfasst:"
 		},
 		"risk_issues_none": "Probleme im Risikomanagement",
+		"risk_issues_report": "Problembericht für den Status am :date",
+		"risks_update_button": "Aktualisiere gültige Risken zum angebenen Zeitpunkt",
 		"sample_check_revoke": "widerrufen",
 		"sample_check_revoke_confirm": "Ja, Stichprobenprüfung widerrufen",
 		"skillfulfilment_warning": "Dieser Fähigkeit ist kein Mitarbeiter zugeordnet!",

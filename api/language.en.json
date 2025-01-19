@@ -437,6 +437,8 @@
 			"risk": "Following characteristics of :process have incomplete risk records:"
 		},
 		"risk_issues_none": "risk management issues",
+		"risk_issues_report": "Issue report for state on :date",
+		"risks_update_button": "Update risks valid at the given date/time",
 		"sample_check_revoke": "Revoke",
 		"sample_check_revoke_confirm": "Yes, revoke sample check",
 		"skillfulfilment_warning": "This skill has no assigned users!",

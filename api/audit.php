@@ -964,23 +964,24 @@ class AUDIT extends API {
 	 */
 	private function risks(){
 		$content = $issues = [];
+		$noissues = false;
+
+		$this->_requestedDate = $this->_requestedDate ? : $this->_currentdate->format('Y-m-d');
+		$this->_requestedTime = $this->_requestedTime ? : $this->_currentdate->format('H:i:59');
+
 		// prepare existing risks lists
 		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
-		// add export button
-		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
-					'data-type' => 'download'
-				]
-			]
-		];
+
 		// gathering and distributing entry properties
 		$entries = [];
 		foreach($risks as $risk){
-			if ($risk['hidden']) continue;
+			if ($risk['date'] >= $this->_requestedDate . ' ' . $this->_requestedTime) continue;
+			if ($risk['hidden']) {
+				$risk['hidden'] = json_decode($risk['hidden'], true);
+				if ($risk['hidden']['date'] <= $this->_requestedDate . ' ' . $this->_requestedTime)
+					continue;
+			}
+
 			if (!isset($entries[$risk['process']])) $entries[$risk['process']] = ['characteristic' => [], 'risk' => [], 'assignmenterror' => []];
 			$risk['risk'] = explode(',', $risk['risk'] ? : '');
 			// detect key errors of risks in case of faulty template imports or changes within languagefile
@@ -996,6 +997,7 @@ class AUDIT extends API {
 			// append assigned risks to type
 			array_push($entries[$risk['process']][$risk['type']], ...$risk['risk']);
 		}
+
 		// match required characteristics risks with actual risks
 		$missing = [];
 		foreach($entries as $process => $properties){
@@ -1033,8 +1035,56 @@ class AUDIT extends API {
 				];
 			}
 		}
-		if (!$issues) $issues = $this->noContentAvailable($this->_lang->GET('audit.risk_issues_none'))[0];
+		if (!$issues) {
+			$issues = $this->noContentAvailable($this->_lang->GET('audit.risk_issues_none'))[0];
+			$noissues = true;
+		}
 
+		// add export button
+		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
+			[
+				'type' => 'date',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.documents_date'),
+					'value' => $this->_requestedDate,
+					'id' => '_documents_date'
+				]
+			], [
+				'type' => 'time',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.documents_time'),
+					'value' => $this->_requestedTime,
+					'id' => '_documents_time' 
+				]
+			], [
+				'type' => 'button',
+				'attributes' => [
+					'data-type' => 'generateupdate',
+					'value' => $this->_lang->GET('audit.risks_update_button'),
+					'onpointerup' => "api.audit('get', 'checks', 'risks', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
+				]
+			], [
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('audit.record_export'),
+					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'data-type' => 'download'
+				]
+			]
+		];
+		if ($noissues){
+			//disable export button
+			$content[count($content) - 1][3]['attributes']['disabled'] = true;
+			unset($content[count($content) - 1][3]['attributes']['onpointerup']);
+		}
+
+		$content[] = [
+			'type' => 'textsection',
+			'attributes' => [
+				'name' => $this->_lang->GET('audit.risk_issues_report', [':date' => $this->_requestedDate . ' ' . $this->_requestedTime])
+			]		
+		];
+		
 		array_push($content, ...$issues);
 		return $content;
 	}
@@ -1055,11 +1105,9 @@ class AUDIT extends API {
 		];
 
 		$issues = $this->risks();
-		foreach($issues as $process){
-			foreach($process as $risk){
-				//var_dump($risk);
-				if ($risk['type'] === 'textsection' && isset($risk['attributes']['name'])) $summary['content'][$risk['attributes']['name']] = isset($risk['content']) ? $risk['content'] : ' ';	
-			}
+		foreach($issues as $issue){
+			if (!isset($issue['type'])) continue;
+			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['content']) ? $issue['content'] : ' ';	
 		}
 
 		$downloadfiles = [];

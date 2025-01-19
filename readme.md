@@ -115,11 +115,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * refactor risk management for improved compliance to iso 14971
     * audit:
-        * fetch risks and match with characteristics, higlight all unaccounted risks per process (not applicable are accounted for)
-        * reversed view: fetch processes, list accounted risks
         * risk export as xlsx with processwise characteristics-sheets, and processwise sheets
-        * select latest date for display/export like documents
-    * *Identification of characteristics related to safety* how to implement?
     * sanitize identical contents of template file
 
 #### issues
