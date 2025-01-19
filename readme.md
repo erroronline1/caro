@@ -114,9 +114,12 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * refactor risk management for improved compliance to iso 14971
-    * audit:
-        * risk export as xlsx with processwise characteristics-sheets, and processwise sheets
     * sanitize identical contents of template file
+    * documentation
+        * [risk-module](#risk-management)
+        * [regulatory goals](#intended-regulatory-goals)
+* make datalist part of text like autocomplete for textbox instead of datalist widget
+* same goes for range
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
