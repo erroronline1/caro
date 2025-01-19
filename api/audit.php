@@ -977,43 +977,64 @@ class AUDIT extends API {
 				]
 			]
 		];
-		$process = '';
-		$issues = [];
+		// gathering and distributing entry properties
+		$entries = [];
 		foreach($risks as $risk){
-			if ($risk['process'] !== $process) $issues[] = [[
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $risk['process']
-				],
-			]];
-			
-			// fallback for occasional level changes in languagefile
-			$risk['probability'] = min($risk['probability'], count($this->_lang->_USER['risk']['probabilities']));
-			$risk['damage'] = min($risk['damage'], count($this->_lang->_USER['risk']['damages']));
-			$risk['measure_probability'] = min($risk['measure_probability'], count($this->_lang->_USER['risk']['probabilities']));
-			$risk['measure_damage'] = min($risk['measure_damage'], count($this->_lang->_USER['risk']['damages']));
-			
-			$process = $risk['process'];
-			$last_edit = json_decode($risk['last_edit'], true);
-			$issues[count($issues)-1][] = [
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $risk['risk'] .
-					" \n" . $this->_lang->GET('risk.cause') . ': ' . $risk['cause']
-				],
-				'content' => $this->_lang->GET('risk.effect') . ': ' . $risk['effect'] .
-				" \n" . $this->_lang->GET('risk.probability') . ': ' . (isset($this->_lang->_USER['risk']['probabilities'][$risk['probability']-1]) ? $this->_lang->_USER['risk']['probabilities'][$risk['probability'] - 1] : $this->_lang->_USER['risk']['probabilities'][count($this->_lang->_USER['risk']['probabilities']) - 1]) .
-				" \n" . $this->_lang->GET('risk.damage') . ': ' . (isset($this->_lang->_USER['risk']['damages'][$risk['damage']-1]) ? $this->_lang->_USER['risk']['damages'][$risk['damage'] - 1] : $this->_lang->_USER['risk']['damages'][count($this->_lang->_USER['risk']['damages']) - 1]) .
-				" \n" . ($risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')) .
-				" \n" . $this->_lang->GET('risk.measure') . ': ' . $risk['measure'] .
-				" \n" . $this->_lang->GET('risk.measure_probability') . ': ' . (isset($this->_lang->_USER['risk']['probabilities'][$risk['measure_probability']-1]) ? $this->_lang->_USER['risk']['probabilities'][$risk['measure_probability'] - 1] : $this->_lang->_USER['risk']['probabilities'][count($this->_lang->_USER['risk']['probabilities']) - 1]) .
-				" \n" . $this->_lang->GET('risk.measure_damage') . ': ' . (isset($this->_lang->_USER['risk']['damages'][$risk['measure_damage']-1]) ? $this->_lang->_USER['risk']['damages'][$risk['measure_damage'] - 1] : $this->_lang->_USER['risk']['damages'][count($this->_lang->_USER['risk']['damages']) - 1]) .
-				" \n" . ($risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')) .
-				" \n" . $this->_lang->GET('risk.risk_benefit') . ': ' . $risk['risk_benefit'] .
-				" \n" . $this->_lang->GET('risk.measure_remainder') . ': ' . $risk['measure_remainder'] .
-				(isset($last_edit['user']) ? " \n" . $this->_lang->GET('risk.last_edit', [':user' => $last_edit['user'], ':date' => $last_edit['date']]): '')
-			];
+			if ($risk['hidden']) continue;
+			if (!isset($entries[$risk['process']])) $entries[$risk['process']] = ['characteristic' => [], 'risk' => [], 'assignmenterror' => []];
+			$risk['risk'] = explode(',', $risk['risk'] ? : '');
+			// detect key errors of risks in case of faulty template imports or changes within languagefile
+			if ($missing_assignments = array_filter(array_diff($risk['risk'], array_keys($this->_lang->_USER['risks'])), fn($v) => boolval($v))){
+				switch($risk['type']){
+					case 'characteristic': // implement further cases if suitable, according to languagefile
+						$entries[$risk['process']]['assignmenterror'][] = $this->_lang->_USER['risk']['type'][$risk['type']] . ': ' . $risk['measure'] . ' - ' . implode(', ', $missing_assignments);
+						break;
+					default: //risks
+						$entries[$risk['process']]['assignmenterror'][] = $this->_lang->_USER['risk']['type'][$risk['type']] . ': ' . $risk['cause'] . ' - ' . $risk['effect'] . ' - ' . implode(', ', $missing_assignments);
+				}
+			}
+			// append assigned risks to type
+			array_push($entries[$risk['process']][$risk['type']], ...$risk['risk']);
 		}
+		// match required characteristics risks with actual risks
+		$missing = [];
+		foreach($entries as $process => $properties){
+			if (!isset($missing[$process])) $missing[$process] = ['characteristic' => [], 'risk' => [], 'assignmenterror' => $properties['assignmenterror']];
+			if (!$properties['characteristic'])
+				array_push($missing[$process]['characteristic'], ...$properties['risk']); // risks are probably set but not yet defined as required
+			else {
+				// compare key beginnings to match main risk groups according to languagefile
+				foreach ($properties['characteristic'] as $risk){
+					$properties['risk'] = array_filter($properties['risk'], fn($v)=> !str_starts_with($v, $risk));
+				
+				}
+				if ($properties['risk']){ // remaining if not filtered out completely
+					$missing[$process]['risk'] = array_diff($properties['characteristic'], $properties['risk']); // all required but not present risks
+					$missing[$process]['characteristic'] = array_diff($properties['risk'], $properties['characteristic']); // all set risks not required by characteristics
+				}
+			}
+		}
+
+		// render issues with translated risks or literal property values
+		$issues = [];
+		foreach($missing as $process => $properties){
+			foreach($properties as $key => $value) {
+				$value = array_unique($value);
+				if (!$value) continue;
+
+				$issuecontent = implode("\n", $value);
+				if (!in_array($key, ['assignmenterror'])) $issuecontent = implode("\n", array_values(array_map(fn($r)=> isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, $value)));
+				$issues[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.risk_issues.' . $key, [':process' => $process])
+					],
+					'content' => $issuecontent
+				];
+			}
+		}
+		if (!$issues) $issues = $this->noContentAvailable($this->_lang->GET('audit.risk_issues_none'))[0];
+
 		array_push($content, ...$issues);
 		return $content;
 	}
@@ -1645,20 +1666,20 @@ class AUDIT extends API {
 		];
 		foreach($vendors as $vendor){
 			$info = '';
-			if ($vendor['active']) {
+			if (!$vendor['hidden']) {
 				if ($vendor['info']) {
-					$vendor['info'] = json_decode($vendor['info'], true) ? : [];
+					$vendor['info'] = json_decode($vendor['info'] ? : '', true);
 					$vendor['info'] = array_filter($vendor['info'], function($value){return $value;});
 					$info .= implode(" \n", array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) . "\n";
 				}
 				$vendor['pricelist'] = isset($vendor['pricelist']) ? $vendor['pricelist'] : [];
-				$pricelist = json_decode($vendor['pricelist'], true);
+				$pricelist = json_decode($vendor['pricelist'] ? : '', true);
 				if (isset($pricelist['validity']) && $pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
 				if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
 				$certificate = json_decode($vendor['certificate'] ? : '', true);
 				if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				if ($vendor['evaluation']){
-					$vendor['evaluation'] = json_decode($vendor['evaluation'], true);
+					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
 					$info .= $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']]) . "\n";
 					unset($vendor['evaluation']['_author'], $vendor['evaluation']['_date']);
 					foreach($vendor['evaluation'] as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";

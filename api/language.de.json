@@ -431,6 +431,12 @@
 		"record_export": "Aufzeichnung als PDF exportieren",
 		"record_export_xlsx": "Aufzeichnung als XLSX exportieren",
 		"regulatory_warning_content": "Dieses regulatorische Thema hat kein zugeordenes Dokument!",
+		"risk_issues": {
+			"assignmenterror": "Folgende Risiken oder Eigenschaften des Prozesses :process haben einen Zuordnungsfehler. Bitte überarbeite:",
+			"characteristic": "Für den Prozess :process sind Risiken beschrieben, aber keine passenden Eigenschaften erfasst:",
+			"risk": "Für folgende Eigenschaften des Prozesses :process sind die Risiken unvollständig erfasst:"
+		},
+		"risk_issues_none": "Probleme im Risikomanagement",
 		"sample_check_revoke": "widerrufen",
 		"sample_check_revoke_confirm": "Ja, Stichprobenprüfung widerrufen",
 		"skillfulfilment_warning": "Dieser Fähigkeit ist kein Mitarbeiter zugeordnet!",
@@ -1045,8 +1051,8 @@
 		"risk_related": "Risikobezug",
 		"risk_save_error": "Es trat ein Fehler bei der Speicherung auf, bitte versuche es erneut.",
 		"risk_saved": "Der Eintrag im Risikomanagement wurde gespeichert",
-		"search":"Suche",
-		"search_result":"Ergebnisse für die Suche nach \":search\"",
+		"search": "Suche",
+		"search_result": "Ergebnisse für die Suche nach \":search\"",
 		"type": {
 			"risk": "Risiko",
 			"characteristic": "Eigenschaft mit Auswirkungen auf die Sicherheit"

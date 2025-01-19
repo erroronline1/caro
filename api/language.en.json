@@ -431,6 +431,12 @@
 		"record_export": "Export record as PDF",
 		"record_export_xlsx": "Export record as XLSX",
 		"regulatory_warning_content": "This regulatory issue has no assigned documents!",
+		"risk_issues": {
+			"assignmenterror": "Following risks or characteristics for :process have an assignment error. Please revise:",
+			"characteristic": "Risks are described for :process, but no fitting characteristics:",
+			"risk": "Following characteristics of :process have incomplete risk records:"
+		},
+		"risk_issues_none": "risk management issues",
 		"sample_check_revoke": "Revoke",
 		"sample_check_revoke_confirm": "Yes, revoke sample check",
 		"skillfulfilment_warning": "This skill has no assigned users!",
