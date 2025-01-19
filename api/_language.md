@@ -64,6 +64,8 @@ All keys are hardcoded
 ### audit
 All keys are hardcoded
 
+`risk_issues`-keys must contain `risk.type` as well
+
 ### calendar
 All keys are hardcoded. `timesheet.pto`, `timesheet.signature` and `timesheet.export.sheet_daily` orders are passed to application.
 
@@ -96,6 +98,8 @@ preset_process and preset_risk can be cropped or extended as well.
 
 `probabilities`, `damage`, `preset_process` and `preset_risk` orders are passed to application.
 
+`type`-keys must be contained within `audit.risk_issues` as well
+
 ### texttemplate
 All keys are hardcoded. `use.genus` can be extended or cropped, order is passed to application.
 
@@ -109,6 +113,11 @@ All keys are hardcoded
 These are the chapters of the ISO 13485 and other regulatory issues. They serve as a checklist for fulfillment regarding document assignment and can be adjusted during runtime and extended by necessary regulatory aspects.
 
 `regulatory` order is passed to application.
+
+### risks
+These are the risks according to ISO 14971 examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org). They serve as a checklist for fulfillment regarding risks and can be adjusted during runtime and extended by necessary regulatory aspects, new risks and process risks that are applicable for a risk based approach regarding ISO 13485.
+
+`risks` order is passed to application.
 
 ### html5_qrcode
 Language mod for https://github.com/mebjas/html5-qrcode
