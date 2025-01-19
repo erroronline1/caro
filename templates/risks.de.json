@@ -8073,7 +8073,7 @@
 	{
 		"type": "risk",
 		"process": "Orthetik Rumpf",
-		"risk": "dgihv7_2",
+		"risk": "dgihv_7_2",
 		"relevance": 1,
 		"cause": "Nichteinhaltung von Kontrollterminen / Wartung",
 		"effect": "indikationsbedingte Versorgung evtl. nicht gegeben, Verringerung der Benutzbarkeit",
