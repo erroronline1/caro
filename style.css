@@ -860,7 +860,7 @@ button.productselection {
 /*************************** article elements and boxes ******************************/
 
 article > header {
-	margin: 0.75em auto;
+	margin: 0 0 0 1.75em;
 	width: auto;
 	text-align: left;
 	display: block;
@@ -1233,6 +1233,10 @@ dialog a:not([data-type])::before {
 	vertical-align: middle;
 	background-size: cover;
 	margin: 0 0.75em 0.2em 0;
+}
+
+article > header[data-type]::before{
+	margin: 0 0.75em 0.2em -1.75em;
 }
 
 [data-multiple]::after {
