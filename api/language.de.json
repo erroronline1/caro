@@ -431,10 +431,11 @@
 		"record_export": "Aufzeichnung als PDF exportieren",
 		"record_export_xlsx": "Aufzeichnung als XLSX exportieren",
 		"regulatory_warning_content": "Dieses regulatorische Thema hat kein zugeordenes Dokument!",
-		"risk_export_column":{
-			"acceptancelevel":"Akzeptanzlevel",
+		"risk_export_column": {
+			"acceptancelevel": "Akzeptanzlevel",
 			"author": "Author",
-			"measureacceptancelevel":"Akzeptanzlevel danach"
+			"effective_date": "Gültigkeit am :date",
+			"measureacceptancelevel": "Akzeptanzlevel danach"
 		},
 		"risk_issues": {
 			"assignmenterror": "Folgende Risiken oder Eigenschaften des Prozesses :process haben einen Zuordnungsfehler. Bitte überarbeite:",

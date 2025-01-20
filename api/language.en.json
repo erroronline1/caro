@@ -431,10 +431,11 @@
 		"record_export": "Export record as PDF",
 		"record_export_xlsx": "Export record as XLSX",
 		"regulatory_warning_content": "This regulatory issue has no assigned documents!",
-		"risk_export_column":{
-			"acceptancelevel":"Acceptance level",
+		"risk_export_column": {
+			"acceptancelevel": "Acceptance level",
 			"author": "Author",
-			"measureacceptancelevel":"Acceptance level afterwards"
+			"effective_date": "Effective as of :date",
+			"measureacceptancelevel": "Acceptance level afterwards"
 		},
 		"risk_issues": {
 			"assignmenterror": "Following risks or characteristics for :process have an assignment error. Please revise:",
@@ -1058,8 +1059,8 @@
 		"risk_related": "Risk related",
 		"risk_save_error": "There has been an error saving, please try again.",
 		"risk_saved": "The risk management entry has been saved",
-		"search":"Search",
-		"search_result":"Matches for this search for \":search\"",
+		"search": "Search",
+		"search_result": "Matches for this search for \":search\"",
 		"type": {
 			"risk": "Risk",
 			"characteristic": "Characteristic related to safety"

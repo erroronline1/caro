@@ -1174,7 +1174,7 @@ class AUDIT extends API {
 					foreach($words[0] as $word){
 						$sheetname .= substr($word, 0, 1) . preg_replace('/[\Waeiou]/i', '', substr($word, 1));
 					}
-					$writer->writeSheetRow($sheetname, [$process, $type]);
+					$writer->writeSheetRow($sheetname, [$process, $type, $this->_lang->GET('audit.risk_export_column.effective_date', [':date' => $this->_requestedDate . ' ' . $this->_requestedTime], true)]);
 					$writer->writeSheetRow($sheetname, []);
 
 					$writer->writeSheetRow($sheetname, array_keys($lines[0]));
