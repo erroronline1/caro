@@ -418,7 +418,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							api.application("get", request[1], data.response.id);
+							if (data.response.id) api.application("get", request[1], data.response.id);
 						};
 						payload = _.getInputs("[data-usecase=manual]", true);
 						break;
