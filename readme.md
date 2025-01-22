@@ -113,11 +113,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * risk templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* refactor risk management for improved compliance to iso 14971
-    * sanitize identical contents of template file
-    * documentation
-        * [risk-module](#risk-management)
-        * [regulatory goals](#intended-regulatory-goals)
 * make datalist part of text like autocomplete for textbox instead of datalist widget
 * same goes for range
 * config.ini
@@ -232,8 +227,12 @@ Application support legend:
 | ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 14971 4.5 Risk management file | structural | &bull; The application has a risk management module to consider, evaluate, control and evaluate residual risks.<br />&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default.<br />&bull; Risks are not deletable but applicability can be revoked.<br />&bull; Edits can be done by authorized users only, but read by all users.<br />&bull; Characteristics of medical devices and risks can be exported from the audit module with any available version. | [Risk management](#risk-management), [Audit](#audit) |
+| ISO 14971 5 Risk analysis | yes | &bull; Templates of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default. | [Risk management](#risk-management), [languagefile](#customisation), [templates](#application-setup) |
+| ISO 14971 6 Risk evaluation | yes | &bull; Requirements are satisfied structural and with the provided templates. | [Risk management](#risk-management), [templates](#application-setup) |
+| ISO 14971 7 Risk control | yes | &bull; Requirements are satisfied structural and with the provided templates. | [Risk management](#risk-management), [templates](#application-setup) |
+| ISO 14971 7.6 Completeness of risk control | yes | &bull; The audit module displays issues regarding risks without defined characteristics and vice versa. | [Audit](#audit) |
 | MPDG §83 Medical device consultants| yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register. | [Users](#users) |
-| ISO 14971 Risk Management | partial | &bull; The application has a risk management module to consider, evaluate and handle risks.<br />&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default. | [Risk management](#risk-management) |
 | SGB 5 §33 Additional Costs | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR Art. 14 Sample check | yes, structural | &bull; Sample check is implemented. Set up a respective document, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents), [Importing vendor pricelists](#importing-vendor-pricelists) |
 | MDR Art. 61 Clinical evaluation | structural | &bull; *describe within documents with the "Case documentation"-context* | |
@@ -640,9 +639,10 @@ Exported reduced record summary
 ### Risk management
 The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals. Identified risks, that may have to be taken into account for any process are defined within the [language file](#customisation) (also see [here](#runtime-variables)).
 
-You are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels.
+As required with ISO 14971 you can describe characteristics for medical devices and applicable risks. Since the DGIHV fortunately decided defining characteristics and risks on a group of medical devices (e.g. prostheses and orthoses in general) as reasonable, all evaluations are based and grouped by a process.
+Furthermore you are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels. To proof your regulatory compliance you can link any of your documents containing measures as defined.
 
-Entries are not persistent but can be exported if desired through the [audit module](#audit). Available entries store and display the user name and date of the last edit. 
+Entries are persistent and can be exported if desired through the [audit module](#audit). Available entries store and display the user name and date of the last edit. 
 
 ![risk screenshot](http://toh.erroronline.one/caro/risks.png)
 
