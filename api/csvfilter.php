@@ -109,7 +109,7 @@ class CSVFILTER extends API {
 							// datalist may contain multiple subsets based on split setting
 							// write each to temp file
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
-							$subsetname = preg_replace(CONFIG['forbidden']['names'][0], '_', $subsetname);
+							$subsetname = preg_replace(CONFIG['forbidden']['names']['characters'], '_', $subsetname);
 							$tempFile = UTILITY::directory('tmp') . '/' . time() . $subsetname . '.csv';
 							$file = fopen($tempFile, 'w');
 							fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
@@ -338,9 +338,7 @@ class CSVFILTER extends API {
 				}
 
 				// check forbidden names
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $filter[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($filter[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 
 				// post filter
 				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [

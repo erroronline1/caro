@@ -355,9 +355,8 @@ class DOCUMENT extends API {
 				}
 
 				// check forbidden names
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $bundle[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($bundle[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
+
 				// append bundle to database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => $bundle
@@ -769,9 +768,7 @@ class DOCUMENT extends API {
 				if (!$component_approve) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.component_not_saved_missing'), 'type' => 'error']]);
 
 				// check for forbidden name
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $component_name, $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
 				$component['content'] = fileupload($component['content'], $component_name, $this->_currentdate->format('YmdHis'));
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
@@ -1182,7 +1179,7 @@ class DOCUMENT extends API {
 		}
 		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier'): null;
 		$summary = [
-			'filename' => preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $document['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $document['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
@@ -1372,9 +1369,7 @@ class DOCUMENT extends API {
 			case 'POST':
 				if (!$this->_payload->context) $this->response(['response' => ['msg' => $this->_lang->GET("assemble.compose.document.document_not_saved_missing"), 'type' => 'error']]); // no content provided
 				// check for forbidden names
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $this->_payload->name, $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($this->_payload->name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 
 				// recursively check for identifier
 				function check4identifier($element, $hasidentifier = false){

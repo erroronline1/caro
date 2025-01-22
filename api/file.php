@@ -595,9 +595,8 @@ class FILE extends API {
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('file.manager.new_folder')));
 				if ($new_folder){
 					// check forbidden names
-					foreach(CONFIG['forbidden']['names'] as $pattern){
-						if (preg_match("/" . $pattern . "/m", $new_folder, $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
-					}
+					if(UTILITY::forbiddenName($new_folder)) $this->response(['response' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
+
 					// create new folder if not present
 					$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
 					UTILITY::storeUploadedFiles([], $new_folder);

@@ -440,9 +440,7 @@ class USER extends API {
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || $nametaken) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($user['name']) || $nametaken) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 		
 				// checked permission levels
 				if ($setpermissions = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.permissions'))){
@@ -624,9 +622,7 @@ class USER extends API {
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $user['name'], $matches) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($entry['name']) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				
 				// chain checked permission levels
 				foreach($this->_lang->_USER['permissions'] as $level => $description){

@@ -699,12 +699,8 @@ class INSTALL {
 				} else {					
 					if (isset($element['type']) && $element['type'] !== 'textsection'
 						&& isset($element['attributes']) && isset($element['attributes']['name'])){
-						foreach(CONFIG['forbidden']['names'] as $pattern) {
-							preg_match('/' . $pattern. '/', $element['attributes']['name'], $match);
-							if ($match) {
-								$forbidden = ['name' => $element['attributes']['name'], 'pattern' => $pattern];
-								break;
-							}
+						if (UTILITY::forbiddenName($element['attributes']['name'])) {
+							$forbidden = ['name' => $element['attributes']['name'], 'pattern' => $pattern];
 						}
 						if ($forbidden) break;
 					}
@@ -728,11 +724,9 @@ class INSTALL {
 			}
 
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
-						continue;
-					}
+				if(UTILITY::forbiddenName($entry['name'])){
+					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					continue;
 				}
 				if (in_array($entry['name'], $names)) {
 					$this->printError('Multiple occurences of the name are not allowed' . '. This item will be skipped:', $entry);
@@ -788,11 +782,9 @@ class INSTALL {
 			}
 
 			if (isset($entry['title']) && $entry['title'] && !in_array($entry['title'], array_column($DBall, 'title'))) {
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)){
-						$this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
-						continue;
-					}
+				if(UTILITY::forbiddenName($entry['title'])){
+					$this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					continue;
 				}
 				if (in_array($entry['title'], $names)) {
 					$this->printError('Multiple occurences of the title are not allowed. This item will be skipped:', $entry);
@@ -922,7 +914,7 @@ class INSTALL {
 		// allowed pattern
 		// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 		// unset types and escaped literals
-		$allowed = preg_replace('/\\\./m', '', CONFIG['forbidden']['names'][0]);
+		$allowed = preg_replace('/\\\./m', '', CONFIG['forbidden']['names']['characters']);
 		// readd some types
 		$allowed = substr_replace($allowed, '\\w\\d', -2, 0);
 		// add multiplier
@@ -948,12 +940,9 @@ class INSTALL {
 			}
 
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				$patterns = $entry['type'] === 'template' ? CONFIG['forbidden']['names'] : [...CONFIG['forbidden']['names'], $allowed];
-				foreach($patterns as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
-						continue;
-					}
+				if (UTILITY::forbiddenName($entry['name'], $entry['type'] === 'template' ? [] : ['characters' => $allowed])){
+					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					continue;
 				}
 				$used = $entry['type'] === 'template' ? $names['template'] : [...$names['text'], ...$names['replacement']];
 				foreach($used as $name){
@@ -1000,11 +989,9 @@ class INSTALL {
 				continue;
 			}
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['name'], $matches)){
-						$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
-						continue;
-					}
+				if(UTILITY::forbiddenName($entry['name'])){
+					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					continue;
 				}
 				if (in_array($entry['name'], $names)) {
 					$this->printError('Multiple occurences of the name are not allowed. This item will be skipped:', $entry);
@@ -1017,7 +1004,7 @@ class INSTALL {
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? json_encode($entry['info']) : null,
 					':certificate' => json_encode([]),
 					':pricelist' => isset($entry['pricelist']) && gettype($entry['info']) === 'pricelist' ? json_encode(['filter' => $entry['pricelist']]) : null,
-					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names'][0], '', $entry['name']) . $this->_currentdate->format('Ymd'),
+					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', $entry['name']) . $this->_currentdate->format('Ymd'),
 					':evaluation' => null,
 					':hidden' => null
 				];

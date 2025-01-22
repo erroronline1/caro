@@ -115,9 +115,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * make datalist part of text like autocomplete for textbox instead of datalist widget
 * same goes for range
-* config.ini
-    * forbidden names with keys, .env override by key or append new
-    * utility method for handling, with parameter to append or override pattern by key
 * audit
     * unused documents, except contexts or analyze for by input widgets within records
 

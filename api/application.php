@@ -273,9 +273,7 @@ class APPLICATION extends API {
 				];
 				
 				// check forbidden names
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($entry['title'])) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 		
 				// chain checked permission levels
 				foreach($this->_lang->_USER['permissions'] as $level => $description){
@@ -317,9 +315,7 @@ class APPLICATION extends API {
 				];
 		
 				// check forbidden names
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $entry['title'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
-				}
+				if(UTILITY::forbiddenName($entry['title'])) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 		
 				// chain checked permission levels
 				foreach($this->_lang->_USER['permissions'] as $level => $description){

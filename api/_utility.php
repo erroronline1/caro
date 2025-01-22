@@ -254,6 +254,35 @@ class UTILITY {
 	}
 
 	/**
+	 *   ___         _   _   _   _                           
+	 *  |  _|___ ___| |_|_|_| |_| |___ ___ ___ ___ _____ ___ 
+	 *  |  _| . |  _| . | | . | . | -_|   |   | .'|     | -_|
+	 *  |_| |___|_| |___|_|___|___|___|_|_|_|_|__,|_|_|_|___|
+	 *
+	 * matches a string against CONFIG['forbidden']['names']
+	 * optional override of a defined pattern if key matches config or append if not
+	 * @param string $name
+	 * @param array $pattern
+	 * @return string|false matched pattern or not matched
+	 */
+	public static function forbiddenName($name, $extendedpattern = []){
+		foreach(CONFIG['forbidden']['names'] as $key => $pattern) {
+			if (isset($extendedpattern[$key])) $pattern = $extendedpattern[$key];
+			preg_match('/' . $pattern. '/m', $name, $match);
+			if ($match) {
+				return $pattern;
+			}
+		}
+		foreach($extendedpattern as $key => $pattern) {
+			preg_match('/' . $pattern. '/m', $name, $match);
+			if ($match) {
+				return $pattern;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 *   _   _   _   _                 _   _         
 	 *  | |_|_|_| |_| |___ ___ ___ ___| |_|_|___ ___ 
 	 *  |   | | . | . | -_|   | . | . |  _| | . |   |

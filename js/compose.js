@@ -118,7 +118,7 @@ export const compose_helper = {
 
 			// check if new elements name is allowed
 			if (element.attributes.name) {
-				for (const pattern of api._settings.config.forbidden.names) {
+				for (const [key, pattern] of api._settings.config.forbidden.names) {
 					if (element.attributes.name.match(new RegExp(pattern, "gm"))) {
 						new Toast(api._lang.GET("assemble.compose.error_forbidden_name", { ":name": element.attributes.name }) + " " + pattern, "error");
 						return;
@@ -463,7 +463,7 @@ export const compose_helper = {
 					forbidden = containsForbidden(element);
 				} else {
 					if (element.type && element.type !== "textsection" && element.attributes && element.attributes.name) {
-						for (const pattern of api._settings.config.forbidden.names) {
+						for (const [key, pattern] of api._settings.config.forbidden.names) {
 							if (element.attributes.name.match(new RegExp(pattern, "gm"))) {
 								forbidden = { name: element.attributes.name, pattern: pattern };
 								break;

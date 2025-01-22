@@ -61,7 +61,7 @@ class TEXTTEMPLATE extends API {
 				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
 				// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 				// unset types and escaped literals
-				$pattern = preg_replace('/\\\./m', '', CONFIG['forbidden']['names'][0]);
+				$pattern = preg_replace('/\\\./m', '', CONFIG['forbidden']['names']['characters']);
 				// readd some types
 				$pattern = substr_replace($pattern, '\\w\\d', -2, 0);
 				// add multiplier
@@ -395,9 +395,8 @@ class TEXTTEMPLATE extends API {
 						]]);	
 				}
 				//check forbidden names
-				foreach(CONFIG['forbidden']['names'] as $pattern){
-					if (preg_match("/" . $pattern . "/m", $template[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
-				}
+				if (UTILITY::forbiddenName($template[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
+
 				// else post new template
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [
 					'values' => $template])) $this->response([
@@ -731,7 +730,7 @@ class TEXTTEMPLATE extends API {
 			
 			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 			// add match not capture
-			$delimiter = substr_replace(CONFIG['forbidden']['names'][0], '?:', 1, 0);
+			$delimiter = substr_replace(CONFIG['forbidden']['names']['character'], '?:', 1, 0);
 			// unset types and escaped literals
 			$delimiter = preg_replace('/\\\./m', '', $delimiter);
 			// readd some types
@@ -739,7 +738,7 @@ class TEXTTEMPLATE extends API {
 
 			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 			// invert first forbidden names to allowed
-			$pattern = substr_replace(CONFIG['forbidden']['names'][0], '', 2, 1);
+			$pattern = substr_replace(CONFIG['forbidden']['names']['character'], '', 2, 1);
 			// add colon
 			$pattern = substr_replace($pattern, ':', 1, 0);
 			// unset types and escaped literals
