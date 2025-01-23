@@ -98,7 +98,7 @@ class PDF{
 
 		//Close and output PDF document
 		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$filename = preg_replace('/' . CONFIG['forbidden']['names'][0] . '/', '', $content) . '.pdf';
+		$filename = preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content) . '.pdf';
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
 	}

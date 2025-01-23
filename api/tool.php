@@ -487,7 +487,7 @@ class TOOL extends API {
 		$files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
 		$options = ['...' => ['value' => 'null']];
 		foreach ($files as $path){
-			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => $path];
+			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => '../api/api.php/file/stream/' . substr($path, 3)];
 		}
 		ksort($options);
 		if (count($options) > 1) {

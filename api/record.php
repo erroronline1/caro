@@ -419,7 +419,7 @@ class RECORD extends API {
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => PDF::recordsPDF($content)
+			'href' => './api/api.php/file/stream/' . PDF::recordsPDF($content)
 		];
 
 		$body = [];
@@ -470,7 +470,7 @@ class RECORD extends API {
 				if ($content){
 					$downloadfiles = [];
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
-						'href' => PDF::identifierPDF($content, UTILITY::propertySet($this->_payload, '_type') ? : 'A4')
+						'href' => './api/api.php/file/stream/' . PDF::identifierPDF($content, UTILITY::propertySet($this->_payload, '_type') ? : 'A4')
 					];
 					$body = [
 						[
@@ -1700,7 +1700,7 @@ class RECORD extends API {
 							}
 							else {
 								if (!isset($summary['files'][$document])) $summary['files'][$document] = [];
-								$summary['files'][$document][$file['basename']] = ['href' => $entry['value']];
+								$summary['files'][$document][$file['basename']] = ['href' => './api/api.php/file/stream/' . $entry['value']];
 							}
 							$displayvalue = $file['basename'];
 						}

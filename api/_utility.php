@@ -187,6 +187,26 @@ class UTILITY {
 	}
 
 	/**
+	 *                   _         _ _             _               
+	 *   ___ ___ ___ ___| |_ ___ _| |_|___ ___ ___| |_ ___ ___ _ _ 
+	 *  |  _|  _| -_| .'|  _| -_| . | |  _| -_|  _|  _| . |  _| | |
+	 *  |___|_| |___|__,|_| |___|___|_|_| |___|___|_| |___|_| |_  |
+	 *                                                        |___|
+	 * creates a directory and inserts a .htaccess-file preventing any access
+	 * @param string $dir path
+	 * @return bool on success
+	 */
+	private static function createDirectory($dir){
+		if (!file_exists($dir) && mkdir($dir, 0777, true)) {
+			$file = fopen($dir . '/.htaccess', 'w');
+			fwrite($file, "Order deny,allow\n<Files * >\ndeny from all\n</Files>");
+			fclose($file);
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 *     _     _     _
 	 *   _| |___| |___| |_ ___
 	 *  | . | -_| | -_|  _| -_|
@@ -522,7 +542,7 @@ class UTILITY {
 	 */
 	public static function storeUploadedFiles($name = [], $folder = '', $prefix = [], $rename = [], $replace = true){
 		/* process $_FILES, store to folder and return an array of destination paths */
-		if (!file_exists($folder)) mkdir($folder, 0777, true);
+		if (!file_exists($folder)) self::createDirectory($folder);
 		$targets = [];
 		for ($i = 0; $i < count($name); $i++) {
 			if (gettype($_FILES[$name[$i]]['name']) !== 'array') {
@@ -578,7 +598,7 @@ class UTILITY {
 	 */
 	public static function tidydir($dir = '', $lifespan = null){
 		if (!$dir) return false;
-		$success = !file_exists(self::directory($dir)) ? mkdir(self::directory($dir), 0777, true) : true;
+		$success = !file_exists(self::directory($dir)) ? self::createDirectory(self::directory($dir)) : true;
 		if ($lifespan && file_exists(self::directory($dir))){
 			$files = self::listFiles(self::directory($dir), 'asc');
 			if ($files){

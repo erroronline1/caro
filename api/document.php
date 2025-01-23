@@ -1342,7 +1342,7 @@ class DOCUMENT extends API {
 		$summary['images'] = [' ' => $summary['images']];
 
 		$downloadfiles[$this->_lang->GET('assemble.render.export')] = [
-			'href' => PDF::documentsPDF($summary)
+			'href' => './api/api.php/file/stream/' . PDF::documentsPDF($summary)
 		];
 		$this->response([
 			'render' => [

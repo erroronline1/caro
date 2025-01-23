@@ -493,10 +493,9 @@ class FILE extends API {
 							// distinguish between uploaded files and linked ressources
 							if (preg_match('/^\.\.\//', $file['path'])){
 								$file['name'] = pathinfo($file['path'])['basename'];
-								$file['path'] = substr($file['path'], 1);
+								$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 							}
 							else $file['name'] = $file['path'];
-
 							// resolve regulatory context
 							$regulatory_context = [];
 							$file['regulatory_context'] = explode(',', $file['regulatory_context']);
@@ -511,7 +510,7 @@ class FILE extends API {
 									'type' => 'links',
 									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => $file['retired']]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
 									'content' => [
-										$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
+										$file['name'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
 									],
 									'data-filtered' => $file['path']
 								],
@@ -712,7 +711,8 @@ class FILE extends API {
 								// set up file properties
 								$file = [
 									'path' => substr($file, 1),
-									'name' => pathinfo($file)['basename']
+									'name' => pathinfo($file)['basename'],
+									'link' => './api/api.php/file/stream/' . substr($file, 1)
 								];
 								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 
@@ -722,7 +722,7 @@ class FILE extends API {
 										'type' => 'links',
 										'description' => $filedate->format('Y-m-d H:i'),
 										'content' => [
-											$file['path'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
+											$file['path'] => ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => $file['path']]
 										],
 										'data-filtered' => $file['path']
 									],
@@ -731,7 +731,7 @@ class FILE extends API {
 										'attributes' => [
 											'value' => $this->_lang->GET('file.manager.copy_path'),
 											'type' => 'button',
-											'onpointerup' => "_client.application.toClipboard('" . $file['path'] . "')",
+											'onpointerup' => "_client.application.toClipboard('" . $file['link'] . "')",
 											'class' => 'inlinebutton',
 											'data-type' => 'copy',
 											'data-filtered' => $file['path']
@@ -840,7 +840,7 @@ class FILE extends API {
 				$matches = [];
 				foreach ($content as $file){
 					// distinguish between uploaded files and linked ressources
-					if (preg_match('/^\.\.\//', $file))	$file = ['name' => pathinfo($file)['basename'], 'path' => substr($file, 1)];
+					if (preg_match('/^\.\.\//', $file))	$file = ['name' => pathinfo($file)['basename'], 'path' => './api/api.php/file/stream/' . substr($file, 1)];
 					else $file = ['name' => $file, 'path' => $file];
 					
 					$matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
@@ -975,6 +975,39 @@ class FILE extends API {
 				];
 				$this->response($result);
 				break;
+		}
+	}
+
+	/**
+	 *       _                     
+	 *   ___| |_ ___ ___ ___ _____ 
+	 *  |_ -|  _|  _| -_| .'|     |
+	 *  |___|_| |_| |___|__,|_|_|_|
+	 * 
+	 * streams a file as requested by following url parameters
+	 * ensuring a requested file is accessed by a valid user since directories are restricted by default
+	 */
+	public function stream(){
+		$file = realpath('../' . implode('/', array_slice(REQUEST, 2)));
+		if ($file){
+
+///////////////////////////////
+// todo: match external files path, check whether file is hidden or not
+// evaluate record file handling, just to be sure
+///////////////////////////////
+
+
+			$pathinfo = pathinfo($file);
+			header('Content-Type: '.mime_content_type($file));
+			header('Content-Disposition: inline; filename=' . pathinfo($file)['basename']);
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: '.filesize($file));
+			ob_clean();
+			flush();
+			readfile($file);
+			exit;
 		}
 	}
 }

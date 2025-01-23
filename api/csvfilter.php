@@ -126,7 +126,7 @@ class CSVFILTER extends API {
 							fclose($file);
 							// provide downloadfile
 							$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])])] = [
-								'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+								'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 								'download' => preg_replace('/.csv$/', (count($datalist->_list) > 1 ? '_' . $subsetname. '.csv' : '.csv'), $content['filesetting']['destination'])
 							];
 						}
@@ -148,7 +148,7 @@ class CSVFILTER extends API {
 						// provide downloadfile
 						$content['filesetting']['destination'] = preg_replace('/.xls$/', '.xlsx', $content['filesetting']['destination']);
 						$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $content['filesetting']['destination']])] = [
-							'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+							'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 							'download' => $content['filesetting']['destination']
 						];
 						break;

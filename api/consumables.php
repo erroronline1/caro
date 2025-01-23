@@ -124,7 +124,7 @@ class CONSUMABLES extends API {
 		}
 		fclose($file);
 		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-			'href' => substr($tempFile, 1),
+			'href' => './api/api.php/file/stream/' . substr($tempFile, 1),
 			'download' => pathinfo($tempFile)['basename']
 		];
 		// create stupid filter for export files if none is provided
@@ -140,7 +140,7 @@ class CONSUMABLES extends API {
 		fwrite($file, json_encode($filter, JSON_PRETTY_PRINT));
 		fclose($file);
 		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-			'href' => substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+			'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
 			'download' => pathinfo($tempFile)['basename']
 		];
 		$this->response([
@@ -814,7 +814,7 @@ class CONSUMABLES extends API {
 					$article_no = explode('_', $file['filename'])[2];
 					similar_text($article_no, $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) 
-						$documents[$file['basename']] = ['target' => '_blank', 'href' => substr($path,1)];
+						$documents[$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path,1)];
 				}
 				// select all products from selected vendor, retrieve similar products
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -1794,11 +1794,11 @@ class CONSUMABLES extends API {
 				if ($vendor['id']) {
 					$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
 					foreach($certfiles as $path){
-						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => $path];
+						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . $path];
 					}
 					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
 					foreach($docfiles as $path){
-						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => substr($path, 1)];
+						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
 					}
 				}
 

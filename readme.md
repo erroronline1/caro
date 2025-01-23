@@ -118,6 +118,10 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * same goes for range
 * audit
     * unused documents, except contexts or analyze for by input widgets within records
+* external files linking ->api checking whether file is hidden or not displaying error messag in new window otherwise stream data
+    * describe safety mechanism on accessability for logged in users only
+    * api endpoint file/stream
+    * code pattern file/stream
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue

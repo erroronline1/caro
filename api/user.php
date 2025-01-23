@@ -261,7 +261,7 @@ class USER extends API {
 					if ($row['file_path']) $usertrainings[] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => ['href' => $row['file_path']]
+							$row['file_path'] => ['href' => './api/api.php/file/stream/' . $row['file_path']]
 						]
 					];
 				}
@@ -622,7 +622,7 @@ class USER extends API {
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-				if(UTILITY::forbiddenName($entry['name']) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+				if(UTILITY::forbiddenName($user['name']) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				
 				// chain checked permission levels
 				foreach($this->_lang->_USER['permissions'] as $level => $description){
@@ -882,7 +882,7 @@ class USER extends API {
 					if ($row['file_path']) $skillmatrix[0][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => ['href' => $row['file_path']]
+							$row['file_path'] => ['href' => './api/api.php/file/stream/' . $row['file_path']]
 						]
 					];
 					$skillmatrix[0][] = [

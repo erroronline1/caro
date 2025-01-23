@@ -235,7 +235,7 @@ class CALENDAR extends API {
 
 		$downloadfiles = [];
 		$downloadfiles[$this->_lang->GET('menu.calendar.timesheet', [], true)] = [
-			'href' => PDF::timesheetPDF($summary)
+			'href' => './api/api.php/file/stream/' . PDF::timesheetPDF($summary)
 		];
 		$body = [];
 		array_push($body, 
