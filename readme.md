@@ -114,6 +114,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * make datalist part of text like autocomplete for textbox instead of datalist widget
+* reconsider checks db, merge data to products db (additional column, for check-date is faster to comprehend by query)
 * same goes for range
 * audit
     * unused documents, except contexts or analyze for by input widgets within records
