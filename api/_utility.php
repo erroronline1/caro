@@ -250,7 +250,7 @@ class UTILITY {
 	 *  | . | |  _| -_|  _|  _| . |  _| | |
 	 *  |___|_|_| |___|___|_| |___|_| |_  |
 	 *                                |___|
-	 * returns folders defined in setup.ini
+	 * returns folders defined in config.ini
 	 * 
 	 * @param string $request key
 	 * @param array $replace optional named array with replacements
@@ -592,7 +592,7 @@ class UTILITY {
 	 *  |  _| | . | | | . | |  _|
 	 *  |_| |_|___|_  |___|_|_|
 	 *            |___|
-	 * prepares a folder according to setup.ini and deletes files if lifespan is set
+	 * prepares a folder according to config.ini and deletes files if lifespan is set
 	 * 
 	 * @param string $dir one of the fileserver keys
 	 * @param int $lifespan in hours
@@ -630,7 +630,7 @@ class PERMISSION {
 	 *  |_| |___|_|_|_  |__,|  _|  _|_| |___|\_/|___|___|
 	 *              |___|   |_| |_|
 	 * check whether an approvalcolumn has been fully approved according to function
-	 * @param string $function as defined within setup.ini
+	 * @param string $function as defined within config.ini
 	 * @param string|array $approvalcolumn 'approval'-column
 	 * @return bool
 	 * 
@@ -652,7 +652,7 @@ class PERMISSION {
 	 *  |_|                   |___|
 	 * check whether an approvalcolumn has pending approvals according to function
 	 * check per user permission so there is only one count per unapproved element even on multiple permissions
-	 * @param string $function as defined within setup.ini
+	 * @param string $function as defined within config.ini
 	 * @param string|array $approvalcolumn 'approval'-column
 	 * @return array of pending approval permission
 	 * 
@@ -673,7 +673,7 @@ class PERMISSION {
 	 *  |  _|___|_| |_|_|_|_|___|___|_|___|_|_|_| |___|_|
 	 *  |_|
 	 * returns a boolean if user is authorized for requested app-function, array of permissions if $returnvalues argument is true
-	 * @param string $function as defined within setup.ini
+	 * @param string $function as defined within config.ini
 	 * @param bool $returnvalues
 	 * @return bool|array
 	 */
@@ -687,7 +687,7 @@ class PERMISSION {
 			}
 			return preg_split('/\W+/', CONFIG['permissions'][$function]);
 		}
-		var_dump('permission ' . $function . ' not found in setup.ini file');
+		var_dump('permission ' . $function . ' not found in config.ini file');
 	}
 
 	/**
