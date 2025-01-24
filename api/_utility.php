@@ -201,6 +201,9 @@ class UTILITY {
 			$file = fopen($dir . '/.htaccess', 'w');
 			fwrite($file, "Order deny,allow\n<Files * >\ndeny from all\n</Files>");
 			fclose($file);
+			$file = fopen($dir . '/web.config', 'w');
+			fwrite($file, '<?xml version="1.0" encoding="UTF-8"?><configuration><system.webServer><rewrite><rules><rule name="deny"><match url=".*" ignoreCase="true" /><action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" /></rule></rules></rewrite></system.webServer></configuration>');
+			fclose($file);
 			return true;
 		}
 		return false;
