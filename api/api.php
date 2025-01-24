@@ -139,7 +139,7 @@ class API {
 							$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
 							$_SESSION['user']['image'] = './' . $user['image'];
 						}
-						else $this->response([strlen($payload), $payload], 401);
+						else $this->response([], 401);
 					} else $this->response([], 401);
 				}
 			}
