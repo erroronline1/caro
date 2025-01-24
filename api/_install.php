@@ -227,7 +227,6 @@ define('DEFAULTSQL', [
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`language` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"   `hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -473,7 +472,6 @@ define('DEFAULTSQL', [
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
-				"	language varchar(255) NOT NULL," .
 				"	type varchar(255) NOT NULL," .
 				"	hidden varchar(MAX) NULL DEFAULT NULL" .
 				");" 
@@ -958,7 +956,6 @@ class INSTALL {
 					':unit' => $entry['unit'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
 					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content'],
-					':language' => isset($entry['language']) ? $entry['language'] : $this->_defaultLanguage,
 					':type' => $entry['type'],
 					':hidden' => null
 				];

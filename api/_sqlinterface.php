@@ -721,8 +721,8 @@ class SQLQUERY {
 
 
 		'texttemplate_post' => [
-			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, language, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, language, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :language, :type, :hidden)"
+			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :type, :hidden)",
+			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :type, :hidden)"
 		],
 		'texttemplate_put' => [
 			'mysql' => "UPDATE caro_texttemplates SET hidden = :hidden, unit = :unit WHERE id = :id",

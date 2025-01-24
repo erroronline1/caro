@@ -7,48 +7,42 @@
 		"name": "DIE_PATIENTIN_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "die Patientin\nder Patient\nder Patient\ndie Patientinder Patient\n\nder Patient\nDu\nSie",
-		"language": "de"
+		"content": "die Patientin\nder Patient\nder Patient\ndie Patientinder Patient\n\nder Patient\nDu\nSie"
 	},
 	{
 		"type": "replacement",
 		"name": "DER_PATIENTIN_AKKUSATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "der Patientin\nden Patienten\nden Patienten\nder Patientinden Patienten\n\nden Patienten\nDich\nSie",
-		"language": "de"
+		"content": "der Patientin\nden Patienten\nden Patienten\nder Patientinden Patienten\n\nden Patienten\nDich\nSie"
 	},
 	{
 		"type": "replacement",
 		"name": "DER_PATIENTIN_DATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "der Patientin\ndem Patienten\ndem Patienten\nder Patientin\ndem Patienten\ndem Patienten\nDir\nIhnen",
-		"language": "de"
+		"content": "der Patientin\ndem Patienten\ndem Patienten\nder Patientin\ndem Patienten\ndem Patienten\nDir\nIhnen"
 	},
 	{
 		"type": "replacement",
 		"name": "DER_PATIENTIN_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "der Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\ndes Patienten\nDein\nIhr",
-		"language": "de"
+		"content": "der Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\ndes Patienten\nDein\nIhr"
 	},
 	{
 		"type": "replacement",
 		"name": "OG_PATIENT",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "die oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\nDu\nSie",
-		"language": "de"
+		"content": "die oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\nDu\nSie"
 	},
 	{
 		"type": "replacement",
 		"name": "IHRE_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "ihre\nseine\nseine\nihre\nseine\nseine\nDeine\nIhre",
-		"language": "de"
+		"content": "ihre\nseine\nseine\nihre\nseine\nseine\nDeine\nIhre"
 	},
 
 	{
@@ -56,192 +50,168 @@
 		"name": "IHR_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "ihr\nsein\nsein\nihr\nsein\nsein\nDein\nIhr",
-		"language": "de"
+		"content": "ihr\nsein\nsein\nihr\nsein\nsein\nDein\nIhr"
 	},
 	{
 		"type": "replacement",
 		"name": "IHRER_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "ihrer\nseiner\nseiner\nihrer\nseiner\nseiner\nDeiner\nIhrer",
-		"language": "de"
+		"content": "ihrer\nseiner\nseiner\nihrer\nseiner\nseiner\nDeiner\nIhrer"
 	},
 	{
 		"type": "replacement",
 		"name": "IHREN_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "ihren\nseinen\nseinen\nihren\nseinen\nseinen\nDeinen\nIhren",
-		"language": "de"
+		"content": "ihren\nseinen\nseinen\nihren\nseinen\nseinen\nDeinen\nIhren"
 	},
 	{
 		"type": "replacement",
 		"name": "IHREM_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "ihrem\nseinem\nseinem\nihrem\nseinem\nseinem\nDeinem\nIhrem",
-		"language": "de"
+		"content": "ihrem\nseinem\nseinem\nihrem\nseinem\nseinem\nDeinem\nIhrem"
 	},
 	{
 		"type": "replacement",
 		"name": "IHRES_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "ihres\nseines\nseines\nihres\nseines\nseines\nDeines\nIhres",
-		"language": "de"
+		"content": "ihres\nseines\nseines\nihres\nseines\nseines\nDeines\nIhres"
 	},
 	{
 		"type": "replacement",
 		"name": "IHRE_VERSICHERTE_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Ihre Versicherte\nIhr Versicherter\nIhr Versicherter\nIhre Versicherte\nIhr Versicherter\nIhr Versicherter\nDu\nSie",
-		"language": "de"
+		"content": "Ihre Versicherte\nIhr Versicherter\nIhr Versicherter\nIhre Versicherte\nIhr Versicherter\nIhr Versicherter\nDu\nSie"
 	},
 	{
 		"type": "replacement",
 		"name": "IHRER_VERSICHERTEN_DATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Ihrer Versicherten\nIhren Versicherten\nIhren Versicherten\nIhrer Versicherten\nIhren Versicherten\nIhren Versicherten\nDich\nSie",
-		"language": "de"
+		"content": "Ihrer Versicherten\nIhren Versicherten\nIhren Versicherten\nIhrer Versicherten\nIhren Versicherten\nIhren Versicherten\nDich\nSie"
 	},
 	{
 		"type": "replacement",
 		"name": "IHRER_VERSICHERTEN_GENITIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Ihrer Versicherten\nIhres Versicherten\nIhres Versicherten\nIhrer Versicherten\nIhres Versicherten\nIhres Versicherten\nvon Dir\nvon Ihnen",
-		"language": "de"
+		"content": "Ihrer Versicherten\nIhres Versicherten\nIhres Versicherten\nIhrer Versicherten\nIhres Versicherten\nIhres Versicherten\nvon Dir\nvon Ihnen"
 	},
 	{
 		"type": "replacement",
 		"name": "SEHR_GEEHRTE",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Liebe\nLieber\n\nSehr geehrte Frau\nSehr geehrter Herr\nSehr geehrte\nLiebe\nSehr geehrte",
-		"language": "de"
+		"content": "Liebe\nLieber\n\nSehr geehrte Frau\nSehr geehrter Herr\nSehr geehrte\nLiebe\nSehr geehrte"
 	},
 	{
 		"type": "replacement",
 		"name": "FRAU_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "\n\n\nFrau\nHerr\n\n\n",
-		"language": "de"
+		"content": "\n\n\nFrau\nHerr\n\n\n"
 	},
 	{
 		"type": "replacement",
 		"name": "FRAU_AKKUSATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "\n\n\nFrau\nHerrn\n\n\n",
-		"language": "de"
+		"content": "\n\n\nFrau\nHerrn\n\n\n"
 	},
 	{
 		"type": "replacement",
 		"name": "ERHÄLT",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "erhält\nerhält\nerhält\nerhält\nerhält\nerhält\nerhältst\nerhalten",
-		"language": "de"
+		"content": "erhält\nerhält\nerhält\nerhält\nerhält\nerhält\nerhältst\nerhalten"
 	},
 	{
 		"type": "replacement",
 		"name": "BESTÄTIGT",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "bestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigst\nbestätigen",
-		"language": "de"
+		"content": "bestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigst\nbestätigen"
 	},
 	{
 		"type": "replacement",
 		"name": "WURDE",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "wurde\nwurde\nwurde\nwurde\nwurde\nwurde\nwurdest\nwurden",
-		"language": "de"
+		"content": "wurde\nwurde\nwurde\nwurde\nwurde\nwurde\nwurdest\nwurden"
 	},
 	{
 		"type": "replacement",
 		"name": "IST_",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "ist\nist\nist\nist\nist\nist\nbist\nsind",
-		"language": "de"
+		"content": "ist\nist\nist\nist\nist\nist\nbist\nsind"
 	},
 	{
 		"type": "replacement",
 		"name": "KANN",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "kann\nkann\nkann\nkann\nkann\nkann\nkannst\nkönnen",
-		"language": "de"
+		"content": "kann\nkann\nkann\nkann\nkann\nkann\nkannst\nkönnen"
 	},
 	{
 		"type": "replacement",
 		"name": "SCHICKEN",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "\n\n\n\n\n\nschicke\nschicken Sie",
-		"language": "de"
+		"content": "\n\n\n\n\n\nschicke\nschicken Sie"
 	},
 	{
 		"type": "replacement",
 		"name": "MACHT",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "macht\nmacht\nmacht\nmacht\nmacht\nmacht\nmachst\nmachen",
-		"language": "de"
+		"content": "macht\nmacht\nmacht\nmacht\nmacht\nmacht\nmachst\nmachen"
 	},
 	{
 		"type": "replacement",
 		"name": "HAT_",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "hat\nhat\nhat\nhat\nhat\nhat\nhast\nhaben",
-		"language": "de"
+		"content": "hat\nhat\nhat\nhat\nhat\nhat\nhast\nhaben"
 	},
 	{
 		"type": "replacement",
 		"name": "LEBT",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "lebt\nlebt\nlebt\nlebt\nlebt\nlebt\nlebst\nleben",
-		"language": "de"
+		"content": "lebt\nlebt\nlebt\nlebt\nlebt\nlebt\nlebst\nleben"
 	},
 	{
 		"type": "replacement",
 		"name": "NIMMT",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "nimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmst\nnehmen",
-		"language": "de"
+		"content": "nimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmst\nnehmen"
 	},
 	{
 		"type": "replacement",
 		"name": "WILL",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "will\nwill\nwill\nwill\nwill\nwill\nwillst\nwollen",
-		"language": "de"
+		"content": "will\nwill\nwill\nwill\nwill\nwill\nwillst\nwollen"
 	},
 	{
 		"type": "replacement",
 		"name": "REIST",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "reist\nreist\nreist\nreist\nreist\nreist\nreist\nreisen",
-		"language": "de"
+		"content": "reist\nreist\nreist\nreist\nreist\nreist\nreist\nreisen"
 	},
 	{
 		"type": "replacement",
 		"name": "NUTZERIN",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Nutzerin\nNutzer\nNutzer\nNutzerin\nNutzer\nNutzer\nNutzer\nNutzer",
-		"language": "de"
+		"content": "Nutzerin\nNutzer\nNutzer\nNutzerin\nNutzer\nNutzer\nNutzer\nNutzer"
 	},
 	{
 		"comment": "following are common texts and templates #################################################################################################"
@@ -251,128 +221,112 @@
 		"name": "Versandschreiben_Empfangsbestätigung_Einleitung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST_, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n",
-		"language": "de"
+		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST_, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n"
 	},
 	{
 		"type": "text",
 		"name": "Versandschreiben_Empfangsbestätigung_Leihschuhe",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Falls Leihschuhe zur Verfügung gestellt wurden, :SCHICKEN auch diese bitte ausreichend frankiert an uns zurück.",
-		"language": "de"
+		"content": "Falls Leihschuhe zur Verfügung gestellt wurden, :SCHICKEN auch diese bitte ausreichend frankiert an uns zurück."
 	},
 	{
 		"type": "text",
 		"name": "Versandschreiben_Empfangsbestätigung_Schlusssatz",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Für Rückfragen stehen wir :DER_PATIENTIN_DATIV selbstverständlich gerne zur Verfügung.\nIm Voraus vielen Dank für die Bemühungen und :DER_PATIENTIN_GENITIV Verständnis.\n\nMit freundlichen Grüßen",
-		"language": "de"
+		"content": "Für Rückfragen stehen wir :DER_PATIENTIN_DATIV selbstverständlich gerne zur Verfügung.\nIm Voraus vielen Dank für die Bemühungen und :DER_PATIENTIN_GENITIV Verständnis.\n\nMit freundlichen Grüßen"
 	},
 	{
 		"type": "template",
 		"name": "Versandschreiben Empfangsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": [[":Versandschreiben_Empfangsbestätigung_Einleitung", ":Versandschreiben_Empfangsbestätigung_Leihschuhe", ":Versandschreiben_Empfangsbestätigung_Schlusssatz"]],
-		"language": "de"
+		"content": [[":Versandschreiben_Empfangsbestätigung_Einleitung", ":Versandschreiben_Empfangsbestätigung_Leihschuhe", ":Versandschreiben_Empfangsbestätigung_Schlusssatz"]]
 	},
 	{
 		"type": "text",
 		"name": "Besuchsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Besuchsbestätigung für :FRAU_AKKUSATIV :Name\n\n:SEHR_GEEHRTE :Name,\n\nhiermit bestätigen wir :DER_PATIENTIN_DATIV den Besuch für :Anlass :IHRES_GENITIV :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen",
-		"language": "de"
+		"content": "Besuchsbestätigung für :FRAU_AKKUSATIV :Name\n\n:SEHR_GEEHRTE :Name,\n\nhiermit bestätigen wir :DER_PATIENTIN_DATIV den Besuch für :Anlass :IHRES_GENITIV :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen"
 	},
 	{
 		"type": "template",
 		"name": "Besuchsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": [[":Besuchsbestätigung"]],
-		"language": "de"
+		"content": [[":Besuchsbestätigung"]]
 	},
 	{
 		"type": "text",
 		"name": "Flughafenbescheinigung_deutsch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Bescheinigung für :FRAU_AKKUSATIV :Name über die Nutzung :Hilfsmittel\n\nSehr geehrte Damen und Herren,\n\n:FRAU_NOMINATIV :Name, geboren am :Geburtsdatum, :IST_ :NUTZERIN von :Hilfsmittel im täglichen Gebrauch. Es können Komponenten aus Metall enthalten sein, welche von Metalldetektoren, wie sie z.B. an Flughafen eingesetzt werden, erkannt werden können.\n\nMit freundlichen Grüßen",
-		"language": "de"
+		"content": "Bescheinigung für :FRAU_AKKUSATIV :Name über die Nutzung :Hilfsmittel\n\nSehr geehrte Damen und Herren,\n\n:FRAU_NOMINATIV :Name, geboren am :Geburtsdatum, :IST_ :NUTZERIN von :Hilfsmittel im täglichen Gebrauch. Es können Komponenten aus Metall enthalten sein, welche von Metalldetektoren, wie sie z.B. an Flughafen eingesetzt werden, erkannt werden können.\n\nMit freundlichen Grüßen"
 	},
 	{
 		"type": "template",
 		"name": "Flughafenbescheinigung deutsch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": [[":Flughafenbescheinigung_deutsch"]],
-		"language": "de"
+		"content": [[":Flughafenbescheinigung_deutsch"]]
 	},
 	{
 		"type": "text",
 		"name": "Flughafenbescheinigung_englisch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Attestation for :Name of use of :Hilfsmittel\n\nDear Madam or Sir,\n\n:Name, born :Geburtsdatum, makes use of :Hilfsmittel on a daily basis. Metal and synthetic materials are contained that may trigger metal  detectors, e.g. as used in airports.\n\nWith kind regards",
-		"language": "en"
+		"content": "Attestation for :Name of use of :Hilfsmittel\n\nDear Madam or Sir,\n\n:Name, born :Geburtsdatum, makes use of :Hilfsmittel on a daily basis. Metal and synthetic materials are contained that may trigger metal  detectors, e.g. as used in airports.\n\nWith kind regards"
 	},
 	{
 		"type": "template",
 		"name": "Flughafenbescheinigung englisch",
 		"unit": "common",
 		"author": "Caro App",
-		"content": [[":Flughafenbescheinigung_englisch"]],
-		"language": "en"
+		"content": [[":Flughafenbescheinigung_englisch"]]
 	},
 	{
 		"type": "text",
 		"name": "Fragenkatalog_Einleitung_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": ":SEHR_GEEHRTE :Name,\n\num ein Versorgungskonzept zu erstellen, benötigen wir zusätzliche Informationen. Bitte erschrecken Sie nicht angesichts der Vielzahl an Fragen, aber wir benötigen möglichst genaue Angaben zu den Lebensumständen, dem Gesundheitszustand und dem Zustand des Stumpfes. Auf Grundlage dieser Informationen bemühen wir uns ein Versorgungskonzept zu erstellen, welches den Erwartungen zu entsprechen versucht und neben dem Nutzen auch die Nachhaltigkeit und Zuverlässigkeit der Versorgung berücksichtigt.\n",
-		"language": "de"
+		"content": ":SEHR_GEEHRTE :Name,\n\num ein Versorgungskonzept zu erstellen, benötigen wir zusätzliche Informationen. Bitte erschrecken Sie nicht angesichts der Vielzahl an Fragen, aber wir benötigen möglichst genaue Angaben zu den Lebensumständen, dem Gesundheitszustand und dem Zustand des Stumpfes. Auf Grundlage dieser Informationen bemühen wir uns ein Versorgungskonzept zu erstellen, welches den Erwartungen zu entsprechen versucht und neben dem Nutzen auch die Nachhaltigkeit und Zuverlässigkeit der Versorgung berücksichtigt.\n"
 	},
 	{
 		"type": "text",
 		"name": "Fragenkatalog_Lebensumstände_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Fragen zu den allgemeinen Lebensumständen:\n\nWie alt :IST_ :DIE_PATIENTIN_NOMINATIV?\nWie aktiv :IST_ :DIE_PATIENTIN_NOMINATIV?\nWas :MACHT :DIE_PATIENTIN_NOMINATIV beruflich?\nWas :HAT_ :DIE_PATIENTIN_NOMINATIV für Hobbies?\nIn welcher Umwelt :LEBT :DIE_PATIENTIN_NOMINATIV (Stadt, Land, trocken, feucht)?\n:IST_ :DIE_PATIENTIN_NOMINATIV auf Hilfe angewiesen oder besteht eine selbstständige Lebensführung?\nErmöglicht die lokale Infrastruktur im Falle einer funktionellen Prothese Reparaturen?\n\n",
-		"language": "de"
+		"content": "Fragen zu den allgemeinen Lebensumständen:\n\nWie alt :IST_ :DIE_PATIENTIN_NOMINATIV?\nWie aktiv :IST_ :DIE_PATIENTIN_NOMINATIV?\nWas :MACHT :DIE_PATIENTIN_NOMINATIV beruflich?\nWas :HAT_ :DIE_PATIENTIN_NOMINATIV für Hobbies?\nIn welcher Umwelt :LEBT :DIE_PATIENTIN_NOMINATIV (Stadt, Land, trocken, feucht)?\n:IST_ :DIE_PATIENTIN_NOMINATIV auf Hilfe angewiesen oder besteht eine selbstständige Lebensführung?\nErmöglicht die lokale Infrastruktur im Falle einer funktionellen Prothese Reparaturen?\n\n"
 	},
 	{
 		"type": "text",
 		"name": "Fragenkatalog_Gesundheitszustand_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Fragen zum Gesundheitszustand:\n\nWie ist :DER_PATIENTIN_GENITIV allgemeine Gesundheitszustand?\nWie und wann kam es zur Amputation?\nIst der Stumpf reizlos, die Wunden verheilt, die Schwellungen abgeklungen?\nFindet oder fand eine Kompressionstherapie zur Stumpfformung statt?\nGibt es Empfindungsstörungen, reduziertes oder überempfindliches Gefühl?\nGibt es auffälliges Narbengewebe, Spalthautdeckung oder tiefe Narbeneinzüge?\nIst das Unterhautgewebe eher weich oder eher fest?\n:HAT_ :DIE_PATIENTIN_NOMINATIV Phantomschmerzen oder andere Schmerzsymptomatiken?\nIst eine Muskelaktivität erkennbar, die Beuge- und Streckmuskeln separat aktivierbar?\nGibt es Einschränkungen der angrenzenden Gelenke (Handgelenk, Ellenbogen, Schulter, Wirbelsäule) oder der Gegenseite?\nSind noch andere orthopädische Hilfsmittel in Gebrauch (z.B. Beinprothesen, Orthesen, etc.)?\nSind Material- oder Lebensmittelallergien bekannt?\n:NIMMT :DIE_PATIENTIN_NOMINATIV Medikamente?\n\n",
-		"language": "de"
+		"content": "Fragen zum Gesundheitszustand:\n\nWie ist :DER_PATIENTIN_GENITIV allgemeine Gesundheitszustand?\nWie und wann kam es zur Amputation?\nIst der Stumpf reizlos, die Wunden verheilt, die Schwellungen abgeklungen?\nFindet oder fand eine Kompressionstherapie zur Stumpfformung statt?\nGibt es Empfindungsstörungen, reduziertes oder überempfindliches Gefühl?\nGibt es auffälliges Narbengewebe, Spalthautdeckung oder tiefe Narbeneinzüge?\nIst das Unterhautgewebe eher weich oder eher fest?\n:HAT_ :DIE_PATIENTIN_NOMINATIV Phantomschmerzen oder andere Schmerzsymptomatiken?\nIst eine Muskelaktivität erkennbar, die Beuge- und Streckmuskeln separat aktivierbar?\nGibt es Einschränkungen der angrenzenden Gelenke (Handgelenk, Ellenbogen, Schulter, Wirbelsäule) oder der Gegenseite?\nSind noch andere orthopädische Hilfsmittel in Gebrauch (z.B. Beinprothesen, Orthesen, etc.)?\nSind Material- oder Lebensmittelallergien bekannt?\n:NIMMT :DIE_PATIENTIN_NOMINATIV Medikamente?\n\n"
 	},
 	{
 		"type": "text",
 		"name": "Fragenkatalog_Versorgungsplanung_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Fragen zur Versorgungsplanung:\n\nGab oder gibt es eine aktuelle Versorgung und wie ist diese aufgebaut?\nWelchen Umfang hat die Hand der erhaltenen Seite im Knöchelbereich, wie lang ist der Mittelfinger?\nWie lang ist der Unterarmstumpf gemessen von der Ellenbeuge aus, wie lang die andere Seite bis zur ausgestreckten Daumenspitze?\nWie lang ist der Oberarmstumpf gemessen von der Achselfalte aus, wie lang die andere Seite bis zur Spitze des abgewinkelten Ellenbogens?\nWie Groß :IST_ :DIE_PATIENTIN_NOMINATIV?\nWelche Erwartungen bestehen gegenüber der Versorgung?\nWas :WILL :DIE_PATIENTIN_NOMINATIV mit der Prothese machen, wie und wofür soll sie eingesetzt werden?\nWie hoch ist der Anspruch an das kosmetische Erscheinungsbild?\nWer übernimmt die Kosten? Gibt es ein Preislimit?\n\n",
-		"language": "de"
+		"content": "Fragen zur Versorgungsplanung:\n\nGab oder gibt es eine aktuelle Versorgung und wie ist diese aufgebaut?\nWelchen Umfang hat die Hand der erhaltenen Seite im Knöchelbereich, wie lang ist der Mittelfinger?\nWie lang ist der Unterarmstumpf gemessen von der Ellenbeuge aus, wie lang die andere Seite bis zur ausgestreckten Daumenspitze?\nWie lang ist der Oberarmstumpf gemessen von der Achselfalte aus, wie lang die andere Seite bis zur Spitze des abgewinkelten Ellenbogens?\nWie Groß :IST_ :DIE_PATIENTIN_NOMINATIV?\nWelche Erwartungen bestehen gegenüber der Versorgung?\nWas :WILL :DIE_PATIENTIN_NOMINATIV mit der Prothese machen, wie und wofür soll sie eingesetzt werden?\nWie hoch ist der Anspruch an das kosmetische Erscheinungsbild?\nWer übernimmt die Kosten? Gibt es ein Preislimit?\n\n"
 	},
 	{
 		"type": "text",
 		"name": "Fragenkatalog_Versorgungsablauf_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Fragen zum Versorgungsablauf:\n\n:KANN :DIE_PATIENTIN_NOMINATIV auf deutsch oder englisch kommunizieren?\n:REIST :DIE_PATIENTIN_NOMINATIV alleine oder in Begleitung?\nIst es :DER_PATIENTIN_DATIV möglich in unser Haus zu kommen und dort eventuell mehrere Wochen oder Monate zu bleiben, bzw. mehrfach anzureisen?\nManche Prothesenkomponenten könnten eine jährliche Inspektion gemäß Garantiebestimmungen erfordern. Ist es :DER_PATIENTIN_DATIV möglich, einen solchen Termin auf jährlicher Basis wahrzunehmen, wobei die Inspektion einige Wochen in Anspruch nehmen kann?",
-		"language": "de"
+		"content": "Fragen zum Versorgungsablauf:\n\n:KANN :DIE_PATIENTIN_NOMINATIV auf deutsch oder englisch kommunizieren?\n:REIST :DIE_PATIENTIN_NOMINATIV alleine oder in Begleitung?\nIst es :DER_PATIENTIN_DATIV möglich in unser Haus zu kommen und dort eventuell mehrere Wochen oder Monate zu bleiben, bzw. mehrfach anzureisen?\nManche Prothesenkomponenten könnten eine jährliche Inspektion gemäß Garantiebestimmungen erfordern. Ist es :DER_PATIENTIN_DATIV möglich, einen solchen Termin auf jährlicher Basis wahrzunehmen, wobei die Inspektion einige Wochen in Anspruch nehmen kann?"
 	},
 	{
 		"type": "text",
 		"name": "Fragenkatalog_Schlusssatz_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": "Zudem benötigen wir aktuelle Fotos aus unterschiedlichen Ansichten und, wenn vorhanden, Röntgenbilder. Bitte nennen Sie uns auch ein Geburtsdatum damit wir ordnungsgemäß einen Fall anlegen können. Nach Zusendung der erforderlichen Informationen bemühen wir uns schnellstmöglich um die Erstellung eines Versorgungskonzepts.\n\nBei weiteren Fragen stehen wir Ihnen gerne zur Verfügung.",
-		"language": "de"
+		"content": "Zudem benötigen wir aktuelle Fotos aus unterschiedlichen Ansichten und, wenn vorhanden, Röntgenbilder. Bitte nennen Sie uns auch ein Geburtsdatum damit wir ordnungsgemäß einen Fall anlegen können. Nach Zusendung der erforderlichen Informationen bemühen wir uns schnellstmöglich um die Erstellung eines Versorgungskonzepts.\n\nBei weiteren Fragen stehen wir Ihnen gerne zur Verfügung."
 	},
 	{
 		"type": "template",
@@ -383,69 +337,55 @@
 			[":Fragenkatalog_Einleitung_deutsch"],
 			[":Fragenkatalog_Lebensumstände_deutsch", ":Fragenkatalog_Gesundheitszustand_deutsch", ":Fragenkatalog_Versorgungsplanung_deutsch", ":Fragenkatalog_Versorgungsablauf_deutsch"],
 			[":Fragenkatalog_Schlusssatz_deutsch"]
-		],
-		"language": "de"
+		]
 	},
 	{
 		"type": "text",
 		"name": "Lieferanten_Einleitung",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Sehr geehrte Damen und Herren,\n",
-		"language": "de"
+		"content": "Sehr geehrte Damen und Herren,\n"
 	},
 	{
 		"type": "text",
 		"name": "Lieferanten_Konformität",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "um eine Konformität der von uns gelieferten orthopädischen Hilfsmittel jederzeit bescheinigen zu können, müssen wir die erforderlichen Zertifikate und Dokumente im Rahmen unseres Qualitätsmanagementsystems vorhalten.\n",
-		"language": "de"
+		"content": "um eine Konformität der von uns gelieferten orthopädischen Hilfsmittel jederzeit bescheinigen zu können, müssen wir die erforderlichen Zertifikate und Dokumente im Rahmen unseres Qualitätsmanagementsystems vorhalten.\n"
 	},
 	{
 		"type": "text",
 		"name": "Lieferanten_Biokompatibilität",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Wir benötigen von Ihnen die aktuellen Dokumente betreffend\n\n- Biokompatibilitätsnachweise nach ISO 10993,\n- Konformitätserklärungen nach ISO 13485,\n- Berichte über die Prüfung der Zytotoxizität und Karzerogenität von akkreditierten Prüflaboren oder\n- im Einzelfall ein ÖkoTex100-Zertifikat.\n\nfür die von Ihnen bezogenen Produkte oder deren Varianten:\n\n:PRD\n\nSofern Sie die Erklärungen / Berichte nicht selbst ausgeben akzeptieren wir auch die Erklärungen / Berichte Ihrer Lieferanten mit einer Erklärung von Ihnen dass es sich bei Ihrem Handelsnamen um das entsprechende Produkt handelt. Beachten Sie bitte, dass sich jeder Ihrer Kunden über eine Aktualität der Unterlagen von nicht älter als 5 Jahren freut.\n\n",
-		"language": "de"
+		"content": "Wir benötigen von Ihnen die aktuellen Dokumente betreffend\n\n- Biokompatibilitätsnachweise nach ISO 10993,\n- Konformitätserklärungen nach ISO 13485,\n- Berichte über die Prüfung der Zytotoxizität und Karzerogenität von akkreditierten Prüflaboren oder\n- im Einzelfall ein ÖkoTex100-Zertifikat.\n\nfür die von Ihnen bezogenen Produkte oder deren Varianten:\n\n:PRD\n\nSofern Sie die Erklärungen / Berichte nicht selbst ausgeben akzeptieren wir auch die Erklärungen / Berichte Ihrer Lieferanten mit einer Erklärung von Ihnen dass es sich bei Ihrem Handelsnamen um das entsprechende Produkt handelt. Beachten Sie bitte, dass sich jeder Ihrer Kunden über eine Aktualität der Unterlagen von nicht älter als 5 Jahren freut.\n\n"
 	},
 	{
 		"type": "text",
 		"name": "Lieferanten_Zertifikat",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Uns ist aufgefallen dass Ihr Zertifkat am :ECR abgelaufen ist und freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats.\n",
-		"language": "de"
+		"content": "Uns ist aufgefallen dass Ihr Zertifkat am :ECR abgelaufen ist und freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats.\n"
 	},
 	{
 		"type": "text",
 		"name": "Lieferanten_Preisliste",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Bitte übermitteln Sie uns Ihre aktuellen Preislisten bevorzugt als Excel-Tabelle.",
-		"language": "de"
+		"content": "Bitte übermitteln Sie uns Ihre aktuellen Preislisten bevorzugt als Excel-Tabelle."
 	},
 	{
 		"type": "text",
 		"name": "Lieferanten_Abschluss",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Unsere Kundennummer lautet :CID. Wir freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats per eMail.\n",
-		"language": "de"
+		"content": "Unsere Kundennummer lautet :CID. Wir freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats per eMail.\n"
 	},
 	{
 		"type": "template",
 		"name": "Lieferanten Zertifikate - Nachweise - Preislisten",
 		"unit": "office",
 		"author": "Caro App",
-		"content": [
-			[":Lieferanten_Einleitung"],
-			[":Lieferanten_Konformität", ":Lieferanten_Biokompatibilität", ":Lieferanten_Zertifikat"],
-			[":Lieferanten_Preisliste"],
-			[":Lieferanten_Abschluss"]
-		],
-		"language": "de"
+		"content": [[":Lieferanten_Einleitung"], [":Lieferanten_Konformität", ":Lieferanten_Biokompatibilität", ":Lieferanten_Zertifikat"], [":Lieferanten_Preisliste"], [":Lieferanten_Abschluss"]]
 	}
-
 ]

@@ -83,7 +83,7 @@ class TEXTTEMPLATE extends API {
 				}
 
 				// put hidden attribute if anything else remains the same
-				if ($exists && $exists['content'] === $chunk[':content'] && $exists['language'] === $chunk[':language'] && $exists['type'] === $chunk[':type']) {
+				if ($exists && $exists['content'] === $chunk[':content'] && $exists['type'] === $chunk[':type']) {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_put', [
 						'values' => [
 							':hidden' => $chunk[':hidden'],
@@ -118,7 +118,6 @@ class TEXTTEMPLATE extends API {
 				$options = [];
 				$alloptions = [];
 				$insertreplacement = ['...' . $this->_lang->GET('texttemplate.chunk.insert_default') => ['value' => ' ']];
-				$languagedatalist = [];
 				$return = [];
 
 				// get selected chunk
@@ -142,7 +141,6 @@ class TEXTTEMPLATE extends API {
 					'name' => '',
 					'unit' => '',
 					'content' => '',
-					'language' => '',
 					'type' => ''
 				];
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('texttemplate.chunk.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -159,7 +157,7 @@ class TEXTTEMPLATE extends API {
 						}
 					}
 					if (!in_array($row['type'], ['replacement', 'text'])) continue;
-					$display = $this->_lang->GET('texttemplate.chunk.types.' . $row['type']) . ' ' . $row['name'] . ' (' . $row['language'] . ')';
+					$display = $this->_lang->GET('texttemplate.chunk.types.' . $row['type']) . ' ' . $row['name'];
 
 					// one selection per unit
 					if (!in_array($row['unit'], array_keys($options))) $options[$row['unit']] = ['...' . $this->_lang->GET('texttemplate.template.new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
@@ -168,13 +166,12 @@ class TEXTTEMPLATE extends API {
 					if (!isset($options[$row['unit']][$display]) && !in_array($row['name'], $hidden)) {
 						$chunkdatalist[] = $row['name'];
 						$options[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-						if ($row['type'] === 'replacement') $insertreplacement[$this->_lang->GET('units.' . $row['unit']) . ' '. $row['name'] . ' (' . $row['language'] . ')'] = ['value' => ':' . $row['name']];
+						if ($row['type'] === 'replacement') $insertreplacement[$this->_lang->GET('units.' . $row['unit']) . ' '. $row['name']] = ['value' => ':' . $row['name']];
 					}
 
 					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
 				// one selection per unit
 				$renderoptions = [];
@@ -286,15 +283,6 @@ class TEXTTEMPLATE extends API {
 									'data-loss' => 'prevent'
 								]
 							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => $this->_lang->GET('texttemplate.chunk.language'),
-									'value' => $chunk['language'],
-									'required' => true,
-									'data-loss' => 'prevent'
-								],
-								'datalist' => array_values(array_unique($languagedatalist))
-							], [
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.chunk.unit')
@@ -350,7 +338,6 @@ class TEXTTEMPLATE extends API {
 					':unit' => UTILITY::propertySet($this->_payload, 'unit') ? : array_key_first($this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
-					':language' => UTILITY::propertySet($this->_payload, 'language'),
 					':type' => 'template',
 					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 				];
@@ -404,7 +391,6 @@ class TEXTTEMPLATE extends API {
 				$options = [];
 				$alloptions = [];
 				$insertreplacement = [];
-				$languagedatalist = [];
 				$return = [];
 
 				// get selected template
@@ -428,7 +414,6 @@ class TEXTTEMPLATE extends API {
 					'name' => '',
 					'unit' => '',
 					'content' => '',
-					'language' => '',
 					'type' => ''
 				];
 				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -440,7 +425,7 @@ class TEXTTEMPLATE extends API {
 					if ($row['type'] === 'replacement') continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if ($row['type'] === 'template'){
-						$display = $row['name'] . ' (' . $row['language'] . ')';
+						$display = $row['name'];
 						// one selection per unit
 						if (!in_array($row['unit'], array_keys($options))) $options[$row['unit']] = ['...' . $this->_lang->GET('texttemplate.template.new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 						if (!in_array($row['unit'], array_keys($alloptions))) $alloptions[$row['unit']] = ['...' . $this->_lang->GET('texttemplate.template.new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
@@ -460,7 +445,6 @@ class TEXTTEMPLATE extends API {
 							$chunks[':' . $row['name']] = $row['content'];
 						}
 					}
-					if (!in_array($row['language'], $languagedatalist)) $languagedatalist[] = $row['language'];
 				}
 
 				// one selection per unit
@@ -549,16 +533,6 @@ class TEXTTEMPLATE extends API {
 						],
 						...$renderinsertreplacement,
 						[
-							'type' => 'text',
-							'attributes' => [
-								'name' => $this->_lang->GET('texttemplate.template.language'),
-								'value' => $template['language'],
-								'id' => 'TemplateLanguage',
-								'required' => true,
-								'data-loss' => 'prevent'
-							],
-							'datalist' => array_values(array_unique($languagedatalist))
-						], [
 							'type' => 'select',
 							'attributes' => [
 								'name' => $this->_lang->GET('texttemplate.chunk.unit'),
@@ -660,9 +634,9 @@ class TEXTTEMPLATE extends API {
 					continue;
 				}
 				if (!in_array($row['unit'], array_keys($options))) $options[$row['unit']] = ['...' => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				if (!isset($options[$row['unit']][$row['name'] . ' (' . $row['language'] . ')'])){
+				if (!isset($options[$row['unit']][$row['name']])){
 					$templatedatalist[] = $row['name'];
-					$options[$row['unit']][$row['name'] . ' (' . $row['language'] . ')'] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					$options[$row['unit']][$row['name']] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 			}
 		}
@@ -703,7 +677,7 @@ class TEXTTEMPLATE extends API {
 			
 			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 			// add match not capture
-			$delimiter = substr_replace(CONFIG['forbidden']['names']['character'], '?:', 1, 0);
+			$delimiter = substr_replace(CONFIG['forbidden']['names']['characters'], '?:', 1, 0);
 			// unset types and escaped literals
 			$delimiter = preg_replace('/\\\./m', '', $delimiter);
 			// readd some types
@@ -711,7 +685,7 @@ class TEXTTEMPLATE extends API {
 
 			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 			// invert first forbidden names to allowed
-			$pattern = substr_replace(CONFIG['forbidden']['names']['character'], '', 2, 1);
+			$pattern = substr_replace(CONFIG['forbidden']['names']['characters'], '', 2, 1);
 			// add colon
 			$pattern = substr_replace($pattern, ':', 1, 0);
 			// unset types and escaped literals

@@ -401,7 +401,6 @@ export const compose_helper = {
 	composeNewTextTemplate: function () {
 		// set dragged/dropped order of elements
 		const name = document.getElementById("TemplateName").value,
-			language = document.getElementById("TemplateLanguage").value,
 			unit = document.getElementById("TemplateUnit").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
 			data = new FormData();
@@ -429,9 +428,8 @@ export const compose_helper = {
 			return content;
 		}
 		const templateContent = nodechildren(document.querySelector("main"));
-		if (name && language && templateContent.length) {
+		if (name && unit && templateContent.length) {
 			data.append("name", name);
-			data.append("language", language);
 			data.append("unit", unit);
 			data.append("content", JSON.stringify(templateContent));
 			data.append("hidden", hidden);
