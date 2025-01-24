@@ -88,21 +88,25 @@ export const api = {
 	 * @param {boolean} form_data tell _.api how to handle payload
 	 * @returns none / results of successFn
 	 */
-	send: async (method, request, successFn = null, errorFn = null, payload = {}, form_data = false) => {
+	send: async (method, request, successFn = null, errorFn = null, payload = {}) => {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
 		api.loadindicator(true);
-		if (api._settings.user && api._settings.user.fingerprint && ["post", "put"].includes(method) && payload instanceof FormData) {
-			let sanitizedpayload = Object.fromEntries(payload);
-			for (const [key, value] of Object.entries(sanitizedpayload)) {
-				// remove file keys for being shifted to $_FILES within the stream
-				// and quick sanitation of arrays; can't be handled by this object
-				if ((value instanceof File && (method === "post" || (method === "put" && value.size))) || key.endsWith("[]")) {
-					delete sanitizedpayload[key];
+		if (api._settings.user && api._settings.user.fingerprint && ["post", "put"].includes(method)) {
+			let sanitizedpayload = {};
+			if (payload instanceof FormData) {
+				sanitizedpayload = Object.fromEntries(payload);
+				for (const [key, value] of Object.entries(sanitizedpayload)) {
+					// remove file keys for being shifted to $_FILES within the stream
+					// and quick sanitation of arrays; can't be handled by this object
+					if ((value instanceof File && (method === "post" || (method === "put" && value.size))) || key.endsWith("[]")) {
+						delete sanitizedpayload[key];
+					}
+					// unset '0' values that are not recognized by backend
+					if (value == "0") sanitizedpayload[key] = "";
 				}
-				// unset '0' values that are not recognized by backend
-				if (value == "0") sanitizedpayload[key] = "";
-			}
+			} else payload = new FormData();
+
 			sanitizedpayload = JSON.stringify(sanitizedpayload)
 				.replace(/\\r|\\n|\\t/g, "")
 				.replaceAll(/[\W_]/g, ""); // harmonize cross browser
@@ -112,7 +116,7 @@ export const api = {
 			//console.log(payload, sanitizedpayload, b.size);
 			payload.append("_user_post_validation", await _.sha256(api._settings.user.fingerprint + b.size.toString()));
 		}
-		await _.api(method, "api/api.php/" + request.join("/"), payload, form_data)
+		await _.api(method, "api/api.php/" + request.join("/"), payload, ['post','put'].includes(method.toLowerCase()))
 			.then(async (data) => {
 				document.querySelector("header>div:nth-of-type(2)").style.display = data.status === 200 ? "none" : "block";
 				if (data.status === 203) new Toast(api._lang.GET("general.service_worker_get_cache_fallback"), "info");
@@ -427,7 +431,7 @@ export const api = {
 			default:
 				return;
 		}
-		await api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		await api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -511,7 +515,7 @@ export const api = {
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -578,7 +582,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -632,7 +636,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post");
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -708,7 +712,7 @@ export const api = {
 				payload = _.getInputs("[data-usecase=file]", true);
 				break;
 		}
-		api.send(method, request, successFn, null, payload, method === "post");
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -872,7 +876,7 @@ export const api = {
 				};
 				break;
 		}
-		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -930,7 +934,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post");
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -1129,7 +1133,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -1323,7 +1327,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post");
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -1390,7 +1394,7 @@ export const api = {
 				}
 				break;
 		}
-		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -1465,7 +1469,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -1521,7 +1525,7 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, method === "post");
+		api.send(method, request, successFn, null, payload);
 	},
 
 	/**
@@ -1571,6 +1575,6 @@ export const api = {
 			default:
 				return;
 		}
-		api.send(method, request, successFn, null, payload, ["put", "post"].includes(method));
+		api.send(method, request, successFn, null, payload);
 	},
 };
