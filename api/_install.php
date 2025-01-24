@@ -23,6 +23,7 @@ header('Content-Type: text/html; charset=UTF-8');
 require_once('_config.php');
 @define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
 require_once('_sqlinterface.php');
+require_once('_utility.php');
 
 define('DEFAULTSQL', [
 	'install_tables' => [
@@ -1003,7 +1004,7 @@ class INSTALL {
 					':name' => $entry['name'],
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? json_encode($entry['info']) : null,
 					':certificate' => json_encode([]),
-					':pricelist' => isset($entry['pricelist']) && gettype($entry['info']) === 'pricelist' ? json_encode(['filter' => $entry['pricelist']]) : null,
+					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? json_encode(['filter' => json_encode($entry['pricelist'], JSON_PRETTY_PRINT)]) : null,
 					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', $entry['name']) . $this->_currentdate->format('Ymd'),
 					':evaluation' => null,
 					':hidden' => null
