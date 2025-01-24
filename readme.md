@@ -120,8 +120,11 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * unused documents, except contexts or analyze for by input widgets within records
 * external files linking ->api checking whether file is hidden or not displaying error messag in new window otherwise stream data
     * describe safety mechanism on accessability for logged in users only
+        * dynamic permission handling for generated directories, consider other server architectures within UTILITY::createDirectory()
     * api endpoint file/stream
     * code pattern file/stream
+* Uncaught PDOException: SQLSTATE[23000]: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Verletzung der UNIQUE KEY-EinschrÃ¤nkung "AK_id". Ein doppelter SchlÃ¼ssel kann in das dbo.caro_sessions-Objekt nicht eingefÃ¼gt werden: on login after session timeout
+
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1046,13 +1049,14 @@ Technically the application is being usable on any webserver but this is **not r
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * php.ini session.gc_maxlifetime according to [CONFIG[limits][idle_logout]](#runtime-variables)
 * php.ini enable extensions:
+    * fileinfo
     * gd
     * gettext
     * mbstring
     * exif
     * pdo_odbc
     * zip
-    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
+    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv if applicable)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 
