@@ -521,34 +521,18 @@ export function rendertest(element) {
 						type: "range",
 						attributes: {
 							name: "Range with datalist",
-							list: "range_datalist",
-							min: 0,
-							max: 4,
-							value: 2,
+							value: 1,
+							onchange: "console.log(this.value)",
 						},
-					},
-					{
-						type: "datalist",
-						attributes: {
-							id: "range_datalist",
-							class: "rangedatalist",
-						},
-						content: ["A", "range", "with", "a", "datalist"],
-						hint: "As seen in user manager.",
-					},
-					{
-						type: "datalist",
-						attributes: {
-							id: "text_datalist",
-						},
-						content: ["A", "textinput", "with", "a", "datalist"],
+						datalist: ["A", "range", "with", "a", "datalist"],
+						hint: "As seen in user manager. Look into console to see the new value.",
 					},
 					{
 						type: "text",
 						attributes: {
 							name: "Text input with datalist",
-							list: "text_datalist",
 						},
+						datalist: ["A", "textinput", "with", "a", "datalist"],
 						hint: "As seen in new conversation.",
 					},
 					{
@@ -572,13 +556,8 @@ export function rendertest(element) {
 							name: "Text with autocomplete",
 							rows: 3,
 						},
-						hint:"Start typing \"lorem ipsum\".",
-						autocomplete: [
-							"Lorem ipsum dolor sit amet, version one",
-							"Lorem ipsum dolor sit amet, version two",
-							"Lorem ipsum dolor sit amet, version three",
-							"Lorem ipsum dolor sit amet, version four",
-						],
+						hint: 'Start typing "lorem ipsum". As seen in risk management.',
+						autocomplete: ["Lorem ipsum dolor sit amet, version one", "Lorem ipsum dolor sit amet, version two", "Lorem ipsum dolor sit amet, version three", "Lorem ipsum dolor sit amet, version four"],
 					},
 					{
 						type: "checkbox",
@@ -751,34 +730,18 @@ export function rendertest(element) {
 						type: "range",
 						attributes: {
 							name: "Regler mit Datenliste",
-							list: "range_datalist",
-							min: 0,
-							max: 4,
-							value: 2,
+							value: 1,
+							onchange: "console.log(this.value)",
 						},
-					},
-					{
-						type: "datalist",
-						attributes: {
-							id: "range_datalist",
-							class: "rangedatalist",
-						},
-						content: [{ label: "Ein" }, { label: "Regler" }, { label: "mit" }, { label: "einer" }, { label: "Datenliste" }],
-						hint: "Verwendet in der Nutzerverwaltung.",
-					},
-					{
-						type: "datalist",
-						attributes: {
-							id: "text_datalist",
-						},
-						content: ["Eine", "Texteingabe", "mit", "einer", "Datenliste"],
+						datalist: ["Ein", "Regler", "mit", "einer", "Datenliste"],
+						hint: "Verwendet in der Nutzerverwaltung. Schaue in die Konsole für den neuen Wert.",
 					},
 					{
 						type: "text",
 						attributes: {
 							name: "Texteingabe mit einer Datenliste",
-							list: "text_datalist",
 						},
+						datalist: ["Eine", "Texteingabe", "mit", "einer", "Datenliste"],
 						hint: "Verwendet in Konversationen.",
 					},
 					{
@@ -802,13 +765,8 @@ export function rendertest(element) {
 							name: "Texteingabe mit automatischer Vervollständigung",
 							rows: 3,
 						},
-						hint:"Starte mit \"lorem ipsum\".",
-						autocomplete: [
-							"Lorem ipsum dolor sit amet, Version Eins",
-							"Lorem ipsum dolor sit amet, Version Zwei",
-							"Lorem ipsum dolor sit amet, Version Drei",
-							"Lorem ipsum dolor sit amet, Version Vier",
-						],
+						hint: 'Starte mit "lorem ipsum". Verwendet im Risikomanagement',
+						autocomplete: ["Lorem ipsum dolor sit amet, Version Eins", "Lorem ipsum dolor sit amet, Version Zwei", "Lorem ipsum dolor sit amet, Version Drei", "Lorem ipsum dolor sit amet, Version Vier"],
 					},
 					{
 						type: "checkbox",

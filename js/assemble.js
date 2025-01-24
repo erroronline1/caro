@@ -1317,55 +1317,6 @@ export class Assemble {
 	}
 
 	/**
-	 * creates a datalist
-	 * @returns {domNodes} datalist, labels if applicable (for range)
-	 * @example this.currentElement
-	 * ```json
-	 * 	{
-	 * 		"type": "datalist",
-	 * 		"attributes": {
-	 * 			"id": "text_datalist",
-	 * 		},
-	 * 		"content": ["A", "textinput", "with", "a", "datalist"]
-	 * 	}
-	 * ```
-	 */
-	datalist() {
-		let datalist = document.createElement("datalist");
-		let option, labels, label;
-		datalist.id = getNextElementID();
-		if (this.currentElement.attributes !== undefined) {
-			if (this.currentElement.attributes.class && this.currentElement.attributes.class === "rangedatalist") {
-				labels = document.createElement("div");
-				labels.classList.add("rangedatalist");
-				delete this.currentElement.attributes.class;
-			}
-			datalist = this.apply_attributes(this.currentElement.attributes, datalist);
-		}
-		this.currentElement.content.forEach((key) => {
-			option = document.createElement("option");
-			if (typeof key === "string") {
-				option.append(document.createTextNode(key));
-				if (labels) {
-					label = document.createElement("span");
-					label.append(document.createTextNode(key));
-					labels.append(label);
-				}
-			} else {
-				if (labels && Object.keys(key).includes("label")) {
-					label = document.createElement("span");
-					label.append(document.createTextNode(key.label));
-					labels.append(label);
-				}
-				option = this.apply_attributes(key, option);
-			}
-			datalist.appendChild(option);
-		});
-		if (labels) return [datalist, labels];
-		return [datalist];
-	}
-
-	/**
 	 * creates a date input
 	 * @returns {domNodes}
 	 * @example this.currentElement
@@ -1677,14 +1628,16 @@ export class Assemble {
 	 * 		"numeration": "anything resulting in true to prevent enumeration"
 	 * 		"attributes": {
 	 * 			"name": "variable name will be used as an accessible placeholder"
-	 * 		}
+	 * 		},
+	 * 		"datalist": ["some", "predefined", "values"]
 	 * 	}
 	 */
 	input(type) {
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
 			hint = this.hint(),
-			imagealigned = false;
+			imagealigned = false,
+			datalist;
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
@@ -1773,13 +1726,26 @@ export class Assemble {
 			input = this.apply_attributes(this.currentElement.attributes, input);
 		}
 
+		if (this.currentElement.datalist !== undefined && this.currentElement.datalist.length) {
+			datalist = document.createElement("datalist");
+			let option;
+			datalist.id = getNextElementID();
+			this.currentElement.datalist.forEach((key) => {
+				option = document.createElement("option");
+				option.append(document.createTextNode(key));
+				datalist.appendChild(option);
+			});
+			input.setAttribute("list", datalist.id);
+		}
+
 		if (imagealigned) {
 			const container = document.createElement("div");
 			container.classList.add("imagealigned");
 			container.append(...this.icon(), input, label, ...hint);
+			if (datalist) container.append(datalist);
 			return [container];
 		}
-
+		if (datalist) return [...this.icon(), input, label, ...hint, datalist];
 		return [...this.icon(), input, label, ...hint];
 	}
 
@@ -2178,21 +2144,42 @@ export class Assemble {
 	 * 			"max": 100,
 	 * 			"step": 5
 	 * 		},
+	 * 		"datalist": ["some", "predefined", "values"]
+	 * 	OR	"datalist": [{"label": "some", "value": "a"}, {"label": "predefined", "value": "b"}, {"label": "values", "value": "c"}]
 	 * 		"hint": "from 0 to 100 in 20 steps"
 	 * 	}
 	 * ```
 	 */
 	range() {
 		let input = document.createElement("input"),
-			hint = this.hint();
+			hint = this.hint(),
+			datalist;
 		input.type = "range";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		this.currentElement.description = this.currentElement.attributes.name;
 		input = this.apply_attributes(this.currentElement.attributes, input);
 
-		if (!this.currentElement.attributes.list && this.currentElement.attributes.step !== "any") {
-			let datalist = document.createElement("datalist");
+		if (this.currentElement.datalist != undefined) {
+			datalist = document.createElement("datalist");
+			let option, labels, label;
+			datalist.id = getNextElementID();
+			labels = document.createElement("div");
+			labels.classList.add("rangedatalist");
+			this.currentElement.datalist.forEach((key) => {
+				option = document.createElement("option");
+				option.append(document.createTextNode(key));
+				label = document.createElement("span");
+				label.append(document.createTextNode(key));
+				labels.append(label);
+				datalist.appendChild(option);
+			});
+			input.setAttribute("list", datalist.id);
+			input.min = 0;
+			input.max = this.currentElement.datalist.length - 1;
+			return [datalist, ...this.header(), input, labels, ...hint];
+		} else if (this.currentElement.attributes.step !== "any") {
+			datalist = document.createElement("datalist");
 			let option;
 			datalist.id = getNextElementID();
 			for (
@@ -2205,7 +2192,7 @@ export class Assemble {
 				datalist.appendChild(option);
 			}
 			input.setAttribute("list", datalist.id);
-			return [datalist, ...this.header(), input, ...hint];
+			return [datalist, ...this.header(), input, ...hint, ...this.br()];
 		}
 		return [...this.header(), input, ...hint];
 	}

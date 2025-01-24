@@ -384,14 +384,7 @@ export const _client = {
 			if (datalist.length) {
 				if (typeof datalist === "string") datalist = datalist.split(",");
 				body[0].type = "text";
-				body[0].attributes.list = "rcptlist";
-				body.push({
-					type: "datalist",
-					content: datalist,
-					attributes: {
-						id: "rcptlist",
-					},
-				});
+				body[0].datalist = datalist;
 			}
 
 			// fire dialog, resolve with post request
