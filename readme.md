@@ -123,8 +123,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
         * dynamic permission handling for generated directories, consider other server architectures within UTILITY::createDirectory()
     * api endpoint file/stream
     * code pattern file/stream
-* Uncaught PDOException: SQLSTATE[23000]: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Verletzung der UNIQUE KEY-EinschrÃ¤nkung "AK_id". Ein doppelter SchlÃ¼ssel kann in das dbo.caro_sessions-Objekt nicht eingefÃ¼gt werden: on login after session timeout
-
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue

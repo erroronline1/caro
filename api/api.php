@@ -86,8 +86,11 @@ class API {
 		$this->_lang = new LANG();
 
 		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])){
-			session_unset();
+			$params = session_get_cookie_params();
+			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 			session_destroy();
+			session_write_close();
+			session_unset();
 		}
 		// check if a registered user with valid token is logged in
 		if (isset($_SESSION['user']['token'])){
