@@ -75,7 +75,7 @@ class FILE extends API {
 			]
 		];
 		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
-		$external = array_map(Fn($path) => substr($path, 1),$this->activeexternalfiles());
+		$external = array_map(Fn($path) => substr($path, 1), $this->activeexternalfiles());
 
 		foreach($bundles as $row) {
 			$list = [];
@@ -990,13 +990,12 @@ class FILE extends API {
 	public function stream(){
 		$file = realpath('../' . implode('/', array_slice(REQUEST, 2)));
 		if ($file){
-
-///////////////////////////////
-// todo: match external files path, check whether file is hidden or not
-// evaluate record file handling, just to be sure
-///////////////////////////////
-
-
+			// filter inactive external files
+			if (stristr($file, CONFIG['fileserver']['external_documents']) && !in_array('../' . substr($file, stripos($file, CONFIG['fileserver']['external_documents'])), $this->activeexternalfiles())) {
+				http_response_code(410);
+				echo $this->_lang->GET('file.external_file.retired_success');
+				die();
+			}
 			$pathinfo = pathinfo($file);
 			header('Content-Type: '.mime_content_type($file));
 			header('Content-Disposition: inline; filename=' . pathinfo($file)['basename']);
@@ -1009,6 +1008,9 @@ class FILE extends API {
 			readfile($file);
 			exit;
 		}
+		http_response_code(410);
+		echo $this->_lang->GET('file.external_file.retired_success');
+		die();
 	}
 }
 ?>
