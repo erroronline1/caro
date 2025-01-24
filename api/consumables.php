@@ -883,18 +883,6 @@ class CONSUMABLES extends API {
 					$result['render'] = ['content' => [
 						[
 							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'vendors'
-								]
-							], [
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist_unit)),
-								'attributes' => [
-									'id' => 'units'
-								]
-							], [
 								'type' => 'scanner',
 								'destination' => 'productsearch'
 							], [
@@ -1004,18 +992,6 @@ class CONSUMABLES extends API {
 					$result['render'] = ['content' => [
 						[
 							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'vendors'
-								]
-							], [
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist_unit)),
-								'attributes' => [
-									'id' => 'units'
-								]
-							], [
 								'type' => 'button',
 								'attributes' => [
 									'value' => $this->_lang->GET('consumables.product.add_new'),
@@ -1054,9 +1030,9 @@ class CONSUMABLES extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.vendor'),
-									'list' => 'vendors',
 									'value' => $product['vendor_name'],
-								]
+								],
+								'datalist' => array_values(array_unique($datalist))
 							], [
 								'type' => 'text',
 								'attributes' => [
@@ -1081,10 +1057,10 @@ class CONSUMABLES extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.article_unit'),
-									'list' => 'units',
 									'required' => true,
 									'value' => $product['article_unit'],
-								]
+								],
+								'datalist' => array_values(array_unique($datalist_unit))
 							], [
 								'type' => 'text',
 								'attributes' => [
@@ -1822,12 +1798,6 @@ class CONSUMABLES extends API {
 					$result['render'] = ['content' => [
 						[
 							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'vendors'
-								]
-							], [
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.information_vendor'),
@@ -1838,9 +1808,9 @@ class CONSUMABLES extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors_search'),
-									'list' => 'vendors',
 									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
-								]
+								],
+								'datalist' => array_values(array_unique($datalist))
 							]
 						]]];
 					
@@ -1922,12 +1892,6 @@ class CONSUMABLES extends API {
 					$result['render'] = ['content' => [
 						[
 							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'vendors'
-								]
-							], [
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors'),
@@ -1938,9 +1902,9 @@ class CONSUMABLES extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors_search'),
-									'list' => 'vendors',
 									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
-								]
+								],
+								'datalist' => array_values(array_unique($datalist))
 							]
 						], [
 							[

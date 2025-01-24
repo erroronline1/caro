@@ -250,13 +250,6 @@ class FILE extends API {
 					'content' => [
 						[
 							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($datalist)),
-								'attributes' => [
-									'id' => 'bundles'
-								]
-							],
-							[
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('file.bundle.existing_bundle_select'),
@@ -268,9 +261,9 @@ class FILE extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('file.bundle.existing_bundle'),
-									'list' => 'bundles',
 									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
-								]
+								],
+								'datalist' => array_values(array_unique($datalist))
 							]
 						]]];
 

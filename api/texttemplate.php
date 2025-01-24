@@ -221,27 +221,14 @@ class TEXTTEMPLATE extends API {
 					'content' => [
 						[
 							[
-								[
-									'type' => 'datalist',
-									'content' => array_values(array_unique($chunkdatalist)),
-									'attributes' => [
-										'id' => 'chunks'
-									]
-								], [
-									'type' => 'datalist',
-									'content' => array_values(array_unique($languagedatalist)),
-									'attributes' => [
-										'id' => 'languages'
-									]
-								],
 								...$renderoptions,
 								[
 									'type' => 'search',
 									'attributes' => [
 										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-										'list' => 'chunks',
 										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
-									]
+									],
+									'datalist' => array_values(array_unique($chunkdatalist))
 								]
 							],
 							[
@@ -250,9 +237,9 @@ class TEXTTEMPLATE extends API {
 									'type' => 'search',
 									'attributes' => [
 										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-										'list' => 'chunks',
 										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
-									]
+									],
+									'datalist' => array_values(array_unique($chunkdatalist))
 								]
 							]
 						], [
@@ -302,11 +289,11 @@ class TEXTTEMPLATE extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.chunk.language'),
-									'list' => 'languages',
 									'value' => $chunk['language'],
 									'required' => true,
 									'data-loss' => 'prevent'
-								]
+								],
+								'datalist' => array_values(array_unique($languagedatalist))
 							], [
 								'type' => 'select',
 								'attributes' => [
@@ -527,28 +514,14 @@ class TEXTTEMPLATE extends API {
 				$return['render'] = ['content' => [
 					[
 						[
-							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($templatedatalist)),
-								'attributes' => [
-									'id' => 'templates'
-								]
-							],
-							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($languagedatalist)),
-								'attributes' => [
-									'id' => 'languages'
-								]
-							],
 							...$renderoptions,
 							[
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-									'list' => 'templates',
 									'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
-								]
+								],
+								'datalist' => array_values(array_unique($templatedatalist))
 							]
 						],
 						[
@@ -557,9 +530,9 @@ class TEXTTEMPLATE extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-									'list' => 'templates',
 									'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
-								]
+								],
+								'datalist' => array_values(array_unique($templatedatalist))
 							]
 						]
 					], [
@@ -579,12 +552,12 @@ class TEXTTEMPLATE extends API {
 							'type' => 'text',
 							'attributes' => [
 								'name' => $this->_lang->GET('texttemplate.template.language'),
-								'list' => 'languages',
 								'value' => $template['language'],
 								'id' => 'TemplateLanguage',
 								'required' => true,
 								'data-loss' => 'prevent'
-							]
+							],
+							'datalist' => array_values(array_unique($languagedatalist))
 						], [
 							'type' => 'select',
 							'attributes' => [

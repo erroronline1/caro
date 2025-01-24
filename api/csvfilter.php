@@ -205,12 +205,6 @@ class CSVFILTER extends API {
 					'content' => [
 						[
 							[
-								'type' => 'datalist',
-								'content' => array_values(array_unique($filterdatalist)),
-								'attributes' => [
-									'id' => 'filters'
-								]
-							], [
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('csvfilter.use.filter_select'),
@@ -221,9 +215,9 @@ class CSVFILTER extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('csvfilter.edit.filter'),
-									'list' => 'filters',
 									'onkeypress' => "if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"
-								]
+								],
+								'datalist' => array_values(array_unique($filterdatalist))
 							]
 						]
 					]
@@ -413,12 +407,6 @@ class CSVFILTER extends API {
 						[
 							[
 								[
-									'type' => 'datalist',
-									'content' => array_values(array_unique($filterdatalist)),
-									'attributes' => [
-										'id' => 'filters'
-									]
-								], [
 									'type' => 'select',
 									'attributes' => [
 										'name' => $this->_lang->GET('csvfilter.edit.filter_select'),
@@ -429,9 +417,9 @@ class CSVFILTER extends API {
 									'type' => 'search',
 									'attributes' => [
 										'name' => $this->_lang->GET('csvfilter.edit.filter'),
-										'list' => 'filters',
 										'onkeypress' => "if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"
-									]
+									],
+									'datalist' => array_values(array_unique($filterdatalist))
 								]
 							], [
 								[

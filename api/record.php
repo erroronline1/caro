@@ -905,13 +905,6 @@ class RECORD extends API {
 							'content' => $messagedialog
 						],
 						[
-							'type' => 'datalist',
-							'attributes' => [
-								'id' => 'rcptlist'
-							],
-							'content' => $datalist
-						],
-						[
 							'type' => 'hidden',
 							'attributes' => [
 								'name' => 'identifier',
@@ -929,8 +922,8 @@ class RECORD extends API {
 							'type' => 'text',
 							'attributes' => [
 								'name' => $this->_lang->GET('record.casestate_change_recipient'),
-								'list' => 'rcptlist'
-							]
+							],
+							'datalist' => $datalist
 						]
 					])
 					. "'.replace()), options: JSON.parse('"
@@ -1322,12 +1315,6 @@ class RECORD extends API {
 		$content = [
 			[
 				[
-					'type' => 'datalist',
-					'content' => array_values(array_unique($recorddatalist)),
-					'attributes' => [
-						'id' => 'records'
-					]
-				], [
 					'type' => 'scanner',
 					'destination' => '_recordfilter',
 					'description' => $this->_lang->GET('record.scan')
@@ -1337,11 +1324,11 @@ class RECORD extends API {
 					'attributes' => [
 						'id' => '_recordfilter',
 						'name' => $this->_lang->GET('record.filter'),
-						'list' => 'records',
 						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}",
 						'onblur' => "api.record('get', 'records', this.value); return false;",
 						'value' => ($this->_requestedID && $this->_requestedID !== 'null') ? $this->_requestedID : ''
-						]
+					],
+					'datalist' => array_values(array_unique($recorddatalist))
 				]
 			],
 			[

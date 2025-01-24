@@ -894,24 +894,13 @@ class USER extends API {
 				}
 
 				// create skill matrix
-				$skilldatalistwithlabel = $skilldatalist = [];
-				$skilldatalistnum = 0;
+				$skilldatalistwithlabel = [];
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					$skillselection = [];
 					if ($duty === '_LEVEL') {
-						$skilldatalistnum ++;
 						foreach($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
-							$skilldatalistwithlabel[] = ['value' => $level, 'label' => $leveldescription];
-							$skilldatalist[] = ['value' => $level];
+							$skilldatalistwithlabel[] = $leveldescription;
 						}
-						$skilldatalistwithlabel = [
-							'type' => 'datalist',
-							'content' => $skilldatalistwithlabel,
-							'attributes' => [
-								'id' => 'skillmarkerswithlabels' . $skilldatalistnum,
-								'class' => 'rangedatalist'
-							]
-						];
 						continue;
 					}
 					foreach ($skills as $skill => $skilldescription){
@@ -927,10 +916,9 @@ class USER extends API {
 								'min' => 0,
 								'max' => count($this->_lang->_USER['skills']['_LEVEL']) - 1,
 								'value' => strval($userlevel),
-								'list' => array_search($skill, array_keys($skills)) < 2 ? 'skillmarkerswithlabels' . $skilldatalistnum : ''
 							],
+							'datalist' => array_search($skill, array_keys($skills)) < 2 ? $skilldatalistwithlabel : []
 						];
-						if (array_search($skill, array_keys($skills)) < 2) $skillselection[] = $skilldatalistwithlabel;
 					}
 					$skillmatrix[] = [
 						...$skillselection
@@ -939,13 +927,6 @@ class USER extends API {
 
 				$result['render'] = ['content' => [
 					[
-						[
-							'type' => 'datalist',
-							'content' => array_values(array_unique($datalist)),
-							'attributes' => [
-								'id' => 'users'
-							]
-						],
 						[
 							'type' => 'select',
 							'attributes' => [
@@ -958,9 +939,9 @@ class USER extends API {
 							'type' => 'search',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.existing_user'),
-								'list' => 'users',
 								'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
-							]
+							],
+							'datalist' => array_values(array_unique($datalist))
 						]
 					],[
 						[

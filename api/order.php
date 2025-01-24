@@ -800,21 +800,8 @@ class ORDER extends API {
 								'value' => $this->_lang->GET('order.add_manually'),
 								'type' => 'button',
 								'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
-									json_encode([
-										[
-											[
-												'type' => 'datalist',
-											'content' => array_values(array_unique($datalist)),
-											'attributes' => [
-												'id' => 'vendors'
-											]
-										], [
-											'type' => 'datalist',
-											'content' => array_values(array_unique($datalist_unit)),
-											'attributes' => [
-												'id' => 'units'
-											]
-										], 
+								json_encode([
+									[
 										[
 											'type' => 'number',
 											'attributes' => [
@@ -824,8 +811,8 @@ class ORDER extends API {
 											'type' => 'text',
 											'attributes' => [
 												'name' => $this->_lang->GET('order.unit_label'),
-												'list' => 'units'
-											]
+											],
+											'datalist' => array_values(array_unique($datalist_unit))
 										], [
 											'type' => 'text',
 											'attributes' => [
@@ -840,8 +827,8 @@ class ORDER extends API {
 											'type' => 'text',
 											'attributes' => [
 												'name' => $this->_lang->GET('order.vendor_label'),
-												'list' => 'vendors'
-											]
+											],
+											'datalist' => array_values(array_unique($datalist))
 										]
 									]
 								])

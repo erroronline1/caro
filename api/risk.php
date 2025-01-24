@@ -324,18 +324,6 @@ class RISK extends API {
 									],
 									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 								], [
-									'type' => 'datalist',
-									'content' => isset($datalist['process']) ? array_values($datalist['process']) : [],
-									'attributes' => [
-										'id' => 'processes'
-									]
-								], [
-									'type' => 'datalist',
-									'content' => isset($datalist['measure']) ? array_values($datalist['measure']) : [],
-									'attributes' => [
-										'id' => 'measure'
-									]
-								], [
 									'type' => 'hidden',
 									'attributes' => [
 										'name' => '_type',
@@ -345,16 +333,16 @@ class RISK extends API {
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.process'),
-										'list' => 'processes',
 										'value' => $risk['process'] ? : '',
-									]
+									],
+									'datalist' => isset($datalist['process']) ? array_values($datalist['process']) : []
 								], [
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.type.characteristic'),
-										'list' => 'measure',
 										'value' => $risk['measure'] ? : '',
-									]
+									],
+									'datalist' => isset($datalist['measure']) ? array_values($datalist['measure']) : []
 								], [
 									'type' => 'radio',
 									'attributes' => [
@@ -509,12 +497,6 @@ class RISK extends API {
 								],
 								'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $risk['date']]) : null
 							], [
-								'type' => 'datalist',
-								'content' => isset($datalist['process']) ? array_values($datalist['process']) : [],
-								'attributes' => [
-									'id' => 'processes'
-								]
-							], [
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => '_type',
@@ -524,9 +506,9 @@ class RISK extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.process'),
-									'list' => 'processes',
 									'value' => $risk['process'] ? : '',
-								]
+								],
+								'datalist' => isset($datalist['process']) ? array_values($datalist['process']) : []
 							], [
 								'type' => 'checkbox2text',
 								'attributes' => [

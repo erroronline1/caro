@@ -457,12 +457,6 @@ class DOCUMENT extends API {
 						[
 							[
 								[
-									'type' => 'datalist',
-									'content' => array_values(array_unique($bundledatalist)),
-									'attributes' => [
-										'id' => 'templates'
-									]
-								], [
 									'type' => 'select',
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle_select'),
@@ -473,9 +467,9 @@ class DOCUMENT extends API {
 									'type' => 'search',
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle'),
-										'list' => 'templates',
 										'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"
-									]
+									],
+									'datalist' => array_values(array_unique($bundledatalist))
 								]
 							], [
 								[
@@ -493,10 +487,10 @@ class DOCUMENT extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('assemble.compose.bundle.name'),
 									'value' => $bundle['name'],
-									'list' => 'templates',
 									'required' => true,
 									'data-loss' => 'prevent'
 								],
+								'datalist' => array_values(array_unique($bundledatalist)),
 								'hint' => ($bundle['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => substr($bundle['date'], 0, -3)]) . '<br>' : $this->_lang->GET('assemble.compose.component.component_name_hint'))
 							], [
 								'type' => 'select',
@@ -582,20 +576,14 @@ class DOCUMENT extends API {
 		$return['render'] = ['content' => [
 			[
 				[
-					'type' => 'datalist',
-					'content' => array_keys($bundles),
-					'attributes' => [
-						'id' => 'bundles'
-					]
-				], [
 					'type' => 'filtered',
 					'attributes' => [
 						'name' => $this->_lang->GET('assemble.compose.document_filter'),
-						'list' => 'bundles',
 						'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value); return false;}",
 						'onblur' => "api.document('get', 'bundles', this.value); return false;",
 						'value' => $this->_requestedID ? : ''
-					]
+					],
+					'datalist' => array_keys($bundles)
 				]
 			]
 		]];
@@ -978,13 +966,6 @@ class DOCUMENT extends API {
 				[
 					[
 						[
-							'type' => 'datalist',
-							'content' => array_values(array_unique($componentdatalist)),
-							'attributes' => [
-								'id' => 'components'
-							]
-						],
-						[
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.component.existing_components_select'),
@@ -995,9 +976,9 @@ class DOCUMENT extends API {
 							'type' => 'search',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.component.existing_components'),
-								'list' => 'components',
 								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component_editor', this.value); return false;}"
-							]
+							],
+							'datalist' => array_values(array_unique($componentdatalist))
 						]
 					],[
 						[
@@ -1748,18 +1729,6 @@ class DOCUMENT extends API {
 				[
 					[
 						[
-							'type' => 'datalist',
-							'content' => array_values(array_unique($documentdatalist)),
-							'attributes' => [
-								'id' => 'documents'
-							]
-						], [
-							'type' => 'datalist',
-							'content' => array_values(array_unique($componentdatalist)),
-							'attributes' => [
-								'id' => 'components'
-							]
-						], [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.document.existing_documents_select'),
@@ -1770,9 +1739,9 @@ class DOCUMENT extends API {
 							'type' => 'search',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.document.existing_documents'),
-								'list' => 'documents',
 								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'document_editor', this.value); return false;}"
-							]
+							],
+							'datalist' => array_values(array_unique($documentdatalist))
 						]
 					],[
 						[
@@ -1796,9 +1765,9 @@ class DOCUMENT extends API {
 						'type' => 'search',
 						'attributes' => [
 							'name' => $this->_lang->GET('assemble.compose.document.add_component'),
-							'list' => 'components',
 							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component', this.value); return false;}"
-						]
+						],
+						'datalist' => array_values(array_unique($componentdatalist))
 					]
 				], [
 					[
@@ -1908,19 +1877,13 @@ class DOCUMENT extends API {
 			'content' => [
 				[
 					[
-						'type' => 'datalist',
-						'content' => array_values(array_unique($documentdatalist)),
-						'attributes' => [
-							'id' => 'documents'
-						]
-					], [
 						'type' => 'filtered',
 						'attributes' => [
 							'name' => $this->_lang->GET('assemble.compose.document_filter'),
-							'list' => 'documents',
 							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}",
 							'onblur' => "api.document('get', 'documentfilter', this.value); return false;",
 						],
+						'datalist' => array_values(array_unique($documentdatalist)),
 						'hint' => $this->_lang->GET('assemble.compose.document_filter_hint')
 					]
 				]
