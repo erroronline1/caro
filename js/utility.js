@@ -1203,48 +1203,6 @@ export const _client = {
 				if (article) article.style.display = "block";
 			});
 		},
-
-		/**
-		 * handles Dialog form data for incorporation and posts results
-		 * @param {object} formdata from Dialog
-		 * @param {int} productid
-		 * @event create FormData and submit post request
-		 */
-		performIncorporation: (formdata, productid) => {
-			const check = [],
-				submit = new FormData();
-			for (const [key, value] of Object.entries(formdata)) {
-				if (key.startsWith("_")) {
-					submit.append(key, value);
-				} else if (value && value !== "on") check.push(key + ": " + value);
-				else check.push(api._lang.GET("order.sample_check.checked", { ":checked": key }));
-			}
-			if (check.length) {
-				const result = check.join("\n");
-				submit.append("content", result);
-				api.purchase("post", "incorporation", productid, submit);
-			} else new Toast(api._lang.GET("order.incorporation.failure"), "error");
-		},
-
-		/**
-		 * handles Dialog form data for sample checks and posts results
-		 * @param {object} formdata from Dialog
-		 * @param {int} productid
-		 * @event create FormData and submit post request
-		 */
-		performSampleCheck: (formdata, productid) => {
-			const check = [];
-			for (const [key, value] of Object.entries(formdata)) {
-				if (value && value !== "on") check.push(key + ": " + value);
-				else check.push(api._lang.GET("order.sample_check.checked", { ":checked": key }));
-			}
-			if (check.length) {
-				const result = check.join("\n");
-				formdata = new FormData();
-				formdata.append("content", result);
-				api.purchase("post", "mdrsamplecheck", productid, formdata);
-			} else new Toast(api._lang.GET("order.sample_check.failure"), "error");
-		},
 	},
 	record: {
 		/**

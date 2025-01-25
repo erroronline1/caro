@@ -116,7 +116,7 @@ export const api = {
 			//console.log(payload, sanitizedpayload, b.size);
 			payload.append("_user_post_validation", await _.sha256(api._settings.user.fingerprint + b.size.toString()));
 		}
-		await _.api(method, "api/api.php/" + request.join("/"), payload, ['post','put'].includes(method.toLowerCase()))
+		await _.api(method, "api/api.php/" + request.join("/"), payload, ["post", "put"].includes(method.toLowerCase()))
 			.then(async (data) => {
 				document.querySelector("header>div:nth-of-type(2)").style.display = data.status === 200 ? "none" : "block";
 				if (data.status === 203) new Toast(api._lang.GET("general.service_worker_get_cache_fallback"), "info");
@@ -1030,9 +1030,9 @@ export const api = {
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {
-									if (response) {
-										_client.order.performIncorporation(response, data.render.productid);
-									}
+									let submission = _client.application.dialogToFormdata(response);
+									if (submission) api.purchase("post", "incorporation", data.render.productid, submission);
+									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -1047,9 +1047,9 @@ export const api = {
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {
-									if (response) {
-										_client.order.performSampleCheck(response, data.render.productid);
-									}
+									let submission = _client.application.dialogToFormdata(response);
+									if (submission) api.purchase("post", "mdrsamplecheck", data.render.productid, submission);
+									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
