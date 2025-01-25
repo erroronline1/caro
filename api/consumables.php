@@ -612,38 +612,31 @@ class CONSUMABLES extends API {
 				break;
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
-				// get check
-				$check = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_by_id', [
+				// get product
+				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'values' => [
-						':id' => intval($this->_requestedID)
+						':ids' => intval($this->_requestedID)
 					]
 				]);
-				$check = $check ? $check[0] : null;
+				$product = $product ? $product[0] : null;
 
-				// get product(s)
-				$content = preg_split("/\n/", $check['content']);
-				$vendor = $content[0];
-				$article_no = $content[1];
+				if (!$product || !$product['checked'] || !$product['sample_checks']) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('order.sample_check.failure'),
+						'type' => 'error'
+					]]);
 
-				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
+				$product['sample_checks'] = json_decode($product['sample_checks'], true);
+				// remove last element
+				array_pop($product['sample_checks']);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 					'values' => [
-						':article_no' => $article_no,
-						':vendor' => $vendor
-					]
-				]);
-				// set check to null
-				SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
-					'values' => [
-						':checked' => null
+						':checked' => null,
+						':sample_checks' => count($product['sample_checks']) ? json_encode($product['sample_checks']) : null
 					],
 					'replacements' => [
-						':ids' => implode(',', [...array_map(Fn($row)=> intval($row['id']), $products)]),
-					]
-				]);
-				// delete check from check-db
-				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_delete', [
-					'values' => [
-						':id' => intval($this->_requestedID)
+						':ids' => intval($this->_requestedID)
 					]
 				])) $this->response([
 					'response' => [
