@@ -747,7 +747,7 @@ class INSTALL {
 					':context' => $entry['context'],
 					':unit' => $entry['unit'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content'],
+					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content'], JSON_INVALID_UTF8_IGNORE) : $entry['content'],
 					':regulatory_context' => $entry['regulatory_context'] ? : '',
 					':permitted_export' => $entry['permitted_export'] ? $entry['permitted_export'] : null,
 					':restricted_access' => $entry['restricted_access'] ? $entry['restricted_access'] : null
@@ -957,7 +957,7 @@ class INSTALL {
 					':name' => $entry['name'],
 					':unit' => $entry['unit'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content']) : $entry['content'],
+					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content'], JSON_INVALID_UTF8_IGNORE) : $entry['content'],
 					':type' => $entry['type'],
 					':hidden' => null
 				];
@@ -1001,9 +1001,9 @@ class INSTALL {
 				$names[] = $entry['name'];
 				$insertions[] = [
 					':name' => $entry['name'],
-					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? json_encode($entry['info']) : null,
+					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? json_encode($entry['info'], JSON_INVALID_UTF8_IGNORE) : null,
 					':certificate' => json_encode([]),
-					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? json_encode(['filter' => json_encode($entry['pricelist'], JSON_PRETTY_PRINT)]) : null,
+					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? json_encode(['filter' => json_encode($entry['pricelist'], JSON_PRETTY_PRINT | JSON_INVALID_UTF8_IGNORE)]) : null,
 					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', $entry['name']) . $this->_currentdate->format('Ymd'),
 					':evaluation' => null,
 					':hidden' => null
