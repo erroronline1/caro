@@ -1040,14 +1040,14 @@ dialect["escape"] = ""
 
 ;unzulässige Namen gemäß REGEX-Mustern
 [forbidden]
-names[] = "([^,\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, MUSS DER ERSTE EINTRAG SEIN, gilt auch für Export-Dateinamen
-names[] = "^.{0,3}$" ; weniger als 4 Zeichen
+names[characters] = "([^,\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, gilt auch für Export-Dateinamen
+names[length] = "^.{0,3}$" ; weniger als 4 Zeichen
 
 ; unveränderliche fest einprogrammierte reservierte Begriffe
-names[] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
-names[] = "^_" ; Namen dürfen nicht mit _ beginnen
-names[] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
+names[numeric] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
+names[underscorestrat] = "^_" ; Namen dürfen nicht mit _ beginnen
+names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
+names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 [lifespan]
 idle = 2700 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
@@ -1175,6 +1175,7 @@ products_per_slide = 6
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es wird nur eine Zeitzone unterstützt.
+* Produkteinführung und Stichprobenprüfung können keine Dokumente mit Datei-, Bilduploads oder Signaturen verarbeiten. Derartige Eingabeoptionen werden ignoriert.
 
 ### Safaris besondere Bedürfnisse
 im Gegensatz zu richtigen Browsern, zumindest auf macOS.

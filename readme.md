@@ -114,9 +114,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * update endpoint responses (search for dropped "datalist")
-* reconsider checks db, merge data to products db (additional column, for check-date is faster to comprehend by query)
-    * DELETE consumables.incorporation ./api/api.php/consumables/mdrsamplecheck/{productid}/{checkid} actual array index?
-    * all of audit
 * audit
     * unused documents, except contexts or analyze for by input widgets within records
 
@@ -1121,14 +1118,14 @@ dialect["escape"] = ""
 
 ;forbidden names as regex-patterns
 [forbidden]
-names[] = "([^,\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, MUST BE THE FIRST ITEM, serves for export filenames as well
-names[] = "^.{0,3}$" ; less than 4 characters
+names[characters] = "([^,\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, serves for export filenames as well
+names[length] = "^.{0,3}$" ; less than 4 characters
 
 ; immutable hardcoded reserved keywords
-names[] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
-names[] = "^_" ; names must not start with _
-names[] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
-names[] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
+names[numeric] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
+names[underscorestrat] = "^_" ; names must not start with _
+names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
+names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
 
 [lifespan]
 idle = 2700 ; SECONDS after which a session expires without intermittend request
@@ -1256,6 +1253,7 @@ products_per_slide = 6
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * Only one timezone is supported.
+* Incorporation and sample check are not able to process documents with file-, imageuploads and signatures. These input fields will be ignored.
 
 ### Safaris special needs
 as opposed to proper browsers. At least on macOS.
