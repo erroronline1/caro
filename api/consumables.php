@@ -671,9 +671,9 @@ class CONSUMABLES extends API {
 		if (!PERMISSION::permissionFor('incorporation')) $this->response([], 401);
 		$result = ['render' => ['content' => []]];
 		$links = [];
-		$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
+		$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 		foreach($allproducts as $product) {
-			if ($product['incorporated']) continue;
+			if (!$product['incorporated']) continue;
 			$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 			if (isset($product['incorporated']['_denied'])) continue;
 			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onpointerup' => "api.purchase('get', 'product', " . $product['id'] . ")"];
@@ -801,15 +801,14 @@ class CONSUMABLES extends API {
 				// handle incorporation options that have not yet been approved
 				if (PERMISSION::permissionFor('incorporation') && $product['incorporated']) {
 					if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation.state_approve'))){
-						$incorporation = explode(', ', $incorporation);
-						if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $product['incorporated'] = '';
+						$incorporation = explode(' | ', $incorporation);
+						if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $product['incorporated'] = null;
 						else {
 							$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-							$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 							foreach($this->_lang->_USER['permissions'] as $permission => $translation){
 								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
 									'name' => $_SESSION['user']['name'],
-									'date' => $time->format('Y-m-d H:i')
+									'date' => $this->_currentdate->format('Y-m-d H:i')
 								];
 							}
 							$product['incorporated'] = json_encode($product['incorporated']);
@@ -1384,6 +1383,7 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('consumables.product.incorporated_not')
 							],
+							'content' => ' ',
 							'hint' => $this->_lang->GET('consumables.product.similar_hint'),
 						];
 					}

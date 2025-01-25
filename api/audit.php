@@ -467,13 +467,13 @@ class AUDIT extends API {
 	private function incorporation(){
 		$content = $orderedunincorporated = $entries = $incorporated = [];
 		// get unincorporated articles from approved orders
-		$unincorporated = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
-		foreach($unincorporated as $id => $row){
+		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+		foreach($products as $id => $row){
 			if (!$row['incorporated']) continue;
 			$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
 			if (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) continue;
 			$incorporated[] = $row;
-			unset($unincorporated[$id]);
+			unset($products[$id]);
 		}
 
 		$approvedorders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
@@ -483,8 +483,8 @@ class AUDIT extends API {
 		]);
 		foreach ($approvedorders as $row){
 			$decoded_order_data = json_decode($row['order_data'], true);
-			if (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($unincorporated, 'article_no'))) !== false){
-				if (isset($decoded_order_data['vendor_label']) && (isset($unincorporated[$tocheck]) && $unincorporated[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label'])){
+			if (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($products, 'article_no'))) !== false){
+				if (isset($decoded_order_data['vendor_label']) && (isset($products[$tocheck]) && $products[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label'])){
 					$article = $decoded_order_data['ordernumber_label'] . $decoded_order_data['vendor_label'];
 					if (!in_array($article, $orderedunincorporated)) $orderedunincorporated[] = $article;
 				}
@@ -584,7 +584,7 @@ class AUDIT extends API {
 	 *  |     | . |  _|_ -| .'|     | . | | -_|  _|   | -_|  _| '_|
 	 *  |_|_|_|___|_| |___|__,|_|_|_|  _|_|___|___|_|_|___|___|_,_|
 	 *                              |_|
-	 * returns all sample checks from the caro_checks database in descending chronological order
+	 * returns all sample checks from the caro_consumables_product database in descending chronological order
 	 * displays a warning if a vendor is overdue for sample check
 	 */
 	private function mdrsamplecheck(){

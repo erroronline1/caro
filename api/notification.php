@@ -219,7 +219,7 @@ class NOTIFICATION extends API {
 	public function consumables(){
 		$unapproved = 0;
 		if (PERMISSION::permissionFor('incorporation')){
-			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention');
+			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 			foreach($allproducts as $product) {
 				if (!$product['incorporated']) continue;
 				$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);

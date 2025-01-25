@@ -328,7 +328,7 @@ class ORDER extends API {
 				$special_attention = [];
 				
 				// gather product information on incorporation and special attention
-				foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_incorporation_attention') as $product) {
+				foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
 					$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
 					if ($product['special_attention']) $special_attention[] = $product['id'];
 					if (!$product['incorporated']) {
