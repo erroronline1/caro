@@ -97,6 +97,7 @@ define('DEFAULTSQL', [
 				"	`protected` tinyint NULL DEFAULT NULL," .
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
 				"	`checked` datetime NULL DEFAULT NULL," .
+				"	`sample_checks` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`incorporated` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`has_expiry_date` tinyint NULL DEFAULT NULL," .
 				"	`special_attention` tinyint NULL DEFAULT NULL," .
@@ -334,6 +335,7 @@ define('DEFAULTSQL', [
 				"	protected tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked smalldatetime NULL DEFAULT NULL," .
+				"	sample_checks varchar(MAX) NULL DEFAULT NULL," .
 				"	incorporated varchar(MAX) NULL DEFAULT NULL," .
 				"	has_expiry_date tinyint NULL DEFAULT NULL," .
 				"	special_attention tinyint NULL DEFAULT NULL," .

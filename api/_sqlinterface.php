@@ -250,7 +250,7 @@ class SQLQUERY {
 		],
 
 
-
+// going to be deprecated
 		'checks_post' => [
 			'mysql' => "INSERT INTO caro_checks (id, type, date, author, content) VALUES (NULL, :type, CURRENT_TIMESTAMP, :author, :content)",
 			'sqlsrv' => "INSERT INTO caro_checks (type, date, author, content) VALUES (:type, CURRENT_TIMESTAMP, :author, :content)"
@@ -292,8 +292,8 @@ class SQLQUERY {
 		],
 
 		'consumables_post_product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, hidden, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :hidden, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, hidden, protected, trading_good, checked, incorporated, has_expiry_date, special_attention, last_order) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :hidden, :protected, :trading_good, NULL, '', :has_expiry_date, :special_attention, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :hidden, :protected, :trading_good, NULL, NULL, NULL, :has_expiry_date, :special_attention, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :hidden, :protected, :trading_good, NULL, NULL, NULL, :has_expiry_date, :special_attention, NULL)"
 		],
 		'consumables_put_product' => [
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, hidden = :hidden, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention WHERE id = :id",
@@ -307,9 +307,9 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)"
 		],
-		'consumables_put_check' => [ // preprocess via strtr
-			'mysql' => "UPDATE caro_consumables_products SET checked = :checked WHERE id IN (:ids)",
-			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked WHERE id IN (:ids)"
+		'consumables_put_sample_check' => [ // preprocess via strtr
+			'mysql' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = :sample_checks WHERE id IN (:ids)",
+			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = :sample_checks WHERE id IN (:ids)"
 		],
 		'consumables_put_incorporation' => [ // preprocess via strtr
 			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)",

@@ -242,11 +242,44 @@ class CONSUMABLES extends API {
 					]
 				]);
 				$similarproducts = [];
+				$productsPerSlide = 0;
+				$matches = [[]];
 				foreach($vendorproducts as $vendorproduct){
 					if ($vendorproduct['article_no'] === $product['article_no']) continue;
 					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
+
+					// construct option to adopt previous checks of similar products
+					if (!$vendorproduct['sample_checks']) continue;
+						$vendorproduct['sample_checks'] = json_decode($vendorproduct['sample_checks'], true);
+						$check = explode("\n", $vendorproduct['sample_checks'][count($vendorproduct['sample_checks']) - 1]['content']); // extract check information
+						if ($check[count($check) - 1] !== $this->_lang->GET('order.incorporation.revoked')){
+							$article = intval(count($matches) - 1);
+							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+								$matches[$article][] = [
+									[
+										'type' => 'textsection',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.incorporation.matching_previous')
+										]
+									]
+								];
+							}
+							$slide = intval(count($matches[$article]) - 1);
+							$matches[$article][$slide][] = [
+								'type' => 'tile',
+								'attributes' => [
+									'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . $identifyproduct . "'",
+								],
+								'content' => [
+									[
+										'type' => 'textsection',
+										'content' => implode("\n", $check['content'])
+									]
+								]
+							];
+						}
 					}
 				}
 				// add selection of similar products to incorporation document
@@ -289,58 +322,7 @@ class CONSUMABLES extends API {
 					'productid' => $product['id']
 				];
 
-				// gather previous incorporation checks to select from
-				// option to adopt previous checks based on smilarity of vendor and article number
-				$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
-					'values' => [
-						':type' => 'incorporation'
-					]
-				]);
-				$productsPerSlide = 0;
-				$matches = [[]];
-				$hideduplicates = [];
-				foreach($checks as $check){
-					$check['content'] = explode("\n", $check['content']); // extract check information
-					$probability = [ 'article_no' => [], 'vendor_name' => []];
-					$identifyproduct = implode(' ', $check['content']);
-					if (!in_array($identifyproduct, $hideduplicates)){
-						foreach ($check['content'] as $information){ // iterate over content in search for following similarities
-							similar_text($information, $product['article_no'], $article_no_percent);
-							if ($article_no_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== $this->_lang->GET('order.incorporation.revoked')) $probability['article_no'][] = $check['id'];
-							similar_text($information, $product['vendor_name'], $vendor_name_percent);
-							if ($vendor_name_percent >= CONFIG['likeliness']['consumables_article_no_similarity'] && $check['content'][count($check['content'])-1] !== $this->_lang->GET('order.incorporation.revoked')) $probability['vendor_name'][] = $check['id'];
-						}
-						// it has been similar enough, add to tile selection
-						if (array_intersect($probability['article_no'], $probability['vendor_name'])){
-							$article = intval(count($matches) - 1);
-							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
-								$matches[$article][] = [
-									[
-										'type' => 'textsection',
-										'attributes' => [
-											'name' => $this->_lang->GET('order.incorporation.matching_previous')
-										]
-									]
-								];
-							}
-							$slide = intval(count($matches[$article]) - 1);
-							$matches[$article][$slide][] = [
-								'type' => 'tile',
-								'attributes' => [
-									'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . $identifyproduct . "'",
-								],
-								'content' => [
-									[
-										'type' => 'textsection',
-										'content' => implode("\n", $check['content'])
-									]
-								]
-							];
-						}
-					}
-					$hideduplicates[] = $identifyproduct;
-				}
-				// actuall add option to adopt previous, if any similar incorporations have been identified
+				// actual add option to adopt previous, if any similar incorporations have been identified
 				if ($matches[0]){
 					array_push($result['render']['content'], ...$matches);
 					$result['render']['content'][] = [
@@ -393,33 +375,28 @@ class CONSUMABLES extends API {
 				$product = $product ? $product[0] : null;
 
 				if (!$product || !$this->_payload->content) $this->response([]);
-				$content = implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name']]) . "\n" . $this->_payload->content;
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'checks_post', [
+				$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
+				$product['sample_checks'][] = ['date' => $this->_currentdate->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $this->_payload->content];
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
 					'values' => [
-						':type' => 'mdrsamplecheck',
-						':author' => $_SESSION['user']['name'],
-						':content' => $content
+						':ids' => $product['id'],
+						':sample_checks' => json_encode($product['sample_checks'])
+					],
+					'replacements' => [
+						':checked' => 'CURRENT_TIMESTAMP'
 					]
-				])){
-					if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
-						'values' => [
-							':ids' => $product['id'],
-						],
-						'replacements' => [
-							':checked' => 'CURRENT_TIMESTAMP'
-						]
-					])) {
-						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
-						$this->_lang->GET('order.sample_check.alert', [
-							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit') . '</a>'
-						], true) . $content);
-						$this->response([
-						'response' => [
-							'msg' => $this->_lang->GET('order.sample_check.success'),
-							'type' => 'success'
-						]]);
-					}
+				])) {
+					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
+					$this->_lang->GET('order.sample_check.alert', [
+						':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit') . '</a>'
+					], true) . $content);
+					$this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('order.sample_check.success'),
+						'type' => 'success'
+					]]);
 				}
 				$this->response([
 					'response' => [
