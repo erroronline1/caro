@@ -866,6 +866,7 @@
 		"failed_save": "Die Bestellung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"incorporation": {
 			"accepted": "Einführung abgeschlossen",
+			"adopt": "übernehmen",
 			"batch": "Auch auf ähnliche Artikel anwenden",
 			"cancel": "Nein danke",
 			"denied": "Einführung verweigert",
@@ -935,7 +936,7 @@
 			"alert": "Eine neue Stichprobenprüfung wurde übermittelt. Bitte überprüfe sie bei :audit\n\n",
 			"by_user": "Dieser Artikel kommt für eine Stichprobenprüfung durch eine persönliche Nutzeranmeldung in Frage!",
 			"cancel": "Nein danke",
-			"checked": "* geprüft: :checked",
+			"checked": "geprüft",
 			"failure": "Es trat ein Fehler auf, die Stichprobenprüfung konnte nicht gespeichert werden, bitte versuche es erneut.",
 			"revoked": "Die Stichprobenprüfung wurde widerrufen",
 			"sample_check": "MDR §14 Stichprobenprüfung durchführen",

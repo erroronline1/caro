@@ -163,35 +163,142 @@ class CONSUMABLES extends API {
 	 * incorporation denial is detected by pattern matching $this->_lang->GET('order.incorporation.denied')
 	 */
 	public function incorporation(){
+		require_once('_shared.php');
+		$document = new SHARED($this->_pdo);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// retrieve ids from possible multiple selected products for inforporation
 				$_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate');
-				$ids = [];
+				$batchids = [];
 				if ($_batchupdate){
-					$ids = explode(',', $_batchupdate);
+					$batchids = explode(',', $_batchupdate);
 				}
-
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'replacements' => [
-						':ids' =>implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)])
+						':ids' =>implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $batchids)])
 					]
 				]);
-				if (!$products || !$this->_payload->content) $this->response([]);
+				if (!$products) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('order.incorporation.failure'),
+						'type' => 'error'
+					]]);
+
+				// recursively retrieve input names, alter as url format (see language->PROPERTY)
+				function inputnames($element, $result = []){
+					foreach($element as $sub){
+						if (array_is_list($sub)){
+							$result = array_merge($result, inputnames($sub, $result));
+						} elseif (isset($sub['type']) && isset($sub['attributes']) && isset($sub['attributes']['name'])) {
+							switch ($sub['type']){
+								case 'checkbox':
+									if (isset($sub['content'])) {
+										foreach(array_keys($sub['content']) as $name){
+											$result[$name] = preg_replace('/[\s\.]/', '_', $name);					
+										}
+									}
+									break;
+								default:
+									$result[$sub['attributes']['name']] = preg_replace('/[\s\.]/', '_', $sub['attributes']['name']);
+							}
+						}
+					}
+					return $result;
+				}
+
+				// samplecheck data handling, also see self::mdrsamplecheck()
+				// unsets payload keys for matches sample check inputs
+				if (array_filter($products, fn($p) => $p['trading_good'])){ // are there trading goods?
+					$inputnames = inputnames($document->recentdocument('document_document_get_by_context', [
+						'values' => [
+							':context' => 'mdr_sample_check_document'
+						]])['content']);
+					if ($inputnames){	
+						// create proper evaluation data
+						// convert checkbox value
+						// unset empty values and keys from payload to freely process occasionally hidden system values
+						$check = [];
+						foreach($this->_payload as $key => &$value){
+							if (!in_array($key, array_values($inputnames))) continue;
+							if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+							if (!$value || $value === '...') unset($this->_payload->$key);
+							elseif ($value === 'on') {
+								$check[array_search($key, $inputnames)] = $this->_lang->GET('order.sample_check.checked', [], true);
+								unset($this->_payload->$key);
+							}
+							else {
+								$check[array_search($key, $inputnames)] = $value;
+								unset($this->_payload->$key);
+							}
+						}
+		
+						$checkcontent = implode("\n", array_map(fn($k, $v) => $k . ': ' . $v, array_keys($check), array_values($check)));
+						if ($checkcontent){
+							foreach (array_filter($products, fn($p) => $p['trading_good']) as $product){
+								$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
+								$product['sample_checks'][] = ['date' => $this->_currentdate->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
+				
+								if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
+									'values' => [
+										':ids' => $product['id'],
+										':sample_checks' => json_encode($product['sample_checks'])
+									],
+									'replacements' => [
+										':checked' => 'CURRENT_TIMESTAMP'
+									]
+								])) {
+									$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
+										$this->_lang->GET('order.sample_check.alert', [
+											':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit', [], true) . '</a>'
+										], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
+								}
+							}
+						}
+					}
+				}
+				// end of samplecheck data handling
+
+				// product incorporation data handling
+				$inputnames = inputnames($document->recentdocument('document_document_get_by_context', [
+					'values' => [
+						':context' => 'product_incorporation_document'
+					]])['content']);
+				// create proper evaluation data
+				// convert checkbox value
+				// unset empty values and keys from payload to freely process occasionally hidden system values
+				$check = [];
+				foreach($this->_payload as $key => &$value){
+					if (!in_array($key, array_values($inputnames))) continue;
+					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					if (!$value || $value === '...') unset($this->_payload->$key);
+					elseif ($value === 'on') {
+						$check[array_search($key, $inputnames)] = $this->_lang->GET('order.sample_check.checked', [], true);
+						unset($this->_payload->$key);
+					}
+					else {
+						$check[array_search($key, $inputnames)] = $value;
+						unset($this->_payload->$key);
+					}
+				}
+				if (!$check) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('order.incorporation.failure'),
+						'type' => 'error'
+					]]);
 
 				// check content denial or not
-				preg_match("/" . $this->_lang->GET('order.incorporation.denied') . ".*/m", $this->_payload->content, $denied);
-				$approve = ['_check' => $denied ? $denied[0] : $this->_payload->content];
+				$checkcontent = implode("\n", array_map(fn($k, $v) => $k . ': ' . $v, array_keys($check), array_values($check)));
+				preg_match("/" . $this->_lang->GET('order.incorporation.denied') . ".*/m", $checkcontent, $denied);
+				$approve = ['_check' => $denied ? $this->_lang->GET('order.incorporation.revoked', [], true) : $checkcontent];
 				if ($denied) $approve['_denied'] = true;
 
 				// set approval for all permissions owned by submitting user
-				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('documentapproval', true)];
-				$time = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('incorporation', true)];
 				foreach($tobeapprovedby as $permission){
 					if (in_array($permission, $_SESSION['user']['permissions'])){
 						$approve[$permission] = [
 							'name' => $_SESSION['user']['name'],
-							'date' => $time->format('Y-m-d H:i')
+							'date' => $this->_currentdate->format('Y-m-d H:i')
 						];
 					}
 				}
@@ -199,7 +306,7 @@ class CONSUMABLES extends API {
 				// update incorporation state for selected products
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
 					'replacements' => [
-						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $ids)]),
+						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $batchids)]),
 						':incorporated' => json_encode($approve)
 					]
 				])) $this->response([
@@ -224,8 +331,6 @@ class CONSUMABLES extends API {
 				if (!$product) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// get incorporation- and sample-check-documents, chain for eligible products
-				require_once('_shared.php');
-				$document = new SHARED($this->_pdo);
 				$incorporationdocument = $document->recentdocument('document_document_get_by_context', [
 					'values' => [
 						':context' => 'product_incorporation_document'
@@ -254,7 +359,7 @@ class CONSUMABLES extends API {
 					if (!$vendorproduct['sample_checks']) continue;
 						$vendorproduct['sample_checks'] = json_decode($vendorproduct['sample_checks'], true);
 						$check = explode("\n", $vendorproduct['sample_checks'][count($vendorproduct['sample_checks']) - 1]['content']); // extract check information
-						if ($check[count($check) - 1] !== $this->_lang->GET('order.incorporation.revoked')){
+						if ($check[count($check) - 1] !== $this->_lang->GET('order.incorporation.revoked', [], true)){
 							$article = intval(count($matches) - 1);
 							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
 								$matches[$article][] = [
@@ -267,15 +372,20 @@ class CONSUMABLES extends API {
 								];
 							}
 							$slide = intval(count($matches[$article]) - 1);
+							array_unshift($check, $vendorproduct['article_no'], $vendorproduct['article_name']); 
 							$matches[$article][$slide][] = [
 								'type' => 'tile',
-								'attributes' => [
-									'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . $identifyproduct . "'",
-								],
 								'content' => [
 									[
 										'type' => 'textsection',
-										'content' => implode("\n", $check['content'])
+										'content' => implode("\n", $check),
+									], [
+										'type' => 'button',
+										'attributes' => [
+											'value' => $this->_lang->GET('order.incorporation.adopt'),
+											'type' => 'button',
+											'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . preg_replace('/\n|\r|\t/', ' ', implode(' ', $check)) . "'"
+										]
 									]
 								]
 							];
@@ -365,6 +475,8 @@ class CONSUMABLES extends API {
 	 * $this->_payload->content is a string passed by utility.js _client.order.performSampleCheck()
 	 */
 	public function mdrsamplecheck(){
+		require_once('_shared.php');
+		$document = new SHARED($this->_pdo);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
@@ -373,13 +485,72 @@ class CONSUMABLES extends API {
 					]
 				]);
 				$product = $product ? $product[0] : null;
+				if (!$product) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('order.sample_check.failure'),
+						'type' => 'error'
+					]]);
 
-				if (!$product || !$this->_payload->content) $this->response([]);
+				// recursively retrieve input names, alter as url format (see language->PROPERTY)
+				function inputnames($element, $result = []){
+					foreach($element as $sub){
+						if (array_is_list($sub)){
+							$result = array_merge($result, inputnames($sub, $result));
+						} elseif (isset($sub['type']) && isset($sub['attributes']) && isset($sub['attributes']['name'])) {
+							switch ($sub['type']){
+								case 'checkbox':
+									if (isset($sub['content'])) {
+										foreach(array_keys($sub['content']) as $name){
+											$result[$name] = preg_replace('/[\s\.]/', '_', $name);					
+										}
+									}
+									break;
+								default:
+									$result[$sub['attributes']['name']] = preg_replace('/[\s\.]/', '_', $sub['attributes']['name']);
+							}
+						}
+					}
+					return $result;
+				}
+				$inputnames = inputnames($document->recentdocument('document_document_get_by_context', [
+					'values' => [
+						':context' => 'mdr_sample_check_document'
+					]])['content']);
 
+				if (!$inputnames) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('order.sample_check.failure'),
+						'type' => 'error'
+					]]);
+
+				// create proper evaluation data
+				// convert checkbox value
+				// unset empty values and keys from payload to freely process occasionally hidden system values
+				$check = [];
+				foreach($this->_payload as $key => &$value){
+					if (!in_array($key, array_values($inputnames))) continue;
+					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					if (!$value || $value === '...') unset($this->_payload->$key);
+					elseif ($value === 'on') {
+						$check[array_search($key, $inputnames)] = $this->_lang->GET('order.sample_check.checked', [], true);
+						unset($this->_payload->$key);
+					}
+					else {
+						$check[array_search($key, $inputnames)] = $value;
+						unset($this->_payload->$key);
+					}
+				}
+				if (!$check) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('order.sample_check.failure'),
+						'type' => 'error'
+					]]);
+
+				$checkcontent = implode("\n", array_map(fn($k, $v) => $k . ': ' . $v, array_keys($check), array_values($check)));
 				$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
-				$product['sample_checks'][] = ['date' => $this->_currentdate->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $this->_payload->content];
+				$product['sample_checks'][] = ['date' => $this->_currentdate->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_check', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 					'values' => [
 						':ids' => $product['id'],
 						':sample_checks' => json_encode($product['sample_checks'])
@@ -389,9 +560,9 @@ class CONSUMABLES extends API {
 					]
 				])) {
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
-					$this->_lang->GET('order.sample_check.alert', [
-						':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit') . '</a>'
-					], true) . $content);
+						$this->_lang->GET('order.sample_check.alert', [
+							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit', [], true) . '</a>'
+						], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('order.sample_check.success'),
@@ -412,9 +583,6 @@ class CONSUMABLES extends API {
 				]);
 				$product = $product ? $product[0] : null;
 				if (!$product) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
-
-				require_once('_shared.php');
-				$document = new SHARED($this->_pdo);
 
 				$result = ['render' => [
 					'content' => [
@@ -671,14 +839,14 @@ class CONSUMABLES extends API {
 				// activate or deactivate selected similar products
 				$batchactive = UTILITY::propertySet($this->_payload, '_batchactive');
 				if (PERMISSION::permissionFor('products') && $batchactive){
-					$ids = explode(',', $batchactive);
+					$batchids = explode(',', $batchactive);
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
 							':value' => $product['hidden'],
 						],
 						'replacements' => [
 							':field' => 'hidden',
-							':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
 						]
 					]);
 				}
@@ -686,7 +854,7 @@ class CONSUMABLES extends API {
 				// update trading good, expiry date or special attention on similar products
 				$_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate');
 				if (PERMISSION::permissionFor('products') && $_batchupdate){
-					$ids = explode(',', $_batchupdate);
+					$batchids = explode(',', $_batchupdate);
 
 					foreach(['trading_good', 'has_expiry_date', 'special_attention'] as $field){ // apply setting to selected similar products
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
@@ -695,7 +863,7 @@ class CONSUMABLES extends API {
 							],
 							'replacements' => [
 								':field' => $field,
-								':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+								':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
 							]
 						]);	
 					}
@@ -705,7 +873,7 @@ class CONSUMABLES extends API {
 							'replacements' => [
 								':field' => 'incorporated',
 								':value' => $product['incorporated'],
-								':ids' => implode(',', array_map(Fn($id) => intval($id), $ids)),	
+								':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
 							]
 						]);
 					}

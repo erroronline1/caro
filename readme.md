@@ -117,7 +117,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * reconsider checks db, merge data to products db (additional column, for check-date is faster to comprehend by query)
     * DELETE consumables.incorporation ./api/api.php/consumables/mdrsamplecheck/{productid}/{checkid} actual array index?
     * all of audit
-    * incorporation split sample_check payload 
 * audit
     * unused documents, except contexts or analyze for by input widgets within records
 
