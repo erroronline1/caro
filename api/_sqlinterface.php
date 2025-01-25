@@ -313,33 +313,33 @@ class SQLQUERY {
 		],
 		'consumables_get_eligible_sample_check' => [ // must be splitted with the following two queries for sql performance reasons
 			'mysql' => "SELECT caro_consumables_products.id AS id, caro_consumables_products.article_no AS article_no, caro_consumables_vendors.name AS vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
-				."AND caro_consumables_products.vendor_id NOT IN (:valid_checked) "
-				."AND caro_consumables_products.id NOT IN (:not_reusable)",
+				. "AND caro_consumables_products.vendor_id NOT IN (:valid_checked) "
+				. "AND caro_consumables_products.id NOT IN (:not_reusable)",
 			'sqlsrv' => "SELECT caro_consumables_products.id AS id, caro_consumables_products.article_no AS article_no, caro_consumables_vendors.name AS vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
-				."AND caro_consumables_products.vendor_id NOT IN (:valid_checked) "
-				."AND caro_consumables_products.id NOT IN (:not_reusable)"
+				. "AND caro_consumables_products.vendor_id NOT IN (:valid_checked) "
+				. "AND caro_consumables_products.id NOT IN (:not_reusable)"
 		],
 		'consumables_get_valid_checked' => [
 			'mysql' => "SELECT caro_consumables_products.vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
-				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( caro_consumables_products.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " ) DAY ) ) ) "
-				."< IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " )",
+				. "AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( caro_consumables_products.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " ) DAY ) ) ) "
+				. "< IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " )",
 			'sqlsrv' => "SELECT caro_consumables_products.vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 AND "
-				."DATEDIFF(day, ISNULL(caro_consumables_products.checked, DATEADD(DD, ISNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
-				."< ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") "
+				. "DATEDIFF(day, ISNULL(caro_consumables_products.checked, DATEADD(DD, ISNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
+				. "< ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") "
 		],
 		'consumables_get_not_reusable_checked' => [
 			'mysql' => "SELECT caro_consumables_products.id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
-				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( caro_consumables_products.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " ) + 1 DAY ) ) ) "
-				."< IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " )",
-			'sqlsrv' => "SELECT caro_consumables_products.id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 AND "
-				."DATEDIFF(day, ISNULL(caro_consumables_products.checked, DATEADD(DD, ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
-				."< ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") "
+				. "AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( caro_consumables_products.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " ) + 1 DAY ) ) ) "
+				. "< IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " )",
+			'sqlsrv' => "SELECT caro_consumables_products.id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
+				. "AND DATEDIFF(day, ISNULL(caro_consumables_products.checked, DATEADD(DD, ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
+				. "< ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") "
 		],
 		'consumables_get_last_checked' => [
 			'mysql' => "SELECT caro_consumables_products.checked as checked, caro_consumables_vendors.id as vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
-				. "caro_consumables_products.checked IS NOT NULL ORDER BY caro_consumables_products.checked DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP(1) caro_consumables_products.checked as checked, caro_consumables_vendors.id as vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 AND "
-				. "caro_consumables_products.checked IS NOT NULL ORDER BY caro_consumables_products.checked"
+				. "AND caro_consumables_products.checked IS NOT NULL ORDER BY caro_consumables_products.checked DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP(1) caro_consumables_products.checked as checked, caro_consumables_vendors.id as vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
+				. "AND caro_consumables_products.checked IS NOT NULL ORDER BY caro_consumables_products.checked"
 		],
 		'consumables_get_product_units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products WHERE article_unit IS NOT NULL GROUP BY article_unit ORDER BY article_unit ASC",
