@@ -113,16 +113,13 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * risk templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* make datalist part of text like autocomplete for textbox instead of datalist widget
+* update endpoint responses (search for dropped "datalist")
 * reconsider checks db, merge data to products db (additional column, for check-date is faster to comprehend by query)
-* same goes for range
+    * DELETE consumables.incorporation ./api/api.php/consumables/mdrsamplecheck/{productid}/{checkid} actual array index?
+    * all of audit
+    * incorporation split sample_check payload 
 * audit
     * unused documents, except contexts or analyze for by input widgets within records
-* external files linking ->api checking whether file is hidden or not displaying error messag in new window otherwise stream data
-    * describe safety mechanism on accessability for logged in users only
-        * dynamic permission handling for generated directories, consider other server architectures within UTILITY::createDirectory()
-    * api endpoint file/stream
-    * code pattern file/stream
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1296,6 +1293,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
     * [risks] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements or new identified risks)
 
 If you ever fiddle around with the sourcecode:
+* The application is designed and [tested](#prerequisites) to work with Apache2 with MySQL/MariaDB and IIS with SQL Server. For other server/database configurations additional prepared queries and access restrictions to the fileserver (`UTILITY::createDirectory()`) may have to be created.
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning. During development altering tables [can be enabled if disabled by default](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
@@ -1839,7 +1837,7 @@ Stakeholder identification:
 
 ### Risk assessment
 
-#### Development riskss
+#### Development risks
 | Risk | Probability | Impact | Measures | Statement |
 | ---- | ----------- | ------ | -------- | --------- |
 | Developer unavailable | Low | High (currently single developer) | Tech stack with vanilla JS and PHP can be handled by any web agency | Getting used to foreign structure is hard, but still |
@@ -1887,7 +1885,7 @@ Stakeholder identification:
 For static code analysis
 
 ## Frontend design
-All requests have to be routed through the api-object to ensure proper result processing and offline fallback. (./js/api.js)
+All requests have to be routed through the api-object to ensure proper result processing, offline fallback and user validation. (./js/api.js)
 
 A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
 
@@ -1902,6 +1900,7 @@ There is a UTILITY class handling
 * image processing
 
 Using these methods for fitting usecases is mandatory. (./api/_utility.php)
+Directory handling creates a .htaccess- / web.config-file preventing direct access to files; these are available through the file/stream-endpoint only. Linking files requires ./api/api.php/file/stream/ as a prefix to otherwise native processed paths.
 
 There is a PERMISSION class handling
 * permissions as set within config.ini
@@ -2189,7 +2188,7 @@ see PUT
 
 > PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
 
-Markes scheduled events as complete or revoke state.
+Marks scheduled events as complete or revoke state.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -2197,6 +2196,7 @@ Parameters
 | {id} | path parameter | required | database id |
 | {bool} | path parameter| required | true or false completed state |
 | {type} | path parameter | required | schedule or timesheet |
+| payload | form data | required | form data including user validation |
 
 Sample response
 ```
@@ -2867,6 +2867,7 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {id} | path parameter | required | database id to update |
 | {value} | path parameter | required | int accessible / comma separated selected regulatory contexts |
+| payload | form data | required | form data including user validation |
 
 Sample response
 ```
@@ -2972,6 +2973,15 @@ Sample response
 ```
 {"response":{"msg":"Upload has been completed","redirect":["sharepoint"],"type":"success"}}
 ```
+
+> GET ./api/api.php/file/stream/{path to file}
+
+Streams a file to verified user or returns http status code 410.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {path to file} | path parameter | true | relative path |
 
 [Content](#content)
 
@@ -3218,6 +3228,7 @@ Parameters
 | {identifier} | path parameter | required | identifier for records |
 | {state} | path parameter | required | as defined within languagefiles |
 | {bool} | path parameter | required | true or false |
+| payload | form data | required | form data including user validation |
 
 Sample response
 ```
@@ -3246,6 +3257,7 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {identifier} | path parameter | required | identifier for records |
+| payload | form data | required | form data including user validation |
 
 Sample response
 ```
@@ -3850,9 +3862,9 @@ I welcome any constructive input on this topic.
 * O.Purp_4 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von der Web-Anwendung oder dem Hintergrundsystem erfasst, erhalten oder genutzt werden.
     > Only active and intentional user input is processed and stored.
 * O.Purp_5 Die Web-Anwendung MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden.
-    > The application is intended as a tool to fulfil regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login.
+    > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login.
 * O.Purp_6 Der Hersteller MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
-    > The application is intended as a tool to fulfil regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login. All individual system information can be accessed through the profile.
+    > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login. All individual system information can be accessed through the profile.
 * O.Purp_7 Setzt die Web-Anwendung Drittanbieter-Software ein, MÜSSEN alle verwendeten Funktionen für die rechtmäßigen Zwecke der Anwendung erforderlich sein. Die Anwendung SOLL anderweitige Funktionen sicher deaktivieren. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, MUSS abgewogen werden, ob die Einbindung des gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
     > [List of third party software](#ressources)
 * O.Purp_8 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer WebAnwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten vollumfänglich infrandormieren und sein Einverständnis einholen (OPT-IN).
@@ -4002,7 +4014,7 @@ I welcome any constructive input on this topic.
 * O.Data_1 Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
     > The application has no prefilled sensitive data on installation. New users have to be assigned roles actively.
 * O.Data_2 Exportiert der Nutzer sensible Daten unverschlüsselt MUSS der Nutzer durch die WebAnwendung darauf aufmerksam gemacht werden, dass der Nutzer selbst die Verantwortung für die Datensicherheit dieser exportierten Daten übernimmt.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. On any export there is a additional reminder by default.
 * O.Data_3 Die Web-Anwendung DARF Ressourcen, die einen Zugriff auf sensible Daten ermöglichen, gegenüber Dritten NICHT verfügbar machen.
     > There are no interfaces outside of the closed environment.
 * O.Data_4 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus in der Web-Anwendung gehalten werden.
@@ -4087,7 +4099,7 @@ I welcome any constructive input on this topic.
 * O.Purp_3 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von dem Hintergrundsystem verarbeitet werden.
     > Only active and intentional user input is processed and stored.
 * O.Purp_4 Das Hintergrundsystem MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden.
-    > The application is intended as a tool to fulfil regulatory requirements. Use may be assigned and a mandatory official task. The backend does not request special user consents.
+    > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. The backend does not request special user consent.
 * O.Purp_5 Der Anbieter MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
     > All user settings are displayed within the profile. Selectable options are disabled by default.
 * O.Purp_6 Setzt das Hintergrundsystem Drittanbieter-Software ein, SOLLEN alle verwendeten Funktionen für den rechtmäßigen Zweck des Gesamtsystems erforderlich sein. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.Anderweitige Funktionen SOLLEN sicher deaktiviert sein. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, SOLL abgewogen werden, ob die Einbindung der gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
@@ -4139,7 +4151,7 @@ I welcome any constructive input on this topic.
 * O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein.
     > Debugging is removed.
 * O.Source_7 Das Hintergrundsystem MUSS sicherstellen, dass alle sensiblen Daten unverzüglich nach der Erfüllung ihres Verarbeitungszwecks sicher gelöscht werden.
-    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GPDR has yet to be received as of 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
+    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received as of 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
 * O.Source_8 Der Hersteller MUSS einen Deployment-Prozess für die Inbetriebnahme, Aktualisierungen und Abschaltung des Hintergrundsystems etablieren, der sicherstellt, dass zu keinem Zeitpunkt die Veröffentlichung oder das Kompromittieren sensibler Daten möglich ist.
     > [Deployment process](#deployment-process)
 * O.Source_9 Der Hersteller SOLL automatische Tools zur Identifikation von Programmfehlern und Best-Practice Violations im Build Process verwenden. Jegliche Warnungen MÜSSEN von dem Hersteller vor dem Produktivbetrieb mitigiert werden.
@@ -4259,6 +4271,7 @@ I welcome any constructive input on this topic.
 * O.Data_1 Sensible Daten MÜSSEN verschlüsselt gespeichert werden. Das Hintergrundsystem SOLL sensible Daten, verschlüsselt speichern, so dass sie nur von dem Nutzer selber wieder entschlüsselt werden können.
     > [Encryption statement](#encryption-statement)
 * O.Data_2 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus im Hintergrundsystem gehalten werden.
+    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received as of 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
 * O.Data_3 Das Hintergrundsystem MUSS die Grundsätze der Datensparsamkeit und Zweckbindung berücksichtigen.
     > Only active and intentional user input is processed and stored.
 * O.Data_4 Das Hintergrundsystem MUSS sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf den GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernen, wenn diese Daten nicht für den rechtmäßigen Zweck der Anwendung benötigt werden.
