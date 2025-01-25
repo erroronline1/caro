@@ -296,58 +296,58 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_products SET last_order = CURRENT_TIMESTAMP WHERE id  = :id"
 		],
 		'consumables_get_product' => [ // preprocess via strtr
-			'mysql' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.id IN (:ids) AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name, dist.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, prod.id) IN (:ids) AND prod.vendor_id = dist.id"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.id IN (:ids)",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE CONVERT(VARCHAR, caro_consumables_products.id) IN (:ids)"
 		],
-		'consumables_get_products_incorporation_attention' => [
-			'mysql' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, prod.last_order AS last_order, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.id AS id, prod.incorporated AS incorporated, prod.special_attention as special_attention, prod.article_name AS article_name, prod.article_no AS article_no, prod.last_order AS last_order, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id"
+		'consumables_get_products' => [
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id"
 		],
 		'consumables_get_product_search' => [
-			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE (LOWER(prod.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(prod.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND prod.vendor_id IN (:vendors) AND prod.vendor_id = dist.id"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND caro_consumables_products.vendor_id IN (:vendors)",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_ean) LIKE LOWER(CONCAT('%', :search, '%'))) AND caro_consumables_products.vendor_id IN (:vendors)"
 		],
 		'consumables_get_product_by_article_no_vendor' => [
-			'mysql' => "SELECT prod.id, prod.last_order FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.id, prod.last_order FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.article_no LIKE :article_no AND dist.name LIKE :vendor AND prod.vendor_id = dist.id"
+			'mysql' => "SELECT caro_consumables_products.id, caro_consumables_products.last_order FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.article_no LIKE :article_no AND caro_consumables_vendors.name LIKE :vendor",
+			'sqlsrv' => "SELECT caro_consumables_products.id, caro_consumables_products.last_order FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.article_no LIKE :article_no AND caro_consumables_vendors.name LIKE :vendor"
 		],
 		'consumables_get_eligible_sample_check' => [ // must be splitted with the following two queries for sql performance reasons
-			'mysql' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND prod.vendor_id NOT IN (:valid_checked) "
-				."AND prod.id NOT IN (:not_reusable)",
-			'sqlsrv' => "SELECT prod.id AS id, prod.article_no AS article_no, dist.name AS vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND prod.vendor_id NOT IN (:valid_checked) "
-				."AND prod.id NOT IN (:not_reusable)"
+			'mysql' => "SELECT caro_consumables_products.id AS id, caro_consumables_products.article_no AS article_no, caro_consumables_vendors.name AS vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
+				."AND caro_consumables_products.vendor_id NOT IN (:valid_checked) "
+				."AND caro_consumables_products.id NOT IN (:not_reusable)",
+			'sqlsrv' => "SELECT caro_consumables_products.id AS id, caro_consumables_products.article_no AS article_no, caro_consumables_vendors.name AS vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
+				."AND caro_consumables_products.vendor_id NOT IN (:valid_checked) "
+				."AND caro_consumables_products.id NOT IN (:not_reusable)"
 		],
 		'consumables_get_valid_checked' => [
-			'mysql' => "SELECT prod.vendor_id AS vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " ) DAY ) ) ) "
-				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " )",
-			'sqlsrv' => "SELECT prod.vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
-				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
-				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") "
+			'mysql' => "SELECT caro_consumables_products.vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
+				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( caro_consumables_products.checked, DATE_SUB(CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " ) DAY ) ) ) "
+				."< IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . " )",
+			'sqlsrv' => "SELECT caro_consumables_products.vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 AND "
+				."DATEDIFF(day, ISNULL(caro_consumables_products.checked, DATEADD(DD, ISNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") * -1, GETDATE())), GETDATE()) "
+				."< ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_interval'), " . CONFIG['lifespan']['mdr14_sample_interval'] . ") "
 		],
 		'consumables_get_not_reusable_checked' => [
-			'mysql' => "SELECT prod.id AS id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 "
-				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( prod.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " ) + 1 DAY ) ) ) "
-				."< IFNULL( JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " )",
-			'sqlsrv' => "SELECT prod.id FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE prod.vendor_id = dist.id AND prod.trading_good = 1 AND "
-				."DATEDIFF(day, ISNULL(prod.checked, DATEADD(DD, ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
-				."< ISNULL(JSON_VALUE(dist.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") "
+			'mysql' => "SELECT caro_consumables_products.id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
+				."AND DATEDIFF( CURRENT_TIMESTAMP, IFNULL( caro_consumables_products.checked, DATE_SUB( CURRENT_TIMESTAMP, INTERVAL IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " ) + 1 DAY ) ) ) "
+				."< IFNULL( JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . " )",
+			'sqlsrv' => "SELECT caro_consumables_products.id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 AND "
+				."DATEDIFF(day, ISNULL(caro_consumables_products.checked, DATEADD(DD, ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") * -1 - 1, GETDATE())), GETDATE()) "
+				."< ISNULL(JSON_VALUE(caro_consumables_vendors.pricelist, '$.samplecheck_reusable'), " . CONFIG['lifespan']['mdr14_sample_reusable'] . ") "
 		],
 		'consumables_get_last_checked' => [
-			'mysql' => "SELECT prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
-				. "prod.checked IS NOT NULL ORDER BY prod.checked DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP(1) prod.checked as checked, dist.id as vendor_id FROM caro_consumables_products AS prod, caro_consumables_vendors as dist WHERE prod.trading_good = 1 AND prod.vendor_id = dist.id AND "
-				. "prod.checked IS NOT NULL ORDER BY prod.checked"
+			'mysql' => "SELECT caro_consumables_products.checked as checked, caro_consumables_vendors.id as vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 "
+				. "caro_consumables_products.checked IS NOT NULL ORDER BY caro_consumables_products.checked DESC LIMIT 1",
+			'sqlsrv' => "SELECT TOP(1) caro_consumables_products.checked as checked, caro_consumables_vendors.id as vendor_id FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.trading_good = 1 AND "
+				. "caro_consumables_products.checked IS NOT NULL ORDER BY caro_consumables_products.checked"
 		],
 		'consumables_get_product_units' => [
 			'mysql' => "SELECT article_unit FROM caro_consumables_products WHERE article_unit IS NOT NULL GROUP BY article_unit ORDER BY article_unit ASC",
 			'sqlsrv' => "SELECT article_unit FROM caro_consumables_products WHERE article_unit IS NOT NULL GROUP BY article_unit ORDER BY article_unit ASC"
 		],
 		'consumables_get_products_by_vendor_id' => [
-			'mysql' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE dist.id IN (:ids) AND prod.vendor_id = dist.id",
-			'sqlsrv' => "SELECT prod.*, dist.name as vendor_name FROM caro_consumables_products AS prod, caro_consumables_vendors AS dist WHERE CONVERT(VARCHAR, dist.id) IN (:ids) AND prod.vendor_id = dist.id"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_vendors.id IN (:ids)",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE CONVERT(VARCHAR, caro_consumables_vendors.id) IN (:ids)"
 		],
 		'consumables_delete_all_unprotected_products' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL AND last_order IS NULL",
