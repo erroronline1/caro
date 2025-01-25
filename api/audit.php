@@ -66,13 +66,8 @@ class AUDIT extends API {
 				$result['render'] = ['content' => []];
 				$selecttypes = [];
 				
-				// checks
-				$types = SQLQUERY::EXECUTE($this->_pdo, 'checks_get_types');
-				foreach($types as $type){
-					$selecttypes[$this->_lang->GET('audit.checks_type.' . $type['type'])] = ['value' => $type['type']];
-					if ($this->_requestedType === $type['type']) $selecttypes[$this->_lang->GET('audit.checks_type.' . $type['type'])]['selected'] = true;
-				}
 				foreach([
+					'mdrsamplecheck', // sample checks on products
 					'incorporation', // incorporated products
 					'documents', // documents and components
 					'userskills', // user skills and certificates
@@ -176,6 +171,7 @@ class AUDIT extends API {
 	public function export(){
 		if (!PERMISSION::permissionFor('auditsoperation')) $this->response([], 401);
 		$static = [
+			'mdrsamplecheck',
 			'incorporation',
 			'documents',
 			'userskills',
@@ -188,57 +184,7 @@ class AUDIT extends API {
 			'risks'
 		];
 		if (in_array($this->_requestedType, $static)) $this->{'export' . $this->_requestedType}();
-		else $this->exportchecks();
-	}
-
-	/**
-	 *                       _       _           _
-	 *   ___ _ _ ___ ___ ___| |_ ___| |_ ___ ___| |_ ___
-	 *  | -_|_'_| . | . |  _|  _|  _|   | -_|  _| '_|_ -|
-	 *  |___|_,_|  _|___|_| |_| |___|_|_|___|___|_,_|___|
-	 *          |_|
-	 * creates and returns a download link to the export file for requested check
-	 * if check type within caro_checks database
-	 */
-	private function exportchecks(){
-		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
-			'values' => [
-				':type' => $this->_requestedType
-			]
-		]);
-		$summary = [
-			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
-			'identifier' => null,
-			'content' => [],
-			'files' => [],
-			'images' => [],
-			'title' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-			'date' => $this->_currentdate->format('y-m-d H:i')
-		];
-		// stringify check records
-		foreach($checks as $row){
-			$summary['content'][$this->_lang->GET('audit.check_description', [
-				':check' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-				':date' => $row['date'],
-				':author' => $row['author']
-			])] = $row['content'];
-		}
-		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
-		];
-
-		$body = [];
-		array_push($body, 
-			[
-				'type' => 'links',
-				'description' =>  $this->_lang->GET('record.export_proceed'),
-				'content' => $downloadfiles
-			]
-		);
-		$this->response([
-			'render' => $body,
-		]);
+		else $this->response([], 404);
 	}
 
 	/**
@@ -583,7 +529,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']
 				],
-				'content' => $incorporationInfo
+				'linkedcontent' => $incorporationInfo . "\n" . '<a href="javascript:api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . $this->_lang->GET('audit.incorporation_link') . '</a>'
 			];
 		}
 		if ($entries) $content[] = $entries;
@@ -608,7 +554,10 @@ class AUDIT extends API {
 
 		for($i = 1; $i<count($documents); $i++){
 			foreach($documents[$i] as $item){
-				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])) $summary['content'][$item['attributes']['name']] = $item['content'];	
+				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])){
+					if (isset($item['content'])) $summary['content'][$item['attributes']['name']] = $item['content'];
+					elseif (isset($item['linkedcontent'])) $summary['content'][$item['attributes']['name']] = strip_tags($item['linkedcontent']);
+				}
 			}
 		}
 		$downloadfiles = [];

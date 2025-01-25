@@ -417,6 +417,7 @@
 		"documents_time": "Zeit",
 		"documents_update_button": "Aktualisiere gültige Dokumente zum angebenen Zeitpunkt",
 		"experience_points": ":number Erfahrungspunkte für das Jahr :year",
+		"incorporation_link" :"zum Artikel",
 		"incorporation_warning_content": "Beobachte Bestellungen und sensibilisiere für die Beachtung: :amount Produkte",
 		"incorporation_warning_description": "Manche bestellten Produkte benötigen noch eine Produkteinführung!",
 		"mdrsamplecheck_warning_content": "Beobachte Bestellungen von folgenden Lieferanten und sensibilisiere für die Beachtung: :vendors",

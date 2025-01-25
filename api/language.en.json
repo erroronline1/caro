@@ -417,6 +417,7 @@
 		"documents_time": "Time",
 		"documents_update_button": "Update documents in use at the given date/time",
 		"experience_points": ":number experience points for the year :year",
+		"incorporation_link" :"to product",
 		"incorporation_warning_content": "Observe orders and sensitise for compliance: :amount products",
 		"incorporation_warning_description": "Some ordered products still have to be incorporated!",
 		"mdrsamplecheck_warning_content": "Observe orders from following vendors and sensitise for compliance: :vendors",
