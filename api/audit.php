@@ -556,7 +556,7 @@ class AUDIT extends API {
 			foreach($documents[$i] as $item){
 				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])){
 					if (isset($item['content'])) $summary['content'][$item['attributes']['name']] = $item['content'];
-					elseif (isset($item['linkedcontent'])) $summary['content'][$item['attributes']['name']] = strip_tags($item['linkedcontent']);
+					elseif (isset($item['linkedcontent'])) $summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation_link') . '$/m','', strip_tags($item['linkedcontent']));
 				}
 			}
 		}
@@ -619,39 +619,87 @@ class AUDIT extends API {
 				]
 			]
 		];
+
 		// add check records
-		$checks = SQLQUERY::EXECUTE($this->_pdo, 'checks_get', [
-			'values' => [
-				':type' => $this->_requestedType
-			]
-		]);
-		foreach($checks as $row){
+		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+		// order descending
+		usort($products, function ($a, $b) {
+			if ($a['checked'] === $b['checked']) return 0;
+			return $a['checked'] < $b['checked'] ? -1: 1;
+		});
+
+		foreach($products as $product){
+			if (!$product['sample_checks']) continue;
+
+			$product['sample_checks'] = json_decode($product['sample_checks'], true);
+			$checks = [];
+			foreach($product['sample_checks'] as $check){
+				$checks[] = $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => $check['date']], true) . "\n" . $check['content'];
+			}
 			$entries[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.check_description', [
-						':check' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-						':date' => $row['date'],
-						':author' => $row['author']
-					])
+					'name' => implode(' ', [$product['vendor_name'], $product['article_no'], $product['article_name']])
 				],
-				'content' => $row['content']
+				'content' => implode("\n\n", $checks)
 			];
+			
 			if(PERMISSION::permissionFor('auditsoperation')) $entries[] = [
 				'type' => 'button',
 				'attributes' => [
 					'type' => 'button',
-					'value' => $this->_lang->GET('audit.sample_check_revoke'),
+					'value' => $this->_lang->GET('audit.mdrsamplecheck_revoke'),
 					'onpointerup' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
-						"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.sample_check_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
+						"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 						"if (response !== false) {" .
-						"api.purchase('delete', 'mdrsamplecheck', " . $row['id']. "); this.disabled=true" .
+						"api.purchase('delete', 'mdrsamplecheck', " . $product['id']. "); this.disabled=true" .
 						"}});"
 				]
 			];
 		}
 		if ($entries) $content[] = $entries;
 		return $content;
+	}
+	/**
+	 * creates and returns a download link to the export file mdrsamplechecks
+	 * processes the result of $this->mdrsamplecheck() and translates the body object into more simple strings
+	 */
+	private function exportmdrsamplecheck(){
+		$summary = [
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
+			'date' => $this->_currentdate->format('y-m-d H:i')
+		];
+
+		$documents = $this->mdrsamplecheck();
+
+		for($i = 1; $i<count($documents); $i++){
+			foreach($documents[$i] as $item){
+				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])){
+					if (isset($item['content'])) $summary['content'][$item['attributes']['name']] = $item['content'];
+				}
+			}
+		}
+		$downloadfiles = [];
+		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
 	}
 
 	/**
