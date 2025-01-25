@@ -42,15 +42,6 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
-				"CREATE TABLE IF NOT EXISTS `caro_checks` (" .
-				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	PRIMARY KEY (`id`)" .
-				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
-				.
 				"CREATE TABLE IF NOT EXISTS `caro_consumables_approved_orders` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`order_data` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -276,15 +267,6 @@ define('DEFAULTSQL', [
 				"	misc varchar(MAX) NULL DEFAULT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	alert tinyint NULL" .
-				");"
-				.
-				"IF OBJECT_ID(N'caro_checks', N'U') IS NULL " .
-				"CREATE TABLE caro_checks (" .
-				"	id int NOT NULL IDENTITY(1,1)," .
-				"	type varchar(255) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NOT NULL," .
-				"	content varchar(MAX) NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_approved_orders', N'U') IS NULL " .

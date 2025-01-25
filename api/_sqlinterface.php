@@ -250,30 +250,6 @@ class SQLQUERY {
 		],
 
 
-// going to be deprecated
-		'checks_post' => [
-			'mysql' => "INSERT INTO caro_checks (id, type, date, author, content) VALUES (NULL, :type, CURRENT_TIMESTAMP, :author, :content)",
-			'sqlsrv' => "INSERT INTO caro_checks (type, date, author, content) VALUES (:type, CURRENT_TIMESTAMP, :author, :content)"
-		],
-		'checks_get_types' => [
-			'mysql' => "SELECT type FROM caro_checks GROUP BY type",
-			'sqlsrv' => "SELECT type FROM caro_checks GROUP BY type"
-		],
-		'checks_get' => [
-			'mysql' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_checks WHERE type = :type ORDER BY id DESC"
-		],
-		'checks_get_by_id' => [
-			'mysql' => "SELECT * FROM caro_checks WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_checks WHERE id = :id"
-		],
-		'checks_delete' => [
-			'mysql' => "DELETE FROM caro_checks WHERE id = :id",
-			'sqlsrv' => "DELETE FROM caro_checks WHERE id = :id"
-		],
-
-
-
 		'consumables_post_vendor' => [
 			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :hidden, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)",
 			'sqlsrv' => "INSERT INTO caro_consumables_vendors (hidden, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( :hidden, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)"
