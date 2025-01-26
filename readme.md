@@ -969,19 +969,21 @@ Also a CSV-Filter and its manager are sorted here. The CSV-filter processes resp
 
 ## Audit
 The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
+* complaints
+* current documents in use including external documents
+* experience points based on user trainings, if trainings are assigned some (internal or external)
 * incoporated articles
 * MDR §14 sample checks
-* current documents in use including external documents
-* user skills and trainings
+* regulatory issues addressed by documents
+* issues with risks definition inconsistencies
 * skill fulfilment
+* training evaluation
+* user skills and trainings with optional adding mandatory trainings to multiple users at once
 * vendor list
-* complaints
-* regulatory issues
-* risks
 
-The module provides a structured Excel-export of order statistics to support vendor evaluation based on delivery data.
-
-Furthermore the module contains the option for training evaluation. Evaluations can be edited.
+Furthermore hopefully beneficial information on
+* appropriateness of current documents including a use count gathered from records
+* order statistics as a structured Excel-export to support vendor evaluation based on delivery data
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 

@@ -897,18 +897,20 @@ Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet
 ## Audit
 Das Audit-Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
 * eingeführte Produkte
-* Stichprobenprüfungen gemäß MDR §14
-* aktuell gültige Dokumente, incl. externe Dokumente
-* Mitarbeiterqualifikationen und Schulungen
-* Qualifikationserfüllung
+* Erfahrungspunkte basierend auf Schulungen, sofern für Schulungen Punkte vergeben werden (intern oder extern, z.b. [IQZ](https://ot-iqz.de/))
+* Erfüllung regulatorischer Anforderungen durch Dokumente
+* aktuell gültige, incl. externe Dokumente
 * Lieferantenverzeichnis
+* Stichprobenprüfungen gemäß MDR §14
+* Mitarbeiterqualifikationen und Schulungen mit der Option verpflichtende Schulungen für mehrere Mitarbeiter gleichzeitig einzutragen 
+* Qualifikationserfüllung
 * Reklamationen
-* regulatorische Anforderungen
-* Risiken
+* Problembericht für inkonsistent definierte Risiken, incl. strukturiertem Export aller erfassten Risiken
+* Schulungsbewertung
 
-Das Modul stellt einen strukturierten Excel-Export der Bestellstatistiken zur Verfügung um die Lieferantenbewertung basierend auf Lieferdaten zu ergänzen. 
-
-Ferner enthält das Modul die Möglichkeit der Schulungsbewertung. Bewertungen können angepasst werden.
+Ferner hoffentlich hilfreiche Informationen zu
+* der Angemessenheit aktueller Dokumente incl. einem Nutzungszähler gemäß Aufzeichnungen
+* Bestellstatistiken in Form eines strukturierten Excel-Export um die Lieferantenbewertung basierend auf Lieferdaten zu ergänzen
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit%20de.png)
 
