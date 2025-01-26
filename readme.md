@@ -975,7 +975,7 @@ The audit module gathers data from the application in regards of proofing lists 
 * incoporated articles
 * MDR §14 sample checks
 * regulatory issues addressed by documents
-* issues with risks definition inconsistencies
+* issues with risks definition inconsistencies, incl. structured export of all defined risks
 * skill fulfilment
 * training evaluation
 * user skills and trainings with optional adding mandatory trainings to multiple users at once
