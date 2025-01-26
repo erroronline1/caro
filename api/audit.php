@@ -472,6 +472,7 @@ class AUDIT extends API {
 		foreach ($records as $record){
 			$record['content'] = json_decode($record['content'], true);
 			foreach($record['content'] as $rc){
+				if (!isset($rc['document'])) continue;
 				if (!isset($usedid[$rc['document']])) $usedid[$rc['document']] = 0;
 				$usedid[$rc['document']]++;
 			}
