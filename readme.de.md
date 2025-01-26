@@ -448,6 +448,17 @@ Verfügbare Elemente für Dokumente sind:
 Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren.
 Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
 
+#### *Caveat:*
+Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
+Some elements are only processible as proper records.
+* Datei-,
+* Foto-Uploads,
+* Produktauswahlfelder,
+* Unterschriftenfelder und
+* Kalenderschaltflächen
+
+sind nicht verwertbar für Dokumenten-Kontexts innerhalb der Sprachdateigruppe documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert.
+
 Bildschirmformular
 
 ![screen document](http://toh.erroronline.one/caro/document%20screen%20de.png)
@@ -1177,7 +1188,6 @@ products_per_slide = 6
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es wird nur eine Zeitzone unterstützt.
-* Produkteinführung und Stichprobenprüfung können keine Dokumente mit Datei-, Bilduploads oder Signaturen verarbeiten. Derartige Eingabeoptionen werden ignoriert.
 
 ### Safaris besondere Bedürfnisse
 im Gegensatz zu richtigen Browsern, zumindest auf macOS.

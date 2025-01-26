@@ -525,6 +525,16 @@ Available elements for documents are:
 Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
 Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
 
+#### *Caveat:*
+Some elements are only processible as proper records.
+* file,
+* photo,
+* product selection,
+* signature and
+* calendarbutton
+
+are not processable for document-contexts within the languagefiles group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored.
+
 Screen document
 
 ![screen document](http://toh.erroronline.one/caro/document%20screen.png)
@@ -1251,7 +1261,6 @@ products_per_slide = 6
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * Only one timezone is supported.
-* Incorporation and sample check are not able to process documents with file-, imageuploads and signatures. These input fields will be ignored.
 
 ### Safaris special needs
 as opposed to proper browsers. At least on macOS.
