@@ -365,7 +365,7 @@
 		"name": "Lieferanten_Zertifikat",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Uns ist aufgefallen dass Ihr Zertifkat am :ECR abgelaufen ist und freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats.\n"
+		"content": "Uns ist aufgefallen dass Ihr Zertifkat am :ECR abgelaufen ist und freuen uns über eine zeitnahe Zusendung eines aktuellen Zertifikats.\n"
 	},
 	{
 		"type": "text",
