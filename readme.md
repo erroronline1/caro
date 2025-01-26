@@ -110,12 +110,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * vendor templates
 * text recommendation templates
 * document templates
-* risk templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* update endpoint responses (search for dropped "datalist")
-* audit
-    * unused documents, except contexts or analyze for by input widgets within records
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -2091,20 +2087,6 @@ Samble response
 
 ### Audit endpoints
 
-> POST ./api/api.php/audit/checks/userskills
-
-Returns userskills after inserting.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | values for database |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},"Skill fulfilment":{"value":"skillfulfilment"},"User skills and trainings":{"value":"userskills","selected":true},"Vendor list":{"value":"vendors"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}],{"type":"textsection","attributes":{"name":"Some defined skills are not matched!"},....
-```
-
 > DELETE ./api/api.php/audit/checks/{type}
 
 Deletes records. Currently implemented for order statistics only.
@@ -2151,13 +2133,14 @@ Sample response
 {"render":[[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Record summary":{"href":".\/fileserver\/tmp\/Incorporatedarticles_202406102018.pdf"}}}]]}
 ```
 
-> PUT ./api/api.php/audit/trainingevaluation/{id}
+> PUT ./api/api.php/audit/checks/{type}/{id}
 
-Saves evaluations of user trainings
+Updates data from the audit module. Currently implemented for user trainings only.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {type} | path parameter | required | defines the response, none if omitted |
 | {id} | path parameter | required | training database id | 
 | payload | form data | required | form data |
  
@@ -2166,20 +2149,20 @@ Sample response
 {"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
 ```
 
-> GET ./api/api.php/audit/trainingevaluation
+> POST ./api/api.php/audit/checks/{type}
 
-Saves evaluations of user trainings
+Inserts data into the database. Currently implemented for user skills only (mandatory trainings for multiple users).
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
+| {type} | path parameter | required | defines the response, none if omitted |
+| payload | form data | required | form data |
+ 
 Sample response
-
-see PUT
-
-[Content](#content)
+```
+{"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+```
 
 ### Calendar endpoints
 
@@ -2476,7 +2459,8 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"datalist","content":["Otto Bock"],"attributes":{"id":"vendors"}},{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":[],"Otto Bock":{"selected":true}}},{"type":"search","attributes":{"name":"Search by name","list":"vendors","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"}}],[{"type":"text","attributes":{"name":"Name","required":true,"value":"Otto Bock"}},{"type":"textarea","attributes":{"name":"Info","value":"&lt;&gt;","rows":8}},{"type":"radio","attributes":{"name":"vendor active"},"content":{"active and available":{"checked":true},"inactive, delete products":[]}}],....
+
+{"render":{"content":[[{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":{"selected":true},"AET GmbH (TSM)":{"value":"AET GmbH (TSM)"},"AMT Aromando Medzintechnik GmbH":{"value":"AMT Aromando Medzintechnik GmbH"},"Albrecht GmbH":{"value":"Albrecht GmbH"},"Arthroven GmbH":{"value":"Arthroven GmbH"},"Aspen Medical Products GmbH":{"value":"Aspen Medical Products GmbH"},"Basko Orthop\u00e4die Handelsgesellschaft mbH":{"value":"Basko Orthop\u00e4die Handelsgesellschaft mbH"},"Blatchford Europe GmbH (Endolite)":{"value":"Blatchford Europe GmbH (Endolite)"},"Bort GmbH":{"value":"Bort GmbH"},....
 ```
 
 > POST ./api/api.php/consumables/vendor
@@ -2524,7 +2508,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"datalist","content":["testfilter"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Select filter","onchange":"api.csvfilter('get', 'filter', this.value)"},"content":{"...Select filter":{"value":"0"},"testfilter":{"value":3,"selected":true}}},{"type":"search","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"}}],[{"type":"file","hint":"with a name like Export.+?\\.csv","attributes":{"name":"Select input file","required":true,"accept":".csv"}},{"type":"br"},{"type":"number","attributes":{"name":"Month","value":"06","readonly":true}},....
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select filter","onchange":"api.csvfilter('get', 'filter', this.value)"},"content":{"...Select filter":{"value":"0","selected":true},"Terminerinnerung":{"value":1}}},{"type":"search","attributes":{"name":"Search name","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"},"datalist":["Terminerinnerung"]}]]}}
 ```
 
 > POST ./api/api.php/csvfilter/filter/{id}
@@ -2553,7 +2537,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'rule')"},"content":[[[{"type":"datalist","content":["test"],"attributes":{"id":"filters"}},{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0"},"test":{"value":1,"selected":true}}},{"type":"search","attributes":{"name":"Search name","list":"filters","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"}}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":....
+{"render":{"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'rule')"},"content":[[[{"type":"select","attributes":{"name":"Edit latest filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Terminerinnerung":{"value":1}}},{"type":"search","attributes":{"name":"Search name","onkeypress":"if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"},"datalist":["Terminerinnerung"]}],[{"type":"select","attributes":{"name":"Edit any filter","onchange":"api.csvfilter('get', 'rule', this.value)"},"content":{"...New filter":{"value":"0","selected":true},"Terminerinnerung  created by error on line 1 on 2025-01-26 01:34:00":{"value":1}}}]],[{"type":"text","attributes":{"name":"Name","value":"","required":true,"data-loss":"prevent"}},{"type":"code","hint":"Please adhere to proper JSON format to describe a working CSV filter. A programmer can help you with that.","attributes":{"name":"Content","value":"","rows":16,"id":"content","required":true,"data-loss":"prevent"}}]]}}
 ```
 
 > POST ./api/api.php/csvfilter/rule
@@ -2628,7 +2612,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"bundle","action":"javascript:api.document('post', 'bundle')"},"content":[[[{"type":"datalist","content":["bundle1"],"attributes":{"id":"templates"}},{"type":"select","attributes":{"name":"Edit existing latest bundle","onchange":"api.document('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},"bundle1":{"value":12}}},{"type":"search","attributes":{"name":"Search by name","list":"templates","onkeypress":"if (event.key === 'Enter') ....
+{"render":{"form":{"data-usecase":"bundle","action":"javascript:api.document('post', 'bundle')"},"content":[[[{"type":"select","attributes":{"name":"Edit existing latest bundle","onchange":"api.document('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},"Versorgungsdokumentation Prothetik II":{"value":152}}},{"type":"search","attributes":{"name":"Search by name","onkeypress":"if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"},"datalist":["Versorgungsdokumentation Prothetik II"]}],[{"type":"select","attributes":{"name":"Edit any existing bundle","onchange":"api.document('get', 'bundle', this.value)"},"content":{"...New bundle":{"value":"0","selected":true},....
 ```
 
 > GET ./api/api.php/document/bundles/{search}
@@ -2698,7 +2682,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"datalist","content":["adddocuments","anamneseOrthetik","anamneseProthetik","fertigungsauftrag","identifier","produkteinführung","Stichprobenprüfung","TelefonEmailFoto","versorgungsbegruendung"],"attributes":{"id":"components"}},{"type":"select","attributes":{"name":"Edit existing latest approved component","onchange":"api.document('get','component_editor', this.value)"},....
+{"render":{"content":[[[{"type":"textsection","attributes":{"name":"Edit existing latest approved component"}},{"type":"select","attributes":{"name":"Common","onchange":"api.document('get', 'component_editor', this.value)"},"content":{"...New component":{"value":"0","selected":true},"basisdaten":{"value":102},"datenverarbeitung auftragserteilung schweigepflichtentbindung":{"value":103},"empfangsbest\u00e4tigung":{"value":105},"erlaubnis zur ausstellung und ver\u00f6ffentlichung":{"value":106},"gebrauchsanweisung allgemein":{"value":109},"gebrauchsanweisung entsorgung":{"value":114},"gebrauchsanweisung handhabung":{"value":110},"gebrauchsanweisung instandhaltung":{"value":113},"gebrauchsanweisung k\u00f6rperpflege":{"value":111},....
 ```
 
 > POST ./api/api.php/document/export
@@ -2764,7 +2748,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "datalist","content": ["Anamnese Orthetik","","Anamnese Prothetik","Kontakt"],"attributes": {"id": "documents"}},{"type": "filtered","attributes": {"name": "Filter","list": "documents","onkeypress": "if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}","onblur": "api.document('get', 'documentfilter', this.value); return false;"}}],{"type": "links","description": "Case documentation","content":....
+{"render":{"content":[[{"type":"filtered","attributes":{"name":"Filter","onkeypress":"if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}","onblur":"api.document('get', 'documentfilter', this.value); return false;"},"datalist":["Abgabeprotokoll Prothetik II","Lieferung","","Lieferprotokoll","Anamnese Prothetik II","Profilerhebung","Basisdaten","Checkliste Prothetik II","Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung","Empfangsbest\u00e4tigung","Erlaubnis zur Ausstellung und Ver\u00f6ffentlichung","Gebrauchsanweisung Prothetik II","Kunststofffertigungsauftrag Prothetik II","Ma\u00dfblatt Prothetik II","Silikonfertigungsauftrag","Versorgungsausf\u00fchrung","Versorgungsma\u00dfnahme","Anprobeprotokoll",....
 ```
 
 [Content](#content)
@@ -2824,7 +2808,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post','bundlemanager')"},"content":[[{"type":"datalist","content":["einkauf","external","test"],"attributes":{"id":"bundles"}},{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get','bundlemanager', this.value)"},"content":{"...":[],"einkauf":[],"external":[],"test":{"selected": true }}},....
+{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post', 'bundlemanager')"},"content":[[{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get', 'bundlemanager', this.value)"},"content":{"...":[]}},{"type":"search","attributes":{"name":"Search by name","onkeypress":"if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"},"datalist":[]}],[[{"type":"checkbox","attributes":{"name":"Files within ..\/fileserver\/documents\/stl_files"},....
 ```
 
 > GET ./api/api.php/file/externalfilemanager
@@ -3403,7 +3387,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"datalist","content":["vorgang 2 ","testuser1 2024-10-27 ","testuser2 2024-10-27 "],"attributes":{"id":"records"}},{"type":"scanner","destination":"_recordfilter","description":"Scan identifier to find record"},{"type":"filtered","hint":"A maximum of 1024 records will be displayed, but any record will be available if filter matches.\nRecords marked with a * contain some kind of complaint.","attributes":{"id":"_recordfilter","name":"Filter by name, casenumber, etc.","list":"records","onkeypress":"if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}","onblur":"api.record('get', 'records', this.value); return false;","value":""}}],....
+{"render":{"content":[[{"type":"scanner","destination":"_recordfilter","description":"Scan identifier to find record"},{"type":"filtered","hint":"A maximum of 1024 records will be displayed, but any record will be available if filter matches.\nRecords containing some kind of complaint are highlighted.","attributes":{"id":"_recordfilter","name":"Filter by name, casenumber, etc.","onkeypress":"if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}","onblur":"api.record('get', 'records', this.value); return false;","value":""},"datalist":["elisabeth m\u00fcller "]}],{"type":"radio","attributes":{"name":"Organizational unit"},"content":{"My units":{"name":"Organizational_unit","onchange":"api.record('get', 'records', document.getElementById('_recordfilter').value || 'null')","checked":true},....
 ```
 
 > POST ./api/api.php/record/reidentify/
@@ -3478,7 +3462,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"select","attributes":{"name":"General","onchange":"api.risk('get', 'risk', this.value)"},"content":{"1 Gef\u00e4hrdungen durch Energien und beitragende Faktoren 1.1 Elektrizit\u00e4t: shock":{"value":2}}}],[{"type":"select","attributes":{"name":"Upper extremity prosthetics","onchange":"api.risk('get', 'risk', this.value)"},"content":{"pinch: lack of training":{"value":3}}}]],[{"type":"datalist","content":["General","Lower extemity prosthetics","Upper extremity prosthetics","Lower extremity orthotics","Upper extremity orthotics","Insoles","Trunk orthotics","Foam beddings","Aids"],"attributes":{"id":"processes"}},{"type":"datalist","content":["1 Gef\u00e4hrdungen durch Energien und beitragende Faktoren 1.1 Elektrizit\u00e4t",....
+{"render":{"content":[[{"type":"search","attributes":{"name":"Search","onkeypress":"if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}"}}],[{"type":"hr"}],[[{"type":"textsection","attributes":{"name":"Risk"}},{"type":"button","attributes":{"value":"New","type":"button","onpointerup":"api.risk('get', 'risk', 'risk')"}},{"type":"select","attributes":{"name":"CAD","onchange":"api.risk('get', 'risk', this.value)"},"content":{"...":[],"Scanspray nicht f\u00fcr Hautkontakt geeignet: Reizung der Haut nach Anwendung in z.B. Prothesenschaft":{"value":"526"},"unzureichende Layerhaftung additiv gefertigter Verschlusssysteme: mangelhafte Stabilit\u00e4t und Funktionsverlust des Verschlussystems":{"value":"528"},"unzureichende Passgenauigkeit nach digitaler\/additiver Modellerstellung: Druckstellen":{"value":"527"}}},....
 ```
 
 > POST ./api/api.php/risk/risk
@@ -3539,7 +3523,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"form":{"data-usecase":"texttemplate","action":"javascript:api.texttemplate('post', 'chunk')"},"content":[[[{"type":"datalist","content":["eins","text"],"attributes":{"id":"chunks"}},{"type":"datalist","content":["de"],"attributes":{"id":"languages"}},{"type":"select","attributes":{"name":"Edit latest chunk","onchange":"api.texttemplate('get', 'chunk', this.value)"},"content":{"...New chunk":{"value":"0"},"Administration Text eins (de)":{"value":3,"selected":true},"Administration Replacement text (de)":{"value":2}}},{"type":"search","attributes":{"name":"Search name","list":"chunks","onkeypress":"if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"}}],....
+{"render":{"form":{"data-usecase":"texttemplate","action":"javascript:api.texttemplate('post', 'chunk')"},"content":[[[{"type":"select","attributes":{"name":"Edit latest chunk for Common","onchange":"api.texttemplate('get', 'chunk', this.value)"},"content":{"...New template":{"value":"0","selected":true},"Replacement BEST\u00c4TIGT":{"value":19},"Replacement DER_PATIENTIN_AKKUSATIV":{"value":2},"Replacement DER_PATIENTIN_DATIV":{"value":3},"Replacement DER_PATIENTIN_GENITIV":{"value":4},"Replacement DIE_PATIENTIN_NOMINATIV":{"value":1},"Replacement ERH\u00c4LT":{"value":18},"Replacement FRAU_AKKUSATIV":{"value":17},"Replacement FRAU_NOMINATIV":{"value":16},"Replacement HAT_":{"value":25},"Replacement IHREM_GENITIV":{"value":10},"Replacement IHREN_GENITIV":{"value":9},"Replacement IHRER_GENITIV":{"value":8},....
 ```
 
 > POST ./api/api.php/texttemplate/chunk
@@ -3735,7 +3719,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "datalist","content": ["armprothetik","CARO App","error on line 1","testuser"],"attributes": {"id": "users"}},{"type": "select","attributes": {"name": "Edit existing user","onchange": "api.user('get', 'user', this.value)"},"content": {"...New user": [],"armprothetik": [],"CARO App": [],"error on line 1": {"selected": true},"testuser": []}},{"type": "search","attributes": {"name": "Search by name","list": "users","onkeypress": "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"}}],....
+{"render":{"content":[[{"type":"select","attributes":{"name":"Edit existing user","onchange":"api.user('get', 'user', this.value)"},"content":{"...New user":{"selected":true},"CARO App":[],"error on line 1":[],"user":[]}},{"type":"search","attributes":{"name":"Search by name","onkeypress":"if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"},"datalist":["CARO App","error on line 1","user"]}],[{"type":"text","attributes":{"name":"Name","required":true,"value":""}},{"type":"checkbox","attributes":{"name":"Authorize"},"content":{"User":[],"Group":[],"Medical device consultant":[],"Supervisor":[],"Office":[],"Human ressources":[],"Purchase":[],"Purchase assistant":[],"Quality management officer":[],"Person responsible for regulatory compliance":[],"CEO":[],"Application admin":[]},....
 ```
 
 > POST ./api/api.php/user/user
