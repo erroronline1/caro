@@ -544,7 +544,7 @@ class INSTALL {
 					'printError',
 					'printSuccess',
 					'printWarning'
-					])) echo '<a href="./_install.php/' . $methodName . '">' . $methodName . '</a><br />';
+					])) echo '<a href="./_install.php/' . $methodName . '">' . $methodName . '</a><br /><br />';
 			}
 			echo '<br /><a href="../index.html">exit</a>';
 		}

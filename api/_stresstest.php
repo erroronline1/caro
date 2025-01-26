@@ -62,7 +62,7 @@ class STRESSTEST extends INSTALL{
 					'importJSON',
 					'installDatabase',
 					'printError'
-					])) echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br />';
+					])) echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br /><br />';
 			}
 
 			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION';
