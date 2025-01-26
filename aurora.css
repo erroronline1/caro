@@ -21,7 +21,8 @@
 	--foreground: rgb(46, 52, 64);
 	--inputborder: #434c5e;
 	--disabled: rgb(92, 97, 109);
-	--article: rgb(236, 239, 244);
+	--article: rgba(236, 239, 244, 1);
+	--article_transparent: rgba(236, 239, 244, 0);
 	--3d-border: rgba(255, 255, 255, 0.3);
 	--lightshadow: rgba(255, 255, 255, 0.9);
 	--lightershadow: rgba(255, 255, 255, 0.5);

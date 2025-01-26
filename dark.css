@@ -21,8 +21,9 @@
 	--foreground: #e5e9f0;
 	--inputborder: #d8dee9;
 	--disabled: #acb1ba;
-	--article: #434c5e;
-	--3d-border: #4c566a;
+	--article: rgba(67, 76, 94, 1);
+	--article_transparent: rgba(67, 76, 94, 0);
+	--3d-border: rgba(67, 76, 94, 0);
 	--lightshadow: rgba(255, 255, 255, 0.1);
 	--lightershadow: rgba(255, 255, 255, 0.5);
 	--darkshadow: rgba(0, 0, 0, 0.4);

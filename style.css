@@ -628,7 +628,8 @@ select + label.input-label {
 	margin: 0 0 0 3.7em;
 	padding: 0 0.5em;
 	opacity: 1;
-	background-color: var(--article);
+	background: var(--article);
+	background: linear-gradient(0deg, var(--article_transparent) 0%, var(--article) 20%, var(--article) 80%, var(--article_transparent) 100%);
 }
 
 html[data-useragent*="safari"] body {
@@ -646,7 +647,8 @@ html[data-useragent*="safari"] body {
 	margin: 0 0 0 1.7em;
 	padding: 0 0.5em;
 	opacity: 1;
-	background-color: var(--article);
+	background: var(--article);
+	background: linear-gradient(0deg, var(--article_transparent) 0%, var(--article) 35%, var(--article) 65%, var(--article_transparent) 100%);
 
 	& + textarea {
 		margin-left: 1.75em;
