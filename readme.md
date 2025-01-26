@@ -534,7 +534,7 @@ Some elements are only processible as proper records.
 * signature and
 * calendarbutton
 
-are not processable for document-contexts within the languagefiles group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored.
+are not processable for document-contexts within the [languagefiles](#customisation) group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored.
 
 Screen document
 

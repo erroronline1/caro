@@ -155,7 +155,7 @@ Anwendungsunterstützung Legende:
 | ISO 14971 7.6 Vollständigkeit der Risikobeherrschung | ja | &bull; Das Audit-Modul zeigt Probleme in Bezug auf Risiken ohne definierte Eigenschaften und anders herum an. | [Audit](#audit) |
 | MPDG §83 Medizinprodukteberater | ja | &bull; Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt. | [Nutzer](#nutzer) |
 | SGB 5 §33 Zusätzliche Kosten | strukturell | &bull; *Aufzeichnung über Dokumente mit "Vorgangsdokumentation"-Kontext* | |
-| MDR Art. 14 Stichprobenprüfung | ja, strukturell | &bull; Eine Stichprobenprüfung ist implementiert. Ein entsprechendes Dokument muss erstellt werden, in Frage kommende Artikel geben sich bei Bestellung zu erkennen. | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Dokumente](#dokumente),[Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten) |
+| MDR Art. 14 Stichprobenprüfung | ja, strukturell | &bull; Eine Stichprobenprüfung ist implementiert. Ein entsprechendes Dokument muss erstellt werden, in Frage kommende Artikel geben sich bei Bestellung zu erkennen. | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Dokumente](#dokumente), [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten) |
 | MDR Art. 61 Klinische Bewertung | strukturell | &bull; *Aufzeichnung über Dokumente mit "Vorgangsdokumentation"-Kontext* | |
 | MDR Art. 83 Nachbeobachtung | strukturell | &bull; Die Überwachung nach dem Inverkehrbringen ist kein direkter Bestandteil der Anwendung. Die regulatorische Anforderung Patienten zur Hilfsmittelkontrolle einzubestellen ist nicht integriert, da eine konsequente Erfassung von Kontaktdaten die Arbeitsbelastung vergrößern würde und redundant wäre, da eine zusätzliche ERP-Software ohnehin erforderlich ist. Statt dessen können deren Datenexporte von Kundendaten genutzt und ein CSV-Filter mit individuellen Regeln erstellt werden um eine Liste passender Empfänger für Serienbriefe zu erhalten. Die Speicherung dieser Liste kann als Nachweis der Erfüllung der regulatorischen Anforderung genutzt werden. | [Werkzeuge](#werkzeuge), [CSV-Filter](#csv-prozessor) |
 | MDR Anhang 1 Grundlegende Sicherheits- und Leistungsanforderungen | strukturell | &bull; *Aufzeichnung über Dokumente mit "Vorgangsdokumentation"-Kontext* | |
@@ -243,7 +243,7 @@ graph TD;
 
     permission-..->manage_users((Nutzerverwaltung));
     manage_users-..->new_user[neuer Nutzer];
-    manage_users-.->edit_user[edit user];
+    manage_users-.->edit_user[Nutzer bearbeiten];
     new_user-.->user_settings["Namen, Berechtigungen,
     Bereiche, Profilbild, Bestellberechtigungs-PIN,
     Fähigkeiten, Schulungen, Anmelde-Token, Dokumente,
@@ -450,14 +450,13 @@ Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporte
 
 #### *Caveat:*
 Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
-Some elements are only processible as proper records.
 * Datei-,
 * Foto-Uploads,
 * Produktauswahlfelder,
 * Unterschriftenfelder und
 * Kalenderschaltflächen
 
-sind nicht verwertbar für Dokumenten-Kontexts innerhalb der Sprachdateigruppe documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert.
+sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert.
 
 Bildschirmformular
 
@@ -470,7 +469,7 @@ Exportiertes Dokument
 [Übersicht](#übersicht)
 
 ### Aufzeichnungen
-Aufzeichnungen speichern alle Eingaben für jedes gewählte Dokument. Manche Dokumenten-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Aufzeichnungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter. Ein weiterer Anwendungsfall sind Gebrauchsanleitungen, deren Inhalt für die Dokumentation gespeichert, aber auch jederzeit für die Anwender inclusive Erläuterungen exportiert werden kann.
+Aufzeichnungen speichern alle Eingaben für jedes gewählte Dokument. Manche Dokumenten-Kontexte erfordern einen Identifikator, der alle Aufzeichnungen zu einer Zusammenfassung zusammenstellt. Zusammenfassungen können exportiert werden. Vollständige Zusammenfassungen enthalten alle Aufzeichnungen in chronologischer Reihenfolge, vereinfachte Zusammenfassungen nur den jeweils neuesten Eintrag. In diesem Fall sind die Zusammenfassungen zwar unvollständig, für eine Weitergabe an dritte jedoch zugunsten einer vereinfachten Darstellung aufgeräumter. Ein weiterer Anwendungsfall sind Gebrauchsanleitungen, deren Inhalt für die Dokumentation gespeichert, aber auch jederzeit für die Anwender inclusive Erläuterungen exportiert werden kann.
 
 Eine vollständig papierlose Lösung könnte für feuchte Umgebungen ungeeignet sein. Daher können einzelne Dokumente ebenfalls exportiert werden um die Daten in Situationen bereithalten zu können, in denen elektronische Geräte Schaden nehmen könnten.
 
@@ -483,7 +482,7 @@ Bei der Anzeige von Zusammenfassungen erscheinen Empfehlungen für die Vervollst
 Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen. Dies betrifft auch Aufzeichnungen die Reklamationen beinhalten. Reklamationen müssen von allen [definierten Rollen](#laufzeitvariablen) abgeschlossen werden, auch wiederholt, sofern zusätzliche Daten zu den Aufzeichnungen hinzugefügt werden.
 An nicht abgeschlossene Aufzeichnungen wird regelmäßig in [definierten Abständen](#laufzeitvariablen) erinnert. Dies erfolgt über eine Nachricht an alle Nutzer der Bereiche des letzten eintragenden Nutzers.
 
-Versorgunsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie genehemigt, Fertigung beauftragt, etc.). Aufzeichnungen in der Übersicht können entsprechend gefiltert werden. Mitarbeiter, die den Status ändern, haben die Wahl andere Mitarbeiter, Versorgungsbereiche oder deren Bereichsleiter via Nachricht zu informieren.
+Versorgungsdokumentationen erlauben das Setzen des aktuellen Fallstatus (wie genehemigt, Fertigung beauftragt, etc.). Aufzeichnungen in der Übersicht können entsprechend gefiltert werden. Mitarbeiter, die den Status ändern, haben die Wahl andere Mitarbeiter, Versorgungsbereiche oder deren Bereichsleiter via Nachricht zu informieren.
 
 Ist eine Aufzeichnung versehentlich als Reklamation markiert worden, können definierte Rollen der Aufzeichnungstyp ändern. Diese Änderung wird ebenfalls dokumentiert.
 Aufzeichnungen können einen neuen Identifikator erhalten, z.B. bei Schreibfehlern oder einer versehentlichen doppelten Anlage. Im zweiten Fall werden die Aufzeichnungen mit bestehenden zusammengeführt sobald der neue Identifikator bereits genutzt wird. Diese Änderung sowie die Neuvergabe eines Identifikators werden ebenfalls dokumentiert.
@@ -560,7 +559,7 @@ Exportierte reduzierte Aufzeichnung
 [Übersicht](#übersicht)
 
 ### Risikomanagement
-Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org). Identifizierte Risiken die je Process beachtung finden können, sind in den [Sprachdateien definiert](#anpassung) (siehe auch [hier](#laufzeitvariablen)).
+Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org). Identifizierte Risiken die je Prozess beachtung finden können, sind in den [Sprachdateien definiert](#anpassung) (siehe auch [hier](#laufzeitvariablen)).
 
 Wie in der ISO 14971 gefordert können Eigenschaften von Medizinprodukten und dahingehend anwendbare Risiken beschrieben werden. Da die DGIHV erfreulicherweise die Definition von Eigenschaften und Risiken für Gruppen von Medizinprodukten (z.B. Prothesen und Orthesen im allgemeinen) als angemessen betrachtet, werden alle Bewertungen prozessweise zugeordnet. 
 Ferner werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [config.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt. Die Schwelle ist das Produkt aus Wahrscheinlichkeit x Schaden gemäß der jeweiligen Positionen in den Auflistungen der Sprachdateien für risk.probabilities und risk.damages. Diese Methode ist der praktischste Weg einer algorithmischen Verarbeitung und Hervorhebung des Akzeptanzbereichs.
@@ -976,13 +975,14 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * php.ini session.gc_maxlifetime gemäß [CONFIG[limits][idle_logout]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
+    * fileinfo
     * gd
     * gettext
     * mbstring
     * exif
     * pdo_odbc
     * zip
-    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv)
+    * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv sofern zutreffend)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
 
@@ -1011,9 +1011,9 @@ innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach d
 Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der config.ini. Diese Optionen werden in großen Teilen als kritisch für die Anwendungsstabilität und Einhaltung regulatorischer Anforderungen betrachtet und sind daher nicht für eine einfache Anpassung über die Nutzeroberfläche vorgesehen; statt dessen mit Bedacht und moderatem Aufwand.
 
 ### Umgebungseinstellungen
-Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklären diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnnung der config.ini-Datei betreffen immer auch die config.env-Datei.
+Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklären diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnung der config.ini-Datei betrifft immer auch die config.env-Datei.
 
-In den Umgebugseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen Umgebungsbezogen ergänzt werden. Nich alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden.
+In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen Umgebungsbezogen ergänzt werden. Nich alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden.
 
 ```
 ; general application settings
@@ -1205,7 +1205,7 @@ Tests:
 Anmerkungen:
 * Benachrichtigungen in Safari funktionieren vermutlich nur in der mobilen Variante wenn die Anwendung als PWA über die *Teilen*-Option zum Startbildschirm hinzugefügt wird.
 * Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
-* Da die WebGL-Implementierung Berichten zufolge einen Fehler aufzuweisen scheint ([1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)) funktioniert der STL-Betrachter nicht. [Funktion testen](https://get.webgl.org)
+* Da die WebGL-Implementierung Berichten zufolge einen Fehler aufzuweisen scheint ([1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)) funktioniert der STL-Betrachter möglicherweise nicht. [Funktion testen](https://get.webgl.org)
 * Disclaimer: es ist möglich dass einige Einschränkungen aufgrund eines selbst signierten Zertifikats der Entwicklungsumgebung für die SSL-Verbdinung auftreten. Einstellungen der Vertrauenswürdigkeit waren jedoch unter macOS auch nicht erfolgreich. Es können auch Einschränkungen aufgrund einer virtuellen Testumgebung auftreten.
 
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
@@ -1224,6 +1224,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
     * [risks] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen oder neu identifizierte Risiken zu reagieren)
 
 Im Falle einer Anpassung des Quelltexts:
+*  Die Anwendung ist für die Verwendung auf Apache2 mit MySQL/MariaDB und IIS mit SQL Server gestaltet und [getested](#voraussetzungen). Für andere Server/Datenbank-Konfigurationen müssen gegebenenfalls zusätzliche vorbereitete Datenbankabfragen und Zugangsbeschränkungen zum Dateispeicher (`UTILITY::createDirectory()`) eingepflegt werden.
 * der [CSV-Prozessor](#csv-prozessor) liefert ein assoziatives Array, daher muss eine nachgelagerte Verarbeitung der Daten selbst implementiert werden.
 * Änderungen der Datenbankstruktur während der Laufzeit ist bei Nutzung von SQL Server eine Herausforderung, da hier Änderungen an der Struktur verhindert werden (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Das Hinzufügen von Spalten an das Ende erscheint einfacher als zwischen vorhandene. Dynamisch hinzugefügte Spalten müssen nullbar sein, was zu beachten ist, sollen Null-Werte eine Bedeutung erhalten. Während der Entwicklung kann die Änderung von Tabellen [aktiviert werden, falls sie standardmäßig deaktiviert ist](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
