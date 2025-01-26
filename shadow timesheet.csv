@@ -199,7 +199,7 @@
 19.11.24:2;"documentation"
 20.11.24;2;"consumables-api, documentation"
 23.11.24;2;"documentation"
-24.11.24;1;"language handling"
+24.11.24;1;"language-handler"
 29.11.24;4;"api, record-api, documentation"
 30.11.24;9;"document-api, tool-api, documentation"
 01.12.24;1;"record-api"
@@ -239,3 +239,4 @@
 23.01.25;2;"file-api"
 24.01.25;8;"file-api, install routine, api, ui-assembler, texttemplates-api, consumables-api"
 25.01.25;11;"consumables-api, audit-api, documentation"
+26.01.25;1;"documentation, language"
