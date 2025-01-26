@@ -64,12 +64,13 @@ class AUDIT extends API {
 			case 'PUT':
 			case 'GET':
 				$result['render'] = ['content' => []];
-				$selecttypes = [];
+				$selecttypes = ['...' => []];
 				
 				foreach([
 					'mdrsamplecheck', // sample checks on products
 					'incorporation', // incorporated products
 					'documents', // documents and components
+					'documentusage', // document usage count
 					'userskills', // user skills and certificates
 					'skillfulfilment', // skill fulfilment
 					'userexperience', // experience points per user and year
@@ -95,7 +96,7 @@ class AUDIT extends API {
 					]
 				];
 
-				if ($this->_requestedType) {
+				if ($this->_requestedType && $this->_requestedType !== '...') {
 					if ($append = $this->{$this->_requestedType}()) array_push($result['render']['content'] , ...$append);
 				}
 				$this->response($result);
@@ -456,6 +457,76 @@ class AUDIT extends API {
 	}
 
 	/**
+	 *     _                           _                       
+	 *   _| |___ ___ _ _ _____ ___ ___| |_ _ _ ___ ___ ___ ___ 
+	 *  | . | . |  _| | |     | -_|   |  _| | |_ -| .'| . | -_|
+	 *  |___|___|___|___|_|_|_|___|_|_|_| |___|___|__,|_  |___|
+	 *                                                |___|
+	 * analyses records and displays a use count for selected document contexts
+	 */
+	private function documentusage(){
+		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$usedname = $usedid = [];
+
+		foreach ($records as $record){
+			$record['content'] = json_decode($record['content'], true);
+			foreach($record['content'] as $rc){
+				if (!isset($usedid[$rc['document']])) $usedid[$rc['document']] = 0;
+				$usedid[$rc['document']]++;
+			}
+		}
+
+		// accumulate usecount by name
+		$hidden = [];
+		foreach($documents as $row => $document){
+			if ($document['hidden']) $hidden[] = $document['name'];
+
+			// skip, and drop for performace reasons
+			if (!in_array($document['context'], array_keys($this->_lang->_DEFAULT['documentcontext']['identify'])) // inappropriate contexts
+				|| in_array($document['name'], $hidden) // hidden
+				|| !PERMISSION::fullyapproved('documentapproval', $document['approval']) // unapproved versions
+			){
+				unset($documents[$row]);
+				continue;
+			}
+
+			if (!isset($usedname[$document['name']])) $usedname[$document['name']] = 0;
+			if (isset($usedid[$document['id']])) $usedname[$document['name']] += $usedid[$document['id']];
+		}
+		array_multisort($usedname); // order by count asc
+		$documents = array_values($documents); // reassign keys if entries have been dropped
+
+		$content = [
+			[
+				'type' => 'textsection',
+				'content' => $this->_lang->GET('audit.documentusage_warning')
+			]
+		];
+		foreach($usedname as $name => $count){
+			$document = $documents[array_search($name, array_column($documents, 'name'))]; // since the document datalist is ordered by date desc the first match is suitable
+
+			if ($document['regulatory_context']) $document['regulatory_context'] = array_map(fn($c) => $this->_lang->_USER['regulatory'][$c], explode(',', $document['regulatory_context']));
+
+			$color = end($usedname) ? 200 * $count / end($usedname) : 0; // avoid division by zero
+			$content[] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $document['name'],
+					'style' => 'color:rgb(' . 200 - $color . ',' . $color . ',0)'
+				],
+				'linkedcontent' => $this->_lang->GET('audit.documentusage_info', [
+					':date' => $document['date'],
+					':regulatory' => implode(', ', $document['regulatory_context']),
+					':count' => $count,
+					':unit' => $this->_lang->_USER['units'][$document['unit']]
+					]) . "\n" . '<a href="javascript:api.record(\'get\', \'document\', \'' . $document['name'] . '\')">' . $this->_lang->GET('audit.documentusage_link'). '</a>'
+			];
+		}
+		return $content;
+	}
+
+	/**
 	 *   _                                 _   _
 	 *  |_|___ ___ ___ ___ ___ ___ ___ ___| |_|_|___ ___
 	 *  | |   |  _| . |  _| . | . |  _| .'|  _| | . |   |
@@ -643,7 +714,7 @@ class AUDIT extends API {
 				],
 				'content' => implode("\n\n", $checks)
 			];
-			
+
 			if(PERMISSION::permissionFor('auditsoperation')) $entries[] = [
 				'type' => 'button',
 				'attributes' => [
