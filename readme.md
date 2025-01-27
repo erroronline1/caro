@@ -113,6 +113,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * info how many unique products have been ordered from vendor based on  caro_consumables_products.last_order (vendor manager, vendor view, audit vendor list)
+* language.xx.env
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
