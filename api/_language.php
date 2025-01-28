@@ -34,12 +34,22 @@ class LANG {
 	 * initalize languagefiles 
 	 */
 	public function __construct(){
-		$file = file_get_contents('./language.' . CONFIG['application']['defaultlanguage'] . '.json');
+		$default = './language.' . CONFIG['application']['defaultlanguage'];
+
+		$file = file_get_contents($default . '.json');
 		$this->_DEFAULT = json_decode($file, true);
+		if (is_file($default . '.env') && $file = file_get_contents($default . '.env')){
+			if ($env = json_decode($file, true)) $this->_DEFAULT = self::override($this->_DEFAULT, $env);
+		}
 		
 		if (isset($_SESSION['user']) && isset($_SESSION['user']['app_settings']['language'])){
-			$language = $_SESSION['user']['app_settings']['language'];
-			if ($file = file_get_contents('./language.' . $language . '.json'))	$this->_USER = json_decode($file, true);
+			$user = './language.' . $_SESSION['user']['app_settings']['language'];
+			if ($file = file_get_contents($user . '.json'))	{
+				$this->_USER = json_decode($file, true);
+				if (is_file($user . '.env') && $file = file_get_contents($user . '.env')){
+					if ($env = json_decode($file, true)) $this->_USER = self::override($this->_USER, $env);
+				}		
+			}
 			else $this->_USER = $this->_DEFAULT;
 		}
 		else $this->_USER = $this->_DEFAULT;
@@ -104,5 +114,25 @@ class LANG {
 	public function PROPERTY($request, $replace = []){
 		return preg_replace('/[\s\.]/', '_', $this->GET($request, $replace));
 	}
+
+	/**
+	* recursively overwrite and append default parameters with environment settings
+	* @param array $lang starting with language.xx.json
+	* @param array $env starting with language.xx.env
+	*/
+	private static function override($lang, $env){
+	   foreach($env as $key => $value){
+		   if (gettype($value) === 'array'){
+			   if (!isset($lang[$key])) {
+				   $lang[$key] = [];
+			   }
+			   $lang[$key] = self::override($lang[$key], $env[$key]);
+		   }
+		   else {
+			   $lang[$key] = $env[$key];
+		   }
+	   }
+	   return $lang;
+   }
 }
 ?>

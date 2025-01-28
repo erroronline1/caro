@@ -113,7 +113,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * info how many unique products have been ordered from vendor based on  caro_consumables_products.last_order (vendor manager, vendor view, audit vendor list)
-* language.xx.env
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1064,12 +1063,12 @@ Technically the application is being usable on any webserver but this is **not r
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to templates/manual.XX.json-files.
-* [Customize](#customisation) your appropriate language-files (language.XX.json and templates/manual.XX.json)
+* [Customize](#customisation) your appropriate language-files (language.XX.env/.json and templates/manual.XX.json)
 * Select an installation password for the system user.
 
 *Optional*
 
-If you are comfortable enough with text editing JSON-files to modify the language file and template-manual you further can prepare
+If you are comfortable enough with text editing JSON-files to modify the language files and template-manual you further can prepare
 * documents.XX.json
 * vendors.XX.json
 * risks.XX.json
@@ -1083,7 +1082,7 @@ within the template directory too for a swift availability upon launch. Structur
 * Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
-Some variables can be edited during runtime. This applies for all *values* of language.XX.json files and some settings in config.ini. These options are mostly considered critical for the applications stability and regulatory compliance, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
+Some variables can be edited during runtime. This applies for all *values* of language.XX.env/.json files and some settings in config.ini. These options are mostly considered critical for the applications stability and regulatory compliance, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
 
 ### Environment settings
 You can add a **config.env**-file being a structural clone of config.ini. Settings within config.env will override config.ini settings. This way you can set up different environments, e.g several development environments and production. On development changes it is self explanatory to keep all files up to date manually. All mentions of the config.ini-file always refer to the config.env-file as well.
@@ -1297,6 +1296,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
     * [calendar][timesheet_signature]
     * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
     * [risks] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements or new identified risks)
+* It is recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one, [just like the option to add a config.env](#environment-settings). The json-files serve as a default fallback and are necessary to detect available languages.
 
 If you ever fiddle around with the sourcecode:
 * The application is designed and [tested](#prerequisites) to work with Apache2 with MySQL/MariaDB and IIS with SQL Server. For other server/database configurations additional prepared queries and access restrictions to the fileserver (`UTILITY::createDirectory()`) may have to be created.
@@ -2046,7 +2046,7 @@ Sample response
 
 > GET ./api/api.php/application/language
 
-Retrieves an object with language chunks, similar to language.XX.json, slightly reduced by properties definetively not used by frontend,  processed by ./js/language.js
+Retrieves an object with language chunks, similar to language.XX.json, slightly reduced by properties definetively not used by frontend, processed by ./js/language.js
 
 Parameters
 | Name | Data Type | Required | Description |

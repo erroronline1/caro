@@ -989,7 +989,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 ### Anwendungseinrichtung
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
 * Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in templates/manual.XX.json-Dateien.
-* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.json und templates/manual.XX.json)
+* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und templates/manual.XX.json)
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
 *Optional*
@@ -1000,7 +1000,7 @@ Sofern keine Berührungsängste bestehen JSON-Dateien wie die Sprachdateien oder
 * risks.XX.json
 * texttemplates.XX.json
 
-innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original templates](https://github.com/erroronline1/caro/tree/master/templates) entsprechen - für den Fall dass diese nicht zur Verfügung gestellt wurden. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
+innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original Templates](https://github.com/erroronline1/caro/tree/master/templates) entsprechen - für den Fall dass diese nicht zur Verfügung gestellt wurden. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
 
 ### Installation
 * Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*, Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind.
@@ -1222,6 +1222,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
     * [calendar][timesheet_signature]
     * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
     * [risks] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen oder neu identifizierte Risiken zu reagieren)
+* Es wird empfohlen language.XX.**env**-Dateien zu erstellen, die ausgewählten Schlüsseln andere oder zusätzliche Werte hinzufügen, ohne dabei möglicherweise erforderliche zu löschen, [so wie die Option eine config.env zu ergänzen](#umgebungseinstellungen). Die json-Dateien dienen als Standard-Rückgriff und sind für die Erkennung verfügbarer Sprachoptionen erforderlich.
 
 Im Falle einer Anpassung des Quelltexts:
 *  Die Anwendung ist für die Verwendung auf Apache2 mit MySQL/MariaDB und IIS mit SQL Server gestaltet und [getested](#voraussetzungen). Für andere Server/Datenbank-Konfigurationen müssen gegebenenfalls zusätzliche vorbereitete Datenbankabfragen und Zugangsbeschränkungen zum Dateispeicher (`UTILITY::createDirectory()`) eingepflegt werden.
