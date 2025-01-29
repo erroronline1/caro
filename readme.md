@@ -113,8 +113,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * info how many unique products have been ordered from vendor based on  caro_consumables_products.last_order (vendor manager, vendor view, audit vendor list)
-* filter documents and bundles by user unit, like records
-* audit questions with assignes regulatory issues
+* audit questions with assigned regulatory issues
 * audit schedule with calendar integration
 * audit report (records)
 
@@ -2758,28 +2757,15 @@ Returns content to create or modify documents. If path parameter is not int the 
 
 Sililar to component_editor.
 
-> GET ./api/api.php/document/documentfilter/{search}
+> GET ./api/api.php/document/documents/{filter}/{unit}
 
-Returns ids of available approved documents matching {search} by name or alias, or where the search string is found within the used components.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string |
-
-Sample response
-```
-{"response": {"data": ["26"]}}
-```
-
-> GET ./api/api.php/document/documents
-
-Returns available approved documents grouped by record type.
+Returns available approved documents grouped by context type and organizational units.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none |  |  |   |
+| {filter} | path parameter | optional | filter by identifier |
+| {unit} | path parameter | optional | filter by unit |
 
 Sample response
 ```

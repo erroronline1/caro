@@ -357,6 +357,8 @@
 			"error_forbidden_name": "The name :name is not allowed, please use another."
 		},
 		"render": {
+			"assign_hint_documents": "\"My units\" lists all documents for your assigned units including common.",
+			"assign_hint_bundles": "\"My units\" lists all document bundles for your assigned units",
 			"clear_signature": "Clear Signature",
 			"error_faulty_widget": "This element does not adhere to the allowed syntax:",
 			"error_no_approved_components": "It seems all contents of this document have been deactivated. Please inform any of :permission to clean things up!",
@@ -378,6 +380,7 @@
 			"files_choose": "choose files...",
 			"files_rechoose": "or rechoose files...",
 			"merge": "Import data",
+			"mine": "My units",
 			"photo_choose": "take a photo...",
 			"photo_rechoose": "or retake photo...",
 			"required_asterisk": "Fields with * are required",

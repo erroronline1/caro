@@ -357,6 +357,8 @@
 			"error_forbidden_name": "Der Name :name ist nicht zulässig, bitte verwende einen anderen."
 		},
 		"render": {
+			"assign_hint_documents": "\"Meine Bereiche\" listet alle Dokumente für deine zugeordneten Bereiche inklusive allgemeiner auf.",
+			"assign_hint_bundles": "\"Meine Bereiche\" listet alle Dokumentenpakete für deine zugeordneten Bereiche.",
 			"clear_signature": "Unterschrift löschen",
 			"error_faulty_widget": "Dieses Element entspricht nicht der erlaubten Syntax:",
 			"error_no_approved_components": "Es scheint als wären alle Inhalte für dieses Dokument deaktiviert worden. Bitte informiere einen von :permission hier aufzuräumen!",
@@ -378,6 +380,7 @@
 			"files_choose": "Dateien wählen...",
 			"files_rechoose": "oder noch einmal neu währen...",
 			"merge": "Daten importieren",
+			"mine": "Meine Bereiche",
 			"photo_choose": "Foto wählen...",
 			"photo_rechoose": "oder noch einmal ein neues Foto wählen...",
 			"required_asterisk": "Felder mit * sind erforderlich",

@@ -21,15 +21,17 @@
 require_once('./_pdf.php');
 
 class DOCUMENT extends API {
-   // processed parameters for readability
-   public $_requestedMethod = REQUEST[1];
-   private $_requestedID = null;
+	// processed parameters for readability
+	public $_requestedMethod = REQUEST[1];
+	private $_requestedID = null;
+	private $_unit = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
 	}
 
 	/**
@@ -556,12 +558,23 @@ class DOCUMENT extends API {
 	 * display all bundles as groups with their documents
 	 */
 	public function bundles(){
+		if ($this->_requestedID === 'null') $this->_requestedID = null;
+		$available_units = [];
+
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = $bundles = [];
 		foreach($bd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+			if (in_array($row['name'], $hidden)) continue;
+			$available_units[] = $row['unit'];
+
+			// filter by unit
+			if ($this->_unit && $this->_unit != $row['unit']) continue;
+			if (!$this->_unit && !in_array($row['unit'], $_SESSION['user']['units'])) continue;
+
+			// add to result
 			if ($this->_requestedID) similar_text($this->_requestedID, $row['name'], $percent); // filter by similarity if search is requested
-			if (!in_array($row['name'], $hidden) && (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity'])) {
+			if (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity']) {
 				if (($documents = $row['content'] ? explode(',', $row['content']) : false) !== false){
 					if (!isset($bundles[$row['name']])) $bundles[$row['name']] = [];
 					foreach ($documents as $key => $documentname){
@@ -572,18 +585,41 @@ class DOCUMENT extends API {
 				}
 			}
 		}
-		
+
+		// append selection of bundles per unit
+		$organizational_units = [];
+		$available_units = array_unique($available_units);
+		sort($available_units);
+		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'bundles', document.getElementById('_bundlefilter').value || 'null')"];
+		if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
+		foreach($available_units as $unit){
+			if (!$unit) {
+				continue;
+			}
+			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'bundles', document.getElementById('_bundlefilter').value || 'null', '" . $unit . "')"];
+			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
+		}
+
 		$return['render'] = ['content' => [
 			[
 				[
 					'type' => 'filtered',
 					'attributes' => [
+						'id' => '_bundlefilter',
 						'name' => $this->_lang->GET('assemble.compose.document_filter'),
 						'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value); return false;}",
 						'onblur' => "api.document('get', 'bundles', this.value); return false;",
 						'value' => $this->_requestedID ? : ''
 					],
 					'datalist' => array_keys($bundles)
+				],
+				[
+					'type' => 'radio',
+					'attributes' => [
+						'name' => $this->_lang->GET('order.organizational_unit')
+					],
+					'content' => $organizational_units,
+					'hint' => $this->_lang->GET('assemble.render.assign_hint_bundles')
 				]
 			]
 		]];
@@ -1831,24 +1867,7 @@ class DOCUMENT extends API {
 		if ($document['name']) $return['header'] = $document['name'];
 		$this->response($return);
 	}
-	
-	/**
-	 *     _                           _   ___ _ _ _           
-	 *   _| |___ ___ _ _ _____ ___ ___| |_|  _|_| | |_ ___ ___ 
-	 *  | . | . |  _| | |     | -_|   |  _|  _| | |  _| -_|  _|
-	 *  |___|___|___|___|_|_|_|___|_|_|_| |_| |_|_|_| |___|_|
-	 * 
-	 * filter by searched name, return ids
-	 */
-	public function documentfilter(){
-		require_once('_shared.php');
-		$search = new SHARED($this->_pdo);
-		$documents = $search->documentsearch(['search' => $this->_requestedID]);
-		$this->response([
-			'data' => $documents ? array_map(fn($v)=> strval($v), array_column($documents, 'id')) : null
-		]);
-	}
-	
+		
 	/**
 	 *     _                           _       
 	 *   _| |___ ___ _ _ _____ ___ ___| |_ ___ 
@@ -1858,38 +1877,76 @@ class DOCUMENT extends API {
 	 * display list of approved and available documents
 	 */
 	public function documents(){
-		$documentdatalist = $documents = [];
+		$documentdatalist = $displayeddocuments = [];
+		$available_units = ['common'];
 		$return = [];
 
-		// prepare existing documents lists
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-		$hidden = [];
-		foreach($fd as $key => $row) {
-			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
-			if ($row['hidden'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (!in_array($row['name'], $documentdatalist) && !in_array($row['name'], $hidden)) {
+		// get all documents or these fitting the search
+		require_once('_shared.php');
+		$search = new SHARED($this->_pdo);
+		$documents = $search->documentsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
+
+		// prepare existing documents lists grouped by context
+		foreach($documents as $row) {
+			if (in_array($row['context'],array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
+			if (!in_array($row['name'], $documentdatalist)) {
 				$documentdatalist[] = $row['name'];
-				$documents[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')", 'data-filtered' => $row['id']];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) $documentdatalist[] = $alias;
+				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) if ($alias) $documentdatalist[] = $alias;
+				$available_units[] = $row['unit'];
+
+				// filter by unit
+				if (($this->_unit && $this->_unit !== $row['unit'])) continue;
+				if (!$this->_unit && !in_array($row['unit'], $_SESSION['user']['units'])) continue;
+
+				// add to result
+				$displayeddocuments[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
 			}
 		}
+		sort($documentdatalist);
+
+		// append selection of documents per unit
+		$organizational_units = [];
+		$available_units = array_unique($available_units);
+		sort($available_units);
+		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'documents', document.getElementById('_documentfilter').value || 'null')"];
+		if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
+		foreach($available_units as $unit){
+			if (!$unit) {
+				continue;
+			}
+			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'documents', document.getElementById('_documentfilter').value || 'null', '" . $unit . "')"];
+			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
+		}
+				
 		$return['render'] = [
 			'content' => [
 				[
 					[
 						'type' => 'filtered',
 						'attributes' => [
+							'id' => '_documentfilter',
+							'value' => $this->_requestedID && $this->_requestedID !== 'null' ? $this->_requestedID : '',
 							'name' => $this->_lang->GET('assemble.compose.document_filter'),
-							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documentfilter', this.value); return false;}",
-							'onblur' => "api.document('get', 'documentfilter', this.value); return false;",
+							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documents', this.value); return false;}",
+							'onblur' => "api.document('get', 'documents', this.value); return false;"
 						],
 						'datalist' => array_values(array_unique($documentdatalist)),
 						'hint' => $this->_lang->GET('assemble.compose.document_filter_hint')
+					],
+					[
+						'type' => 'radio',
+						'attributes' => [
+							'name' => $this->_lang->GET('order.organizational_unit')
+						],
+						'content' => $organizational_units,
+						'hint' => $this->_lang->GET('assemble.render.assign_hint_documents')
 					]
 				]
-			]];
+			]
+		];
+
 		// sort by context for easier comprehension
-		foreach ($documents as $context => $list){
+		foreach ($displayeddocuments as $context => $list){
 			$contexttranslation = '';
 			foreach ($this->_lang->_USER['documentcontext'] as $documentcontext => $contexts){
 				if (isset($contexts[$context])){
