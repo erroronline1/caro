@@ -604,8 +604,9 @@ export const _client = {
 							name: api._lang.GET("order.commission"),
 							readonly: true,
 							class: "imagealigned",
+							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onpointerup: function () {
-								new Dialog({
+								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.commission"),
 									render: [
@@ -708,8 +709,9 @@ export const _client = {
 							name: api._lang.GET("order.ordernumber_label"),
 							readonly: true,
 							class: "imagealigned",
+							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onpointerup: function () {
-								new Dialog({
+								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.ordernumber_label"),
 									render: [
@@ -789,8 +791,9 @@ export const _client = {
 						attributes: {
 							value: api._lang.GET("order.add_information"),
 							type: "button",
+							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onpointerup: function () {
-								new Dialog({
+								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.add_information"),
 									render: [
@@ -899,11 +902,12 @@ export const _client = {
 					buttons = {};
 					buttons[api._lang.GET("order.add_information_cancel")] = false;
 					buttons[api._lang.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
+					// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 					states[api._lang.GET("order.order.partially_received")].onchange = function () {
 						api.purchase("put", "approved", "element.id", "partially_received", this.checked);
 						this.setAttribute("data-partially_received", this.checked.toString());
 						if (this.checked)
-							new Dialog({
+							new _client.Dialog({
 								type: "input",
 								header: api._lang.GET("order.add_information"),
 								render: [
@@ -930,8 +934,9 @@ export const _client = {
 					buttons[api._lang.GET("order.disapprove_message_ok")] = { value: true, class: "reducedCTA" };
 					states[api._lang.GET("order.disapprove")] = {
 						data_disapproved: "false",
+						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
-							new Dialog({
+							new _client.Dialog({
 								type: "input",
 								header: api._lang.GET("order.disapprove"),
 								render: [
@@ -963,8 +968,9 @@ export const _client = {
 					buttons[api._lang.GET("order.cancellation_message_ok")] = { value: true, class: "reducedCTA" };
 					states[api._lang.GET("order.cancellation")] = {
 						data_cancellation: "false",
+						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
-							new Dialog({
+							new _client.Dialog({
 								type: "input",
 								header: api._lang.GET("order.cancellation"),
 								render: [
@@ -996,8 +1002,9 @@ export const _client = {
 					buttons[api._lang.GET("order.return_message_ok")] = { value: true, class: "reducedCTA" };
 					states[api._lang.GET("order.return")] = {
 						data_return: "false",
+						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
-							new Dialog({
+							new _client.Dialog({
 								type: "input",
 								header: api._lang.GET("order.return"),
 								render: [
@@ -1036,9 +1043,10 @@ export const _client = {
 						numeration: 0,
 						attributes: {
 							name: api._lang.GET("order.orderstate_description"),
+							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onchange: function () {
 								if (this.value === "...") return false;
-								new Dialog({
+								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.orderstate_description") + " " + this.value,
 									render: [
@@ -1075,8 +1083,9 @@ export const _client = {
 						attributes: {
 							type: "button",
 							value: api._lang.GET("order.delete_prepared_order"),
+							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onpointerup: function () {
-								new Dialog({ type: "confirm", header: api._lang.GET("order.delete_prepared_order_confirm_header"), options: buttons }).then((confirmation) => {
+								new _client.Dialog({ type: "confirm", header: api._lang.GET("order.delete_prepared_order_confirm_header"), options: buttons }).then((confirmation) => {
 									if (confirmation) api.purchase("delete", "approved", "element.id");
 								});
 							}
