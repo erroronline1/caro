@@ -624,6 +624,7 @@ export class Assemble {
 				URL.revokeObjectURL(img.src);
 			}
 		}
+		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
 	}
 
 	/**
