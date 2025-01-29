@@ -21,20 +21,13 @@
 
 Array.prototype.contains = function (values) {
 	return _.contains(this, values);
-}; // to use intitive with arrays
+}; // to use intuitive with arrays
 String.prototype.contains = function (values) {
 	return _.contains(this, values);
-}; // to use intitive with string
-
+}; // to use intuitive with strings
 String.prototype._replaceArray = function (find, replace) {
-	var replaceString = this;
-	var regex;
-	for (var i = 0; i < find.length; i++) {
-		regex = new RegExp(find[i], "g");
-		replaceString = replaceString.replace(regex, replace[i]);
-	}
-	return replaceString;
-};
+	return _.replaceArray(this, find, replace);
+}; // to use intuitive with strings
 
 var httpResponse = {
 	100: "Continue",
@@ -90,6 +83,15 @@ const _ = {
 	contains: function (obj, values) {
 		// searches if at least one element of values (string or array) occurs in obj (string or array)
 		return Array.isArray(values) ? values.some((value) => obj.includes(value)) : obj.includes(values);
+	},
+	replaceArray : function (obj, find, replace) {
+		var replaceString = obj;
+		var regex;
+		for (var i = 0; i < find.length; i++) {
+			regex = new RegExp(find[i], "g");
+			replaceString = replaceString.replace(regex, replace[i]);
+		}
+		return replaceString;
 	},
 	api: async function (method, destination, payload, form_data = false) {
 		method = method.toUpperCase();
