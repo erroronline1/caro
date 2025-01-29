@@ -958,10 +958,10 @@ article[data-type],
 	padding: 1em 2em 1em 3.5em;
 }
 
-[data-type="links"] {
+/*[data-type="links"] {
 	max-height: 15em;
 	overflow: auto;
-}
+}*/
 
 [data-type="composer-form"] > [data-type="links"] {
 	/* otherwise composer displays faulty */
