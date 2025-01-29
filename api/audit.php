@@ -1002,7 +1002,14 @@ class AUDIT extends API {
 
 		$issues = $this->regulatory();
 		foreach($issues[1] as $item){
-			$summary['content'][$item['description']] = $item['content'];	
+			switch ($item['type']){
+				case 'links':
+					$summary['content'][$item['description']] = $item['content'];	
+					break;
+				case 'textsection':
+					$summary['content'][$item['attributes']['name']] = $item['content'];	
+					break;
+			}
 		}
 
 		$downloadfiles = [];
