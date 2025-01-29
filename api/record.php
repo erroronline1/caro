@@ -1257,11 +1257,6 @@ class RECORD extends API {
 		$search = new SHARED($this->_pdo);
 		$data = $search->recordsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
 
-		if (!$data) {
-			$result['render']['content'] = $this->noContentAvailable($this->_lang->GET('record.no_records'));
-			$this->response($result);
-		}
-
 		// prepare datalists, display values, available units to select and styling
 		$recorddatalist = $contexts = $available_units = [];
 		foreach($data as $contextkey => $context){
@@ -1273,6 +1268,10 @@ class RECORD extends API {
 				// append units of available records 
 				if ($record['units']) array_push($available_units, ...$record['units']);
 				else $available_units[] = null;
+
+				// filter by unit
+				if (!$this->_unit && !array_intersect($record['units'], $_SESSION['user']['units'])) continue;
+
 				// add to result
 				$linkdisplay = $this->_lang->GET('record.list_touched', [
 					':identifier' => $record['identifier'],
@@ -1329,32 +1328,35 @@ class RECORD extends API {
 						'value' => ($this->_requestedID && $this->_requestedID !== 'null') ? $this->_requestedID : ''
 					],
 					'datalist' => array_values(array_unique($recorddatalist))
-				]
-			],
-			[
-				'type' => 'radio',
-				'attributes' => [
-					'name' => $this->_lang->GET('order.organizational_unit')
 				],
-				'content' => $organizational_units,
-				'hint' => $this->_lang->GET('record.assign_hint')
+				[
+					'type' => 'radio',
+					'attributes' => [
+						'name' => $this->_lang->GET('order.organizational_unit')
+					],
+					'content' => $organizational_units,
+					'hint' => $this->_lang->GET('record.assign_hint')
+				]
 			]
 		];
 		// append records
-		foreach($contexts as $context => $links){
-			if ($links){
-				if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"]))
-					array_push($content, $casestate);
-				array_push($content, [
-					[
-						'type' => 'links',
-						'description' => $this->_lang->GET('documentcontext.' . $context),
-						'content' => $links
-					]
-				]);
+		if ($contexts){
+			foreach($contexts as $context => $links){
+				if ($links){
+					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"]))
+						array_push($content, $casestate);
+					array_push($content, [
+						[
+							'type' => 'links',
+							'description' => $this->_lang->GET('documentcontext.' . $context),
+							'content' => $links
+						]
+					]);
+				}
+				else array_push($content, $this->noContentAvailable($this->_lang->GET('record.no_records')));
 			}
-			else array_push($content, $this->noContentAvailable($this->_lang->GET('record.no_records')));
 		}
+		else array_push($content, ...$this->noContentAvailable($this->_lang->GET('record.no_records')));
 
 		$result['render']['content'] = $content;
 		$this->response($result);		
