@@ -122,11 +122,12 @@ class SHARED {
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
 				// match similarity
 				foreach ($terms as $term){
-					similar_text($parameter['search'], $term, $percent);
-					if (($percent >= CONFIG['likeliness']['file_search_similarity'])) {
-						$matches[] = $row;
-						break;
+					// limit search to similarity
+					if ($parameter['search']){
+						similar_text($parameter['search'], $term, $percent);
+						if ($percent < CONFIG['likeliness']['file_search_similarity']) continue;
 					}
+					$matches[] = $row;
 				}
 				if (in_array($row, $matches)) continue;
 
