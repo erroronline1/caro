@@ -113,6 +113,11 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * info how many unique products have been ordered from vendor based on  caro_consumables_products.last_order (vendor manager, vendor view, audit vendor list)
+* filter documents and bundles by user unit, like records
+* audit questions with assignes regulatory issues
+* audit schedule with calendar integration
+* audit report (records)
+
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1287,7 +1292,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
 ## Customisation
 * The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the templates/manual.XX.json for the selected default language prior to the installation process (see _language.md within api-directory).
 * Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to only change values. Customize all available language.XX.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-directory) you may occasionally append to but better not reduce
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to mainly change values. Customize all available language.XX.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-directory) you may occasionally append to but better not reduce
     * [permissions] (has no effect without consideration in role management within config.ini)
     * [units]
     * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
@@ -1296,7 +1301,24 @@ Albeit Safari being capable of displaying most of the content and contributing r
     * [calendar][timesheet_signature]
     * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
     * [risks] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements or new identified risks)
-* It is recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one, [just like the option to add a config.env](#environment-settings). The json-files serve as a default fallback and are necessary to detect available languages.
+
+It is highly recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one, [just like the option to add a config.env](#environment-settings). The json-files serve as a default fallback, are necessary to detect available languages and serve required values in case of future updates of the original repository.
+As an example you could override the default setting
+
+```json
+"company": {
+    "address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland"
+}
+```
+with just the entry
+```json
+{
+	"company": {
+		"address": "Actual Company Name, Actual Address"
+	}
+}
+```
+within the env-file and leave the remaining language chunks untouched to adapt to your actual environment.
 
 If you ever fiddle around with the sourcecode:
 * The application is designed and [tested](#prerequisites) to work with Apache2 with MySQL/MariaDB and IIS with SQL Server. For other server/database configurations additional prepared queries and access restrictions to the fileserver (`UTILITY::createDirectory()`) may have to be created.

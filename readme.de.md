@@ -1213,7 +1213,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 ## Anpassung
 * Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei templates/manual.XX.json entsprechend der gewünschten Standardsprache angepasst werden (siehe _language.md im api-Verzeichnis).
 * Manche Teile der config.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
-* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen nur die Werte angepasst werden. Alle Spachdateien (language.XX.json) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber (gemäß _language.md im api-Verzeichnis) teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
+* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen im Wesentlichen die Werte angepasst werden. Alle Spachdateien (language.XX.json) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber (gemäß _language.md im api-Verzeichnis) teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
     * [permissions] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in config.ini berücksichtigt)
     * [units]
     * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)
@@ -1222,7 +1222,24 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
     * [calendar][timesheet_signature]
     * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
     * [risks] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen oder neu identifizierte Risiken zu reagieren)
-* Es wird empfohlen language.XX.**env**-Dateien zu erstellen, die ausgewählten Schlüsseln andere oder zusätzliche Werte hinzufügen, ohne dabei möglicherweise erforderliche zu löschen, [so wie die Option eine config.env zu ergänzen](#umgebungseinstellungen). Die json-Dateien dienen als Standard-Rückgriff und sind für die Erkennung verfügbarer Sprachoptionen erforderlich.
+
+Es wird dringend empfohlen language.XX.**env**-Dateien zu erstellen, die ausgewählten Schlüsseln andere oder zusätzliche Werte hinzufügen, ohne dabei möglicherweise erforderliche zu löschen, [so wie die Option eine config.env zu ergänzen](#umgebungseinstellungen). Die JSON-Dateien dienen als Standard-Rückgriff, sind für die Erkennung verfügbarer Sprachoptionen erforderlich und erfüllen erforderliche Werte im Falle zukünftiger Aktualisierungen der Originalquelle.
+Es kann beispielsweise die Standardeinstellung
+
+```json
+"company": {
+    "address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland"
+}
+```
+nur mit dem Eintrag
+```json
+{
+	"company": {
+		"address": "Tatsächlicher Firmenname, Tatsächliche Adresse"
+	}
+}
+```
+innerhalb der ENV-Datei überschrieben werden um an die tatsächlichen Umgebungsbedingungen anzupassen, während die übrigen Sprachblöcke beibehalten werden.
 
 Im Falle einer Anpassung des Quelltexts:
 *  Die Anwendung ist für die Verwendung auf Apache2 mit MySQL/MariaDB und IIS mit SQL Server gestaltet und [getested](#voraussetzungen). Für andere Server/Datenbank-Konfigurationen müssen gegebenenfalls zusätzliche vorbereitete Datenbankabfragen und Zugangsbeschränkungen zum Dateispeicher (`UTILITY::createDirectory()`) eingepflegt werden.
