@@ -3,6 +3,7 @@
 
 ## Übersicht
 * [Ziele](#ziele)
+    * [Wesentliche Aspekte](#wesentliche-aspekte)
     * [Erforderliche Infrastruktur](#erforderliche-infrastruktur)
     * [Was es nicht ist](#was-es-nicht-ist)
     * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
@@ -50,6 +51,17 @@ Die aktuellste Dokumentation ist verfügbar auf [https://github.com/erroronline1
 Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 13485 und der internen Kommunikation unterstützen. Sie wird als Web-Anwendung auf einem Server verwendet. Datensicherheitsmaßnahmen sind auf die Nutzung innerhalb eines geschlossenen Netzwerks ausgelegt. Die Ausgestaltung ermöglicht es der Belegschaft Daten abzurufen und bereitzustellen wo andere Branchensoftware aufgrund ihrer Lizenzmodelle nur eingeschränkt verwendet werden kann.
 
 Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln anstelle von Sonderanfertigungen, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
+
+## Wesentliche Aspekte
+* Dokumentenverwaltung: volle Versionskontrolle, wiederverwendbare Komponenten, Zugriff auf frühere Versionen
+* einfache Formularerstellung: Formulare einfach zusammenstellen und nahtlose Integration in die Anwendung
+* Risikomanagment: mit Abgleich zwischen Risiken und Eigenschaften von Medizinprodukten
+* Schulungs- und Qualifikationsverwaltung: schnelle Übersicht mit Beurteilungserinnerung und hervorgehobenen Ablaufdaten
+* Aufgaben- und Abwesenheitsplaner: Arbeiten planen mit gleichzeitiger Übersicht über Abwesenheiten
+* strukturierte Beschaffung: reduzierte Rückfragen, automatisierte Erinnerungen, Einführungsaufzeichnungen und Stichprobenprüfung
+* Rollenverwaltung: definierte Nutzerberechtigungen und eine angemessene Informationsfülle
+* Auditunterstützung: Zusammenfassungen der Anwendungsdaten in aufgeräumten Übersichten
+* keine künstliche Intelligenz: volle Datenhoheit behalten
 
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de.png)
 

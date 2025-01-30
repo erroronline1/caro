@@ -3,6 +3,7 @@
 
 ## Content
 * [Aims](#aims)
+    * [Key aspects](#key-aspects)
     * [Necessary infrastructure](#necessary-infrastructure)
     * [What it is not](#what-it-is-not)
     * [Intended regulatory goals](#intended-regulatory-goals)
@@ -126,6 +127,17 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
 Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices instead of custom-made products, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
+
+## Key aspects
+* Document management: full version control, reusable components, with access to former versions
+* Easy form creation: simplified form assembly and seamless integration into the application
+* Risk management: with alignment check of risks and medical device characteristics
+* Trainings and skills management: quick overwiew with evaluation reminder and highlighted expiries
+* Task and absence schedules: plan tasks while having an overview on personnel ressources
+* Structured procurement: reduced inquiries, automated reminders, incorporation records and sample checks
+* Role management: defined user permissions and appropriate information load
+* Audit support: summarizing application data to tidy overviews
+* No artificial intelligence: you have absolute data authority
 
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard.png)
 
