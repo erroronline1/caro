@@ -116,7 +116,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit questions with assigned regulatory issues
 * audit schedule with calendar integration
 * audit report (records)
-
+* Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) as per [stakeholder requirements](#stakeholder-requirements)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1794,7 +1794,7 @@ Verification and Validation
 * Software Test Results
 * List of Known Anomalies: [Useage notes and caveats](#useage-notes-and-caveats)
 * Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), templates/manual.en.json / templates/manual.de.json
-* Usability Test Protocol
+* Usability Test Protocol: [Usability test](#usability-tests)
 * Usability Test Report: [Stakeholder requirements](#stakeholder-requirements)
 * Clinical Evaluation Report: **not applicable**
 * Risk Management Report: [Risk assessment](#risk-assessment)
@@ -1808,7 +1808,7 @@ Product Release
 
 ### Stakeholder requirements
 Stakeholder identification:
-* User (regular Employees)
+* User (regular employees)
 * CEO (Chief executive officer)
 * QMO (Quality management officer)
 * Supervisor
@@ -1851,14 +1851,20 @@ Stakeholder identification:
 | Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
 | Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | **Rejected**; 2024-12-26 |
+| Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
 * Current structure of order dump mostly identified (ERP OptaData eva 3/viva)
 * [unidentifiable null] [ERPorderRecordNumber int, orderDate Y-m-d H:i:s.0] [ERPvendorCode int, ERPstorageUnit int] [ERParticleNumber int, ERPitemDescription string] [deliveryDate Y-m-d H:i:s.0] [ERPcustomerNumber int] [orderAmount float] [deliveredAmount float] [openAmount float] [ERPunitCode int] [orderPrice float] [unidentifiable null] [ERPnoticeFlag int > 1, unidentifiable 0]
 * /^\[.+?\]\t\[(\d+),.(.*?)]\t\[(\d{1,}),.(\d{1,})\]\t\[(\d{1,}),.(.*?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?),.(.+?)\]/gms would be able to extract data from copy/pasting the dump
-* while adding the ERPvendorCode to the vendor database might be considered reasonable, it is likely unreliable to keep ERParticleNumbers and ERPunitCodes up to date, unreasonable to link the ERPcustomerNumber to a commissioned order, and most likely impossible to match the ordered article with the dump given a mostly messy data within the erp system and missing article numbers within the dump
+* while adding the ERPvendorCode to the vendor database might be considered reasonable, it is likely unreliable to keep ERParticleNumbers and ERPunitCodes up to date, unreasonable to link the ERPcustomerNumber to a commissioned order, and most likely impossible to match the ordered article with the dump given a mostly messy data within the ERP system and missing article numbers within the dump
 * requirement rejected as this **contradicts simplifying current processes and workloads** as of 2024-12-26
+
+#### Usability tests
+| Goals | Stakeholder | Time | Outcome |
+| ----- | ----------- | ---- | ------- |
+| Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025.01.30 | Current state looks suitable, field test will get more detailed results |
 
 [Content](#content)
 
