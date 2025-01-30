@@ -62,6 +62,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Rollenverwaltung: definierte Nutzerberechtigungen und eine angemessene Informationsfülle
 * Auditunterstützung: Zusammenfassungen der Anwendungsdaten in aufgeräumten Übersichten
 * keine künstliche Intelligenz: volle Datenhoheit behalten
+* Geräteunabhängig: Web-Anwendung mit jedem geeigneten Gerät nutzbar
 
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de.png)
 
@@ -1218,7 +1219,7 @@ Anmerkungen:
 * Benachrichtigungen in Safari funktionieren vermutlich nur in der mobilen Variante wenn die Anwendung als PWA über die *Teilen*-Option zum Startbildschirm hinzugefügt wird.
 * Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
 * Da die WebGL-Implementierung Berichten zufolge einen Fehler aufzuweisen scheint ([1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)) funktioniert der STL-Betrachter möglicherweise nicht. [Funktion testen](https://get.webgl.org)
-* Disclaimer: es ist möglich dass einige Einschränkungen aufgrund eines selbst signierten Zertifikats der Entwicklungsumgebung für die SSL-Verbdinung auftreten. Einstellungen der Vertrauenswürdigkeit waren jedoch unter macOS auch nicht erfolgreich. Es können auch Einschränkungen aufgrund einer virtuellen Testumgebung auftreten.
+* Disclaimer: es ist möglich dass einige Einschränkungen aufgrund eines selbst signierten Zertifikats der Entwicklungsumgebung für die SSL-Verbindung auftreten. Einstellungen der Vertrauenswürdigkeit waren jedoch unter macOS auch nicht erfolgreich. Es können auch Einschränkungen aufgrund einer virtuellen Testumgebung auftreten.
 
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
 

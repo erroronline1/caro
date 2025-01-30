@@ -118,6 +118,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit schedule with calendar integration
 * audit report (records)
 * Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) as per [stakeholder requirements](#stakeholder-requirements)
+* mermaid integration? https://www.jsdelivr.com/package/npm/mermaid?tab=files
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -138,6 +139,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Role management: defined user permissions and appropriate information load
 * Audit support: summarizing application data to tidy overviews
 * No artificial intelligence: you have absolute data authority
+* Device agnostic: web-application accessible by any suitable device
 
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard.png)
 
