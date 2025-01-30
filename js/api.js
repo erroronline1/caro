@@ -132,7 +132,8 @@ export const api = {
 				// erroronline1.js _.api returns something like *Error: server responded 401: Unauthorized*
 				// translate errorcode with languagefile translations
 				// no altering library
-				console.trace(error);
+				const date = new Date();
+				console.trace(request, date.toUTCString(), error);
 				const errorcode = error.message.match(/\d+/g);
 				if (api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
 
