@@ -101,8 +101,8 @@
 	{
 		"type": "characteristic",
 		"process": "Prothetik untere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -1542,8 +1542,8 @@
 	{
 		"type": "characteristic",
 		"process": "Prothetik untere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -1687,8 +1687,8 @@
 	{
 		"type": "characteristic",
 		"process": "Prothetik untere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -4205,8 +4205,8 @@
 	{
 		"type": "characteristic",
 		"process": "Prothetik obere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -5646,8 +5646,8 @@
 	{
 		"type": "characteristic",
 		"process": "Prothetik obere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -5791,8 +5791,8 @@
 	{
 		"type": "characteristic",
 		"process": "Prothetik obere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -7701,8 +7701,8 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik untere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -9142,7 +9142,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik untere Extremität",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -9287,7 +9287,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik untere Extremität",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -11245,8 +11245,8 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik obere Extremität",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -12686,7 +12686,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik obere Extremität",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -12831,7 +12831,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik obere Extremität",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -14549,8 +14549,8 @@
 	{
 		"type": "characteristic",
 		"process": "Einlagen",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -14903,7 +14903,7 @@
 		"process": "Einlagen",
 		"risk": "dgihv_5",
 		"relevance": 1,
-		"cause": "",
+		"cause": "Einlagen unterstützen eine insuffiziente Fußstabilität oder neurologische Abweichungen.",
 		"effect": null,
 		"probability": null,
 		"damage": null,
@@ -16903,8 +16903,8 @@
 	{
 		"type": "characteristic",
 		"process": "Einlagen",
-		"risk": "dgihv_5",
-		"relevance": 1,
+		"risk": "",
+		"relevance": 0,
 		"cause": "",
 		"effect": null,
 		"probability": null,
@@ -17357,8 +17357,8 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik Rumpf",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -18798,7 +18798,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik Rumpf",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -18943,7 +18943,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik Rumpf",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -19326,6 +19326,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process": "Orthetik Rumpf",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -19533,6 +19534,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process": "Orthetik Rumpf",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -20659,8 +20661,8 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik Kopf / Hals",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -22100,7 +22102,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik Kopf / Hals",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -22245,7 +22247,7 @@
 	{
 		"type": "characteristic",
 		"process": "Orthetik Kopf / Hals",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -22628,6 +22630,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process": "Orthetik Kopf / Hals",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -22835,6 +22838,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process": "Orthetik Kopf / Hals",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -23833,8 +23837,8 @@
 	{
 		"type": "characteristic",
 		"process": "Sitzschalen / Schaumstofflagerung",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -25274,7 +25278,7 @@
 	{
 		"type": "characteristic",
 		"process": "Sitzschalen / Schaumstofflagerung",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -25419,7 +25423,7 @@
 	{
 		"type": "characteristic",
 		"process": "Sitzschalen / Schaumstofflagerung",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -25802,6 +25806,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process" : "Sitzschalen / Schaumstofflagerung",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -26009,6 +26014,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process": "Sitzschalen / Schaumstofflagerung",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -26943,8 +26949,8 @@
 	{
 		"type": "characteristic",
 		"process": "Ohnhänderhilfen",
-		"risk": "",
-		"relevance": 0,
+		"risk": "dgihv_2",
+		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
 		"probability": null,
@@ -28384,7 +28390,7 @@
 	{
 		"type": "characteristic",
 		"process": "Ohnhänderhilfen",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -28529,7 +28535,7 @@
 	{
 		"type": "characteristic",
 		"process": "Ohnhänderhilfen",
-		"risk": "",
+		"risk": "dgihv_2",
 		"relevance": 1,
 		"cause": "Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.",
 		"effect": null,
@@ -28912,6 +28918,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process": "Ohnhänderhilfen",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -29119,6 +29126,7 @@
 	},
 	{
 		"type": "characteristic",
+		"process": "Ohnhänderhilfen",
 		"risk": "",
 		"relevance": 0,
 		"cause": "",
@@ -29474,6 +29482,7 @@
 	{
 		"type": "risk",
 		"process": "Ohnhänderhilfen",
+		"risk": "dgihv_2_13,dgihv_3_10",
 		"relevance": 1,
 		"cause": "Materialverschleiß, Materialzersetzung",
 		"effect": "Hautschädigung durch Materialermüdung, Bruch des Hilfsmittels, unzureichende mechanische Funktionalität",
