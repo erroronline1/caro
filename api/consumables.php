@@ -715,6 +715,7 @@ class CONSUMABLES extends API {
 					'article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null,
 					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
 					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
+					'article_info' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null,
 					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 					'protected' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
@@ -746,6 +747,7 @@ class CONSUMABLES extends API {
 						':article_alias' => $product['article_alias'],
 						':article_unit' => $product['article_unit'],
 						':article_ean' => $product['article_ean'],
+						':article_info' => $product['article_info'],
 						':hidden' => $product['hidden'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
@@ -779,6 +781,7 @@ class CONSUMABLES extends API {
 
 				// hand over payload to product properties
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null;
+				$product['article_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null;
 				if (!PERMISSION::permissionFor('productslimited')){
 					$product['vendor_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) !== $this->_lang->GET('consumables.product.vendor_select_default') ? UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor'));
 					$product['article_no'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : null;
@@ -883,6 +886,7 @@ class CONSUMABLES extends API {
 						':article_alias' => $product['article_alias'] ? : null,
 						':article_unit' => $product['article_unit'],
 						':article_ean' => $product['article_ean'],
+						':article_info' => $product['article_info'],
 						':hidden' => $product['hidden'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
@@ -925,13 +929,14 @@ class CONSUMABLES extends API {
 				if (!$product) $product = [
 					'id' => null,
 					'vendor_id' => '',
-					'vendor_name' => UTILITY::propertySet($this->_payload, 'vendor_name') ? : '',
+					'vendor_name' => UTILITY::propertySet($this->_payload, 'vendor_name') ? : '', // occasionally passed parameters from order to add product to database
 					'vendor_immutable_fileserver' => '',
 					'article_no' => UTILITY::propertySet($this->_payload, 'article_no') ? : '',
 					'article_name' => UTILITY::propertySet($this->_payload, 'article_name') ? : '',
 					'article_alias' => '',
 					'article_unit' => UTILITY::propertySet($this->_payload, 'article_unit') ? : '',
 					'article_ean' => '',
+					'article_info' => '',
 					'hidden' => null,
 					'protected' => null,
 					'trading_good' => null,
@@ -1055,7 +1060,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => $product['article_no'] . ' ' . $product['article_name']. ($product['article_alias'] ? ' (' . $product['article_alias'] . ') ' : ' ') . $product['article_unit']
 								],
-								'content' => $product['vendor_name']
+								'content' => $product['vendor_name'] . ($product['article_info'] ? "\n" . $this->_lang->GET('consumables.product.article_info') . ': ' . $product['article_info'] : '')
 							],
 							[
 								'type' => 'br'
@@ -1204,7 +1209,13 @@ class CONSUMABLES extends API {
 									'name' => $this->_lang->GET('consumables.product.article_ean'),
 									'value' => $product['article_ean'],
 								]
-							], 
+							], [
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.article_info'),
+									'value' => $product['article_info'] ? : '',
+								]
+							]
 						]
 					]];
 					// append form for authorized users
@@ -1225,10 +1236,13 @@ class CONSUMABLES extends API {
 						$result['render']['content'][2][3]['attributes']['readonly'] = // article name
 						$result['render']['content'][2][4]['attributes']['readonly'] = // article alias
 						$result['render']['content'][2][5]['attributes']['readonly'] = // order unit
+						$result['render']['content'][2][6]['attributes']['readonly'] = // article ean
+						$result['render']['content'][2][7]['attributes']['readonly'] = // article info
 						true; 
 					}
 					if (PERMISSION::permissionFor('productslimited')){
 						unset($result['render']['content'][2][4]['attributes']['readonly']); // article alias
+						unset($result['render']['content'][2][7]['attributes']['readonly']); // article info
 					}
 
 					// append toggles

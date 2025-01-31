@@ -85,6 +85,7 @@ define('DEFAULTSQL', [
 				"	`article_alias` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`article_unit` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`article_info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`protected` tinyint NULL DEFAULT NULL," .
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
@@ -314,6 +315,7 @@ define('DEFAULTSQL', [
 				"	article_alias varchar(255) NULL DEFAULT NULL," .
 				"	article_unit varchar(255) NULL DEFAULT NULL," .
 				"	article_ean varchar(255) NULL DEFAULT NULL," .
+				"	article_info varchar(MAX) NULL DEFAULT NULL," .
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
 				"	protected tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .

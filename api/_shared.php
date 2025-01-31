@@ -310,7 +310,7 @@ class SHARED {
 					$vendors = SQLQUERY::EXECUTE($this->_pdo, SQLQUERY::PREPARE('consumables_get_vendor_datalist'));
 					$parameter['vendors'] = implode('_', array_values(array_column($vendors, 'id')));
 				}
-				$search = SQLQUERY::EXECUTE($this->_pdo, $usecase === 'editconsumables' ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
+				$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['editconsumables', 'productinformation']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 					'values' => [
 						':search' => $parameter['search']
 					],
@@ -340,21 +340,8 @@ class SHARED {
 					$slide = intval(count($matches[$article]) - 1);
 					switch ($usecase){
 						case 'editconsumables': // consumables.php can make good use of this method!
-							$matches[$article][$slide][] = [
-								'type' => 'tile',
-								'attributes' => [
-									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
-								],
-								'content' => [
-									[
-										'type' => 'textsection',
-										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
-									]
-								]
-							];
-							break;
 						case 'productinformation': // consumables.php can make good use of this method!
-							$matches[$article][$slide][] = [
+								$matches[$article][$slide][] = [
 								'type' => 'tile',
 								'attributes' => [
 									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",

@@ -116,7 +116,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit questions with assigned regulatory issues
 * audit schedule with calendar integration
 * audit report (records)
-* Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) as per [stakeholder requirements](#stakeholder-requirements)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1866,7 +1865,7 @@ Stakeholder identification:
 | Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
 | Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | **Rejected**; 2024-12-26 |
-| Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30
+| Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30 | Implemented; 2025-01-31 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -1879,7 +1878,7 @@ Stakeholder identification:
 #### Usability tests
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
-| Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025.01.30 | Current state looks suitable, field test will get more detailed results |
+| Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
 
 [Content](#content)
 
