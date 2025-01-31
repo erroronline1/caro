@@ -546,7 +546,7 @@ class APPLICATION extends API {
 			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
 			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 		}
-		if (PERMISSION::permissionFor('audits')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.audit')] =['onpointerup' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('audits')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onpointerup' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onpointerup' => "api.document('get', 'approval')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
@@ -826,7 +826,8 @@ class APPLICATION extends API {
 		// sort events
 		foreach ($thisDaysEvents as $row){
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
-			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
+			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || 
+				array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
 			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
 		}
 		// display todays events
