@@ -434,11 +434,20 @@ class STRESSTEST extends INSTALL{
 					$dbuser['permissions'] === $user['permissions'] &&
 					$dbuser['units'] === $user['units']
 				){
-					$deletion = [
-						'mysql' => "DELETE FROM caro_user WHERE id = " . $dbuser['id'],
-						'sqlsrv' => "DELETE FROM caro_user WHERE id = " . $dbuser['id']
-					];
-					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']])){
+					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+						'replacements' => [
+							':ids' => $dbuser['id'] ? : 0
+						]
+					]);
+					if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
+						'values' => [
+							':id' => $dbuser['id']
+						]
+					]))	{
+						// delete training attachments (certificates)
+						foreach ($trainings as $row){
+							if ($row['file_path']) UTILITY::delete('.' . $row['file_path']);
+						}
 						// delete user image
 						if ($dbuser['image'] && $dbuser['id'] > 1) UTILITY::delete('../' . $dbuser['image']);
 						$matches++;
@@ -446,7 +455,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' users according to template file deleted. This only affects the user database and profile pictures, no trainings and files. You may head over directly to the database and file system and don\'t mess up production server!';
+		echo '[*] ' . $matches . ' users and their trainings according to template file deleted.';
 	}
 
 	/**
