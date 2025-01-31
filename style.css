@@ -732,6 +732,7 @@ input[type="range"] {
 
 input[type="range"],
 .rangedatalist {
+	width: calc(100% - 2.5rem);
 	margin-left: 2em;
 }
 
