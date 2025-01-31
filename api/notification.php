@@ -112,7 +112,7 @@ class NOTIFICATION extends API {
 					$subject = $this->_lang->GET('audit.userskills_notification_message', [
 						':user' => $users[$user]['name'],
 						':training' => $training['name'],
-						':module' => $this->_lang->GET('menu.tools.audit'),
+						':module' => $this->_lang->GET('menu.tools.regulatory', [], true),
 						':date' => $training['date']
 					], true);
 					$reminders = $calendar->search($subject);
