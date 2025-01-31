@@ -951,7 +951,7 @@ Ferner hoffentlich hilfreiche Informationen zu
     * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzwerkverbindung) (Cache, indexedDB) beim Beenden
     * Druckerzugang für alle Endgeräte
 * Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
-* Gelegentlich administrativer Zugang zum Server für [Anpassungen der Sprachdateien](#anpassung) während der Laufzeit
+* Gelegentlich FTP-Zugang zum Server für [Anpassungen der Sprachdateien](#anpassung) während der Laufzeit
 
 Getestete Serverumgebungen:
 * Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
@@ -1001,17 +1001,17 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
 
 ### Anwendungseinrichtung
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
-* Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in templates/manual.XX.json-Dateien.
-* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und templates/manual.XX.json)
+* Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in templates/manual.XX.env/.json-Dateien.
+* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und templates/manual.XX.env/.json)
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
 *Optional*
 
 Sofern keine Berührungsängste bestehen JSON-Dateien wie die Sprachdateien oder die Standardanleitung mit einem Text-Editor zu bearbeiten können auch 
-* documents.XX.json
-* vendors.XX.json
-* risks.XX.json
-* texttemplates.XX.json
+* documents.XX.env/.json
+* vendors.XX.env/.json
+* risks.XX.env/.json
+* texttemplates.XX.env/.json
 
 innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original Templates](https://github.com/erroronline1/caro/tree/master/templates) entsprechen - für den Fall dass diese nicht zur Verfügung gestellt wurden. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
 
@@ -1024,9 +1024,9 @@ innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach d
 Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft alle *Werte* der Sprachdateien und einige Einstellungen der config.ini. Diese Optionen werden in großen Teilen als kritisch für die Anwendungsstabilität und Einhaltung regulatorischer Anforderungen betrachtet und sind daher nicht für eine einfache Anpassung über die Nutzeroberfläche vorgesehen; statt dessen mit Bedacht und moderatem Aufwand.
 
 ### Umgebungseinstellungen
-Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklären diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnung der config.ini-Datei betrifft immer auch die config.env-Datei.
+Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklärend diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnung der config.ini-Datei betrifft immer auch die config.env-Datei.
 
-In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen Umgebungsbezogen ergänzt werden. Nich alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden.
+In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen umgebungsbezogen ergänzt werden. Nicht alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden (siehe auch [Anpassung](#anpassung)).
 
 ```
 ; general application settings
@@ -1224,20 +1224,8 @@ Anmerkungen:
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
 
 ## Anpassung
-* Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei templates/manual.XX.json entsprechend der gewünschten Standardsprache angepasst werden (siehe _language.md im api-Verzeichnis).
-* Manche Teile der config.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
-* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen im Wesentlichen die Werte angepasst werden. Alle Spachdateien (language.XX.json) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber (gemäß _language.md im api-Verzeichnis) teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
-    * [permissions] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in config.ini berücksichtigt)
-    * [units]
-    * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)
-    * [documentcontext][anonymous]
-    * [calendar][timesheet_pto]
-    * [calendar][timesheet_signature]
-    * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
-    * [risks] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen oder neu identifizierte Risiken zu reagieren)
-
-Es wird dringend empfohlen language.XX.**env**-Dateien zu erstellen, die ausgewählten Schlüsseln andere oder zusätzliche Werte hinzufügen, ohne dabei möglicherweise erforderliche zu löschen, [so wie die Option eine config.env zu ergänzen](#umgebungseinstellungen). Die JSON-Dateien dienen als Standard-Rückgriff, sind für die Erkennung verfügbarer Sprachoptionen erforderlich und erfüllen erforderliche Werte im Falle zukünftiger Aktualisierungen der Originalquelle.
-Es kann beispielsweise die Standardeinstellung
+Es gibt einige JSON-Dateien für die Spracheinstellungen (language.XX.json) und als Vorlagen für eine schnelle Installation. Jede JSON-Datei kann mit einer ENV-Datei erweitert werden und Standardwerte zu überschreiben oder weitere Einträge zu ergänzen. Es wird dringend empfohlen language.XX.**env**-Dateien zu erstellen, die ausgewählten Schlüsseln andere oder zusätzliche Werte hinzufügen, ohne dabei möglicherweise erforderliche zu löschen. Die JSON-Dateien dienen als Standard-Rückgriff, sind für die Erkennung verfügbarer Sprachoptionen erforderlich und erfüllen erforderliche Werte im Falle zukünftiger Aktualisierungen der Originalquelle.
+Es kann beispielsweise die Sprachen-Standardeinstellung
 
 ```json
 "company": {
@@ -1253,6 +1241,20 @@ nur mit dem Eintrag
 }
 ```
 innerhalb der ENV-Datei überschrieben werden um an die tatsächlichen Umgebungsbedingungen anzupassen, während die übrigen Sprachblöcke beibehalten werden.
+
+Das gleiche betrifft auch die config.ini-Datei sowie alle Vorlagen. Da die letztgenannten primär für die Installation genutzt werden, werden auch nur ENV-Dateien verarbeitet, vorausgesetzt die Struktur ist geeignet. ENV-Dateien **entfernen jedoch keine** Standard JSON-Werte. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden (siehe auch [Umgebungseinstellungen](#umgebungseinstellungen)).
+
+* Die Anleitung ist bewusst bearbeitbar um sie an das technische Verständnis der Nutzer anpassen zu können. Bei der Installation werden Standardeinträge eingefügt. Die Inhalte können vor der Installation in der Datei templates/manual.XX.env/.json entsprechend der gewünschten Standardsprache angepasst werden (siehe _language.md im api-Verzeichnis).
+* Manche Teile der config.ini können während der Laufzeit angepasst werden, andere werden das System destabilisieren. Entsprechende Bereiche sind gekennzeichnet.
+* Sprachdateien können an die Bedürfnisse angepasst werden. Dabei dürfen im Wesentlichen die Werte angepasst werden. Alle Spachdateien (language.XX.env/.json) müssen angepasst werden und die selben Schlüssel enthalten - oder können bei Nichtbenutzung gelöscht werden. Die Nutzereinstellungen listen alle verfügbaren Sprachdateien für eine individuelle Auswahl auf. Die meisten der Schlüssel sind fest einprogrammiert, es können aber (gemäß _language.md im api-Verzeichnis) teilweise Werte ergänzt (idealerweise aber nicht gekürzt) werden:
+    * [permissions] (bleibt ohne Effekt, wenn nicht innerhalb der Rollenverteilung in config.ini berücksichtigt)
+    * [units]
+    * [skills] (dürfen währen der Laufzeit angepasst werden, z.B. um die Qualifikationsmatrix anzupassen)
+    * [documentcontext][anonymous]
+    * [calendar][timesheet_pto]
+    * [calendar][timesheet_signature]
+    * [regulatory] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen zu reagieren)
+    * [risks] (dürfen während der Laufzeit angepasst werden, z.B um auf geänderte regulatorische Anforderungen oder neu identifizierte Risiken zu reagieren)
 
 Im Falle einer Anpassung des Quelltexts:
 *  Die Anwendung ist für die Verwendung auf Apache2 mit MySQL/MariaDB und IIS mit SQL Server gestaltet und [getested](#voraussetzungen). Für andere Server/Datenbank-Konfigurationen müssen gegebenenfalls zusätzliche vorbereitete Datenbankabfragen und Zugangsbeschränkungen zum Dateispeicher (`UTILITY::createDirectory()`) eingepflegt werden.

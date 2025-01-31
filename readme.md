@@ -111,6 +111,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * vendor templates
 * text recommendation templates
 * document templates
+* user templates, welcome message as boolean option, e.g. after initial insertion of key roles
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * info how many unique products have been ordered from vendor based on  caro_consumables_products.last_order (vendor manager, vendor view, audit vendor list)
@@ -118,7 +119,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit schedule with calendar integration
 * audit report (records)
 * Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) as per [stakeholder requirements](#stakeholder-requirements)
-* mermaid integration? https://www.jsdelivr.com/package/npm/mermaid?tab=files
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1030,7 +1030,7 @@ Furthermore hopefully beneficial information on
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
-* Occasionally adminstrative access to the server for updates of [language files](#customisation) during runtime.
+* Occasionally FTP-access to the server for updates of [language files](#customisation) during runtime.
 
 Tested server environments:
 * Apache [Uniform Server Zero XV](https://unidocumentserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
@@ -1080,17 +1080,17 @@ Technically the application is being usable on any webserver but this is **not r
 
 ### Application setup
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
-* Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to templates/manual.XX.json-files.
-* [Customize](#customisation) your appropriate language-files (language.XX.env/.json and templates/manual.XX.json)
+* Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to templates/manual.XX.env/.json-files.
+* [Customize](#customisation) your appropriate language-files (language.XX.env/.json and templates/manual.XX.env/.json)
 * Select an installation password for the system user.
 
 *Optional*
 
 If you are comfortable enough with text editing JSON-files to modify the language files and template-manual you further can prepare
-* documents.XX.json
-* vendors.XX.json
-* risks.XX.json
-* texttemplates.XX.json
+* documents.XX.env/.json
+* vendors.XX.env/.json
+* risks.XX.env/.json
+* texttemplates.XX.env/.json
 
 within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro/tree/master/templates) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
 
@@ -1105,7 +1105,7 @@ Some variables can be edited during runtime. This applies for all *values* of la
 ### Environment settings
 You can add a **config.env**-file being a structural clone of config.ini. Settings within config.env will override config.ini settings. This way you can set up different environments, e.g several development environments and production. On development changes it is self explanatory to keep all files up to date manually. All mentions of the config.ini-file always refer to the config.env-file as well.
 
-Using the config.env-file you can also append labels, forbidden names, hide_offduty_reasons, easter-related holidays and SQL-settings related to your environment. Not all settings have to be present, on missing parameters within the environment settings the default ini-settings will take place. By default env.files are ignored in version control; if you set the production-server as upstream you'll have to provide the file manually.
+Using the config.env-file you can also append labels, forbidden names, hide_offduty_reasons, easter-related holidays and SQL-settings related to your environment. Not all settings have to be present, on missing parameters within the environment settings the default ini-settings will take place. By default ENV-files are ignored in version control; if you set the production-server as upstream you'll have to provide the file manually (also see [Customization](#customisation)).
 
 ```
 ; general application settings
@@ -1303,20 +1303,8 @@ Notes:
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
 
 ## Customisation
-* The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the templates/manual.XX.json for the selected default language prior to the installation process (see _language.md within api-directory).
-* Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
-* Languagefiles can be edited to accomodate it to users comprehension. Make sure to mainly change values. Customize all available language.XX.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-directory) you may occasionally append to but better not reduce
-    * [permissions] (has no effect without consideration in role management within config.ini)
-    * [units]
-    * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
-    * [documentcontext][anonymous]
-    * [calendar][timesheet_pto]
-    * [calendar][timesheet_signature]
-    * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
-    * [risks] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements or new identified risks)
-
-It is highly recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one, [just like the option to add a config.env](#environment-settings). The json-files serve as a default fallback, are necessary to detect available languages and serve required values in case of future updates of the original repository.
-As an example you could override the default setting
+There are a few JSON-files, for language (language.XX.json) and as templates for swift installation. Every JSON-file can be extended with an ENV-file to override default settings or append entries. It is highly recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one. The JSON-files serve as a default fallback, are necessary to detect available languages and serve required values in case of future updates of the original repository.
+As an example you could override the default language setting
 
 ```json
 "company": {
@@ -1331,7 +1319,21 @@ with just the entry
 	}
 }
 ```
-within the env-file and leave the remaining language chunks untouched to adapt to your actual environment.
+within the ENV-file and leave the remaining language chunks untouched to adapt to your actual environment.
+
+The same applies to the config.ini-file and to all template files. As the latter are primarily for installation even an template ENV-File without a JSON-File will be processed, given the structure is suitable. However ENV-Files **do not delete** default JSON-settings. By default ENV-files are ignored in version control; if you set the production-server as upstream you'll have to provide the files manually (also see [Environment settings](#environment-settings)).
+
+* The manual is intentionally editable to accomodate it to users comprehension, but set up with default entries on installation. You can customize the templates/manual.XX.env/.json for the selected default language prior to the installation process (see _language.md within api-directory).
+* Some parts of the config.ini can be changed during runtime, others will mess up your system. Respective parts are marked.
+* Languagefiles can be edited to accomodate it to users comprehension. Make sure to mainly change values. Customize all available language.XX.env/.json-files or delete unused - user customization lists all available files automated. All used languagefiles must contain the same keys. Most of the keys are hardcoded so (according to _language.md within the api-directory) you may occasionally append to but better not reduce
+    * [permissions] (has no effect without consideration in role management within config.ini)
+    * [units]
+    * [skills] (can be edited during runtime, e.g. to enhance your skill matrix)
+    * [documentcontext][anonymous]
+    * [calendar][timesheet_pto]
+    * [calendar][timesheet_signature]
+    * [regulatory] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements)
+    * [risks] (can be edited during runtime, e.g. to accomodate to changing regulatory requirements or new identified risks)
 
 If you ever fiddle around with the sourcecode:
 * The application is designed and [tested](#prerequisites) to work with Apache2 with MySQL/MariaDB and IIS with SQL Server. For other server/database configurations additional prepared queries and access restrictions to the fileserver (`UTILITY::createDirectory()`) may have to be created.

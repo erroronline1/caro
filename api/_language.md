@@ -1,18 +1,18 @@
 # Important notices on customizing language files
 
-## templates/manual.XX.json
-templates/manual.XX.json stores default database entries that are made during installation, so these can as well be prepared in the set up default language. Crop, extend and change to your needs in advance to installation. This file is only used once at this procedure.
+## templates/manual.XX.env/.json
+templates/manual.XX.env/.json stores default database entries that are made during installation, so these can as well be prepared in the set up default language. Crop, extend and change to your needs in advance to installation. This file is only used once at this procedure.
 
-## language.XX.json
+## language.XX.env/.json
 
-language.XX.json store language chunks, tokens like :token are replaced by the language handlers (language.php and language.js).
+language.XX.env/.json store language chunks, tokens like :token are replaced by the language handlers (language.php and language.js).
 The structure MUST be the same across all language files! 
 Any key is used and therefore can affect function of the whole application. Try to avoid equal values within one context if possible.
 Values occasionally may be stored within databases.
 
 Some subsets are displayed in the given order, hence can be customized to your comprehensible needs. Respective keys are mentioned below.
 
-As stated in the readme it is recommended to keep the original json-file and customize copies named language.XX.**env**, where you can alter or append selected entries, without deleting a probably needed one.
+As stated in the readme it is recommended to keep the original JSON-file and customize copies named language.XX.**env**, where you can alter or append selected entries, without deleting a probably needed one.
 
 ### company
 Holds general company info, used on pdf exports.

@@ -276,7 +276,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all documents, components and bundles according to template file
 	 */
 	public function removeDocuments(){
-		$file = '../templates/documents.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/documents.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 
 		$DBall = [
@@ -315,7 +315,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all manual entries according to template file
 	 */
 	public function removeManual(){
-		$file = '../templates/manual.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/manual.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
@@ -341,7 +341,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all risk entries according to template file
 	 */
 	public function removeRisks(){
-		$file = '../templates/risks.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/risks.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
@@ -374,7 +374,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all text templates according to template file
 	 */
 	public function removeTexttemplates(){
-		$file = '../templates/texttemplates.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/texttemplates.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
@@ -407,7 +407,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all vendors according to template file
 	 */
 	public function removeVendors(){
-		$file = '../templates/vendors.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/vendors.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');

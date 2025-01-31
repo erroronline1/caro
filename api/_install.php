@@ -605,15 +605,33 @@ class INSTALL {
 	 * @param string $file filepath to template file
 	 * @return array parsed json
 	 */
-	public function importJSON($file){
-		if (($path = realpath($file)) === false) {
-			$this->printError($file . ' not found');
+	public function importJSON($filename){
+		$jsonpath = realpath($filename . '.json');
+		$envpath = realpath($filename . '.env');
+		if (!($jsonpath || $envpath)) {
+			$this->printError($filename . '.* not found');
 			die();
 		}
-		$json = file_get_contents($path);
-		if ($json = json_decode($json, true)) return $json;
-		$this->printError($file . ' is defective and could not be properly parsed.');
-		die();
+		$json = $env = [];
+		if ($jsonpath){
+			$json = file_get_contents($jsonpath);
+			$json = json_decode($json, true);
+			if (!$json)	{
+				$this->printError($filename . '.json is defective and could not be properly parsed.');
+				$json = [];
+			}
+		}
+		if ($envpath){
+			$env = file_get_contents($envpath);
+			$env = json_decode($env, true);
+			if (!$env) {
+				$this->printError($filename . '.env is defective and could not be properly parsed.');
+				$env = [];
+			}
+		}
+		if (!$json && !$env) die();
+		$data = array_unique([...$json, ...$env], SORT_REGULAR);
+		return $data;
 	}
 
 	/**
@@ -658,7 +676,7 @@ class INSTALL {
 	 * installs documents by novel name
 	 */
 	public function installDocuments(){
-		$file = '../templates/documents.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/documents.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 		// gather possibly existing entries
 		$DBall = [
@@ -745,7 +763,7 @@ class INSTALL {
 	 * installs manual entries by novel title
 	 */
 	public function installManual(){
-		$file = '../templates/manual.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/manual.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 		// gather possibly existing entries
 		$DBall = [
@@ -791,7 +809,7 @@ class INSTALL {
 	 * installs risks by novel process+risk+cause+measure
 	 */
 	public function installRisks(){
-		$file = '../templates/risks.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/risks.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 		// gather possibly existing entries
 		$DBall = [];
@@ -887,7 +905,7 @@ class INSTALL {
 	 * installs texttemplates by novel name
 	 */
 	public function installTexttemplates(){
-		$file = '../templates/texttemplates.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/texttemplates.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 		// gather possibly existing entries
 		$DBall = [
@@ -954,7 +972,7 @@ class INSTALL {
 	 * installs vendors by novel name
 	 */
 	public function installVendors(){
-		$file = '../templates/vendors.' . $this->_defaultLanguage . '.json';
+		$file = '../templates/vendors.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
 		// gather possibly existing entries
 		$DBall = [
