@@ -295,7 +295,7 @@ class RISK extends API {
 								'type' => 'select',
 								'attributes' => [
 									'name' => $process,
-									'onchange' => "api.risk('get', 'risk', this.value)"
+									'onchange' => "if (this.value !== '...') api.risk('get', 'risk', this.value)"
 								],
 								'content' => $dbrisks
 							];
