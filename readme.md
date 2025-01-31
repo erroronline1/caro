@@ -1090,6 +1090,7 @@ If you are comfortable enough with text editing JSON-files to modify the languag
 * vendors.XX.env/.json
 * risks.XX.env/.json
 * texttemplates.XX.env/.json
+* users.env/.json
 
 within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro/tree/master/templates) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
 

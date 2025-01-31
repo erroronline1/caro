@@ -1012,8 +1012,9 @@ Sofern keine Berührungsängste bestehen JSON-Dateien wie die Sprachdateien oder
 * vendors.XX.env/.json
 * risks.XX.env/.json
 * texttemplates.XX.env/.json
+* users.env/.json
 
-innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original Templates](https://github.com/erroronline1/caro/tree/master/templates) entsprechen - für den Fall dass diese nicht zur Verfügung gestellt wurden. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
+innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original Templates](https://github.com/erroronline1/caro/tree/master/templates) (für den Fall dass diese nicht zur Verfügung gestellt wurden) entsprechen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
 
 ### Installation
 * Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*, Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind.
