@@ -111,7 +111,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * vendor templates
 * text recommendation templates
 * document templates
-* user templates, welcome message as boolean option, e.g. after initial insertion of key roles
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * info how many unique products have been ordered from vendor based on  caro_consumables_products.last_order (vendor manager, vendor view, audit vendor list)
