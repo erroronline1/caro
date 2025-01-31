@@ -1,0 +1,11 @@
+[
+	{
+		"name": "",
+		"permissions": "",
+		"units": "",
+		"booleans": {
+			"orderauth": false,
+			"welcomemessage": false
+		}
+	}
+]

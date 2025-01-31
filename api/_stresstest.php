@@ -24,7 +24,7 @@ class STRESSTEST extends INSTALL{
 	 * identifying prefixes for creation and safe deletion, default values
 	 */
 	public $_prefix = 'UVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY';
-	public $_caleandarentries = 20000;
+	public $_calendarentries = 20000;
 	public $_recordentries = 20000;
 	public $_orderentries = 1000;
 	public $_autopermission = true;
@@ -51,21 +51,21 @@ class STRESSTEST extends INSTALL{
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
-			echo '<br />';
+			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION, USER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.';
+			echo '<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
 			foreach($methods as $methodName){
 				if (!in_array($methodName, [
 					'__construct',
 					'navigation',
+					'defaultPic',
 					'executeSQL',
 					'importJSON',
 					'installDatabase',
 					'printError'
 					])) echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br /><br />';
 			}
-
-			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION';
 			echo '<br /><br /><a href="../../index.html">exit</a>';
 		}
 	}
@@ -75,8 +75,8 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function createCalendarEvents(){
 		$this->_currentdate->modify('-12 month');
-		for ($i = 0; $i < $this->_caleandarentries; $i++){
-			if (!($i % intval($this->_caleandarentries/12/30))) $this->_currentdate->modify('+1 day');
+		for ($i = 0; $i < $this->_calendarentries; $i++){
+			if (!($i % intval($this->_calendarentries/12/30))) $this->_currentdate->modify('+1 day');
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 				'values' => [
 					':type' => 'schedule',
@@ -287,6 +287,10 @@ class STRESSTEST extends INSTALL{
 		$matches = 0;
 		foreach($DBall as $dbdocument){
 			foreach($json as $document){
+				//ensure proper formatting
+				$document['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $document['regulatory_context']));
+				$document['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $document['restricted_access']));
+
 				if (
 					isset($document['name']) &&
 					$dbdocument['name'] === $document['name'] &&
@@ -323,6 +327,9 @@ class STRESSTEST extends INSTALL{
 		$matches = 0;
 		foreach($DBall as $dbmanual){
 			foreach($json as $manual){
+				//ensure proper formatting
+				$manual['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $manual['permissions']));
+
 				if (
 					isset($manual['title']) &&
 					$dbmanual['title'] === $manual['title'] &&
@@ -349,6 +356,8 @@ class STRESSTEST extends INSTALL{
 		$matches = 0;
 		foreach($DBall as $dbrisk){
 			foreach($json as $risk){
+				//ensure proper formatting
+				$risk['risk'] = implode(',', preg_split('/[^\w\d]+/m', $risk['risk']));
 				if (
 					isset($risk['type']) &&
 					$dbrisk['type'] === $risk['type'] &&
@@ -406,6 +415,43 @@ class STRESSTEST extends INSTALL{
 	/**
 	 * deletes all vendors according to template file
 	 */
+	public function removeUsers(){
+		$file = '../templates/users';
+		$json = $this->importJSON($file);
+
+		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
+		$matches = 0;
+		foreach($DBall as $dbuser){
+			foreach($json as $user){
+				//ensure proper formatting
+				$user['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $user['permissions']));
+				$user['units'] = implode(',', preg_split('/[^\w\d]+/m', $user['units']));
+				
+				if (
+					isset($user['name']) &&
+					$dbuser['name'] === $user['name'] &&
+					$dbuser['permissions'] === $user['permissions'] &&
+					$dbuser['units'] === $user['units']
+				){
+					$deletion = [
+						'mysql' => "DELETE FROM caro_user WHERE id = " . $dbuser['id'],
+						'sqlsrv' => "DELETE FROM caro_user WHERE id = " . $dbuser['id']
+					];
+					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']])){
+						// delete user image
+						if ($dbuser['image'] && $dbuser['id'] > 1) UTILITY::delete('../' . $dbuser['image']);
+						$matches++;
+					}
+				}
+			}
+		}
+		echo '[*] ' . $matches . ' users according to template file deleted. This only affects the user database and profile pictures, no trainings and files. You may head over directly to the database and file system and don\'t mess up production server!';
+	}
+
+	/**
+	 * deletes all vendors according to template file
+	 */
 	public function removeVendors(){
 		$file = '../templates/vendors.' . $this->_defaultLanguage;
 		$json = $this->importJSON($file);
@@ -431,7 +477,6 @@ class STRESSTEST extends INSTALL{
 		}
 		echo '[*] ' . $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the immutable_fileserver directories, head over directly to the file system and don\'t mess up production server!';
 	}
-
 }
 
 $stresstest = new STRESSTEST();

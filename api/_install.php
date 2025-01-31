@@ -24,6 +24,7 @@ require_once('_config.php');
 @define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
 require_once('_sqlinterface.php');
 require_once('_utility.php');
+require_once('_language.php');
 
 define('DEFAULTSQL', [
 	'install_tables' => [
@@ -501,6 +502,11 @@ class INSTALL {
 	public $_currentdate;
 
 	/**
+	 * make languagemodel LANG class and its methods available
+	 */
+	public $_lang = [];
+
+	/**
 	 * current settings for install
 	 */
 	public $_defaultUser = CONFIG['system']['caroapp'];
@@ -517,6 +523,8 @@ class INSTALL {
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
 		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+
+		$this->_lang = new LANG();
 	}
 
 	/**
@@ -539,6 +547,7 @@ class INSTALL {
 				if (!in_array($methodName, [
 					'__construct',
 					'navigation',
+					'defaultPic',
 					'executeSQL',
 					'importJSON',
 					'printError',
@@ -548,6 +557,33 @@ class INSTALL {
 			}
 			echo '<br /><a href="../index.html">exit</a>';
 		}
+	}
+
+	/**
+	 * create a default user profile picture from initials
+	 * duplicate from user.php
+	 * @param string $name username
+	 * 
+	 * @return binary image data
+	 */
+	public function defaultPic($name){
+		$names = explode(' ', $name);
+		$initials = strtoupper(substr($names[0], 0, 1));
+		if (count($names) >1) $initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
+
+		$image = imagecreatetruecolor(256, 256);
+		$font_size = round(256 / 2);
+		$y = round(256 / 2 + $font_size / 2.4);
+		$x= round(256 / 2 - $font_size *.33 * strlen($initials));
+		$background_color = imagecolorallocate($image, 163, 190, 140); // nord green
+		imagefill($image, 0, 0, $background_color);
+		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
+		imagefttext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
+		ob_start();
+		imagepng($image);
+		$image = ob_get_contents();
+		ob_end_clean();
+		return $image;
 	}
 
 	/**
@@ -717,7 +753,6 @@ class INSTALL {
 				isset($entry['name']) && $entry['name'] &&
 				isset($entry['context']) && $entry['context'] &&
 				isset($entry['unit']) && $entry['unit'] &&
-				isset($entry['unit']) && $entry['unit'] &&
 				isset($entry['content']) && $entry['content']
 				)){
 				$this->printError('The following dataset is invalid and will be skipped:', $entry);
@@ -739,6 +774,10 @@ class INSTALL {
 						continue;
 					}
 				}
+
+				//ensure proper formatting
+				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context']));
+				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access']));
 
 				$names[] = $entry['name'];
 				$insertions[] = [
@@ -791,6 +830,9 @@ class INSTALL {
 					$this->printError('Multiple occurences of the title are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
+
+				//ensure proper formatting
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
 
 				$names[] = $entry['title'];
 				$insertions[] = [
@@ -874,6 +916,9 @@ class INSTALL {
 				}
 
 				if ($valid){
+					//ensure proper formatting
+					$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk']));
+
 					if (!in_array($entry['process'].$entry['risk'].$entry['cause'].$entry['measure'], $DBall))
 					$insertions[] = [
 						':type' => $entry['type'],
@@ -964,6 +1009,81 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
+			$this->printSuccess('novel entries by name ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
+	}
+
+	/**
+	 * installs vendors by novel name
+	 */
+	public function installUsers(){
+		$file = '../templates/users';
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
+		];
+
+		$insertions = $names = [];
+		foreach ($json as $entry){
+			// documents are only transferred if the name is not already taken
+			if (!(
+				isset($entry['name']) && $entry['name']
+				)){
+				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				continue;
+			}
+			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
+				if(UTILITY::forbiddenName($entry['name'])){
+					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					continue;
+				}
+				if (in_array($entry['name'], $names)) {
+					$this->printError('Multiple occurences of the name are not allowed. This item will be skipped:', $entry);
+					continue;
+				}
+
+				// property setting as in user.php->user()
+				$entry['orderauth'] = '';
+				if (isset($entry['booleans']['orderauth']) && $entry['booleans']['orderauth']){
+					foreach ($DBall as $row){
+						$orderauths[] = $row['orderauth'];
+					}
+					do {
+						$entry['orderauth'] = random_int(10000, max(99999, count($DBall)*100));
+					} while (in_array($entry['orderauth'], $orderauths));
+				}
+				$entry['token'] = hash('sha256', $entry['name'] . random_int(100000,999999) . time());
+
+				$tempPhoto = tmpfile();
+				fwrite($tempPhoto, $this->defaultPic($entry['name'])); 
+				$_FILES[$this->_lang->PROPERTY('user.take_photo')] = [
+					'name' => 'defaultpic.png',
+					'type' => 'image/png',
+					'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
+				];
+				$entry['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $entry['name']])[0];
+				UTILITY::alterImage($entry['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+				$entry['image'] = substr($entry['image'], 3);
+
+				//ensure proper formatting
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
+				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units']));
+
+				$names[] = $entry['name'];
+				$insertions[] = [
+					':name' => $entry['name'],
+					':permissions' => $entry['permissions'],
+					':units' => $entry['units'],
+					':token' => $entry['token'],
+					':orderauth' => $entry['orderauth'],
+					':image' => $entry['image'],
+					':app_settings' => '',
+					':skills' => ''
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('user_post'), $insertions)))
 			$this->printSuccess('novel entries by name ' . $file . ' have been installed.');
 		else $this->printWarning('there were no novelties to install from '. $file . '.');
 	}
