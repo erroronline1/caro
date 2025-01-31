@@ -1024,7 +1024,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
 		];
 
-		$insertions = $names = [];
+		$insertions = $names = $orderauths = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
 			if (!(
@@ -1052,6 +1052,7 @@ class INSTALL {
 					do {
 						$entry['orderauth'] = random_int(10000, max(99999, count($DBall)*100));
 					} while (in_array($entry['orderauth'], $orderauths));
+					$orderauths[] = $entry['orderauth'];
 				}
 				$entry['token'] = hash('sha256', $entry['name'] . random_int(100000,999999) . time());
 
