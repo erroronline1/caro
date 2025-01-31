@@ -249,7 +249,7 @@ class CONSUMABLES extends API {
 								])) {
 									$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 										$this->_lang->GET('order.sample_check.alert', [
-											':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit', [], true) . '</a>'
+											':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
 										], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 								}
 							}
@@ -561,7 +561,7 @@ class CONSUMABLES extends API {
 				])) {
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 						$this->_lang->GET('order.sample_check.alert', [
-							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.audit', [], true) . '</a>'
+							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
 						], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 					$this->response([
 					'response' => [

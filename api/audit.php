@@ -41,7 +41,7 @@ class AUDIT extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		if (!PERMISSION::permissionFor('audits')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('regulatory')) $this->response([], 401);
 
 		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_requestedDate = $this->_requestedID = $this->_requestedOption = isset(REQUEST[3]) ? REQUEST[3] : null;
@@ -91,7 +91,7 @@ class AUDIT extends API {
 						'content' => $selecttypes,
 						'attributes' => [
 							'name' => $this->_lang->GET('audit.checks_select_type'),
-							'onchange' => "api.audit('get', 'checks', this.value)"
+							'onchange' => "if (this.value !== '...') api.audit('get', 'checks', this.value)"
 						]
 					]
 				];
@@ -102,7 +102,7 @@ class AUDIT extends API {
 				$this->response($result);
 				break;
 			case 'DELETE':
-				if (!PERMISSION::permissionFor('auditsoperation')) $this->response([], 401);
+				if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
 				$permitted = [
 					'orderstatistics'
 				];
@@ -170,7 +170,7 @@ class AUDIT extends API {
 	 * calls export . $this->_requestedType method
 	 */
 	public function export(){
-		if (!PERMISSION::permissionFor('auditsoperation')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
 		$static = [
 			'mdrsamplecheck',
 			'incorporation',
@@ -394,7 +394,7 @@ class AUDIT extends API {
 		}
 
 		// add export button
-		if (PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -573,7 +573,7 @@ class AUDIT extends API {
 			]
 		];
 		// add export button
-		if (PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -681,7 +681,7 @@ class AUDIT extends API {
 			]
 		];
 		// add export button
-		if (PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -716,7 +716,7 @@ class AUDIT extends API {
 				'content' => implode("\n\n", $checks)
 			];
 
-			if(PERMISSION::permissionFor('auditsoperation')) $entries[] = [
+			if(PERMISSION::permissionFor('regulatoryoperation')) $entries[] = [
 				'type' => 'button',
 				'attributes' => [
 					'type' => 'button',
@@ -796,7 +796,7 @@ class AUDIT extends API {
 			]
 		];
 
-		if (count($orders) && PERMISSION::permissionFor('auditsoperation')){
+		if (count($orders) && PERMISSION::permissionFor('regulatoryoperation')){
 			// add export button
 			$content[] = [
 				[
@@ -956,7 +956,7 @@ class AUDIT extends API {
 		}
 
 		// add export button
-		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -1114,7 +1114,7 @@ class AUDIT extends API {
 		}
 
 		// add export button
-		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'date',
 				'attributes' => [
@@ -1446,7 +1446,7 @@ class AUDIT extends API {
 	 */
 	private function userexperience(){
 		// add export button
-		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -1593,7 +1593,7 @@ class AUDIT extends API {
 		}
 		$content = [];
 		// add export button
-		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -1853,7 +1853,7 @@ class AUDIT extends API {
 		];
 
 		// add export button
-		if(PERMISSION::permissionFor('auditsoperation')) $content[] = [
+		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [

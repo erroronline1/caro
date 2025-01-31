@@ -546,12 +546,12 @@ class APPLICATION extends API {
 			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
 			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 		}
-		if (PERMISSION::permissionFor('audits')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onpointerup' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onpointerup' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onpointerup' => "api.document('get', 'approval')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
 		if (PERMISSION::permissionFor('csvrules')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
-		if (PERMISSION::permissionFor('audits')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
 
 		// make sure info comes last so this is an exception
 		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onpointerup' => "api.application('get', 'info')"];

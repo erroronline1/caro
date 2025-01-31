@@ -464,7 +464,7 @@ export const api = {
 				}
 			},
 			title = {
-				checks: api._lang.GET("menu.tools.audit"),
+				checks: api._lang.GET("menu.tools.regulatory"),
 			};
 		switch (method) {
 			case "get":
