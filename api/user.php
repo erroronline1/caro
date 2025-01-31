@@ -917,7 +917,7 @@ class USER extends API {
 								'max' => count($this->_lang->_USER['skills']['_LEVEL']) - 1,
 								'value' => strval($userlevel),
 							],
-							'datalist' => array_search($skill, array_keys($skills)) < 2 ? $skilldatalistwithlabel : []
+							'datalist' => array_search($skill, array_keys($skills)) < 2 ? $skilldatalistwithlabel : null
 						];
 					}
 					$skillmatrix[] = [
