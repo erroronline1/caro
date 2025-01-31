@@ -193,7 +193,7 @@ class APPLICATION extends API {
 			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 			session_destroy();
 			session_write_close();
-			header("Location:../index.html");
+			header('Location:' . preg_split('/[\\/]/m', $_SERVER['PHP_SELF'])[1] . '/../index.html');
 			die();
 		}
 		// append login screen
