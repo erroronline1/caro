@@ -588,6 +588,7 @@
 			"incorporated_revoke": "Status widerrufen",
 			"incorporation_no_approvals": "Produkte mit laufenden Einführungsverfahren",
 			"information_products_available": ":available verfügbare Produkte in der Datenbank",
+			"information_products_ordered": "davon :ordered Produkte bestellt",
 			"information_vendor": "Lieferanten",
 			"may_affect_import_filter": "Diese Einstellungen betreffen möglicherweise auch den Importfilter der Preisliste. Bitte setze dich mit der dafür verantwortlichen Person in Verbindung.",
 			"not_deleted": ":name konnte nicht gelöscht werden",

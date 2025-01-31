@@ -1917,11 +1917,20 @@ class CONSUMABLES extends API {
 				}
 
 				// get all vendor products
-				if ($vendor['id']) $vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-					'values' => [
-						':ids' => intval($vendor['id'])
-					]
-				]);
+				$available = 0;
+				$ordered = 0;
+				if ($vendor['id']) {
+						$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+						'values' => [
+							':ids' => intval($vendor['id'])
+						]
+					]);
+					// count available products for this vendor
+					foreach($vendorproducts as $product){
+						if (!$product['hidden']) $available++;
+						if ($product['last_order']) $ordered++;
+					}
+				}
 
 				$hidden = null;
 				if ($vendor['hidden']) {
@@ -1952,16 +1961,14 @@ class CONSUMABLES extends API {
 							]
 						]]];
 					
+
 					// display selected vendor
 					if ($vendor['id']) {
 						// deactivate toggle inputs
 						$isactive['disabled'] = $isinactive['disabled'] = true;
 
-						// count available products for this vendor
-						$available = 0;
-						foreach($vendorproducts as $product){
-							if (!$product['hidden']) $available++;
-						}
+						unset($vendor['info']['purchase_info']);
+
 
 						// render information on vendor
 						$result['render']['content'][] = [
@@ -1972,7 +1979,8 @@ class CONSUMABLES extends API {
 								],
 								'content' => implode(" \n", array_filter(array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info']), Fn($value) => boolval($value))) .
 									(isset($vendor['certificate']['validity']) && $vendor['certificate']['validity'] ? " \n" . $this->_lang->GET('consumables.vendor.certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
-									" \n" . $this->_lang->GET('consumables.product.information_products_available', [':available' => $available])
+									" \n" . $this->_lang->GET('consumables.product.information_products_available', [':available' => $available]) .
+									" \n" . $this->_lang->GET('consumables.product.information_products_ordered', [':ordered' => $ordered])
 							],[
 								'type' => 'radio',
 								'attributes' => [
@@ -2099,7 +2107,10 @@ class CONSUMABLES extends API {
 										'value' => isset($vendor['info']['purchase_info']) ? $vendor['info']['purchase_info']: '',
 										'rows' => 8
 									],
-									'hint' => $this->_lang->GET('consumables.vendor.info_hint')
+								], [
+									'type' => 'textsection',
+									'content' => $this->_lang->GET('consumables.product.information_products_available', [':available' => $available]) .
+										" \n" . $this->_lang->GET('consumables.product.information_products_ordered', [':ordered' => $ordered])
 								], [
 									'type' => 'radio',
 									'attributes' => [

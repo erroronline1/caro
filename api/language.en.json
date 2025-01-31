@@ -588,6 +588,7 @@
 			"incorporated_revoke": "Revoke state",
 			"incorporation_no_approvals": "products with pending incorporations",
 			"information_products_available": ":available available products in database",
+			"information_products_ordered": "of which :ordered products ordered",
 			"information_vendor": "Vendors",
 			"may_affect_import_filter": "These settings may affect the vendors pricelist import filter. Get in touch with the responsible person on this topic.",
 			"not_deleted": "Product :name could not be deleted",
