@@ -728,8 +728,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills WHERE id = :id"
 		],
 		'user_get_datalist' => [
-			'mysql' => "SELECT id, name, orderauth, permissions, units, app_settings, skills FROM caro_user ORDER BY name ASC",
-			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, app_settings, skills FROM caro_user ORDER BY name ASC"
+			'mysql' => "SELECT id, name, orderauth, permissions, units, image, app_settings, skills FROM caro_user ORDER BY name ASC",
+			'sqlsrv' => "SELECT id, name, orderauth, permissions, units, image, app_settings, skills FROM caro_user ORDER BY name ASC"
 		],
 		'user_get' => [
 			'mysql' => "SELECT * FROM caro_user WHERE id IN (:id) OR name IN (:name)",
