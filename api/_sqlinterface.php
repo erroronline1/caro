@@ -160,16 +160,20 @@ class SQLQUERY {
 
 		
 		'audit_post' => [
-			'mysql' => "INSERT INTO caro_audit (id, template, unit, content, last_touch, last_user, closed, notified) VALUES (NULL, :template, :unit :content, CURRENT_TIMESTAMP, :author, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_audit (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit :content, CURRENT_TIMESTAMP, :author, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_audit (id, template, unit, content, last_touch, last_user, closed, notified) VALUES (NULL, :template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)",
+			'sqlsrv' => "INSERT INTO caro_audit (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)"
 		],
 		'audit_put' => [
-			'mysql' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :author, closed = :closed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :author, closed = :closed WHERE id = :id"
+			'mysql' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id"
 		],
 		'audit_get' => [
 			'mysql' => "SELECT * FROM caro_audit",
 			'sqlsrv' => "SELECT * FROM caro_audit"
+		],
+		'audit_get_by_id' => [
+			'mysql' => "SELECT * FROM caro_audit WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_audit WHERE id = :id"
 		],
 		'audit_delete' => [
 			'mysql' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NOT NULL",
@@ -188,6 +192,10 @@ class SQLQUERY {
 		'audit_get_templates' => [
 			'mysql' => "SELECT * FROM caro_audit_templates",
 			'sqlsrv' => "SELECT * FROM caro_audit_templates"
+		],
+		'audit_get_template' => [
+			'mysql' => "SELECT * FROM caro_audit_templates WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_audit_templates WHERE id = :id"
 		],
 		'audit_delete_template' => [
 			'mysql' => "DELETE FROM caro_audit_templates WHERE id = :id",
