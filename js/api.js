@@ -520,7 +520,6 @@ export const api = {
 					};
 				}
 				else payload = _.getInputs("[data-usecase=audit]", true);
-				console.log(payload);
 				break;
 			case "put":
 				if (4 in request && request[4] && typeof request[4] === "object") {
@@ -534,6 +533,12 @@ export const api = {
 							document.getElementById("main").replaceChildren(render.initializeSection());
 							render.processAfterInsertion();
 						}
+						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+					};
+				}
+				else if (request[1] === 'audittemplate'){
+					if (!(payload = compose_helper.composeNewAuditTemplate())) return;
+					successFn = function (data) {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
 				}
