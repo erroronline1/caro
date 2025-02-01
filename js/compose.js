@@ -58,6 +58,7 @@ export const compose_helper = {
 		}
 		return elements;
 	},
+	newAuditQuestions: {},
 	newDocumentComponents: {},
 	newDocumentElements: new Set(),
 	newTextElements: {},
@@ -66,11 +67,36 @@ export const compose_helper = {
 	getNextElementID: getNextElementID,
 
 	/**
+	 * append new audit question to view and newAuditQuestions. used by audit.php composer
+	 * @requires _client, Compose
+	 * @param {string} key referring _client.texttemplate.data
+	 * @event append question to view
+	 * @event add question structure to compose_helper.newAuditQuestions
+	 */
+	composeNewAuditQuestionCallback: function (question, regulatory, hint) {
+		const chunk = new Compose({
+			draggable: true,
+			allowSections: false,
+			content: [
+				[
+					{
+						type: "textsection",
+						content: api._lang.GET("audit.audit.question") + "\n" + question + "\n \n" + api._lang.GET("audit.audit.regulatory") + "\n" + regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + hint,
+					},
+				],
+			],
+		});
+		document.getElementById("main").append(...chunk.initializeSection());
+		chunk.processAfterInsertion();
+		compose_helper.newAuditQuestions[chunk.generatedElementIDs[0]] = { question: question, regulatory: regulatory, hint: hint };
+	},
+
+	/**
 	 * create widget from composer and append to view and newDocumentComponents
 	 * @requires Compose, api
 	 * @param {domNode} parent composer form for widget
 	 * @event append widget to view
-	 * @event add widget structure to this.newDocumentComponents
+	 * @event add widget structure to compose_helper.newDocumentComponents
 	 */
 	composeNewElementCallback: function (parent) {
 		let sibling = parent.childNodes[0].nextSibling,
@@ -298,6 +324,50 @@ export const compose_helper = {
 	},
 
 	/**
+	 * creates an audit template by comparing the contents of newAuditQuestions and the actual order from view (after reordering/dragging)
+	 * textcomponents not present in view will be skipped on compose_helper.newAuditQuestions
+	 * @requires api, Toast
+	 * @returns object|null
+	 * @event Toast on errors
+	 */
+	composeNewAuditTemplate: function () {
+		// set dragged/dropped order of elements
+		const unit = document.getElementById("TemplateUnit").value,
+			data = new FormData();
+
+		/**
+		 * recursively get dragged/dropped order of elements and add to array
+		 * @param {domNode} parent passed node to analyze contents
+		 * @return {array} array of ordered compose_helper.newAuditQuestions
+		 */
+		function nodechildren(parent) {
+			let content = [];
+			[...parent.childNodes].forEach((node) => {
+				if (node.draggable && node.children.item(1) && node.children.item(1).localName === "article") {
+					[...node.childNodes].forEach((element) => {
+						if (element.localName === "article") {
+							content.push(nodechildren(element));
+						}
+					});
+				} else {
+					if (node.id in compose_helper.newAuditQuestions) {
+						content.push(compose_helper.newAuditQuestions[node.id]);
+					}
+				}
+			});
+			return content;
+		}
+		const templateContent = nodechildren(document.querySelector("main"));
+		if (unit && templateContent.length) {
+			data.append("unit", unit);
+			data.append("content", JSON.stringify(templateContent));
+			return data;
+		}
+		new Toast(api._lang.GET("audit.audit.not_saved_missing"), "error");
+		return null;
+	},
+
+	/**
 	 * creates a full component by comparing the contents of newDocumentComponents and the actual order from view (after reordering/dragging)
 	 * widgets not present in view will be skipped on compose_helper.newDocumentComponents
 	 * @requires api, Toast
@@ -435,9 +505,37 @@ export const compose_helper = {
 			data.append("hidden", hidden);
 			return data;
 		}
-		new Toast(api._lang.GET("assemble.edit_template_not_saved_missing"), "error");
+		new Toast(api._lang.GET("texttemplate.template.not_saved_missing"), "error");
 		return null;
 	},
+
+	/**
+	 * appends audit questions to view and newAuditQuestions after being fetched by api.js
+	 * @requires Compose
+	 * @param {object} chunks Assemble syntax
+	 * @event append chunks
+	 * @event update compose_helper.newAuditQuestions
+	 */
+	importAuditTemplate: function (chunks) {
+		compose_helper.newTextElements = {};
+		let question = [];
+		for (const questions of chunks) {
+			question.push({
+				type: "textsection",
+				content: api._lang.GET("audit.audit.question") + "\n" + questions.question + "\n \n" + api._lang.GET("audit.audit.regulatory") + "\n" + questions.regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + questions.hint,
+			});
+		}
+		let chunk = new Compose({
+			draggable: true,
+			allowSections: false,
+			content: [structuredClone(question)],
+		});
+		document.getElementById("main").append(...chunk.initializeSection());
+		chunk.processAfterInsertion();
+		for (let i = 0; i < question.length; i++) {
+			compose_helper.newAuditQuestions[chunk.generatedElementIDs[i]] = question;
+		}
+},
 
 	/**
 	 * appends a component to view and newDocumentComponents after being fetched by api.js

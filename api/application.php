@@ -540,6 +540,10 @@ class APPLICATION extends API {
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_documents')] = ['onpointerup' => "api.document('get', 'document_editor')"];
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_bundles')] = ['onpointerup' => "api.document('get', 'bundle')"];
 		}
+		if (PERMISSION::permissionFor('audit')){
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit')] = ['onpointerup' => "api.audit('get', 'audit')"];
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit_templates')] = ['onpointerup' => "api.audit('get', 'audittemplate')"];
+		}
 		if (PERMISSION::permissionFor('filebundles')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
 		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onpointerup' => "api.user('get', 'user')"];
 		if (PERMISSION::permissionFor('texttemplates')) {

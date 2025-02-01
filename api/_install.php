@@ -28,7 +28,25 @@ require_once('_language.php');
 
 define('DEFAULTSQL', [
 	'install_tables' => [
-		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
+		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_audit` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				.
+				"CREATE TABLE IF NOT EXISTS `caro_audit_templates` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				.
+				"CREATE TABLE IF NOT EXISTS `caro_calendar` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`span_start` datetime NOT NULL," .
@@ -256,7 +274,25 @@ define('DEFAULTSQL', [
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
-		'sqlsrv' => "IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
+		'sqlsrv' => "IF OBJECT_ID(N'caro_audit', N'U') IS NULL " .
+				"CREATE TABLE caro_audit (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	content varchar(MAX) NOT NULL," .
+				"	unit varchar(255) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NULL DEFAULT NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_audit_templates', N'U') IS NULL " .
+				"CREATE TABLE caro_audit_templates (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	content varchar(MAX) NOT NULL," .
+				"	unit varchar(255) NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	author varchar(MAX) NULL DEFAULT NULL," .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
 				"CREATE TABLE caro_calendar (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	type varchar(255) NOT NULL," .

@@ -158,6 +158,35 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 
+		
+		'audit_post' => [
+			'mysql' => "INSERT INTO caro_audit (id, content, unit, date, author) VALUES (NULL, :content, :unit, CURRENT_TIMESTAMP, :author)",
+			'sqlsrv' => "INSERT INTO caro_audit (content, unit, date, author) VALUES (:content, :unit, CURRENT_TIMESTAMP, :author)"
+		],
+		'audit_get' => [
+			'mysql' => "SELECT * FROM caro_audit",
+			'sqlsrv' => "SELECT * FROM caro_audit"
+		],
+		
+		'audit_post_template' => [
+			'mysql' => "INSERT INTO caro_audit_templates (id, content, unit, date, author) VALUES (NULL, :content, :unit, CURRENT_TIMESTAMP, :author)",
+			'sqlsrv' => "INSERT INTO caro_audit_templates (content, unit, date, author) VALUES (:content, :unit, CURRENT_TIMESTAMP, :author)"
+		],
+		'audit_put_template' => [
+			'mysql' => "UPDATE caro_audit_templates SET content = :content, unit = :unit, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit_templates SET content = :content, unit = :unit, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id"
+		],
+		'audit_get_templates' => [
+			'mysql' => "SELECT * FROM caro_audit_templates",
+			'sqlsrv' => "SELECT * FROM caro_audit_templates"
+		],
+		'audit_delete_template' => [
+			'mysql' => "DELETE FROM caro_audit_templates WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_audit_templates WHERE id = :id"
+		],
+
+
+
 		'application_login' => [
 			'mysql' => "SELECT * FROM caro_user WHERE token = :token LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token = :token"

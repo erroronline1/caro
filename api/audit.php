@@ -49,12 +49,190 @@ class AUDIT extends API {
 	}
 
 	/**
+	 * 
+	 */
+	public function audit(){
+		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				break;
+			case 'GET':
+				break;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public function audittemplate(){
+		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$template = [
+					':content' => UTILITY::propertySet($this->_payload, 'content'),
+					':unit' => UTILITY::propertySet($this->_payload, 'unit'),
+					':author' => $_SESSION['user']['name'],
+				];
+				$template[':content'] = json_decode($template[':content'] ? : '', true);
+				if (!$template[':content'] || !$template[':unit']) $this->response([], 400);
+
+				// recursively sanitize unpredictable nested frontend input
+				function sanitizeQuestions($element, $result = []){
+					foreach($element as $sub){
+						if (array_is_list($sub)){
+							array_push($result, ...sanitizeQuestions($sub, $result));
+						} else {
+							$result[] = $sub;					
+						}
+					}
+					return $result;
+				}
+				$template[':content'] = json_encode(sanitizeQuestions($template[':content']));
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', [
+					'values' => $template
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.audit.template_saved'),
+						'id' => $this->_pdo->lastInsertId(),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.audit.not_saved'),
+						'id' => false,
+						'type' => 'error'
+					]]);
+
+
+				var_dump($template);
+				die();
+				break;
+			case 'PUT':
+				break;
+			case 'GET':
+				$datalist = $return = [];
+				$select = ['...NEW' => ['value' => false]];
+				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
+
+				if($this->_requestedID && $this->_requestedID !== 'false' && array_search($this->_requestedID, array_column($data, 'id')) === false) $return['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+
+				if (!$data || !$this->_requestedID || ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false){
+					$template = [
+						'id' => null,
+						'content' => '',
+						'unit' => '',
+						'author' => '',
+						'date' => null
+					];
+				}
+
+				// set up regulatory selection according to language file
+				$regulatory = [];
+				foreach($this->_lang->_USER['regulatory'] as $key => $translation){
+					$regulatory[$translation] = ['value' => $key];
+				}
+
+				// gather available units
+				$units = [];
+				foreach($this->_lang->_USER['units'] as $unit => $description){
+					$units[$description] = $unit === $template['unit'] ? ['checked' => true] : [];
+				}
+				
+				foreach($data as $row){
+					$select[$row['unit'] . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
+					
+					$row['content'] = json_decode($row['content'] ? : '', true);
+					foreach($row['content'] as $question){
+						$datalist[] = $question['question'];
+					}
+				}
+				// sanitize datalists
+				$datalist = array_filter($datalist, fn($v) => boolval($v));
+				ksort($datalist);
+				// for sanitation of template files:
+				//var_dump($data, array_values($values));
+
+				$result['render']['form'] = [
+					'data-usecase' => 'audittemplate',
+					'action' => "javascript:api.audit('" . ($template['id'] ? 'put' : 'post') . "', 'audittemplate', 'null', " . $template['id'] . ")"
+				];
+
+				$result['render']['content'][] = [
+					[
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.new'),
+							'onchange' => "api.audit('get', 'audittemplate', 'null', this.value)"
+						],
+						'content' => $select
+					]
+				];
+				$result['render']['content'][] = [
+					[
+						'type' => 'textsection',
+						'content' => $template['author'] ? $this->_lang->GET('risk.author', [':author' => $template['author'], ':date' => $template['date']]) : null
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.units'),
+							'id' => 'TemplateUnit'
+						],
+						'content' => $units
+					], [
+						'type' => 'textarea',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.question'),
+							'id' => '_question',
+							'rows' => 4,
+						],
+						'autocomplete' => array_values($datalist) ? : null
+					], [
+						'type' => 'checkbox2text',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.regulatory'),
+							'id' => '_regulatory'
+						],
+						'content' => $regulatory
+					], [
+						'type' => 'textarea',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.hint'),
+							'id' => '_hint',
+							'rows' => 4,
+						],
+						'autocomplete' => array_values($datalist) ? : null
+					], [
+						'type' => 'button',
+						'attributes' => [
+							'type' => 'button',
+							'value' => $this->_lang->GET('audit.audit.add'),
+							'onpointerup' => "compose_helper.composeNewAuditQuestionCallback(document.getElementById('_question').value, document.getElementById('_regulatory').value, document.getElementById('_hint').value);"
+						]
+					]
+				];
+				$result['render']['content'][] = [
+					[
+						'type' => 'trash',
+						'description' => $this->_lang->GET('assemble.compose.edit_trash')
+					]
+				];
+				$result['selected'] = json_decode($template['content'] ? : '', true);
+				break;
+			case 'DELETE':
+				break;
+		}
+		$this->response($result);
+
+	}
+
+	/**
 	 *       _           _
 	 *   ___| |_ ___ ___| |_ ___
 	 *  |  _|   | -_|  _| '_|_ -|
 	 *  |___|_|_|___|___|_,_|___|
 	 *
-	 * main entry point for module
+	 * main entry point for regulatory evaluations and summaries
 	 * displays a selection of available options
 	 * calls $this->_requestedType method if set
 	 */

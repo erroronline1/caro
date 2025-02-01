@@ -392,6 +392,16 @@
 		}
 	},
 	"audit": {
+		"audit": {
+			"add": "Frage hinzufügen",
+			"hint": "Hinweis",
+			"new": "Neue Vorlage",
+			"not_saved": "Vorlage konnte nicht gespeichert werden.",
+			"not_saved_missing": "Die Vorlage konnte nicht gespeichert werden, bitte gib einen Bereich und einen Inhalt an!",
+			"regulatory": "Regulatorischer Zusammenhang",
+			"template_saved": "Vorlage gespeichert",
+			"question": "Frage"
+		},
 		"check_description": ":check am :date von :author",
 		"checks_select_type": "Wähle den Datentyp aus",
 		"checks_type": {
@@ -771,6 +781,8 @@
 			"vendor": "Lieferanten"
 		},
 		"records": {
+			"audit": "Audit",
+			"audit_templates": "Auditvorlagen verwalten",
 			"documents_manage_approval": "Dokumente freigeben",
 			"documents_manage_bundles": "Dokumentenpakete verwalten",
 			"documents_manage_components": "Komponenten verwalten",
@@ -783,7 +795,6 @@
 			"risk_management": "Risikomanagement"
 		},
 		"tools": {
-			"audit": "Audit",
 			"calculator": "Rechner",
 			"csvfilter_filter": "CSV-Filter",
 			"csvfilter_filter_manager": "CSV-Filter verwalten",

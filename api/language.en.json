@@ -392,6 +392,16 @@
 		}
 	},
 	"audit": {
+		"audit": {
+			"add": "Add question",
+			"hint": "Hint",
+			"new": "New template",
+			"not_saved": "Template could not be saved.",
+			"not_saved_missing": "Template could not been saved, please provide a unit and content!",
+			"regulatory": "Regulatory issues",
+			"template_saved": "Template saved",
+			"question": "Question"
+		},
 		"check_description": ":check on :date by :author",
 		"checks_select_type": "Select type of data",
 		"checks_type": {
@@ -771,6 +781,8 @@
 			"vendor": "Vendors"
 		},
 		"records": {
+			"audit": "Audit",
+			"audit_templates": "Manage audittemplates",
 			"documents_manage_approval": "Approve document",
 			"documents_manage_bundles": "Manage document bundles",
 			"documents_manage_components": "Manage components",
@@ -783,7 +795,6 @@
 			"risk_management": "Risk management"
 		},
 		"tools": {
-			"audit": "Audit",
 			"calculator": "Calculator",
 			"csvfilter_filter": "CSV filter",
 			"csvfilter_filter_manager": "Manage CSV filter",

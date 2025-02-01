@@ -464,11 +464,25 @@ export const api = {
 				}
 			},
 			title = {
+				audit: api._lang.GET("menu.records.audit"),
+				audittemplate: api._lang.GET("menu.records.audit_templates"),
 				checks: api._lang.GET("menu.tools.regulatory"),
 			};
 		switch (method) {
 			case "get":
 				switch (request[1]) {
+					case "audittemplate":
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]]);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.selected && data.selected.length) compose_helper.importAuditTemplate(data.selected);
+						}
+						break;
 					case "export":
 						break;
 					default:
@@ -497,7 +511,16 @@ export const api = {
 						}
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
-				} else payload = _.getInputs("[data-usecase=audit]", true);
+				}
+				else if (request[1] === 'audittemplate'){
+					if (!(payload = compose_helper.composeNewAuditTemplate())) return;
+					successFn = function (data) {
+						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						if (data.id) api.audit('get','audittemplate', null, data.id);
+					};
+				}
+				else payload = _.getInputs("[data-usecase=audit]", true);
+				console.log(payload);
 				break;
 			case "put":
 				if (4 in request && request[4] && typeof request[4] === "object") {
