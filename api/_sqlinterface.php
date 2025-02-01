@@ -169,12 +169,12 @@ class SQLQUERY {
 		],
 		
 		'audit_post_template' => [
-			'mysql' => "INSERT INTO caro_audit_templates (id, content, unit, date, author) VALUES (NULL, :content, :unit, CURRENT_TIMESTAMP, :author)",
-			'sqlsrv' => "INSERT INTO caro_audit_templates (content, unit, date, author) VALUES (:content, :unit, CURRENT_TIMESTAMP, :author)"
+			'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives,unit, date, author) VALUES (NULL, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author)",
+			'sqlsrv' => "INSERT INTO caro_audit_templates (content, objectives, unit, date, author) VALUES (:content, :unit, :objectives, CURRENT_TIMESTAMP, :author)"
 		],
 		'audit_put_template' => [
-			'mysql' => "UPDATE caro_audit_templates SET content = :content, unit = :unit, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_audit_templates SET content = :content, unit = :unit, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id"
+			'mysql' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id"
 		],
 		'audit_get_templates' => [
 			'mysql' => "SELECT * FROM caro_audit_templates",

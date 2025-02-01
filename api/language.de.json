@@ -388,7 +388,7 @@
 			"scan_button": "Einen Code scannen",
 			"scan_multiple": "Nach dem Scan oder einer Eingabe erscheint ein weiteres Feld.",
 			"select_multiple": "Nach der Auswahl erscheint eine weitere Liste.",
-			"textarea_autocomplete": "Drücke die Alt- oder AltGr-Taste um durch die Optionen zu schalten."
+			"textarea_autocomplete": "Drücke die Alt- oder AltGr-Taste um durch die verfügbaren Optionen zu schalten."
 		}
 	},
 	"audit": {
@@ -398,12 +398,13 @@
 			"delete_confirm_cancel": "Nein danke!",
 			"delete_confirm_header": "Vorlage für :unit dauerhaft löschen?",
 			"delete_confirm_ok": "Ja, Vorlage löschen",
-			"delete_success":"Die Vorlage wurde gelöscht",
-			"edit":"Bearbeiten",
+			"delete_success": "Die Vorlage wurde gelöscht",
+			"edit": "Bearbeiten",
 			"hint": "Hinweis",
 			"new": "Neue Vorlage",
 			"not_saved": "Vorlage konnte nicht gespeichert werden.",
 			"not_saved_missing": "Die Vorlage konnte nicht gespeichert werden, bitte gib einen Bereich und einen Inhalt an!",
+			"objectives": "Auditprogrammziele",
 			"regulatory": "Regulatorischer Zusammenhang",
 			"template_saved": "Vorlage gespeichert",
 			"question": "Frage"

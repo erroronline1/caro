@@ -92,10 +92,11 @@ class AUDIT extends API {
 			case 'POST':
 				$template = [
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
+					':objectives' => UTILITY::propertySet($this->_payload, 'objectives'),
 					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 				];
-				if (!$template[':content'] || !$template[':unit']) $this->response([], 400);
+				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives']) $this->response([], 400);
 
 				// sanitize payload content and translate regulatory to keys
 				$template[':content'] = json_decode($template[':content'] ? : '', true);
@@ -124,11 +125,12 @@ class AUDIT extends API {
 			case 'PUT':
 				$template = [
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
+					':objectives' => UTILITY::propertySet($this->_payload, 'objectives'),
 					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 					':id' => $this->_requestedID
 				];
-				if (!$template[':content'] || !$template[':unit']) $this->response([], 400);
+				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives']) $this->response([], 400);
 
 				// sanitize payload content and translate regulatory to keys
 				$template[':content'] = json_decode($template[':content'] ? : '', true);
@@ -155,7 +157,8 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'GET':
-				$datalist = $return = [];
+				$return = [];
+				$datalist = ['objectives'=> [], 'questions' => [], 'hints' => []];
 				$select = ['...' . $this->_lang->GET('audit.audit.new') => ['value' => '0']];
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
 
@@ -166,6 +169,7 @@ class AUDIT extends API {
 						'id' => null,
 						'content' => '',
 						'unit' => '',
+						'objectives' => '',
 						'author' => '',
 						'date' => null
 					];
@@ -186,16 +190,22 @@ class AUDIT extends API {
 				foreach($data as $row){
 					$select[$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
 					
+					// objective datalist
+					$datalist['objectives'][] = $row['objectives'];
+					// question datalist
 					$row['content'] = json_decode($row['content'] ? : '', true);
 					foreach($row['content'] as $question){
-						$datalist[] = $question['question'];
+						$datalist['questions'][] = $question['question'];
+						$datalist['hints'][] = $question['hint'];
 					}
 				}
 				// sanitize datalists
-				$datalist = array_filter($datalist, fn($v) => boolval($v));
-				ksort($datalist);
-				// for sanitation of template files:
-				//var_dump($data, array_values($values));
+				foreach($datalist as $data => &$values){
+					$values = array_filter($values, fn($v) => boolval($v));
+					ksort($values);
+					// for sanitation of template files:
+					//var_dump($data, array_values($values));
+				}
 
 				// prepare and append content for editor rendering
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
@@ -235,11 +245,23 @@ class AUDIT extends API {
 					], [
 						'type' => 'textarea',
 						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.objectives'),
+							'id' => 'TemplateObjectives',
+							'value' => $template['objectives'] ? : '',
+							'required' => true
+						],
+						'autocomplete' => array_values($datalist['objectives']) ? : null
+					]
+				];
+				$result['render']['content'][] = [
+					[
+						'type' => 'textarea',
+						'attributes' => [
 							'name' => $this->_lang->GET('audit.audit.question'),
 							'id' => '_question',
 							'rows' => 4,
 						],
-						'autocomplete' => array_values($datalist) ? : null
+						'autocomplete' => array_values($datalist['questions']) ? : null
 					], [
 						'type' => 'checkbox2text',
 						'attributes' => [
@@ -254,7 +276,7 @@ class AUDIT extends API {
 							'id' => '_hint',
 							'rows' => 4,
 						],
-						'autocomplete' => array_values($datalist) ? : null
+						'autocomplete' => array_values($datalist['hints']) ? : null
 					], [
 						'type' => 'button',
 						'attributes' => [

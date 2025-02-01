@@ -40,6 +40,7 @@ define('DEFAULTSQL', [
 				"CREATE TABLE IF NOT EXISTS `caro_audit_templates` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`objectives` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -287,6 +288,7 @@ define('DEFAULTSQL', [
 				"CREATE TABLE caro_audit_templates (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	content varchar(MAX) NOT NULL," .
+				"	objectives varchar(MAX) NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NULL DEFAULT NULL," .

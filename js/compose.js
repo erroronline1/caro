@@ -333,6 +333,7 @@ export const compose_helper = {
 	composeNewAuditTemplate: function () {
 		// set dragged/dropped order of elements
 		const unit = document.getElementById("TemplateUnit").value,
+			objectives = document.getElementById("TemplateObjectives").value,
 			data = new FormData();
 
 		/**
@@ -358,9 +359,10 @@ export const compose_helper = {
 			return content;
 		}
 		const templateContent = nodechildren(document.querySelector("main"));
-		if (unit && templateContent.length) {
+		if (unit && objectives && templateContent.length) {
 			data.append("unit", unit);
 			data.append("content", JSON.stringify(templateContent));
+			data.append("objectives", objectives);
 			return data;
 		}
 		new Toast(api._lang.GET("audit.audit.not_saved_missing"), "error");

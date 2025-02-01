@@ -388,22 +388,23 @@
 			"scan_button": "Scan a Code",
 			"scan_multiple": "Another scan option will appear after success or input.",
 			"select_multiple": "Another selection will apper after input.",
-			"textarea_autocomplete": "Press the Alt- or AltGr-key to toggle through provided options."
+			"textarea_autocomplete": "Press the Alt- or AltGr-key to toggle through available options."
 		}
 	},
 	"audit": {
 		"audit": {
 			"add": "Add question",
-			"delete":"delete",
+			"delete": "delete",
 			"delete_confirm_cancel": "No, thank you",
 			"delete_confirm_header": "Delete template for :unit permanently?",
 			"delete_confirm_ok": "Yes, delete",
-			"delete_success":"Template deleted",
-			"edit":"Edit",
+			"delete_success": "Template deleted",
+			"edit": "Edit",
 			"hint": "Hint",
 			"new": "New template",
 			"not_saved": "Template could not be saved.",
 			"not_saved_missing": "Template could not been saved, please provide a unit and content!",
+			"objectives": "Audit programme objectives",
 			"regulatory": "Regulatory issues",
 			"template_saved": "Template saved",
 			"question": "Question"
