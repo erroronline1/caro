@@ -403,6 +403,7 @@
 				"conversation_partner": "Conversation partner",
 				"delete_confirm_header": "Delete Audit for :unit permanently?",
 				"delete_confirm_ok": "Yes, delete",
+				"delete_error": "The audit could not be deleted",
 				"delete_success": "Audit deleted",
 				"new": "New Audit",
 				"not_saved": "Audit could not be saved.",
@@ -424,6 +425,7 @@
 			"template": {
 				"delete_confirm_header": "Delete template for :unit permanently?",
 				"delete_confirm_ok": "Yes, delete",
+				"delete_error": "The template could not be deleted",
 				"delete_success": "Template deleted",
 				"new": "New template",
 				"not_saved": "Template could not be saved.",

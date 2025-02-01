@@ -76,7 +76,8 @@ class AUDIT extends API {
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
 				$audit[':content'] = [
 					'objectives' => $template['objectives'],
-					'summary' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.summary')) ? : null
+					'summary' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.summary')) ? : null,
+					'questions' => []
 				];
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.summary')});
 
@@ -89,10 +90,10 @@ class AUDIT extends API {
 					$set[2] = str_replace('_', ' ', $set[2]);
 					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
 						// translateable system fields
-						$audit[':content'][intval($set[1])][$input][isset($set[3]) ? $set[3] - 1 : 0] = $value;
+						$audit[':content']['questions'][intval($set[1])][$input][isset($set[3]) ? $set[3] - 1 : 0] = $value;
 					else
 						// manual human template question
-						$audit[':content'][intval($set[1])][$set[2]][0] = $value;
+						$audit[':content']['questions'][intval($set[1])][$set[2]][0] = $value;
 				}
 				$audit[':content'] = json_encode($audit[':content']);
 
@@ -207,6 +208,7 @@ class AUDIT extends API {
 						'data-usecase' => 'audit',
 						'action' => "javascript:api.audit('" . ($audit['id'] ? 'put' : 'post') . "', 'audit', " . $template['id']. ", " . $audit['id'] . ")"
 					];
+					if ($audit) $audit['content'] = json_decode($audit['content'], true);
 
 					// display unit and audit objectives
 					$result['render']['content'][] = [
@@ -222,22 +224,52 @@ class AUDIT extends API {
 					// display template questions and respective inputs
 					$rating = [];
 					foreach(json_decode($template['content'], true) as $number => $question){
+						$preset = [];
+						if (isset($audit['content']['questions'][strval($number + 1)])) $preset = $audit['content']['questions'][strval($number + 1)];
+
+						// set up rating and import preset if applicable
 						foreach($this->_lang->_USER['audit']['audit']['execute']['rating_steps'] as $key => $translation){
 							$rating[$translation] = ['value' => $key];
+							if (isset($preset['rating']) && $preset['rating'][0] === $key) $rating[$translation] = ['value' => $key, 'checked' => true];
 						}
+						// set up proof inputs, multiple if applicable due to preset
+						$proof = [];
+						if (isset($preset['proof'])){
+							foreach($preset['proof'] as $value){
+								$proof[] = ['type' => 'scanner',
+									'attributes' => [
+										'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
+										'multiple' => true,
+										'data_loss' => 'prevent',
+										'value' => $value
+									]
+								];
+							}
+						}
+						$proof[] = ['type' => 'scanner',
+							'attributes' => [
+								'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
+								'multiple' => true,
+								'data_loss' => 'prevent'
+							]
+						];
+
+						// render regular inputs
 						$result['render']['content'][] = [
 							[
 								'type' => 'text',
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.conversation_partner'),
-									'data_loss' => 'prevent'
+									'data_loss' => 'prevent',
+									'value' => isset($preset['conversation_partner']) ? $preset['conversation_partner'][0] : ''
 								],
 								'datalist' => $users
 							], [
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $question['question'],
-									'data_loss' => 'prevent'
+									'data_loss' => 'prevent',
+									'value' => isset($preset[$question['question']]) ? $preset[$question['question']][0] : ''
 								]
 							], [
 								'type' => 'textsection',
@@ -255,15 +287,10 @@ class AUDIT extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.statement'),
-									'data_loss' => 'prevent'
+									'data_loss' => 'prevent',
+									'value' => isset($preset['statement']) ? $preset['statement'][0] : ''
 								]
-							], ['type' => 'scanner',
-								'attributes' => [
-									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
-									'multiple' => true,
-									'data_loss' => 'prevent'
-								]
-							]
+							], ...$proof
 						];	
 					}
 
@@ -272,7 +299,8 @@ class AUDIT extends API {
 						[
 							'type' => 'textarea',
 							'attributes' => [
-								'name' => $this->_lang->GET('audit.audit.execute.summary')
+								'name' => $this->_lang->GET('audit.audit.execute.summary'),
+								'value' => isset($audit['content']['summary']) ? $audit['content']['summary'] : ''
 							]
 						], [
 							'type' => 'checkbox',
@@ -286,24 +314,35 @@ class AUDIT extends API {
 							]
 						]
 					];
+
 					if ($audit['id']){
-						$result['render']['content'][count($result['render']['content']) - 1][] =
-							[
-								'type' => 'deletebutton',
-								'attributes' => [
-									'value' => $this->_lang->GET('audit.audit.delete'),
-									'type' => 'button',
-									'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.execute.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
-									"'".$this->_lang->GET('audit.audit.delete_confirm_cancel')."': false,".
-									"'".$this->_lang->GET('audit.audit.execute.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
-									"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audit', 'null', " . $template['id'] . ")})"
-								]
-							];
+						$result['render']['content'][count($result['render']['content']) - 1][] = [
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => $this->_lang->GET('audit.audit.delete'),
+								'type' => 'button',
+								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.execute.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
+								"'".$this->_lang->GET('audit.audit.delete_confirm_cancel')."': false,".
+								"'".$this->_lang->GET('audit.audit.execute.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
+								"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audit', 'null', " . $audit['id'] . ")})"
+							]
+						];
 					}
-					
 				}
 				break;
 			case 'DELETE':
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_delete', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				])) $this->response(['response' => [
+					'msg' => $this->_lang->GET('audit.audit.execute.delete_success'),
+					'type' => 'success'
+					]]);
+				else $this->response(['response' => [
+					'msg' => $this->_lang->GET('audit.audit.execute.delete_error'),
+					'type' => 'error'
+					]]);
 				break;
 		}
 		$this->response($result);
@@ -567,6 +606,10 @@ class AUDIT extends API {
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.template.delete_success'),
 					'type' => 'success'
+					]]);
+				else $this->response(['response' => [
+					'msg' => $this->_lang->GET('audit.audit.template.delete_error'),
+					'type' => 'error'
 					]]);
 				break;
 		}

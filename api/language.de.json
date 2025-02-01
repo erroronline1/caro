@@ -403,6 +403,7 @@
 				"conversation_partner": "Gesprächspartner",
 				"delete_confirm_header": "Audit für :unit dauerhaft löschen?",
 				"delete_confirm_ok": "Ja, Audit löschen",
+				"delete_error": "Das Audit konnte nicht gelöscht werden",
 				"delete_success": "Das Audit wurde gelöscht",
 				"new": "Neues Audit",
 				"not_found": "Audit nicht gefunden",
@@ -425,6 +426,7 @@
 			"template": {
 				"delete_confirm_header": "Vorlage für :unit dauerhaft löschen?",
 				"delete_confirm_ok": "Ja, Vorlage löschen",
+				"delete_error": "Die Vorlage konnte nicht gelöscht werden",
 				"delete_success": "Die Vorlage wurde gelöscht",
 				"new": "Neue Vorlage",
 				"not_found": "Vorlage nicht gefunden",

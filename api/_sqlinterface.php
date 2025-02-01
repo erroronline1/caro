@@ -176,8 +176,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT * FROM caro_audit WHERE id = :id"
 		],
 		'audit_delete' => [
-			'mysql' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NOT NULL",
-			'sqlsrv' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NOT NULL"
+			'mysql' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NULL",
+			'sqlsrv' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NULL"
 		],
 	
 		
