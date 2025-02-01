@@ -394,6 +394,12 @@
 	"audit": {
 		"audit": {
 			"add": "Frage hinzufügen",
+			"delete": "löschen",
+			"delete_confirm_cancel": "Nein danke!",
+			"delete_confirm_header": "Vorlage für :unit dauerhaft löschen?",
+			"delete_confirm_ok": "Ja, Vorlage löschen",
+			"delete_success":"Die Vorlage wurde gelöscht",
+			"edit":"Bearbeiten",
 			"hint": "Hinweis",
 			"new": "Neue Vorlage",
 			"not_saved": "Vorlage konnte nicht gespeichert werden.",

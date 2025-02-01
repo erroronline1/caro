@@ -394,6 +394,12 @@
 	"audit": {
 		"audit": {
 			"add": "Add question",
+			"delete":"delete",
+			"delete_confirm_cancel": "No, thank you",
+			"delete_confirm_header": "Delete template for :unit permanently?",
+			"delete_confirm_ok": "Yes, delete",
+			"delete_success":"Template deleted",
+			"edit":"Edit",
 			"hint": "Hint",
 			"new": "New template",
 			"not_saved": "Template could not be saved.",

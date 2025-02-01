@@ -49,6 +49,11 @@ class AUDIT extends API {
 	}
 
 	/**
+	 *             _ _ _   
+	 *   ___ _ _ _| |_| |_ 
+	 *  | .'| | | . | |  _|
+	 *  |__,|___|___|_|_|  
+	 *
 	 * 
 	 */
 	public function audit(){
@@ -62,32 +67,44 @@ class AUDIT extends API {
 	}
 
 	/**
+	 *             _ _ _   _                 _     _       
+	 *   ___ _ _ _| |_| |_| |_ ___ _____ ___| |___| |_ ___ 
+	 *  | .'| | | . | |  _|  _| -_|     | . | | .'|  _| -_|
+	 *  |__,|___|___|_|_| |_| |___|_|_|_|  _|_|__,|_| |___|
+	 *                                  |_|
 	 * 
 	 */
 	public function audittemplate(){
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
+		// recursively sanitize unpredictable nested frontend input
+		function sanitizeQuestionNesting($element, $result = []){
+			foreach($element as $sub){
+				if (array_is_list($sub)){
+					array_push($result, ...sanitizeQuestionNesting($sub, $result));
+				} else {
+					$result[] = $sub;					
+				}
+			}
+			return $result;
+		}
+
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$template = [
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
-					':unit' => UTILITY::propertySet($this->_payload, 'unit'),
+					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 				];
-				$template[':content'] = json_decode($template[':content'] ? : '', true);
 				if (!$template[':content'] || !$template[':unit']) $this->response([], 400);
 
-				// recursively sanitize unpredictable nested frontend input
-				function sanitizeQuestions($element, $result = []){
-					foreach($element as $sub){
-						if (array_is_list($sub)){
-							array_push($result, ...sanitizeQuestions($sub, $result));
-						} else {
-							$result[] = $sub;					
-						}
-					}
-					return $result;
+				// sanitize payload content and translate regulatory to keys
+				$template[':content'] = json_decode($template[':content'] ? : '', true);
+				$template[':content'] = sanitizeQuestionNesting($template[':content']);
+				foreach($template[':content'] as &$question){
+					$question['regulatory'] = explode(', ', $question['regulatory']);
+					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
-				$template[':content'] = json_encode(sanitizeQuestions($template[':content']));
+				$template[':content'] = json_encode($template[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', [
 					'values' => $template
@@ -103,16 +120,43 @@ class AUDIT extends API {
 						'id' => false,
 						'type' => 'error'
 					]]);
-
-
-				var_dump($template);
-				die();
 				break;
 			case 'PUT':
+				$template = [
+					':content' => UTILITY::propertySet($this->_payload, 'content'),
+					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
+					':author' => $_SESSION['user']['name'],
+					':id' => $this->_requestedID
+				];
+				if (!$template[':content'] || !$template[':unit']) $this->response([], 400);
+
+				// sanitize payload content and translate regulatory to keys
+				$template[':content'] = json_decode($template[':content'] ? : '', true);
+				$template[':content'] = sanitizeQuestionNesting($template[':content']);
+				foreach($template[':content'] as &$question){
+					$question['regulatory'] = explode(', ', $question['regulatory']);
+					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
+				}
+				$template[':content'] = json_encode($template[':content']);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put_template', [
+					'values' => $template
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.audit.template_saved'),
+						'id' => $this->_pdo->lastInsertId(),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.audit.not_saved'),
+						'id' => false,
+						'type' => 'error'
+					]]);
 				break;
 			case 'GET':
 				$datalist = $return = [];
-				$select = ['...NEW' => ['value' => false]];
+				$select = ['...' . $this->_lang->GET('audit.audit.new') => ['value' => '0']];
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
 
 				if($this->_requestedID && $this->_requestedID !== 'false' && array_search($this->_requestedID, array_column($data, 'id')) === false) $return['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -136,11 +180,11 @@ class AUDIT extends API {
 				// gather available units
 				$units = [];
 				foreach($this->_lang->_USER['units'] as $unit => $description){
-					$units[$description] = $unit === $template['unit'] ? ['checked' => true] : [];
+					$units[$description] = $unit === $template['unit'] ? ['selected' => true] : [];
 				}
 				
 				foreach($data as $row){
-					$select[$row['unit'] . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
+					$select[$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
 					
 					$row['content'] = json_decode($row['content'] ? : '', true);
 					foreach($row['content'] as $question){
@@ -153,6 +197,15 @@ class AUDIT extends API {
 				// for sanitation of template files:
 				//var_dump($data, array_values($values));
 
+				// prepare and append content for editor rendering
+				if ($template['content'] = json_decode($template['content'] ? : '', true)){
+					foreach($template['content'] as &$question){
+						$question['regulatory'] = explode(',', $question['regulatory']);
+						$question['regulatory'] = implode(', ', array_map(fn($r) => $this->_lang->_USER['regulatory'][$r], $question['regulatory']));
+					}
+					$result['selected'] = $template['content'];
+				}
+
 				$result['render']['form'] = [
 					'data-usecase' => 'audittemplate',
 					'action' => "javascript:api.audit('" . ($template['id'] ? 'put' : 'post') . "', 'audittemplate', 'null', " . $template['id'] . ")"
@@ -162,7 +215,7 @@ class AUDIT extends API {
 					[
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('audit.audit.new'),
+							'name' => $this->_lang->GET('audit.audit.edit'),
 							'onchange' => "api.audit('get', 'audittemplate', 'null', this.value)"
 						],
 						'content' => $select
@@ -211,15 +264,39 @@ class AUDIT extends API {
 						]
 					]
 				];
+
+				if ($template['id']){
+					$result['render']['content'][count($result['render']['content']) - 1][] = [
+						[
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => $this->_lang->GET('audit.audit.delete'),
+								'type' => 'button',
+								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
+								"'".$this->_lang->GET('audit.audit.delete_confirm_cancel')."': false,".
+								"'".$this->_lang->GET('audit.audit.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
+								"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audittemplate', 'null', " . $template['id'] . ")})"
+							]
+						]
+					];		
+				}
+
 				$result['render']['content'][] = [
 					[
 						'type' => 'trash',
 						'description' => $this->_lang->GET('assemble.compose.edit_trash')
 					]
 				];
-				$result['selected'] = json_decode($template['content'] ? : '', true);
 				break;
 			case 'DELETE':
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_delete_template', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				])) $this->response(['response' => [
+					'msg' => $this->_lang->GET('audit.audit.delete_success'),
+					'type' => 'success'
+					]]);
 				break;
 		}
 		$this->response($result);
