@@ -365,7 +365,7 @@ export const compose_helper = {
 			data.append("objectives", objectives);
 			return data;
 		}
-		new Toast(api._lang.GET("audit.audit.not_saved_missing"), "error");
+		new Toast(api._lang.GET("audit.audit.template.not_saved_missing"), "error");
 		return null;
 	},
 
@@ -1720,6 +1720,7 @@ export class Compose extends Assemble {
 			type: type.type,
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_name"),
+				maxlength: 50,
 				required: true,
 			},
 		};
@@ -1800,6 +1801,7 @@ export class Compose extends Assemble {
 			type: type.type,
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.multilist_name"),
+				maxlength: 50,
 				required: true,
 			},
 		};
@@ -2100,6 +2102,7 @@ export class Compose extends Assemble {
 			type: type.type,
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.simple_element"),
+				maxlength: 50,
 				required: true,
 			},
 		};
