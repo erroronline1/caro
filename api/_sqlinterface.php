@@ -160,16 +160,25 @@ class SQLQUERY {
 
 		
 		'audit_post' => [
-			'mysql' => "INSERT INTO caro_audit (id, content, unit, date, author) VALUES (NULL, :content, :unit, CURRENT_TIMESTAMP, :author)",
-			'sqlsrv' => "INSERT INTO caro_audit (content, unit, date, author) VALUES (:content, :unit, CURRENT_TIMESTAMP, :author)"
+			'mysql' => "INSERT INTO caro_audit (id, template, unit, content, last_touch, last_user, closed, notified) VALUES (NULL, :template, :unit :content, CURRENT_TIMESTAMP, :author, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_audit (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit :content, CURRENT_TIMESTAMP, :author, NULL, NULL)"
+		],
+		'audit_put' => [
+			'mysql' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :author, closed = :closed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :author, closed = :closed WHERE id = :id"
 		],
 		'audit_get' => [
 			'mysql' => "SELECT * FROM caro_audit",
 			'sqlsrv' => "SELECT * FROM caro_audit"
 		],
+		'audit_delete' => [
+			'mysql' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NOT NULL",
+			'sqlsrv' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NOT NULL"
+		],
+	
 		
 		'audit_post_template' => [
-			'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives,unit, date, author) VALUES (NULL, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author)",
+			'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives, unit, date, author) VALUES (NULL, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author)",
 			'sqlsrv' => "INSERT INTO caro_audit_templates (content, objectives, unit, date, author) VALUES (:content, :unit, :objectives, CURRENT_TIMESTAMP, :author)"
 		],
 		'audit_put_template' => [

@@ -30,10 +30,13 @@ define('DEFAULTSQL', [
 	'install_tables' => [
 		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_audit` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`template` int NOT NULL," .
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` datetime NOT NULL," .
-				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`last_touch` datetime NOT NULL," .
+				"	`last_user` int NOT NULL," .
+				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.

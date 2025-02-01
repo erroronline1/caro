@@ -471,6 +471,18 @@ export const api = {
 		switch (method) {
 			case "get":
 				switch (request[1]) {
+					case "audit":
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]]);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							api.preventDataloss.start();
+						};
+						break;
 					case "audittemplate":
 						successFn = function (data) {
 							if (data.render) {
@@ -481,6 +493,7 @@ export const api = {
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.selected && data.selected.length) compose_helper.importAuditTemplate(data.selected);
+							api.preventDataloss.start();
 						}
 						break;
 					case "export":
@@ -542,6 +555,7 @@ export const api = {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
 				}
+				else payload = _.getInputs("[data-usecase=audit]", true);
 				break;
 		}
 		api.send(method, request, successFn, null, payload);

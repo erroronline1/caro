@@ -31,6 +31,7 @@ class AUDIT extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
+	private $_requestedTemplate = null;
 	private $_requestedDate = null;
 	private $_requestedID = null;
 	private $_requestedOption = null;
@@ -43,7 +44,7 @@ class AUDIT extends API {
 		parent::__construct();
 		if (!PERMISSION::permissionFor('regulatory')) $this->response([], 401);
 
-		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedType = $this->_requestedTemplate = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_requestedDate = $this->_requestedID = $this->_requestedOption = isset(REQUEST[3]) ? REQUEST[3] : null;
 		$this->_requestedTime = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
@@ -60,10 +61,203 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+var_dump($payload);
+				break;
+			case 'PUT':
 				break;
 			case 'GET':
+				$result = [];
+				$datalist = ['user'=> []];
+				$audit = $template = null;
+				$select = [
+					'edit' => [
+						'...' => ['value' => '0']
+					],
+					'templates'=> [
+						'...' => ['value' => '0']
+					],
+					'closed' => [
+						'...' => ['value' => '0']
+					],
+				];
+				$templates = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
+				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				// drop system user and group accounts
+				foreach($users as $key => $row){
+					if ($row['id'] < 2 || in_array('group', explode(',', $row['permissions']))) unset($users[$key]);
+				}
+				$users = array_column($users, 'name');
+
+				if($this->_requestedID && $this->_requestedID !== 'false' && ($audit = $audits[array_search($this->_requestedID, array_column($audits, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+
+				//template selection
+				foreach($templates as $row){
+					$select['templates'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['date']] = ['value' => $row['id']];
+				}
+
+				// audit selections
+				foreach($audits as $row){
+					if ($row['closed']){
+						$select['closed'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					}
+					else {
+						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					}
+				}
+
+				// display selections
+				$result['render']['content'][] = [
+					[
+						'type' => 'button',
+						'attributes' => [
+							'value' => $this->_lang->GET('audit.audit.execute.new'),
+							'type' => 'button',
+							'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('audit.audit.execute.new') . "', render: JSON.parse('" . 
+								json_encode([[
+									'type' => 'select',
+									'attributes' => [
+										'name' => $this->_lang->GET('audit.audit.template.select')
+									],
+									'content' => $select['templates']
+								]]) .
+								"'), options:{".
+								"'".$this->_lang->GET('general.cancel_button')."': {value: true, class: 'reducedCTA'},".
+								"'".$this->_lang->GET('general.ok_button')."': true".
+								"}}).then(response => {if (response && response !== '...') api.audit('get', 'audit', response['" . $this->_lang->GET('audit.audit.template.select') . "'])});"
+						]
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.edit'),
+							'onchange' => "if (this.value !== '0') api.audit('get', 'audit', 'null', this.value);"
+						],
+						'content' => $select['edit']
+					]
+				];
+
+				if ($this->_requestedTemplate && $this->_requestedTemplate !== 'null' && !$audit){
+					$template = $templates[array_search($this->_requestedID, array_column($templates, 'id'))];
+				}
+				elseif ($audit){
+					$template = $templates[array_search($audit['template'], array_column($templates, 'id'))];
+				}
+				if (!$audit){
+					$audit = [
+						'id' => null,
+						'template'=>isset($template['id']) ? $template['id'] : null,
+						'content' => '',
+						'unit' => isset($template['unit']) ? $template['unit'] : null,
+						'last_touch' => null,
+					];
+				}
+
+				// render template
+				if ($template) {
+					$result['render']['form'] = [
+						'data-usecase' => 'audit',
+						'action' => "javascript:api.audit('" . ($audit['id'] ? 'put' : 'post') . "', 'audit', 'null', " . $audit['id'] . ")"
+					];
+
+					// display unit and audit objectives
+					$result['render']['content'][] = [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->_USER['units'][$template['unit']]
+							],
+							'content' => $template['objectives']
+						]
+					];
+
+					// display template questions and respective inputs
+					$rating = [];
+					foreach(json_decode($template['content'], true) as $number => $question){
+						foreach($this->_lang->_USER['audit']['audit']['execute']['rating_steps'] as $key => $translation){
+							$rating[$translation] = ['value' => $key];
+						}
+						$result['render']['content'][] = [
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('audit.audit.execute.conversation_partner') . ' - ' . $question['question'],
+									'data_loss' => 'prevent'
+								],
+								'datalist' => $users
+							], [
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => $question['question'],
+									'data_loss' => 'prevent'
+								]
+							], [
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => implode(', ' , array_map(fn($r) => $this->_lang->_USER['regulatory'][$r], explode(',', $question['regulatory'])))
+								],
+								'content' => $question['hint'] ? : ' '
+							], [
+								'type' => 'radio',
+								'attributes' => [
+									'name' => $this->_lang->GET('audit.audit.execute.rating') . ' - ' . $question['question']
+								],
+								'content' => $rating
+							], [
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => $this->_lang->GET('audit.audit.execute.statement') . ' - ' . $question['question'],
+									'data_loss' => 'prevent'
+								]
+							], ['type' => 'scanner',
+								'attributes' => [
+									'name' => $this->_lang->GET('audit.audit.execute.proof') . ' - ' . $question['question'],
+									'multiple' => true,
+									'data_loss' => 'prevent'
+								]
+							]
+						];	
+					}
+
+					// append final note, deletion and closing options
+					$result['render']['content'][] = [
+						[
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => $this->_lang->GET('audit.audit.execute.summary')
+							]
+						], [
+							'type' => 'checkbox',
+							'content' => [
+								$this->_lang->GET('audit.audit.execute.close') => [
+									'onchange' => "if (this.checked) {new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.execute.close_confirm') ."', options:{".
+									"'".$this->_lang->GET('general.cancel_button')."': false,".
+									"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
+									"}}).then(confirmation => {if (!confirmation) this.checked = false})}"
+								]
+							]
+						]
+					];
+					if ($audit['id']){
+						$result['render']['content'][count($result['render']['content']) - 1][] =
+							[
+								'type' => 'deletebutton',
+								'attributes' => [
+									'value' => $this->_lang->GET('audit.audit.delete'),
+									'type' => 'button',
+									'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.execute.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
+									"'".$this->_lang->GET('audit.audit.delete_confirm_cancel')."': false,".
+									"'".$this->_lang->GET('audit.audit.execute.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
+									"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audit', 'null', " . $template['id'] . ")})"
+								]
+							];
+					}
+					
+				}
+				break;
+			case 'DELETE':
 				break;
 		}
+		$this->response($result);
 	}
 
 	/**
@@ -111,13 +305,13 @@ class AUDIT extends API {
 					'values' => $template
 				])) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.template_saved'),
+						'msg' => $this->_lang->GET('audit.audit.template.saved'),
 						'id' => $this->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.not_saved'),
+						'msg' => $this->_lang->GET('audit.audit.template.not_saved'),
 						'id' => false,
 						'type' => 'error'
 					]]);
@@ -145,26 +339,26 @@ class AUDIT extends API {
 					'values' => $template
 				])) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.template_saved'),
+						'msg' => $this->_lang->GET('audit.audit.template.saved'),
 						'id' => $this->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.not_saved'),
+						'msg' => $this->_lang->GET('audit.audit.template.not_saved'),
 						'id' => false,
 						'type' => 'error'
 					]]);
 				break;
 			case 'GET':
-				$return = [];
+				$result = [];
 				$datalist = ['objectives'=> [], 'questions' => [], 'hints' => []];
-				$select = ['...' . $this->_lang->GET('audit.audit.new') => ['value' => '0']];
+				$select = ['...' . $this->_lang->GET('audit.audit.template.new') => ['value' => '0']];
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
 
-				if($this->_requestedID && $this->_requestedID !== 'false' && array_search($this->_requestedID, array_column($data, 'id')) === false) $return['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if($this->_requestedID && $this->_requestedID !== 'false' && ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				if (!$data || !$this->_requestedID || ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false){
+				if (!$data || !$this->_requestedID || !$template){
 					$template = [
 						'id' => null,
 						'content' => '',
@@ -239,7 +433,8 @@ class AUDIT extends API {
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('user.units'),
-							'id' => 'TemplateUnit'
+							'id' => 'TemplateUnit',
+							'data-loss' => 'prevent'
 						],
 						'content' => $units
 					], [
@@ -248,7 +443,8 @@ class AUDIT extends API {
 							'name' => $this->_lang->GET('audit.audit.objectives'),
 							'id' => 'TemplateObjectives',
 							'value' => $template['objectives'] ? : '',
-							'required' => true
+							'required' => true,
+							'data-loss' => 'prevent'
 						],
 						'autocomplete' => array_values($datalist['objectives']) ? : null
 					]
@@ -260,13 +456,16 @@ class AUDIT extends API {
 							'name' => $this->_lang->GET('audit.audit.question'),
 							'id' => '_question',
 							'rows' => 4,
+							'data-loss' => 'prevent',
+							'maxlength' => 80
 						],
 						'autocomplete' => array_values($datalist['questions']) ? : null
 					], [
 						'type' => 'checkbox2text',
 						'attributes' => [
 							'name' => $this->_lang->GET('audit.audit.regulatory'),
-							'id' => '_regulatory'
+							'id' => '_regulatory',
+							'data-loss' => 'prevent'
 						],
 						'content' => $regulatory
 					], [
@@ -275,6 +474,7 @@ class AUDIT extends API {
 							'name' => $this->_lang->GET('audit.audit.hint'),
 							'id' => '_hint',
 							'rows' => 4,
+							'data-loss' => 'prevent'
 						],
 						'autocomplete' => array_values($datalist['hints']) ? : null
 					], [
@@ -294,9 +494,9 @@ class AUDIT extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('audit.audit.delete'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
+								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.template.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
 								"'".$this->_lang->GET('audit.audit.delete_confirm_cancel')."': false,".
-								"'".$this->_lang->GET('audit.audit.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
+								"'".$this->_lang->GET('audit.audit.template.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
 								"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audittemplate', 'null', " . $template['id'] . ")})"
 							]
 						]
@@ -316,13 +516,12 @@ class AUDIT extends API {
 						':id' => $this->_requestedID
 					]
 				])) $this->response(['response' => [
-					'msg' => $this->_lang->GET('audit.audit.delete_success'),
+					'msg' => $this->_lang->GET('audit.audit.template.delete_success'),
 					'type' => 'success'
 					]]);
 				break;
 		}
 		$this->response($result);
-
 	}
 
 	/**
