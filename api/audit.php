@@ -113,6 +113,8 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'PUT':
+				var_dump($this->_payload);
+				die();
 				break;
 			case 'GET':
 				$result = [];
@@ -576,7 +578,16 @@ class AUDIT extends API {
 				];
 
 				if ($template['id']){
-					$result['render']['content'][count($result['render']['content']) - 1][] = [
+					// a template can only be deleted if not used by an unfinished audit
+					$unused = true;
+					$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+					foreach($audits as $audit){
+						if ($audit['template'] === $template['id'] && !$audit['closed']) {
+							$unused = false;
+							break;
+						}
+					}
+					if ($unused) $result['render']['content'][count($result['render']['content']) - 1][] = [
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
@@ -588,7 +599,15 @@ class AUDIT extends API {
 								"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audittemplate', 'null', " . $template['id'] . ")})"
 							]
 						]
-					];		
+					];
+					else $result['render']['content'][count($result['render']['content']) - 1][] = [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('audit.audit.template.used')
+							]
+						]
+					];
 				}
 
 				$result['render']['content'][] = [

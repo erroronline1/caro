@@ -431,7 +431,8 @@
 				"not_saved": "Template could not be saved.",
 				"not_saved_missing": "Template could not been saved, please provide a unit and content!",
 				"select": "Select template",
-				"saved": "Template saved"
+				"saved": "Template saved",
+				"used" : "This template can not be deleted as it is currently in use by an unfinished audit."
 			},
 			"question": "Question"
 		},

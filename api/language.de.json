@@ -433,7 +433,8 @@
 				"not_saved": "Vorlage konnte nicht gespeichert werden.",
 				"not_saved_missing": "Die Vorlage konnte nicht gespeichert werden, bitte gib einen Bereich und einen Inhalt an!",
 				"select": "Vorlage wählen",
-				"saved": "Vorlage gespeichert"
+				"saved": "Vorlage gespeichert",
+				"used" : "Diese Vorlage kann nicht gelöscht werden, da sie derzeit noch von einem nicht abgeschlossenen Audit verwendet wird."
 			},
 			"question": "Frage"
 		},
