@@ -517,7 +517,7 @@ export const compose_helper = {
 	 * @event update compose_helper.newAuditQuestions
 	 */
 	importAuditTemplate: function (chunks) {
-		compose_helper.newTextElements = {};
+		compose_helper.newAuditQuestions = {};
 		let question = [];
 		for (const questions of chunks) {
 			question.push({
@@ -532,10 +532,10 @@ export const compose_helper = {
 		});
 		document.getElementById("main").append(...chunk.initializeSection());
 		chunk.processAfterInsertion();
-		for (let i = 0; i < question.length; i++) {
-			compose_helper.newAuditQuestions[chunk.generatedElementIDs[i]] = question;
+		for (let i = 0; i < chunks.length; i++) {
+			compose_helper.newAuditQuestions[chunk.generatedElementIDs[i]] = chunks[i];
 		}
-},
+	},
 
 	/**
 	 * appends a component to view and newDocumentComponents after being fetched by api.js
