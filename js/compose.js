@@ -1720,7 +1720,7 @@ export class Compose extends Assemble {
 			type: type.type,
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_name"),
-				maxlength: 50,
+				maxlength: 80,
 				required: true,
 			},
 		};
@@ -1801,7 +1801,7 @@ export class Compose extends Assemble {
 			type: type.type,
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.multilist_name"),
-				maxlength: 50,
+				maxlength: 80,
 				required: true,
 			},
 		};
@@ -2102,7 +2102,7 @@ export class Compose extends Assemble {
 			type: type.type,
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.simple_element"),
-				maxlength: 50,
+				maxlength: 80,
 				required: true,
 			},
 		};
