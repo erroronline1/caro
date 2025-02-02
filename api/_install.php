@@ -35,7 +35,7 @@ define('DEFAULTSQL', [
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`last_touch` datetime NOT NULL," .
 				"	`last_user` int NOT NULL," .
-				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`closed` int NULL DEFAULT NULL," .
 				"	`notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -281,10 +281,13 @@ define('DEFAULTSQL', [
 		'sqlsrv' => "IF OBJECT_ID(N'caro_audit', N'U') IS NULL " .
 				"CREATE TABLE caro_audit (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	content varchar(MAX) NOT NULL," .
+				"	template int NOT NULL," .
 				"	unit varchar(255) NOT NULL," .
-				"	date smalldatetime NOT NULL," .
-				"	author varchar(MAX) NULL DEFAULT NULL" .
+				"	content varchar(MAX) NOT NULL," .
+				"	last_touch smalldatetime NOT NULL," .
+				"	last_user int NOT NULL," .
+				"	closed tinyint NULL DEFAULT NULL," .
+				"	notified int NULL DEFAULT NULL," .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_audit_templates', N'U') IS NULL " .
