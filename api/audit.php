@@ -402,6 +402,58 @@ class AUDIT extends API {
 		$this->response($result);
 	}
 
+	/**
+	 *             _ _ _       
+	 *   ___ _ _ _| |_| |_ ___ 
+	 *  | .'| | | . | |  _|_ -|
+	 *  |__,|___|___|_|_| |___|
+	 *
+	 * 
+	 */
+	public function audits(){
+		$content = [];
+		$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+
+		foreach ($audits as $audit){
+			if (!$audit['closed']) continue;
+			$audit['content'] = json_decode($audit['content'], true);
+			$current = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->_DEFAULT['units'][$audit['unit']] . ' ' . $audit['last_touch'] . ' ' . $audit['last_user']
+					],
+					'content' => $this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives']
+				]
+			];
+			$q = 0;
+			foreach($audit['content']['questions'] as $question){
+				$currentquestion = '';
+				foreach($question as $key => $values){
+					$currentquestion .= (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ': ' .
+						($key === 'rating' ? $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]] : implode("\n", $values)) . "\n";
+				}
+//add regulatory context
+				
+				$current[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.audit.question', [], true) . ' ' . strval(++$q)
+					],
+					'content' => $currentquestion
+				];
+		}
+			$current[] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.audit.execute.summary', [], true)
+				],
+				'content' => $audit['content']['summary']
+			];
+			$content[] = $current;
+		}
+		return $content;
+	}
 
 	/**
 	 *             _ _ _   _                 _     _       
@@ -715,6 +767,7 @@ class AUDIT extends API {
 				$selecttypes = ['...' => []];
 				
 				foreach([
+					'audits', // internal audits
 					'mdrsamplecheck', // sample checks on products
 					'incorporation', // incorporated products
 					'documents', // documents and components
@@ -820,6 +873,7 @@ class AUDIT extends API {
 	public function export(){
 		if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
 		$static = [
+			'audits',
 			'mdrsamplecheck',
 			'incorporation',
 			'documents',

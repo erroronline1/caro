@@ -60,7 +60,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Aufgaben- und Abwesenheitsplaner: Arbeiten planen mit gleichzeitiger Übersicht über Abwesenheiten
 * strukturierte Beschaffung: reduzierte Rückfragen, automatisierte Erinnerungen, Einführungsaufzeichnungen und Stichprobenprüfung
 * Rollenverwaltung: definierte Nutzerberechtigungen und eine angemessene Informationsfülle
-* Auditunterstützung: Zusammenfassungen der Anwendungsdaten in aufgeräumten Übersichten
+* Auditunterstützung: interne Audits vorbereiten, planen und durchführen, Zusammenfassungen der Anwendungsdaten in aufgeräumten Übersichten
 * keine künstliche Intelligenz: volle Datenhoheit behalten
 * Geräteunabhängig: Web-Anwendung mit jedem geeigneten Gerät nutzbar
 

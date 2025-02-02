@@ -441,6 +441,7 @@
 		"check_description": ":check on :date by :author",
 		"checks_select_type": "Select type of data",
 		"checks_type": {
+			"audits": "Internal audits",
 			"complaints": "Complaints",
 			"documents": "Current documents in use",
 			"documentusage": "Current documents - appropriateness",

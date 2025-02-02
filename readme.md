@@ -117,6 +117,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
 * token export with name, pdf card format
+* unclosed audit reminder
+* save regulatory to audit, do not rely on template!
 * [audit api endpoints](#audit-endpoints)
 * [audit description](#audit)
 * [rename audit to Regulatory evaluations and summaries](#audit)
@@ -139,7 +141,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Task and absence schedules: plan tasks while having an overview on personnel ressources
 * Structured procurement: reduced inquiries, automated reminders, incorporation records and sample checks
 * Role management: defined user permissions and appropriate information load
-* Audit support: summarizing application data to tidy overviews
+* Audit support: prepare, schedule and execute internal audits, summarizing application data to tidy overviews
 * No artificial intelligence: you have absolute data authority
 * Device agnostic: web-application accessible by any suitable device
 

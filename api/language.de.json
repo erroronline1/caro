@@ -443,6 +443,7 @@
 		"check_description": ":check am :date von :author",
 		"checks_select_type": "Wähle den Datentyp aus",
 		"checks_type": {
+			"audits": "Interne Audits",
 			"complaints": "Reklamationen",
 			"documents": "Gültige Dokumente",
 			"documentusage": "Gültige Dokumente - Angemessenheit",
