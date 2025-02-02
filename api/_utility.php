@@ -443,7 +443,9 @@ class UTILITY {
 						$raw_headers = explode("\r\n", $raw_headers);
 						$headers = array();
 						foreach ($raw_headers as $header){
-							list($name, $value) = explode(':', $header);
+							//list($name, $value) = explode(':', $header); this original does not work with input names containing colons
+							preg_match("/^(.+?):(.+?)$/m", $header, $formerlyexploded);
+							list(, $name, $value) = $formerlyexploded;
 							$headers[strtolower($name)] = ltrim($value, ' ');
 						}
 
