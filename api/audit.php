@@ -70,7 +70,7 @@ class AUDIT extends API {
 					':template'=> $template['id'],
 					':unit' => $template['unit'],
 					':content' => [],
-					':last_user' => $_SESSION['user']['id'],
+					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null
 				];
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
@@ -121,7 +121,7 @@ class AUDIT extends API {
 				if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
 				// update general properties
-				$audit['last_user'] = $_SESSION['user']['id'];
+				$audit['last_user'] = $_SESSION['user']['name'];
 				$audit['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null;
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
 
@@ -200,7 +200,7 @@ class AUDIT extends API {
 				// audit selections
 				foreach($audits as $row){
 					if (!$row['closed']){
-						$select['closed'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 				}
 
@@ -243,7 +243,7 @@ class AUDIT extends API {
 							]
 						]
 					];
-					if (count($select['edit']) > 2) $result['render']['content'][count($result['render']['content']) - 1][] = [
+					if (count(array_keys($select['edit'])) > 1) $result['render']['content'][count($result['render']['content']) - 1][] = [
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('audit.audit.edit'),
@@ -258,7 +258,9 @@ class AUDIT extends API {
 						'data-usecase' => 'audit',
 						'action' => "javascript:api.audit('" . ($audit['id'] ? 'put' : 'post') . "', 'audit', " . $template['id']. ", " . $audit['id'] . ")"
 					];
-					if ($audit) $audit['content'] = json_decode($audit['content'], true);
+					if ($audit) {
+						$audit['content'] = json_decode($audit['content'], true);
+					}
 
 					// display unit and audit objectives
 					$result['render']['content'][] = [
@@ -267,7 +269,8 @@ class AUDIT extends API {
 							'attributes' => [
 								'name' => $this->_lang->_USER['units'][$template['unit']]
 							],
-							'content' => $template['objectives']
+							'content' => $template['objectives'] .
+								($audit ? "\n \n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $audit['last_touch'], ':user' => $audit['last_user']]) : '')
 						]
 					];
 

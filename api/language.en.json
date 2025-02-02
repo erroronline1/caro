@@ -405,6 +405,7 @@
 				"delete_confirm_ok": "Yes, delete",
 				"delete_error": "The audit could not be deleted",
 				"delete_success": "Audit deleted",
+				"last_edit": "Last edit on :date by :user",
 				"new": "New Audit",
 				"not_saved": "Audit could not be saved.",
 				"proof": "Proof",
@@ -816,7 +817,7 @@
 		},
 		"records": {
 			"audit": "Execute Audit",
-			"audit_templates": "Plan audit",
+			"audit_templates": "Prepare audit",
 			"documents_manage_approval": "Approve document",
 			"documents_manage_bundles": "Manage document bundles",
 			"documents_manage_components": "Manage components",

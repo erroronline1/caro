@@ -405,6 +405,7 @@
 				"delete_confirm_ok": "Ja, Audit löschen",
 				"delete_error": "Das Audit konnte nicht gelöscht werden",
 				"delete_success": "Das Audit wurde gelöscht",
+				"last_edit": "Letzte Bearbeitung am :date von :user",
 				"new": "Neues Audit",
 				"not_found": "Audit nicht gefunden",
 				"not_saved": "Audit konnte nicht gespeichert werden.",
@@ -818,7 +819,7 @@
 		},
 		"records": {
 			"audit": "Audit durchführen",
-			"audit_templates": "Audit planen",
+			"audit_templates": "Audit vorbereiten",
 			"documents_manage_approval": "Dokumente freigeben",
 			"documents_manage_bundles": "Dokumentenpakete verwalten",
 			"documents_manage_components": "Komponenten verwalten",
