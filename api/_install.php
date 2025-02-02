@@ -34,7 +34,7 @@ define('DEFAULTSQL', [
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`last_touch` datetime NOT NULL," .
-				"	`last_user` int NOT NULL," .
+				"	`last_user` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`closed` int NULL DEFAULT NULL," .
 				"	`notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
@@ -285,7 +285,7 @@ define('DEFAULTSQL', [
 				"	unit varchar(255) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	last_touch smalldatetime NOT NULL," .
-				"	last_user int NOT NULL," .
+				"	last_user varchar(255) NOT NULL," .
 				"	closed tinyint NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL," .
 				");"
