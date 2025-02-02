@@ -815,8 +815,8 @@
 			"vendor": "Vendors"
 		},
 		"records": {
-			"audit": "Audit",
-			"audit_templates": "Manage audittemplates",
+			"audit": "Execute Audit",
+			"audit_templates": "Plan audit",
 			"documents_manage_approval": "Approve document",
 			"documents_manage_bundles": "Manage document bundles",
 			"documents_manage_components": "Manage components",

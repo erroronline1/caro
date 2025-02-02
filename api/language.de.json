@@ -817,8 +817,8 @@
 			"vendor": "Lieferanten"
 		},
 		"records": {
-			"audit": "Audit",
-			"audit_templates": "Auditvorlagen verwalten",
+			"audit": "Audit durchführen",
+			"audit_templates": "Audit planen",
 			"documents_manage_approval": "Dokumente freigeben",
 			"documents_manage_bundles": "Dokumentenpakete verwalten",
 			"documents_manage_components": "Komponenten verwalten",
