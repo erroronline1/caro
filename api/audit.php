@@ -20,6 +20,7 @@
  // audit overview and export
 require_once('./_pdf.php');
 require_once("../libraries/xlsxwriter.class.php");
+require_once('./_calendarutility.php');
 
 class AUDIT extends API {
 	/**
@@ -401,6 +402,7 @@ class AUDIT extends API {
 		$this->response($result);
 	}
 
+
 	/**
 	 *             _ _ _   _                 _     _       
 	 *   ___ _ _ _| |_| |_| |_ ___ _____ ___| |___| |_ ___ 
@@ -495,6 +497,7 @@ class AUDIT extends API {
 				$result = [];
 				$datalist = ['objectives'=> [], 'questions' => [], 'hints' => []];
 				$select = ['...' . $this->_lang->GET('audit.audit.template.new') => ['value' => '0']];
+				$calendar = new CALENDARUTILITY($this->_pdo);
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
 
 				if($this->_requestedID && $this->_requestedID !== 'false' && ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'];
@@ -588,7 +591,14 @@ class AUDIT extends API {
 							'data-loss' => 'prevent'
 						],
 						'autocomplete' => array_values($datalist['objectives']) ? : null
+					], [
+						'type' => 'calendarbutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('audit.audit.template.schedule'),
+							'onpointerup' => $calendar->dialog([':type'=>'schedule'])
+						]
 					]
+
 				];
 				$result['render']['content'][] = [
 					[
