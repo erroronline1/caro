@@ -71,7 +71,7 @@ class AUDIT extends API {
 					':unit' => $template['unit'],
 					':content' => [],
 					':last_user' => $_SESSION['user']['id'],
-					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? : null
+					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null
 				];
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
 				$audit[':content'] = [
@@ -113,8 +113,61 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'PUT':
-				var_dump($this->_payload);
-				die();
+				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', ['values' => [':id' => $this->_requestedTemplate]]);
+				$template = $template ? $template[0] : null;
+				if (!$template) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
+				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+				$audit = $audit ? $audit[0] : null;
+				if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
+
+				// update general properties
+				$audit['last_user'] = $_SESSION['user']['id'];
+				$audit['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null;
+				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
+
+				// reset content to passed values
+				$audit['content'] = [
+					'objectives' => $template['objectives'],
+					'summary' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.summary')) ? : null,
+					'questions' => []
+				];
+				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.summary')});
+
+				// process content
+				// iterate over payload, match template question index, input name and possible multiples
+				// values always will be stored within an array to handle multiples by default
+				foreach($this->_payload as $key => $value){
+					if (!$value || $key === 'null') continue;
+					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // [1] setindex, [2] input, isset [3] possible multiple field
+					$set[2] = str_replace('_', ' ', $set[2]);
+					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
+						// translateable system fields
+						$audit['content']['questions'][intval($set[1])][$input][isset($set[3]) ? $set[3] - 1 : 0] = $value;
+					else
+						// manual human template question
+						$audit['content']['questions'][intval($set[1])][$set[2]][0] = $value;
+				}
+				$audit['content'] = json_encode($audit['content']);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put', [
+					'values' => [
+						':id' => $audit['id'],
+						':content' => $audit['content'],
+						':last_user' => $audit['last_user'],
+						':closed' => $audit['closed']
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.audit.execute.saved'),
+						'id' => $this->_pdo->lastInsertId(),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.audit.execute.not_saved'),
+						'id' => false,
+						'type' => 'error'
+					]]);
 				break;
 			case 'GET':
 				$result = [];
@@ -126,10 +179,7 @@ class AUDIT extends API {
 					],
 					'templates'=> [
 						'...' => ['value' => '0']
-					],
-					'closed' => [
-						'...' => ['value' => '0']
-					],
+					]
 				];
 				$templates = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
 				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
@@ -149,11 +199,8 @@ class AUDIT extends API {
 
 				// audit selections
 				foreach($audits as $row){
-					if ($row['closed']){
+					if (!$row['closed']){
 						$select['closed'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-					}
-					else {
-						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 				}
 
@@ -194,14 +241,15 @@ class AUDIT extends API {
 									"'".$this->_lang->GET('general.ok_button')."': true".
 									"}}).then(response => {if (response && response !== '...') api.audit('get', 'audit', response['" . $this->_lang->GET('audit.audit.template.select') . "'])});"
 							]
-						], [
-							'type' => 'select',
-							'attributes' => [
-								'name' => $this->_lang->GET('audit.audit.edit'),
-								'onchange' => "if (this.value !== '0') api.audit('get', 'audit', 'null', this.value);"
-							],
-							'content' => $select['edit']
 						]
+					];
+					if (count($select['edit']) > 2) $result['render']['content'][count($result['render']['content']) - 1][] = [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.edit'),
+							'onchange' => "if (this.value !== '0') api.audit('get', 'audit', 'null', this.value);"
+						],
+						'content' => $select['edit']
 					];
 				}
 				else {
