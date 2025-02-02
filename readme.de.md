@@ -1117,7 +1117,7 @@ user_image = 256 ; maximale Pixel für längste Seite
 ; Im Falle einer Änderung von Berechtigungen für Freigaben müssen alle Elemente auch Rückwirkend von der neuen Gruppe freigegeben werden!
 [permissions]
 appmanual = "qmo" ; Ergänzugen und Änderungen der Anleitung
-audits = "ceo, qmo, prrc, supervisor" ; Zugriff auf das Audit-Modul
+audit = "ceo, qmo" ; Vorbereiten und Durchführen von internen Audits
 auditsoperation = "ceo, qmo, prrc" ; Erlaubnis zum Export, dem Widerruf von Stichprobenprüfungen, dem Löschen von Bestellstatistiken, etc.
 calendaredit = "ceo, qmo, supervisor" ; Änderung, Löschung oder Abschluss von Kalenderereignissen oder Arbeitszeiteinträgen
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; z.B. Anlegen von Krankheitstagen nach telefonischer Meldung
@@ -1133,7 +1133,7 @@ formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Do
 documentcomposer = "ceo, qmo" ; Dokumente und Komponenten erstellen
 documentexport = "ceo, qmo, supervisor" ; Dokumente als PDF exportieren
 incorporation = "ceo, qmo, prrc" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
-mdrsamplecheck = "ceo, qmo, prrc"; Stichprobenprüfung zurücksetzen - müssen auch Zugriff auf Audit haben
+mdrsamplecheck = "ceo, qmo, prrc"; Stichprobenprüfung zurücksetzen - müssen auch Zugriff auf regulatorische Auswertungen haben
 orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Bereiche hinzuzufügen
 ordercancel = "ceo" ; Berechtigung Bestellungen anderer Bereiche zu stornieren oder Rücksendungen zu veranlassen
 orderdisplayall = "purchase" ; standardmäßig alle Bestellungen anzeigen
@@ -1144,6 +1144,8 @@ recordsclosing = "ceo, supervisor" ; Dokumentationen als abgeschlossen kennzeich
 recordscasestate = "ceo, supervisor, office" ; Fall-Stände bearbeiten
 recordsexport = "user"; Export von Aufzeichnungen, ggf. einschränken um ungewollte Datenverbreitung einzuschränken
 recordsretyping = "ceo, supervisor, prrc" ; Reklamationen und Nacharbeiten als anderen Dokumentationstyp abändern
+regulatory = "ceo, qmo, prrc, supervisor" ; Zugriff auf regulatorische Auswertungen und Zusammenfassungen
+regulatoryoperation = "ceo, qmo, prrc" ; Erlaubnis zum Export, dem Widerruf von Stichprobenprüfungen, dem Löschen von Bestellstatistiken, etc.
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen
 texttemplates = "ceo, qmo" ; Textvorschläge anlegen und bearbeiten
 trainingevaluation = "ceo, supervisor" ; Schulungsbewertungen

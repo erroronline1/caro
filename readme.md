@@ -111,12 +111,16 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * vendor templates
 * text recommendation templates
 * document templates
+* audit templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* audit questions with assigned regulatory issues
-* audit schedule with calendar integration
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
+* token export with name, pdf card format
+* [audit api endpoints](#audit-endpoints)
+* [audit description](#audit)
+* [rename audit to Regulatory evaluations and summaries](#audit)
+* [describe ISO 19011 goals](#extras)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -1194,8 +1198,7 @@ user_image = 256 ; max pixels on longer side
 ; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
 [permissions]
 appmanual = "qmo" ; contribute to and edit application manual
-audits = "ceo, qmo, prrc, supervisor" ; access audits
-auditsoperation = "ceo, qmo, prrc" ; export, revoke sample checks, drain order statistics, etc.
+audit = "ceo, qmo" ; prepare and execute internal audits
 calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
 calendaraddforeigntimesheet = "ceo, supervisor, human_ressources" ; e.g. insert sick days after calling in
 calendarfullaccess = "ceo" ; edit, delete or complete events and entries
@@ -1206,11 +1209,11 @@ csvrules = "qmo" ; add csv filter
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
 filebundles = "ceo, qmo" ; create file bundles
 files = "office, ceo, qmo" ; upload and delete files
-'documentapproval' = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve documents and components
+documentapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve documents and components
 documentcomposer = "ceo, qmo" ; compose documents
 documentexport = "ceo, qmo, supervisor" ; export documents as printable pdf
 incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
-mdrsamplecheck = "ceo, qmo, prrc"; must have access to audit as well
+mdrsamplecheck = "ceo, qmo, prrc"; must have access to regulatory as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
 orderdisplayall = "purchase" ; display all orders by default, not only for own units
@@ -1221,6 +1224,8 @@ recordscasestate = "ceo, supervisor, office" ; set casestates
 recordsclosing = "ceo, supervisor" ; mark record as closed, reassign identifier (e.g. on accidentally duplicate creation)
 recordsexport = "user"; exporting records, limit if reasonable to reduce risk of data breach
 recordsretyping = "ceo, supervisor, prrc" ; reset type of complaints and reworks
+regulatory = "ceo, qmo, prrc, supervisor" ; access regulatory evaluations and summaries
+regulatoryoperation = "ceo, qmo, prrc" ; export, revoke sample checks, drain order statistics, etc.
 riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
 texttemplates = "ceo, qmo" ; add and edit text templates
 trainingevaluation = "ceo, supervisor" ; evaluate trainings
