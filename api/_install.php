@@ -1113,6 +1113,11 @@ class INSTALL {
 				UTILITY::alterImage($entry['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$entry['image'] = substr($entry['image'], 3);
 
+				// gather timesheet setup
+				$entry['app_settings']['annualvacation'] = $this->_currentdate->format('Y-m-d'). ' 30';
+				$entry['app_settings']['weeklyhours'] =  $this->_currentdate->format('Y-m-d'). ' 38,5';
+				$entry['app_settings']['initialovertime'] = 0;
+				
 				//ensure proper formatting
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
 				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units']));
@@ -1125,7 +1130,7 @@ class INSTALL {
 					':token' => $entry['token'],
 					':orderauth' => $entry['orderauth'],
 					':image' => $entry['image'],
-					':app_settings' => '',
+					':app_settings' => json_encode($entry['app_settings']),
 					':skills' => ''
 				];
 			}
