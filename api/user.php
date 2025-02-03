@@ -1092,6 +1092,10 @@ class USER extends API {
 								'attributes' => [
 									'name' => $user['name'] . '_token',
 									'url' => 'data:image/png;base64, ' . base64_encode($this->token($user['token'], $user['name']))
+								],
+								'dimensions' => [
+									'width' => 1024,
+									'height' => ceil(1024 / 85.6 * 53.9) // see $this->token()
 								]
 							]
 						],

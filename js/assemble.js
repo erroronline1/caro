@@ -603,20 +603,21 @@ export class Assemble {
 					img = new Image();
 				img.src = image.content;
 				img.addEventListener("load", function (e) {
-					let x,
-						y,
+					let x = imgcanvas.width,
+						y = imgcanvas.height,
 						w = this.width,
 						h = this.height,
 						xoffset = 0,
 						yoffset = 0;
-					if (w >= h) {
-						x = imgcanvas.width;
-						y = (imgcanvas.height * h) / w;
-						yoffset = (x - y) / 2;
-					} else {
-						x = (imgcanvas.width * w) / h;
-						y = imgcanvas.height;
-						xoffset = (y - x) / 2;
+					if (imgcanvas.width > w || imgcanvas.height > h) {
+						// aka square by default if dimensions have not been passed
+						if (w >= h) {
+							y = (imgcanvas.height * h) / w;
+							yoffset = (x - y) / 2;
+						} else {
+							x = (imgcanvas.width * w) / h;
+							xoffset = (y - x) / 2;
+						}
 					}
 					imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
 				});
@@ -1541,6 +1542,10 @@ export class Assemble {
 	 * 			"barcode": {"value":"e.g. tokenfor display of a barcode with this value", "format": "see documentation"},
 	 * 			"url": "base64 encoded string|url",
 	 * 			"imageonly": {"inline styles": "overriding .imagecanvas"}|undefined
+	 * 		},
+	 * 		"dimensions"{
+	 * 			"width": int,
+	 * 			"height": int
 	 * 		}
 	 * 	}
 	 */
@@ -1556,8 +1561,10 @@ export class Assemble {
 				canvas.style[key] = value;
 			}
 		} else result = result.concat(this.header());
-
-		canvas.width = canvas.height = 1024;
+		if (this.currentElement.dimensions) {
+			canvas.width = this.currentElement.dimensions.width;
+			canvas.height = this.currentElement.dimensions.height;
+		} else canvas.width = canvas.height = 1024;
 		if (this.currentElement.attributes.qrcode) {
 			this.imageQrCode.push({
 				id: canvas.id,
