@@ -118,6 +118,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
 * token export with name, pdf card format
 * save regulatory to audit, do not rely on template!
+* message unit and permissions on closed audits, how to access information without regulatory permission? message text?
+* display summary of last audit, if available for new audit planning? how could that work with frontend selecting unit?
 * [audit api endpoints](#audit-endpoints)
 * [audit description](#audit)
 * [rename audit to Regulatory evaluations and summaries](#audit)
