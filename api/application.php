@@ -667,6 +667,29 @@ class APPLICATION extends API {
 			];
 		}
 
+		// unclosed audits
+		if (PERMISSION::permissionFor('audit')){
+			$number = $notifications->audits();
+			if ($number){
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onpointerup' => "api.audit('get', 'audit')",
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('application.dashboard.audits', [':number' => $number]),
+							'attributes' => [
+								'data-type' => 'record',
+								'name' => $this->_lang->GET('menu.records.header')
+							]
+						]
+					]
+				];
+			}
+		}
+
 		// unapproved documents and components
 		$unapproved = $notifications->documents();
 		if ($unapproved){

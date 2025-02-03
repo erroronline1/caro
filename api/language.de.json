@@ -120,6 +120,7 @@
 	},
 	"application": {
 		"dashboard": {
+			"audits": ":number Audits müssen abgeschlossen werden",
 			"cases": ":number offene Vorgänge für deine zugeordneten Bereiche",
 			"complaints": ":number nicht abgeschlossene Reklamationen",
 			"messages": "Du hast :number ungelesene Nachricht(en)",

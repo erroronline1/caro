@@ -120,6 +120,7 @@
 	},
 	"application": {
 		"dashboard": {
+			"audits": ":number audits await completion",
 			"cases": "There are :number open cases for your assigned units",
 			"complaints": ":number open complaints",
 			"messages": "You have :number unread message(s)",
