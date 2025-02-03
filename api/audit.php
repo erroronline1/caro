@@ -259,9 +259,7 @@ class AUDIT extends API {
 						'data-usecase' => 'audit',
 						'action' => "javascript:api.audit('" . ($audit['id'] ? 'put' : 'post') . "', 'audit', " . $template['id']. ", " . $audit['id'] . ")"
 					];
-					if ($audit) {
-						$audit['content'] = json_decode($audit['content'], true);
-					}
+					$audit['content'] = json_decode($audit['content'], true);
 
 					// display unit and audit objectives
 					$result['render']['content'][] = [
@@ -271,7 +269,7 @@ class AUDIT extends API {
 								'name' => $this->_lang->_USER['units'][$template['unit']]
 							],
 							'content' => $template['objectives'] .
-								($audit ? "\n \n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $audit['last_touch'], ':user' => $audit['last_user']]) : '')
+								($audit['id'] ? "\n \n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $audit['last_touch'], ':user' => $audit['last_user']]) : '')
 						]
 					];
 
