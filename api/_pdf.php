@@ -21,93 +21,11 @@
 require_once('../libraries/TCPDF/tcpdf_import.php');
 
 class PDF{
-	public static function identifierPDF($content, $type = 'sheet'){
-		// create a pdf for a label sheet with qr code and plain text
-		// or label for label printer as selected
-		$_lang = new LANG();
-
-		$setup = [
-			'orientation' => isset(CONFIG['label'][$type]['orientation']) ? CONFIG['label'][$type]['orientation'] : 'portrait',
-			'format' => isset(CONFIG['label'][$type]['format']) ? CONFIG['label'][$type]['format'] : 'A4',
-			'title' => $_lang->GET('record.create_identifier', [], true),
-			'margin' => [
-				'top' => isset(CONFIG['label'][$type]['margintop']) ? CONFIG['label'][$type]['margintop'] : 0,
-				'right' => isset(CONFIG['label'][$type]['marginright']) ? CONFIG['label'][$type]['marginright'] : 0,
-				'bottom' => isset(CONFIG['label'][$type]['marginbottom']) ? CONFIG['label'][$type]['marginbottom'] : 0 ,
-				'left' => isset(CONFIG['label'][$type]['marginleft']) ? CONFIG['label'][$type]['marginleft'] : 0,
-			],
-			'rows' => isset(CONFIG['label'][$type]['rows']) ? CONFIG['label'][$type]['rows'] : 1,
-			'columns' => isset(CONFIG['label'][$type]['columns']) ? CONFIG['label'][$type]['columns'] : 1,
-			'fontsize' => isset(CONFIG['label'][$type]['fontsize']) ? CONFIG['label'][$type]['fontsize'] : 10,
-			'codesizeoffset' => isset(CONFIG['label'][$type]['codesizeoffset']) ? CONFIG['label'][$type]['codesizeoffset'] :0
-		];
-		$customsetup = preg_split('/\D{1,}/', $setup['format']);
-		if (count($customsetup) > 1){
-			$setup['format'] = [$customsetup[0], $customsetup[1]];
-		}
-
-		// create new PDF document
-		$pdf = new TCPDF($setup['orientation'], PDF_UNIT, $setup['format'], true, 'UTF-8', false);
-
-		// set document information
-		$pdf->SetCreator(CONFIG['system']['caroapp']);
-		$pdf->SetAuthor($_SESSION['user']['name']);
-		$pdf->SetTitle($setup['title']);
-		$pdf->setPrintHeader(false);
-		$pdf->setPrintFooter(false);
-		// set margins
-		$pdf->SetMargins($setup['margin']['left'], $setup['margin']['top'], $setup['margin']['right'], true);
-		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, $setup['margin']['bottom']); // margin bottom
-		// set font
-		$pdf->SetFont('helvetica', '', $setup['fontsize']); // font size
-		// add a page
-		$pdf->AddPage();
-		// set cell padding
-		$pdf->setCellPaddings(0, 0, 0, 0);
-		// set cell margins
-		$pdf->setCellMargins(0, 0, 0, 0);
-		// set color for background
-		$pdf->SetFillColor(255, 255, 255);
-
-		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$format = [$pdf->getPageWidth(), $pdf->getPageheight()];
-		$columnwidth = ($format[0] - ($setup['margin']['left'] + $setup['margin']['right'])) / $setup['columns'];
-		$rowheight = ($format[1] - ($setup['margin']['top'] + $setup['margin']['bottom'])) / $setup['rows'];
-
-		//var_dump($columnwidth, $rowheight);
-		$codesize = min($columnwidth, $rowheight) - $setup['codesizeoffset'];
-		$style = array(
-			'border' => 0,
-			'vpadding' => 'auto',
-			'hpadding' => 'auto',
-			'fgcolor' => array(0,0,0),
-			'bgcolor' => false, //array(255,255,255)
-			'module_width' => 1, // width of a single module in points
-			'module_height' => 1 // height of a single module in points
-		);
-
-		for ($row = 0; $row < $setup['rows']; $row++){
-			for ($column = 0; $column < $setup['columns']; $column++){
-				$pdf->write2DBarcode($content, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], $codesize, $codesize, $style, 'N');
-				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === $setup['columns'] - 1), $column * $columnwidth + $codesize + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], true, 0, false, true, 24, 'T', true);
-			}
-		}
-		// move pointer to last page
-		$pdf->lastPage();
-
-		//Close and output PDF document
-		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$filename = preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content) . '.pdf';
-		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
-	}
-
-	public static function recordsPDF($content){
+	public static function auditPDF($content){
 		// create a pdf for a record summary
 		// create new PDF document
 		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['record']['format'], true, 'UTF-8', false, false,
-		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
+		20, null, ['title' => $content['title'], 'date' => $content['date']]);
 
 		// set document information
 		$pdf->SetCreator(CONFIG['system']['caroapp']);
@@ -115,7 +33,7 @@ class PDF{
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'], 1);
+		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'],1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
@@ -130,48 +48,26 @@ class PDF{
 		$pdf->SetFillColor(255, 255, 255);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		
 		$height = [
 			'font' => 10,
 		];
 
-		foreach($content['content'] as $document => $entries){
-			$pdf->SetFont('helvetica', '', $height['font'] + 2); // font size
-			$pdf->MultiCell(140, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-			foreach($entries as $key => $value){
-				// name column
-				$pdf->SetFont('helvetica', 'B', $height['font']); // font size
-				$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-				$pdf->applyCustomPageBreak($nameLines, $height['font']);
-				
-				// values column
-				$pdf->SetFont('helvetica', '', $height['font']); // font size
-				preg_match("/(?:^href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
-				if ($link) {
-					// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-					$valueLines = $pdf->writeHTMLCell(140, 4, 60, $pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
-				}
-				// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-				else $valueLines = $pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-				
-				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
-				$pdf->Ln(($offset - 1) * $height['font'] / 2);
+		foreach($content['content'] as $key => $value){
+			// name column
+			$pdf->SetFont('helvetica', 'B', $height['font']); // font size
+			$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+			$pdf->applyCustomPageBreak($nameLines, $height['font']);
+
+			// values column
+			$pdf->SetFont('helvetica', '', $height['font']); // font size
+			if (gettype($value) === 'array') {
+				$value = implode("\n", array_keys($value));
 			}
-			if (array_key_exists($document, $content['images'])){
-				$ln = 0;
-				foreach ($content['images'][$document] as $image){
-					$imagedata = pathinfo($image);
-					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
-					$pdf->SetFont('helvetica', 'B', $height['font']); // font size
-					$pdf->MultiCell(50, CONFIG['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-					if ($img_width && CONFIG['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / CONFIG['pdf']['exportimage']['maxheight']))
-						$pdf->Image('.' . $image, null, null, 0, CONFIG['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
-					else
-						$pdf->Image('.' . $image, null, null, 145, 0, '', '', 'R', true, 300, 'R');
-					$pdf->Ln(CONFIG['pdf']['exportimage']['maxheight']);
-				}
-			}
+			$valueLines = $pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+
+			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
+			$pdf->Ln(($offset - 1) * $height['font'] / 2);
 		}
 		// move pointer to last page
 		$pdf->lastPage();
@@ -323,11 +219,93 @@ class PDF{
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
 
-	public static function auditPDF($content){
+	public static function identifierPDF($content, $type = 'sheet'){
+		// create a pdf for a label sheet with qr code and plain text
+		// or label for label printer as selected
+		$_lang = new LANG();
+
+		$setup = [
+			'orientation' => isset(CONFIG['label'][$type]['orientation']) ? CONFIG['label'][$type]['orientation'] : 'portrait',
+			'format' => isset(CONFIG['label'][$type]['format']) ? CONFIG['label'][$type]['format'] : 'A4',
+			'title' => $_lang->GET('record.create_identifier', [], true),
+			'margin' => [
+				'top' => isset(CONFIG['label'][$type]['margintop']) ? CONFIG['label'][$type]['margintop'] : 0,
+				'right' => isset(CONFIG['label'][$type]['marginright']) ? CONFIG['label'][$type]['marginright'] : 0,
+				'bottom' => isset(CONFIG['label'][$type]['marginbottom']) ? CONFIG['label'][$type]['marginbottom'] : 0 ,
+				'left' => isset(CONFIG['label'][$type]['marginleft']) ? CONFIG['label'][$type]['marginleft'] : 0,
+			],
+			'rows' => isset(CONFIG['label'][$type]['rows']) ? CONFIG['label'][$type]['rows'] : 1,
+			'columns' => isset(CONFIG['label'][$type]['columns']) ? CONFIG['label'][$type]['columns'] : 1,
+			'fontsize' => isset(CONFIG['label'][$type]['fontsize']) ? CONFIG['label'][$type]['fontsize'] : 10,
+			'codesizeoffset' => isset(CONFIG['label'][$type]['codesizeoffset']) ? CONFIG['label'][$type]['codesizeoffset'] : 0
+		];
+		$customsetup = preg_split('/\D{1,}/', $setup['format']);
+		if (count($customsetup) > 1){
+			$setup['format'] = [$customsetup[0], $customsetup[1]];
+		}
+
+		// create new PDF document
+		$pdf = new TCPDF($setup['orientation'], PDF_UNIT, $setup['format'], true, 'UTF-8', false);
+
+		// set document information
+		$pdf->SetCreator(CONFIG['system']['caroapp']);
+		$pdf->SetAuthor($_SESSION['user']['name']);
+		$pdf->SetTitle($setup['title']);
+		$pdf->setPrintHeader(false);
+		$pdf->setPrintFooter(false);
+		// set margins
+		$pdf->SetMargins($setup['margin']['left'], $setup['margin']['top'], $setup['margin']['right'], true);
+		// set auto page breaks
+		$pdf->SetAutoPageBreak(TRUE, $setup['margin']['bottom']); // margin bottom
+		// set font
+		$pdf->SetFont('helvetica', '', $setup['fontsize']); // font size
+		// add a page
+		$pdf->AddPage();
+		// set cell padding
+		$pdf->setCellPaddings(0, 0, 0, 0);
+		// set cell margins
+		$pdf->setCellMargins(0, 0, 0, 0);
+		// set color for background
+		$pdf->SetFillColor(255, 255, 255);
+
+		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		$format = [$pdf->getPageWidth(), $pdf->getPageheight()];
+		$columnwidth = ($format[0] - ($setup['margin']['left'] + $setup['margin']['right'])) / $setup['columns'];
+		$rowheight = ($format[1] - ($setup['margin']['top'] + $setup['margin']['bottom'])) / $setup['rows'];
+
+		//var_dump($columnwidth, $rowheight);
+		$codesize = min($columnwidth, $rowheight) - $setup['codesizeoffset'];
+		$style = array(
+			'border' => 0,
+			'vpadding' => 'auto',
+			'hpadding' => 'auto',
+			'fgcolor' => array(0,0,0),
+			'bgcolor' => false, //array(255,255,255)
+			'module_width' => 1, // width of a single module in points
+			'module_height' => 1 // height of a single module in points
+		);
+
+		for ($row = 0; $row < $setup['rows']; $row++){
+			for ($column = 0; $column < $setup['columns']; $column++){
+				$pdf->write2DBarcode($content, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], $codesize, $codesize, $style, 'N');
+				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === $setup['columns'] - 1), $column * $columnwidth + $codesize + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], true, 0, false, true, 24, 'T', true);
+			}
+		}
+		// move pointer to last page
+		$pdf->lastPage();
+
+		//Close and output PDF document
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
+		$filename = preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content) . '.pdf';
+		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
+		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
+	}
+
+	public static function recordsPDF($content){
 		// create a pdf for a record summary
 		// create new PDF document
 		$pdf = new RECORDTCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, CONFIG['pdf']['record']['format'], true, 'UTF-8', false, false,
-		20, null, ['title' => $content['title'], 'date' => $content['date']]);
+		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
 
 		// set document information
 		$pdf->SetCreator(CONFIG['system']['caroapp']);
@@ -335,7 +313,7 @@ class PDF{
 		$pdf->SetTitle($content['title']);
 
 		// set margins
-		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'],1);
+		$pdf->SetMargins(CONFIG['pdf']['record']['marginleft'], PDF_MARGIN_HEADER + CONFIG['pdf']['record']['margintop'], CONFIG['pdf']['record']['marginright'], 1);
 		$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
 		$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 		// set auto page breaks
@@ -350,27 +328,49 @@ class PDF{
 		$pdf->SetFillColor(255, 255, 255);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		
 		$height = [
 			'font' => 10,
 		];
 
-		foreach($content['content'] as $key => $value){
-			// name column
-			$pdf->SetFont('helvetica', 'B', $height['font']); // font size
-			$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-			$pdf->applyCustomPageBreak($nameLines, $height['font']);
-
-			// values column
-			$pdf->SetFont('helvetica', '', $height['font']); // font size
-			if (gettype($value) === 'array') {
-				$value = implode("\n", array_keys($value));
+		foreach($content['content'] as $document => $entries){
+			$pdf->SetFont('helvetica', '', $height['font'] + 2); // font size
+			$pdf->MultiCell(140, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			foreach($entries as $key => $value){
+				// name column
+				$pdf->SetFont('helvetica', 'B', $height['font']); // font size
+				$nameLines = $pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+				$pdf->applyCustomPageBreak($nameLines, $height['font']);
+				
+				// values column
+				$pdf->SetFont('helvetica', '', $height['font']); // font size
+				preg_match("/(?:^href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
+				if ($link) {
+					// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+					$valueLines = $pdf->writeHTMLCell(140, 4, 60, $pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
+				}
+				// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+				else $valueLines = $pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+				
+				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
+				$pdf->Ln(($offset - 1) * $height['font'] / 2);
 			}
-			$valueLines = $pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-
-			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
-			$pdf->Ln(($offset - 1) * $height['font'] / 2);
-}
+			if (array_key_exists($document, $content['images'])){
+				$ln = 0;
+				foreach ($content['images'][$document] as $image){
+					$imagedata = pathinfo($image);
+					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
+					$pdf->SetFont('helvetica', 'B', $height['font']); // font size
+					$pdf->MultiCell(50, CONFIG['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+					if ($img_width && CONFIG['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / CONFIG['pdf']['exportimage']['maxheight']))
+						$pdf->Image('.' . $image, null, null, 0, CONFIG['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+					else
+						$pdf->Image('.' . $image, null, null, 145, 0, '', '', 'R', true, 300, 'R');
+					$pdf->Ln(CONFIG['pdf']['exportimage']['maxheight']);
+				}
+			}
+		}
 		// move pointer to last page
 		$pdf->lastPage();
 
@@ -426,6 +426,87 @@ class PDF{
 		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+	}
+
+	public static function tokenPDF($content, $type = 'card'){
+		// create a pdf for a token card with qr code and plain text
+		$_lang = new LANG();
+
+		$setup = [
+			'orientation' => isset(CONFIG['token'][$type]['orientation']) ? CONFIG['token'][$type]['orientation'] : 'portrait',
+			'format' => isset(CONFIG['token'][$type]['format']) ? CONFIG['token'][$type]['format'] : 'A4',
+			'title' => $_lang->GET('record.create_identifier', [], true),
+			'margin' => [
+				'top' => isset(CONFIG['token'][$type]['margintop']) ? CONFIG['token'][$type]['margintop'] : 0,
+				'right' => isset(CONFIG['token'][$type]['marginright']) ? CONFIG['token'][$type]['marginright'] : 0,
+				'bottom' => isset(CONFIG['token'][$type]['marginbottom']) ? CONFIG['token'][$type]['marginbottom'] : 0 ,
+				'left' => isset(CONFIG['token'][$type]['marginleft']) ? CONFIG['token'][$type]['marginleft'] : 0,
+			],
+			'rows' => isset(CONFIG['token'][$type]['rows']) ? CONFIG['token'][$type]['rows'] : 1,
+			'columns' => isset(CONFIG['token'][$type]['columns']) ? CONFIG['token'][$type]['columns'] : 1,
+			'fontsize' => isset(CONFIG['token'][$type]['fontsize']) ? CONFIG['token'][$type]['fontsize'] : 10,
+			'codesizeoffset' => isset(CONFIG['token'][$type]['codesizeoffset']) ? CONFIG['token'][$type]['codesizeoffset'] : 0
+		];
+		$customsetup = preg_split('/\D{1,}/', $setup['format']);
+		if (count($customsetup) > 1){
+			$setup['format'] = [$customsetup[0], $customsetup[1]];
+		}
+
+		// create new PDF document
+		$pdf = new TCPDF($setup['orientation'], PDF_UNIT, $setup['format'], true, 'UTF-8', false);
+
+		// set document information
+		$pdf->SetCreator(CONFIG['system']['caroapp']);
+		$pdf->SetAuthor($_SESSION['user']['name']);
+		$pdf->SetTitle($setup['title']);
+		$pdf->setPrintHeader(false);
+		$pdf->setPrintFooter(false);
+		// set margins
+		$pdf->SetMargins($setup['margin']['left'], $setup['margin']['top'], $setup['margin']['right'], true);
+		// set auto page breaks
+		$pdf->SetAutoPageBreak(TRUE, $setup['margin']['bottom']); // margin bottom
+		// set font
+		$pdf->SetFont('helvetica', '', $setup['fontsize']); // font size
+		// add a page
+		$pdf->AddPage();
+		// set cell padding
+		$pdf->setCellPaddings(0, 0, 0, 0);
+		// set cell margins
+		$pdf->setCellMargins(0, 0, 0, 0);
+		// set color for background
+		$pdf->SetFillColor(255, 255, 255);
+
+		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+		$format = [$pdf->getPageWidth(), $pdf->getPageheight()];
+		$columnwidth = ($format[0] - ($setup['margin']['left'] + $setup['margin']['right'])) / $setup['columns'];
+		$rowheight = ($format[1] - ($setup['margin']['top'] + $setup['margin']['bottom'])) / $setup['rows'];
+
+		//var_dump($columnwidth, $rowheight);
+		$codesize = min($columnwidth, $rowheight) - $setup['codesizeoffset'];
+		$style = array(
+			'border' => 0,
+			'vpadding' => 'auto',
+			'hpadding' => 'auto',
+			'fgcolor' => array(0,0,0),
+			'bgcolor' => false, //array(255,255,255)
+			'module_width' => 1, // width of a single module in points
+			'module_height' => 1 // height of a single module in points
+		);
+
+		for ($row = 0; $row < $setup['rows']; $row++){
+			for ($column = 0; $column < $setup['columns']; $column++){
+				$pdf->write2DBarcode($content['token'], 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], $codesize, $codesize, $style, 'N');
+				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content['text'], 0, '', 0, intval($column === $setup['columns'] - 1), $column * $columnwidth + $codesize + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], true, 0, false, true, 24, 'T', true);
+			}
+		}
+		// move pointer to last page
+		$pdf->lastPage();
+
+		//Close and output PDF document
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
+		$filename = preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content['text']) . '.pdf';
+		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
+		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
 	}
 }
 

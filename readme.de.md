@@ -1174,6 +1174,18 @@ label[marginbottom] = 2 ; in mm
 label[marginleft] = 1 ; in mm
 label[fontsize] = 12
 
+; Seiteneinstellungen für PDF Nutzertoken export
+[token]
+card[format] = '85 x 53' ; Breite und Höhe in mm, ggf Bezeichnung
+card[orientation] = 'landscape' ; portrait or landscape
+card[rows] = 1
+card[colums] = 1
+card[margintop] = 5 ; in mm
+card[marginright] = 5 ; in mm
+card[marginbottom] = 5 ; in mm
+card[marginleft] = 5 ; in mm
+card[fontsize] = 12
+
 ; Seiteneinstellungen für PDF-Aufzeichnungen
 [pdf]
 record[format] = 'A4'

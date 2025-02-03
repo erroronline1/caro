@@ -1088,10 +1088,20 @@ class USER extends API {
 						[
 							[
 								'type' => 'image',
-								'description' => $this->_lang->GET('user.export_qr_token'),
+								'description' => $this->_lang->GET('user.export_qr_token_image'),
 								'attributes' => [
-								'name' => $user['name'] . '_token',
-								'qrcode' => $user['token']]
+									'name' => $user['name'] . '_token',
+									'qrcode' => $user['token']
+								]
+							], [
+								'type' => 'br'
+							], [
+								'type' => 'button',
+								'attributes' => [
+									'value' => $this->_lang->GET('user.export_qr_token_card'),
+									'type' => 'button',
+									'onpointerup' => "api.user('get', 'token', ".$user['id'].")"
+								]
 							]
 						],
 						$result['render']['content'][6]
@@ -1142,6 +1152,45 @@ class USER extends API {
 					]]);
 				break;
 		}
+	}
+
+	/**
+	 *
+	 *   _ _ ___ ___ ___
+	 *  | | |_ -| -_|  _|
+	 *  |___|___|___|_|
+	 *
+	 * edit users
+	 */
+	public function token(){
+		if (!PERMISSION::permissionFor('users')) $this->response([], 401);
+
+		require_once('./_pdf.php');
+
+		// select single user based on id or name
+		$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+			'replacements' => [
+				':id' => intval($this->_requestedID) ? : '',
+				':name' => ''
+			]
+		]);
+		$user = $user ? $user[0] : null;
+		if (!$user) $this->response([], 404);
+
+		$downloadfiles = [];
+		$downloadfiles[$this->_lang->GET('user.export_qr_token_card')] = [
+			'href' => './api/api.php/file/stream/' . PDF::tokenPDF(['token' => $user['token'], 'text' => $user['name']])
+		];
+		$body = [
+			[
+				'type' => 'links',
+				'description' => $this->_lang->GET('user.export_qr_token_card'),
+				'content' => $downloadfiles
+			]
+		];
+		$this->response([
+			'render' => $body
+		]);
 	}
 }
 ?>

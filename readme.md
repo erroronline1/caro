@@ -116,7 +116,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
-* token export with name, pdf card format
+* token export with name, pdf card format, **api endpoint token**
 * save regulatory to audit, do not rely on template!
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text?
 * display summary of last audit, if available for new audit planning? how could that work with frontend selecting unit?
@@ -1257,6 +1257,18 @@ label[marginbottom] = 2 ; in mm
 label[marginleft] = 1 ; in mm
 label[fontsize] = 12
 
+; settings for pdf user token export
+[token]
+card[format] = '85 x 53' ; width and height in mm
+card[orientation] = 'landscape' ; portrait or landscape
+card[rows] = 1
+card[colums] = 1
+card[margintop] = 5 ; in mm
+card[marginright] = 5 ; in mm
+card[marginbottom] = 5 ; in mm
+card[marginleft] = 5 ; in mm
+card[fontsize] = 12
+
 ; page settings for record pdf
 [pdf]
 record[format] = 'A4'
@@ -1346,6 +1358,7 @@ If you ever fiddle around with the sourcecode:
 * The application is designed and [tested](#prerequisites) to work with Apache2 with MySQL/MariaDB and IIS with SQL Server. For other server/database configurations additional prepared queries and access restrictions to the fileserver (`UTILITY::createDirectory()`) may have to be created.
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning. During development altering tables [can be enabled if disabled by default](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
+* Settings to access a local server on the development machine: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 
 [Content](#content)

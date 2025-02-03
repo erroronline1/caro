@@ -1597,15 +1597,32 @@ export const api = {
 			};
 		switch (method) {
 			case "get":
-				successFn = function (data) {
-					if (data.render) {
-						api.update_header(title[request[1]]);
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
-					}
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				};
+				switch(request[1]){
+					case 'token':
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.render !== undefined) {
+								const options = {};
+								options[api._lang.GET("general.ok_button")] = false;
+								new Dialog({
+									type: "input",
+									render: data.render,
+									options: options,
+								});
+							};
+						}
+						break;
+					default:
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]]);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+				}
 				break;
 			case "post":
 				payload = _.getInputs("[data-usecase=user]", true);
