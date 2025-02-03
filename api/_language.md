@@ -61,7 +61,7 @@ All keys are hardcoded
 ### audit
 All keys are hardcoded
 
-`risk_issues`-keys must contain `risk.type` as well
+`risk_issues`-keys must contain `risk.type` as well. `audit.execute.rating_steps` order is passed to application.
 
 ### calendar
 All keys are hardcoded. `timesheet.pto`, `timesheet.signature` and `timesheet.export.sheet_daily` orders are passed to application.
