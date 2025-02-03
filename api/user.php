@@ -1088,19 +1088,10 @@ class USER extends API {
 						[
 							[
 								'type' => 'image',
-								'description' => $this->_lang->GET('user.export_qr_token_image'),
+								'description' => $this->_lang->GET('user.export_qr_token'),
 								'attributes' => [
 									'name' => $user['name'] . '_token',
-									'qrcode' => $user['token']
-								]
-							], [
-								'type' => 'br'
-							], [
-								'type' => 'button',
-								'attributes' => [
-									'value' => $this->_lang->GET('user.export_qr_token_card'),
-									'type' => 'button',
-									'onpointerup' => "api.user('get', 'token', ".$user['id'].")"
+									'url' => 'data:image/png;base64, ' . base64_encode($this->token($user['token'], $user['name']))
 								]
 							]
 						],
@@ -1160,37 +1151,41 @@ class USER extends API {
 	 *  | | |_ -| -_|  _|
 	 *  |___|___|___|_|
 	 *
-	 * edit users
+	 * returns an image in credit card format containing a token qr and the user name
 	 */
-	public function token(){
-		if (!PERMISSION::permissionFor('users')) $this->response([], 401);
+	private function token($CODE, $STRING){
+		if (!PERMISSION::permissionFor('users')) return null;
 
-		require_once('./_pdf.php');
+		require_once('../libraries/TCPDF/tcpdf_barcodes_2d.php');
+		require_once('../libraries/TCPDF/include/barcodes/qrcode.php');
+		$qrcode = new TCPDF2DBarcode($CODE, 'QRCODE,' . CONFIG['limits']['qr_errorlevel']);
+		$pngcode = imagecreatefromstring($qrcode->getBarcodePngData());
 
-		// select single user based on id or name
-		$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-			'replacements' => [
-				':id' => intval($this->_requestedID) ? : '',
-				':name' => ''
-			]
-		]);
-		$user = $user ? $user[0] : null;
-		if (!$user) $this->response([], 404);
-
-		$downloadfiles = [];
-		$downloadfiles[$this->_lang->GET('user.export_qr_token_card')] = [
-			'href' => './api/api.php/file/stream/' . PDF::tokenPDF(['token' => $user['token'], 'text' => $user['name']])
-		];
-		$body = [
-			[
-				'type' => 'links',
-				'description' => $this->_lang->GET('user.export_qr_token_card'),
-				'content' => $downloadfiles
+		$card = [85.6, 53.9];
+		$dimensions = [1024, ceil(1024 / $card[0] * $card[1])];
+		$margin = [
+			'qr' => [
+				'x' => 50,
+				'y' => 100,
 			]
 		];
-		$this->response([
-			'render' => $body
-		]);
+		$image = imagecreatetruecolor($dimensions[0], $dimensions[1]);
+		$background_color = imagecolorallocate($image, 255, 255, 255);
+		imagefill($image, 0, 0, $background_color);
+		imagecolortransparent($image, $background_color);
+		imagecopyresampled($image, $pngcode, $margin['qr']['x'], $margin['qr']['y'], 0, 0, $dimensions[1] - $margin['qr']['x'] * 4, $dimensions[1] - $margin['qr']['y'] * 2, $qrcode->getBarcodeArray()['num_cols'] * 3, $qrcode->getBarcodeArray()['num_rows'] * 3);
+
+		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
+		$font_size = 36;
+		$l = 0;
+		foreach(preg_split('/\s+/m', $STRING) as $line){
+			imagefttext($image, $font_size, 0, $dimensions[1] - $margin['qr']['x'], $margin['qr']['y'] + $font_size + ($font_size * 1.5 * $l++), $text_color, '../media/UbuntuMono-R.ttf', $line);
+		}
+		ob_start();
+		imagepng($image);
+		$image = ob_get_contents();
+		ob_end_clean();
+		return $image;
 	}
 }
 ?>

@@ -116,7 +116,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
-* token export with name, pdf card format, **api endpoint token**
 * save regulatory to audit, do not rely on template!
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text?
 * display summary of last audit, if available for new audit planning? how could that work with frontend selecting unit?
@@ -1256,18 +1255,6 @@ label[marginright] = 2 ; in mm
 label[marginbottom] = 2 ; in mm
 label[marginleft] = 1 ; in mm
 label[fontsize] = 12
-
-; settings for pdf user token export
-[token]
-card[format] = '85 x 53' ; width and height in mm
-card[orientation] = 'landscape' ; portrait or landscape
-card[rows] = 1
-card[colums] = 1
-card[margintop] = 5 ; in mm
-card[marginright] = 5 ; in mm
-card[marginbottom] = 5 ; in mm
-card[marginleft] = 5 ; in mm
-card[fontsize] = 12
 
 ; page settings for record pdf
 [pdf]
