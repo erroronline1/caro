@@ -422,6 +422,7 @@
 			},
 			"hint": "Hint",
 			"objectives": "Audit programme objectives",
+			"reminder_message": "It has been :days days since the last record edit of the audit of :unit. The last edit happened on :date.\nPlease finalize the audit.",
 			"regulatory": "Regulatory issues",
 			"template": {
 				"delete_confirm_header": "Delete template for :unit permanently?",

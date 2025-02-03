@@ -117,7 +117,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
 * token export with name, pdf card format
-* unclosed audit reminder
 * save regulatory to audit, do not rely on template!
 * [audit api endpoints](#audit-endpoints)
 * [audit description](#audit)

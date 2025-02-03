@@ -41,6 +41,7 @@ class NOTIFICATION extends API {
 	 */
 	public function notifs(){
 		$result = [
+			'audit_closing' => $this->audits(),
 			'calendar_uncompletedevents' => $this->calendar(),
 			'consumables_pendingincorporation' => $this->consumables(),
 			'document_approval' => $this->documents(),
@@ -50,6 +51,46 @@ class NOTIFICATION extends API {
 			'message_unseen' => $this->messageunseen()
 		];
 		$this->response($result);
+	}
+
+	/**
+	 *             _ _ _       
+	 *   ___ _ _ _| |_| |_ ___ 
+	 *  | .'| | | . | |  _|_ -|
+	 *  |__,|___|___|_|_| |___|
+	 * 
+	 * notify on unclosed audits
+	 */
+	public function audits(){
+		if (!PERMISSION::permissionFor('audit')) return 0;
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+		$number = 0;
+		foreach ($data as $row){
+			if ($row['closed']) continue;
+			// alert if applicable
+			$last = new DateTime($row['last_touch'], new DateTimeZone(CONFIG['application']['timezone']));
+			$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
+			$row['notified'] = $row['notified'] || 0;
+			if ($row['notified'] < $diff){
+				$this->alertUserGroup(
+					['permission' => [...PERMISSION::permissionFor('audit', true)]],
+					$this->_lang->GET('audit.audit.reminder_message', [
+						':days' => $last->diff($this->_currentdate)->days,
+						':date' => substr($row['last_touch'], 0, -3),
+						':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
+					], true)
+				);
+				SQLQUERY::EXECUTE($this->_pdo, 'audit_notified',
+					[
+					'values' => [
+						':notified' => $diff,
+						':id' => $row['id']]
+					]
+				);
+			}
+			$number++;
+		} 
+		return $number;
 	}
 
 	/**

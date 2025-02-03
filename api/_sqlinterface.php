@@ -167,6 +167,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id"
 		],
+		'audit_notified' => [
+			'mysql' => "UPDATE caro_audit SET notified = :notified WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit SET notified = :notified WHERE id = :id"
+		],
 		'audit_get' => [
 			'mysql' => "SELECT * FROM caro_audit",
 			'sqlsrv' => "SELECT * FROM caro_audit"

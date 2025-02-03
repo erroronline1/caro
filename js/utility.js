@@ -46,11 +46,21 @@ export const _serviceWorker = {
 		 */
 		document_approval: function (data) {
 			let notif;
-			if ("document_approval" in data) {
+			if ("document_approval" in data || "audit_closing" in data) {
+				let document_approval = 0,
+				audit_closing = 0;
+				if ("document_approval" in data) {
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.documents_manage_approval").replace(" ", "_") + "]");
+					if (notif) notif.setAttribute("data-notification", data.document_approval);
+					document_approval = data.document_approval;
+				}
+				if ("audit_closing" in data) {
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.audit").replace(" ", "_") + "]");
+					if (notif) notif.setAttribute("data-notification", data.audit_closing);
+					audit_closing = data.audit_closing;
+				}
 				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.records.header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.document_approval);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.documents_manage_approval").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", data.document_approval);
+				if (notif) notif.setAttribute("data-notification", parseInt(document_approval, 10) + parseInt(audit_closing, 10));
 			}
 		},
 
