@@ -117,9 +117,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
-* save regulatory to audit, do not rely on template!
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
-* [audit api endpoints](#audit-endpoints)
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -2124,7 +2122,7 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {logout} | path parameter | optional | triggers active logout if added literally |
-| payload | form data | optional | contains password for login
+| payload | form data | optional | contains password for login |
 
 Sample response
 ```
@@ -2162,6 +2160,123 @@ Samble response
 [Content](#content)
 
 ### Audit endpoints
+
+> POST ./api/api.php/audit/audit/{template_id}
+
+Stores a new audit to the database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | template id |
+| payload | form data | required | input data |
+
+Sample response
+```
+{"response":{"msg":"Audit saved","id":"2","type":"success"}}
+```
+
+> PUT ./api/api.php/audit/audit/{template_id}/{audit_id}
+
+Updates an unclosed audit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | template database id |
+| {audit_id} | path parameter | required | audit database id |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Audit saved","id":"","type":"success"}}
+```
+
+> GET ./api/api.php/audit/audit/{template_id}/{audit_id}
+
+Returns a selection to start or edit unclosed audits or displays selected audit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | optional | template database id |
+| {audit_id} | path parameter | optional | audit database id |
+
+Sample response
+```
+{"render": {"content": [[{"type": "button","attributes": {"value": "New Audit","type": "button","onpointerup": "new _client.Dialog({type: 'input', header: 'New Audit', render: JSON.parse('[{\"type\":\"select\",\"attributes\":{\"name\":\"Select template\"},\"content\":{\"...\":{\"value\":\"0\"},\"Common 2025-02-03 07:41:00\":{\"value\":\"2\"}}}]'), options:{'No, I am not done yet': {value: true, class: 'reducedCTA'},'Ok': true}}).then(response => {if (response && response !== '...') api.audit('get', 'audit', response['Select template'])});"}},{"type": "select","attributes": {"name": "Edit","onchange": "if (this.value !== '0') api.audit('get', 'audit', 'null', this.value);"},"content": {"...": {"value": "0"},"Common 2025-02-04 13:56:00": {"value": "2"}}}]]}}
+```
+
+> DELETE ./api/api.php/audit/audit/null/{audit_id}
+
+Deletes an unclosed audit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {audit_id} | path parameter | required | audit database id |
+
+Sample response
+```
+{"response":{"msg":"Order statistics have been deleted.","type":"success"}}
+```
+
+> POST ./api/api.php/audit/audittemplate/{template_id}
+
+Stores a new audit template to the database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Template saved","id":"3","type":"success"}}
+```
+
+> PUT ./api/api.php/audit/audittemplate/null/{template_id}
+
+Updates an audit template.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | template database id |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Template saved","id":"","type":"success"}}
+```
+
+> GET ./api/api.php/audit/audittemplate/null/{template_id}
+
+Returns a selection to start or edit audit templates.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | optional | template database id |
+
+Sample response
+```
+{"render": {"form": {"data-usecase": "audittemplate","action": "javascript:api.audit('post', 'audittemplate', 'null', )"},"content": [[{"type": "select","attributes": {"name": "Edit","onchange": "api.audit('get', 'audittemplate', 'null', this.value)"},"content": {"...New template": {"value": "0"},"Common 2025-02-03 07:41:00": {"value": "2"}}}],[{"type": "textsection","content": null},{"type": "select","attributes": {"name": "Organizational units","id": "TemplateUnit","data-loss": "prevent"},....
+```
+
+> DELETE ./api/api.php/audit/audittemplate/null/{template_id}
+
+Deletes an audit template.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | audit database id |
+
+Sample response
+```
+{"response":{"msg":"Template deleted","type":"success"}}
+```
 
 > DELETE ./api/api.php/audit/checks/{type}
 
@@ -2238,6 +2353,21 @@ Parameters
 Sample response
 ```
 {"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+```
+
+> GET ./api/api.php/audit/import/{type}/{param}
+
+Returns requested data for importing to the frontend. Currently implemented for returning the latest audit summary for a passed unit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | required | submethod, currently auditsummary only |
+| {param} | path parameter | required | keyword, currently unit-value only |
+
+Sample response
+```
+{"data":"...whatever text..."}
 ```
 
 ### Calendar endpoints
