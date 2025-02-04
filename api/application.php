@@ -550,6 +550,10 @@ class APPLICATION extends API {
 			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
 			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
 		}
+
+		// make sure measure management comes after texttemplate management so this is an exception
+		$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.measure')] = ['onpointerup' => "api.measure('get', 'measure')"];
+
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onpointerup' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onpointerup' => "api.document('get', 'approval')"];

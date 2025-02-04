@@ -531,6 +531,28 @@ class SQLQUERY {
 
 
 
+		'measure_post' => [
+			'mysql' => "INSERT INTO caro_measures (id, timestamp, content, user_id, votes, measures, closed) VALUES (NULL, CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_measures (timestamp, content, user_id, votes, measures, closed) VALUES (CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL)"
+		],
+		'measure_put' => [
+			'mysql' => "UPDATE caro_measures SET measures = :measures, closed = :closed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_measures SET measures = :measures, closed = :closed WHERE id = :id"
+		],
+		'measure_vote' => [
+			'mysql' => "UPDATE caro_measures SET votes = :votes WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_measures SET votes = :votes WHERE id = :id"
+		],
+		'measure_get' => [
+			'mysql' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id",
+			'sqlsrv' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id"
+		],
+		'measure_delete' => [
+			'mysql' => "DELETE FROM caro_measures WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_measures WHERE id = :id"
+		],
+
+
 		'message_get_unnotified' => [
 			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0",
 			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0"

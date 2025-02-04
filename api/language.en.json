@@ -438,7 +438,7 @@
 				"schedule": "Schedule audit",
 				"select": "Select template",
 				"saved": "Template saved",
-				"used" : "This template can not be deleted as it is currently in use by an unfinished audit."
+				"used": "This template can not be deleted as it is currently in use by an unfinished audit."
 			},
 			"question": "Question"
 		},
@@ -798,6 +798,7 @@
 		"communication": {
 			"conversations": "Conversations",
 			"header": "Communication",
+			"measure": "Improvement suggestions",
 			"register": "Register",
 			"texttemplate_chunks": "Manage text chunks",
 			"texttemplate_templates": "Manage text templates",
@@ -846,6 +847,23 @@
 			"scanner": "2D-scanner",
 			"stl_viewer": "STL viewer"
 		}
+	},
+	"measure": {
+		"anonymous": "submit anonymous",
+		"anonymous_hint": "Your name will not be stored nor displayed, your suggestion yet remains public.",
+		"closed":"closed",
+		"closed_info":"closed on :date by :user",
+		"anonymous_user": "Anonymous or deleted user",
+		"deleted": "Suggestion deleted wurde gelöscht",
+		"delete_error": "Suggestion could not be deleted. Please try again.",
+		"measure":"Measure, evaluation",
+		"measure_save_error": "Measure could not be saved. Please try again.",
+		"measure_saved": "Measure saved",
+		"new": "New suggestion",
+		"suggestion_save_error": "Suggestion could not be saved. Please try again.",
+		"suggestion_saved": "Suggestion saved",
+		"select": "Select",
+		"suggestion": "Suggestion"
 	},
 	"message": {
 		"delete": "Delete conversation",

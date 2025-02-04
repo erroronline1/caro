@@ -382,7 +382,23 @@ class API {
 	}
 }
 
-if (in_array(REQUEST[0], ['application', 'audit', 'calendar', 'consumables', 'csvfilter', 'file', 'document', 'message', 'notification', 'order', 'record', 'risk', 'texttemplate', 'tool', 'user'])) require_once(REQUEST[0] . '.php');
+if (in_array(REQUEST[0], [
+	'application',
+	'audit',
+	'calendar',
+	'consumables',
+	'csvfilter',
+	'file',
+	'document',
+	'message',
+	'measure',
+	'notification',
+	'order',
+	'record',
+	'risk',
+	'texttemplate',
+	'tool',
+	'user'])) require_once(REQUEST[0] . '.php');
 
 $call = strtoupper(REQUEST[0]);
 $api = new $call();

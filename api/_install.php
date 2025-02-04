@@ -187,6 +187,17 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
+				"CREATE TABLE IF NOT EXISTS `caro_measures` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`timestamp` datetime NOT NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`user_id` int NULL," .
+				"	`votes` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`measures` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_messages` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
@@ -436,6 +447,17 @@ define('DEFAULTSQL', [
 				"	title varchar(255) NOT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	permissions varchar(MAX) NOT NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_measures', N'U') IS NULL " .
+				"CREATE TABLE caro_measures (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	timestamp smalldatetime NOT NULL," .
+				"	content varchar(MAX) NOT NULL," .
+				"	user_id int NULL," .
+				"	votes varchar(MAX) NULL," .
+				"	measures varchar(MAX) NULL," .
+				"	closed varchar(MAX) NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_messages', N'U') IS NULL " .

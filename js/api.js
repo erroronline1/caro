@@ -934,6 +934,53 @@ export const api = {
 	},
 
 	/**
+	 *                                 
+	 *   _____ ___ ___ ___ _ _ ___ ___ 
+	 *  |     | -_| .'|_ -| | |  _| -_|
+	 *  |_|_|_|___|__,|___|___|_| |___|
+	 *
+	 * handles proposals and measures
+	 *
+	 * @param {string} method get|post|delete
+	 * @param  {array} request api method, measure id, vote
+	 * @returns request
+	 */
+	measure: (method, ...request) => {
+		request = [...request];
+		request.splice(0, 0, "measure");
+		let payload,
+			successFn = function (data) {
+				new Toast(data.response.msg, data.response.type);
+			},
+			title = {
+				measure: api._lang.GET("menu.communication.conversations")
+			};
+
+		switch (method) {
+			case "get":
+				successFn = function (data) {
+					if (data.render) {
+						api.update_header(title[request[1]]);
+						const render = new Assemble(data.render);
+						document.getElementById("main").replaceChildren(render.initializeSection());
+						render.processAfterInsertion();
+					}
+					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+				};
+				break;
+			case "put":
+			case "post":
+				payload = _.getInputs("[data-usecase=measure]", true);
+				break;
+			case "delete":
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
 	 *
 	 *   _____ ___ ___ ___ ___ ___ ___
 	 *  |     | -_|_ -|_ -| .'| . | -_|
