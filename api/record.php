@@ -470,7 +470,7 @@ class RECORD extends API {
 				if ($content){
 					$downloadfiles = [];
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
-						'href' => './api/api.php/file/stream/' . PDF::identifierPDF($content, UTILITY::propertySet($this->_payload, '_type') ? : 'A4')
+						'href' => './api/api.php/file/stream/' . PDF::qrcodePDF([$content, $content], UTILITY::propertySet($this->_payload, '_type') ? : 'A4')
 					];
 					$body = [
 						[

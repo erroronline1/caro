@@ -219,9 +219,10 @@ class PDF{
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}
 
-	public static function identifierPDF($content, $type = 'sheet'){
+	public static function qrcodePDF($content = [], $type = 'sheet'){
 		// create a pdf for a label sheet with qr code and plain text
-		// or label for label printer as selected
+		// or label for label printer as selected or other available type as per config.ini
+		// $content is an array of [qrcode content, written text beside]
 		$_lang = new LANG();
 
 		$setup = [
@@ -287,8 +288,8 @@ class PDF{
 
 		for ($row = 0; $row < $setup['rows']; $row++){
 			for ($column = 0; $column < $setup['columns']; $column++){
-				$pdf->write2DBarcode($content, 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], $codesize, $codesize, $style, 'N');
-				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content, 0, '', 0, intval($column === $setup['columns'] - 1), $column * $columnwidth + $codesize + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], true, 0, false, true, 24, 'T', true);
+				$pdf->write2DBarcode($content[0], 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], $codesize, $codesize, $style, 'N');
+				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content[1], 0, '', 0, intval($column === $setup['columns'] - 1), $column * $columnwidth + $codesize + $setup['margin']['left'], $row * $rowheight + $setup['margin']['top'], true, 0, false, true, 24, 'T', true);
 			}
 		}
 		// move pointer to last page
