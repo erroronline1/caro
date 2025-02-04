@@ -417,6 +417,7 @@
 					"minor_deficiencies": "minor deficiencies",
 					"irrelevant": "not relevant"
 				},
+				"regulatory": "Regulatorischer Zusammenhang",
 				"saved": "Audit saved",
 				"statement": "Statement",
 				"summary": "Summary"
@@ -424,14 +425,13 @@
 			"hint": "Hint",
 			"objectives": "Audit programme objectives",
 			"reminder_message": "It has been :days days since the last record edit of the audit of :unit. The last edit happened on :date.\nPlease finalize the audit.",
-			"regulatory": "Regulatory issues",
 			"template": {
 				"delete_confirm_header": "Delete template for :unit permanently?",
 				"delete_confirm_ok": "Yes, delete",
 				"delete_error": "The template could not be deleted",
 				"delete_success": "Template deleted",
 				"import_summary": "Import previous summary",
-				"import_summary_hint": "Only the last finalized audit of the selected unit is processed.",
+				"import_summary_hint": "Only the last finalized audit of the selected unit is processed. The planned audit is supposed to take previous results into account.",
 				"new": "New template",
 				"not_saved": "Template could not be saved.",
 				"not_saved_missing": "Template could not been saved, please provide a unit and content!",

@@ -330,6 +330,12 @@ class AUDIT extends API {
 								],
 								'content' => $question['hint'] ? : ' '
 							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.regulatory'),
+									'value' => $question['regulatory']
+								]
+							], [
 								'type' => 'radio',
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.rating')
@@ -428,10 +434,19 @@ class AUDIT extends API {
 			foreach($audit['content']['questions'] as $question){
 				$currentquestion = '';
 				foreach($question as $key => $values){
-					$currentquestion .= (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ': ' .
-						($key === 'rating' ? $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]] : implode("\n", $values)) . "\n";
+					$currentquestion .= (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ': ';
+					switch ($key){
+						case 'rating':
+							$currentquestion .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
+							break;
+						case 'regulatory':
+							$currentquestion .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+							break;
+						default:
+							$currentquestion .= implode("\n", $values);
+					}
+					$currentquestion .= "\n";
 				}
-//add regulatory context
 				
 				$current[] = [
 					'type' => 'textsection',
@@ -672,7 +687,7 @@ class AUDIT extends API {
 					], [
 						'type' => 'checkbox2text',
 						'attributes' => [
-							'name' => $this->_lang->GET('audit.audit.regulatory'),
+							'name' => $this->_lang->GET('audit.audit.execute.regulatory'),
 							'id' => '_regulatory',
 							'data-loss' => 'prevent'
 						],
@@ -1246,6 +1261,7 @@ class AUDIT extends API {
 	public function import(){
 		switch($this->_requestedType){
 			case 'auditsummary':
+				$this->_requestedOption = array_search($this->_requestedOption, $this->_lang->_USER['units']);
 				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
 				foreach($audits as $audit){
 					if ($audit['unit'] === $this->_requestedOption && $audit['closed']) {
