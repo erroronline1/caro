@@ -418,6 +418,7 @@
 					"serious_deficiencies": "Schwere Mängel",
 					"irrelevant": "nicht relevant"
 				},
+				"regulatory": "Regulatorischer Zusammenhang",
 				"saved": "Audit gespeichert",
 				"statement": "Anmerkung",
 				"summary": "Zusammenfassung"
@@ -425,12 +426,13 @@
 			"hint": "Hinweis",
 			"objectives": "Auditprogrammziele",
 			"reminder_message": "Es sind :days Tage vergangen seit der letzten Bearbeitung des Audits für :unit. Die letzte Bearbeitung fand am :date statt.\nBitte schließe das Audit ab.",
-			"regulatory": "Regulatorischer Zusammenhang",
 			"template": {
 				"delete_confirm_header": "Vorlage für :unit dauerhaft löschen?",
 				"delete_confirm_ok": "Ja, Vorlage löschen",
 				"delete_error": "Die Vorlage konnte nicht gelöscht werden",
 				"delete_success": "Die Vorlage wurde gelöscht",
+				"import_summary": "Vorige Zusammenfassung importieren",
+				"import_summary_hint": "Es wird nur das letzte abgeschlossene Audit für den gewählten Bereich verwendet. Im geplanten Audit sollte auf die Ergebnisse des vorherigen Audits eingegangen werden.",
 				"new": "Neue Vorlage",
 				"not_found": "Vorlage nicht gefunden",
 				"not_saved": "Vorlage konnte nicht gespeichert werden.",

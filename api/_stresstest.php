@@ -55,6 +55,7 @@ class STRESSTEST extends INSTALL{
 			echo '<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
+			$delimiter = '';
 			foreach($methods as $methodName){
 				if (!in_array($methodName, [
 					'__construct',
@@ -63,9 +64,17 @@ class STRESSTEST extends INSTALL{
 					'executeSQL',
 					'importJSON',
 					'installDatabase',
-					'printError'
-					])) echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br /><br />';
-			}
+					'printError',
+					'printSuccess',
+					'printWarning'
+					])) {
+						if ($delimiter !== substr($methodName, 0, 1)){
+							echo '--------------<br /><br />';
+							$delimiter = substr($methodName, 0, 1);
+						}
+						echo '<a href="./_stresstest.php/' . $methodName . '">' . $methodName . '</a><br /><br />';
+					}
+				}
 			echo '<br /><br /><a href="../../index.html">exit</a>';
 		}
 	}

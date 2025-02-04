@@ -498,6 +498,17 @@ export const api = {
 						break;
 					case "export":
 						break;
+					case "import":
+						switch(request[2]){
+							case 'auditsummary':
+								successFn = function (data) {
+									api.preventDataloss.stop();
+									if (data.data) document.getElementById('TemplateObjectives').value += "\n\n" + data.data
+									api.preventDataloss.start();
+								}
+								break;
+						}
+						break;
 					default:
 						successFn = function (data) {
 							if (data.render) {

@@ -83,7 +83,7 @@
 		"permissions": "user,group"
 	},
 	{
-		"title": "Audit",
+		"title": "Regulatory evaluations and summaries",
 		"content": "Available data from the application can be summarized here and mostly being exportable as records within audits.\nYou can do the training evaluation here and revoke sample checks.\nAlso you will find the tool to insert trainings for several users at once here.",
 		"permissions": "ceo,qmo,prrc"
 	}

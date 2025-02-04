@@ -22,13 +22,14 @@
         * [Documents](#documents)
         * [Records](#records-1)
         * [Risk management](#risk-management)
+        * [Audit](#audit)
     * [Calendar](#calendar)
     * [Files](#files)
     * [Purchase](#purchase)
         * [Vendor and product management](#vendor-and-product-management)
         * [Order](#order)
     * [Tools](#tools)
-    * [Audit](#audit)
+    * [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
     * [Runtime variables](#runtime-variables)
@@ -116,13 +117,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
-* save regulatory to audit, do not rely on template!
-* message unit and permissions on closed audits, how to access information without regulatory permission? message text?
-* display summary of last audit, if available for new audit planning? how could that work with frontend selecting unit?
-* [audit api endpoints](#audit-endpoints)
-* [audit description](#audit)
-* [rename audit to Regulatory evaluations and summaries](#audit)
-* [describe ISO 19011 goals](#extras)
+* message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
 
 #### issues
 * review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
@@ -162,7 +157,7 @@ The application does not replace an ERP system. Procurement data is solely acces
 Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
 
 ## Intended regulatory goals
-Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by documents. This way you ensure a proper version control and approval as well as a fulfillment check within the [audit-module](#audit).
+Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by documents. This way you ensure a proper version control and approval as well as a fulfillment check within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
 Application support legend:
 * yes: the applications functionality supports all of the chapters requirements
@@ -171,7 +166,7 @@ Application support legend:
 
 | Regulatory requirement | Application support | Method | Reference |
 | ---- | ---- | ---- | ---- |
-| ISO 13485 4.1.1 General quality management requirements | partial, structural | &bull; Fulfilment of regulatory issues can be verified within the audit-module, given documents are assigned proper regulatory contexts.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Audit](#audit)|
+| ISO 13485 4.1.1 General quality management requirements | partial, structural | &bull; Fulfilment of regulatory issues can be verified, given documents are assigned proper regulatory contexts.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)|
 | ISO 13485 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Risk management](#risk-management) |
 | ISO 13485 4.1.3 Process monitoring | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
 | ISO 13485 4.1.4 Process control | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
@@ -189,12 +184,12 @@ Application support legend:
 | ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.5.1 Responsibility and authority | partial, structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A user register summarizes all users, also grouped by organizational unit and permission<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Conversations](#conversations), [Runtime variables](#runtime-variables) |
 | ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Audit](#audit) |
+| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.1 General management assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
 | ISO 13485 5.6.2 Rating input | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
 | ISO 13485 5.6.3 Rating results | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
 | ISO 13485 6.1 Provision of resources | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed within the audit module.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Audit](#audit) |
+| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 6.3 Infrastructure | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context*<br/>&bull; *record with documents with the "Equipment surveillance"-context* | |
 | ISO 13485 6.4.1 Working environment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 6.4.2 Contamination control | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
@@ -212,7 +207,7 @@ Application support legend:
 | ISO 13485 7.3.8 Development transfer | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
 | ISO 13485 7.3.9 Controlling development changes | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
 | ISO 13485 7.3.10 Development files | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.4.1 Procurement process | yes, structural | &bull; Procurement is guided through the application. Vendors and products can be added into the database.<br/>&bull; Vendor evaluation is implemented within the vendor manager by customizable documents with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns.<br/>&bull; Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported within the audit module. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.<br/>&bull; Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.<br/>&bull; Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated document with the respective context.<br/>&bull; Products are deleted by default on update of the pricelist unless an incorporation has been made, a sample check has been made, any document to the product has been provided, an alias has been modified, it has been ordered<br/>&bull; Vendor and product editing is permitted by defined authorized users only.<br/>&bull; Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *prepare documents with the "Vendor evaluation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Audit](#audit) |
+| ISO 13485 7.4.1 Procurement process | yes, structural | &bull; Procurement is guided through the application. Vendors and products can be added into the database.<br/>&bull; Vendor evaluation is implemented within the vendor manager by customizable documents with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns.<br/>&bull; Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.<br/>&bull; Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.<br/>&bull; Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated document with the respective context.<br/>&bull; Products are deleted by default on update of the pricelist unless an incorporation has been made, a sample check has been made, any document to the product has been provided, an alias has been modified, it has been ordered<br/>&bull; Vendor and product editing is permitted by defined authorized users only.<br/>&bull; Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *prepare documents with the "Vendor evaluation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 7.4.2 Procurement data | partially | &bull; Orders preferably make use of the vendors own pricelists<br/>&bull; recording procurement data does have to take place in a third party software though (ERP) | [Vendor and product management](#vendor-and-product-management), [Order](#order) |
 | ISO 13485 7.4.3 Verification of procured products | yes, structural | &bull; MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.<br/>&bull; Sample check information is to be enriched through a dedicated document with the respective context. All users (except groups) can gather the required information and commit the check.<br/>&bull; Sample checks can be revoked by authorized users.&bull; *prepare documents with the "MDR §14 Sample Check"- or "Product incorporation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents) |
 | ISO 13485 7.5.1 Control of production and service | partial, structural | &bull; Dedicated documents are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the document, ticking the checkbox, adding this content with username and date to the record.<br/>&bull; Form contexts allow the definition as process or work instructions.<br/>&bull; The inbuilt calendar assists in scheduling operations. | [Documents](#documents), [Records](#records), [Calendar](#calendar) |
@@ -229,24 +224,31 @@ Application support legend:
 | ISO 13485 7.6 Surveillance and measuring equipment control | structural | &bull; Dedicated documents make use of an identifier, like production documents. Measuring equipment may each have assigned their distinct identifier.<br/>&bull; Adding a document component to address scheduling helps with future events that will show up and alert user groups where reasonable.<br/>&bull; <br/>&bull; *record with documents with the "Equipment Surveillance"-context* | [Documents](#documents), [Records](#records), [Calendar](#calendar) |
 | ISO 13485 8.1 General assessment, analysis and improvement processes | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.2.1 Feedback | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 8.2.2 Complaint handling | structural | &bull; Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed within the audit module.<br/>&bull; Closing records containing a complaint requires action from all defined roles. | [Records](#records), [Audit](#audit) |
+| ISO 13485 8.2.2 Complaint handling | structural | &bull; Records require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed.<br/>&bull; Closing records containing a complaint requires action from all defined roles. | [Records](#records), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.2.3 Regulatory authorities coverage | structural | &bull; Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident documents to access the terminology codes for report documents to the authorities<br/>&bull; *record with documents with the "Incident"-context*| |
-| ISO 13485 8.2.4 Internal audit | partial, structural | The audit module aquires data from the application and is partially able to export<br/>&bull; records of product incorporation. If currently ordered products miss an incorporation there will be a note.<br/>&bull; records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.<br/>&bull; a list of current documents in use (documents and their components).<br/>&bull; user skills and trainings (with expiries highlighted).<br/>&bull; vendor lists with last article update, last MDR sample check and details for certificates (if provided).<br/>&bull; order statistics.<br/>&bull; complaints.<br/>&bull; fulfilment of regulatory issues considered by documents.<br/>&bull; risk analyses. | [Audit](#audit) |
+| ISO 13485 8.2.4 Internal audit | partial, structural | Internal audits can be prepared, planned ans executed.<br />Application data can be gathered and exported, e.g.<br/>&bull; records of product incorporation. If currently ordered products miss an incorporation there will be a note.<br/>&bull; records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.<br/>&bull; a list of current documents in use (documents and their components).<br/>&bull; user skills and trainings (with expiries highlighted).<br/>&bull; vendor lists with last article update, last MDR sample check and details for certificates (if provided).<br/>&bull; order statistics.<br/>&bull; complaints.<br/>&bull; fulfilment of regulatory issues considered by documents.<br/>&bull; risk analyses. | [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.2.5 Process surveillance and assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.2.6 Product surveillance and assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Records](#records) |
 | ISO 13485 8.3.1 General non-compliant products control | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.2 Measures on identified non-compliant products in advance of delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.3 Measures on identified non-compliant products after delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.4 Rework | yes, structural | &bull; Records require a statement if it happens in context with a rework. Documents do not differ though, so recording measures follows the same processes than a general treatment process. | [Records](#records) |
-| ISO 13485 8.4 Data analysis | partial, structural | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though. | [Order](#order), [Audit](#audit) |
+| ISO 13485 8.4 Data analysis | partial, structural | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though. | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 14971 4.5 Risk management file | structural | &bull; The application has a risk management module to consider, evaluate, control and evaluate residual risks.<br />&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default.<br />&bull; Risks are not deletable but applicability can be revoked.<br />&bull; Edits can be done by authorized users only, but read by all users.<br />&bull; Characteristics of medical devices and risks can be exported from the audit module with any available version. | [Risk management](#risk-management), [Audit](#audit) |
+| ISO 14971 4.5 Risk management file | structural | &bull; The application has a risk management module to consider, evaluate, control and evaluate residual risks.<br />&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default.<br />&bull; Risks are not deletable but applicability can be revoked.<br />&bull; Edits can be done by authorized users only, but read by all users.<br />&bull; Characteristics of medical devices and risks can be exported with any available version. | [Risk management](#risk-management), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 14971 5 Risk analysis | yes | &bull; Templates of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default. | [Risk management](#risk-management), [languagefile](#customisation), [templates](#application-setup) |
 | ISO 14971 6 Risk evaluation | yes | &bull; Requirements are satisfied structural and with the provided templates. | [Risk management](#risk-management), [templates](#application-setup) |
 | ISO 14971 7 Risk control | yes | &bull; Requirements are satisfied structural and with the provided templates. | [Risk management](#risk-management), [templates](#application-setup) |
-| ISO 14971 7.6 Completeness of risk control | yes | &bull; The audit module displays issues regarding risks without defined characteristics and vice versa. | [Audit](#audit) |
+| ISO 14971 7.6 Completeness of risk control | yes | &bull; Display of issues regarding risks without defined characteristics and vice versa. | [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 19011 5.2 Establishing audit programme objectives | structural | &bull; A programme for internal audits can be prepared, including objectives and summaries of previous audits. | [Audit](#audit) |
+| ISO 19011 5.4 Establishing the audit programme | structural | &bull; A programme for internal audits can be prepared, including objectives and summaries of previous audits. | [Audit](#audit) |
+| ISO 19011 5.5 Audit programme implementation | yes | &bull; Prepared audits can be added to the schedule and address respective units. | [Audit](#audit), [Calendar](#calendar) |
+| ISO 19011 5.5.7 Managing and maintaining audit programme records | yes | &bull; Audits contain all data from the programme and remain read-only once finished. | [Audit](#audit), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 19011 5.7 Reviewing and improving audit programme | structural | &bull; On adding or editing audit programmes previous summaries can be imported to be taken into consideration during planning. | [Audit](#audit) |
+| ISO 19011 6.4 Conducting audit activites | structural | &bull; Editing and finalizing is possible anytime as long as the audit is not marked as finished. | [Audit](#audit) |
+| ISO 19011 6.6 Completing audit | structural | &bull; Editing and finalizing is possible anytime as long as the audit is not marked as finished. | [Audit](#audit) |
 | MPDG §83 Medical device consultants| yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register. | [Users](#users) |
 | SGB 5 §33 Additional Costs | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR Art. 14 Sample check | yes, structural | &bull; Sample check is implemented. Set up a respective document, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents), [Importing vendor pricelists](#importing-vendor-pricelists) |
@@ -667,9 +669,17 @@ The risk management supports describing risks according to ISO 14971 and in acco
 As required with ISO 14971 you can describe characteristics for medical devices and applicable risks. Since the DGIHV fortunately decided defining characteristics and risks on a group of medical devices (e.g. prostheses and orthoses in general) as reasonable, all evaluations are based and grouped by a process.
 Furthermore you are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels. To proof your regulatory compliance you can link any of your documents containing measures as defined.
 
-Entries are persistent and can be exported if desired through the [audit module](#audit). Available entries store and display the user name and date of the last edit. 
+Entries are persistent and can be exported if desired through the [evaluation and summary-module](#regulatory-evaluations-and-summaries). Available entries store and display the user name and date of the last edit. 
 
 ![risk screenshot](http://toh.erroronline.one/caro/risks.png)
+
+[Content](#content)
+
+### Audit
+The application enables you to prepare internal audits, including programme objectives and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted and reordered.
+Audits can be added to the calendar from the form as well, informing selected units.
+
+Executing an audit starts by selecting one of the prepared templates. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. Closed audits can be displayed within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
 [Content](#content)
 
@@ -901,7 +911,7 @@ A label can be created directly from the commission field to support allocation 
 
 A label can be created directly from the article number field supplemented by a suitable batch or delivery note number to create a scannable code for material traceability.
 
-Processed orders are also added to a second database with reduced data. This data can be exported through the [audit module](#audit) and used for vendor evaluation.
+Processed orders are also added to a second database with reduced data. This data can be exported through the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and used for vendor evaluation.
 
 ![orders screenshot](http://toh.erroronline.one/caro/orders.png)
 
@@ -989,7 +999,7 @@ graph TD;
     prepared_orders-.->add_product;
 ```
 Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.
-Sample checks are added to the records. New checks trigger a sytem message to these users. Defined authorized users can revoke the sample check from within the [audit module](#audit).
+Sample checks are added to the records. New checks trigger a sytem message to these users. Defined authorized users can revoke the sample check from within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
 [Content](#content)
 
@@ -1000,12 +1010,13 @@ Some general tools are available to read and create 2D-barcodes, view STL-files 
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 
-## Audit
-The audit module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
+## Regulatory evaluations and summaries
+This module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
 * complaints
 * current documents in use including external documents
 * experience points based on user trainings, if trainings are assigned some (internal or external)
 * incoporated articles
+* internal audits
 * MDR §14 sample checks
 * regulatory issues addressed by documents
 * issues with risks definition inconsistencies, incl. structured export of all defined risks
@@ -2111,7 +2122,7 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {logout} | path parameter | optional | triggers active logout if added literally |
-| payload | form data | optional | contains password for login
+| payload | form data | optional | contains password for login |
 
 Sample response
 ```
@@ -2149,6 +2160,123 @@ Samble response
 [Content](#content)
 
 ### Audit endpoints
+
+> POST ./api/api.php/audit/audit/{template_id}
+
+Stores a new audit to the database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | template id |
+| payload | form data | required | input data |
+
+Sample response
+```
+{"response":{"msg":"Audit saved","id":"2","type":"success"}}
+```
+
+> PUT ./api/api.php/audit/audit/{template_id}/{audit_id}
+
+Updates an unclosed audit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | template database id |
+| {audit_id} | path parameter | required | audit database id |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Audit saved","id":"","type":"success"}}
+```
+
+> GET ./api/api.php/audit/audit/{template_id}/{audit_id}
+
+Returns a selection to start or edit unclosed audits or displays selected audit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | optional | template database id |
+| {audit_id} | path parameter | optional | audit database id |
+
+Sample response
+```
+{"render": {"content": [[{"type": "button","attributes": {"value": "New Audit","type": "button","onpointerup": "new _client.Dialog({type: 'input', header: 'New Audit', render: JSON.parse('[{\"type\":\"select\",\"attributes\":{\"name\":\"Select template\"},\"content\":{\"...\":{\"value\":\"0\"},\"Common 2025-02-03 07:41:00\":{\"value\":\"2\"}}}]'), options:{'No, I am not done yet': {value: true, class: 'reducedCTA'},'Ok': true}}).then(response => {if (response && response !== '...') api.audit('get', 'audit', response['Select template'])});"}},{"type": "select","attributes": {"name": "Edit","onchange": "if (this.value !== '0') api.audit('get', 'audit', 'null', this.value);"},"content": {"...": {"value": "0"},"Common 2025-02-04 13:56:00": {"value": "2"}}}]]}}
+```
+
+> DELETE ./api/api.php/audit/audit/null/{audit_id}
+
+Deletes an unclosed audit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {audit_id} | path parameter | required | audit database id |
+
+Sample response
+```
+{"response":{"msg":"Order statistics have been deleted.","type":"success"}}
+```
+
+> POST ./api/api.php/audit/audittemplate/{template_id}
+
+Stores a new audit template to the database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Template saved","id":"3","type":"success"}}
+```
+
+> PUT ./api/api.php/audit/audittemplate/null/{template_id}
+
+Updates an audit template.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | template database id |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Template saved","id":"","type":"success"}}
+```
+
+> GET ./api/api.php/audit/audittemplate/null/{template_id}
+
+Returns a selection to start or edit audit templates.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | optional | template database id |
+
+Sample response
+```
+{"render": {"form": {"data-usecase": "audittemplate","action": "javascript:api.audit('post', 'audittemplate', 'null', )"},"content": [[{"type": "select","attributes": {"name": "Edit","onchange": "api.audit('get', 'audittemplate', 'null', this.value)"},"content": {"...New template": {"value": "0"},"Common 2025-02-03 07:41:00": {"value": "2"}}}],[{"type": "textsection","content": null},{"type": "select","attributes": {"name": "Organizational units","id": "TemplateUnit","data-loss": "prevent"},....
+```
+
+> DELETE ./api/api.php/audit/audittemplate/null/{template_id}
+
+Deletes an audit template.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required | audit database id |
+
+Sample response
+```
+{"response":{"msg":"Template deleted","type":"success"}}
+```
 
 > DELETE ./api/api.php/audit/checks/{type}
 
@@ -2225,6 +2353,21 @@ Parameters
 Sample response
 ```
 {"render":{"content":[[{"type":"select","content":{"Complaints":{"value":"complaints"},"Current documents in use":{"value":"documents"},"Experience points":{"value":"userexperience"},"Incorporated articles":{"value":"incorporation"},"Order statistics":{"value":"orderstatistics"},"Regulatory issues considered by documents and documents":{"value":"regulatory"},"Risk management":{"value":"risks"},....
+```
+
+> GET ./api/api.php/audit/import/{type}/{param}
+
+Returns requested data for importing to the frontend. Currently implemented for returning the latest audit summary for a passed unit.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | required | submethod, currently auditsummary only |
+| {param} | path parameter | required | keyword, currently unit-value only |
+
+Sample response
+```
+{"data":"...whatever text..."}
 ```
 
 ### Calendar endpoints

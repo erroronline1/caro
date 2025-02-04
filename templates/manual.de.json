@@ -83,7 +83,7 @@
 		"permissions": "user,group"
 	},
 	{
-		"title": "Audit",
+		"title": "Regulatorische Auswertungen und Zusammenfassungen",
 		"content": "Verfügbare Daten aus der Anwendung können hier zusammengefasst und weitestgehend als Nachweisdokumente für Audits exportiert werden.\nHier können auch Schulungsbewertungen durchgeführt werden und Stichprobenprüfungen widerrufen werden.\nBerechtigte Nutzer können Schulungen für mehrere Nutzer gleichzeitig eintragen.",
 		"permissions": "ceo,qmo,prrc"
 	}
