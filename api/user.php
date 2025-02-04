@@ -1150,10 +1150,10 @@ class USER extends API {
 	}
 
 	/**
-	 *
-	 *   _ _ ___ ___ ___
-	 *  | | |_ -| -_|  _|
-	 *  |___|___|___|_|
+	 *   _       _           
+	 *  | |_ ___| |_ ___ ___ 
+	 *  |  _| . | '_| -_|   |
+	 *  |_| |___|_,_|___|_|_|
 	 *
 	 * returns an image in credit card format containing a token qr and the user name
 	 */
