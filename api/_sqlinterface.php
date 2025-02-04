@@ -172,8 +172,8 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_audit SET notified = :notified WHERE id = :id"
 		],
 		'audit_get' => [
-			'mysql' => "SELECT * FROM caro_audit",
-			'sqlsrv' => "SELECT * FROM caro_audit"
+			'mysql' => "SELECT * FROM caro_audit ORDER BY last_touch DESC",
+			'sqlsrv' => "SELECT * FROM caro_audit ORDER BY last_touch DESC"
 		],
 		'audit_get_by_id' => [
 			'mysql' => "SELECT * FROM caro_audit WHERE id = :id",

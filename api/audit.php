@@ -642,6 +642,14 @@ class AUDIT extends API {
 						],
 						'autocomplete' => array_values($datalist['objectives']) ? : null
 					], [
+						'type' => 'button',
+						'attributes' => [
+							'value' => $this->_lang->GET('audit.audit.template.import_summary'),
+							'type' => 'button',
+							'onpointerup' => "api.audit('get', 'import', 'auditsummary', document.getElementById('TemplateUnit').value);"
+						],
+						'hint' => $this->_lang->GET('audit.audit.template.import_summary_hint'),
+					], [
 						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => $this->_lang->GET('audit.audit.template.schedule'),
@@ -1225,6 +1233,30 @@ class AUDIT extends API {
 			];
 		}
 		return $content;
+	}
+
+	/**
+	 *   _                   _
+	 *  |_|_____ ___ ___ ___| |_
+	 *  | |     | . | . |  _|  _|
+	 *  |_|_|_|_|  _|___|_| |_|
+	 *          |_|
+	 * imports selected database content based on type and option
+	 */
+	public function import(){
+		switch($this->_requestedType){
+			case 'auditsummary':
+				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+				foreach($audits as $audit){
+					if ($audit['unit'] === $this->_requestedOption && $audit['closed']) {
+						$audit['content'] = json_decode($audit['content'], true);
+						if (isset($audit['content']['summary']) && $audit['content']['summary']) $this->response(['data' => $audit['content']['summary']]);
+					}
+				}
+				$this->response([], 404);
+				break;
+		}
+		$this->response([], 400);
 	}
 
 	/**

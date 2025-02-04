@@ -431,6 +431,8 @@
 				"delete_confirm_ok": "Ja, Vorlage löschen",
 				"delete_error": "Die Vorlage konnte nicht gelöscht werden",
 				"delete_success": "Die Vorlage wurde gelöscht",
+				"import_summary": "Vorige Zusammenfassung importieren",
+				"import_summary_hint": "Es wird nur das letzte abgeschlossene Audit für den gewählten Bereich verwendet.",
 				"new": "Neue Vorlage",
 				"not_found": "Vorlage nicht gefunden",
 				"not_saved": "Vorlage konnte nicht gespeichert werden.",
