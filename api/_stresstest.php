@@ -285,27 +285,27 @@ class STRESSTEST extends INSTALL{
 			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
 		];
 		$matches = 0;
-		foreach($DBall as $dbdocument){
-			foreach($json as $document){
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
 				//ensure proper formatting
-				$document['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $document['regulatory_context']));
-				$document['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $document['restricted_access']));
+				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context']));
+				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access']));
 
 				if (
-					isset($document['name']) &&
-					$dbdocument['name'] === $document['name'] &&
-					$dbdocument['alias'] === $document['alias'] &&
-					$dbdocument['context'] === $document['context'] &&
-					$dbdocument['unit'] === $document['unit'] &&
-					$dbdocument['author'] === $document['author'] &&
-					$dbdocument['regulatory_context'] === $document['regulatory_context'] &&
-					$dbdocument['permitted_export'] == $document['permitted_export'] &&
-					$dbdocument['restricted_access'] === $document['restricted_access']
-					// no checking if $dbdocument['content'] === $document['content'] for db-specific character encoding
+					isset($entry['name']) &&
+					$dbentry['name'] === $entry['name'] &&
+					$dbentry['alias'] === $entry['alias'] &&
+					$dbentry['context'] === $entry['context'] &&
+					$dbentry['unit'] === $entry['unit'] &&
+					$dbentry['author'] === $entry['author'] &&
+					!array_diff(explode(',', $dbentry['regulatory_context'] ? : ''), explode(',', $entry['regulatory_context'] ? : '')) &&
+					$dbentry['permitted_export'] == $entry['permitted_export'] &&
+					!array_diff(explode(',', $dbentry['restricted_access'] ? : ''), explode(',', $entry['restricted_access'] ? : ''))
+					// no checking if $dbdocument['content'] === $entry['content'] for db-specific character encoding
 				){
 					SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
 						'values' => [
-							':id' => $dbdocument['id']
+							':id' => $dbentry['id']
 						]
 					]);
 					$matches++;
@@ -325,18 +325,18 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 
 		$matches = 0;
-		foreach($DBall as $dbmanual){
-			foreach($json as $manual){
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
 				//ensure proper formatting
-				$manual['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $manual['permissions']));
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
 
 				if (
-					isset($manual['title']) &&
-					$dbmanual['title'] === $manual['title'] &&
-					$dbmanual['content'] === $manual['content'] &&
-					$dbmanual['permissions'] === $manual['permissions']
+					isset($entry['title']) &&
+					$dbentry['title'] === $entry['title'] &&
+					$dbentry['content'] === $entry['content'] &&
+					!array_diff(explode(',', $dbentry['permissions'] ? : ''), explode(',', $entry['permissions'] ? : ''))
 				){
-					if (SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', ['values'=> [':id' => $dbmanual['id']]]))
+					if (SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', ['values'=> [':id' => $dbentry['id']]]))
 						$matches++;
 				}
 			}
@@ -354,22 +354,22 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbrisk){
-			foreach($json as $risk){
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
 				//ensure proper formatting
-				$risk['risk'] = implode(',', preg_split('/[^\w\d]+/m', $risk['risk']));
+				$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk']));
 				if (
-					isset($risk['type']) &&
-					$dbrisk['type'] === $risk['type'] &&
-					$dbrisk['process'] === $risk['process'] &&
-					($dbrisk['risk'] === $risk['risk'] || (!$dbrisk['risk'] && !$risk['risk'])) &&
-					($dbrisk['cause'] === $risk['cause'] || (!$dbrisk['cause'] && !$risk['cause'])) &&
-					($dbrisk['measure'] === $risk['measure'] || (!$dbrisk['measure'] && !$risk['measure'])) &&
-					$dbrisk['author'] === $risk['author']
+					isset($entry['type']) &&
+					$dbentry['type'] === $entry['type'] &&
+					$dbentry['process'] === $entry['process'] &&
+					!array_diff(explode(',', $dbentry['risk'] ? : ''), explode(',', $entry['risk'] ? : '')) &&
+					($dbentry['cause'] === $entry['cause'] || (!$dbentry['cause'] && !$entry['cause'])) &&
+					($dbentry['measure'] === $entry['measure'] || (!$dbentry['measure'] && !$entry['measure'])) &&
+					$dbentry['author'] === $entry['author']
 				){
 					$deletion = [
-						'mysql' => "DELETE FROM caro_risks WHERE id = " . $dbrisk['id'],
-						'sqlsrv' => "DELETE FROM caro_risks WHERE id = " . $dbrisk['id']
+						'mysql' => "DELETE FROM caro_risks WHERE id = " . $dbentry['id'],
+						'sqlsrv' => "DELETE FROM caro_risks WHERE id = " . $dbentry['id']
 					];
 					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
 						$matches++;
@@ -389,20 +389,19 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbtexts){
-			foreach($json as $texts){
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
 				if (
 					isset($texts['type']) &&
-					$dbtexts['type'] === $texts['type'] &&
-					$dbtexts['name'] === $texts['name'] &&
-					$dbtexts['unit'] === $texts['unit'] &&
-					$dbtexts['author'] === $texts['author'] &&
-					$dbtexts['author'] === $texts['author'] &&
-					$dbtexts['language'] === $texts['language']
+					$dbentry['type'] === $entry['type'] &&
+					$dbentry['name'] === $entry['name'] &&
+					$dbentry['unit'] === $entry['unit'] &&
+					$dbentry['author'] === $entry['author'] &&
+					$dbentry['language'] === $entry['language']
 				){
 					$deletion = [
-						'mysql' => "DELETE FROM caro_texttemplates WHERE id = " . $dbtexts['id'],
-						'sqlsrv' => "DELETE FROM caro_texttemplates WHERE id = " . $dbtexts['id']
+						'mysql' => "DELETE FROM caro_texttemplates WHERE id = " . $dbentry['id'],
+						'sqlsrv' => "DELETE FROM caro_texttemplates WHERE id = " . $dbentry['id']
 					];
 					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
 						$matches++;
@@ -422,26 +421,26 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbuser){
-			foreach($json as $user){
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
 				//ensure proper formatting
-				$user['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $user['permissions']));
-				$user['units'] = implode(',', preg_split('/[^\w\d]+/m', $user['units']));
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
+				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units']));
 				
 				if (
-					isset($user['name']) &&
-					$dbuser['name'] === $user['name'] &&
-					$dbuser['permissions'] === $user['permissions'] &&
-					$dbuser['units'] === $user['units']
+					isset($entry['name']) &&
+					$dbentry['name'] === $entry['name'] &&
+					!array_diff(explode(',', $dbentry['permissions'] ? : ''), explode(',', $entry['permissions'] ? : '')) &&
+					!array_diff(explode(',', $dbentry['units'] ? : ''), explode(',', $entry['units'] ? : ''))
 				){
 					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 						'replacements' => [
-							':ids' => $dbuser['id'] ? : 0
+							':ids' => $dbentry['id'] ? : 0
 						]
 					]);
 					if (SQLQUERY::EXECUTE($this->_pdo, 'user_delete', [
 						'values' => [
-							':id' => $dbuser['id']
+							':id' => $dbentry['id']
 						]
 					]))	{
 						// delete training attachments (certificates)
@@ -449,7 +448,7 @@ class STRESSTEST extends INSTALL{
 							if ($row['file_path']) UTILITY::delete('.' . $row['file_path']);
 						}
 						// delete user image
-						if ($dbuser['image'] && $dbuser['id'] > 1) UTILITY::delete('../' . $dbuser['image']);
+						if ($dbentry['image'] && $dbentry['id'] > 1) UTILITY::delete('../' . $dbentry['image']);
 						$matches++;
 					}
 				}
@@ -468,16 +467,16 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbvendor){
-			foreach($json as $vendor){
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
 				if (
-					isset($vendor['name']) &&
-					$dbvendor['name'] === $vendor['name'] &&
-					json_decode($dbvendor['info'], true) === $vendor['info']
+					isset($entry['name']) &&
+					$dbentry['name'] === $entry['name'] &&
+					json_decode($dbentry['info'], true) === $entry['info']
 				){
 					$deletion = [
-						'mysql' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbvendor['id'],
-						'sqlsrv' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbvendor['id']
+						'mysql' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbentry['id'],
+						'sqlsrv' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbentry['id']
 					];
 					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
 						$matches++;
