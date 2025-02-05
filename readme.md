@@ -103,6 +103,7 @@
 
 The most recent documentation is available at [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
 
+# PRE ALPHA STATE
 ## discussion
 * recall option (how?)
 * post-market surveillance (how?)
@@ -123,10 +124,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * measure management pictures
 * accessability according to https://www.w3.org/TR/WCAG21/, https://martijnhols.nl/blog/the-european-accessibility-act-for-websites-and-apps, https://webaim.org/techniques/javascript/eventhandlers
 * update readme pictures on tools menu, record menu, audit and regulatory
-
-#### issues
-* review modal return on closing -> still not always returning false -> not reproduceable in firefox -> observe, could have been a cache issue
-* force form submission by passing and validating value on submit button?
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
