@@ -292,7 +292,7 @@ class AUDIT extends API {
 									'attributes' => [
 										'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
 										'multiple' => true,
-										'data_loss' => 'prevent',
+										'data-loss' => 'prevent',
 										'value' => $value
 									]
 								];
@@ -302,7 +302,7 @@ class AUDIT extends API {
 							'attributes' => [
 								'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
 								'multiple' => true,
-								'data_loss' => 'prevent'
+								'data-loss' => 'prevent'
 							]
 						];
 
@@ -312,7 +312,7 @@ class AUDIT extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.conversation_partner'),
-									'data_loss' => 'prevent',
+									'data-loss' => 'prevent',
 									'value' => isset($preset['conversation_partner']) ? $preset['conversation_partner'][0] : ''
 								],
 								'datalist' => $users
@@ -320,7 +320,7 @@ class AUDIT extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $question['question'],
-									'data_loss' => 'prevent',
+									'data-loss' => 'prevent',
 									'value' => isset($preset[$question['question']]) ? $preset[$question['question']][0] : ''
 								]
 							], [
@@ -345,7 +345,7 @@ class AUDIT extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.statement'),
-									'data_loss' => 'prevent',
+									'data-loss' => 'prevent',
 									'value' => isset($preset['statement']) ? $preset['statement'][0] : ''
 								]
 							], ...$proof

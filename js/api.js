@@ -481,7 +481,7 @@ export const api = {
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							api.preventDataloss.start();
-						};
+						}
 						break;
 					case "audittemplate":
 						successFn = function (data) {
@@ -501,9 +501,9 @@ export const api = {
 					case "import":
 						switch(request[2]){
 							case 'auditsummary':
+								api.preventDataloss.stop();
 								successFn = function (data) {
-									api.preventDataloss.stop();
-									if (data.data) document.getElementById('TemplateObjectives').value += "\n\n" + data.data
+									if (data.data) document.getElementById('TemplateObjectives').value += "\n\n" + data.data;
 									api.preventDataloss.start();
 								}
 								break;
