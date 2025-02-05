@@ -282,6 +282,37 @@ class STRESSTEST extends INSTALL{
 	}
 
 	/**
+	 * deletes all audit templates according to template file
+	 */
+	public function removeAudittemplates(){
+		$file = '../templates/audittemplates.' . $this->_defaultLanguage;
+		$json = $this->importJSON($file);
+
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates')
+		];
+		$matches = 0;
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
+				if (
+					isset($entry['unit']) &&
+					$dbentry['unit'] === $entry['unit'] &&
+					$dbentry['objectives'] === $entry['objectives']
+					// no checking if $dbentry['content'] === $entry['content'] for db-specific character encoding
+				){
+					SQLQUERY::EXECUTE($this->_pdo, 'audit_delete_template', [
+						'values' => [
+							':id' => $dbentry['id']
+						]
+					]);
+					$matches++;
+				}
+			}
+		}
+		echo '[*] ' . $matches . ' audit templates according to template file deleted';
+	}
+
+	/**
 	 * deletes all documents, components and bundles according to template file
 	 */
 	public function removeDocuments(){
