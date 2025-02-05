@@ -198,6 +198,9 @@ class API {
 		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
 		array_push($recipients, ...$user);
 		$recipients = array_unique($recipients);
+		// delete system user to receive any messages
+		unset($recipients[array_search(1,recipients)]);
+		$recipients = array_values($recipients);
 
 		if (!$recipients) return false;
 		if (!isset($this->_messages[$message])) $this->_messages[$message] = [];
