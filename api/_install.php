@@ -781,6 +781,54 @@ class INSTALL {
 	}
 
 	/**
+	 * installs audit templates
+	 */
+	public function installAudittemplates(){
+		$file = '../templates/audittemplates.' . $this->_defaultLanguage;
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates'),
+		];
+
+		$insertions = $names = [];
+		foreach ($json as $entry){
+			// documents are only transferred if the title is not already taken
+			if (!(
+				isset($entry['unit']) && $entry['unit'] &&
+				isset($entry['objectives']) && $entry['objectives'] &&
+				isset($entry['content']) && $entry['content']
+				)){
+				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				continue;
+			}
+
+			if ((isset($entry['unit']) && $entry['unit'] && !in_array($entry['unit'], array_column($DBall, 'unit'))) &&
+				isset($entry['objectives']) && $entry['objectives'] && !in_array($entry['objectives'], array_column($DBall, 'objectives'))
+			) {
+				foreach($entry['content'] as &$question){
+					// ensure proper formatting
+					if (isset($question['regulatory']) && $question['regulatory']) $question['regulatory'] = implode(',', preg_split('/[^\w\d]+/m', $question['regulatory']));
+				}
+				if (($entry['content'] = json_encode($entry['content'])) === false){
+					$this->printError('A question set is malformed. This item will be skipped:', $entry);
+					continue;
+				}
+
+				$insertions[] = [
+					':content' => $entry['content'],
+					':objectives' => $entry['objectives'],
+					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
+					':content' => $entry['content']
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('audit_post_template'), $insertions)))
+			$this->printSuccess('novel entries by unit and objectives from ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
+	}
+	
+	/**
 	 * installs documents by novel name
 	 */
 	public function installDocuments(){
@@ -847,7 +895,7 @@ class INSTALL {
 					}
 				}
 
-				//ensure proper formatting
+				// ensure proper formatting
 				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context']));
 				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access']));
 
@@ -903,7 +951,7 @@ class INSTALL {
 					continue;
 				}
 
-				//ensure proper formatting
+				// ensure proper formatting
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
 
 				$names[] = $entry['title'];
@@ -917,7 +965,7 @@ class INSTALL {
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('application_post_manual'), $insertions)))
 			$this->printSuccess('novel entries by name from ' . $file . ' have been installed.');
 		else $this->printWarning('there were no novelties to install from '. $file . '.');
-		}
+	}
 
 	/**
 	 * installs risks by novel process+risk+cause+measure
@@ -988,7 +1036,7 @@ class INSTALL {
 				}
 
 				if ($valid){
-					//ensure proper formatting
+					// ensure proper formatting
 					$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk']));
 
 					if (!in_array($entry['process'].$entry['risk'].$entry['cause'].$entry['measure'], $DBall))
@@ -1144,7 +1192,7 @@ class INSTALL {
 				$entry['app_settings']['weeklyhours'] =  $this->_currentdate->format('Y-m-d'). ' 38,5';
 				$entry['app_settings']['initialovertime'] = 0;
 				
-				//ensure proper formatting
+				// ensure proper formatting
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
 				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units']));
 
