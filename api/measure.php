@@ -81,11 +81,15 @@ class MEASURE extends API {
 				$measure = $measure ? $measure[0] : null;
 				if (!$measure) $this->respond([], 404);
 
+				$changed = !(
+					$measure['measures'] == UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure')) &&
+					boolval($measure['closed']) == boolval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')))
+				);
 				$measure['measures'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure'));
 				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? json_encode(['date' => $this->_currentdate->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
 				$measure['id'] = $this->_requestedID;
 				$measure['last_user'] = $_SESSION['user']['name'];
-				
+
 				// delete. as edits are displayed within a modal this is handled by a checkbox insteat of a confirming button, hence no delete request-method
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.delete'))){
 					if (SQLQUERY::EXECUTE($this->_pdo, 'measure_delete', [
@@ -103,7 +107,6 @@ class MEASURE extends API {
 							'type' => 'error'
 						]]);
 				}
-
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_put', [
 					'values' =>[
 						':measures' => $measure['measures'],
@@ -112,11 +115,12 @@ class MEASURE extends API {
 						':last_user' => $_SESSION['user']['name']
 					]
 				])) {
-					$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
-						':user' => $_SESSION['user']['name'],
-						':content' => substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : ''),
-						':link' => '<a href="javascript:void(0);" onpointerup="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
-					], true)));
+					if ($changed)
+						$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
+							':user' => $_SESSION['user']['name'],
+							':content' => substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : ''),
+							':link' => '<a href="javascript:void(0);" onpointerup="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
+						], true)));
 					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.measure_saved'),
@@ -225,7 +229,7 @@ class MEASURE extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('measure.measure'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
+								'onpointerup' => "if (!this.disabled) new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
 									json_encode([
 										[
 											[
@@ -249,8 +253,7 @@ class MEASURE extends API {
 									])
 									."'), options:{".
 										"'".$this->_lang->GET('general.ok_button')."': true,".
-										"'".$this->_lang->GET('general.cancel_button')."': {value: false, class: 'reducedCTA'},".
-									"}}).then(response => {api.measure('put', 'measure', " . $measure['id'] . ", _client.application.dialogToFormdata());})"
+									"}}).then(response => {api.measure('put', 'measure', " . $measure['id'] . ", _client.application.dialogToFormdata());}); this.disabled = true;"
 							]
 						];
 					}
