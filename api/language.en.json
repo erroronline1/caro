@@ -849,21 +849,27 @@
 		}
 	},
 	"measure": {
+		"alert_new":"There is a new improvement suggestion. What do you think of it? :link",
+		"alert_response":":user processed your improvement suggestion \":content\" :link",
 		"anonymous": "submit anonymous",
 		"anonymous_hint": "Your name will not be stored nor displayed, your suggestion yet remains public.",
-		"closed":"closed",
+		"closed": "closed",
 		"anonymous_user": "Anonymous or deleted user",
-		"deleted": "Suggestion deleted wurde gelöscht",
+		"delete": "delete",
+		"delete_confirm_header": "On deletion the suggestion and measure are permanantly removed! Even non feasible suggestions can illustrate that all concerns matter!",
+		"deleted": "Suggestion deleted",
 		"delete_error": "Suggestion could not be deleted. Please try again.",
-		"last_touch":"last edit on :date by :user",
-		"measure":"Measure, evaluation",
+		"last_touch": "last edit on :date by :user",
+		"measure": "Measure, evaluation",
 		"measure_save_error": "Measure could not be saved. Please try again.",
 		"measure_saved": "Measure saved",
 		"new": "New suggestion",
 		"suggestion_save_error": "Suggestion could not be saved. Please try again.",
 		"suggestion_saved": "Suggestion saved",
 		"select": "Select",
-		"suggestion": "Suggestion"
+		"suggestion": "Suggestion",
+		"vote_confirm": "Thank you for your opinion!",
+		"vote_error": "Opinion could not be saved, please try again"
 	},
 	"message": {
 		"delete": "Delete conversation",

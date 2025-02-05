@@ -851,21 +851,27 @@
 		}
 	},
 	"measure": {
+		"alert_new":"Es gibt einen neuen Verbesserungsvorschlag. Was hältst Du davon? :link",
+		"alert_response":":user hat deinen Vorschlag \":content\" bearbeitet. :link",
 		"anonymous": "anonym einreichen",
 		"anonymous_hint": "Dein Name wird nicht gespeichert oder angezeigt, der Vorschlag ist jedoch öffentlich.",
 		"anonymous_user": "Anonymer oder gelöschter Nutzer",
-		"closed":"abgeschlossen",
+		"closed": "abgeschlossen",
+		"delete": "Löschen",
+		"delete_confirm_header": "Bei Löschung werden Vorschlag und die Maßnahme unwiderruflich entfernt! Auch nicht umsetzbare Vorschläge können zeigen, dass die Anliegen ernst genommen werden!",
 		"deleted": "Vorschlag wurde gelöscht",
 		"delete_error": "Der Vorschlag konnte nicht gelöscht werden. Bitte versuche es erneut.",
-		"last_touch":"zuletzt bearbeitet am :date von :user",
-		"measure":"Maßnahme, Bewertung",
+		"last_touch": "zuletzt bearbeitet am :date von :user",
+		"measure": "Maßnahme, Bewertung",
 		"measure_save_error": "Die Maßnahme konnte nicht gespeichert werden. Bitte versuche es erneut.",
 		"measure_saved": "Maßnahme gespeichert",
 		"new": "Neuer Vorschlag",
 		"suggestion_save_error": "Der Vorschlag konnte nicht gespeichert werden. Bitte versuche es erneut.",
 		"suggestion_saved": "Vorschlag gespeichert",
 		"select": "Auswahl",
-		"suggestion": "Vorschlag"
+		"suggestion": "Vorschlag",
+		"vote_confirm": "Danke für deine Meinung!",
+		"vote_error": "Deine Meinung konnte nicht gespeichert werden, bitte versuche es erneut."
 	},
 	"message": {
 		"delete": "Unterhaltung löschen",

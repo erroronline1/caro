@@ -1632,3 +1632,16 @@ button[data-type="submitbutton"]::before {
 	-webkit-mask-image: url("./media/pencil.svg");
 	mask-image: url("./media/pencil.svg");
 }
+
+button[data-type="upvote"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./media/thumbs-up.svg");
+	mask-image: url("./media/thumbs-up.svg");
+}
+button[data-type="downvote"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./media/thumbs-down.svg");
+	mask-image: url("./media/thumbs-down.svg");
+}

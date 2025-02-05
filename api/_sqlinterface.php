@@ -547,6 +547,10 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id ORDER BY timestamp DESC",
 			'sqlsrv' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id ORDER BY timestamp DESC"
 		],
+		'measure_get_by_id' => [
+			'mysql' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id WHERE caro_measures.id = :id",
+			'sqlsrv' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id WHERE caro_measures.id = :id"
+		],
 		'measure_delete' => [
 			'mysql' => "DELETE FROM caro_measures WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_measures WHERE id = :id"

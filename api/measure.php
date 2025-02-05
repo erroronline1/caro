@@ -22,12 +22,14 @@ class MEASURE extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_requestedVote = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedVote = isset(REQUEST[3]) ? REQUEST[3] : null;
 	}
 
 	/**
@@ -50,12 +52,20 @@ class MEASURE extends API {
 				
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_post', [
 					'values' => $measure
-				])) $this->response([
+				])) {
+					// get users
+					$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+					$this->alertUserGroup(['user' => array_column($user, 'name')], str_replace('\n', ', ', $this->_lang->GET('measure.alert_new', [
+						':link' => '<a href="javascript:void(0);" onpointerup="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
+					], true)));
+
+					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.suggestion_saved'),
 						'id' => $this->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.suggestion_save_error'),
@@ -65,20 +75,54 @@ class MEASURE extends API {
 				break;
 			case 'PUT':
 				if (!PERMISSION::permissionFor('measureedit')) $this->response([], 401);
-				$measure = [
-					':measures' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure')),
-					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? json_encode(['date' => $this->_currentdate->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null,
-					':id' => $this->_requestedID,
-					':last_user' => $_SESSION['user']['name']
-				];
+				$measure = SQLQUERY::EXECUTE($this->_pdo, 'measure_get_by_id', [
+					'values' => [':id' => $this->_requestedID]
+				]);
+				$measure = $measure ? $measure[0] : null;
+				if (!$measure) $this->respond([], 404);
+
+				$measure['measures'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure'));
+				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? json_encode(['date' => $this->_currentdate->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
+				$measure['id'] = $this->_requestedID;
+				$measure['last_user'] = $_SESSION['user']['name'];
 				
+				// delete. as edits are displayed within a modal this is handled by a checkbox insteat of a confirming button, hence no delete request-method
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.delete'))){
+					if (SQLQUERY::EXECUTE($this->_pdo, 'measure_delete', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
+					])) $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('measure.deleted'),
+							'type' => 'success'
+						]]);
+					else $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('measure.delete_error'),
+							'type' => 'error'
+						]]);
+				}
+
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_put', [
-					'values' => $measure
-				])) $this->response([
+					'values' =>[
+						':measures' => $measure['measures'],
+						':closed' => $measure['closed'],
+						':id' => $measure['id'],
+						':last_user' => $_SESSION['user']['name']
+					]
+				])) {
+					$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
+						':user' => $_SESSION['user']['name'],
+						':content' => substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : ''),
+						':link' => '<a href="javascript:void(0);" onpointerup="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
+					], true)));
+					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.measure_saved'),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.measure_save_error'),
@@ -126,85 +170,93 @@ class MEASURE extends API {
 				]];
 				foreach($measures as $measure){
 					$measurecontent = [];
-						$measure['closed'] = json_decode($measure['closed'] ? : '', true);
+					$measure['closed'] = json_decode($measure['closed'] ? : '', true);
+					$measurecontent[] = [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => ($measure['user_name'] ? : $this->_lang->GET('measure.anonymous_user')) . ' ' . $measure['timestamp']
+						],
+						'content' => $measure['content']
+					];
+					if ($measure['closed']){
 						$measurecontent[] = [
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => ($measure['user_name'] ? : $this->_lang->GET('measure.anonymous_user')) . ' ' . $measure['timestamp']
+								'name' => $this->_lang->GET('measure.closed')
 							],
-							'content' => $measure['content']
 						];
-						if ($measure['measures'])
-							$measurecontent[] = [
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('measure.measure')
-								],
-								'content' => $measure['measures'],
-								'hint' => $this->_lang->GET('measure.last_touch', [':user' => $measure['last_user'], ':date' => $measure['last_touch']])
-							];
-						if ($measure['closed'])
-							$measurecontent[] = [
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('measure.closed')
-								],
-							];
-						if (PERMISSION::permissionFor('measureedit'))
-							$measurecontent[] = [
+					}
+					else {
+						$measure['votes'] = json_decode($measure['votes'] ? : '', true);
+						$measurecontent[] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => strval($measure['votes'] ? array_sum(array_filter(array_values($measure['votes']), fn($v) => $v > 0)) : 0),
+								'data-type' => 'upvote',
+								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) > 0 ? ' green': ''),
+								'onpointerup' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('green'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('green') ? 1 : -1));"
+							],
+						];
+						$measurecontent[] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => strval($measure['votes'] ? abs(array_sum(array_filter(array_values($measure['votes']), fn($v) => $v < 0))) : 0),
+								'data-type' => 'downvote',
+								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) < 0 ? ' red': ''),
+								'onpointerup' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('red'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('red') ? 1 : -1));"
+							],
+						];
+						$measurecontent[] = [
+							'type' => 'br'
+						];
+					}
+					if ($measure['measures'])
+						$measurecontent[] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('measure.measure')
+							],
+							'content' => $measure['measures'],
+							'hint' => $this->_lang->GET('measure.last_touch', [':user' => $measure['last_user'], ':date' => $measure['last_touch']])
+						];
+					if (PERMISSION::permissionFor('measureedit')) {
+						$measurecontent[] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('measure.measure'),
 								'type' => 'button',
-								'attributes' => [
-									'value' => $this->_lang->GET('measure.measure'),
-									'type' => 'button',
-									'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
-										json_encode([
+								'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
+									json_encode([
+										[
 											[
-												[
-													'type' => 'textarea',
-													'attributes' => [
-														'name' => $this->_lang->GET('measure.measure'),
-														'value' => $measure['measures'] ? : ''
-													]
-												], [
-													'type' => 'checkbox',
-													'attributes' => [
-														'name' => $this->_lang->GET('measure.closed'),
-													],
-													'content' => [
-														$this->_lang->GET('measure.closed') => $measure['closed'] ? ['checked' => true] : []
-													]
+												'type' => 'textarea',
+												'attributes' => [
+													'name' => $this->_lang->GET('measure.measure'),
+													'value' => $measure['measures'] ? : ''
 												]
-											]
-										])
-										."'), options:{".
-											"'".$this->_lang->GET('general.ok_button')."': true,".
-											"'".$this->_lang->GET('general.cancel_button')."': {value: false, class: 'reducedCTA'},".
-										"}}).then(response => {if (Object.keys(response).length) {".
-											"api.measure('put', 'measure', " . $measure['id'] . ", _client.application.dialogToFormdata());}})"
-								]
-							];
-
-
-							// add votes
+											], [
+												'type' => 'checkbox',
+												'attributes' => [
+													'name' => $this->_lang->GET('measure.closed'),
+												],
+												'content' => [
+													$this->_lang->GET('measure.closed') => $measure['closed'] ? ['checked' => true] : [],
+													$this->_lang->GET('measure.delete') => ['class' => 'red']
+												],
+												'hint' => $this->_lang->GET('measure.delete_confirm_header')
+											],
+										]
+									])
+									."'), options:{".
+										"'".$this->_lang->GET('general.ok_button')."': true,".
+										"'".$this->_lang->GET('general.cancel_button')."': {value: false, class: 'reducedCTA'},".
+									"}}).then(response => {api.measure('put', 'measure', " . $measure['id'] . ", _client.application.dialogToFormdata());})"
+							]
+						];
+					}
 					$result['render']['content'][] = $measurecontent;
 				}
 				break;
-			case 'DELETE':
-				if (!PERMISSION::permissionFor('measureedit')) $this->response([], 401);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_delete', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
-				])) $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('measure.deleted'),
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('measure.delete_error'),
-						'type' => 'error'
-					]]);
 		}
 		$this->response($result);
 	}
@@ -218,10 +270,34 @@ class MEASURE extends API {
 	 * 
 	 */
 	public function vote(){
-		if (array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
 				// anonymous user id upvote 1 downote -1 , able to calculate median
+				$measure = SQLQUERY::EXECUTE($this->_pdo, 'measure_get_by_id', [
+					'values' => [':id' => $this->_requestedID]
+				]);
+				$measure = $measure ? $measure[0] : null;
+				if (!$measure) $this->respond([], 404);
+				$measure['votes'] = json_decode($measure['votes'] ? : '', true);
+				if (isset($measure['votes'][$_SESSION['user']['id']]) && $measure['votes'][$_SESSION['user']['id']] === $this->_requestedVote) unset($measure['votes'][$_SESSION['user']['id']]);
+				else $measure['votes'][$_SESSION['user']['id']] = $this->_requestedVote;
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_vote', [
+					'values' => [
+						':votes' => json_encode($measure['votes']),
+						':id' => $measure['id']
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('measure.vote_confirm'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('measure.vote_error'),
+						'type' => 'error'
+					]]);
+
 				break;
 		}
 		$this->response($result);
