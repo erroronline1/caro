@@ -18,6 +18,7 @@
         * [Unterhaltungen](#unterhaltungen)
         * [Verzeichnis](#verzeichnis)
         * [Textvorschläge](#textvorschläge)
+        * [Verbesserungsvorschläge](#verbesserungsvorschläge)
     * [Aufzeichnungen](#aufzeichnungen)
         * [Dokumente](#dokumente)
         * [Aufzeichnungen](#aufzeichnungen-1)
@@ -62,8 +63,9 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * strukturierte Beschaffung: reduzierte Rückfragen, automatisierte Erinnerungen, Einführungsaufzeichnungen und Stichprobenprüfung
 * Rollenverwaltung: definierte Nutzerberechtigungen und eine angemessene Informationsfülle
 * Auditunterstützung: interne Audits vorbereiten, planen und durchführen, Zusammenfassungen der Anwendungsdaten in aufgeräumten Übersichten
-* keine künstliche Intelligenz: volle Datenhoheit behalten
+* Verbesserungsvorschläge: jeder kann Verbesserungsvorschläge äußern und bewerten, sowie die Maßnahmen einsehen
 * Geräteunabhängig: Web-Anwendung mit jedem geeigneten Gerät nutzbar
+* keine künstliche Intelligenz: volle Datenhoheit behalten
 
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de.png)
 
@@ -372,6 +374,13 @@ graph TD;
     chunks-...->edittemplate[Vorlage bearbeiten];
     edittemplate-.->|Vorlage hinzufügen|chunks;
 ```
+
+[Übersicht](#übersicht)
+
+### Verbesserungsvorschläge
+Jeder Nutzer kann öffentlich Verbessungsvorschläge zu beliebigen Themen einreichen, auch Prozessen. Selbst anonyme Einreichungen sind möglich. Bei neuen Vorschlägen wird eine Systemnachricht an alle Nutzer versandt. Nutzer können ihre Meinung zu den Themen ausdrücken. Berechtigte Nutzer können Maßnahmen beschreiben oder Bewerten und die Themen abschließen. Der Vorschlagende wird per nachricht darüber informiert, dass sein Anliegen bearbeitet wurde.
+
+Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, können Vorschläge gelöscht werden, wenngleich dies Standardmäßig nicht empfohlen wird. beiträge haben keinen Aufzeichnungscharakter, beabsichtigen aber Meinungsbilder einzusammeln und als Eingabe für Qualitätsverbesserungen und die Managementbewertung zu dienen.
 
 [Übersicht](#übersicht)
 
@@ -1150,6 +1159,7 @@ formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Do
 documentcomposer = "ceo, qmo" ; Dokumente und Komponenten erstellen
 documentexport = "ceo, qmo, supervisor" ; Dokumente als PDF exportieren
 incorporation = "ceo, qmo, prrc" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
+measureedit = "ceo, qmo, prrc" ; Verbesserungsvorschläge bearbeiten, schließen und löschen
 mdrsamplecheck = "ceo, qmo, prrc"; Stichprobenprüfung zurücksetzen - müssen auch Zugriff auf regulatorische Auswertungen haben
 orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Bereiche hinzuzufügen
 ordercancel = "ceo" ; Berechtigung Bestellungen anderer Bereiche zu stornieren oder Rücksendungen zu veranlassen

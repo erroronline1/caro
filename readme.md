@@ -18,6 +18,7 @@
         * [Conversations](#conversations)
         * [Register](#register)
         * [Text recommendations](#text-recommendations)
+        * [Improvement suggestions](#improvement-suggestions)
     * [Records](#records)
         * [Documents](#documents)
         * [Records](#records-1)
@@ -60,6 +61,7 @@
     * [CSV filter endpoints](#csv-filter-endpoints)
     * [Document endpoints](#document-endpoints)
     * [File endpoints](#file-endpoints)
+    * [Measure endpoints](#measure-endpoints)
     * [Message endpoints](#message-endpoints)
     * [Notification endpoints](#notification-endpoints)
     * [Order endpoints](#order-endpoints)
@@ -118,10 +120,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit report (records)
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
-* measure management
-    * description, pictures
-    * api endpoints
-    * config.ini readme
+* measure management pictures
 * accessability according to https://www.w3.org/TR/WCAG21/, https://martijnhols.nl/blog/the-european-accessibility-act-for-websites-and-apps, https://webaim.org/techniques/javascript/eventhandlers
 * update readme pictures on tools menu, record menu, audit and regulatory
 
@@ -143,8 +142,9 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Structured procurement: reduced inquiries, automated reminders, incorporation records and sample checks
 * Role management: defined user permissions and appropriate information load
 * Audit support: prepare, schedule and execute internal audits, summarizing application data to tidy overviews
-* No artificial intelligence: you have absolute data authority
+* Improvement suggestions: everyone can suggest improvements, express their opinion and look at resulting measures
 * Device agnostic: web-application accessible by any suitable device
+* No artificial intelligence: you have absolute data authority
 
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard.png)
 
@@ -448,6 +448,13 @@ graph TD;
     chunks-...->edittemplate[edit template];
     edittemplate-.->|add template|chunks;
 ```
+
+[Content](#content)
+
+### Improvement suggestions
+All users can publicy suggest improvements to any topic, including processes. Even anonymous suggestions are allowed. On new suggestions a system alert to all users is raised. Users can express their opinion on topics. Authorized users can describe measures and evaluations or close the topic. The submitting user will receive a message, that their topic has been processed.
+
+To reduce pointless data and possible malignant spam, suggestions can be deleted although by default it is not recommended to do so. Entries have no record character but are supposed to gather opinion formation and serve as a source for quality improvement and management reporting.
 
 [Content](#content)
 
@@ -1232,6 +1239,7 @@ documentapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve document
 documentcomposer = "ceo, qmo" ; compose documents
 documentexport = "ceo, qmo, supervisor" ; export documents as printable pdf
 incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+measureedit = "ceo, qmo, prrc" ; edit, close and delete measures
 mdrsamplecheck = "ceo, qmo, prrc"; must have access to regulatory as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
 ordercancel = "ceo" ; permission to cancel or return any order beside own unit assigned ones
@@ -3164,6 +3172,66 @@ Parameters
 | {path to file} | path parameter | true | relative path |
 
 [Content](#content)
+
+### Measure endpoints
+
+> POST ./api/api.php/measure/measure
+
+Adds an improvement suggestions to the database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | suggestion |
+
+Sample response
+```
+{"response":{"msg":"Suggestion saved","id":"15","type":"success"}}
+```
+
+> PUT ./api/api.php/measure/measure/{id}
+
+Updates or deletes an improvement suggestions.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | measure database id |
+| payload | form data | required | measure, deletes if deletion flag is set within payload |
+
+Sample response
+```
+{"response":{"msg":"Measure saved","type":"success"}}
+```
+
+> GET ./api/api.php/measure/measure
+
+Displays all improvement suggestions.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render": {"content": [[{"type": "button","attributes": {"value": "New suggestion","type": "button","onpointerup": "new _client.Dialog({type: 'input', header: 'New suggestion', render: JSON.parse('[[{\"type\":\"textarea\",\"attributes\":{\"name\":\"Suggestion\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"submit anonymous\"},\"content\":{\"submit anonymous\":[]},\"hint\":\"Your name will not be stored nor displayed, your suggestion yet remains public.\"}]]'), options:{'Ok': true,'No, I am not done yet': {value: false, class: 'reducedCTA'},}}).then(response => {if (Object.keys(response).length)....
+```
+
+> PUT ./api/api.php/measure/vote/{id}/{vote}
+
+Adds, revokes or changes a vote on a topic.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | measure database id |
+| {vote} | path parameter | required | 1 or -1 |
+
+Sample response
+```
+{"response":{"msg":"Thank you for your opinion!","type":"success"}}
+```
 
 ### Message endpoints
 
