@@ -86,5 +86,10 @@
 		"title": "Regulatorische Auswertungen und Zusammenfassungen",
 		"content": "Verfügbare Daten aus der Anwendung können hier zusammengefasst und weitestgehend als Nachweisdokumente für Audits exportiert werden.\nHier können auch Schulungsbewertungen durchgeführt werden und Stichprobenprüfungen widerrufen werden.\nBerechtigte Nutzer können Schulungen für mehrere Nutzer gleichzeitig eintragen.",
 		"permissions": "ceo,qmo,prrc"
+	},
+	{
+		"title": "Verbesserungsvorschläge",
+		"content": "Es können Verbesserungsvorschläge eingereicht werden, die sich auf alle Themen beziehen. Die Verbesserungsvorschläge sind für alle einsehbar und können bewertet werden. Wenn Du Dich unwohl fühlst, darfst du das auch anonym tun.\nAlle werden über neue Vorschläge benachrichtigt, Du selbst, sobald deine bearbeitet werden.\nBerechtigte Nutzer können für die Vorschläge Maßnahmen festlegen und den Beitrag abschließen sobald dies angemessen erscheint.",
+		"permissions": "user,group"
 	}
 ]

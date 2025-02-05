@@ -86,5 +86,10 @@
 		"title": "Regulatory evaluations and summaries",
 		"content": "Available data from the application can be summarized here and mostly being exportable as records within audits.\nYou can do the training evaluation here and revoke sample checks.\nAlso you will find the tool to insert trainings for several users at once here.",
 		"permissions": "ceo,qmo,prrc"
+	},
+	{
+		"title": "Improvement suggestions",
+		"content": "You can contribute improvement suggestions for all topics. Suggestions are public and can be voted on. If you fell uncomfortable you are allowed to contribute anonymously.\nEveryone gets informed on new suggestions, only you as soon as yours are being processed.\nAuthorized users can define measures and close the contribution if this appears reasonable.",
+		"permissions": "user,group"
 	}
 ]
