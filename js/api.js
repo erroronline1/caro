@@ -522,7 +522,7 @@ export const api = {
 				}
 				break;
 			case "post":
-				if (3 in request && request[3] && typeof request[3] === "object") {
+				if (3 in request && request[3] && request[3] instanceof FormData) {
 					// passed formdata
 					payload = request[3];
 					delete request[3];
@@ -546,7 +546,7 @@ export const api = {
 				else payload = _.getInputs("[data-usecase=audit]", true);
 				break;
 			case "put":
-				if (4 in request && request[4] && typeof request[4] === "object") {
+				if (4 in request && request[4] && request[4] instanceof FormData) {
 					// passed formdata
 					payload = request[4];
 					delete request[4];
@@ -942,7 +942,7 @@ export const api = {
 	 * handles proposals and measures
 	 *
 	 * @param {string} method get|post|delete
-	 * @param  {array} request api method, measure id, vote
+	 * @param  {array} request api method, measure id, vote / message form data
 	 * @returns request
 	 */
 	measure: (method, ...request) => {
@@ -953,7 +953,7 @@ export const api = {
 				new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				measure: api._lang.GET("menu.communication.conversations")
+				measure: api._lang.GET("menu.communication.measure")
 			};
 
 		switch (method) {
@@ -970,7 +970,11 @@ export const api = {
 				break;
 			case "put":
 			case "post":
-				payload = _.getInputs("[data-usecase=measure]", true);
+				if (3 in request && request[3] && request[3] instanceof FormData) {
+					// passed formdata
+					payload = request[3];
+					delete request[3];
+				}
 				break;
 			case "delete":
 				break;
@@ -1024,7 +1028,7 @@ export const api = {
 				};
 				break;
 			case "post":
-				if (2 in request && request[2] && typeof request[2] === "object") {
+				if (2 in request && request[2] && request[2] instanceof FormData) {
 					// passed formdata
 					payload = request[2];
 					delete request[2];
@@ -1204,7 +1208,7 @@ export const api = {
 				break;
 			case "put":
 				if (["ordered", "partially_received", "received", "partially_delivered", "delivered", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
-					if (typeof request[4] === "object") {
+					if (request[4] instanceof FormData) {
 						payload = request[4];
 						delete request[4];
 					}

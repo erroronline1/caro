@@ -194,6 +194,8 @@ define('DEFAULTSQL', [
 				"	`user_id` int NULL," .
 				"	`votes` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`measures` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`last_user` tinytext COLLATE utf8mb4_unicode_ci NULL," .
+				"	`last_touch` datetime NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
@@ -457,6 +459,8 @@ define('DEFAULTSQL', [
 				"	user_id int NULL," .
 				"	votes varchar(MAX) NULL," .
 				"	measures varchar(MAX) NULL," .
+				"	last_user varchar(255) NULL," .
+				"	last_touch smalldatetime NULL," .
 				"	closed varchar(MAX) NULL" .
 				");"
 				.

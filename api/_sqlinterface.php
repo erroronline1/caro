@@ -532,20 +532,20 @@ class SQLQUERY {
 
 
 		'measure_post' => [
-			'mysql' => "INSERT INTO caro_measures (id, timestamp, content, user_id, votes, measures, closed) VALUES (NULL, CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_measures (timestamp, content, user_id, votes, measures, closed) VALUES (CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_measures (id, timestamp, content, user_id, votes, measures, last_user, last_touch, closed) VALUES (NULL, CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_measures (timestamp, content, user_id, votes, measures, last_user, last_touch, closed) VALUES (CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL, NULL, NULL)"
 		],
 		'measure_put' => [
-			'mysql' => "UPDATE caro_measures SET measures = :measures, closed = :closed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_measures SET measures = :measures, closed = :closed WHERE id = :id"
+			'mysql' => "UPDATE caro_measures SET measures = :measures, closed = :closed, last_user = :last_user, last_touch = CURRENT_TIMESTAMP WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_measures SET measures = :measures, closed = :closed, last_user = :last_user, last_touch = CURRENT_TIMESTAMP WHERE id = :id"
 		],
 		'measure_vote' => [
 			'mysql' => "UPDATE caro_measures SET votes = :votes WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_measures SET votes = :votes WHERE id = :id"
 		],
 		'measure_get' => [
-			'mysql' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id",
-			'sqlsrv' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id"
+			'mysql' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id ORDER BY timestamp DESC",
+			'sqlsrv' => "SELECT caro_measures.*, caro_user.name AS user_name FROM caro_measures LEFT JOIN caro_user ON caro_measures.user_id = caro_user.id ORDER BY timestamp DESC"
 		],
 		'measure_delete' => [
 			'mysql' => "DELETE FROM caro_measures WHERE id = :id",
