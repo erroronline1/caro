@@ -1060,7 +1060,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'name' => $product['article_no'] . ' ' . $product['article_name']. ($product['article_alias'] ? ' (' . $product['article_alias'] . ') ' : ' ') . $product['article_unit']
 								],
-								'content' => $product['vendor_name'] . ($product['article_info'] ? "\n" . $this->_lang->GET('consumables.product.article_info') . ': ' . $product['article_info'] : '')
+								'content' => $product['vendor_name'] . (isset($product['article_info']) && $product['article_info'] ? "\n" . $this->_lang->GET('consumables.product.article_info') . ': ' . $product['article_info'] : '')
 							],
 							[
 								'type' => 'br'
