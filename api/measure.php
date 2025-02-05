@@ -53,7 +53,7 @@ class MEASURE extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_post', [
 					'values' => $measure
 				])) {
-					// get users
+					// get users and trigger system message to all
 					$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					$this->alertUserGroup(['user' => array_column($user, 'name')], str_replace('\n', ', ', $this->_lang->GET('measure.alert_new', [
 						':link' => '<a href="javascript:void(0);" onpointerup="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
@@ -81,6 +81,7 @@ class MEASURE extends API {
 				$measure = $measure ? $measure[0] : null;
 				if (!$measure) $this->respond([], 404);
 
+				// check for changes as put request is always triggered through the frontend since empty values are legit
 				$changed = !(
 					$measure['measures'] == UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure')) &&
 					boolval($measure['closed']) == boolval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')))
@@ -90,7 +91,7 @@ class MEASURE extends API {
 				$measure['id'] = $this->_requestedID;
 				$measure['last_user'] = $_SESSION['user']['name'];
 
-				// delete. as edits are displayed within a modal this is handled by a checkbox insteat of a confirming button, hence no delete request-method
+				// delete. as edits are displayed within a modal this is handled by a checkbox instead of a confirming button, hence no delete request-method
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.delete'))){
 					if (SQLQUERY::EXECUTE($this->_pdo, 'measure_delete', [
 						'values' => [
@@ -107,6 +108,8 @@ class MEASURE extends API {
 							'type' => 'error'
 						]]);
 				}
+
+				// put if not deleted
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_put', [
 					'values' =>[
 						':measures' => $measure['measures'],
@@ -115,7 +118,7 @@ class MEASURE extends API {
 						':last_user' => $_SESSION['user']['name']
 					]
 				])) {
-					if ($changed)
+					if ($changed) // alert on changes only
 						$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
 							':user' => $_SESSION['user']['name'],
 							':content' => substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : ''),
@@ -138,6 +141,7 @@ class MEASURE extends API {
 				// get measures and assemble selection
 				$measures = SQLQUERY::EXECUTE($this->_pdo, 'measure_get');
 
+				// new suggestion button
 				$result['render']['content'] = [[
 					[
 						'type' => 'button',
@@ -172,6 +176,8 @@ class MEASURE extends API {
 						]
 					]
 				]];
+
+				// all suggestions
 				foreach($measures as $measure){
 					$measurecontent = [];
 					$measure['closed'] = json_decode($measure['closed'] ? : '', true);
@@ -190,7 +196,7 @@ class MEASURE extends API {
 							],
 						];
 					}
-					else {
+					else { // vote buttons
 						$measure['votes'] = json_decode($measure['votes'] ? : '', true);
 						$measurecontent[] = [
 							'type' => 'button',
@@ -282,8 +288,8 @@ class MEASURE extends API {
 				$measure = $measure ? $measure[0] : null;
 				if (!$measure) $this->respond([], 404);
 				$measure['votes'] = json_decode($measure['votes'] ? : '', true);
-				if (isset($measure['votes'][$_SESSION['user']['id']]) && $measure['votes'][$_SESSION['user']['id']] === $this->_requestedVote) unset($measure['votes'][$_SESSION['user']['id']]);
-				else $measure['votes'][$_SESSION['user']['id']] = $this->_requestedVote;
+				if (isset($measure['votes'][$_SESSION['user']['id']]) && $measure['votes'][$_SESSION['user']['id']] === $this->_requestedVote) unset($measure['votes'][$_SESSION['user']['id']]); // revoke vote
+				else $measure['votes'][$_SESSION['user']['id']] = $this->_requestedVote; // insert or update vote
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_vote', [
 					'values' => [
@@ -305,6 +311,5 @@ class MEASURE extends API {
 		}
 		$this->response($result);
 	}
-
 }
 ?>
