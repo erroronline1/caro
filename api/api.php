@@ -199,7 +199,7 @@ class API {
 		array_push($recipients, ...$user);
 		$recipients = array_unique($recipients);
 		// delete system user to receive any messages
-		unset($recipients[array_search(1,recipients)]);
+		unset($recipients[array_search(1, $recipients)]);
 		$recipients = array_values($recipients);
 
 		if (!$recipients) return false;
