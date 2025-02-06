@@ -597,7 +597,7 @@ export const api = {
 					if (request[3] !== undefined) location.hash = "#displayspecificdate";
 				}
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				if (data.data) _serviceWorker.notif.calendar_uncompletedevents(data.data);
+				if (data.data) _serviceWorker.notif.calendar(data.data);
 			},
 			title = {
 				schedule: api._lang.GET("menu.calendar.scheduling"),
@@ -883,7 +883,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
-							if (data.data) _serviceWorker.notif.document_approval(data.data);
+							if (data.data) _serviceWorker.notif.records(data.data);
 						};
 						payload = _.getInputs("[data-usecase=approval]", true);
 						break;
@@ -1019,7 +1019,7 @@ export const api = {
 						render.processAfterInsertion();
 						if (request[2]) window.scrollTo(0, document.body.scrollHeight);
 					}
-					if (data.data) _serviceWorker.notif.message_unseen(data.data);
+					if (data.data) _serviceWorker.notif.communication(data.data);
 					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					if (request[1] === "inbox" && _serviceWorker.worker)
 						_serviceWorker.onMessage({
@@ -1064,7 +1064,7 @@ export const api = {
 			successFn = function (data) {
 				new Toast(data.response.msg, data.response.type);
 				if (data.response.type !== "error") api.purchase("get", request[1], data.response.id);
-				if (data.data) _serviceWorker.notif.order_unprocessed_consumables_pendingincorporation(data.data);
+				if (data.data) _serviceWorker.notif.consumables(data.data);
 			},
 			title = {
 				vendor: api._lang.GET("menu.purchase.vendor"),
@@ -1214,13 +1214,13 @@ export const api = {
 					}
 					successFn = function (data) {
 						new Toast(data.response.msg, data.response.type);
-						if (data.data) _serviceWorker.notif.order_unprocessed_consumables_pendingincorporation(data.data);
+						if (data.data) _serviceWorker.notif.consumables(data.data);
 					};
 				}
 				if (request[1] == "prepared") {
 					successFn = function (data) {
 						new Toast(data.response.msg, data.response.type);
-						if (data.data) _serviceWorker.notif.order_unprocessed_consumables_pendingincorporation(data.data);
+						if (data.data) _serviceWorker.notif.consumables(data.data);
 						api.purchase("get", "prepared");
 					};
 				}
