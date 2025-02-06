@@ -47,6 +47,7 @@ class NOTIFICATION extends API {
 			'document_approval' => $this->documents(),
 			'order_unprocessed' => $this->order(),
 			'order_prepared' => $this->preparedorders(),
+			'measure_unclosed' => $this->measures(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen()
 		];
@@ -294,6 +295,19 @@ class NOTIFICATION extends API {
 			}
 		}
 		return $unapproved;
+	}
+
+	/**
+	 *
+	 *   _____ ___ ___ ___ _ _ ___ ___ ___
+	 *  |     | -_| .'|_ -| | |  _| -_|_ -|
+	 *  |_|_|_|___|__,|___|___|_| |___|___|
+	 *
+	 * number of unclosed measures 
+	 */
+	public function measures(){
+		$measures = SQLQUERY::EXECUTE($this->_pdo, 'measure_get');
+		return count(array_filter($measures, fn($m) => !$m['closed']));
 	}
 
 	/**
