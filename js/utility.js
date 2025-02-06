@@ -28,7 +28,7 @@ export const _serviceWorker = {
 		 * @param {object} data containing calendar_uncompletedevents
 		 * @event sets querySelector attribute data-notification
 		 */
-		calendar_uncompletedevents: function (data) {
+		calendar: function (data) {
 			let notif;
 			if ("calendar_uncompletedevents" in data) {
 				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.calendar.header").replace(" ", "_") + "]");
@@ -44,7 +44,7 @@ export const _serviceWorker = {
 		 * @param {object} data containing document_approval
 		 * @event sets querySelector attribute data-notification
 		 */
-		document_approval: function (data) {
+		records: function (data) {
 			let notif;
 			if ("document_approval" in data || "audit_closing" in data) {
 				let document_approval = 0,
@@ -72,13 +72,18 @@ export const _serviceWorker = {
 		 * @param {object} data containing message_unseen
 		 * @event sets querySelector attribute data-notification
 		 */
-		message_unseen: function (data) {
+		communication: function (data) {
+			let notif;
 			if ("message_unseen" in data) {
-				let notif;
 				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
+			}
+			if ("measure_unclosed" in data){
+				// no appending number to userMenu to avoid distracting from unread messages
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.measure").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", data.measure_unclosed);
 			}
 		},
 
@@ -88,7 +93,7 @@ export const _serviceWorker = {
 		 * @param {object} data containing order_prepared, order_unprocessed, consumables_pendingincorporation
 		 * @event sets querySelector attribute data-notification
 		 */
-		order_unprocessed_consumables_pendingincorporation: function (data) {
+		consumables: function (data) {
 			let notif;
 			if ("order_prepared" in data || "order_unprocessed" in data || "consumables_pendingincorporation" in data) {
 				let order_prepared = 0,
@@ -139,10 +144,10 @@ export const _serviceWorker = {
 				this.showLocalNotification(api._lang.GET("menu.communication.header"), body);
 			}
 		}
-		this.notif.message_unseen(data);
-		this.notif.order_unprocessed_consumables_pendingincorporation(data);
-		this.notif.calendar_uncompletedevents(data);
-		this.notif.document_approval(data);
+		this.notif.communication(data);
+		this.notif.consumables(data);
+		this.notif.calendar(data);
+		this.notif.records(data);
 	},
 
 	/**
