@@ -74,6 +74,9 @@ export const assemble_helper = {
 			input.type = "radio";
 			input.name = "userMenu";
 			input.id = "userMenu" + group;
+			// accessibility settings
+			input.setAttribute("role", "none");
+			input.title = group;
 
 			// set up div containing subsets of category
 			div2 = document.createElement("div");
@@ -750,6 +753,7 @@ export class Assemble {
 		toleft.dataset.type = "toleft";
 		toleft.classList.add("inlinebutton");
 		toleft.type = "button";
+		toleft.title = api._lang.GET("assemble.render.aria.toleft");
 		indicators.appendChild(toleft);
 
 		// indicator circles of length with pointerenter event
@@ -783,8 +787,10 @@ export class Assemble {
 		toright.dataset.type = "toright";
 		toright.classList.add("inlinebutton");
 		toright.type = "button";
+		toright.title = api._lang.GET("assemble.render.aria.toright");
 		indicators.appendChild(toright);
-
+		// accessibility setting, reduce distractions from contextwise inappropriate elements
+		indicators.setAttribute("aria-hidden", true);
 		return indicators;
 	}
 
@@ -940,6 +946,8 @@ export class Assemble {
 			if (this.currentElement.attributes.multiple) span.dataset.multiple = "multiple";
 			if (this.currentElement.attributes["data-filtered"]) span.dataset.filtered = this.currentElement.attributes["data-filtered"];
 		}
+		// accessibility setting
+		span.setAttribute("aria-hidden", true);
 		return [br, span];
 	}
 
@@ -1307,6 +1315,8 @@ export class Assemble {
 		img.onpointerup = () => {
 			div.classList.toggle("extended");
 		};
+		// accessibility setting
+		img.setAttribute("aria-hidden", true);
 		div.append(img);
 		div.classList.add("em8");
 		if (this.currentElement.attributes !== undefined) div = this.apply_attributes(this.currentElement.attributes, div);
@@ -1437,6 +1447,8 @@ export class Assemble {
 		button.type = "button";
 		button.dataset.type = "reset";
 		button.classList.add("inlinebutton");
+		// accessibility setting; hide button, as input can be accessed directly
+		button.setAttribute("aria-hidden", true);
 		return [...this.header(), input, label, button, ...this.hint()];
 	}
 
@@ -1586,6 +1598,9 @@ export class Assemble {
 			});
 			disabled = false;
 		}
+
+		// accessibility setting
+		canvas.title = api._lang.GET("assemble.render.aria.image", { ":image": this.currentElement.attributes.name });
 
 		result.push(canvas);
 
@@ -1924,6 +1939,8 @@ export class Assemble {
 		span.append(document.createTextNode(this.currentElement.content));
 		img.classList.add("nocontent");
 		span.classList.add("nocontent");
+		// accessibility setting;
+		img.setAttribute("aria-hidden", true);	
 		return [img, span];
 	}
 
@@ -2279,7 +2296,7 @@ export class Assemble {
 		if (multiple) this.currentElement.attributes.multiple = true;
 
 		let button = document.createElement("button");
-		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.scan_button")));
+		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.scan_button", { ":field": this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "") })));
 		button.type = "button";
 		button.dataset.type = "scanner";
 

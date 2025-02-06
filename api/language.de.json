@@ -358,6 +358,11 @@
 			"error_forbidden_name": "Der Name :name ist nicht zulässig, bitte verwende einen anderen."
 		},
 		"render": {
+			"aria":{
+				"image":"Bild :image",
+				"toleft":"nach links schieben",
+				"toright":"nach rechts schieben"
+			},
 			"assign_hint_documents": "\"Meine Bereiche\" listet alle Dokumente für deine zugeordneten Bereiche inklusive allgemeiner auf.",
 			"assign_hint_bundles": "\"Meine Bereiche\" listet alle Dokumentenpakete für deine zugeordneten Bereiche.",
 			"clear_signature": "Unterschrift löschen",
@@ -386,7 +391,7 @@
 			"photo_rechoose": "oder noch einmal ein neues Foto wählen...",
 			"required_asterisk": "Felder mit * sind erforderlich",
 			"reset": "Zurücksetzen",
-			"scan_button": "Einen Code scannen",
+			"scan_button": "Einen Code für :field scannen",
 			"scan_multiple": "Nach dem Scan oder einer Eingabe erscheint ein weiteres Feld.",
 			"select_multiple": "Nach der Auswahl erscheint eine weitere Liste.",
 			"textarea_autocomplete": "Drücke die Alt- oder AltGr-Taste um durch die verfügbaren Optionen zu schalten."
