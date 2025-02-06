@@ -76,6 +76,7 @@ export const assemble_helper = {
 			input.id = "userMenu" + group;
 			// accessibility settings
 			input.setAttribute("role", "none");
+			input.tabIndex = -1;
 			input.title = group;
 
 			// set up div containing subsets of category
@@ -189,7 +190,8 @@ export class Dialog {
 			const img = document.createElement("img");
 			img.classList.add("close");
 			img.src = "./media/times.svg";
-			img.onpointerup = () => {
+			img.alt = api._lang.GET("assemble.render.aria.cancel");
+			img.onclick = () => {
 				const scanner = document.querySelector("video");
 				if (scanner) scanner.srcObject.getTracks()[0].stop();
 				document.getElementById(modal).close();
@@ -452,10 +454,12 @@ export class Toast {
 			if (type) this.toast.classList.add(type);
 			closeimg.classList.add("close");
 			closeimg.src = "./media/times.svg";
-			closeimg.onpointerdown = new Function("document.getElementById('toast').close();");
+			closeimg.alt = api._lang.GET("assemble.render.aria.cancel");
+			closeimg.onclick = new Function("document.getElementById('toast').close();");
 			pauseimg.classList.add("pause");
 			pauseimg.src = "./media/equals.svg";
-			pauseimg.onpointerdown = new Function("window.clearTimeout(window.toasttimeout);");
+			pauseimg.alt = api._lang.GET("assemble.render.aria.pause");
+			pauseimg.onclick = new Function("window.clearTimeout(window.toasttimeout);");
 			msg.innerHTML = message;
 			this.toast.replaceChildren(closeimg, pauseimg, msg, div);
 			this.toast.show();
@@ -754,6 +758,7 @@ export class Assemble {
 		toleft.classList.add("inlinebutton");
 		toleft.type = "button";
 		toleft.title = api._lang.GET("assemble.render.aria.toleft");
+		toleft.tabIndex = -1;
 		indicators.appendChild(toleft);
 
 		// indicator circles of length with pointerenter event
@@ -788,6 +793,7 @@ export class Assemble {
 		toright.classList.add("inlinebutton");
 		toright.type = "button";
 		toright.title = api._lang.GET("assemble.render.aria.toright");
+		toright.tabIndex = -1;
 		indicators.appendChild(toright);
 		// accessibility setting, reduce distractions from contextwise inappropriate elements
 		indicators.setAttribute("aria-hidden", true);
@@ -1082,7 +1088,7 @@ export class Assemble {
 	 * 		"hint": "this button does this or that",
 	 * 		"attributes": {
 	 * 			"value": "this is displayed on the button",
-	 *			"onpointerup": "alert('hello')"
+	 *			"onclick": "alert('hello')"
 	 *		}
 	 * 	}
 	 * ```
@@ -1108,7 +1114,7 @@ export class Assemble {
 		}
 
 		// bind to form if applicable
-		if (this.currentElement.type === "submitbutton") button.onpointerup = this.prepareForm.bind(this);
+		if (this.currentElement.type === "submitbutton") button.onclick = this.prepareForm.bind(this);
 
 		// embed in styleable container to prevent from 100% width
 		if (imagealigned) {
@@ -1152,7 +1158,7 @@ export class Assemble {
 					daytile.append(document.createTextNode(line));
 					daytile.append(document.createElement("br"));
 				}
-				daytile.onpointerup = function () {
+				daytile.onclick = function () {
 					api.calendar("get", apicall, day.date, day.date);
 				};
 				if (day.today) daytile.classList.add("today");
@@ -1251,7 +1257,7 @@ export class Assemble {
 	}
 
 	/**
-	 * creates a text typed input with onpointerup modal with checkbox selection
+	 * creates a text typed input with onclick modal with checkbox selection
 	 * requires additional options property on this.currentElement containing an options object
 	 * @return {domNodes}
 	 * @example this.currentElement
@@ -1312,7 +1318,8 @@ export class Assemble {
 			img = document.createElement("img");
 		img.classList.add("close");
 		img.src = "./media/plus.svg";
-		img.onpointerup = () => {
+		img.alt=api._lang.GET('assemble.render.aria.extend');
+		img.onclick = () => {
 			div.classList.toggle("extended");
 		};
 		// accessibility setting
@@ -1354,7 +1361,7 @@ export class Assemble {
 	 * 		"type": "deletebutton",
 	 * 		"attributes": {
 	 * 			"value": "yeet that!",
-	 *			"onpointerdown": "some.deletion.event()"
+	 *			"onclick": "some.deletion.event()"
 	 *		}
 	 * 	}
 	 * ```
@@ -1429,7 +1436,7 @@ export class Assemble {
 					  api._lang.GET("assemble.render.file_rechoose")
 					: api._lang.GET("assemble.render.file_choose");
 			};
-		label.onpointerup = () => {
+		label.onclick = () => {
 			document.getElementById(input.id).click();
 		};
 		label.type = "button";
@@ -1438,7 +1445,7 @@ export class Assemble {
 		label.appendChild(document.createTextNode(this.currentElement.attributes.multiple !== undefined ? api._lang.GET("assemble.render.files_choose") : api._lang.GET("assemble.render.file_choose")));
 		if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
 
-		button.onpointerup = () => {
+		button.onclick = () => {
 			let e = document.getElementById(input.id);
 			e.value = "";
 			e.dispatchEvent(new Event("change"));
@@ -1479,7 +1486,7 @@ export class Assemble {
 	 * 		"type": "documentbutton",
 	 * 		"attributes": {
 	 * 			"value": "{selected document title} anzeigen",
-	 * 			"onpointerup": "api.record('get', 'displayonly', '{selected document title}')"
+	 * 			"onclick": "api.record('get', 'displayonly', '{selected document title}')"
 	 * 		}
 	 * 	}
 	 * ```
@@ -1631,7 +1638,7 @@ export class Assemble {
 				type: "button",
 				class: "inlinebutton",
 				"data-type": this.currentElement.type,
-				onpointerup: create_virtual_link_and_click.fn.toString().replace("name", create_virtual_link_and_click.name).replace("canvas_id", create_virtual_link_and_click.canvas_id),
+				onclick: create_virtual_link_and_click.fn.toString().replace("name", create_virtual_link_and_click.name).replace("canvas_id", create_virtual_link_and_click.canvas_id),
 			};
 			if (disabled) this.currentElement.attributes.disabled = true;
 			result = result.concat(this.button());
@@ -1712,7 +1719,7 @@ export class Assemble {
 			}
 			input.value = inputvalue.join(", ");
 			let currentElement = this.currentElement;
-			input.onpointerup = function () {
+			input.onclick = function () {
 				const options = {};
 				options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
 				options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
@@ -1803,7 +1810,7 @@ export class Assemble {
 	 * 			},
 	 * 			"Link 2": {
 	 * 				"href": #"",
-	 * 				"onpointerup": "alert('hello')"
+	 * 				"onclick": "alert('hello')"
 	 * 			}
 	 * 		},
 	 * 		"hint": "these links serve the purpose of..."
@@ -1839,9 +1846,9 @@ export class Assemble {
 	 * 			"unseen": "null|int styled like notifications for conversations overview"
 	 * 		},
 	 * 		"attributes":{
-	 * 			"onpointerup" : "event applies to whole container",
+	 * 			"onclick" : "event applies to whole container",
 	 * 			"class": "right, conversation",
-	 * 			"ICON_onpointerup": "event only applies to user icon"
+	 * 			"ICON_onclick": "event only applies to user icon"
 	 * 		}
 	 * 	}
 	 */
@@ -1860,8 +1867,9 @@ export class Assemble {
 			icondiv.classList.add("image");
 			icon = document.createElement("img");
 			icon.src = this.currentElement.content.img;
+			icon.alt=api._lang.GET("assemble.render.aria.image", {":image":this.currentElement.content.user});
 			icondiv.append(icon);
-			if (onpointerup_forward) icondiv.onpointerup = new Function(onpointerup_forward);
+			if (onpointerup_forward) icondiv.onclick = new Function(onpointerup_forward);
 			message.append(icondiv);
 		}
 		p = document.createElement("p");
@@ -2014,7 +2022,7 @@ export class Assemble {
 		input.capture = true;
 		input.onchange = changeEvent;
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		button.onpointerup = () => {
+		button.onclick = () => {
 			document.getElementById(input.id).click();
 		};
 		button.type = "button";
@@ -2024,7 +2032,7 @@ export class Assemble {
 
 		img.classList.add("photoupload");
 
-		resetbutton.onpointerup = () => {
+		resetbutton.onclick = () => {
 			let e = document.getElementById(input.id);
 			e.value = "";
 			e.dispatchEvent(new Event("change"));
@@ -2036,7 +2044,7 @@ export class Assemble {
 
 		if (multiple) this.currentElement.attributes.multiple = true; // reapply after input apply_attributes
 		const photoElementClone = structuredClone(this.currentElement);
-		addbutton.onpointerup = function () {
+		addbutton.onclick = function () {
 			new Assemble({
 				content: [[photoElementClone]],
 				composer: "elementClone",
@@ -2103,7 +2111,7 @@ export class Assemble {
 
 		button.classList.add("productselection");
 		button.dataset.type = "search";
-		button.onpointerup = function () {
+		button.onclick = function () {
 			const options = {};
 			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
 			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
@@ -2300,7 +2308,7 @@ export class Assemble {
 		button.type = "button";
 		button.dataset.type = "scanner";
 
-		button.onpointerup = () => {
+		button.onclick = () => {
 			// arrow function for reference of this.names
 			new Dialog({
 				type: "scanner",
@@ -2325,7 +2333,7 @@ export class Assemble {
 			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.merge")));
 			button.type = "button";
 			button.dataset.type = "merge";
-			button.onpointerup = function () {
+			button.onclick = function () {
 				if (document.getElementById(inputid).value) api.record("get", "import", document.getElementById(inputid).value);
 			};
 			result.push(button);
@@ -2334,7 +2342,7 @@ export class Assemble {
 				button = document.createElement("button");
 				button.appendChild(document.createTextNode(api._lang.GET("record.create_identifier_type", { ":format": setting.format })));
 				button.type = "button";
-				button.onpointerup = function () {
+				button.onclick = function () {
 					if (document.getElementById(inputid).value) _client.application.postLabelSheet(document.getElementById(inputid).value, true, { _type: label });
 				};
 				result.push(button);
@@ -2449,7 +2457,7 @@ export class Assemble {
 			}
 		}
 
-		select.onpointerdown = (e) => {
+		select.onclick = (e) => {
 			// arrow function for reference of this.names
 			e.preventDefault();
 			if (!e.target.disabled)
@@ -2507,7 +2515,7 @@ export class Assemble {
 		this.currentElement.attributes = {
 			value: api._lang.GET("assemble.render.clear_signature"),
 			type: "button",
-			onpointerup: "signaturePad.clear()",
+			onclick: "signaturePad.clear()",
 		};
 		result = result.concat(this.deletebutton()); // hint will be added here as well
 		this.signaturePad = true;
@@ -2541,7 +2549,7 @@ export class Assemble {
 	 * 		"type": "submitbutton",
 	 * 		"attributes": {
 	 * 			"value": "save that!",
-	 *			"onpointerdown": "some.submission.event()"
+	 *			"onclick": "some.submission.event()"
 	 *		}
 	 * 	}
 	 * ```
@@ -2597,7 +2605,7 @@ export class Assemble {
 	 * 		"type": "text_copy",
 	 * 		"attributes": {
 	 * 			"name": "variable name",
-	 * 			"onpointerup": "_client.application.toClipboard(this)"
+	 * 			"onclick": "_client.application.toClipboard(this)"
 	 * 		}
 	 * 	}
 	 * ```
@@ -2645,7 +2653,7 @@ export class Assemble {
 			this.currentElement.attributes = {
 				value: api._lang.GET("menu.communication.texttemplate_texts"),
 				type: "button",
-				onpointerup: "api.texttemplate('get', 'text', 'false', 'modal')",
+				onclick: "api.texttemplate('get', 'text', 'false', 'modal')",
 				class: "floatright",
 			};
 			delete this.currentElement.hint;
@@ -2715,7 +2723,7 @@ export class Assemble {
 	 * @see this.textarea()
 	 */
 	textarea_copy() {
-		this.currentElement.attributes.onpointerup = "_client.application.toClipboard(this)";
+		this.currentElement.attributes.onclick = "_client.application.toClipboard(this)";
 		return this.textarea();
 	}
 

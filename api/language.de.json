@@ -359,7 +359,10 @@
 		},
 		"render": {
 			"aria":{
+				"cancel":"Abbrechen",
+				"extend":"erweitern / verbergen",
 				"image":"Bild :image",
+				"pause":"Anhalten",
 				"toleft":"nach links schieben",
 				"toright":"nach rechts schieben"
 			},

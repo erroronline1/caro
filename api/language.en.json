@@ -359,7 +359,10 @@
 		},
 		"render": {
 			"aria":{
+				"cancel":"Cancel",
+				"extend":"Extend / collapse",
 				"image":"Image of :image",
+				"pause":"Pause",
 				"toleft":"slide to left",
 				"toright":"slide to right"
 			},
