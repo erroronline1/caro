@@ -349,6 +349,13 @@ class USER extends API {
 					$lang = explode('.', $file);
 					$languages[$lang[1]] = (isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
 				}
+				// preset available themes
+				$theme = [];
+				foreach(glob('../*.css') as $file){
+					$name = pathinfo($file)['filename'];
+					if (in_array($name, ['style'])) continue;
+					$theme[ucfirst($name)] = (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === $name) ? ['checked' => true, 'value' => $name] : ['value' => $name];
+				}
 				// append application settings
 				$result['render']['content'][] = [
 					[
@@ -372,11 +379,7 @@ class USER extends API {
 						'attributes' => [
 							'name' => $this->_lang->GET('user.settings_theme')
 						],
-						'content' => [
-							$this->_lang->GET('user.settings_theme_light') => (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === 'light') ? ['checked' => true, 'value' => 'light'] : ['value' => 'light'],
-							$this->_lang->GET('user.settings_theme_aurora') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'aurora') ? ['checked' => true, 'value' => 'aurora'] : ['value' => 'aurora'],
-							$this->_lang->GET('user.settings_theme_dark') => (isset($user['app_settings']['theme']) && $user['app_settings']['theme'] === 'dark') ? ['checked' => true, 'value' => 'dark'] : ['value' => 'dark'],
-						]
+						'content' => $theme
 					]
 				];
 				// append primary unit selection for orders
