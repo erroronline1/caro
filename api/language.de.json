@@ -359,11 +359,14 @@
 		},
 		"render": {
 			"aria": {
+				"add":"Weiteres hinzufügen",
 				"cancel": "Abbrechen",
 				"extend": "erweitern / verbergen",
 				"image": "Bild :image",
 				"pause": "Anhalten",
 				"preview": "Vorschau",
+				"scan_button_generic":"Feld",
+				"search":"Suche",
 				"signature": "Unterschriftenfeld",
 				"toleft": "nach links schieben",
 				"toright": "nach rechts schieben"

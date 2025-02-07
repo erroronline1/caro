@@ -82,11 +82,11 @@ export const assemble_helper = {
 			// set up div containing subsets of category
 			div2 = document.createElement("div");
 			div2.classList.add("options");
+			div2.role="menu";
 			span = document.createElement("span");
 			span.append(document.createTextNode(group));
 			div2.append(span);
 			div2.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
-			div2.role = "group";
 
 			// iterate over subset
 			for (const [description, attributes] of Object.entries(items)) {
@@ -947,6 +947,7 @@ export class Assemble {
 	 * @returns {domNodes} br, span with styleable data-type
 	 */
 	icon() {
+		return [];
 		const br = document.createElement("br"),
 			span = document.createElement("span");
 		span.dataset.type = this.currentElement.type;
@@ -991,6 +992,7 @@ export class Assemble {
 		if (!this.currentElement.hint) return [];
 		let div = document.createElement("div");
 		div.classList.add("hint");
+		div.role = "note";
 		const content = this.currentElement.hint.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
 		for (const part of content) {
 			if (!part[1].length) continue;
@@ -1416,7 +1418,7 @@ export class Assemble {
 		if (this.currentElement.attributes.multiple) {
 			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
 		}
-
+		input.setAttribute("aria-label", this.currentElement.description);
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (this.currentElement.attributes.multiple !== undefined)
 			input.onchange = function () {
@@ -1520,8 +1522,8 @@ export class Assemble {
 		input.type = "hidden";
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		if (this.currentElement.attributes !== undefined) input = this.apply_attributes(this.currentElement.attributes, input);
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		input = this.apply_attributes(this.currentElement.attributes, input);
 		return [input];
 	}
 
@@ -1660,7 +1662,7 @@ export class Assemble {
 	 * 		"hint": "please provide information about...",
 	 * 		"numeration": "anything resulting in true to prevent enumeration"
 	 * 		"attributes": {
-	 * 			"name": "variable name will be used as an accessible placeholder"
+	 * 			"name": "variable name will be used as label as well"
 	 * 		},
 	 * 		"datalist": ["some", "predefined", "values"]
 	 * 	}
@@ -1668,6 +1670,7 @@ export class Assemble {
 	input(type) {
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
+			span = document.createElement("span"),
 			hint = this.hint(),
 			imagealigned = false,
 			datalist;
@@ -1676,19 +1679,14 @@ export class Assemble {
 		if (type === "password") this.currentElement.type = "password";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
-		label.htmlFor = input.id;
-		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
-		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
-		label.classList.add("input-label");
-		if (this.currentElement.attributes) {
-			if (this.currentElement.attributes.required) label.dataset.required = true;
-			if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
-		}
+
+		if (this.currentElement.attributes.required) span.dataset.required = true;
+		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 
 		if (type === "number") input.step = ".01";
 		if (this.currentElement.type === "link") input.dataset.wrap = "href='___'";
 
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
 			input.onchange = () => {
 				// arrow function for reference of this.names
@@ -1704,13 +1702,11 @@ export class Assemble {
 			};
 		}
 
-		if (this.currentElement.attributes !== undefined) {
-			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
-				imagealigned = true;
-				this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
-			}
-			input = this.apply_attributes(this.currentElement.attributes, input);
+		if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
+			imagealigned = true;
+			this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 		}
+		input = this.apply_attributes(this.currentElement.attributes, input);
 
 		if (type === "email") input.multiple = true;
 
@@ -1751,13 +1747,11 @@ export class Assemble {
 
 		if (this.currentElement.attributes.hidden !== undefined) return input;
 
-		if (this.currentElement.attributes !== undefined) {
-			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
-				imagealigned = true;
-				this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
-			}
-			input = this.apply_attributes(this.currentElement.attributes, input);
+		if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
+			imagealigned = true;
+			this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 		}
+		input = this.apply_attributes(this.currentElement.attributes, input);
 
 		if (this.currentElement.datalist !== undefined && this.currentElement.datalist.length) {
 			datalist = document.createElement("datalist");
@@ -1771,15 +1765,20 @@ export class Assemble {
 			input.setAttribute("list", datalist.id);
 		}
 
+		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
+
+		label.dataset.type = this.currentElement.type;
+		label.append(span, input);
+
 		if (imagealigned) {
 			const container = document.createElement("div");
 			container.classList.add("imagealigned");
-			container.append(...this.icon(), input, label, ...hint);
+			container.append(label, ...hint);
 			if (datalist) container.append(datalist);
 			return [container];
 		}
-		if (datalist) return [...this.icon(), input, label, ...hint, datalist];
-		return [...this.icon(), input, label, ...hint];
+		if (datalist) return [label, ...hint, datalist];
+		return [label, ...hint];
 	}
 
 	/**
@@ -2025,6 +2024,7 @@ export class Assemble {
 		input.capture = true;
 		input.onchange = changeEvent;
 		input = this.apply_attributes(this.currentElement.attributes, input);
+		input.setAttribute("aria-label", this.currentElement.description);
 		button.onclick = () => {
 			document.getElementById(input.id).click();
 		};
@@ -2060,6 +2060,7 @@ export class Assemble {
 		addbutton.dataset.type = "additem";
 		addbutton.classList.add("inlinebutton");
 		addbutton.type = "button";
+		addbutton.title = api._lang.GET("assemble.render.aria.add");
 
 		return [...this.header(), input, img, button, multiple ? addbutton : [], resetbutton, ...hint];
 	}
@@ -2074,7 +2075,7 @@ export class Assemble {
 	 * 		"hint": "somethingsomething"...,
 	 * 		"numeration": "anything resulting in true to prevent enumeration",
 	 * 		"attributes": {
-	 * 			"name": "variable name will be used as an accessible placeholder",
+	 * 			"name": "variable name will be used as label",
 	 * 			"multiple": "bool on changing the input field another appends"
 	 * 		}
 	 * 	}
@@ -2083,23 +2084,20 @@ export class Assemble {
 	productselection() {
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
+			span = document.createElement("span"),
 			button = document.createElement("button"),
 			hint = [...this.hint()];
 		const productselectionClone = structuredClone(this.currentElement);
 		input.type = "text";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = "off";
-		input.classList.add("productselection");
-		label.htmlFor = input.id;
-		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
-		this.currentElement.attributes.placeholder = " "; // to access input:not(:placeholder-shown) query selector
-		label.classList.add("input-label", "productselection");
-		if (this.currentElement.attributes) {
-			if (this.currentElement.attributes.required) label.dataset.required = true;
-			if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
-		}
+		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
+		label.classList.add("productselection");
+		if (this.currentElement.attributes.required) span.dataset.required = true;
+		if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
+		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
 
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
 			input.onchange = () => {
 				// arrow function for reference of this.names
@@ -2116,8 +2114,12 @@ export class Assemble {
 		}
 		input = this.apply_attributes(this.currentElement.attributes, input);
 
+		label.dataset.type = this.currentElement.type;
+		label.append(span, input);
+
 		button.classList.add("productselection");
 		button.dataset.type = "search";
+		button.title = api._lang.GET("assemble.render.aria.search");
 		button.onclick = function () {
 			const options = {};
 			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
@@ -2159,7 +2161,7 @@ export class Assemble {
 				}
 			});
 		};
-		return [...this.icon(), input, button, label, ...hint];
+		return [label, button, ...hint];
 	}
 
 	/**
@@ -2192,32 +2194,38 @@ export class Assemble {
 	 */
 	range() {
 		let input = document.createElement("input"),
+			label = document.createElement("label"),
+			span = document.createElement("span"),
 			hint = this.hint(),
 			datalist;
 		input.type = "range";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		this.currentElement.description = this.currentElement.attributes.name;
 		input = this.apply_attributes(this.currentElement.attributes, input);
 
+		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
+		label.dataset.type = this.currentElement.type;
+		label.append(span, input);
+
 		if (this.currentElement.datalist != undefined) {
 			datalist = document.createElement("datalist");
-			let option, labels, label;
+			let option, textlabels, textlabel;
 			datalist.id = getNextElementID();
-			labels = document.createElement("div");
-			labels.classList.add("rangedatalist");
+			textlabels = document.createElement("div");
+			textlabels.classList.add("rangedatalist");
 			this.currentElement.datalist.forEach((key) => {
 				option = document.createElement("option");
 				option.append(document.createTextNode(key));
-				label = document.createElement("span");
-				label.append(document.createTextNode(key));
-				labels.append(label);
+				textlabel = document.createElement("span");
+				textlabel.append(document.createTextNode(key));
+				textlabels.append(textlabel);
 				datalist.appendChild(option);
 			});
 			input.setAttribute("list", datalist.id);
 			input.min = 0;
 			input.max = this.currentElement.datalist.length - 1;
-			return [datalist, ...this.header(), input, labels, ...hint];
+			return [datalist, label, textlabels, ...hint];
 		} else if (this.currentElement.attributes.step !== "any") {
 			datalist = document.createElement("datalist");
 			let option;
@@ -2232,7 +2240,7 @@ export class Assemble {
 				datalist.appendChild(option);
 			}
 			input.setAttribute("list", datalist.id);
-			return [datalist, ...this.header(), input, ...hint, ...this.br()];
+			return [datalist, label, ...hint, ...this.br()];
 		}
 		return [...this.header(), input, ...hint];
 	}
@@ -2259,6 +2267,7 @@ export class Assemble {
 			input,
 			inputid,
 			label,
+			span,
 			multiple,
 			originaltype = this.currentElement.type;
 		const scannerElementClone = structuredClone(this.currentElement);
@@ -2273,23 +2282,20 @@ export class Assemble {
 			inputid = this.currentElement.destination;
 		} else {
 			input = document.createElement("input");
+			span = document.createElement("span");
+			label = document.createElement("label");
 			input.type = "text";
 			input.id = inputid = getNextElementID();
-			input.placeholder = " "; // to access input:not(:placeholder-shown) query selector
 			input.autocomplete = input.type === "password" ? "one-time-code" : "off";
-
-			label = document.createElement("label");
-			label.htmlFor = input.id;
-			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")));
-			label.classList.add("input-label");
 			if (this.currentElement.attributes) {
-				if (this.currentElement.attributes.required) label.dataset.required = true;
+				span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "")));
+				if (this.currentElement.attributes.required) span.dataset.required = true;
+				if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
 				if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
+
+				this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+				input = this.apply_attributes(this.currentElement.attributes, input);
 			}
-
-			if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-			if (this.currentElement.attributes) input = this.apply_attributes(this.currentElement.attributes, input);
-
 			if (multiple) {
 				input.onchange = () => {
 					// arrow function for reference of this.names
@@ -2304,14 +2310,24 @@ export class Assemble {
 				};
 			}
 			if (input.type === "password") this.currentElement.type = "password"; // for icon
-			result = result.concat([...this.icon(), input, label, ...this.hint()]);
+
+			label.dataset.type = this.currentElement.type;
+			label.append(span, input);
+
+			result = result.concat([label, ...this.hint()]);
 			this.currentElement.type = originaltype;
 		}
 
 		if (multiple) this.currentElement.attributes.multiple = true;
 
 		let button = document.createElement("button");
-		button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.scan_button", { ":field": this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "") })));
+		button.appendChild(
+			document.createTextNode(
+				this.currentElement.description
+					? this.currentElement.description
+					: api._lang.GET("assemble.render.scan_button", { ":field": this.currentElement.attributes ? this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "") : api._lang.GET("assemble.render.aria.scan_button_generic") })
+			)
+		);
 		button.type = "button";
 		button.dataset.type = "scanner";
 
@@ -2404,8 +2420,8 @@ export class Assemble {
 		const groups = {};
 		let select = document.createElement("select"),
 			label = document.createElement("label"),
+			span = document.createElement("span"),
 			selectModal = {},
-			icon = this.icon(),
 			multiple,
 			selectElementClone,
 			hint,
@@ -2413,6 +2429,7 @@ export class Assemble {
 			elements;
 		if (this.currentElement.attributes.multiple) {
 			multiple = true;
+			label.dataset.multiple = "multiple";
 			delete this.currentElement.attributes.multiple;
 			selectElementClone = structuredClone(this.currentElement);
 			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.render.select_multiple") : api._lang.GET("assemble.render.select_multiple");
@@ -2420,16 +2437,12 @@ export class Assemble {
 		hint = this.hint();
 		select.title = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		select.id = getNextElementID();
-		label.htmlFor = select.id;
-		label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
-		label.classList.add("input-label");
-		if (this.currentElement.attributes) {
-			if (this.currentElement.attributes.required) label.dataset.required = true;
-			if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
-		}
 
-		if (this.currentElement.attributes.name !== undefined) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		if (this.currentElement.attributes !== undefined) select = this.apply_attributes(this.currentElement.attributes, select);
+		if (this.currentElement.attributes.required) span.dataset.required = true;
+		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
+
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		select = this.apply_attributes(this.currentElement.attributes, select);
 
 		if (JSON.stringify(Object.keys(this.currentElement.content)) === JSON.stringify(Object.keys(this.currentElement.content).sort())) {
 			Object.keys(this.currentElement.content)
@@ -2489,7 +2502,12 @@ export class Assemble {
 					}
 				});
 		};
-		return [...icon, select, label, ...hint];
+
+		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
+		label.dataset.type = this.currentElement.type;
+		label.append(span, select);
+
+		return [label, ...hint];
 	}
 
 	/**
@@ -2520,6 +2538,9 @@ export class Assemble {
 		input.id = "SIGNATURE";
 		input.name = this.currentElement.attributes.name;
 		input.hidden = true;
+		input.tabIndex=-1;
+		input.role="none";
+		input.setAttribute("aria-hidden", true);
 		result.push(input);
 		this.currentElement.attributes = {
 			value: api._lang.GET("assemble.render.clear_signature"),
@@ -2647,18 +2668,15 @@ export class Assemble {
 	 */
 	textarea() {
 		let textarea = document.createElement("textarea"),
-			label;
+			label = document.createElement("label"),
+			span = document.createElement("span");
+
 		textarea.id = getNextElementID();
 		textarea.autocomplete = "off";
-		if (this.currentElement.attributes.name !== undefined) {
-			this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-			label = document.createElement("label");
-			label.htmlFor = textarea.id;
-			label.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
-			label.classList.add("textarea-label");
-			if (this.currentElement.attributes && this.currentElement.attributes.required) label.dataset.required = true;
-		}
-		if (this.currentElement.attributes !== undefined) textarea = this.apply_attributes(this.currentElement.attributes, textarea);
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]/g, "")));
+		if (this.currentElement.attributes.required) span.dataset.required = true;
+		textarea = this.apply_attributes(this.currentElement.attributes, textarea);
 		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			this.currentElement.attributes = {
@@ -2724,8 +2742,12 @@ export class Assemble {
 			});
 			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.render.textarea_autocomplete") : api._lang.GET("assemble.render.textarea_autocomplete");
 		}
-		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [...this.icon(), label, textarea, ...this.hint(), ...this.button(), ...this.br()];
-		return [...this.icon(), label, textarea, ...this.hint()];
+
+		label.dataset.type = this.currentElement.type;
+		label.append(span, textarea);
+
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [label, ...this.hint(), ...this.button(), ...this.br()];
+		return [label, ...this.hint()];
 	}
 
 	/**

@@ -359,11 +359,14 @@
 		},
 		"render": {
 			"aria": {
+				"add":"Add another",
 				"cancel": "Cancel",
 				"extend": "Extend / collapse",
 				"image": "Image of :image",
 				"pause": "Pause",
 				"preview": "Preview",
+				"scan_button_generic":"field",
+				"search":"Search",
 				"signature": "Signature field",
 				"toleft": "slide to left",
 				"toright": "slide to right"
@@ -398,7 +401,7 @@
 			"reset": "Reset",
 			"scan_button": "Scan a Code for :field",
 			"scan_multiple": "Another scan option will appear after success or input.",
-			"select_multiple": "Another selection will apper after input.",
+			"select_multiple": "Another selection will appear after input.",
 			"textarea_autocomplete": "Press the Alt- or AltGr-key to toggle through available options."
 		}
 	},

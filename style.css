@@ -456,6 +456,26 @@ html[data-useragent*="safari"] body {
 }
 
 /*************************** input elements and call to action *******************************/
+a,
+a:active,
+a:visited {
+	color: var(--cta_darker);
+	text-decoration: none;
+	outline: none;
+	display: block;
+}
+
+a[data-filtered],
+header ~ a,
+a + a {
+	margin-top: 1.5em;
+}
+
+a.inline {
+	display: inline !important;
+	margin: initial;
+}
+
 input,
 textarea,
 select,
@@ -495,44 +515,47 @@ input[type="file"] {
 	display: none;
 }
 
-a,
-a:active,
-a:visited {
-	color: var(--cta_darker);
-	text-decoration: none;
-	outline: none;
-	display: block;
+label {
+	span {
+		font-size: small;
+		margin-left: 0.5em;
+		padding: 0 0.5em;
+		background: var(--article);
+	}
+
+	input[type="text"],
+	input[type="number"],
+	input[type="search"],
+	input[type="password"],
+	input[type="date"],
+	input[type="time"],
+	input[type="tel"],
+	input[type="email"],
+	textarea,
+	select,
+	.editor {
+		display: block;
+		margin-top: -0.55em;
+		margin-bottom: 1em;
+		margin-left: 1.75em;
+		border: 1px solid var(--inputborder);
+		border-radius: 0.2rem;
+		padding: 0.75em;
+	}
+	.editor{
+		margin-left:2.25em;
+	}
+
+	input[type="number"] {
+		appearance: textfield;
+	}
 }
 
-a[data-filtered],
-header ~ a,
-a + a {
-	margin-top:1.5em;
-}
-
-a.inline {
-	display: inline !important;
-	margin: initial;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="search"],
-input[type="password"],
-input[type="date"],
-input[type="time"],
-input[type="tel"],
-input[type="email"],
-textarea,
-select,
-.editor {
-	border: 1px solid var(--inputborder);
-	border-radius: 0.2rem;
-	padding: 0.75em;
-}
-
-input[type="number"] {
-	appearance: textfield;
+label[data-type="range"] {
+	span {
+		font-size: medium;
+		margin-left: 0;
+	}
 }
 
 input[type="radio"],
@@ -603,33 +626,9 @@ input:checked + .radio.red {
 	border-color: var(--article);
 }
 
-.input-label {
-	position: relative;
-	top: -2.15em;
-	pointer-events: none;
-	transition: 0.3s;
-	opacity: 0.5;
-	margin: 0 0 0 2.8em;
-}
 input[type="checkbox"]:disabled + label,
 input[type="radio"]:disabled + label {
 	color: var(--darkshadow);
-}
-
-input:not(:placeholder-shown) + .input-label,
-input:not(:placeholder-shown) + button + .input-label,
-input:focus + .input-label,
-input:focus + button + .input-label,
-select + label.input-label {
-	position: relative;
-	pointer-events: none;
-	font-size: 0.75em;
-	top: -4.75em;
-	margin: 0 0 0 3.7em;
-	padding: 0 0.5em;
-	opacity: 1;
-	background: var(--article);
-	background: linear-gradient(0deg, var(--article_transparent) 0%, var(--article) 20%, var(--article) 80%, var(--article_transparent) 100%);
 }
 
 html[data-useragent*="safari"] body {
@@ -639,30 +638,8 @@ html[data-useragent*="safari"] body {
 	}
 }
 
-.textarea-label {
-	position: relative;
-	pointer-events: all;
-	font-size: 0.75em;
-	top: -1.25em;
-	margin: 0 0 0 1.7em;
-	padding: 0 0.5em;
-	opacity: 1;
-	background: var(--article);
-	background: linear-gradient(0deg, var(--article_transparent) 0%, var(--article) 35%, var(--article) 65%, var(--article_transparent) 100%);
-
-	& + textarea {
-		margin-left: 1.75em;
-		margin-top: -1.5em;
-	}
-	& + .editor {
-		margin-left: 2.25em;
-		margin-top: -1.85em;
-	}
-
-}
-
 .editor {
-	display: flex;
+	display: flex !important;
 	gap: 10px;
 	font-family: monospace;
 	line-height: 1.5em;
@@ -671,7 +648,7 @@ html[data-useragent*="safari"] body {
 	padding: 0.75em;
 
 	& > textarea {
-		font-family: monospace;
+		font-family: inherit;
 		line-height: inherit;
 		overflow-y: hidden;
 		white-space: pre;
@@ -693,11 +670,11 @@ html[data-useragent*="safari"] body {
 
 	.line-numbers span {
 		counter-increment: linenumber;
+		display: block;
 	}
 
 	.line-numbers span::before {
 		content: counter(linenumber);
-		display: block;
 		color: var(--disabled);
 	}
 }
@@ -851,9 +828,9 @@ input:invalid + label.input_required_alert,
 	}
 }
 
-input.productselection {
-	width: calc(95% - 5em);
-	display: inline;
+label.productselection {
+	width: calc(98% - 5em);
+	display: inline-block;
 }
 button.productselection {
 	display: inline-block;
@@ -882,18 +859,21 @@ article > span[data-type] {
 
 /* hint messages below */
 .hint {
-	margin: -1em 0 0 2.3em;
+	margin: -1em 0 1em 2rem;
 	font-size: 0.75em;
 	clear: both;
 }
 .editor + .hint {
-	margin: 1em 0 0 2.3em;
+	margin: 1.3em 0 0 2.3em;
 }
-
 .links-hint,
 .range-hint,
 button + .hint {
 	margin-top: 1em;
+}
+label + button + .hint {
+	/* productselection */
+	margin-top: -1em;
 }
 
 button + div,
@@ -1239,7 +1219,7 @@ dialog a:not([data-type])::before {
 	margin: 0 0.75em 0.2em 0;
 }
 
-article > header[data-type]::before{
+article > header[data-type]::before {
 	margin: 0 0.75em 0.2em -1.75em;
 }
 
@@ -1249,8 +1229,8 @@ article > header[data-type]::before{
 	height: 0.75em;
 	width: 0.75em;
 	position: absolute;
-	margin-left: -0.15em;
-	margin-top: 2.2em;
+	margin-left: 1.95em;
+	margin-top: -1.95em;
 	background-size: cover;
 	background-image: none;
 	background-color: var(--disabled);
