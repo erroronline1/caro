@@ -430,7 +430,7 @@ class APPLICATION extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('application.manual.delete'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('application.manual.delete_confirm') ."', options: {".
+								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('application.manual.delete_confirm') ."', options: {".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
 									"}}).then(confirmation => {if (confirmation) api.application('delete', 'manual', " . $entry['id'] . ")})"
@@ -473,8 +473,8 @@ class APPLICATION extends API {
 	public function menu(){
 		// get permission based menu items
 		if (!isset($_SESSION['user'])) $this->response(['render' => [$this->_lang->GET('menu.application.header') => [
-			$this->_lang->GET('menu.application.signin') => ['onpointerup' => "api.application('get', 'login')"],
-			$this->_lang->GET('menu.application.info') => ['onpointerup' => "api.application('get', 'info')"]
+			$this->_lang->GET('menu.application.signin') => ['onclick' => "api.application('get', 'login')"],
+			$this->_lang->GET('menu.application.info') => ['onclick' => "api.application('get', 'info')"]
 			]]]);	// early exit
 
 		//////////////////////////////////
@@ -483,40 +483,40 @@ class APPLICATION extends API {
 		$menu = [
 			// order here defines frontend order
 			$this->_lang->GET('menu.communication.header') => [
-				$this->_lang->GET('menu.communication.conversations') => ['onpointerup' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
-				$this->_lang->GET('menu.communication.register') => ['onpointerup' => "api.message('get', 'register')"],
-				$this->_lang->GET('menu.communication.texttemplate_texts') => ['onpointerup' => "api.texttemplate('get', 'text')"],
+				$this->_lang->GET('menu.communication.conversations') => ['onclick' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
+				$this->_lang->GET('menu.communication.register') => ['onclick' => "api.message('get', 'register')"],
+				$this->_lang->GET('menu.communication.texttemplate_texts') => ['onclick' => "api.texttemplate('get', 'text')"],
 			],
 			$this->_lang->GET('menu.records.header') => [
-				$this->_lang->GET('menu.records.record_create_identifier') => ['onpointerup' => "api.record('get', 'identifier')"],
-				$this->_lang->GET('menu.records.record_summary') => ['onpointerup' => "api.record('get', 'records')"]
+				$this->_lang->GET('menu.records.record_create_identifier') => ['onclick' => "api.record('get', 'identifier')"],
+				$this->_lang->GET('menu.records.record_summary') => ['onclick' => "api.record('get', 'records')"]
 			],
 			$this->_lang->GET('menu.calendar.header') => [
-				$this->_lang->GET('menu.calendar.scheduling') => ['onpointerup' => "api.calendar('get', 'schedule')"]
+				$this->_lang->GET('menu.calendar.scheduling') => ['onclick' => "api.calendar('get', 'schedule')"]
 			],
 			$this->_lang->GET('menu.application.header') => [
-				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onpointerup' => "api.application('post', 'login', 'logout')"],
-				$this->_lang->GET('menu.application.start') => ['onpointerup' => "api.application('get', 'start')"],			
-				$this->_lang->GET('menu.application.user_profile') => ['onpointerup' => "api.user('get', 'profile')"],			
+				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('post', 'login', 'logout')"],
+				$this->_lang->GET('menu.application.start') => ['onclick' => "api.application('get', 'start')"],			
+				$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
 			],
 			$this->_lang->GET('menu.files.header') => [
-				$this->_lang->GET('menu.files.files') => ['onpointerup' => "api.file('get', 'files')"],
-				$this->_lang->GET('menu.files.bundles') => ['onpointerup' => "api.file('get', 'bundle')"],
-				$this->_lang->GET('menu.files.sharepoint') => ['onpointerup' => "api.file('get', 'sharepoint')"],
+				$this->_lang->GET('menu.files.files') => ['onclick' => "api.file('get', 'files')"],
+				$this->_lang->GET('menu.files.bundles') => ['onclick' => "api.file('get', 'bundle')"],
+				$this->_lang->GET('menu.files.sharepoint') => ['onclick' => "api.file('get', 'sharepoint')"],
 			],
 			$this->_lang->GET('menu.purchase.header') => [
-				$this->_lang->GET('menu.purchase.order') => ['onpointerup' => "api.purchase('get', 'order')"],
-				$this->_lang->GET('menu.purchase.prepared_orders') => ['onpointerup' => "api.purchase('get', 'prepared')"],
-				$this->_lang->GET('menu.purchase.approved_orders') => ['onpointerup' => "api.purchase('get', 'approved')"],
-				$this->_lang->GET('menu.purchase.vendor') => ['onpointerup' => "api.purchase('get', 'vendor')"],
-				$this->_lang->GET('menu.purchase.product') => ['onpointerup' => "api.purchase('get', 'product')"],
+				$this->_lang->GET('menu.purchase.order') => ['onclick' => "api.purchase('get', 'order')"],
+				$this->_lang->GET('menu.purchase.prepared_orders') => ['onclick' => "api.purchase('get', 'prepared')"],
+				$this->_lang->GET('menu.purchase.approved_orders') => ['onclick' => "api.purchase('get', 'approved')"],
+				$this->_lang->GET('menu.purchase.vendor') => ['onclick' => "api.purchase('get', 'vendor')"],
+				$this->_lang->GET('menu.purchase.product') => ['onclick' => "api.purchase('get', 'product')"],
 			],
 			$this->_lang->GET('menu.tools.header') => [
-				$this->_lang->GET('menu.tools.digital_codes') => ['onpointerup' => "api.tool('get', 'code')"],
-				$this->_lang->GET('menu.tools.scanner') => ['onpointerup' => "api.tool('get', 'scanner')"],
-				$this->_lang->GET('menu.tools.stl_viewer') => ['onpointerup' => "api.tool('get', 'stlviewer')"],
-				$this->_lang->GET('menu.tools.calculator') => ['onpointerup' => "api.tool('get', 'calculator')"],
-				$this->_lang->GET('menu.tools.image') => ['onpointerup' => "api.tool('get', 'image')"],
+				$this->_lang->GET('menu.tools.digital_codes') => ['onclick' => "api.tool('get', 'code')"],
+				$this->_lang->GET('menu.tools.scanner') => ['onclick' => "api.tool('get', 'scanner')"],
+				$this->_lang->GET('menu.tools.stl_viewer') => ['onclick' => "api.tool('get', 'stlviewer')"],
+				$this->_lang->GET('menu.tools.calculator') => ['onclick' => "api.tool('get', 'calculator')"],
+				$this->_lang->GET('menu.tools.image') => ['onclick' => "api.tool('get', 'image')"],
 			],
 		];
 
@@ -524,45 +524,45 @@ class APPLICATION extends API {
 		// permission based functions
 		//////////////////////////////////
 
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onpointerup' => "api.document('get', 'bundles')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_record')] = ['onpointerup' => "api.document('get', 'documents')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onclick' => "api.document('get', 'bundles')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_record')] = ['onclick' => "api.document('get', 'documents')"];
 		
 		// make sure risk management comes after documents so this is an exception
-		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onpointerup' => "api.risk('get', 'risk')"];
+		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onclick' => "api.risk('get', 'risk')"];
 
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
-			$menu[$this->_lang->GET('menu.calendar.header')][$this->_lang->GET('menu.calendar.timesheet')] = ['onpointerup' => "api.calendar('get', 'timesheet')"];
+			$menu[$this->_lang->GET('menu.calendar.header')][$this->_lang->GET('menu.calendar.timesheet')] = ['onclick' => "api.calendar('get', 'timesheet')"];
 
-		if (PERMISSION::permissionFor('files')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.file_manager')] = ['onpointerup' => "api.file('get', 'filemanager')"];
-		if (PERMISSION::permissionFor('externaldocuments')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.external_file_manager')] = ['onpointerup' => "api.file('get', 'externalfilemanager')"];
+		if (PERMISSION::permissionFor('files')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.file_manager')] = ['onclick' => "api.file('get', 'filemanager')"];
+		if (PERMISSION::permissionFor('externaldocuments')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.external_file_manager')] = ['onclick' => "api.file('get', 'externalfilemanager')"];
 		if (PERMISSION::permissionFor('documentcomposer')){
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_components')] = ['onpointerup' => "api.document('get', 'component_editor')"];
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_documents')] = ['onpointerup' => "api.document('get', 'document_editor')"];
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_bundles')] = ['onpointerup' => "api.document('get', 'bundle')"];
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_components')] = ['onclick' => "api.document('get', 'component_editor')"];
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_documents')] = ['onclick' => "api.document('get', 'document_editor')"];
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_bundles')] = ['onclick' => "api.document('get', 'bundle')"];
 		}
 		if (PERMISSION::permissionFor('audit')){
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit')] = ['onpointerup' => "api.audit('get', 'audit')"];
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit_templates')] = ['onpointerup' => "api.audit('get', 'audittemplate')"];
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit')] = ['onclick' => "api.audit('get', 'audit')"];
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit_templates')] = ['onclick' => "api.audit('get', 'audittemplate')"];
 		}
-		if (PERMISSION::permissionFor('filebundles')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.bundle_manager')] = ['onpointerup' => "api.file('get', 'bundlemanager')"];
-		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onpointerup' => "api.user('get', 'user')"];
+		if (PERMISSION::permissionFor('filebundles')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.bundle_manager')] = ['onclick' => "api.file('get', 'bundlemanager')"];
+		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onclick' => "api.user('get', 'user')"];
 		if (PERMISSION::permissionFor('texttemplates')) {
-			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_chunks')] =['onpointerup' => "api.texttemplate('get', 'chunk')"];
-			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_templates')] =['onpointerup' => "api.texttemplate('get', 'template')"];
+			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_chunks')] =['onclick' => "api.texttemplate('get', 'chunk')"];
+			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_templates')] =['onclick' => "api.texttemplate('get', 'template')"];
 		}
 
 		// make sure measure management comes after texttemplate management so this is an exception
-		$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.measure')] = ['onpointerup' => "api.measure('get', 'measure')"];
+		$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.measure')] = ['onclick' => "api.measure('get', 'measure')"];
 
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onpointerup' => "api.audit('get', 'checks')"];
-		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onpointerup' => "api.csvfilter('get', 'filter')"];
-		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onpointerup' => "api.document('get', 'approval')"];
-		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onpointerup' => "api.application('get', 'manual')"];
-		if (PERMISSION::permissionFor('csvrules')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter_manager')] =['onpointerup' => "api.csvfilter('get', 'rule')"];
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onpointerup' => "api.purchase('get', 'pendingincorporations')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
+		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onclick' => "api.document('get', 'approval')"];
+		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onclick' => "api.application('get', 'manual')"];
+		if (PERMISSION::permissionFor('csvrules')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter_manager')] =['onclick' => "api.csvfilter('get', 'rule')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
 		// make sure info comes last so this is an exception
-		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onpointerup' => "api.application('get', 'info')"];
+		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onclick' => "api.application('get', 'info')"];
 
 		$this->response(['render' => $menu, 'user' => $_SESSION['user']['name']]);
 	}
@@ -589,7 +589,7 @@ class APPLICATION extends API {
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onpointerup' => "api.message('get', 'conversation')",
+					'onclick' => "api.message('get', 'conversation')",
 				],
 				'content' => [
 					[
@@ -611,7 +611,7 @@ class APPLICATION extends API {
 				$tiles[] = [
 					'type' => 'tile',
 					'attributes' => [
-						'onpointerup' => "api.purchase('get', 'approved')",
+						'onclick' => "api.purchase('get', 'approved')",
 					],
 					'content' => [
 						[
@@ -634,7 +634,7 @@ class APPLICATION extends API {
 				$tiles[] = [
 					'type' => 'tile',
 					'attributes' => [
-						'onpointerup' => "api.purchase('get', 'prepared')",
+						'onclick' => "api.purchase('get', 'prepared')",
 					],
 					'content' => [
 						[
@@ -656,7 +656,7 @@ class APPLICATION extends API {
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onpointerup' => "api.record('get', 'records')",
+					'onclick' => "api.record('get', 'records')",
 				],
 				'content' => [
 					[
@@ -678,7 +678,7 @@ class APPLICATION extends API {
 				$tiles[] = [
 					'type' => 'tile',
 					'attributes' => [
-						'onpointerup' => "api.audit('get', 'audit')",
+						'onclick' => "api.audit('get', 'audit')",
 					],
 					'content' => [
 						[
@@ -700,7 +700,7 @@ class APPLICATION extends API {
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onpointerup' => "api.document('get', 'approval')",
+					'onclick' => "api.document('get', 'approval')",
 				],
 				'content' => [
 					[
@@ -721,7 +721,7 @@ class APPLICATION extends API {
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onpointerup' => "api.purchase('get', 'pendingincorporations')",
+					'onclick' => "api.purchase('get', 'pendingincorporations')",
 				],
 				'content' => [
 					[
@@ -742,7 +742,7 @@ class APPLICATION extends API {
 			$tiles[] = [
 				'type' => 'tile',
 				'attributes' => [
-					'onpointerup' => "api.audit('get', 'checks', 'complaints')",
+					'onclick' => "api.audit('get', 'checks', 'complaints')",
 				],
 				'content' => [
 					[
@@ -805,7 +805,7 @@ class APPLICATION extends API {
 			if ($documents = $search->documentsearch(['search' => $this->_search])){
 				$matches = [];
 				foreach ($documents as $document){
-					$matches[$document['name']] = ['href' => 'javascript:void(0);', 'onpointerup' => "api.record('get', 'document', '" . $document['name'] . "')"];
+					$matches[$document['name']] = ['href' => 'javascript:void(0);', 'onclick' => "api.record('get', 'document', '" . $document['name'] . "')"];
 				}
 				$searchelements[] = [
 					'type' => 'links',
