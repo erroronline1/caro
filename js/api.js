@@ -329,7 +329,6 @@ export const api = {
 
 					// update default language
 					if (api._settings.config.application && api._settings.config.application.defaultlanguage) {
-						console.log(document.querySelector("html").lang , api._settings.config.application.defaultlanguage);
 						document.querySelector("html").lang = api._settings.config.application.defaultlanguage;
 					}
 
