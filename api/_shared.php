@@ -256,7 +256,7 @@ class SHARED {
 				$matches[$article][$slide][] = [
 					'type' => 'tile',
 					'attributes' => [
-						'onpointerup' => "api.risk('get', 'risk', " . $row['id'] . ")",
+						'onclick' => "api.risk('get', 'risk', " . $row['id'] . ")",
 					],
 					'content' => [
 						[
@@ -344,7 +344,7 @@ class SHARED {
 								$matches[$article][$slide][] = [
 								'type' => 'tile',
 								'attributes' => [
-									'onpointerup' => "api.purchase('get', 'product', " . $row['id'] . ")",
+									'onclick' => "api.purchase('get', 'product', " . $row['id'] . ")",
 								],
 								'content' => [
 									[
@@ -377,7 +377,7 @@ class SHARED {
 							$matches[$article][$slide][] = [
 								'type' => 'tile',
 								'attributes' => [
-									'onpointerup' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+									'onclick' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
 								],
 								'content' => [
 									[

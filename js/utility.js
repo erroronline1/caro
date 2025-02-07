@@ -505,7 +505,7 @@ export const _client = {
 								type: "deletebutton",
 								attributes: {
 									value: api._lang.GET("order.add_delete"),
-									onpointerup: "this.parentNode.remove()",
+									onclick: "this.parentNode.remove()",
 								},
 							},
 						],
@@ -607,7 +607,7 @@ export const _client = {
 							type: "button",
 							attributes: {
 								value: api._lang.GET("record.create_identifier_type", { ":format": setting.format }),
-								onpointerup: `_client.application.postLabelSheet('element.commission', null, {_type: '${label}'});`,
+								onclick: `_client.application.postLabelSheet('element.commission', null, {_type: '${label}'});`,
 							},
 						});
 					}
@@ -620,7 +620,7 @@ export const _client = {
 							readonly: true,
 							class: "imagealigned",
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
-							onpointerup: function () {
+							onclick: function () {
 								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.commission"),
@@ -632,7 +632,7 @@ export const _client = {
 													value: "element.commission",
 													name: api._lang.GET("order.commission"),
 													readonly: true,
-													onpointerup: "_client.application.toClipboard(this)",
+													onclick: "_client.application.toClipboard(this)",
 												},
 												hint: api._lang.GET("order.copy_value"),
 											},
@@ -708,7 +708,7 @@ export const _client = {
 								type: "button",
 								attributes: {
 									value: api._lang.GET("record.create_identifier_type", { ":format": setting.format }),
-									onpointerup:
+									onclick:
 										`let _ordernumber = document.getElementById('_ordernumber').value, _name = document.getElementById('_name').value, _commission = document.getElementById('_commission').value, _vendor = document.getElementById('_vendor').value, _trace = document.getElementById('_trace').value;` +
 										` _client.application.postLabelSheet(_ordernumber + ' - ' + _name.substring(0, 64) + ' - ' + _vendor + ' - ' + _commission + ' - ' + _trace, true, {_type: '${label}'});`,
 								},
@@ -725,7 +725,7 @@ export const _client = {
 							readonly: true,
 							class: "imagealigned",
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
-							onpointerup: function () {
+							onclick: function () {
 								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.ordernumber_label"),
@@ -738,7 +738,7 @@ export const _client = {
 													name: api._lang.GET("order.ordernumber_label"),
 													id: "_ordernumber",
 													readonly: true,
-													onpointerup: "_client.application.toClipboard(this)",
+													onclick: "_client.application.toClipboard(this)",
 												},
 												hint: api._lang.GET("order.copy_value"),
 											},
@@ -807,7 +807,7 @@ export const _client = {
 							value: api._lang.GET("order.add_information"),
 							type: "button",
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
-							onpointerup: function () {
+							onclick: function () {
 								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.add_information"),
@@ -840,7 +840,7 @@ export const _client = {
 					links[api._lang.GET("order.message_orderer", { ":orderer": element.orderer })] = {
 						href: "javascript:void(0)",
 						"data-type": "input",
-						onpointerup: function () {
+						onclick: function () {
 							_client.message.newMessage(
 								api._lang.GET("order.message_orderer", { ":orderer": "element.orderer" }),
 								"element.orderer",
@@ -1099,7 +1099,7 @@ export const _client = {
 							type: "button",
 							value: api._lang.GET("order.delete_prepared_order"),
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
-							onpointerup: function () {
+							onclick: function () {
 								new _client.Dialog({ type: "confirm", header: api._lang.GET("order.delete_prepared_order_confirm_header"), options: buttons }).then((confirmation) => {
 									if (confirmation) api.purchase("delete", "approved", "element.id");
 								});
@@ -1132,7 +1132,7 @@ export const _client = {
 							attributes: {
 								value: api._lang.GET("order.incorporation.incorporation"),
 								type: "button",
-								onpointerup: "if (!this.disabled) api.purchase('get', 'incorporation', " + element.incorporation.item + "); this.disabled = true",
+								onclick: "if (!this.disabled) api.purchase('get', 'incorporation', " + element.incorporation.item + "); this.disabled = true",
 							},
 						});
 					else if (element.incorporation.state)
@@ -1151,7 +1151,7 @@ export const _client = {
 							attributes: {
 								value: api._lang.GET("order.sample_check.sample_check"),
 								type: "button",
-								onpointerup: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
+								onclick: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
 							},
 						});
 					else if (element.samplecheck.state)
@@ -1169,7 +1169,7 @@ export const _client = {
 						attributes: {
 							value: api._lang.GET("consumables.product.add_new"),
 							type: "button",
-							onpointerup:
+							onclick:
 								"api.purchase('get', 'product', '" +
 								JSON.stringify({
 									article_no: element.ordernumber ? element.ordernumber : "",

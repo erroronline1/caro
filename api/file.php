@@ -512,7 +512,7 @@ class FILE extends API {
 									'attributes' => [
 										'value' => $this->_lang->GET('file.manager.copy_path'),
 										'type' => 'button',
-										'onpointerup' => "_client.application.toClipboard('" . $file['path'] . "')",
+										'onclick' => "_client.application.toClipboard('" . $file['path'] . "')",
 										'class' => 'inlinebutton',
 										'data-filtered' => $file['path'],
 										'data-type' => 'copy'
@@ -648,7 +648,7 @@ class FILE extends API {
 									'attributes' => [
 										'value' => $this->_lang->GET('file.manager.delete_folder'),
 										'type' => 'button',
-										'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $foldername]) ."', options:{".
+										'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $foldername]) ."', options:{".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
 											"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $foldername . "')})"
@@ -724,7 +724,7 @@ class FILE extends API {
 										'attributes' => [
 											'value' => $this->_lang->GET('file.manager.copy_path'),
 											'type' => 'button',
-											'onpointerup' => "_client.application.toClipboard('" . $file['link'] . "')",
+											'onclick' => "_client.application.toClipboard('" . $file['link'] . "')",
 											'class' => 'inlinebutton',
 											'data-type' => 'copy',
 											'data-filtered' => $file['path']
@@ -736,7 +736,7 @@ class FILE extends API {
 											'value' => $this->_lang->GET('file.manager.delete_file'),
 											'type' => 'button',
 											'data-filtered' => $file['path'],
-											'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $file['name']]) ."', options:{".
+											'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $file['name']]) ."', options:{".
 												"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
 												"'".$this->_lang->GET('file.manager.delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
 												"}}).then(confirmation => {if (confirmation) api.file('delete', 'filemanager', '" . $this->_requestedFolder . "', '" . $file['name'] . "')})"

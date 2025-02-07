@@ -1856,13 +1856,13 @@ export class Assemble {
 	 * 	}
 	 */
 	message() {
-		let message, icondiv, icon, p, date, unseen, onpointerup_forward;
+		let message, icondiv, icon, p, date, unseen, onclick_forward;
 		message = document.createElement("div");
 
-		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.ICON_onpointerup !== undefined) {
+		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.ICON_onclick !== undefined) {
 			// ugly but effective
-			onpointerup_forward = this.currentElement.attributes.ICON_onpointerup;
-			delete this.currentElement.attributes.ICON_onpointerup;
+			onclick_forward = this.currentElement.attributes.ICON_onclick;
+			delete this.currentElement.attributes.ICON_onclick;
 		}
 
 		if (this.currentElement.content.img != undefined) {
@@ -1872,7 +1872,7 @@ export class Assemble {
 			icon.src = this.currentElement.content.img;
 			icon.alt = api._lang.GET("assemble.render.aria.image", { ":image": this.currentElement.content.user });
 			icondiv.append(icon);
-			if (onpointerup_forward) icondiv.onclick = new Function(onpointerup_forward);
+			if (onclick_forward) icondiv.onclick = new Function(onclick_forward);
 			message.append(icondiv);
 		}
 		p = document.createElement("p");
@@ -1898,10 +1898,10 @@ export class Assemble {
 			for (let i = 0; i < textbetween.length; i++) {
 				p.append(document.createTextNode(textbetween[i]));
 				if (i in links) {
-					link = links[i][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
+					link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
 					a = document.createElement("a");
 					a.href = link[2];
-					if (link[4]) a.onpointerup = new Function(link[4]);
+					if (link[4]) a.onclick = new Function(link[4]);
 					a.classList.add("inline");
 					a.appendChild(document.createTextNode(link[5]));
 					p.append(a);
@@ -1909,10 +1909,10 @@ export class Assemble {
 			}
 			if (links.length > textbetween.length) {
 				for (let j = i; j < links.length; j++) {
-					link = links[i][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
+					link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
 					a = document.createElement("a");
 					a.href = link[2];
-					if (link[4]) a.onpointerup = new Function(link[4]);
+					if (link[4]) a.onclick = new Function(link[4]);
 					a.classList.add("inline");
 					a.appendChild(document.createTextNode(link[5]));
 					p.append(a);
@@ -2465,7 +2465,7 @@ export class Assemble {
 		}
 
 		// no onclick because accessability does not mind about a modal and can navigate the generic selection by default
-		select.onpointerup = (e) => {
+		select.onpointerdown = (e) => {
 			// arrow function for reference of this.names
 			e.preventDefault();
 			if (!e.target.disabled)
@@ -2781,10 +2781,10 @@ export class Assemble {
 				for (let i = 0; i < textbetween.length; i++) {
 					p.append(document.createTextNode(textbetween[i]));
 					if (i in links) {
-						link = links[i][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
+						link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
 						a = document.createElement("a");
 						a.href = link[2];
-						if (link[4]) a.onpointerup = new Function(link[4]);
+						if (link[4]) a.onclick = new Function(link[4]);
 						a.classList.add("inline");
 						a.appendChild(document.createTextNode(link[5]));
 						p.append(a);
@@ -2792,10 +2792,10 @@ export class Assemble {
 				}
 				if (links.length > textbetween.length) {
 					for (let j = i; j < links.length; j++) {
-						link = links[j][0].match(/(href="(.+?)")( onpointerup="(.+?)")*>(.+?)</);
+						link = links[j][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
 						a = document.createElement("a");
 						a.href = link[2];
-						if (link[4]) a.onpointerup = new Function(link[4]);
+						if (link[4]) a.onclick = new Function(link[4]);
 						a.classList.add("inline");
 						a.appendChild(document.createTextNode(link[5]));
 						p.append(a);

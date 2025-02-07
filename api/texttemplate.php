@@ -545,7 +545,7 @@ class TEXTTEMPLATE extends API {
 								'value' => $this->_lang->GET('texttemplate.template.save'),
 								'type' => 'button',
 								'data-type' => 'submitbutton',
-								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '" .
+								'onclick' => "new _client.Dialog({type: 'confirm', header: '" .
 									$this->_lang->GET("texttemplate.template.save") .
 									"', options:{" .
 									"'" .
@@ -739,7 +739,7 @@ class TEXTTEMPLATE extends API {
 					'attributes' => [
 						'type' => 'button',
 						'value' => $this->_lang->GET('texttemplate.use.import', [':placeholders' => implode(', ', array_keys($clientimport))]),
-						'onpointerup' => "_client.texttemplate.import('" . $this->_clientimport . "');"
+						'onclick' => "_client.texttemplate.import('" . $this->_clientimport . "');"
 					],
 					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])
 				];	
@@ -766,7 +766,7 @@ class TEXTTEMPLATE extends API {
 				'attributes' => [
 					'type' => 'button',
 					'value' => $this->_lang->GET('texttemplate.use.refresh'),
-					'onpointerup' => '_client.texttemplate.update();',
+					'onclick' => '_client.texttemplate.update();',
 					'data-type' => 'generateupdate'
 				],
 				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])
@@ -785,7 +785,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $content,
 						'rows' => 13,
 						'readonly' => true,
-						'onpointerup' => '_client.application.toClipboard(this.value)'
+						'onclick' => '_client.application.toClipboard(this.value)'
 						]
 				]
 			];

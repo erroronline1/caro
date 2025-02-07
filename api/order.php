@@ -195,7 +195,7 @@ class ORDER extends API {
 							$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
 								':order' => $this->_lang->GET('order.message', $messagepayload, true),
 								':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-								':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+								':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
 							], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')));
 							break;
 						case 'addinformation':
@@ -228,7 +228,7 @@ class ORDER extends API {
 								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
 								])));
 							}
 							break;
@@ -799,7 +799,7 @@ class ORDER extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('order.add_manually'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
+								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
 								json_encode([
 									[
 										[
@@ -1018,7 +1018,7 @@ class ORDER extends API {
 								'type' => 'deletebutton',
 								'attributes' => [
 									'value' => $this->_lang->GET('order.add_delete'),
-									'onpointerup' => 'this.parentNode.remove()'
+									'onclick' => 'this.parentNode.remove()'
 								]
 							]
 						]);
@@ -1032,7 +1032,7 @@ class ORDER extends API {
 					'attributes' => [
 						'value' => $this->_lang->GET('order.delete_prepared_order'),
 						'type' => 'button', // apparently defaults to submit otherwise
-						'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('order.delete_prepared_order_confirm_header') ."', options:{".
+						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('order.delete_prepared_order_confirm_header') ."', options:{".
 							"'".$this->_lang->GET('order.delete_prepared_order_confirm_cancel')."': false,".
 							"'".$this->_lang->GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 							"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'order', " . $this->_requestedID . ")})"
@@ -1368,7 +1368,7 @@ class ORDER extends API {
 								'attributes' =>[
 									'value' => $this->_lang->GET('order.edit_prepared_order'),
 									'type' => 'button',
-									'onpointerup' => "api.purchase('get', 'order', " . $order['id']. ")"
+									'onclick' => "api.purchase('get', 'order', " . $order['id']. ")"
 								]
 							]
 						]);

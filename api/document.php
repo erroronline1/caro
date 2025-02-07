@@ -88,7 +88,7 @@ class DOCUMENT extends API {
 						// set up alerts about new documents/versions
 						$documents = [];
 						if (in_array($approve['context'], [...array_keys($this->_lang->_USER['documentcontext']['identify']), ...array_keys($this->_lang->_USER['documentcontext']['anonymous'])])) {
-							$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'document\', \'' . $approve['name'] . '\')">' . $approve['name'] . '</a>';
+							$documents[] = '<a href="javascript:void(0);" onclick="api.record(\'get\', \'document\', \'' . $approve['name'] . '\')">' . $approve['name'] . '</a>';
 						}
 						elseif ($approve['context'] === 'component') {
 							// check for dependencies in documents
@@ -99,7 +99,7 @@ class DOCUMENT extends API {
 								if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 								if (isset($component['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
 									$dependeddocuments[] = $row['name'];
-									$documents[] = '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'document\', \'' . $row['name'] . '\')">' . $row['name'] . '</a>';
+									$documents[] = '<a href="javascript:void(0);" onclick="api.record(\'get\', \'document\', \'' . $row['name'] . '\')">' . $row['name'] . '</a>';
 								}
 							}
 						}
@@ -273,7 +273,7 @@ class DOCUMENT extends API {
 								'attributes' => [
 									'value' => $this->_lang->GET('assemble.compose.edit_existing'),
 									'type' => 'button',
-									'onpointerup' => "api.document('get', '" . ($approve['context'] === 'component' ? 'component' : 'document') . "_editor', " . $approve['id'] . ")"
+									'onclick' => "api.document('get', '" . ($approve['context'] === 'component' ? 'component' : 'document') . "_editor', " . $approve['id'] . ")"
 								]
 							]
 						]);
@@ -810,7 +810,7 @@ class DOCUMENT extends API {
 				])) {
 					// alert userGroups for approval
 					$component_id = $this->_pdo->lastInsertId();
-					$message = $this->_lang->GET('assemble.approve.component_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
+					$message = $this->_lang->GET('assemble.approve.component_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
 					foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
 						if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
 						else $this->alertUserGroup(['permission' => [$permission]], $message);
@@ -1128,7 +1128,7 @@ class DOCUMENT extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('assemble.compose.component.component_delete'),
-						'onpointerup' => "api.document('delete', 'component', " . $component['id'] . ")" 
+						'onclick' => "api.document('delete', 'component', " . $component['id'] . ")" 
 					]
 				]
 			];
@@ -1521,7 +1521,7 @@ class DOCUMENT extends API {
 					]
 				])) {
 						$document_id = $this->_pdo->lastInsertId();
-						$message = $this->_lang->GET('assemble.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onpointerup="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
+						$message = $this->_lang->GET('assemble.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
 						foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
@@ -1845,7 +1845,7 @@ class DOCUMENT extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('assemble.compose.document.document_delete'),
-						'onpointerup' => "api.document('delete', 'document', " . $document['id'] . ")" 
+						'onclick' => "api.document('delete', 'document', " . $document['id'] . ")" 
 					]
 				]
 			];

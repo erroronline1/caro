@@ -152,7 +152,7 @@ class RECORD extends API {
 		}
 		$message = $this->_lang->GET('record.casestate_change_message_content', [
 			':user' => $_SESSION['user']['name'],
-			':identifier' => '<a href="javascript:void(0);" onpointerup="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
+			':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
 			':casestate' => $this->_lang->GET($casestatestate === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $context . '.' . $casestate, [], true)], true)
 		], true);
 
@@ -238,7 +238,7 @@ class RECORD extends API {
 					}
 					if ($subs['type'] === 'calendarbutton'){
 						$subs['attributes']['value'] = $_lang->GET('calendar.schedule.new');
-						$subs['attributes']['onpointerup'] = $calendar->dialog([':type'=>'schedule']);
+						$subs['attributes']['onclick'] = $calendar->dialog([':type'=>'schedule']);
 					}
 					if (in_array($subs['type'], [
 							'checkbox',
@@ -516,7 +516,7 @@ class RECORD extends API {
 						'type' => 'button',
 						'attributes' => [
 							'type' => 'button',
-							'onpointerup' => "_client.application.postLabelSheet(document.getElementById('_identifier').value, 'appendDate', {_type:'" . $type . "'});",
+							'onclick' => "_client.application.postLabelSheet(document.getElementById('_identifier').value, 'appendDate', {_type:'" . $type . "'});",
 							'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 						]
 					];
@@ -878,7 +878,7 @@ class RECORD extends API {
 						'type' => 'button',
 						'attributes' => [
 							'type' => 'button',
-							'onpointerup' => "_client.application.postLabelSheet('" . $this->_requestedID . "', null, {_type:'" . $type . "'});",
+							'onclick' => "_client.application.postLabelSheet('" . $this->_requestedID . "', null, {_type:'" . $type . "'});",
 							'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 						]
 					];
@@ -987,7 +987,7 @@ class RECORD extends API {
 							'type' => 'button',
 							'attributes' => [
 								'title' => $this->_lang->GET('record.append_document'),
-								'onpointerup' => "api.record('get', 'document', '" . $document . "', '" . $this->_requestedID . "')",
+								'onclick' => "api.record('get', 'document', '" . $document . "', '" . $this->_requestedID . "')",
 								'data-type' => 'additem',
 								'class' => 'inlinebutton'
 							]
@@ -999,9 +999,9 @@ class RECORD extends API {
 								'title' => $this->_lang->GET('record.export'),
 								'data-type' => 'download',
 								'class' => 'inlinebutton',
-								'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
-								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
+								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
+								"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'documentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}},".
+								"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'simplifieddocumentexport\', \'" . $this->_requestedID . "\', \'" . $document . "\')'}}".
 								"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 							]
 						]);
@@ -1063,7 +1063,7 @@ class RECORD extends API {
 						foreach ($this->_lang->_USER['record']['type'] as $record_type => $description){
 							$options[$description] = ['value' => $record_type];
 						}						
-						$typeaction = "<a href=\"javascript:void(0);\" onpointerup=\"new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
+						$typeaction = "<a href=\"javascript:void(0);\" onclick=\"new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
 							[[
 								'type' => 'radio',
 								'attributes' => [
@@ -1105,7 +1105,7 @@ class RECORD extends API {
 						'attributes' => [
 							'data-type' => 'merge',
 							'value' => $this->_lang->GET('record.reidentify'),
-							'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
+							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
 								[
 									[
 										'type' => 'scanner',
@@ -1181,9 +1181,9 @@ class RECORD extends API {
 									'title' => $this->_lang->GET('record.export'),
 									'value' => $this->_lang->GET('record.export'),
 									'data-type' => 'download',
-									'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
-									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'fullexport\', \'" . $this->_requestedID . "\')'}},".
-									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onpointerup: 'api.record(\'get\', \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
+									'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.export') . "', render: [" . 
+									"{type:'button', attributes:{value: api._lang.GET('record.full_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'fullexport\', \'" . $this->_requestedID . "\')'}},".
+									"{type:'button', attributes:{value: api._lang.GET('record.simplified_export'), 'data-type': 'download', onclick: 'api.record(\'get\', \'simplifiedexport\', \'" . $this->_requestedID . "\')'}}".
 									"], options:{'" . $this->_lang->GET('general.cancel_button') . "': false}})"
 								]
 							]
@@ -1414,7 +1414,7 @@ class RECORD extends API {
 						'attributes' => [
 							'data-type' => 'merge',
 							'value' => $this->_lang->GET('record.reidentify'),
-							'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
+							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
 								[
 									[
 										'type' => 'scanner',
@@ -1663,7 +1663,7 @@ class RECORD extends API {
 				$value = str_replace('\n', "\n", $value); // format linebreaks
 				preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
 				if ($link && !$export){
-					$value = '<a href="javascript:void(0);" onpointerup="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
+					$value = '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
 				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
 				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)])];

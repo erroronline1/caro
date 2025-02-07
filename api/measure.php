@@ -56,7 +56,7 @@ class MEASURE extends API {
 					// get users and trigger system message to all
 					$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					$this->alertUserGroup(['user' => array_column($user, 'name')], str_replace('\n', ', ', $this->_lang->GET('measure.alert_new', [
-						':link' => '<a href="javascript:void(0);" onpointerup="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
 					], true)));
 
 					$this->response([
@@ -122,7 +122,7 @@ class MEASURE extends API {
 						$this->alertUserGroup(['user' => [$measure['user_name']]], str_replace('\n', ', ', $this->_lang->GET('measure.alert_response', [
 							':user' => $_SESSION['user']['name'],
 							':content' => substr($measure['content'], 0, 64) . (strlen($measure['content']) > 64 ? '...' : ''),
-							':link' => '<a href="javascript:void(0);" onpointerup="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
+							':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
 						], true)));
 					$this->response([
 					'response' => [
@@ -148,7 +148,7 @@ class MEASURE extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('measure.new'),
 							'type' => 'button',
-							'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.new') ."', render: JSON.parse('".
+							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.new') ."', render: JSON.parse('".
 								json_encode([
 									[
 										[
@@ -204,7 +204,7 @@ class MEASURE extends API {
 								'value' => strval($measure['votes'] ? array_sum(array_filter(array_values($measure['votes']), fn($v) => $v > 0)) : 0),
 								'data-type' => 'upvote',
 								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) > 0 ? ' green': ''),
-								'onpointerup' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('green'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('green') ? 1 : -1));"
+								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('green'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('green') ? 1 : -1));"
 							],
 						];
 						$measurecontent[] = [
@@ -213,7 +213,7 @@ class MEASURE extends API {
 								'value' => strval($measure['votes'] ? abs(array_sum(array_filter(array_values($measure['votes']), fn($v) => $v < 0))) : 0),
 								'data-type' => 'downvote',
 								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) < 0 ? ' red': ''),
-								'onpointerup' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('red'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('red') ? 1 : -1));"
+								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('red'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('red') ? 1 : -1));"
 							],
 						];
 						$measurecontent[] = [
@@ -235,7 +235,7 @@ class MEASURE extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('measure.measure'),
 								'type' => 'button',
-								'onpointerup' => "if (!this.disabled) new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
+								'onclick' => "if (!this.disabled) new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
 									json_encode([
 										[
 											[

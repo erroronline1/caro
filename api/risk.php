@@ -285,7 +285,7 @@ class RISK extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('risk.new'),
 								'type' => 'button',
-								'onpointerup' => "api.risk('get', 'risk', '" . $type . "')"
+								'onclick' => "api.risk('get', 'risk', '" . $type . "')"
 							]
 						]
 					];
@@ -379,7 +379,7 @@ class RISK extends API {
 										}
 									}
 									else {
-										unset ($result['render']['content'][$last][$index]['attributes']['onpointerup']);
+										unset ($result['render']['content'][$last][$index]['attributes']['onclick']);
 										unset ($result['render']['content'][$last][$index]['attributes']['onpointerdown']);
 										$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
 									}
@@ -627,7 +627,7 @@ class RISK extends API {
 									}
 								}
 								else {
-									unset ($result['render']['content'][$last][$index]['attributes']['onpointerup']);
+									unset ($result['render']['content'][$last][$index]['attributes']['onclick']);
 									unset ($result['render']['content'][$last][$index]['attributes']['onpointerdown']);
 									$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
 								}

@@ -570,7 +570,7 @@ class USER extends API {
 					}
 					foreach($roles as $key => &$values){
 						$values = array_unique($values);
-						$values = array_map(fn($v) => '<a href="javascript:void(0);" onpointerup="_client.message.newMessage(\''. $this->_lang->GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
+						$values = array_map(fn($v) => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\''. $this->_lang->GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
 					}
 
 					$message = [
@@ -579,9 +579,9 @@ class USER extends API {
 						':supervisor' => implode(', ', $roles['supervisor']),
 						':qmo' => implode(', ', $roles['qmo']),
 						':prrc' => implode(', ', $roles['prrc']),
-						':register' => '<a href="javascript:void(0);" onpointerup="api.message(\'get\', \'register\')">' . $this->_lang->GET('menu.communication.register', [], true) . '</a>',
-						':landingpage' => '<a href="javascript:void(0);" onpointerup="api.application(\'get\', \'start\')">' . $this->_lang->GET('menu.application.start', [], true) . '</a>',
-						':profile' => '<a href="javascript:void(0);" onpointerup="api.user(\'get\', \'profile\')">' . $this->_lang->GET('menu.application.user_profile', [], true) . '</a>',
+						':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('menu.communication.register', [], true) . '</a>',
+						':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'start\')">' . $this->_lang->GET('menu.application.start', [], true) . '</a>',
+						':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('menu.application.user_profile', [], true) . '</a>',
 						':admin' => implode(', ', $roles['admin'])
 					];
 					$this->alertUserGroup(['user' => [$user['name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
@@ -1035,7 +1035,7 @@ class USER extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('user.delete_button'),
 								'type' => 'button', // apparently defaults to submit otherwise
-								'onpointerup' => $user['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.delete_confirm_header', [':name' => $user['name']]) ."', options:{".
+								'onclick' => $user['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.delete_confirm_header', [':name' => $user['name']]) ."', options:{".
 									"'".$this->_lang->GET('user.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('user.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.user('delete', 'user', ". $user['id'] . ")})" : '',

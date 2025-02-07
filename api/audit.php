@@ -229,7 +229,7 @@ class AUDIT extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('audit.audit.execute.new'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('audit.audit.execute.new') . "', render: JSON.parse('" . 
+								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('audit.audit.execute.new') . "', render: JSON.parse('" . 
 									json_encode([[
 										'type' => 'select',
 										'attributes' => [
@@ -379,7 +379,7 @@ class AUDIT extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('audit.audit.delete'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.execute.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
+								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.execute.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
 								"'".$this->_lang->GET('audit.audit.delete_confirm_cancel')."': false,".
 								"'".$this->_lang->GET('audit.audit.execute.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
 								"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audit', 'null', " . $audit['id'] . ")})"
@@ -661,14 +661,14 @@ class AUDIT extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('audit.audit.template.import_summary'),
 							'type' => 'button',
-							'onpointerup' => "api.audit('get', 'import', 'auditsummary', document.getElementById('TemplateUnit').value);"
+							'onclick' => "api.audit('get', 'import', 'auditsummary', document.getElementById('TemplateUnit').value);"
 						],
 						'hint' => $this->_lang->GET('audit.audit.template.import_summary_hint'),
 					], [
 						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => $this->_lang->GET('audit.audit.template.schedule'),
-							'onpointerup' => $calendar->dialog([':type'=>'schedule'])
+							'onclick' => $calendar->dialog([':type'=>'schedule'])
 						]
 					]
 
@@ -706,7 +706,7 @@ class AUDIT extends API {
 						'attributes' => [
 							'type' => 'button',
 							'value' => $this->_lang->GET('audit.audit.add'),
-							'onpointerup' => "compose_helper.composeNewAuditQuestionCallback(document.getElementById('_question').value, document.getElementById('_regulatory').value, document.getElementById('_hint').value);"
+							'onclick' => "compose_helper.composeNewAuditQuestionCallback(document.getElementById('_question').value, document.getElementById('_regulatory').value, document.getElementById('_hint').value);"
 						]
 					]
 				];
@@ -727,7 +727,7 @@ class AUDIT extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('audit.audit.delete'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.template.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
+								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.audit.template.delete_confirm_header', [':unit' => $this->_lang->_USER['units'][$template['unit']]]) ."', options:{".
 								"'".$this->_lang->GET('audit.audit.delete_confirm_cancel')."': false,".
 								"'".$this->_lang->GET('audit.audit.template.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
 								"}}).then(confirmation => {if (confirmation) api.audit('delete', 'audittemplate', 'null', " . $template['id'] . ")})"
@@ -987,7 +987,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'data-type' => 'generateupdate',
 					'value' => $this->_lang->GET('audit.documents_update_button'),
-					'onpointerup' => "api.audit('get', 'checks', 'documents', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
+					'onclick' => "api.audit('get', 'checks', 'documents', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
 				]
 			],
 			[
@@ -1047,7 +1047,7 @@ class AUDIT extends API {
 					'type' => 'button',
 					'data-type' => 'download',
 					'value' => $this->_lang->GET('assemble.render.export'),
-					'onpointerup' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('assemble.render.export') . "', render: JSON.parse('" . json_encode(
+					'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('assemble.render.export') . "', render: JSON.parse('" . json_encode(
 						[
 							[
 								'type' => 'textsection',
@@ -1122,7 +1122,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
 			]
@@ -1326,7 +1326,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -1434,7 +1434,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -1469,7 +1469,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'type' => 'button',
 					'value' => $this->_lang->GET('audit.mdrsamplecheck_revoke'),
-					'onpointerup' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
+					'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
 						"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 						"if (response !== false) {" .
 						"api.purchase('delete', 'mdrsamplecheck', " . $product['id']. "); this.disabled=true" .
@@ -1551,7 +1551,7 @@ class AUDIT extends API {
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.record_export_xlsx'),
-						'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 					]
 				]
@@ -1561,7 +1561,7 @@ class AUDIT extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.orderstatistics_truncate'),
-						'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.orderstatistics_truncate') ."', options:{".
+						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.orderstatistics_truncate') ."', options:{".
 						"'".$this->_lang->GET('general.cancel_button')."': false,".
 						"'".$this->_lang->GET('audit.orderstatistics_truncate_confirm')."': {value: true, class: 'reducedCTA'},".
 						"}}).then(confirmation => {if (confirmation) api.audit('delete', 'checks', '" . $this->_requestedType . "');})",
@@ -1709,7 +1709,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -1882,13 +1882,13 @@ class AUDIT extends API {
 				'attributes' => [
 					'data-type' => 'generateupdate',
 					'value' => $this->_lang->GET('audit.risks_update_button'),
-					'onpointerup' => "api.audit('get', 'checks', 'risks', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
+					'onclick' => "api.audit('get', 'checks', 'risks', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
 				]
 			], [
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
 			]
@@ -2166,7 +2166,7 @@ class AUDIT extends API {
 						'attributes' => [
 							'type' => 'button',
 							'value' => $this->_lang->GET('audit.checks_type.trainingevaluation'),
-							'onpointerup' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . json_encode(
+							'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . json_encode(
 								$sharedfunction->populatedocument($evaluationdocument, $row['evaluation'] ? $row['evaluation']['content'] : [])
 							) . "'), options:{".
 							"'" . $this->_lang->GET('general.cancel_button') . "': false,".
@@ -2199,7 +2199,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -2346,7 +2346,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]
@@ -2476,7 +2476,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'type' => 'button',
 					'value' => $this->_lang->GET('audit.userskills_bulk_training'),
-					'onpointerup' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . json_encode(
+					'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . json_encode(
 						$skillmatrix
 					) . "'), options:{".
 					"'" . $this->_lang->GET('general.cancel_button') . "': false,".
@@ -2606,7 +2606,7 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onpointerup' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
 			]

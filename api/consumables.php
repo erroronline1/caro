@@ -249,7 +249,7 @@ class CONSUMABLES extends API {
 								])) {
 									$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 										$this->_lang->GET('order.sample_check.alert', [
-											':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
+											':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
 										], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 								}
 							}
@@ -384,7 +384,7 @@ class CONSUMABLES extends API {
 										'attributes' => [
 											'value' => $this->_lang->GET('order.incorporation.adopt'),
 											'type' => 'button',
-											'onpointerup' => "document.getElementById('incorporationmatchingprevious').value = '" . preg_replace('/\n|\r|\t/', ' ', implode(' ', $check)) . "'"
+											'onclick' => "document.getElementById('incorporationmatchingprevious').value = '" . preg_replace('/\n|\r|\t/', ' ', implode(' ', $check)) . "'"
 										]
 									]
 								]
@@ -400,7 +400,7 @@ class CONSUMABLES extends API {
 						'attributes' => [
 							'type' => 'button',
 							'value' => $this->_lang->GET('order.incorporation.batch'),
-							'onpointerup' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input2')
+							'onclick' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input2')
 						]
 					];
 					$incorporationdocument[] = [
@@ -561,7 +561,7 @@ class CONSUMABLES extends API {
 				])) {
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 						$this->_lang->GET('order.sample_check.alert', [
-							':audit' => '<a href="javascript:void(0);" onpointerup="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
+							':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
 						], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 					$this->response([
 					'response' => [
@@ -669,7 +669,7 @@ class CONSUMABLES extends API {
 			if (!$product['incorporated']) continue;
 			$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 			if (isset($product['incorporated']['_denied'])) continue;
-			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onpointerup' => "api.purchase('get', 'product', " . $product['id'] . ")"];
+			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onclick' => "api.purchase('get', 'product', " . $product['id'] . ")"];
 		}
 		if ($links){
 			$result['render']['content'][] = [
@@ -1138,7 +1138,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'value' => $this->_lang->GET('consumables.product.add_new'),
 									'type' => 'button',
-									'onpointerup' => "api.purchase('get', 'product')",
+									'onclick' => "api.purchase('get', 'product')",
 								]
 							], [
 								'type' => 'scanner',
@@ -1403,7 +1403,7 @@ class CONSUMABLES extends API {
 								'attributes' => [
 									'value' => $this->_lang->GET('consumables.product.delete'),
 									'type' => 'button', // apparently defaults to submit otherwise
-									'onpointerup' => $product['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('consumables.product.delete_confirm_header', [':name' => $product['article_name']]) ."', options:{".
+									'onclick' => $product['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('consumables.product.delete_confirm_header', [':name' => $product['article_name']]) ."', options:{".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_cancel')."': false,".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
 										"}}).then(confirmation => {if (confirmation) api.purchase('delete', 'product', " . $product['id'] . ")})" : ""
@@ -2264,7 +2264,7 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('consumables.vendor.pricelist_export'),
 								'type' => 'button',
-								'onpointerup' => "api.purchase('get', 'exportpricelist', " . $vendor['id']. ")"
+								'onclick' => "api.purchase('get', 'exportpricelist', " . $vendor['id']. ")"
 							],
 							'hint' => $this->_lang->GET('consumables.vendor.pricelist_export_hint')
 						]
@@ -2304,7 +2304,7 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'type' => 'button',
 								'value' => $this->_lang->GET('menu.communication.texttemplate_texts'),
-								'onpointerup' => "api.texttemplate('get', 'text', 'false', 'modal', '" . json_encode([
+								'onclick' => "api.texttemplate('get', 'text', 'false', 'modal', '" . json_encode([
 									':PRD' => 'select_special_attention_products',
 									':CID' => 'vendor_customer_id',
 									':ECR' => 'vendor_certificate_validity'

@@ -81,7 +81,7 @@ class MESSAGE extends API {
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
 								//inline system links won't work otherwise, therefore this property exists for conversation threads
-								'ICON_onpointerup' => "_client.message.newMessage('". $this->_lang->GET('message.forward') ."', '', '" . 
+								'ICON_onclick' => "_client.message.newMessage('". $this->_lang->GET('message.forward') ."', '', '" . 
 									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')"
 							]
@@ -94,7 +94,7 @@ class MESSAGE extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('message.delete'),
 								'type' => 'button',
-								'onpointerup' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
+								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
 									"'".$this->_lang->GET('message.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', " . $conversation['conversation_user'] . ", 'inbox')})"
@@ -141,7 +141,7 @@ class MESSAGE extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('message.new'),
 								'type' => 'button',
-								'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
+								'onclick' => "_client.message.newMessage('". $this->_lang->GET('message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
 							]
 						]
 					];
@@ -176,7 +176,7 @@ class MESSAGE extends API {
 										'unseen' => $unseen
 									],
 									'attributes' =>  [
-										'onpointerup' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
+										'onclick' => "api.message('get', 'conversation', '" . $conversation['conversation_user'] . "')",
 									]
 								]
 							];
@@ -319,7 +319,7 @@ class MESSAGE extends API {
 				foreach($content as $user) $links[$user] = [
 					'href' => 'javascript:void(0)',
 					'data-type' => 'input',
-					'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) . "', '" . $user . "', '', {}, [])"
+					'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) . "', '" . $user . "', '', {}, [])"
 				];
 				switch ($group){
 					case 'name':
@@ -348,7 +348,7 @@ class MESSAGE extends API {
 						$this->_lang->GET('message.register_message_all') => [
 							'href' => 'javascript:void(0)',
 							'data-type' => 'input',
-							'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => implode(', ', $users)]) ."', '" . implode(', ', $users) . "', '', {}, [])"
+							'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => implode(', ', $users)]) ."', '" . implode(', ', $users) . "', '', {}, [])"
 						]
 					];
 
@@ -356,7 +356,7 @@ class MESSAGE extends API {
 					foreach($users as $user) $links[$user] = [
 						'href' => 'javascript:void(0)',
 						'data-type' => 'input',
-						'onpointerup' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) ."', '" . $user . "', '', {}, [])"
+						'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) ."', '" . $user . "', '', {}, [])"
 					];
 
 					// append panel

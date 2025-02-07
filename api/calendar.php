@@ -569,7 +569,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_previous'),
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'schedule', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', 'schedule', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
 					],
@@ -578,7 +578,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_next') . ' ',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'schedule', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', 'schedule', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
 					],
@@ -621,7 +621,7 @@ class CALENDAR extends API {
 					'type' => 'calendarbutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.schedule.new'),
-						'onpointerup' => $calendar->dialog($columns)
+						'onclick' => $calendar->dialog($columns)
 					]
 				];
 
@@ -756,7 +756,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'type' => 'button',
 						'value' => $this->_lang->GET('calendar.schedule.edit'),
-						'onpointerup' => $calendar->dialog($columns)
+						'onclick' => $calendar->dialog($columns)
 					],
 					'hint' => $this->_lang->GET('calendar.schedule.author') . ': ' . $row['author']
 				];
@@ -766,7 +766,7 @@ class CALENDAR extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.schedule.delete'),
-						'onpointerup' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . " " . $row['subject'] . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+						'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . " " . $row['subject'] . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
 							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];
@@ -937,7 +937,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_previous'),
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
 					],
@@ -946,7 +946,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_next') . ' ',
 							'type' => 'button',
-							'onpointerup' => "api.calendar('get', 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
+							'onclick' => "api.calendar('get', 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
 					],
@@ -1010,7 +1010,7 @@ class CALENDAR extends API {
 						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.timesheet.new'),
-							'onpointerup' => $calendar->dialog($columns)
+							'onclick' => $calendar->dialog($columns)
 						]
 					];
 				}
@@ -1022,7 +1022,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.timesheet.bulk_approve', [':number' => count($bulkapproval)]),
-							'onpointerup' => "api.calendar('put', 'complete', '" . implode(',', $bulkapproval) . "', true, 'timesheet')"
+							'onclick' => "api.calendar('put', 'complete', '" . implode(',', $bulkapproval) . "', true, 'timesheet')"
 						]
 					];
 				}
@@ -1036,7 +1036,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.timesheet.monthly_summary'),
-							'onpointerup' => "api.calendar('get', 'monthlyTimesheets', '" . $this->_requestedDate . "')"
+							'onclick' => "api.calendar('get', 'monthlyTimesheets', '" . $this->_requestedDate . "')"
 						]
 					];
 				}
@@ -1193,7 +1193,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'type' => 'button',
 						'value' => $this->_lang->GET('calendar.schedule.edit'),
-						'onpointerup' => $calendar->dialog($columns)
+						'onclick' => $calendar->dialog($columns)
 					]
 				];
 
@@ -1202,7 +1202,7 @@ class CALENDAR extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.schedule.delete'),
-						'onpointerup' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
+						'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.schedule.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.schedule.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
 							".then(confirmation => {if (confirmation) api.calendar('delete', 'schedule', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];
