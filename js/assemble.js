@@ -2526,7 +2526,9 @@ export class Assemble {
 			type: "button",
 			onclick: "signaturePad.clear()",
 		};
-		result = result.concat(this.deletebutton()); // hint will be added here as well
+		result = result.concat(this.hint());
+		delete this.currentElement.hint;
+		result = result.concat(this.deletebutton()); // hint would be added here as well
 		this.signaturePad = true;
 		return result;
 	}
