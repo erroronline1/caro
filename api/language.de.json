@@ -358,13 +358,15 @@
 			"error_forbidden_name": "Der Name :name ist nicht zulässig, bitte verwende einen anderen."
 		},
 		"render": {
-			"aria":{
-				"cancel":"Abbrechen",
-				"extend":"erweitern / verbergen",
-				"image":"Bild :image",
-				"pause":"Anhalten",
-				"toleft":"nach links schieben",
-				"toright":"nach rechts schieben"
+			"aria": {
+				"cancel": "Abbrechen",
+				"extend": "erweitern / verbergen",
+				"image": "Bild :image",
+				"pause": "Anhalten",
+				"preview": "Vorschau",
+				"signature": "Unterschriftenfeld",
+				"toleft": "nach links schieben",
+				"toright": "nach rechts schieben"
 			},
 			"assign_hint_documents": "\"Meine Bereiche\" listet alle Dokumente für deine zugeordneten Bereiche inklusive allgemeiner auf.",
 			"assign_hint_bundles": "\"Meine Bereiche\" listet alle Dokumentenpakete für deine zugeordneten Bereiche.",
@@ -859,8 +861,8 @@
 		}
 	},
 	"measure": {
-		"alert_new":"Es gibt einen neuen Verbesserungsvorschlag. Was hältst Du davon? :link",
-		"alert_response":":user hat deinen Vorschlag \":content\" bearbeitet. :link",
+		"alert_new": "Es gibt einen neuen Verbesserungsvorschlag. Was hältst Du davon? :link",
+		"alert_response": ":user hat deinen Vorschlag \":content\" bearbeitet. :link",
 		"anonymous": "anonym einreichen",
 		"anonymous_hint": "Dein Name wird nicht gespeichert oder angezeigt, der Vorschlag ist jedoch öffentlich.",
 		"anonymous_user": "Anonymer oder gelöschter Nutzer",

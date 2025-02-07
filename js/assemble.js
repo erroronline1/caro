@@ -86,11 +86,12 @@ export const assemble_helper = {
 			span.append(document.createTextNode(group));
 			div2.append(span);
 			div2.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
+			div2.role = "group";
 
 			// iterate over subset
 			for (const [description, attributes] of Object.entries(items)) {
 				// create button to access subsets action
-				if ("onpointerup" in attributes) {
+				if ("onclick" in attributes) {
 					button = document.createElement("button");
 					for (const [attribute, value] of Object.entries(attributes)) {
 						button.setAttribute(attribute, value);
@@ -100,6 +101,7 @@ export const assemble_helper = {
 					button.setAttribute("data-for", "userMenuItem" + description.replace(" ", "_"));
 					button.setAttribute("data-notification", 0);
 					button.appendChild(document.createTextNode(description));
+					button.role = "menuitem";
 					div2.append(button);
 				}
 				// create description element
@@ -747,7 +749,7 @@ export class Assemble {
 		indicators.id = sectionID + "indicator";
 
 		// navigate left button
-		toleft.addEventListener("pointerup", function (e) {
+		toleft.addEventListener("click", function (e) {
 			document.getElementById(sectionID).scrollBy({
 				top: 0,
 				left: -400,
@@ -782,7 +784,7 @@ export class Assemble {
 		}
 
 		// navigate right button
-		toright.addEventListener("pointerup", function (e) {
+		toright.addEventListener("click", function (e) {
 			document.getElementById(sectionID).scrollBy({
 				top: 0,
 				left: 400,
@@ -1171,7 +1173,7 @@ export class Assemble {
 	}
 
 	/**
-	 * creates a calendar button to add a new calendarevent, pointer-event is defined by the backend though
+	 * creates a calendar button to add a new calendarevent, click-event is defined by the backend though
 	 * @returns {domNodes} br, button
 	 * @example this.currentElement
 	 * ```json
@@ -1318,7 +1320,7 @@ export class Assemble {
 			img = document.createElement("img");
 		img.classList.add("close");
 		img.src = "./media/plus.svg";
-		img.alt=api._lang.GET('assemble.render.aria.extend');
+		img.alt = api._lang.GET("assemble.render.aria.extend");
 		img.onclick = () => {
 			div.classList.toggle("extended");
 		};
@@ -1454,8 +1456,9 @@ export class Assemble {
 		button.type = "button";
 		button.dataset.type = "reset";
 		button.classList.add("inlinebutton");
-		// accessibility setting; hide button, as input can be accessed directly
-		button.setAttribute("aria-hidden", true);
+		// accessibility setting; hide "select"-button, as input can be accessed directly
+		label.tabIndex = -1;
+		label.setAttribute("aria-hidden", true);
 		return [...this.header(), input, label, button, ...this.hint()];
 	}
 
@@ -1867,7 +1870,7 @@ export class Assemble {
 			icondiv.classList.add("image");
 			icon = document.createElement("img");
 			icon.src = this.currentElement.content.img;
-			icon.alt=api._lang.GET("assemble.render.aria.image", {":image":this.currentElement.content.user});
+			icon.alt = api._lang.GET("assemble.render.aria.image", { ":image": this.currentElement.content.user });
 			icondiv.append(icon);
 			if (onpointerup_forward) icondiv.onclick = new Function(onpointerup_forward);
 			message.append(icondiv);
@@ -1948,7 +1951,7 @@ export class Assemble {
 		img.classList.add("nocontent");
 		span.classList.add("nocontent");
 		// accessibility setting;
-		img.setAttribute("aria-hidden", true);	
+		img.setAttribute("aria-hidden", true);
 		return [img, span];
 	}
 
@@ -2029,8 +2032,12 @@ export class Assemble {
 		button.dataset.type = "photo";
 		button.classList.add("inlinebutton");
 		button.appendChild(document.createTextNode(api._lang.GET("assemble.render.photo_choose")));
+		// accessibility setting; hide "select"-button, as input can be accessed directly
+		button.tabIndex = -1;
+		button.setAttribute("aria-hidden", true);
 
 		img.classList.add("photoupload");
+		img.alt = api._lang.GET("assemble.render.aria.preview");
 
 		resetbutton.onclick = () => {
 			let e = document.getElementById(input.id);
@@ -2457,7 +2464,8 @@ export class Assemble {
 			}
 		}
 
-		select.onclick = (e) => {
+		// no onclick because accessability does not mind about a modal and can navigate the generic selection by default
+		select.onpointerup = (e) => {
 			// arrow function for reference of this.names
 			e.preventDefault();
 			if (!e.target.disabled)
@@ -2505,6 +2513,7 @@ export class Assemble {
 		const canvas = document.createElement("canvas");
 		canvas.id = "signaturecanvas";
 		if (this.currentElement.attributes.required) canvas.setAttribute("data-required", "required");
+		canvas.title = api._lang.GET("assemble.render.aria.signature");
 		result.push(canvas);
 		const input = document.createElement("input");
 		input.type = "file";

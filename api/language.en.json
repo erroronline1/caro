@@ -358,13 +358,15 @@
 			"error_forbidden_name": "The name :name is not allowed, please use another."
 		},
 		"render": {
-			"aria":{
-				"cancel":"Cancel",
-				"extend":"Extend / collapse",
-				"image":"Image of :image",
-				"pause":"Pause",
-				"toleft":"slide to left",
-				"toright":"slide to right"
+			"aria": {
+				"cancel": "Cancel",
+				"extend": "Extend / collapse",
+				"image": "Image of :image",
+				"pause": "Pause",
+				"preview": "Preview",
+				"signature": "Signature field",
+				"toleft": "slide to left",
+				"toright": "slide to right"
 			},
 			"assign_hint_documents": "\"My units\" lists all documents for your assigned units including common.",
 			"assign_hint_bundles": "\"My units\" lists all document bundles for your assigned units",
@@ -857,8 +859,8 @@
 		}
 	},
 	"measure": {
-		"alert_new":"There is a new improvement suggestion. What do you think of it? :link",
-		"alert_response":":user processed your improvement suggestion \":content\" :link",
+		"alert_new": "There is a new improvement suggestion. What do you think of it? :link",
+		"alert_response": ":user processed your improvement suggestion \":content\" :link",
 		"anonymous": "submit anonymous",
 		"anonymous_hint": "Your name will not be stored nor displayed, your suggestion yet remains public.",
 		"closed": "closed",
