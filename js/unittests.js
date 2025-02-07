@@ -204,7 +204,7 @@ export function rendertest(element) {
 							name: "A simple text input",
 							required: true,
 						},
-						hint: "Clarify with hints, required fields are makred with an asterisk",
+						hint: "Clarify with hints, required fields are marked with an asterisk",
 					},
 					{
 						type: "textarea",
