@@ -46,6 +46,7 @@
     * [Performance evaluation](#performance-evaluation)
     * [Tech doc](#tech-doc)
         * [Risk assessment](#risk-assessment)
+    * [Accessibility statement](#accessibility-statement)
 * [Code design patterns](#code-design-patterns)
     * [Frontend design](#frontend-design)
     * [Backend design](#backend-design)
@@ -122,7 +123,12 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
 * measure management pictures
-* accessability according to https://www.w3.org/TR/WCAG21/, https://martijnhols.nl/blog/the-european-accessibility-act-for-websites-and-apps, https://webaim.org/techniques/javascript/eventhandlers
+* accessability according to
+    * https://www.w3.org/TR/WCAG21/
+    * https://martijnhols.nl/blog/the-european-accessibility-act-for-websites-and-apps
+    * https://webaim.org/techniques/javascript/eventhandlers
+    * https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32019L0882
+    * [Accessibility statement](#accessibility-statement)
 * update readme pictures on tools menu, record menu, audit and regulatory
 
 # Aims
@@ -263,6 +269,7 @@ Application support legend:
 | MDR annex 14 Clinical evaluation and post-market clinical follow-up| structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MPBetreibV | structural | &bull; *record within documents with the "Equipment surveillance"-context* | |
 | ArbSchG §3 / BAG Az. 1 ABR 22/21 | yes | &bull; Registered users can contribute their working hours, vacations, sick leaves, etc.<br />&bull; These inputs can be exported for documentation regarding labour laws | [Calendar](#calendar) |
+| Directive (EU) 2019/882 European Accessibility Act | yes | &bull; The application has been designed to be accessible according to [WCAG 2.1 Level](https://www.w3.org/TR/WCAG21/) | [Accessibility statement](#accessibility-statement) |
 
 [Content](#content)
 
@@ -1956,6 +1963,10 @@ Stakeholder identification:
 | Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 | Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
+
+[Content](#content)
+
+### Accessibility statement
 
 [Content](#content)
 

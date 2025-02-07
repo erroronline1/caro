@@ -40,6 +40,7 @@
 * [CSV Processor](#csv-prozessor)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
     * [Risikoanalyse](#risikoanalyse)
+    * [Barrierefreiheit](#barrierefreiheit)
 * [Code Design Vorlagen](#code-design-vorlagen)
 * [API Dokumentation](#api-dokumentation)
 * [Stellungnahme zu technischen Richtlinien zur Datensicherheit](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit)
@@ -187,7 +188,7 @@ Anwendungsunterstützung Legende:
 | MDR Anhang 14 Klinische Bewertung und klinische Nachbeobachtung nach dem Inverkehrbringen | strukturell | &bull; *Aufzeichnung über Dokumente mit "Vorgangsdokumentation"-Kontext* | |
 | MPBetreibV | strukturell | &bull; *Aufzeichnung über Dokumente mit "Überwachung von Arbeitsmitteln"-Kontext* | |
 | ArbSchG §3 / BAG Az. 1 ABR 22/21 | ja | &bull; Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. erfassen. Die Einträge können unter Berücksichtigung von Arbeitszeitgesetzen als Dokumentation exportiert werden. | [Kalender](#kalender) |
-
+| Richtlinie (EU) 2019/882 Europäische Barrierefreiheitsanforderungen | ja | &bull; Die anwendung berücksicht die Barrierefreiheitsanforderungen in Bezug auf [WCAG 2.1 Level](https://www.w3.org/TR/WCAG21/) | [Barrierefreiheit](#barrierefreiheit) |
 
 [Übersicht](#übersicht)
 
@@ -1661,6 +1662,10 @@ Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [OpenReg
 
 ### Risikoanalyse
 Eine Risikoanalyse liegt in der englischsprachigen Beschreibung vor.
+
+[Übersicht](#übersicht)
+
+### Barrierefreiheit
 
 [Übersicht](#übersicht)
 
