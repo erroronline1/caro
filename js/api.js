@@ -327,6 +327,12 @@ export const api = {
 						return;
 					}
 
+					// update default language
+					if (api._settings.config.application && api._settings.config.application.defaultlanguage) {
+						console.log(document.querySelector("html").lang , api._settings.config.application.defaultlanguage);
+						document.querySelector("html").lang = api._settings.config.application.defaultlanguage;
+					}
+
 					// update application menu icon with user image
 					if (api._settings.user.image) {
 						let applicationLabel;

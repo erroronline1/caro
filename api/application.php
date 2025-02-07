@@ -133,6 +133,7 @@ class APPLICATION extends API {
 				],
 				'config' => [
 					'application' => [
+						'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
 						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
 					],
 					'lifespan' => [
@@ -174,6 +175,7 @@ class APPLICATION extends API {
 				],
 				'config' => [
 					'application' => [
+						'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
 						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
 					],
 					'lifespan' => [
@@ -216,7 +218,11 @@ class APPLICATION extends API {
 				]
 			],
 			'user' => [],
-			'config' => []
+			'config' => [
+				'application' => [
+					'defaultlanguage' => CONFIG['application']['defaultlanguage'],
+				]
+			]
 		];
 
 		// prepare term of service with providable permission settings
