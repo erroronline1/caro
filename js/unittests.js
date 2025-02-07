@@ -308,12 +308,14 @@ export function rendertest(element) {
 						attributes: {
 							value: "Add event to calendar",
 						},
+						hint: "This will be prepared by the backend, even if nothing happens now.",
 					},
 					{
 						type: "documentbutton",
 						attributes: {
 							value: "Display SILLY FORM",
 						},
+						hint: "This will be prepared by the backend, even if nothing happens now.",
 					},
 				],
 			],
@@ -471,12 +473,14 @@ export function rendertest(element) {
 						attributes: {
 							value: "Füge ein Ereignis zum Kalender hinzu",
 						},
+						hint: "Das wird vom Hintergrundsystem vorbereitet, auch wenn hier gerade nichts passiert.",
 					},
 					{
 						type: "documentbutton",
 						attributes: {
 							value: "Zeige TOLLES FORMULAR an",
 						},
+						hint: "Das wird vom Hintergrundsystem vorbereitet, auch wenn hier gerade nichts passiert.",
 					},
 				],
 			],
