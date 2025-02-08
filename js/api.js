@@ -220,7 +220,7 @@ export const api = {
 				clearInterval(_serviceWorker.notif.interval);
 				_serviceWorker.notif.interval = null;
 				document.querySelector("header>div:nth-of-type(3)").style.display = "block";
-			}, 1000);
+			}, 5000);
 		},
 		render: function (percent, remaining = 0) {
 			if (!this.circle) this.circle = document.querySelector(".session-timeout__circle");
@@ -228,8 +228,10 @@ export const api = {
 			if (percent < 0 || !this.circle) return;
 			const circumference = this.circle.r.baseVal.value * 2 * Math.PI,
 				offset = circumference - (percent / 100) * circumference;
-			if (remaining / 1000 < 120) this.circle.classList.add("warning");
-			else this.circle.classList.remove("warning");
+			if (remaining / 1000 < 120) {
+				if (!this.circle.classList.contains("warning")) new Toast(api._lang.GET("assemble.render.aria.timeout", { ":seconds": 120 }), "info", 120000);
+				this.circle.classList.add("warning");
+			} else this.circle.classList.remove("warning");
 			this.circle.style.strokeDasharray = `${circumference} ${circumference}`;
 			this.circle.style.strokeDashoffset = offset;
 		},
@@ -486,7 +488,7 @@ export const api = {
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							api.preventDataloss.start();
-						}
+						};
 						break;
 					case "audittemplate":
 						successFn = function (data) {
@@ -499,18 +501,18 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.selected && data.selected.length) compose_helper.importAuditTemplate(data.selected);
 							api.preventDataloss.start();
-						}
+						};
 						break;
 					case "export":
 						break;
 					case "import":
-						switch(request[2]){
-							case 'auditsummary':
+						switch (request[2]) {
+							case "auditsummary":
 								api.preventDataloss.stop();
 								successFn = function (data) {
-									if (data.data) document.getElementById('TemplateObjectives').value += "\n\n" + data.data;
+									if (data.data) document.getElementById("TemplateObjectives").value += "\n\n" + data.data;
 									api.preventDataloss.start();
-								}
+								};
 								break;
 						}
 						break;
@@ -540,15 +542,13 @@ export const api = {
 						}
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
-				}
-				else if (request[1] === 'audittemplate'){
+				} else if (request[1] === "audittemplate") {
 					if (!(payload = compose_helper.composeNewAuditTemplate())) return;
 					successFn = function (data) {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						if (data.id) api.audit('get','audittemplate', null, data.id);
+						if (data.id) api.audit("get", "audittemplate", null, data.id);
 					};
-				}
-				else payload = _.getInputs("[data-usecase=audit]", true);
+				} else payload = _.getInputs("[data-usecase=audit]", true);
 				break;
 			case "put":
 				if (4 in request && request[4] && request[4] instanceof FormData) {
@@ -564,14 +564,12 @@ export const api = {
 						}
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
-				}
-				else if (request[1] === 'audittemplate'){
+				} else if (request[1] === "audittemplate") {
 					if (!(payload = compose_helper.composeNewAuditTemplate())) return;
 					successFn = function (data) {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
-				}
-				else payload = _.getInputs("[data-usecase=audit]", true);
+				} else payload = _.getInputs("[data-usecase=audit]", true);
 				break;
 		}
 		api.send(method, request, successFn, null, payload);
@@ -939,8 +937,8 @@ export const api = {
 	},
 
 	/**
-	 *                                 
-	 *   _____ ___ ___ ___ _ _ ___ ___ 
+	 *
+	 *   _____ ___ ___ ___ _ _ ___ ___
 	 *  |     | -_| .'|_ -| | |  _| -_|
 	 *  |_|_|_|___|__,|___|___|_| |___|
 	 *
@@ -958,7 +956,7 @@ export const api = {
 				new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				measure: api._lang.GET("menu.communication.measure")
+				measure: api._lang.GET("menu.communication.measure"),
 			};
 
 		switch (method) {
@@ -1664,8 +1662,8 @@ export const api = {
 			};
 		switch (method) {
 			case "get":
-				switch(request[1]){
-					case 'token':
+				switch (request[1]) {
+					case "token":
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.render !== undefined) {
@@ -1676,8 +1674,8 @@ export const api = {
 									render: data.render,
 									options: options,
 								});
-							};
-						}
+							}
+						};
 						break;
 					default:
 						successFn = function (data) {
