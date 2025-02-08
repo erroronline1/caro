@@ -368,6 +368,7 @@
 				"scan_button_generic": "Feld",
 				"search": "Suche",
 				"signature": "Unterschriftenfeld",
+				"stl": "STL :file",
 				"timeout": "Du wirst in weniger als :seconds Sekunden automatisch abgemeldet!",
 				"toleft": "nach links schieben",
 				"toright": "nach rechts schieben"
@@ -1283,7 +1284,7 @@
 			"source": "Bild"
 		},
 		"scanner": { "result": "Ergebnis" },
-		"stl_viewer": { "select": "Wähle eine Date für die Darstellung" }
+		"stl_viewer": { "select": "Wähle eine Datei für die Darstellung" }
 	},
 	"user": {
 		"add_training": "Schulung hinzufügen",

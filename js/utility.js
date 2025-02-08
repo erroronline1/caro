@@ -48,7 +48,7 @@ export const _serviceWorker = {
 			let notif;
 			if ("document_approval" in data || "audit_closing" in data) {
 				let document_approval = 0,
-				audit_closing = 0;
+					audit_closing = 0;
 				if ("document_approval" in data) {
 					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.documents_manage_approval").replace(" ", "_") + "]");
 					if (notif) notif.setAttribute("data-notification", data.document_approval);
@@ -80,7 +80,7 @@ export const _serviceWorker = {
 				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			}
-			if ("measure_unclosed" in data){
+			if ("measure_unclosed" in data) {
 				// no appending number to userMenu to avoid distracting from unread messages
 				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.measure").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", data.measure_unclosed);
@@ -1314,6 +1314,7 @@ export const _client = {
 		initStlViewer: function (file) {
 			if (file === "../null") return;
 			const canvas = document.getElementById("stlviewer_canvas");
+			canvas.title = api._lang.GET("assemble.render.aria.stl", { ":file": file });
 			canvas.replaceChildren();
 			this.stlviewer = new StlViewer(canvas, {
 				models: [

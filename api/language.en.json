@@ -368,6 +368,7 @@
 				"scan_button_generic": "field",
 				"search": "Search",
 				"signature": "Signature field",
+				"stl": "STL :file",
 				"timeout": "You are about to be logged out in less than :seconds seconds!",
 				"toleft": "slide to left",
 				"toright": "slide to right"
