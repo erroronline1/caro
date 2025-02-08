@@ -655,6 +655,7 @@ export const _client = {
 							imageonly: {},
 							qrcode: element.commission,
 							class: "order2dcode",
+							name:api._lang.GET("order.commission")
 						},
 					});
 				}
@@ -765,6 +766,7 @@ export const _client = {
 								imageonly: {},
 								barcode: { value: element.barcode },
 								class: "order2dcode",
+								name:api._lang.GET("order.ordernumber_label")
 							},
 						});
 					else
@@ -774,6 +776,7 @@ export const _client = {
 								imageonly: {},
 								qrcode: element.ordernumber,
 								class: "order2dcode",
+								name:api._lang.GET("order.ordernumber_label")
 							},
 						});
 

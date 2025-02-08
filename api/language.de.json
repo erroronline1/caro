@@ -361,8 +361,10 @@
 			"aria": {
 				"add": "Weiteres hinzufügen",
 				"cancel": "Abbrechen",
+				"dialog":"Eingabemaske",
+				"dialog_toast":"Systemhinweis",
 				"extend": "erweitern / verbergen",
-				"image": "Bild :image",
+				"image": "Bild von :image",
 				"pause": "Anhalten",
 				"preview": "Vorschau",
 				"scan_button_generic": "Feld",

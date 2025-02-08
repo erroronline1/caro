@@ -384,6 +384,10 @@ export const api = {
 						}
 					}
 
+					// set general titles to common elements
+					document.querySelector("dialog#inputmodal").ariaLabel = document.querySelector("dialog#inputmodal2").ariaLabel = document.querySelector("dialog#modal").ariaLabel = api._lang.GET("assemble.render.aria.dialog");
+					document.querySelector("dialog#toast").ariaLabel = api._lang.GET("assemble.render.aria.dialog_toast");
+
 					// retrieve landing page
 					api.application("get", "start");
 				};

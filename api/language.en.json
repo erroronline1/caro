@@ -361,6 +361,8 @@
 			"aria": {
 				"add": "Add another",
 				"cancel": "Cancel",
+				"dialog":"Input form",
+				"dialog_toast":"System feedback",
 				"extend": "Extend / collapse",
 				"image": "Image of :image",
 				"pause": "Pause",
