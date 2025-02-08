@@ -534,6 +534,7 @@
 		"userskills_warning_description": "Manche gewünschten Fähigkeiten haben keine Zuordnung!"
 	},
 	"calendar": {
+		"daily_title":":day: :number Einträge",
 		"month_next": "nächster Monat",
 		"month_previous": "voriger Monat",
 		"schedule": {
