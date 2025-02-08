@@ -371,7 +371,8 @@
 				"search": "Search",
 				"signature": "Signature field",
 				"stl": "STL :file",
-				"timeout": "You are about to be logged out in less than :seconds seconds!",
+				"timeout": "Your session expired. You have to log in again.",
+				"timeout_warning": "You are about to be logged out in less than :seconds seconds! Please save your work to prevent data loss.",
 				"toleft": "slide to left",
 				"toright": "slide to right"
 			},

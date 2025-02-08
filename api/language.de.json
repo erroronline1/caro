@@ -371,7 +371,8 @@
 				"search": "Suche",
 				"signature": "Unterschriftenfeld",
 				"stl": "STL :file",
-				"timeout": "Du wirst in weniger als :seconds Sekunden automatisch abgemeldet!",
+				"timeout":"Deine Sitzung wurde beendet. Bitte melde dich erneut an.",
+				"timeout_warning": "Du wirst in weniger als :seconds Sekunden automatisch abgemeldet! Bitte speichere deine Arbeit um Datenverlust zu verhindern.",
 				"toleft": "nach links schieben",
 				"toright": "nach rechts schieben"
 			},
