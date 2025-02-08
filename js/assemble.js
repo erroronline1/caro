@@ -75,14 +75,14 @@ export const assemble_helper = {
 			input.name = "userMenu";
 			input.id = "userMenu" + group;
 			// accessibility settings
-			input.setAttribute("role", "none");
 			input.tabIndex = -1;
+			input.setAttribute("aria-hidden", true);
 			input.title = group;
 
 			// set up div containing subsets of category
 			div2 = document.createElement("div");
 			div2.classList.add("options");
-			div2.role="menu";
+			div2.role = "menu";
 			span = document.createElement("span");
 			span.append(document.createTextNode(group));
 			div2.append(span);
@@ -943,24 +943,6 @@ export class Assemble {
 	}
 
 	/**
-	 * add icon before widgets based on this.currentElement.type, ~.multiple, ~.[data-filtered]
-	 * @returns {domNodes} br, span with styleable data-type
-	 */
-	icon() {
-		return [];
-		const br = document.createElement("br"),
-			span = document.createElement("span");
-		span.dataset.type = this.currentElement.type;
-		if (this.currentElement.attributes) {
-			if (this.currentElement.attributes.multiple) span.dataset.multiple = "multiple";
-			if (this.currentElement.attributes["data-filtered"]) span.dataset.filtered = this.currentElement.attributes["data-filtered"];
-		}
-		// accessibility setting
-		span.setAttribute("aria-hidden", true);
-		return [br, span];
-	}
-
-	/**
 	 * add header based on this.currentElement.description, ~.type, ~.required
 	 * @returns {domNodes} header with styleable data-type and data-required if applicable
 	 */
@@ -1168,6 +1150,8 @@ export class Assemble {
 				if (day.today) daytile.classList.add("today");
 				if (day.selected) daytile.classList.add("selected");
 				if (day.holiday) daytile.classList.add("holiday");
+				daytile.title = day.title;
+				daytile.role = "link";
 			}
 			cal.push(daytile);
 		}
@@ -1855,7 +1839,7 @@ export class Assemble {
 	 * 	}
 	 */
 	message() {
-		let message, icondiv, icon, p, date, unseen, onclick_forward;
+		let message, icon, p, date, unseen, onclick_forward;
 		message = document.createElement("div");
 
 		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.ICON_onclick !== undefined) {
@@ -1865,14 +1849,15 @@ export class Assemble {
 		}
 
 		if (this.currentElement.content.img != undefined) {
-			icondiv = document.createElement("div");
-			icondiv.classList.add("image");
 			icon = document.createElement("img");
 			icon.src = this.currentElement.content.img;
 			icon.alt = api._lang.GET("assemble.render.aria.image", { ":image": this.currentElement.content.user });
-			icondiv.append(icon);
-			if (onclick_forward) icondiv.onclick = new Function(onclick_forward);
-			message.append(icondiv);
+			if (onclick_forward) {
+				icon.onclick = new Function(onclick_forward);
+				icon.title = api._lang.GET("message.forward");
+				icon.role = "link";
+			}
+			message.append(icon);
 		}
 		p = document.createElement("p");
 		p.append(document.createTextNode(this.currentElement.content.user));
@@ -1925,7 +1910,13 @@ export class Assemble {
 			unseen.append(document.createTextNode(this.currentElement.content.unseen));
 			message.append(unseen);
 		}
-		if (this.currentElement.attributes !== undefined) message = this.apply_attributes(this.currentElement.attributes, message);
+		if (this.currentElement.attributes !== undefined) {
+			message = this.apply_attributes(this.currentElement.attributes, message);
+			if ("onclick" in this.currentElement.attributes) {
+				message.role = "link";
+				message.title = api._lang.GET("message.no_messages");
+			}
+		}
 		message.classList.add("message");
 		if (this.currentElement.dirright != undefined && this.currentElement.dirright) message.classList.add("right");
 
@@ -1933,7 +1924,7 @@ export class Assemble {
 	}
 
 	/**
-	 * created a default view for no database content
+	 * creates a default view for no database content
 	 * @returns {domNodes} img, span
 	 * @example this.currentElement
 	 * ```json
@@ -2538,8 +2529,8 @@ export class Assemble {
 		input.id = "SIGNATURE";
 		input.name = this.currentElement.attributes.name;
 		input.hidden = true;
-		input.tabIndex=-1;
-		input.role="none";
+		input.tabIndex = -1;
+		input.role = "none";
 		input.setAttribute("aria-hidden", true);
 		result.push(input);
 		this.currentElement.attributes = {
@@ -2893,6 +2884,9 @@ export class Assemble {
 	 * feature poor method but necessary to display the delete-area for composer or possibly other future use
 	 */
 	trash() {
-		return [...this.icon(), document.createTextNode(this.currentElement.description)];
+		const span = document.createElement("span");
+		span.dataset.type = "trash";
+		span.append(document.createTextNode(this.currentElement.description));
+		return [span];
 	}
 }
