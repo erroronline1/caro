@@ -646,7 +646,8 @@ class CALENDARUTILITY {
 					'display' => $this->_lang->_USER['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
 					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
 					'selected' => $date === $day->format('Y-m-d'),
-					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays)
+					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays),
+					'title' => $this->_lang->GET('calendar.daily_title', [':day' => $this->_lang->_USER['general']['weekday'][$day->format('N')] . ' ' . $day->format('Y-m-d'), ':number' => $numbers])
 				];
 
 				if ($result['header']) continue;
