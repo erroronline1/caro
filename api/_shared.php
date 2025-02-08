@@ -383,7 +383,8 @@ class SHARED {
 									[
 										'type' => 'textsection',
 										'attributes' => [
-											'name' => $incorporationState
+											'name' => $incorporationState,
+											'data-type' => 'cart'
 										],
 										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']]
 									]
