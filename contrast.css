@@ -35,7 +35,7 @@
 	--purple: rgb(180, 142, 173);
 	--cta: rgb(136, 192, 208);
 	--evenDiscreetButton: rgba(136, 192, 208, 0.2);
-	--cta_darker: rgb(80, 155, 176);
+	--cta_darker: rgb(24, 113, 138);
 	--cta_active: rgb(161, 227, 246);
 	--shadow: 2px 2px 6px rgba(76, 86, 106, 0.3);
 	--notif: #e5e9f0;
@@ -44,4 +44,38 @@
 
 body {
 	background: var(--background);
+}
+
+button{
+	color:var(--foreground);
+}
+
+[data-type="addblock"]::before,
+button[data-type="additem"]::before,
+button[data-type="calendarbutton"]::before,
+[data-type="copy"]::before,
+button[data-type="download"]::before,
+button[data-type="file"]::before,
+button[data-type="image"]::before,
+button[data-type="import"]::before,
+button[data-type="merge"]::before,
+button[data-type="photo"]::before,
+button[data-type="documentbutton"]::before,
+button[data-type="reset"]::before,
+button[data-type="generateupdate"]::before,
+button[data-type="scanner"]::before,
+button[data-type="search"]::before,
+button[data-type="submitbutton"]::before,
+button[data-type="upvote"]::before,
+button[data-type="downvote"]::before,
+[data-type="toleft"]::before,
+[data-type="toright"]::after
+{
+	background-color: var(--foreground);
+}
+
+input:checked + .checkbox,
+input:checked + .checkbox::before,
+input:checked + .radio{
+	color: var(--foreground)
 }

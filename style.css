@@ -954,7 +954,7 @@ section > form,
 section > article,
 section > div[draggable] {
 	width: 100%;
-	padding-top: 0;
+	padding-top: 1em;
 	margin-top: 0;
 	padding-bottom: 1em;
 	scroll-snap-align: center;
@@ -1079,7 +1079,7 @@ article > article {
 		height: 3em;
 		border-radius: 50%;
 	}
-	div:nth-of-type(2) {
+	div:nth-of-type(1) {
 		background-color: var(--red);
 		color: var(--article);
 		width: fit-content;
