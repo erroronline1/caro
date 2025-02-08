@@ -123,12 +123,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
 * measure management pictures
-* accessability according to
-    * https://www.w3.org/TR/WCAG21/
-    * https://martijnhols.nl/blog/the-european-accessibility-act-for-websites-and-apps
-    * https://webaim.org/techniques/javascript/eventhandlers
-    * https://eur-lex.europa.eu/legal-content/en/TXT/?uri=CELEX%3A32019L0882
-    * [Accessibility statement](#accessibility-statement)
 * update readme pictures on tools menu, record menu, audit and regulatory
 
 # Aims
