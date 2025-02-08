@@ -46,17 +46,17 @@
 	<nav></nav>
 	<header>
 		<!-- nth-of-type 1: toggle fullscreen -->
-		<div onclick="_client.application.toggleFullScreen()"></div>
+		<div aria-hidden="true" onclick="_client.application.toggleFullScreen()"></div>
 		<h1></h1>
 		<!-- nth-of-type 2: server connection loss -->
-		<div></div>
+		<div aria-hidden="true"></div>
 		<!-- nth-of-type 3: session expired -->
-		<div></div>
-		<svg class="session-timeout" viewbox="0 0 30 30">
+		<div aria-hidden="true"></div>
+		<svg aria-hidden="true" class="session-timeout" viewbox="0 0 30 30">
 			<circle class="session-timeout__circle" stroke-width="2" fill="transparent" r="13" cx="15" cy="15" />
 		</svg>
 		<!-- last-of-type: scoll process -->
-		<div></div>
+		<div aria-hidden="true"></div>
 	</header>
 	<main id="main"></main>
 	<div class="loader"></div>
