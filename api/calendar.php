@@ -379,7 +379,6 @@ class CALENDAR extends API {
 				[
 					'type' => 'scanner',
 					'destination' => 'recordfilter', // assuming/hoping record identifiers are used to schedule events/tasks
-					'description' => $this->_lang->GET('assemble.render.scan_button')
 				], [
 					'type' => 'search',
 					'attributes' => [
@@ -543,7 +542,6 @@ class CALENDAR extends API {
 					[
 						'type' => 'scanner',
 						'destination' => 'recordfilter', // assuming/hoping record identifiers are used to schedule events/tasks
-						'description' => $this->_lang->GET('assemble.render.scan_button')
 					], [
 						'type' => 'search',
 						'attributes' => [
