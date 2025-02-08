@@ -1496,7 +1496,7 @@ export class Assemble {
 	 * 		"type": "hidden",
 	 * 		"numeration": "anything resulting in true to prevent enumeration"
 	 * 		"attributes": {
-	 * 			"name": "name",
+	 * 			"name": "name", not neccessarily set for pure filter functions
 	 * 			"value": 3.14}
 	 * 		}
 	 * 	}
@@ -1506,7 +1506,7 @@ export class Assemble {
 		input.type = "hidden";
 		input.id = getNextElementID();
 		input.value = this.currentElement.value;
-		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.name) this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		return [input];
 	}
