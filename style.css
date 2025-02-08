@@ -193,7 +193,8 @@ dialog {
 	pointer-events: none;
 	width: 40rem;
 
-	&#toast {
+	&#toast,
+	&#sessionwarning {
 		bottom: 6rem;
 		border: 3px solid transparent !important;
 		span {
@@ -209,13 +210,16 @@ dialog {
 			background: var(--yellow);
 		}
 	}
-	&#toast.success {
+	&#toast.success,
+	&#sessionwarning.success {
 		border: 3px solid var(--green) !important;
 	}
-	&#toast.error {
+	&#toast.error,
+	&#sessionwarning.error {
 		border: 3px solid var(--red) !important;
 	}
-	&#toast.info {
+	&#toast.info,
+	&#sessionwarning.info {
 		border: 3px solid var(--cta) !important;
 	}
 
