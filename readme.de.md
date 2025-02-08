@@ -40,7 +40,7 @@
 * [CSV Processor](#csv-prozessor)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
     * [Risikoanalyse](#risikoanalyse)
-    * [Barrierefreiheit](#barrierefreiheit)
+    * [Erklärung zur Barrierefreiheit](#erklärung-zur-barrierefreiheit)
 * [Code Design Vorlagen](#code-design-vorlagen)
 * [API Dokumentation](#api-dokumentation)
 * [Stellungnahme zu technischen Richtlinien zur Datensicherheit](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit)
@@ -188,7 +188,7 @@ Anwendungsunterstützung Legende:
 | MDR Anhang 14 Klinische Bewertung und klinische Nachbeobachtung nach dem Inverkehrbringen | strukturell | &bull; *Aufzeichnung über Dokumente mit "Vorgangsdokumentation"-Kontext* | |
 | MPBetreibV | strukturell | &bull; *Aufzeichnung über Dokumente mit "Überwachung von Arbeitsmitteln"-Kontext* | |
 | ArbSchG §3 / BAG Az. 1 ABR 22/21 | ja | &bull; Registrierte Nutzer können ihre Arbeitszeiten, Urlaube, Krankheitsausfälle, etc. erfassen. Die Einträge können unter Berücksichtigung von Arbeitszeitgesetzen als Dokumentation exportiert werden. | [Kalender](#kalender) |
-| Richtlinie (EU) 2019/882 Europäische Barrierefreiheitsanforderungen | ja | &bull; Die anwendung berücksicht die Barrierefreiheitsanforderungen in Bezug auf [WCAG 2.1 Level](https://www.w3.org/TR/WCAG21/) | [Barrierefreiheit](#barrierefreiheit) |
+| Richtlinie (EU) 2019/882 Europäische Barrierefreiheitsanforderungen | ja | &bull; Die Anwendung berücksicht die Barrierefreiheitsanforderungen in Bezug auf [WCAG 2.1 Level](https://www.w3.org/TR/WCAG21/) | [Erklärung zur Barrierefreiheit](#erklärung-zur-barrierefreiheit) |
 
 [Übersicht](#übersicht)
 
@@ -1665,7 +1665,50 @@ Eine Risikoanalyse liegt in der englischsprachigen Beschreibung vor.
 
 [Übersicht](#übersicht)
 
-### Barrierefreiheit
+### Erklärung zur Barrierefreiheit
+Folgendes sollte möglich sein:
+* bis zu 200 % problemlos zu zoomen
+* auf einem Großteil der Anwendung nur mithilfe der Tastatur zu navigieren
+* auf einem Großteil der Anwendung mithilfe eines modernen Bildschirmlesers und einer Spracherkennungssoftware (auf ihrem Computer oder Telefon) zu navigieren
+* ein kontrastreiches Farbschema wählen 
+
+Diese Anwendung ist gemäß der technischen Norm für Websites und mobile Apps gestaltet und entspricht weitestgehend der Stufe „AA“ der Richtlinien für barrierefreie Webinhalte (WCAG) Version 2.1.
+
+#### Stand der Vereinbarkeit mit den Anforderungen
+Diese Anwendung entspricht teilweise den Richtlinien für barrierefreie Webinhalte (WCAG) Version 2.1 Stufe AA. Siehe [Nicht barrierefreie Inhalte] für nähere Informationen.
+
+Die Website wurde zuletzt am 08. Februar 2025 getestet.
+
+#### Erstellung der Erklärung
+Diese Erklärung wurde am 08. Februar 2025 erstellt.
+
+Die Erklärung basiert auf den automatisierten Rückmeldungen des [axe DevTools Firefox Plugins](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/).
+
+#### Feedback
+
+Ich begrüße Ihr Feedback bezüglich der Barrierefreiheit der CARO App. Bitte teilen Sie mir mit, wenn Sie Probleme mit der Barrierefreiheit haben:
+* [GitHub issues](https://github.com/erroronline1/caro/issues) (bitte geben Sie im Formular keine sensiblen Informationen an, z. B. zu Ihren Finanzen, Ihrer Gesundheit oder anderen Themen, die sehr persönlich sind)
+
+Ich bemühe mich die Probleme schnellstmöglich zu addressieren.
+
+#### Kompatibilität mit Browsern und unterstützenden Technologien
+Die CARO App ist mit den folgenden meistgenutzten unterstützenden Technologien kompatibel:
+* der neuesten Version der Browser Google Chrome, Microsoft Edge, Mozilla Firefox und Apple Safari
+* in Kombination mit den neuesten Versionen von NVDA, VoiceOver und TalkBack
+
+#### Technische Spezifikationen
+Die Barrierefreiheit der CARO App wird durch die nachstehenden Technologien unterstützt und beruht auf einer Kombination aus Webbrowser und unterstützenden Technologien oder Plug-ins, die auf Ihrem Computer installiert sind:
+* HTML
+* WAI-ARIA
+* CSS
+* JavaScript
+
+#### Nicht barrierefreie Inhalte
+Trotz meiner Bemühungen, die CARO App barrierefrei zu gestalten, bin ich mir verschiedener Einschränkungen bewusst, die ich versuche zu beheben. Nachstehend finden Sie eine Beschreibung der mir bekannten Einschränkungen und potenzieller Lösungen. Bitte teilen Sie mir mit, wenn Sie mit einem Problem konfrontiert werden, das nicht in der Liste aufgeführt ist.
+
+Bekannte Einschränkungen auf der CARO App:
+* Farbkontrast-Verhältnisse erreichen standardmäßig nicht die gewünschte Grenze. Sie können ein hoffentlich adäquates Farbschema im Nutzerprofil wählen.
+* Manche horizontal scrollende Bereiche haben keine Tastaturerreichbarkeit. Im Darstellungkontext ist dies schwerlich zu beheben, sollte aber für Bildschirmleser keine Probleme bereiten.
 
 [Übersicht](#übersicht)
 

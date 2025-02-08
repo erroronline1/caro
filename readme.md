@@ -1967,6 +1967,48 @@ Stakeholder identification:
 [Content](#content)
 
 ### Accessibility statement
+You should be able to:
+* zoom up to 200% without problems
+* navigate most of the application using just a keyboard
+* navigate most of the application using a modern screen reader and speech recognition software (on your computer or phone)
+* select a high contrast theme if required
+
+This application is designed to comply with the technical standard for websites and mobile apps closely following level ‘AA’ of the Web Content Accessibility Guidelines (WCAG) version 2.1.
+
+#### Compliance status
+This application is partially compliant with the [Web Content Accessibility Guidelines (WCAG) 2.1 Level AA](https://www.w3.org/TR/WCAG21/). See [Non-accessible content](#non-accessible-content) for more details.
+
+The website was last tested on 08 February 2025.
+
+#### Preparation of this statement
+This statement was prepared on 08 February 2025.
+
+The statement is based on feedback of the [axe DevTools Firefox plugin](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/), using automated testing.
+
+#### Feedback
+I welcome your feedback on the accessibility of the CARO App. Please let us know if you encounter accessibility barriers:
+* [GitHub issues](https://github.com/erroronline1/caro/issues) (please refrain from providing sensitive information in the form, e.g. any information that would reveal personal financial information, information related to your health, or any other sensitive topic).
+
+I try to address issues as soon as possible.
+
+#### Compatibility with browsers and assistive technology
+The CARO App is designed to be compatible with the following most used assistive technologies:
+* the latest version of Google Chrome, Microsoft Edge, Mozilla Firefox and Apple Safari browsers;
+* in combination with the latest versions of NVDA, VoiceOver and TalkBack.
+
+#### Technical specifications
+The accessibility of the CARO App relies on the following technologies to work with the particular combination of web browser and any assistive technologies or plugins installed on your computer:
+* HTML
+* WAI-ARIA
+* CSS
+* JavaScript
+
+#### Non-accessible content
+Despite my best efforts to ensure the accessibility of the CARO App, I am aware of some limitations, which I am working to fix. Below is a description of known limitations and potential solutions. Please contact me if you encounter an issue not listed below.
+
+Known limitations for the CARO App:
+* Color contrast ratios are not meeting desired thresholds by default. You are able to select a hopefully adequate theme within your user profile.
+* Some horizontal scrollable regions lack keyboard access. This is hardly fixable given the context but should be of no concern to screen readers.
 
 [Content](#content)
 
