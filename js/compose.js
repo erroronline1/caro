@@ -29,7 +29,7 @@ export const compose_helper = {
 	 * @param {int} numberOfElements
 	 * @returns {domNodes}]
 	 */
-	cloneMultipleItems: function (startNode, offset = -4, numberOfElements = 4) {
+	cloneMultipleItems: function (startNode, offset = -1, numberOfElements = 1) {
 		// positive offset for nodes after fromNode, negative for previous nodes
 		// ids and htmlfor are only assigned within first layer !!!
 
@@ -43,15 +43,13 @@ export const compose_helper = {
 			clonedIds = {};
 		for (let i = 0; i < numberOfElements; i++) {
 			let clone = startNode.cloneNode(true);
-			if ("value" in clone) clone.value = "";
-			if ("id" in clone && clone.id) {
-				clonedIds[clone.id] = compose_helper.getNextElementID();
-				clone.id = clonedIds[clone.id];
-			}
-			if ("required" in clone) clone.removeAttribute("required");
-			if ("htmlFor" in clone && Object.keys(clonedIds).includes(clone.htmlFor)) {
-				// does work only if label comes after input
-				clone.htmlFor = clonedIds[clone.htmlFor];
+			for (let i = 0; i < clone.childNodes.length; i++) {
+				if ("value" in clone.childNodes[i]) clone.childNodes[i].value = "";
+				if ("id" in clone.childNodes[i] && clone.childNodes[i].id) {
+					clonedIds[clone.childNodes[i].id] = compose_helper.getNextElementID();
+					clone.childNodes[i].id = clonedIds[clone.childNodes[i].id];
+				}
+				if ("required" in clone.childNodes[i]) clone.childNodes[i].removeAttribute("required");
 			}
 			elements.push(clone);
 			startNode = startNode.nextElementSibling;
@@ -81,7 +79,7 @@ export const compose_helper = {
 				[
 					{
 						type: "textsection",
-						content: api._lang.GET("audit.audit.question") + "\n" + question + "\n \n" + api._lang.GET("audit.audit.regulatory") + "\n" + regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + hint,
+						content: api._lang.GET("audit.audit.question") + "\n" + question + "\n \n" + api._lang.GET("audit.audit.execute.regulatory") + "\n" + regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + hint,
 					},
 				],
 			],
@@ -99,17 +97,14 @@ export const compose_helper = {
 	 * @event add widget structure to compose_helper.newDocumentComponents
 	 */
 	composeNewElementCallback: function (parent) {
-		let sibling = parent.childNodes[0].nextSibling,
-			setTo,
-			elementName,
-			value;
+		let sibling, setTo, siblingName, siblingValue, widgetName;
 
 		// define which attribute is assigned the name value, and set default values
 		const setName = {
 				name: ["select", "scanner", "radio", "photo", "file", "signature", "textselection", "checkbox"],
 				description: ["links"],
 			},
-			buttonValues = {
+			buttonDefaultValues = {
 				calendarbutton: api._lang.GET("planning.event_new"),
 			},
 			element = {
@@ -117,59 +112,53 @@ export const compose_helper = {
 			};
 
 		// iterate over all nodes of the respective widgets composer form
-		do {
+		for (let s = 0; s < parent.childNodes.length; s++) {
+			sibling = parent.childNodes[s];
+			console.log(sibling);
 			// skip nodes
-			if (!["span", "input", "textarea", "header", "select"].includes(sibling.localName)) {
-				sibling = sibling.nextSibling;
+			//if (!["span", "input", "textarea", "header", "select"].includes(sibling.localName)) {
+			if (!["label", "header", "input"].includes(sibling.localName)) {
 				continue;
 			}
 
-			// get widget type by icon
-			if (sibling.localName === "span") {
-				if (element.type === undefined) element["type"] = sibling.dataset.type;
-				sibling = sibling.nextSibling;
-				continue;
-			}
-
-			// get widget type by header
 			if (sibling.localName === "header") {
+				// e.g. button
 				if (element.type === undefined) element["type"] = sibling.dataset.type;
-				if (!element.attributes) element["attributes"] = { value: buttonValues[sibling.dataset.type] };
-				sibling = sibling.nextSibling;
+				if (!element.attributes) element["attributes"] = { value: buttonDefaultValues[sibling.dataset.type] };
 				continue;
-			}
-
-			// sanitize widget name
-			elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
-
-			// check if new elements name is allowed
-			if (element.attributes.name) {
-				for (const [key, pattern] of api._settings.config.forbidden.names) {
-					if (element.attributes.name.match(new RegExp(pattern, "gm"))) {
-						new Toast(api._lang.GET("assemble.compose.error_forbidden_name", { ":name": element.attributes.name }) + " " + pattern, "error");
-						return;
-					}
+			} else if (sibling.localName === "input") {
+				// e.g. file
+				siblingName = sibling.name;
+				siblingValue = sibling.value;
+			} else if (sibling.localName === "label") {
+				// first input assigns type
+				if (element.type === undefined) element["type"] = sibling.dataset.type;
+				for (let i = 0; i < sibling.childNodes.length; i++) {
+					if (!["input", "textarea", "select"].includes(sibling.childNodes[i].localName)) continue;
+					siblingName = sibling.childNodes[i].name.replace(/\(.*?\)|\[\]/g, "");
+					siblingValue = sibling.childNodes[i].value;
+					break;
 				}
 			}
+
 			// route values to names, values and attributes
-			value = sibling.value;
 			if (["links", "radio", "select", "checkbox"].includes(element.type)) {
-				if (elementName === api._lang.GET("assemble.compose.component.multilist_name")) {
-					setTo = Object.keys(setName).find((key) => setName[key].includes(element.type));
-					if (value && setTo === "name") element.attributes.name = value;
-					else if (value && setTo === "description") element.description = value;
-					else return;
+				if (siblingName === api._lang.GET("assemble.compose.component.multilist_name")) {
+					if (siblingValue) {
+						if (["links"].includes(element.type)) element.description = siblingValue;
+						else element.attributes.name = siblingValue;
+					} else return;
 				}
-				if (elementName === api._lang.GET("assemble.compose.component.multilist_add_item") && value) {
+				if (siblingName === api._lang.GET("assemble.compose.component.multilist_add_item") && siblingValue) {
 					if (element.content === undefined) element.content = {};
-					element.content[value] = {};
+					element.content[siblingValue] = {};
 				}
 			} else if (["file", "photo", "scanner", "signature", "identify"].includes(element.type)) {
-				if (elementName === api._lang.GET("assemble.compose.component.simple_element")) {
-					if (value) element.attributes.name = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.simple_element")) {
+					if (siblingValue) element.attributes.name = siblingValue;
 					else return;
 				}
-				if (elementName === api._lang.GET("assemble.compose.component.context_identify") && sibling.checked) {
+				if (siblingName === api._lang.GET("assemble.compose.component.context_identify") && sibling.checked) {
 					element.attributes.required = true;
 					delete element.attributes.multiple;
 					element.type = "identify";
@@ -177,7 +166,7 @@ export const compose_helper = {
 					document.getElementById("setIdentify").checked = false;
 				}
 				if (element.type === "signature") {
-					const signatureform = document.querySelector("form>span[data-type=signature").parentNode;
+					const signatureform = document.querySelector("form>label[data-type=signature").parentNode;
 					for (const node of signatureform) {
 						if (node.dataset.type === "addblock") {
 							node.disabled = true;
@@ -186,26 +175,26 @@ export const compose_helper = {
 					}
 				}
 			} else if (["textsection"].includes(element.type)) {
-				if (elementName === api._lang.GET("assemble.compose.component.textsection_description")) {
-					if (value) element.attributes.name = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.textsection_description")) {
+					if (siblingValue) element.attributes.name = siblingValue;
 					else return;
 				}
-				if (elementName === api._lang.GET("assemble.compose.component.textsection_content") && value) {
-					element.content = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.textsection_content") && siblingValue) {
+					element["content"] = siblingValue;
 				}
 			} else if (["documentbutton"].includes(element.type)) {
-				if (elementName === api._lang.GET("assemble.compose.component.link_document_select")) {
-					if (value) element.attributes.value = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.link_document")) {
+					if (siblingValue) element.attributes.value = siblingValue;
 					else return;
 				}
 			} else if (["image"].includes(element.type)) {
-				if (elementName === api._lang.GET("assemble.compose.component.image_description")) {
-					if (value) element.description = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.image_description")) {
+					if (siblingValue) element.description = siblingValue;
 				}
-				if (elementName === api._lang.GET("assemble.compose.component.image")) {
-					if (value) {
+				if (siblingName === api._lang.GET("assemble.compose.component.image")) {
+					if (siblingValue) {
 						element.attributes = {
-							name: value,
+							name: siblingValue,
 							url: URL.createObjectURL(sibling.files[0]),
 						};
 						// add component structure to multipart form
@@ -217,39 +206,48 @@ export const compose_helper = {
 					} else return;
 				}
 			} else if (["range"].includes(element.type)) {
-				if (elementName === api._lang.GET("assemble.compose.component.simple_element")) {
-					if (value) element.attributes.name = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.simple_element")) {
+					if (siblingValue) element.attributes.name = siblingValue;
 					else return;
 				}
 				element.attributes.value = "0";
-				if (elementName === api._lang.GET("assemble.compose.component.range_min")) element.attributes.min = Number(value);
-				if (elementName === api._lang.GET("assemble.compose.component.range_max")) element.attributes.max = Number(value);
-				if (elementName === api._lang.GET("assemble.compose.component.range_step")) {
-					value = value.replace(",", ".");
-					if ((typeof Number(value) === "number" && Number(value) < element.attributes.max) || value === "any") element.attributes.step = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.range_min")) element.attributes.min = Number(siblingValue);
+				if (siblingName === api._lang.GET("assemble.compose.component.range_max")) element.attributes.max = Number(siblingValue);
+				if (siblingName === api._lang.GET("assemble.compose.component.range_step")) {
+					siblingValue = siblingValue.replace(",", ".");
+					if ((typeof Number(siblingValue) === "number" && Number(siblingValue) < element.attributes.max) || siblingValue === "any") element.attributes.step = siblingValue;
 				}
 			} else {
 				// ...input
-				if (elementName === api._lang.GET("assemble.compose.component.field_name")) {
-					if (value) element.attributes.name = value;
+				if (siblingName === api._lang.GET("assemble.compose.component.field_name")) {
+					if (siblingValue) element.attributes.name = siblingValue;
 					else return;
 				}
 			}
-			if (elementName === api._lang.GET("assemble.component.texttemplate") && value) element.texttemplates = true;
-			if (elementName === api._lang.GET("assemble.compose.component.field_hint") && value) element.hint = value;
-			if (elementName === api._lang.GET("assemble.compose.component.required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
-			if (elementName === api._lang.GET("assemble.compose.component.multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
-			if (elementName === api._lang.GET("assemble.compose.component.link_document_choice") && value === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
+			if (siblingName === api._lang.GET("assemble.compose.component.texttemplate") && siblingValue) element.texttemplates = true;
+			if (siblingName === api._lang.GET("assemble.compose.component.field_hint") && siblingValue) element.hint = siblingValue;
+			if (siblingName === api._lang.GET("assemble.compose.component.required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
+			if (siblingName === api._lang.GET("assemble.compose.component.multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
+			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
 				element.attributes.onpointerup = "api.record('get','displayonly', '" + element.attributes.value + "')";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_display_button", { ":document": element.attributes.value });
 			}
-			if (elementName === api._lang.GET("assemble.compose.component.link_document_choice") && value === api._lang.GET("assemble.compose.component.link_document_continue") && sibling.checked) {
+			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_continue") && sibling.checked) {
 				element.attributes.onpointerup = "api.record('get','document', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_continue_button", { ":document": element.attributes.value });
 			}
-			sibling = sibling.nextSibling;
-		} while (sibling);
 
+			// check if new elements name is allowed
+			if (element.attributes.name) {
+				for (const pattern of Object.entries(api._settings.config.forbidden.names)) {
+					if (element.attributes.name.match(new RegExp(pattern, "gm"))) {
+						new Toast(api._lang.GET("assemble.compose.error_forbidden_name", { ":name": element.attributes.name }) + " " + pattern, "error");
+						return;
+					}
+				}
+			}
+		}
+		console.log(element);
 		// append new widget to dom and update compose_helper.newDocumentComponents
 		if (Object.keys(element).length > 1) {
 			const newElement = new Compose({
@@ -1009,7 +1007,7 @@ export const compose_helper = {
 								let next = [],
 									all = [];
 								for (let i = 1; i < options.length; i++) {
-									next = compose_helper.cloneMultipleItems(sibling, -2, 4);
+									next = compose_helper.cloneMultipleItems(sibling, 0, 1);
 									for (const e of next) {
 										if ("value" in e) e.value = options[i];
 									}
@@ -1634,18 +1632,10 @@ export class Compose extends Assemble {
 			document = this.currentElement.content;
 
 		this.currentElement = {
-			type: "textsection",
+			type: "documentbutton",
+			numeration: "prevent",
 			attributes: {
-				"data-type": "documentbutton",
 				name: api._lang.GET("assemble.compose.component.link_document"),
-			},
-		};
-		result = result.concat(...this.textsection());
-
-		this.currentElement = {
-			type: "select",
-			attributes: {
-				name: api._lang.GET("assemble.compose.component.link_document_select"),
 			},
 			content: document,
 		};
@@ -1687,6 +1677,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: "image",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.image_description"),
 			},
@@ -1718,6 +1709,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: type.type,
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_name"),
 				maxlength: 80,
@@ -1727,6 +1719,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "textsection",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
 			},
@@ -1799,6 +1792,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: type.type,
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.multilist_name"),
 				maxlength: 80,
@@ -1808,6 +1802,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "textsection",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
 			},
@@ -1829,7 +1824,7 @@ export class Compose extends Assemble {
 				"data-type": "additem",
 				type: "button",
 				onpointerup: function () {
-					for (const e of compose_helper.cloneMultipleItems(this, -4, 4)) this.parentNode.insertBefore(e, this);
+					for (const e of compose_helper.cloneMultipleItems(this, -1, 1)) this.parentNode.insertBefore(e, this);
 				}.toString(),
 			},
 		};
@@ -1940,6 +1935,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: "range",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.simple_element"),
 				required: true,
@@ -1948,6 +1944,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "textsection",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
 			},
@@ -1955,6 +1952,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "number",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.range_min"),
 			},
@@ -1963,6 +1961,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.number());
 		this.currentElement = {
 			type: "number",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.range_max"),
 			},
@@ -1971,6 +1970,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.number());
 		this.currentElement = {
 			type: "text",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.range_step"),
 			},
@@ -2001,6 +2001,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: "code",
+			numeration: "prevent",
 			hint: api._lang.GET("assemble.compose.component.raw_hint"),
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.raw"),
@@ -2100,6 +2101,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: type.type,
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.simple_element"),
 				maxlength: 80,
@@ -2109,6 +2111,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "textsection",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
 			},
@@ -2215,6 +2218,7 @@ export class Compose extends Assemble {
 		let result = [];
 		this.currentElement = {
 			type: "textsection",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.textsection_description"),
 				required: true,
@@ -2223,6 +2227,7 @@ export class Compose extends Assemble {
 		result = result.concat(...this.text());
 		this.currentElement = {
 			type: "textarea",
+			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.textsection_content"),
 				rows: 5,
