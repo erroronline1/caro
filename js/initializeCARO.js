@@ -21,6 +21,7 @@
 // main modules
 import { api } from "./api.js";
 window.api = api;
+window.toasttimeout = {};
 import { _serviceWorker, _client } from "./utility.js";
 window._serviceWorker = _serviceWorker;
 window._client = _client;

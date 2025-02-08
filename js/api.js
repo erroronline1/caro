@@ -204,6 +204,7 @@ export const api = {
 	session_timeout: {
 		circle: null,
 		init: function () {
+			new Toast(null, null, null, "sessionwarning");
 			if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
 			this.stop = new Date().getTime() + api._settings.config.lifespan.idle * 1000;
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
@@ -216,7 +217,7 @@ export const api = {
 					return;
 				}
 				api.session_timeout.render(0);
-				new Toast();
+				if (Object.keys(api._settings.user).length) new Toast(api._lang.GET("assemble.render.aria.timeout"), "error", 1800000, "sessionwarning");
 				clearInterval(api.session_timeout.interval);
 				clearInterval(_serviceWorker.notif.interval);
 				_serviceWorker.notif.interval = null;
@@ -229,8 +230,8 @@ export const api = {
 			if (percent < 0 || !this.circle) return;
 			const circumference = this.circle.r.baseVal.value * 2 * Math.PI,
 				offset = circumference - (percent / 100) * circumference;
-			if (remaining / 1000 < 120) {
-				if (!this.circle.classList.contains("warning")) new Toast(api._lang.GET("assemble.render.aria.timeout", { ":seconds": 120 }), "info", 120000);
+			if (remaining && remaining / 1000 < 120) {
+				if (!this.circle.classList.contains("warning")) new Toast(api._lang.GET("assemble.render.aria.timeout_warning", { ":seconds": 120 }), "error", 60000, "sessionwarning");
 				this.circle.classList.add("warning");
 			} else this.circle.classList.remove("warning");
 			this.circle.style.strokeDasharray = `${circumference} ${circumference}`;
@@ -387,7 +388,7 @@ export const api = {
 
 					// set general titles to common elements
 					document.querySelector("dialog#inputmodal").ariaLabel = document.querySelector("dialog#inputmodal2").ariaLabel = document.querySelector("dialog#modal").ariaLabel = api._lang.GET("assemble.render.aria.dialog");
-					document.querySelector("dialog#toast").ariaLabel = api._lang.GET("assemble.render.aria.dialog_toast");
+					document.querySelector("dialog#toast").ariaLabel = document.querySelector("dialog#sessionwarning").ariaLabel =api._lang.GET("assemble.render.aria.dialog_toast");
 
 					// retrieve landing page
 					api.application("get", "start");

@@ -436,15 +436,17 @@ export class Toast {
 	 * @param {string} message
 	 * @param {string} type success|error|info
 	 * @param {int} duration in milliseconds
+	 * @param {string} destination toast or sessionwarning
 	 * @example new Toast('message', 'success')
 	 *
 	 * duration is a bit fuzzy, idk why
 	 *
 	 */
-	constructor(message = "", type = "", duration = 4000) {
+	constructor(message = "", type = "", duration = 4000, destination = "toast") {
 		this.message = message || undefined;
 		this.duration = duration;
-		this.toast = document.getElementById("toast");
+		this.destination = destination;
+		this.toast = document.getElementById(destination);
 		this.toast.removeAttribute("class");
 		if (typeof this.message !== "undefined") {
 			const closeimg = document.createElement("img"),
@@ -455,11 +457,11 @@ export class Toast {
 			closeimg.classList.add("close");
 			closeimg.src = "./media/times.svg";
 			closeimg.alt = api._lang.GET("assemble.render.aria.cancel");
-			closeimg.onclick = new Function("document.getElementById('toast').close();");
+			closeimg.onclick = new Function("document.getElementById('" + destination + "').close();");
 			pauseimg.classList.add("pause");
 			pauseimg.src = "./media/equals.svg";
 			pauseimg.alt = api._lang.GET("assemble.render.aria.pause");
-			pauseimg.onclick = new Function("window.clearTimeout(window.toasttimeout);");
+			pauseimg.onclick = new Function("window.clearTimeout(window.toasttimeout['"+destination+"']);");
 			msg.innerHTML = message;
 			this.toast.replaceChildren(closeimg, pauseimg, msg, div);
 			this.toast.show();
@@ -471,11 +473,11 @@ export class Toast {
 	 * @param {int} percent
 	 */
 	countdown(percent = 100) {
-		const countdowndiv = document.querySelector("#toast > div");
+		const countdowndiv = document.querySelector("#" + this.destination + " > div");
 		countdowndiv.style.width = percent + "%";
-		window.toasttimeout = window.setTimeout(this.countdown.bind(this), this.duration / 1000, percent - 1000 / this.duration);
+		window.toasttimeout[this.destination] = window.setTimeout(this.countdown.bind(this), this.duration / 1000, Math.round((percent - 1000 / this.duration) * 1000) / 1000);
 		if (percent < 0) {
-			window.clearTimeout(window.toasttimeout);
+			window.clearTimeout(window.toasttimeout[this.destination]);
 			this.toast.close();
 		}
 	}
