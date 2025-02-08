@@ -1670,30 +1670,28 @@ Folgendes sollte möglich sein:
 * bis zu 200 % problemlos zu zoomen
 * auf einem Großteil der Anwendung nur mithilfe der Tastatur zu navigieren
 * auf einem Großteil der Anwendung mithilfe eines modernen Bildschirmlesers und einer Spracherkennungssoftware (auf ihrem Computer oder Telefon) zu navigieren
-* ein kontrastreiches Farbschema wählen 
 
 Diese Anwendung ist gemäß der technischen Norm für Websites und mobile Apps gestaltet und entspricht weitestgehend der Stufe „AA“ der Richtlinien für barrierefreie Webinhalte (WCAG) Version 2.1.
 
 #### Stand der Vereinbarkeit mit den Anforderungen
-Diese Anwendung entspricht teilweise den Richtlinien für barrierefreie Webinhalte (WCAG) Version 2.1 Stufe AA. Siehe [Nicht barrierefreie Inhalte] für nähere Informationen.
+Diese Anwendung entspricht teilweise den Richtlinien für [barrierefreie Webinhalte (WCAG) Version 2.1 Stufe AA](https://www.w3.org/TR/WCAG21/). Siehe [Nicht barrierefreie Inhalte](#nicht-barrierefreie-inhalte) für nähere Informationen.
 
-Die Website wurde zuletzt am 08. Februar 2025 getestet.
+Die Anwendung wurde zuletzt am 08. Februar 2025 getestet.
 
 #### Erstellung der Erklärung
 Diese Erklärung wurde am 08. Februar 2025 erstellt.
 
-Die Erklärung basiert auf den automatisierten Rückmeldungen des [axe DevTools Firefox Plugins](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/).
+Die Erklärung basiert auf den automatisierten Analyseergebnissen des [axe DevTools Firefox Plugins](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/).
 
 #### Feedback
-
 Ich begrüße Ihr Feedback bezüglich der Barrierefreiheit der CARO App. Bitte teilen Sie mir mit, wenn Sie Probleme mit der Barrierefreiheit haben:
-* [GitHub issues](https://github.com/erroronline1/caro/issues) (bitte geben Sie im Formular keine sensiblen Informationen an, z. B. zu Ihren Finanzen, Ihrer Gesundheit oder anderen Themen, die sehr persönlich sind)
+* [GitHub issues](https://github.com/erroronline1/caro/issues) (bitte geben Sie im Formular keine sensiblen Informationen an, z.B. zu Ihren Finanzen, Ihrer Gesundheit oder anderen Themen, die sehr persönlich sind)
 
 Ich bemühe mich die Probleme schnellstmöglich zu addressieren.
 
 #### Kompatibilität mit Browsern und unterstützenden Technologien
 Die CARO App ist mit den folgenden meistgenutzten unterstützenden Technologien kompatibel:
-* der neuesten Version der Browser Google Chrome, Microsoft Edge, Mozilla Firefox und Apple Safari
+* der neuesten Version der Browser Mozilla Firefox, Microsoft Edge, Google Chrome und Apple Safari
 * in Kombination mit den neuesten Versionen von NVDA, VoiceOver und TalkBack
 
 #### Technische Spezifikationen
@@ -1704,11 +1702,12 @@ Die Barrierefreiheit der CARO App wird durch die nachstehenden Technologien unte
 * JavaScript
 
 #### Nicht barrierefreie Inhalte
-Trotz meiner Bemühungen, die CARO App barrierefrei zu gestalten, bin ich mir verschiedener Einschränkungen bewusst, die ich versuche zu beheben. Nachstehend finden Sie eine Beschreibung der mir bekannten Einschränkungen und potenzieller Lösungen. Bitte teilen Sie mir mit, wenn Sie mit einem Problem konfrontiert werden, das nicht in der Liste aufgeführt ist.
+Trotz meiner Bemühungen, die CARO App barrierefrei zu gestalten, bin ich mir verschiedener Einschränkungen bewusst, die ich versuche zu beheben sobald ich eine bessere Lösung habe. Nachstehend finden Sie eine Beschreibung der mir bekannten Einschränkungen und potenzieller Lösungen. Bitte teilen Sie mir mit, wenn Sie mit einem Problem konfrontiert werden, das nicht in der Liste aufgeführt ist.
 
 Bekannte Einschränkungen auf der CARO App:
 * Farbkontrast-Verhältnisse erreichen standardmäßig nicht die gewünschte Grenze. Sie können ein hoffentlich adäquates Farbschema im Nutzerprofil wählen.
-* Manche horizontal scrollende Bereiche haben keine Tastaturerreichbarkeit. Im Darstellungkontext ist dies schwerlich zu beheben, sollte aber für Bildschirmleser keine Probleme bereiten.
+* Manche horizontal scrollbare Bereiche haben keine direkte Tastaturerreichbarkeit. Der Desktopmodus stellt Bedienelemente für die Navigation zur Verfügung. Für Bildschirmleser sind diese verborgen. Horizontal scrollbare Bereiche reduzieren die visuelle Informationsfülle für zweitranginge aber zugehörige Informationen und werden daher als insgesamt vorteilhaft betrachtet, auch trotz möglicher Konflikte mit dem Informationsfluss-Kriterium.
+* Der Ablauf von Verbindungen ist nicht individuell anpassbar, da dies eine Servereinstellung ist. Bitte besprechen sie diese [allgemein anpassbare Einstellung](#servereinrichtung) mit Ihrem Betreiber.
 
 [Übersicht](#übersicht)
 
