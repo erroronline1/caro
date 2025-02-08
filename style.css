@@ -1627,9 +1627,15 @@ button[data-type="upvote"]::before {
 	-webkit-mask-image: url("./media/thumbs-up.svg");
 	mask-image: url("./media/thumbs-up.svg");
 }
+button[data-type="upvote"].voted::before {
+	background-color: var(--green);
+}
 button[data-type="downvote"]::before {
 	background-image: none;
 	background-color: var(--article);
 	-webkit-mask-image: url("./media/thumbs-down.svg");
 	mask-image: url("./media/thumbs-down.svg");
+}
+button[data-type="downvote"].voted::before {
+	background-color: var(--red);
 }

@@ -203,8 +203,8 @@ class MEASURE extends API {
 							'attributes' => [
 								'value' => strval($measure['votes'] ? array_sum(array_filter(array_values($measure['votes']), fn($v) => $v > 0)) : 0),
 								'data-type' => 'upvote',
-								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) > 0 ? ' green': ''),
-								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('green'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('green') ? 1 : -1));"
+								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) > 0 ? ' voted': ''),
+								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));"
 							],
 						];
 						$measurecontent[] = [
@@ -212,8 +212,8 @@ class MEASURE extends API {
 							'attributes' => [
 								'value' => strval($measure['votes'] ? abs(array_sum(array_filter(array_values($measure['votes']), fn($v) => $v < 0))) : 0),
 								'data-type' => 'downvote',
-								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) < 0 ? ' red': ''),
-								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('red'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('red') ? 1 : -1));"
+								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) < 0 ? ' voted': ''),
+								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));"
 							],
 						];
 						$measurecontent[] = [
