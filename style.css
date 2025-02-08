@@ -1223,6 +1223,10 @@ dialog a:not([data-type])::before {
 	margin: 0 0.75em 0.2em 0;
 }
 
+label[data-type]::before {
+	margin-bottom: -2.5em;
+}
+
 article > header[data-type]::before {
 	margin: 0 0.75em 0.2em -1.75em;
 }
