@@ -97,14 +97,10 @@ export const compose_helper = {
 	 * @event add widget structure to compose_helper.newDocumentComponents
 	 */
 	composeNewElementCallback: function (parent) {
-		let sibling, setTo, siblingName, siblingValue, widgetName;
+		let sibling, siblingName, siblingValue;
 
 		// define which attribute is assigned the name value, and set default values
-		const setName = {
-				name: ["select", "scanner", "radio", "photo", "file", "signature", "textselection", "checkbox"],
-				description: ["links"],
-			},
-			buttonDefaultValues = {
+		const buttonDefaultValues = {
 				calendarbutton: api._lang.GET("planning.event_new"),
 			},
 			element = {
@@ -116,7 +112,6 @@ export const compose_helper = {
 			sibling = parent.childNodes[s];
 			console.log(sibling);
 			// skip nodes
-			//if (!["span", "input", "textarea", "header", "select"].includes(sibling.localName)) {
 			if (!["label", "header", "input"].includes(sibling.localName)) {
 				continue;
 			}
@@ -1353,6 +1348,7 @@ export class Compose extends Assemble {
 				name: std.name,
 				required: true,
 				list: std.list,
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -1367,6 +1363,7 @@ export class Compose extends Assemble {
 					value: alias.value || "",
 					name: alias.name,
 					required: true,
+					"data-loss": "prevent",
 				},
 			};
 			result = result.concat(...this.text());
@@ -1381,6 +1378,7 @@ export class Compose extends Assemble {
 					id: "ComponentContext",
 					name: context.name,
 					required: true,
+					"data-loss": "prevent",
 				},
 				content: context.content,
 			};
@@ -1394,6 +1392,7 @@ export class Compose extends Assemble {
 				type: "checkbox",
 				hint: permitted_export.hint,
 				content: permitted_export.content,
+				"data-loss": "prevent",
 			};
 			result = result.concat(...this.checkbox());
 		}
@@ -1406,6 +1405,7 @@ export class Compose extends Assemble {
 				attributes: {
 					name: api._lang.GET("assemble.compose.document.document_restricted_access"),
 					id: "ComponentRestrictedAccess",
+					"data-loss": "prevent",
 				},
 				hint: restricted_access.hint,
 			};
@@ -1420,6 +1420,7 @@ export class Compose extends Assemble {
 				attributes: {
 					name: api._lang.GET("assemble.compose.document.document_regulatory_context"),
 					id: "ComponentRegulatoryContext",
+					"data-loss": "prevent",
 				},
 			};
 			result = result.concat(...this.checkbox2text());
@@ -1434,6 +1435,7 @@ export class Compose extends Assemble {
 					id: "ComponentApprove",
 					name: approve.name,
 					required: true,
+					"data-loss": "prevent",
 				},
 				content: approve.content,
 			};
@@ -1635,6 +1637,7 @@ export class Compose extends Assemble {
 			type: "documentbutton",
 			numeration: "prevent",
 			attributes: {
+				"data-loss": "prevent",
 				name: api._lang.GET("assemble.compose.component.link_document"),
 			},
 			content: document,
@@ -1679,6 +1682,7 @@ export class Compose extends Assemble {
 			type: "image",
 			numeration: "prevent",
 			attributes: {
+				"data-loss": "prevent",
 				name: api._lang.GET("assemble.compose.component.image_description"),
 			},
 		};
@@ -1714,6 +1718,7 @@ export class Compose extends Assemble {
 				name: api._lang.GET("assemble.compose.component.field_name"),
 				maxlength: 80,
 				required: true,
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -1722,6 +1727,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -1730,14 +1736,17 @@ export class Compose extends Assemble {
 		};
 		this.currentElement.content[api._lang.GET("assemble.compose.component.required")] = {
 			name: api._lang.GET("assemble.compose.component.required"),
+			"data-loss": "prevent",
 		};
 		if (type.multiple)
 			this.currentElement.content[api._lang.GET("assemble.compose.component.multiple")] = {
 				name: api._lang.GET("assemble.compose.component.multiple"),
+				"data-loss": "prevent",
 			};
 		if (type.type === "textarea")
 			this.currentElement.content[api._lang.GET("assemble.compose.component.texttemplate")] = {
 				name: api._lang.GET("assemble.compose.component.texttemplate"),
+				"data-loss": "prevent",
 			};
 		result = result.concat(...this.br(), ...this.checkbox());
 		this.currentElement = {
@@ -1797,6 +1806,7 @@ export class Compose extends Assemble {
 				name: api._lang.GET("assemble.compose.component.multilist_name"),
 				maxlength: 80,
 				required: true,
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -1805,6 +1815,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -1814,6 +1825,7 @@ export class Compose extends Assemble {
 				rows: 3,
 				name: api._lang.GET("assemble.compose.component.multilist_add_item") + "[]",
 				required: true,
+				"data-loss": "prevent",
 			},
 		};
 		if (type.type === "links") result = result.concat(...this.text());
@@ -1837,10 +1849,12 @@ export class Compose extends Assemble {
 			if (type.required !== undefined)
 				this.currentElement.content[api._lang.GET("assemble.compose.component.required")] = {
 					name: api._lang.GET("assemble.compose.component.required"),
+					"data-loss": "prevent",
 				};
 			if (type.multiple !== undefined)
 				this.currentElement.content[api._lang.GET("assemble.compose.component.multiple")] = {
 					name: api._lang.GET("assemble.compose.component.multiple"),
+					"data-loss": "prevent",
 				};
 			result = result.concat(...this.br(), ...this.checkbox());
 		}
@@ -1939,6 +1953,7 @@ export class Compose extends Assemble {
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.simple_element"),
 				required: true,
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -1947,6 +1962,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -1955,6 +1971,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.range_min"),
+				"data-loss": "prevent",
 			},
 			hint: api._lang.GET("assemble.compose.component.range_min_hint"),
 		};
@@ -1964,6 +1981,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.range_max"),
+				"data-loss": "prevent",
 			},
 			hint: api._lang.GET("assemble.compose.component.range_max_hint"),
 		};
@@ -1973,6 +1991,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.range_step"),
+				"data-loss": "prevent",
 			},
 			hint: api._lang.GET("assemble.compose.component.range_step_hint"),
 		};
@@ -2006,6 +2025,7 @@ export class Compose extends Assemble {
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.raw"),
 				id: "_compose_raw",
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.code());
@@ -2106,6 +2126,7 @@ export class Compose extends Assemble {
 				name: api._lang.GET("assemble.compose.component.simple_element"),
 				maxlength: 80,
 				required: true,
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -2114,6 +2135,7 @@ export class Compose extends Assemble {
 			numeration: "prevent",
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.field_hint"),
+				"data-loss": "prevent",
 			},
 			hint: type.hint ? type.hint : null,
 		};
@@ -2124,6 +2146,7 @@ export class Compose extends Assemble {
 			};
 			this.currentElement.content[api._lang.GET("assemble.compose.component.required")] = {
 				name: api._lang.GET("assemble.compose.component.required"),
+				"data-loss": "prevent",
 			};
 			result = result.concat(...this.br(), ...this.checkbox());
 		}
@@ -2135,12 +2158,14 @@ export class Compose extends Assemble {
 		if (type.multiple !== undefined) {
 			this.currentElement.content[api._lang.GET("assemble.compose.component.multiple")] = {
 				name: api._lang.GET("assemble.compose.component.multiple"),
+				"data-loss": "prevent",
 			};
 		}
 		if (type.type === "scanner") {
 			this.currentElement.content[api._lang.GET("assemble.compose.component.context_identify")] = {
 				name: api._lang.GET("assemble.compose.component.context_identify"),
 				id: "setIdentify",
+				"data-loss": "prevent",
 			};
 		}
 		if (Object.keys(this.currentElement.content).length) result = result.concat(...this.br(), ...this.checkbox());
@@ -2222,6 +2247,7 @@ export class Compose extends Assemble {
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.textsection_description"),
 				required: true,
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.text());
@@ -2231,6 +2257,7 @@ export class Compose extends Assemble {
 			attributes: {
 				name: api._lang.GET("assemble.compose.component.textsection_content"),
 				rows: 5,
+				"data-loss": "prevent",
 			},
 		};
 		result = result.concat(...this.textarea());
