@@ -461,7 +461,7 @@ export class Toast {
 			pauseimg.classList.add("pause");
 			pauseimg.src = "./media/equals.svg";
 			pauseimg.alt = api._lang.GET("assemble.render.aria.pause");
-			pauseimg.onclick = new Function("window.clearTimeout(window.toasttimeout['"+destination+"']);");
+			pauseimg.onclick = new Function("window.clearTimeout(window.toasttimeout['" + destination + "']);");
 			msg.innerHTML = message;
 			this.toast.replaceChildren(closeimg, pauseimg, msg, div);
 			this.toast.show();
@@ -1672,6 +1672,7 @@ export class Assemble {
 
 		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
+			label.dataset.multiple = "multiple";
 			input.onchange = () => {
 				// arrow function for reference of this.names
 				if (input.value) {
