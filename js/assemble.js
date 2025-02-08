@@ -56,18 +56,16 @@ export const assemble_helper = {
 		icons[api._lang.GET("menu.files.header")] = "url('./media/folders.svg')";
 		icons[api._lang.GET("menu.tools.header")] = "url('./media/tools.svg')";
 
-		let label, div, input, div2, button, span;
+		let label, input, div, button, span;
 		// iterate over main categories
 		for (const [group, items] of Object.entries(content)) {
 			label = document.createElement("label");
-			div = document.createElement("div");
 
 			// set up label and notification element
 			label.htmlFor = "userMenu" + group;
 			label.style.maskImage = label.style.webkitMaskImage = icons[group];
-			div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
-			div.setAttribute("data-notification", 0);
-			div.append(label);
+			label.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
+			label.setAttribute("data-notification", 0);
 
 			// set up radio input for css checked condition
 			input = document.createElement("input");
@@ -80,13 +78,13 @@ export const assemble_helper = {
 			input.title = group;
 
 			// set up div containing subsets of category
-			div2 = document.createElement("div");
-			div2.classList.add("options");
-			div2.role = "menu";
+			div = document.createElement("div");
+			div.classList.add("options");
+			div.role = "menu";
 			span = document.createElement("span");
 			span.append(document.createTextNode(group));
-			div2.append(span);
-			div2.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
+			div.append(span);
+			div.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
 
 			// iterate over subset
 			for (const [description, attributes] of Object.entries(items)) {
@@ -102,18 +100,18 @@ export const assemble_helper = {
 					button.setAttribute("data-notification", 0);
 					button.appendChild(document.createTextNode(description));
 					button.role = "menuitem";
-					div2.append(button);
+					div.append(button);
 				}
 				// create description element
 				else {
 					span = document.createElement("span");
 					span.append(document.createTextNode(description));
-					div2.append(span);
+					div.append(span);
 				}
 			}
-			elements.push(div);
+			elements.push(label);
 			elements.push(input);
-			elements.push(div2);
+			elements.push(div);
 		}
 		menu.replaceChildren(...elements);
 		// trigger notifications

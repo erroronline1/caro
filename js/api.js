@@ -340,7 +340,7 @@ export const api = {
 						let applicationLabel;
 						while (!applicationLabel) {
 							await _.sleep(50);
-							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.application.header") + "]>label");
+							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.application.header") + "]");
 						}
 						applicationLabel.style.maskImage = applicationLabel.style.webkitMaskImage = "none";
 						applicationLabel.style.backgroundImage = "url('" + api._settings.user.image + "')";

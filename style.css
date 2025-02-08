@@ -368,7 +368,7 @@ nav {
 	vertical-align: top;
 	text-align: center;
 
-	div[data-notification]::after,
+	label[data-notification]::after,
 	button[data-notification]::after {
 		content: attr(data-notification);
 		color: var(--notif);
@@ -385,25 +385,20 @@ nav {
 		margin-left: 0.75em;
 	}
 
-	div[data-notification="0"]::after,
+	label[data-notification="0"]::after,
 	button[data-notification="0"]::after {
 		display: none;
 	}
 
-	div[data-for] {
+	label[data-for] {
 		display: inline-block;
 		margin: 0 0.75em;
-		width: fit-content;
-		height: fit-content;
 
-		label {
-			display: block;
-			background-color: var(--cta_darker);
-			cursor: pointer;
-			width: 2.5em;
-			height: 2.5em;
-			padding: 0.2em;
-		}
+		background-color: var(--cta_darker);
+		cursor: pointer;
+		width: 2.5em;
+		height: 2.5em;
+		padding: 0.2em;
 	}
 
 	input {
@@ -411,7 +406,7 @@ nav {
 		width: auto;
 	}
 
-	div[data-for="userMenuApplication"] > label {
+	label[data-for="userMenuApplication"] > label {
 		border-radius: 50%;
 		background-size: cover;
 		background-repeat: no-repeat;
