@@ -179,6 +179,7 @@ class TEXTTEMPLATE extends API {
 					ksort($templates);
 					$renderoptions[] = [
 						'type' => 'select',
+						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.chunk.select', [':unit' => $this->_lang->_USER['units'][$unit]]),
 							'onchange' => "api.texttemplate('get', 'chunk', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
@@ -192,6 +193,7 @@ class TEXTTEMPLATE extends API {
 					ksort($templates);
 					$renderalloptions[] = [
 						'type' => 'select',
+						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.chunk.all', [':unit' => $this->_lang->_USER['units'][$unit]]),
 							'onchange' => "api.texttemplate('get', 'chunk', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
@@ -221,6 +223,7 @@ class TEXTTEMPLATE extends API {
 								...$renderoptions,
 								[
 									'type' => 'search',
+									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
 										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
@@ -232,6 +235,7 @@ class TEXTTEMPLATE extends API {
 								...$renderalloptions,
 								[
 									'type' => 'search',
+									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
 										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
@@ -453,6 +457,7 @@ class TEXTTEMPLATE extends API {
 					ksort($templates);
 					$renderoptions[] = [
 						'type' => 'select',
+						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.template.select', [':unit' => $this->_lang->_USER['units'][$unit]]),
 							'onchange' => "api.texttemplate('get', 'template', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
@@ -466,6 +471,7 @@ class TEXTTEMPLATE extends API {
 					ksort($templates);
 					$renderalloptions[] = [
 						'type' => 'select',
+						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.template.all', [':unit' => $this->_lang->_USER['units'][$unit]]),
 							'onchange' => "api.texttemplate('get', 'template', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
@@ -501,6 +507,7 @@ class TEXTTEMPLATE extends API {
 							...$renderoptions,
 							[
 								'type' => 'search',
+								'numeration' => 'prevent',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
 									'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
@@ -512,6 +519,7 @@ class TEXTTEMPLATE extends API {
 							...$renderalloptions,
 							[
 								'type' => 'search',
+								'numeration' => 'prevent',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
 									'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"

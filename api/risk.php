@@ -293,6 +293,7 @@ class RISK extends API {
 						foreach($select[$type] as $process => $dbrisks){
 							$typeselection[] = [
 								'type' => 'select',
+								'numeration' => 'prevent',
 								'attributes' => [
 									'name' => $process,
 									'onchange' => "if (this.value !== '...') api.risk('get', 'risk', this.value)"

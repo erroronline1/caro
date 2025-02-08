@@ -460,6 +460,7 @@ class DOCUMENT extends API {
 							[
 								[
 									'type' => 'select',
+									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle_select'),
 										'onchange' => "api.document('get', 'bundle', this.value)"
@@ -467,6 +468,7 @@ class DOCUMENT extends API {
 									'content' => $options
 								], [
 									'type' => 'search',
+									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle'),
 										'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"
@@ -476,6 +478,7 @@ class DOCUMENT extends API {
 							], [
 								[
 									'type' => 'select',
+									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle_all'),
 										'onchange' => "api.document('get', 'bundle', this.value)"
@@ -951,6 +954,7 @@ class DOCUMENT extends API {
 			ksort($components);
 			$options_selection[] = [
 				'type' => 'select',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'name' => $this->_lang->_USER['units'][$unit],
 					'onchange' => "api.document('get', 'component_editor', this.value)"
@@ -965,6 +969,7 @@ class DOCUMENT extends API {
 			ksort($components);
 			$alloptions_selection[] = [
 				'type' => 'select',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'name' => $this->_lang->_USER['units'][$unit],
 					'onchange' => "api.document('get', 'component_editor', this.value)"
@@ -1010,6 +1015,7 @@ class DOCUMENT extends API {
 						...$options_selection,
 						[
 							'type' => 'search',
+							'numeration' => 'prevent',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.component.existing_components'),
 								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component_editor', this.value); return false;}"
@@ -1649,6 +1655,7 @@ class DOCUMENT extends API {
 			ksort($components);
 			$options_selection[] = [
 				'type' => 'select',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'name' => $this->_lang->_USER['units'][$unit],
 					'onchange' => "api.document('get', 'document_editor', this.value)"
@@ -1663,6 +1670,7 @@ class DOCUMENT extends API {
 			ksort($components);
 			$alloptions_selection[] = [
 				'type' => 'select',
+				'numeration' => 'prevent',
 				'attributes' => [
 					'name' => $this->_lang->_USER['units'][$unit],
 					'onchange' => "api.document('get', 'document_editor', this.value)"
@@ -1773,6 +1781,7 @@ class DOCUMENT extends API {
 						...$options_selection,
 						[
 							'type' => 'search',
+							'numeration' => 'prevent',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.document.existing_documents'),
 								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'document_editor', this.value); return false;}"
@@ -1799,6 +1808,7 @@ class DOCUMENT extends API {
 					...$components_selection,
 					[
 						'type' => 'search',
+						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('assemble.compose.document.add_component'),
 							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component', this.value); return false;}"
