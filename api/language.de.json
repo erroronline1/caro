@@ -359,15 +359,16 @@
 		},
 		"render": {
 			"aria": {
-				"add":"Weiteres hinzufügen",
+				"add": "Weiteres hinzufügen",
 				"cancel": "Abbrechen",
 				"extend": "erweitern / verbergen",
 				"image": "Bild :image",
 				"pause": "Anhalten",
 				"preview": "Vorschau",
-				"scan_button_generic":"Feld",
-				"search":"Suche",
+				"scan_button_generic": "Feld",
+				"search": "Suche",
 				"signature": "Unterschriftenfeld",
+				"timeout": "Du wirst in weniger als :seconds Sekunden automatisch abgemeldet!",
 				"toleft": "nach links schieben",
 				"toright": "nach rechts schieben"
 			},
@@ -534,7 +535,7 @@
 		"userskills_warning_description": "Manche gewünschten Fähigkeiten haben keine Zuordnung!"
 	},
 	"calendar": {
-		"daily_title":":day: :number Einträge",
+		"daily_title": ":day: :number Einträge",
 		"month_next": "nächster Monat",
 		"month_previous": "voriger Monat",
 		"schedule": {

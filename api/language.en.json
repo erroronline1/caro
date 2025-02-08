@@ -359,15 +359,16 @@
 		},
 		"render": {
 			"aria": {
-				"add":"Add another",
+				"add": "Add another",
 				"cancel": "Cancel",
 				"extend": "Extend / collapse",
 				"image": "Image of :image",
 				"pause": "Pause",
 				"preview": "Preview",
-				"scan_button_generic":"field",
-				"search":"Search",
+				"scan_button_generic": "field",
+				"search": "Search",
 				"signature": "Signature field",
+				"timeout": "You are about to be logged out in less than :seconds seconds!",
 				"toleft": "slide to left",
 				"toright": "slide to right"
 			},
@@ -532,7 +533,7 @@
 		"userskills_warning_description": "Some defined skills are not matched!"
 	},
 	"calendar": {
-		"daily_title":":day: :number enries",
+		"daily_title": ":day: :number enries",
 		"month_next": "next month",
 		"month_previous": "previous month",
 		"schedule": {
