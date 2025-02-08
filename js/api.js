@@ -216,6 +216,7 @@ export const api = {
 					return;
 				}
 				api.session_timeout.render(0);
+				new Toast();
 				clearInterval(api.session_timeout.interval);
 				clearInterval(_serviceWorker.notif.interval);
 				_serviceWorker.notif.interval = null;
