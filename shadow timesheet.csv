@@ -1,251 +1,252 @@
-;"=SUM(B:B)";"=ROUND(B1/((365-30-5-12-104)*7.7/12), 2)"
-22.9.23;5;"ui"
-25.9.23;2;"ui"
-29.9.23;5;"ui, ui-assembler"
-30.9.23;6;"ui-assembler"
-1.10.23;6;"ui-assembler, signature"
-3.10.23;3;"backend preparation"
-4.10.23;2;"ui-assembler"
-5.10.23;2;"ui, ui-assembler"
-6.10.23;2;"ui-assembler, signature"
-7.10.23;12;"ui, qr-reader, ui-composer"
-13.10.23;8;"ui-composer"
-14.10.23;10;"ui-composer"
-18.10.23;2;"ui-composer"
-20.10.23;6;"ui-assembler, ui-composer"
-21.10.23;8;"ui-assembler, ui-composer"
-25.10.23;2;"ui"
-27.10.23;7;"user-api"
-28.10.23;10;"user-api, document-api"
-29.10.23;9;"api, login, permissions"
-30.10.23;7;"sql-queries, language setup"
-31.10.23;5;"api"
-1.11.23;3;"restful api"
-3.11.23;9;"restful api, csv-filter"
-4.11.23;8;"csv-filter"
-9.11.23;4;"csv-filter"
-10.11.23;5;"consumables-api"
-11.11.23;8;"consumables-api"
-12.11.23;5;"fileserver, api"
-18.11.23;8;"consumables-api"
-19.11.23;4;"api"
-30.11.23;2;"ui-assembler"
-1.12.23;6;"order-api"
-9.12.23;6;"order-api"
-15.12.23;7;"order-api"
-21.12.23;1;"repo"
-22.12.22;7;"order-api"
-23.12.23;6;"conversation-api"
-27.12.23;1;"conversation-api"
-28.12.23;1;"order-api"
-29.12.23;7;"order-api"
-30.12.23;8;"service-worker, conversation-api"
-1.1.24;4;"service-worker"
-3.1.24;1;"conversation-api, service-worker"
-4.1.24;2;"service-worker"
-5.1.24;4;"service-worker, ui"
-6.1.24;4;"service-worker, notifications"
-7.1.24;2;"notifications"
-10.1.24;1;"file-api"
-12.1.24;7;"file-api, user-api"
-13.1.24;10;"tool-api, stl-viewer, 2d code generator, application-api, manual"
-14.1.24;2;"consumables-api, install routine"
-17.1.24;3;"ui-assembler"
-19.1.24;8;"ui, ui-assembler"
-20.1.24;5;"ui, ui-assembler"
-21.1.24;1;"user-api"
-25.1.24;1;"ui-assembler"
-26.1.24;4;"ui"
-27.1.24;11;"ui, order-api"
-30.1.24;1;"ui"
-31.1.24;2;"ui"
-1.2.24;2;"ui, scanner"
-2.2.24;8;"order-api, ui-composer"
-3.2.24;7;"ui-composer"
-5.2.24;3;"ui-composer"
-6.2.24;2;"ui-assembler, ui-composer"
-9.2.24;8;"order-api, ui-assembler, ui-composer"
-12.2.24;1;"ui"
-14.2.24;6;"order-api, user-api, document-api"
-15.2.24;1;"document-api"
-16.2.24;6;"document-api"
-18.2.24;2;"documentation"
-19.2.24;2;"document-api"
-23.2.24;8;"texttemplate-api"
-24.2.24;8;"texttemplate-api, csvfilter-api, csvfilter"
-1.3.24;8;"pdf-library, record-api"
-2.3.24;8;"record-api"
-4.3.24;2;"record-api"
-8.3.24;4;"texttemplate-api, record-api"
-9.3.24;11;"record-api, ui-composer"
-12.3.24;1;"record-api"
-14.3.24;1;"audit-api"
-15.3.24;8;"ui-assembler, record-api"
-16.3.24;8;"order-api, consumables-api, documentation, document-api"
-21.3.24;2;"order-api, document-api"
-22.3.24;8;"document-api"
-23.3.24;9;"ui-composer, consumables-api"
-25.3.24;1;"documentation"
-27.3.24;2;"documentation"
-28.3.24;7;"csv-processor, consumables-api, record-api"
-12.4.24;6;"csv-processor, consumables-api"
-13.4.24;7;"csv-processor"
-14.4.24;2;"csv-processor"
-15.4.24;2;"sql-interface"
-18.4.24;2;"csv-processor"
-19.4.24;5;"order-api"
-26.4.24;4;"record-api"
-30.4.24;4;"calendar-api"
-1.5.24;3;"calendar-api"
-2.5.24;3;"calendar-api"
-3.5.24;6;"calendar-api, audit-api"
-4.5.24;6;"csv-processor, consumables-api, ui-assembler, ui-composer, calendar-api"
-8.5.24;6;"conversation-api"
-10.5.24;7;"ui-composer, ui-assembler, file-api"
-11.5.24;6;"documentation, ui-assembler, file-api"
-13.5.24;4;"document-api, calendar-api"
-14.5.24;6;"calendar-api"
-15.5.24;5;"calendar-api"
-16.5.24;4;"calendar-api"
-17.5.24;10;"calendar-api"
-18.5.24;6;"calendar-api"
-19.5.24;5;"calendar-api"
-24.5.24;6;"calendar-api, documentation, consumables-api"
-25.5.24;8;"consumables-api, documentation, calendar-api"
-30.5.24;6;"api (permissions, connectivity), documentation"
-31.5.24;6;"api (permissions), documentation"
-1.6.24;8;"consumables-api, order-api, audit-api"
-4.6.24;2;"api (modularization), notifications"
-6.6.24;3;"sql-interface"
-7.6.24;8;"sql-interface"
-8.6.24;8;"order-api, api (login), terms of service, document-api"
-10.6.24;1;"documentation"
-11.6.24;2;"sql-interface, documentation"
-12.6.24;1;"documentation"
-13.6.24;2;"documentation"
-14.6.24;4;"user-api, conversation-api, documentation"
-15.6.24;7;"consumables-api, service-worker, post validity"
-18.6.24;2;"database-update process"
-20.6.24;2;"consumables-api"
-21.6.24;7;"consumables-api, ui"
-22.6.24;6;"consumables-api, ui, user-api, audit-api"
-28.6.24;5;"ui-assembler, ui-composer, user-api"
-29.6.24;6;"ui, code maintenance, calendar-api"
-4.7.24;2;"record-api"
-5.7.24;4;"purchase-api"
-6.7.24;6;"user-api, audit-api"
-11.7.24;1;"audit-api"
-12.7.24;6;"audit-api, risk-api"
-14.7.24;3;"risk-api, audit-api, documentation, unittests"
-16.7.24;1;"unittests"
-17.7.24;2;"ui"
-19.7.24;3;"order-api"
-20.7.24;7;"order-api, audit-api"
-24.7.24;2;"documentation"
-26.7.24;6;"order-api, translation"
-27.7.24;7;"translation"
-28.7.24;1;"translation"
-29.7.24;1;"translation"
-30.7.24;1;"translation"
-31.7.24;1;"translation"
-1.8.24;4;"translation"
-2.8.24;7;"translation, documentation, record-api"
-3.8.24;3;"documentation, record-api, audit-api"
-9.8.24;1;"api"
-16.8.24;6;"document-api, record-api, language-handler, documentation"
-17.8.24;6;"record-api"
-22.8.24;1;"tool-api"
-23.8.24;7;"tool-api, record-api"
-24.8.24;8;"record-api, conversation-api"
-30.8.24;2;"record-api, documentation"
-31.8.24;7;"record-api, message-api, documentation"
-6.9.24;6;"record-api, ui-assembler, audit-api, database-update process"
-7.9.24;6;"purchase-api, order-api, texttemplate-api, documentation"
-13.9.24;7;"calendar-api, record-api, documentation, stress-test"
-14.9.24;4;"ui"
-19.9.24;2;"document-api, record-api"
-20.9.24;8;"ui-assembler"
-21.9.24;9;"ui-assembler, document-api, templates"
-22.9.24;3;"ui-composer, templates"
-24.9.24;2;"templates"
-25.9.24;3;"record-api, ui-composer"
-26.9.24;1;"ui-composer"
-27.9.24;8;"record-api"
-28.9.24;9;"record-api, documentation"
-30.9.24;2;"miscellaneous minor bug-fixes"
-1.10.24;1;"scanner-translation"
-2.10.24;1;"scanner-translation"
-4.10.24;4;"miscellaneous minor bug-fixes"
-5.10.24;8;"document-api"
-11.10.24;7;"record-api"
-12.10.24;6;"record-api, consumables-api"
-19.10.24;4;"record-api, stress-test, ui-assembler, unittests"
-24.10.24;3;"order-api"
-25.10.24;6;"order-api"
-26.10.24;6;"order-api"
-27.10.24;3;"record-api"
-28.10.24;4;"record-api, order-api, consumables-api"
-29.10.24;4;"audit-api, record-api, ui-composer"
-30.10.24;3;"audit-api, record-api, document-api"
-31.10.24;2;"record-api, order-api"
-01.11.24;8;"order-api, csv-processor, templates, record-api, code maintenance"
-03.11.24;2;"calendar-api"
-09.11.24;2;"audit-api"
-10.11.24;7;"documentation, record-api"
-12.11.24;2;"documentation"
-14.11.24;3;"templates"
-15.11.24;7;"templates, audit-api, user-api, notification"
-16.11.24;6;"order-api, templates, audit-api, notification, consumables-api"
-19.11.24:2;"documentation"
-20.11.24;2;"consumables-api, documentation"
-23.11.24;2;"documentation"
-24.11.24;1;"language-handler"
-29.11.24;4;"api, record-api, documentation"
-30.11.24;9;"document-api, tool-api, documentation"
-01.12.24;1;"record-api"
-06.12.24;6;"document-api, record-api"
-07.12.24;6;"stress-test, templates, documentation"
-11.12.24;1;"templates, record-api"
-12.12.24;3;"pdf-library, order-api, record-api"
-13.12.24;7:"file-api, document-api, record-api, application-api"
-14.12.24;12;"code maintenance, development-setup"
-17.12.24;2;"delevopment-setup, records-api"
-18.12.24;2;"user-api, record-api"
-20.12.24;6;"consumables-api, audit-api, order-api" 
-21.12.24;5;"order-api, development-setup"
-22.12.24;9;"safari-compatibility, ui"
-23.12.24;3;"ui-composer, document-api, record-api, pdf-library"
-25.12.24;7;"file-api, record-api, order-api, documentation"
-26.12.24;7;"language-handler"
-27.12.24;12;"language-handler, audit-api, record-api, document-api, code maintenance, documentation"
-28.12.24;5;"code maintenance, documentation"
-29.12.24;5;"code maintenance, documentation"
-30.12.24;8;"code maintenance, documentation"
-31.12.24;1;"application-api"
-03.01.25;7;"purchase-api, templates, stress-test, install routine"
-04.01.25;4;"code maintenance, documentation"
-05.01.25;3;"code maintenance, templates"
-06.01.25;3;"templates, install routine"
-08.01.25;2;"database type maintenance"
-10.01.25;7;"stress-test, risk-api"
-11.01.25;10;"risk-api, templates, ui"
-12.01.25;1;"ui"
-13.01.25;1;"install routine, ui-composer"
-14.01.25;1;"risk-api, ui"
-17.01.25;4;"install routine, ui-assembler, risk-api"
-18.01.25;8;"ui, audit-api"
-19.01.25;2;"risk-api, audit-api"
-22.01.25;2;"documentation, config handling"
-23.01.25;2;"file-api"
-24.01.25;8;"file-api, install routine, api, ui-assembler, texttemplates-api, consumables-api"
-25.01.25;11;"consumables-api, audit-api, documentation"
-26.01.25;2;"documentation, language"
-28.01.25;1;"language-handler
-29.01.25;2;"document-api"
-31.01.25;8;"consumables-api, audit-api"
-01.02.25;11;"audit-api"
-04.02.25;2;"measure-api"
-05.02.25;2;"install routine, stress test, templates, documentation"
-06.02.25;1;"ui-assembler"
-07.02.25;8;"ui-assembler"
-08.02.25;8;"ui-assembler, documentation, ui-composer"
+,=SUM(B:B),"=ROUND(B1/((365-30-5-12-104)*7.7/12), 2)"
+22.9.23,5,ui
+25.9.23,2,ui
+29.9.23,5,"ui, ui-assembler"
+30.9.23,6,ui-assembler
+01.10.23,6,"ui-assembler, signature"
+03.10.23,3,backend preparation
+04.10.23,2,ui-assembler
+05.10.23,2,"ui, ui-assembler"
+06.10.23,2,"ui-assembler, signature"
+07.10.23,12,"ui, qr-reader, ui-composer"
+13.10.23,8,ui-composer
+14.10.23,10,ui-composer
+18.10.23,2,ui-composer
+20.10.23,6,"ui-assembler, ui-composer"
+21.10.23,8,"ui-assembler, ui-composer"
+25.10.23,2,ui
+27.10.23,7,user-api
+28.10.23,10,"user-api, document-api"
+29.10.23,9,"api, login, permissions"
+30.10.23,7,"sql-queries, language setup"
+31.10.23,5,api
+01.11.23,3,restful api
+03.11.23,9,"restful api, csv-filter"
+04.11.23,8,csv-filter
+09.11.23,4,csv-filter
+10.11.23,5,consumables-api
+11.11.23,8,consumables-api
+12.11.23,5,"fileserver, api"
+18.11.23,8,consumables-api
+19.11.23,4,api
+30.11.23,2,ui-assembler
+01.12.23,6,order-api
+09.12.23,6,order-api
+15.12.23,7,order-api
+21.12.23,1,repo
+22.12.22,7,order-api
+23.12.23,6,conversation-api
+27.12.23,1,conversation-api
+28.12.23,1,order-api
+29.12.23,7,order-api
+30.12.23,8,"service-worker, conversation-api"
+01.01.24,4,service-worker
+03.01.24,1,"conversation-api, service-worker"
+04.01.24,2,service-worker
+05.01.24,4,"service-worker, ui"
+06.01.24,4,"service-worker, notifications"
+07.01.24,2,notifications
+10.01.24,1,file-api
+12.01.24,7,"file-api, user-api"
+13.01.24,10,"tool-api, stl-viewer, 2d code generator, application-api, manual"
+14.01.24,2,"consumables-api, install routine"
+17.01.24,3,ui-assembler
+19.01.24,8,"ui, ui-assembler"
+20.01.24,5,"ui, ui-assembler"
+21.01.24,1,user-api
+25.01.24,1,ui-assembler
+26.01.24,4,ui
+27.01.24,11,"ui, order-api"
+30.01.24,1,ui
+31.01.24,2,ui
+01.02.24,2,"ui, scanner"
+02.02.24,8,"order-api, ui-composer"
+03.02.24,7,ui-composer
+05.02.24,3,ui-composer
+06.02.24,2,"ui-assembler, ui-composer"
+09.02.24,8,"order-api, ui-assembler, ui-composer"
+12.02.24,1,ui
+14.02.24,6,"order-api, user-api, document-api"
+15.02.24,1,document-api
+16.02.24,6,document-api
+18.02.24,2,documentation
+19.02.24,2,document-api
+23.02.24,8,texttemplate-api
+24.02.24,8,"texttemplate-api, csvfilter-api, csvfilter"
+01.03.24,8,"pdf-library, record-api"
+02.03.24,8,record-api
+04.03.24,2,record-api
+08.03.24,4,"texttemplate-api, record-api"
+09.03.24,11,"record-api, ui-composer"
+12.03.24,1,record-api
+14.03.24,1,audit-api
+15.03.24,8,"ui-assembler, record-api"
+16.03.24,8,"order-api, consumables-api, documentation, document-api"
+21.03.24,2,"order-api, document-api"
+22.03.24,8,document-api
+23.03.24,9,"ui-composer, consumables-api"
+25.03.24,1,documentation
+27.03.24,2,documentation
+28.03.24,7,"csv-processor, consumables-api, record-api"
+12.04.24,6,"csv-processor, consumables-api"
+13.04.24,7,csv-processor
+14.04.24,2,csv-processor
+15.04.24,2,sql-interface
+18.04.24,2,csv-processor
+19.04.24,5,order-api
+26.04.24,4,record-api
+30.04.24,4,calendar-api
+01.05.24,3,calendar-api
+02.05.24,3,calendar-api
+03.05.24,6,"calendar-api, audit-api"
+04.05.24,6,"csv-processor, consumables-api, ui-assembler, ui-composer, calendar-api"
+08.05.24,6,conversation-api
+10.05.24,7,"ui-composer, ui-assembler, file-api"
+11.05.24,6,"documentation, ui-assembler, file-api"
+13.05.24,4,"document-api, calendar-api"
+14.05.24,6,calendar-api
+15.05.24,5,calendar-api
+16.05.24,4,calendar-api
+17.05.24,10,calendar-api
+18.05.24,6,calendar-api
+19.05.24,5,calendar-api
+24.05.24,6,"calendar-api, documentation, consumables-api"
+25.05.24,8,"consumables-api, documentation, calendar-api"
+30.05.24,6,"api (permissions, connectivity), documentation"
+31.05.24,6,"api (permissions), documentation"
+01.06.24,8,"consumables-api, order-api, audit-api"
+04.06.24,2,"api (modularization), notifications"
+06.06.24,3,sql-interface
+07.06.24,8,sql-interface
+08.06.24,8,"order-api, api (login), terms of service, document-api"
+10.06.24,1,documentation
+11.06.24,2,"sql-interface, documentation"
+12.06.24,1,documentation
+13.06.24,2,documentation
+14.06.24,4,"user-api, conversation-api, documentation"
+15.06.24,7,"consumables-api, service-worker, post validity"
+18.06.24,2,database-update process
+20.06.24,2,consumables-api
+21.06.24,7,"consumables-api, ui"
+22.06.24,6,"consumables-api, ui, user-api, audit-api"
+28.06.24,5,"ui-assembler, ui-composer, user-api"
+29.06.24,6,"ui, code maintenance, calendar-api"
+04.07.24,2,record-api
+05.07.24,4,purchase-api
+06.07.24,6,"user-api, audit-api"
+11.07.24,1,audit-api
+12.07.24,6,"audit-api, risk-api"
+14.07.24,3,"risk-api, audit-api, documentation, unittests"
+16.07.24,1,unittests
+17.07.24,2,ui
+19.07.24,3,order-api
+20.07.24,7,"order-api, audit-api"
+24.07.24,2,documentation
+26.07.24,6,"order-api, translation"
+27.07.24,7,translation
+28.07.24,1,translation
+29.07.24,1,translation
+30.07.24,1,translation
+31.07.24,1,translation
+01.08.24,4,translation
+02.08.24,7,"translation, documentation, record-api"
+03.08.24,3,"documentation, record-api, audit-api"
+09.08.24,1,api
+16.08.24,6,"document-api, record-api, language-handler, documentation"
+17.08.24,6,record-api
+22.08.24,1,tool-api
+23.08.24,7,"tool-api, record-api"
+24.08.24,8,"record-api, conversation-api"
+30.08.24,2,"record-api, documentation"
+31.08.24,7,"record-api, message-api, documentation"
+06.09.24,6,"record-api, ui-assembler, audit-api, database-update process"
+07.09.24,6,"purchase-api, order-api, texttemplate-api, documentation"
+13.09.24,7,"calendar-api, record-api, documentation, stress-test"
+14.09.24,4,ui
+19.09.24,2,"document-api, record-api"
+20.09.24,8,ui-assembler
+21.09.24,9,"ui-assembler, document-api, templates"
+22.09.24,3,"ui-composer, templates"
+24.09.24,2,templates
+25.09.24,3,"record-api, ui-composer"
+26.09.24,1,ui-composer
+27.09.24,8,record-api
+28.09.24,9,"record-api, documentation"
+30.09.24,2,miscellaneous minor bug-fixes
+01.10.24,1,scanner-translation
+02.10.24,1,scanner-translation
+04.10.24,4,miscellaneous minor bug-fixes
+05.10.24,8,document-api
+11.10.24,7,record-api
+12.10.24,6,"record-api, consumables-api"
+19.10.24,4,"record-api, stress-test, ui-assembler, unittests"
+24.10.24,3,order-api
+25.10.24,6,order-api
+26.10.24,6,order-api
+27.10.24,3,record-api
+28.10.24,4,"record-api, order-api, consumables-api"
+29.10.24,4,"audit-api, record-api, ui-composer"
+30.10.24,3,"audit-api, record-api, document-api"
+31.10.24,2,"record-api, order-api"
+01.11.24,8,"order-api, csv-processor, templates, record-api, code maintenance"
+03.11.24,2,calendar-api
+09.11.24,2,audit-api
+10.11.24,7,"documentation, record-api"
+12.11.24,2,documentation
+14.11.24,3,templates
+15.11.24,7,"templates, audit-api, user-api, notification"
+16.11.24,6,"order-api, templates, audit-api, notification, consumables-api"
+19.11.24,2,documentation
+20.11.24,2,"consumables-api, documentation"
+23.11.24,2,documentation
+24.11.24,1,language-handler
+29.11.24,4,"api, record-api, documentation"
+30.11.24,9,"document-api, tool-api, documentation"
+01.12.24,1,record-api
+06.12.24,6,"document-api, record-api"
+07.12.24,6,"stress-test, templates, documentation"
+11.12.24,1,"templates, record-api"
+12.12.24,3,"pdf-library, order-api, record-api"
+13.12.24,7,"file-api, document-api"
+14.12.24,12,"code maintenance, development-setup"
+17.12.24,2,"delevopment-setup, records-api"
+18.12.24,2,"user-api, record-api"
+20.12.24,6,"consumables-api, audit-api, order-api "
+21.12.24,5,"order-api, development-setup"
+22.12.24,9,"safari-compatibility, ui"
+23.12.24,3,"ui-composer, document-api, record-api, pdf-library"
+25.12.24,7,"file-api, record-api, order-api, documentation"
+26.12.24,7,language-handler
+27.12.24,12,"language-handler, audit-api, record-api, document-api, code maintenance, documentation"
+28.12.24,5,"code maintenance, documentation"
+29.12.24,5,"code maintenance, documentation"
+30.12.24,8,"code maintenance, documentation"
+31.12.24,1,application-api
+03.01.25,7,"purchase-api, templates, stress-test, install routine"
+04.01.25,4,"code maintenance, documentation"
+05.01.25,3,"code maintenance, templates"
+06.01.25,3,"templates, install routine"
+08.01.25,2,database type maintenance
+10.01.25,7,"stress-test, risk-api"
+11.01.25,10,"risk-api, templates, ui"
+12.01.25,1,ui
+13.01.25,1,"install routine, ui-composer"
+14.01.25,1,"risk-api, ui"
+17.01.25,4,"install routine, ui-assembler, risk-api"
+18.01.25,8,"ui, audit-api"
+19.01.25,2,"risk-api, audit-api"
+22.01.25,2,"documentation, config handling"
+23.01.25,2,file-api
+24.01.25,8,"file-api, install routine, api, ui-assembler, texttemplates-api, consumables-api"
+25.01.25,11,"consumables-api, audit-api, documentation"
+26.01.25,2,"documentation, language"
+28.01.25,1,language-handler
+29.01.25,2,document-api
+31.01.25,8,"consumables-api, audit-api"
+01.02.25,11,audit-api
+04.02.25,2,measure-api
+05.02.25,2,"install routine, stress test, templates, documentation"
+06.02.25,1,ui-assembler
+07.02.25,8,ui-assembler
+08.02.25,8,"ui-assembler, documentation, ui-composer"
+09.02.25,1,ui-composer

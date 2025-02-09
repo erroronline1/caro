@@ -832,7 +832,11 @@ export const compose_helper = {
 				if (!target) return;
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
-					target.parentNode.insertBefore(targetClone, target.parentNode.children[0]);
+					let c;
+					for (c = 0; c < target.parentNode.childNodes.length; c++) {
+						if (target.parentNode.childNodes[c].draggable) break;
+					}
+					target.parentNode.insertBefore(targetClone, target.parentNode.childNodes[c]); // hidden form for submission and undraggable div with general selection, properties and delete area come before
 					target.remove();
 				}
 				div.remove();
