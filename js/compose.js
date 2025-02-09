@@ -30,8 +30,7 @@ export const compose_helper = {
 	 * @returns {domNodes}]
 	 */
 	cloneMultipleItems: function (startNode, offset = -1, numberOfElements = 1) {
-		// positive offset for nodes after fromNode, negative for previous nodes
-		// ids and htmlfor are only assigned within first layer !!!
+		// positive offset for nodes after fromNode, negative for previous nodes, zero to take exactly the passed node
 
 		//set pointer
 		for (let i = 0 || offset; i < (offset < 0 ? 0 : offset); i++) {
@@ -110,14 +109,13 @@ export const compose_helper = {
 		// iterate over all nodes of the respective widgets composer form
 		for (let s = 0; s < parent.childNodes.length; s++) {
 			sibling = parent.childNodes[s];
-			console.log(sibling);
 			// skip nodes
 			if (!["label", "header", "input"].includes(sibling.localName)) {
 				continue;
 			}
 
 			if (sibling.localName === "header") {
-				// e.g. button
+				// e.g. calendarbutton
 				if (element.type === undefined) element["type"] = sibling.dataset.type;
 				if (!element.attributes) element["attributes"] = { value: buttonDefaultValues[sibling.dataset.type] };
 				continue;
@@ -224,11 +222,11 @@ export const compose_helper = {
 			if (siblingName === api._lang.GET("assemble.compose.component.required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
-				element.attributes.onpointerup = "api.record('get','displayonly', '" + element.attributes.value + "')";
+				element.attributes.onclick = "api.record('get','displayonly', '" + element.attributes.value + "')";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_display_button", { ":document": element.attributes.value });
 			}
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_continue") && sibling.checked) {
-				element.attributes.onpointerup = "api.record('get','document', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
+				element.attributes.onclick = "api.record('get','document', '" + element.attributes.value + "', document.querySelector('input[name^=IDENTIFY_BY_]') ? document.querySelector('input[name^=IDENTIFY_BY_]').value : null)";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_continue_button", { ":document": element.attributes.value });
 			}
 
@@ -554,7 +552,7 @@ export const compose_helper = {
 					forbidden = containsForbidden(element);
 				} else {
 					if (element.type && element.type !== "textsection" && element.attributes && element.attributes.name) {
-						for (const [key, pattern] of api._settings.config.forbidden.names) {
+						for (const pattern of Object.entries(api._settings.config.forbidden.names)) {
 							if (element.attributes.name.match(new RegExp(pattern, "gm"))) {
 								forbidden = { name: element.attributes.name, pattern: pattern };
 								break;
@@ -669,6 +667,106 @@ export const compose_helper = {
 		}
 	},
 
+	/**
+	 * populates the respective components editor forms with widgets settings
+	 * @param {domNode} widgetcontainer event
+	 * @event populate components editor form with values
+	 * @see compose_helper.composeNewElementCallback()
+	 */
+	importWidget: function (widgetcontainer) {
+		// this doesn't make sense for some types but idc. actually impossible for image type, so this is a exit case
+
+		let type,
+			targetform,
+			forms = document.querySelectorAll("form");
+
+		type = widgetcontainer.childNodes[0].dataset.type;
+		if (!type || !Object.keys(compose_helper.newDocumentComponents).includes(widgetcontainer.id)) {
+			new Toast(api._lang.GET("assemble.compose.context_edit_error"), "error");
+			return;
+		}
+		// detect appropriate form
+		for (let f = 0; f < forms.length; f++) {
+			if (forms[f].childNodes[0] && type === forms[f].childNodes[0].dataset.type) {
+				targetform = forms[f];
+				break;
+			}
+		}
+		if (!targetform) return;
+		targetform.scrollIntoView();
+
+		// import attributes
+		const element = compose_helper.newDocumentComponents[widgetcontainer.id];
+		if (["image"].includes(element.type)) return;
+
+		if (element.type === type || (element.type === "identify" && type === "scanner")) {
+			// actual inverse compose_helper.composeNewElementCallback
+			let sibling,
+				siblingName,
+				multilistupdated = false;
+
+			for (let s = 0; s < targetform.childNodes.length; s++) {
+				sibling = targetform.childNodes[s];
+
+				if (!["label", "input"].includes(sibling.localName)) {
+					continue;
+				}
+
+				if (sibling.localName === "label" && sibling.childNodes.length) sibling = sibling.childNodes[sibling.childNodes.length - 1];
+				if (!sibling.name) continue;
+				siblingName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
+				if (siblingName === api._lang.GET("assemble.compose.component.field_hint") && element.hint) sibling.value = element.hint;
+				if (siblingName === api._lang.GET("assemble.compose.component.texttemplate")) sibling.checked = Boolean(element.texttemplates);
+				if (siblingName === api._lang.GET("assemble.compose.component.required")) sibling.checked = Boolean("required" in element.attributes && element.attributes.required);
+				if (siblingName === api._lang.GET("assemble.compose.component.multiple")) sibling.checked = Boolean("multiple" in element.attributes && element.attributes.multiple);
+				if (siblingName === api._lang.GET("assemble.compose.component.context_identify")) sibling.checked = Boolean(element.type === "identify");
+
+				if (["links", "radio", "select", "checkbox"].includes(element.type)) {
+					if (siblingName === api._lang.GET("assemble.compose.component.multilist_name")) {
+						if (["links"].includes(element.type)) sibling.value = element.description;
+						else sibling.value = element.attributes.name;
+					}
+					if (siblingName === api._lang.GET("assemble.compose.component.multilist_add_item") && !multilistupdated) {
+						let deletesibling = sibling.parentNode; // label container
+						console.log(deletesibling.nextElementSibling);
+						while (deletesibling.nextElementSibling && deletesibling.nextElementSibling.localName !== "button") {
+							deletesibling.nextElementSibling.remove();
+						}
+						const options = Object.keys(element.content);
+						sibling.value = options[0];
+						let next = [],
+							all = [];
+						for (let i = 1; i < options.length; i++) {
+							next = compose_helper.cloneMultipleItems(sibling.parentNode, 0);
+							for (const e of next) {
+								if ("value" in e.childNodes[e.childNodes.length - 1]) e.childNodes[e.childNodes.length - 1].value = options[i];
+							}
+							all = all.concat(next);
+						}
+						sibling.parentNode.after(...all);
+						multilistupdated = true; // otherwise targetform.childNodes expands indefinitely causing an overflow
+						continue;
+					}
+				} else if (["file", "photo", "scanner", "signature", "identify"].includes(element.type)) {
+					if (siblingName === api._lang.GET("assemble.compose.component.simple_element")) sibling.value = element.attributes.name;
+				} else if (["textsection"].includes(element.type)) {
+					if (siblingName === api._lang.GET("assemble.compose.component.textsection_description")) sibling.value = element.attributes.name;
+					if (siblingName === api._lang.GET("assemble.compose.component.textsection_content")) if (element.content) sibling.value = element.content;
+				} else if (["range"].includes(element.type)) {
+					if (siblingName === api._lang.GET("assemble.compose.component.simple_element")) sibling.value = element.attributes.name;
+					if (siblingName === api._lang.GET("assemble.compose.component.range_min")) sibling.value = element.attributes.min;
+					if (siblingName === api._lang.GET("assemble.compose.component.range_max")) sibling.value = element.attributes.max;
+					if (siblingName === api._lang.GET("assemble.compose.component.range_step")) sibling.value = element.attributes.step;
+				} else {
+					// ...input
+					if (siblingName === api._lang.GET("assemble.compose.component.field_name")) {
+						sibling.value = element.attributes.name;
+					}
+				}
+			}
+		}
+	},
+
 	dragNdrop: {
 		stopParentDropEvent: false,
 		allowDrop: function (evnt) {
@@ -708,17 +806,30 @@ export const compose_helper = {
 			const img = document.createElement("img");
 			img.classList.add("close");
 			img.src = "./media/times.svg";
-			img.onpointerup = () => {
+			img.onclick = () => {
 				div.remove();
 			};
 			div.append(img);
+
+			// edit option
+			button = document.createElement("button");
+			button.type = "button";
+			button.classList.add("discreetButton");
+			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_edit")));
+			button.onclick = () => {
+				if (!target) return;
+				compose_helper.importWidget(target);
+				div.remove();
+			};
+			div.append(button);
 
 			// to top option
 			button = document.createElement("button");
 			button.type = "button";
 			button.classList.add("discreetButton");
 			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2top")));
-			button.onpointerup = () => {
+			button.onclick = () => {
+				if (!target) return;
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
 					target.parentNode.insertBefore(targetClone, target.parentNode.children[0]);
@@ -733,7 +844,8 @@ export const compose_helper = {
 			button.type = "button";
 			button.classList.add("discreetButton");
 			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1up")));
-			button.onpointerup = () => {
+			button.onclick = () => {
+				if (!target) return;
 				if (target.previousElementSibling && target.previousElementSibling.draggable) {
 					targetClone = target.cloneNode(true);
 					target.parentNode.insertBefore(targetClone, target.previousElementSibling);
@@ -748,7 +860,8 @@ export const compose_helper = {
 			button.type = "button";
 			button.classList.add("discreetButton");
 			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1down")));
-			button.onpointerup = () => {
+			button.onclick = () => {
+				if (!target) return;
 				if (target.nextElementSibling) {
 					targetClone = target.cloneNode(true);
 					target.nextElementSibling.after(targetClone);
@@ -763,7 +876,8 @@ export const compose_helper = {
 			button.type = "button";
 			button.classList.add("discreetButton");
 			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2bottom")));
-			button.onpointerup = () => {
+			button.onclick = () => {
+				if (!target) return;
 				targetClone = target.cloneNode(true);
 				target.parentNode.append(targetClone);
 				target.remove();
@@ -779,7 +893,7 @@ export const compose_helper = {
 			let options = {};
 			(options[api._lang.GET("general.cancel_button")] = false),
 				(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
-				(button.onpointerup = () => {
+				(button.onclick = () => {
 					new _client.Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.context_delete"), options: options }).then((confirmation) => {
 						if (confirmation) {
 							compose_helper.dragNdrop.drop_delete(evnt);
@@ -932,7 +1046,7 @@ export const compose_helper = {
 							compose_helper.componentIdentify--;
 						}
 						if (node.id && node.id === "signaturecanvas") {
-							const signatureformsibling = document.querySelector("form>span[data-type=signature");
+							const signatureformsibling = document.querySelector("form>label[data-type=signature");
 							if (signatureformsibling)
 								for (const node of signatureformsibling.parentNode) {
 									if (node.dataset.type === "addblock") node.disabled = false;
@@ -944,95 +1058,6 @@ export const compose_helper = {
 			}
 			nodechildren(draggedElement);
 			draggedElement.remove();
-		},
-
-		/**
-		 * populates the respective components editor forms with widgets settings
-		 * @param {event} evnt event
-		 * @event populate components editor form with values
-		 * @see compose_helper.composeNewElementCallback()
-		 */
-		drop_reimport: function (evnt) {
-			// this doesn't make sense for some types but idc. actually impossible for image type, so this is a exit case
-			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
-			let targetform = evnt.target;
-			if (targetform.constructor.name !== "HTMLFormElement") targetform = targetform.parentNode;
-			const targettype = targetform.children[1].dataset.type;
-
-			if (Object.keys(compose_helper.newFormComponents).includes(draggedElement.id)) {
-				const importable = compose_helper.newFormComponents[draggedElement.id];
-
-				if (["image"].includes(importable.type)) return;
-
-				if (importable.type === targettype || (importable.type === "identify" && targettype === "scanner")) {
-					// actual inverse compose_helper.composeNewElementCallback
-
-					let sibling = targetform.childNodes[0].nextSibling,
-						setTo,
-						elementName;
-					const setName = {
-						name: ["select", "scanner", "radio", "photo", "file", "signature", "checkbox"],
-						description: ["links"],
-					};
-					do {
-						if (!["input", "textarea"].includes(sibling.localName)) {
-							sibling = sibling.nextSibling;
-							continue;
-						}
-						elementName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
-						if (elementName === api._lang.GET("assemble.compose.component.field_hint") && importable.hint) sibling.value = importable.hint;
-						if (elementName === api._lang.GET("assemble.component.texttemplate")) sibling.checked = Boolean(importable.texttemplates);
-						if (elementName === api._lang.GET("assemble.compose.component.required")) sibling.checked = Boolean("required" in importable.attributes && importable.attributes.required);
-						if (elementName === api._lang.GET("assemble.compose.component.multiple")) sibling.checked = Boolean("multiple" in importable.attributes && importable.attributes.multiple);
-						if (elementName === api._lang.GET("assemble.compose.component.context_identify")) sibling.checked = Boolean(importable.type === "identify");
-
-						if (["links", "radio", "select", "checkbox"].includes(importable.type)) {
-							if (elementName === api._lang.GET("assemble.compose.component.multilist_name")) {
-								setTo = Object.keys(setName).find((key) => setName[key].includes(importable.type));
-								if (setTo === "name") sibling.value = importable.attributes.name;
-								else if (setTo === "description") sibling.value = importable.description;
-							}
-							if (elementName === api._lang.GET("assemble.compose.component.multilist_add_item")) {
-								let deletesibling = sibling.nextSibling;
-								while (deletesibling.nextElementSibling.constructor.name !== "HTMLButtonElement") {
-									deletesibling.nextElementSibling.remove();
-								}
-								const options = Object.keys(importable.content);
-								sibling.value = options[0];
-								let next = [],
-									all = [];
-								for (let i = 1; i < options.length; i++) {
-									next = compose_helper.cloneMultipleItems(sibling, 0, 1);
-									for (const e of next) {
-										if ("value" in e) e.value = options[i];
-									}
-									all = all.concat(next);
-								}
-								sibling.nextSibling.after(...all);
-								// set pointer to avoid overflow
-								for (let i = 0; i < all.length + 1; i++) sibling = sibling.nextSibling;
-								continue;
-							}
-						} else if (["file", "photo", "scanner", "signature", "identify"].includes(importable.type)) {
-							if (elementName === api._lang.GET("assemble.compose.component.simple_element")) sibling.value = importable.attributes.name;
-						} else if (["textsection"].includes(importable.type)) {
-							if (elementName === api._lang.GET("assemble.compose.component.textsection_description")) sibling.value = importable.attributes.name;
-							if (elementName === api._lang.GET("assemble.compose.component.textsection_content")) if (importable.content) sibling.value = importable.content;
-						} else if (["range"].includes(importable.type)) {
-							if (elementName === api._lang.GET("assemble.compose.component.simple_element")) sibling.value = importable.attributes.name;
-							if (elementName === api._lang.GET("assemble.compose.component.range_min")) sibling.value = importable.attributes.min;
-							if (elementName === api._lang.GET("assemble.compose.component.range_max")) sibling.value = importable.attributes.max;
-							if (elementName === api._lang.GET("assemble.compose.component.range_step")) sibling.value = importable.attributes.step;
-						} else {
-							// ...input
-							if (elementName === api._lang.GET("assemble.compose.component.field_name")) {
-								sibling.value = importable.attributes.name;
-							}
-						}
-						sibling = sibling.nextSibling;
-					} while (sibling);
-				}
-			}
 		},
 	},
 
@@ -1482,7 +1507,7 @@ export class Compose extends Assemble {
 		this.currentElement = {
 			attributes: {
 				value: std.description,
-				onpointerup: std.action,
+				onclick: std.action,
 				type: "button",
 			},
 		};
@@ -1835,7 +1860,7 @@ export class Compose extends Assemble {
 				value: api._lang.GET("assemble.compose.component.multilist_add_item_button"),
 				"data-type": "additem",
 				type: "button",
-				onpointerup: function () {
+				onclick: function () {
 					for (const e of compose_helper.cloneMultipleItems(this, -1, 1)) this.parentNode.insertBefore(e, this);
 				}.toString(),
 			},
@@ -2033,7 +2058,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.raw"),
 				"data-type": "addblock",
-				onpointerup: function () {
+				onclick: function () {
 					if (document.getElementById("_compose_raw").value)
 						try {
 							compose_helper.importComponent({ content: JSON.parse(document.getElementById("_compose_raw").value) });
@@ -2048,7 +2073,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.raw_import"),
 				"data-type": "import",
-				onpointerup: function () {
+				onclick: function () {
 					let component = compose_helper.composeNewComponent(true);
 					document.getElementById("_compose_raw").value = component ? JSON.stringify(component.content, null, 4) : "";
 					document.getElementById("_compose_raw").dispatchEvent(new Event("keyup"));

@@ -309,6 +309,8 @@
 			"context_1up": "move one up",
 			"context_2bottom": "move to bottom",
 			"context_2top": "move to top",
+			"context_edit": "edit",
+			"context_edit_error":"Element is not editable",
 			"context_delete": "delete",
 			"context_delete_error": "The element could not be identified. Try moving the cursor to the center of the area or the bar above the area.",
 			"document": {
