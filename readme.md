@@ -124,6 +124,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
 * measure management pictures
 * update readme pictures on tools menu, record menu, audit and regulatory
+* audittemplate comment e.g. office (office/purchase)
 * import audit questions (importWidget)
     * compose_helper.newDocumentComponents || compose_helper.newAuditQuestions
     * field name comparison
