@@ -124,6 +124,9 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
 * measure management pictures
 * update readme pictures on tools menu, record menu, audit and regulatory
+* import audit questions (importWidget)
+    * compose_helper.newDocumentComponents || compose_helper.newAuditQuestions
+    * field name comparison
 * still:  Uncaught PDOException: SQLSTATE[23000]: [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Verletzung der UNIQUE KEY-Einschränkung &quot;AK_id &quot;. Ein doppelter Schlüssel kann in das dbo.caro_sessions-Objekt nicht eingefügt werden. Der doppelte Schlüsselwert ist (m43bh73tker93v0armsq5s27oc). in C:\inetpub\wwwroot\caro\api\_sqlinterface.php:84
 Stack trace:
 #0 C:\inetpub\wwwroot\caro\api\_sqlinterface.php(84): PDOStatement-&gt;execute()
