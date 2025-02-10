@@ -1266,7 +1266,7 @@
 			"barcode_code128_hint": "Eine beliebige kurze Zeichenfolge",
 			"barcode_description": "Barcode aus:",
 			"barcode_ean13": "Barcode EAN13",
-			"barcode_ean13_hint": "13 Zahlen",
+			"barcode_ean13_hint": "12 bis 13 Zahlen, Prüfziffer wird validiert oder angehängt",
 			"code_created": "Lade den erzeugten Code herunter",
 			"code_select_type": "Generiere einen",
 			"qrcode_appointment": "QR-Code für Termin",

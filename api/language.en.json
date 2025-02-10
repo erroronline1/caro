@@ -1264,7 +1264,7 @@
 			"barcode_code128_hint": "Any short character chain",
 			"barcode_description": "Barcode from:",
 			"barcode_ean13": "Barcode EAN13",
-			"barcode_ean13_hint": "13 numbers only",
+			"barcode_ean13_hint": "12 to 13 numbers only, check number will be verified or appended",
 			"code_created": "Download created code",
 			"code_select_type": "Create a",
 			"qrcode_appointment": "QR appointment",
