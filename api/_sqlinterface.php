@@ -32,9 +32,6 @@ class SQLQUERY {
 	 * execute a query
 	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]
 	 * 
-	 * REPLACEMENTS ARE PROCESED RAW
-	 * MASKING HAS TO BE DONE BEFOREHAND
-	 * 
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query either defined within queries below or prepared raw queries
 	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries
@@ -84,16 +81,21 @@ class SQLQUERY {
 		if (!$statement->execute($parameters['values'])) return false;
 		if (str_starts_with($query, 'SELECT')) {
 			//var_dump($statement->debugDumpParams());
-			return $statement->fetchAll();
+			$result = $statement->fetchAll();
+			$statement = null;
+			return $result;
 		}
-		return $statement->rowCount();
-	}
+		$result = $statement->rowCount();
+		$statement = null;
+		return $result;
+}
 
 	/**
 	 * creates packages of well prepared sql queries to handle sql package size
 	 * 
 	 * MASKING HAS TO BE DONE BEFOREHAND
 	 * 
+	 * @param object $_pdo preset database connection, passed from main application
 	 * @param array $chunks packages so far
 	 * @param string $query next sql query
 	 * @return array $chunks extended packages so far
@@ -113,6 +115,8 @@ class SQLQUERY {
 	/**
 	 * creates packages of sql INSERTIONS to handle sql package size
 	 * e.g. for multiple inserts
+	 * 
+	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query sql query
 	 * @param array $items named array to replace query by strtr have to be sanitized and masked
 	 * @return array $chunks extended packages so far
@@ -144,6 +148,16 @@ class SQLQUERY {
 			}
 		}
 		return $chunks;
+	}
+
+	/**
+	 * closes the passed connection
+	 * 
+	 * @param object $_pdo preset database connection, passed from main application
+	 * @return none
+	 */
+	public static function CLOSE($_pdo){
+		$_pdo = null;
 	}
 
 	/**
