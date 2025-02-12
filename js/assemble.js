@@ -599,11 +599,15 @@ export class Assemble {
 		}
 		if (this.imageBarCode.length) {
 			for (const image of this.imageBarCode) {
-				JsBarcode("#" + image.id, image.content.value, {
-					format: image.content.format || "CODE128",
-					background: "transparent",
-					displayValue: image.content.displayValue != undefined ? image.content.displayValue : true,
-				});
+				try {
+					JsBarcode("#" + image.id, image.content.value, {
+						format: image.content.format || "CODE128",
+						background: "transparent",
+						displayValue: image.content.displayValue != undefined ? image.content.displayValue : true,
+					});
+				} catch (e) {
+					new Toast(api._lang.GET("jsbarcode.error"), "error");
+				}
 			}
 		}
 		if (this.imageUrl.length) {

@@ -310,7 +310,7 @@
 			"context_2bottom": "ganz nach unten verschieben",
 			"context_2top": "ganz nach oben verschieben",
 			"context_edit": "in den Editor importieren",
-			"context_edit_error":"Element kann nicht importiert werden.",
+			"context_edit_error": "Element kann nicht importiert werden.",
 			"context_delete": "löschen",
 			"context_delete_error": "Das Element konnte nicht identifiziert werden. Bewege den Zeiger zum Beispiel mitten auf die Fläche oder den Balken über der Fläche.",
 			"document": {
@@ -362,8 +362,8 @@
 			"aria": {
 				"add": "Weiteres hinzufügen",
 				"cancel": "Abbrechen",
-				"dialog":"Eingabemaske",
-				"dialog_toast":"Systemhinweis",
+				"dialog": "Eingabemaske",
+				"dialog_toast": "Systemhinweis",
 				"extend": "erweitern / verbergen",
 				"image": "Bild von :image",
 				"pause": "Anhalten",
@@ -372,7 +372,7 @@
 				"search": "Suche",
 				"signature": "Unterschriftenfeld",
 				"stl": "STL :file",
-				"timeout":"Deine Sitzung wurde beendet. Bitte melde dich erneut an.",
+				"timeout": "Deine Sitzung wurde beendet. Bitte melde dich erneut an.",
 				"timeout_warning": "Du wirst in weniger als :seconds Sekunden automatisch abgemeldet! Bitte speichere deine Arbeit um Datenverlust zu verhindern.",
 				"toleft": "nach links schieben",
 				"toright": "nach rechts schieben"
@@ -1575,5 +1575,8 @@
 			"loading": "Lade Bilddatei...",
 			"select_camera": "Wähle Kamera"
 		}
+	},
+	"jsbarcode": {
+		"error": "Deine Eingabe konnte nicht in des gewählte Format umgewandelt werden."
 	}
 }

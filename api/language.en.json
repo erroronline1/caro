@@ -310,7 +310,7 @@
 			"context_2bottom": "move to bottom",
 			"context_2top": "move to top",
 			"context_edit": "import into editor",
-			"context_edit_error":"Element is not importable",
+			"context_edit_error": "Element is not importable",
 			"context_delete": "delete",
 			"context_delete_error": "The element could not be identified. Try moving the cursor to the center of the area or the bar above the area.",
 			"document": {
@@ -362,8 +362,8 @@
 			"aria": {
 				"add": "Add another",
 				"cancel": "Cancel",
-				"dialog":"Input form",
-				"dialog_toast":"System feedback",
+				"dialog": "Input form",
+				"dialog_toast": "System feedback",
 				"extend": "Extend / collapse",
 				"image": "Image of :image",
 				"pause": "Pause",
@@ -427,6 +427,7 @@
 				"delete_success": "Audit deleted",
 				"last_edit": "Last edit on :date by :user",
 				"new": "New Audit",
+				"not_found": "Audit not found",
 				"not_saved": "Audit could not be saved.",
 				"proof": "Proof",
 				"rating": "Rating",
@@ -452,6 +453,7 @@
 				"import_summary": "Import previous summary",
 				"import_summary_hint": "Only the last finalized audit of the selected unit is processed. The planned audit is supposed to take previous results into account.",
 				"new": "New template",
+				"not_found": "Template not found",
 				"not_saved": "Template could not be saved.",
 				"not_saved_missing": "Template could not been saved, please provide a unit and content!",
 				"schedule": "Schedule audit",
@@ -1573,5 +1575,8 @@
 			"loading": "Loading image...",
 			"select_camera": "Select Camera"
 		}
+	},
+	"jsbarcode": {
+		"error": "Your input could not resolve to the selected output format."
 	}
 }
