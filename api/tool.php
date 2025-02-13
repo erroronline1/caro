@@ -214,17 +214,6 @@ class TOOL extends API {
 	 */
 	public function code(){
 		$types = [
-			'qrcode_text' => ['name' => $this->_lang->GET('tool.code.qrcode_text'),
-				'content'=> [
-					[
-						'type' => 'textarea',
-						'attributes' => [
-							'name' => $this->_lang->GET('tool.code.qrcode_text'),
-							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_text')) ? : ''
-						]
-					]
-				],
-				'code' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_text')) ? : ''],
 			'qrcode_appointment' => ['name' => $this->_lang->GET('tool.code.qrcode_appointment'),
 				'content'=> [
 					[
@@ -272,10 +261,22 @@ class TOOL extends API {
 					"BEGIN:VEVENT\n" .
 					"SUMMARY:" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')) . "\n" .
 					"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
-					"DESCRIPTION:" . (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_reminder')) ? : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion'))) . "\n" .
+					"DESCRIPTION:" . (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_reminder')) ? : '') . (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')) ? : '') . ' ' . $this->_lang->GET('tool.code.qrcode_appointment_reminder_default') . "\n" .
 					"DTSTART:" . str_replace('-', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date'))) . 'T' . str_replace(':', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) . "00\n" .
 					"DTEND:" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration')))*3600) . "\n" .
 					"END:VEVENT"
+			],
+			'qrcode_text' => ['name' => $this->_lang->GET('tool.code.qrcode_text'),
+				'content'=> [
+					[
+						'type' => 'textarea',
+						'attributes' => [
+							'name' => $this->_lang->GET('tool.code.qrcode_text'),
+							'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_text')) ? : ''
+						]
+					]
+				],
+				'code' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_text')) ? : ''
 			],
 			'barcode_code128' => ['name' => $this->_lang->GET('tool.code.barcode_code128'),
 				'content'=> [
@@ -311,7 +312,7 @@ class TOOL extends API {
 
 		$result['render'] = ['form' => [
 			'data-usecase' => 'tool_create_code',
-			'action' => "javascript:api.tool('post', 'code', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text') . "')"
+			'action' => "javascript:api.tool('post', 'code', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_appointment') . "')"
 		],
 		'content' => [
 			[
@@ -323,7 +324,7 @@ class TOOL extends API {
 					],
 					'content' => $options
 				],
-				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text']['content'],
+				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_appointment']['content'],
 			]
 		]];
 
