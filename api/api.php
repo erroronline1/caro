@@ -344,7 +344,12 @@ class API {
 			]
 		]);
 
-		SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
+		// dirty error suppression
+		// the session cookie may occasionally not be deleted on automated logout, submitting a false session id, raising a duplicate key error
+		// i don't know how to handle this otherwise
+		// on failure the user may just not get a meaningful response and has to update the interface.
+		// does not happen on proper logout and even on automated logout only rarely
+		@SQLQUERY::EXECUTE($this->_pdo, 'application_post_session', [
 			'values' => [
 				':id' => session_id(),
 				':user_id' => $_SESSION['user']['id']
