@@ -418,8 +418,9 @@ class RECORD extends API {
 		$content = $this->summarizeRecord($summarize, false, true);
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::recordsPDF($content)
+			'href' => './api/api.php/file/stream/' . $PDF->recordsPDF($content)
 		];
 
 		$body = [];
@@ -469,8 +470,9 @@ class RECORD extends API {
 				}
 				if ($content){
 					$downloadfiles = [];
+					$PDF = new PDF(CONFIG['label'][UTILITY::propertySet($this->_payload, '_type') ? : 'sheet']);
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
-						'href' => './api/api.php/file/stream/' . PDF::qrcodePDF([$content, $content], UTILITY::propertySet($this->_payload, '_type') ? : 'A4')
+						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF([$content, $content])
 					];
 					$body = [
 						[

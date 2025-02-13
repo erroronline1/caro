@@ -1162,8 +1162,9 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
 		$body = [];
@@ -1381,8 +1382,9 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
 		$body = [];
@@ -1505,8 +1507,9 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
 		$body = [];
@@ -1761,8 +1764,9 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
 		$body = [];
@@ -1928,8 +1932,9 @@ class AUDIT extends API {
 			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['content']) ? $issue['content'] : ' ';	
 		}
 		if (count($summary['content']) > 1){
+			$PDF = new PDF(CONFIG['pdf']['record']);
 			$downloadfiles[$this->_lang->GET('audit.risk_issues_none')] = [
-				'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+				'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 			];
 		}
 
@@ -2279,8 +2284,9 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
 		$body = [];
@@ -2561,8 +2567,9 @@ class AUDIT extends API {
 			}
 		}
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
 		$body = [];
@@ -2682,8 +2689,9 @@ class AUDIT extends API {
 		}
 
 		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
 		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
-			'href' => './api/api.php/file/stream/' . PDF::auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 		$body = [];
 		array_push($body, 
