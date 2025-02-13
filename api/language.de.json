@@ -1273,8 +1273,9 @@
 			"qrcode_appointment_date": "Datum / Zeit",
 			"qrcode_appointment_duration": "Ungefähre Dauer in Stunden",
 			"qrcode_appointment_occasion": "Anlass",
-			"qrcode_appointment_occasion_hint": "z.B. Gipsabdruck für Orthese, Prothesenaprobe, etc.",
+			"qrcode_appointment_occasion_hint": "z.B. Gipsabdruck für Orthese, Prothesenanprobe, etc.",
 			"qrcode_appointment_reminder": "Erinnerung",
+			"qrcode_appointment_reminder_default": "Sagen Sie uns bitte bescheid, falls Sie den Termin nicht wahrnehmen können.",
 			"qrcode_appointment_reminder_hint": "z.B. Vergessen Sie nicht passende Schuhe mitzubringen",
 			"qrcode_appointment_time": "Zeit",
 			"qrcode_text": "QR Text / URL"

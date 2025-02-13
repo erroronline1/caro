@@ -1273,8 +1273,9 @@
 			"qrcode_appointment_date": "Date / Time",
 			"qrcode_appointment_duration": "Approximate duration (hours)",
 			"qrcode_appointment_occasion": "Occasion",
-			"qrcode_appointment_occasion_hint": "e.g. cast for orthosis, fitting for prosthesis, etc",
+			"qrcode_appointment_occasion_hint": "e.g. cast for orthosis, fitting for prosthesis, etc.",
 			"qrcode_appointment_reminder": "Reminder",
+			"qrcode_appointment_reminder_default": "Please let us know if you cannot make the appointment.",
 			"qrcode_appointment_reminder_hint": "e.g. remember bringing shoes",
 			"qrcode_appointment_time": "Time",
 			"qrcode_text": "QR text / URL"
