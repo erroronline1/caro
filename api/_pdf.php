@@ -260,7 +260,7 @@ class PDF{
 		$pdf->setPrintHeader(false);
 		$pdf->setPrintFooter(false);
 		// set margins
-		$pdf->SetMargins($this->_setup['marginleft'], $this->_setup['marginop'], $this->_setup['marginright'], true);
+		$pdf->SetMargins($this->_setup['marginleft'], $this->_setup['margintop'], $this->_setup['marginright'], true);
 		// set auto page breaks
 		$pdf->SetAutoPageBreak(TRUE, $this->_setup['marginbottom']);
 		// set font
@@ -302,7 +302,7 @@ class PDF{
 
 		//Close and output PDF document
 		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$filename = preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content) . '.pdf';
+		$filename = preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content[1]) . '.pdf';
 		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
 	}
