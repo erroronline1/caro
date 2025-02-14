@@ -342,7 +342,7 @@ class RECORD extends API {
 			if (in_array($document['context'], ['casedocumentation'])) {
 				$options = [];
 				foreach ($this->_lang->_USER['record']['type'] as $key => $value){
-					$options[$value] = boolval(CONFIG['application']['require_record_type_selection']) ? ['value' => $key, 'required' => true] : ['value' => $key];
+					$options[$value] = CONFIG['application']['require_record_type_selection'] ? ['value' => $key, 'required' => true] : ['value' => $key];
 				}
 				$defaults[] = [
 					'type' => 'radio',
@@ -471,8 +471,13 @@ class RECORD extends API {
 				if ($content){
 					$downloadfiles = [];
 					$PDF = new PDF(CONFIG['label'][UTILITY::propertySet($this->_payload, '_type') ? : 'sheet']);
+					$content = [
+						'title' => $this->_lang->GET('record.create_identifier', [], true),
+						'content' => [$content, $content],
+						'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content) . '.pdf'
+					];
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
-						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF([$content, $content])
+						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
 					];
 					$body = [
 						[

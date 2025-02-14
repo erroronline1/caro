@@ -759,7 +759,7 @@ export const _client = {
 					});
 
 					// display barcode or qr-code
-					if (element.barcode && Boolean(Number(api._settings.config.application.order_gtin_barcode)))
+					if (element.barcode && api._settings.config.application.order_gtin_barcode)
 						collapsible.push({
 							type: "image",
 							attributes: {
