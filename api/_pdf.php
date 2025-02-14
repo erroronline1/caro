@@ -17,7 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 require_once('../libraries/TCPDF/tcpdf_import.php');
 
 class PDF{
@@ -43,7 +42,12 @@ class PDF{
 		];				
 	}
 
-	private function page_setup(){
+	private function init($content){
+		// create new PDF document and set initial properties
+		$this->_pdf = new RECORDTCPDF($this->_setup, true, 'UTF-8', false, false,
+		20, isset($content['identifier']) ? $content['identifier'] : null, ['title' => $content['title'], 'date' => $content['date']]);
+		$this->_pdf->SetTitle($content['title']);
+
 		// set document information
 		$this->_pdf->SetCreator(CONFIG['system']['caroapp']);
 		$this->_pdf->SetAuthor($_SESSION['user']['name']);
@@ -62,14 +66,20 @@ class PDF{
 		$this->_pdf->SetFillColor(255, 255, 255);
 	}
 
+	private function return($content){
+		// export pdf to temp and return link
+		// move pointer to last page
+		$this->_pdf->lastPage();
+
+		//Close and output PDF document
+		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
+		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
+		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+	}
+
 	public function auditPDF($content){
 		// create a pdf for a record summary
-		// create new PDF document
-		$this->_pdf = new RECORDTCPDF($this->_setup['orientation'], $this->_setup['unit'], $this->_setup['format'], true, 'UTF-8', false, false,
-		20, null, ['title' => $content['title'], 'date' => $content['date']]);
-		$this->_pdf->SetTitle($content['title']);
-
-		$this->page_setup();
+		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
 
@@ -91,23 +101,13 @@ class PDF{
 			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
 			$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
 		}
-		// move pointer to last page
-		$this->_pdf->lastPage();
 
-		//Close and output PDF document
-		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		return $this->return($content);
 	}
 
 	public function documentsPDF($content){
 		// create a pdf for a document export
-		// create new PDF document
-		$this->_pdf = new RECORDTCPDF($this->_setup['orientation'], $this->_setup['unit'], $this->_setup['format'], true, 'UTF-8', false, false,
-		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
-		$this->_pdf->SetTitle($content['title']);
-
-		$this->page_setup();
+		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
 
@@ -215,13 +215,8 @@ class PDF{
 				}
 			}
 		}
-		// move pointer to last page
-		$this->_pdf->lastPage();
 
-		//Close and output PDF document
-		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		return $this->return($content);
 	}
 
 	public function qrcodePDF($content = [], $type = 'sheet'){
@@ -309,12 +304,7 @@ class PDF{
 
 	public function recordsPDF($content){
 		// create a pdf for a record summary
-		// create new PDF document
-		$this->_pdf = new RECORDTCPDF($this->_setup['orientation'], $this->_setup['unit'], $this->_setup['format'], true, 'UTF-8', false, false,
-		20, $content['identifier'], ['title' => $content['title'], 'date' => $content['date']]);
-		$this->_pdf->SetTitle($content['title']);
-
-		$this->page_setup();
+		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
 
@@ -358,24 +348,13 @@ class PDF{
 				}
 			}
 		}
-		// move pointer to last page
-		$this->_pdf->lastPage();
 
-		//Close and output PDF document
-		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		return $this->return($content);
 	}
 
 	public function timesheetPDF($content){
 		// create a pdf for a timesheet output
-		// create new PDF document
-		$this->_pdf = new RECORDTCPDF($this->_setup['orientation'], $this->_setup['unit'], $this->_setup['format'], true, 'UTF-8', false, false,
-		20, null, ['title' => $content['title'], 'date' => $content['date']]);
-		$this->_pdf->SetTitle($content['title']);
-
-		$this->page_setup();
-
+		$this->init($content);
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 1, 5, 1);
 
@@ -394,13 +373,8 @@ class PDF{
 				$this->_pdf->MultiCell(145, 2, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 			}
 		}
-		// move pointer to last page
-		$this->_pdf->lastPage();
 
-		//Close and output PDF document
-		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
+		return $this->return($content);
 	}
 }
 
@@ -409,19 +383,21 @@ class RECORDTCPDF extends TCPDF {
 	public $qrcodesize = null;
 	public $qrcodecontent = null;
 	public $header = null;
+	public $_setup = null;
 
-	public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false, $qrcodesize=20, $qrcodecontent='', $header=['title' => '', 'date' => '']){
-		parent::__construct($orientation, $unit, $format, $unicode, $encoding, $diskcache, $pdfa);
+	public function __construct($setup, $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false, $qrcodesize=20, $qrcodecontent='', $header=['title' => '', 'date' => '']){
+		parent::__construct($setup['orientation'], $setup['unit'], $setup['format'], $unicode, $encoding, $diskcache, $pdfa);
 		$this->qrcodesize = $qrcodesize;
 		$this->qrcodecontent = $qrcodecontent;
 		$this->header = $header;
+		$this->_setup = $setup;
 	}
 
 	// forces pagebreak if content exceeds name or page height
 	public function applyCustomPageBreak($lines, $lineheight) {
-		if ($this->GetY() > $this->getPageHeight() - CONFIG['pdf']['record']['marginbottom'] - $lines * $lineheight) {
+		if ($this->GetY() > $this->getPageHeight() - $this->_setup['marginbottom'] - $lines * $lineheight) {
 			if ($this->getNumPages() < $this->getPage() + 1) $this->AddPage();
-			$this->SetY(CONFIG['pdf']['record']['margintop']);
+			$this->SetY($this->_setup['margintop']);
 		}
 		if ($this->getNumPages() > $this->getPage()) $this->setPage($this->getPage() + 1);
 	}
@@ -431,7 +407,7 @@ class RECORDTCPDF extends TCPDF {
 		// Title
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$right_margin = 0;
-		if ($image = CONFIG['pdf']['record']['header_image']){
+		if ($image = $this->_setup['header_image']){
 			// given the image will always be 20mm high
 			list($width, $height, $type, $attr) = getimagesize('../' . $image);
 			if ($width && $height){ // avoid division by zero error for faulty input
@@ -468,7 +444,7 @@ class RECORDTCPDF extends TCPDF {
 		// Position at 15 mm from bottom
 		$this->SetY(-15);
 		$imageMargin = 0;
-		if ($image = CONFIG['pdf']['record']['footer_image']){
+		if ($image = $this->_setup['footer_image']){
 			list($width, $height, $type, $attr) = getimagesize('../' . $image);
 			if ($width && $height){ // avoid division by zero error for faulty input
 				// given the image will always be 10mm high
@@ -482,7 +458,7 @@ class RECORDTCPDF extends TCPDF {
 		$this->SetFont('helvetica', 'I', 8);
 		// company contacts and page number
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$this->MultiCell($this->getPageWidth() - CONFIG['pdf']['record']['marginleft'] - 10 - $imageMargin, 10, $_lang->GET('company.address', [], true) . ' | ' . CONFIG['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, CONFIG['pdf']['record']['marginleft'], $this->GetY(), true, 0, false, true, CONFIG['pdf']['record']['marginbottom'], 'T', true);
+		$this->MultiCell($this->getPageWidth() - $this->_setup['marginleft'] - 10 - $imageMargin, 10, $_lang->GET('company.address', [], true) . ' | ' . CONFIG['system']['caroapp'] . ' | ' . $this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 'C', false, 0, $this->_setup['marginleft'], $this->GetY(), true, 0, false, true, $this->_setup['marginbottom'], 'T', true);
 	}
 }
 
