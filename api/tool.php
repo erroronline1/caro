@@ -213,6 +213,9 @@ class TOOL extends API {
 	 *
 	 */
 	public function code(){
+		$appointmentreminder = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_reminder')) ? : '';
+		if ($appointmentreminder && !str_ends_with($appointmentreminder, '.')) $appointmentreminder .= '.';
+		$appointmentreminder .= ' ' . $this->_lang->GET('tool.code.qrcode_appointment_reminder_default');
 		$types = [
 			'qrcode_appointment' => ['name' => $this->_lang->GET('tool.code.qrcode_appointment'),
 				'content'=> [
@@ -261,9 +264,9 @@ class TOOL extends API {
 					"BEGIN:VEVENT\n" .
 					"SUMMARY:" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')) . "\n" .
 					"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
-					"DESCRIPTION:" . (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_reminder')) ? : '') . (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')) ? : '') . ' ' . $this->_lang->GET('tool.code.qrcode_appointment_reminder_default') . "\n" .
+					"DESCRIPTION:" . $appointmentreminder . "\n" .
 					"DTSTART:" . str_replace('-', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date'))) . 'T' . str_replace(':', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) . "00\n" .
-					"DTEND:" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration')))*3600) . "\n" .
+					"DTEND:" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration'))) * 3600) . "\n" .
 					"END:VEVENT"
 			],
 			'qrcode_text' => ['name' => $this->_lang->GET('tool.code.qrcode_text'),
@@ -330,19 +333,54 @@ class TOOL extends API {
 
 		if ($this->_requestedType){
 			if ($types[$this->_requestedType]['code']){
-				if (in_array($this->_requestedType, ['qrcode_text', 'qrcode_appointment'])){
-					$result['render']['content'][] = [
-						[
-							'type' => 'image',
-							'description' => $this->_lang->GET('tool.code.code_created'),
-							'attributes' =>[
-								'name' => $types[$this->_requestedType]['name'],
-								'qrcode' => $types[$this->_requestedType]['code']
+				switch ($this->_requestedType){
+					case 'qrcode_appointment':
+						require_once('./_pdf.php');
+						$downloadfiles = [];
+						$PDF = new PDF(CONFIG['pdf']['appointment']);
+						$content = [
+							'title' => $this->_lang->GET('tool.code.qrcode_appointment_title', [], true),
+							'date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')),
+							'content' => [
+								$types[$this->_requestedType]['code'],
+								$this->_lang->GET('tool.code.qrcode_appointment_readable', [
+									':company' => $this->_lang->GET('company.address'),
+									':occasion' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')),
+									':start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time')),
+									':end' => date("Y-m-d H:i", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration'))) * 3600),
+									':reminder' => $appointmentreminder
+								])
+							],
+							'filename' => $this->_lang->GET('tool.code.qrcode_appointment') . '.pdf'
+						];
+						$downloadfiles[$this->_lang->GET('tool.code.qrcode_appointment')] = [
+							'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
+						];
+						$body = [
+							[
+								'type' => 'links',
+								'description' => $this->_lang->GET('record.create_identifier_proceed'),
+								'content' => $downloadfiles
 							]
-						]
-					];	
-				}
-				else { // barcode
+						];
+						$this->response([
+							'render' => $body
+						]);
+	
+						break;
+					case 'qrcode_text':
+						$result['render']['content'][] = [
+							[
+								'type' => 'image',
+								'description' => $this->_lang->GET('tool.code.code_created'),
+								'attributes' =>[
+									'name' => $types[$this->_requestedType]['name'],
+									'qrcode' => $types[$this->_requestedType]['code']
+								]
+							]
+						];
+						break;
+					default: //barcode
 					$result['render']['content'][] = [
 						[
 							'type' => 'image',
