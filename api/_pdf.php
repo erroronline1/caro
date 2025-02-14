@@ -39,23 +39,37 @@ class PDF{
 			'columns'=> isset($setup['columns']) ? intval($setup['columns']) : 1,
 			'fontsize'=> isset($setup['fontsize']) ? intval($setup['fontsize']) : 12,
 			'codesizeoffset' => isset($setup['codesizeoffset']) ? intval($setup['codesizeoffset']) : 0,
-		];				
+			'header' => isset($setup['header']) ? $setup['header'] : true,
+			'footer' => isset($setup['footer']) ? $setup['footer'] : true,
+		];
+		$customsetup = preg_split('/\D{1,}/', $this->_setup['format']);
+		if (count($customsetup) > 1 && $customsetup[0] /*not line start*/){
+			$this->_setup['format'] = [$customsetup[0], $customsetup[1]];
+		}
 	}
 
 	private function init($content){
 		// create new PDF document and set initial properties
 		$this->_pdf = new RECORDTCPDF($this->_setup, true, 'UTF-8', false, false,
-		20, isset($content['identifier']) ? $content['identifier'] : null, ['title' => $content['title'], 'date' => $content['date']]);
-		$this->_pdf->SetTitle($content['title']);
+		20, isset($content['identifier']) ? $content['identifier'] : null, ['title' => isset($content['title']) ? $content['title'] : '', 'date' => isset($content['date']) ? $content['date'] : '']);
 
 		// set document information
 		$this->_pdf->SetCreator(CONFIG['system']['caroapp']);
 		$this->_pdf->SetAuthor($_SESSION['user']['name']);
+		$this->_pdf->SetTitle($content['title']);
 
 		// set margins
-		$this->_pdf->SetMargins($this->_setup['marginleft'], PDF_MARGIN_HEADER + $this->_setup['margintop'], $this->_setup['marginright'],1);
-		$this->_pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-		$this->_pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+		if ($this->_setup['header']){
+			$this->_pdf->SetMargins($this->_setup['marginleft'], PDF_MARGIN_HEADER + $this->_setup['margintop'], $this->_setup['marginright'], true);
+			$this->_pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+		} else {
+			$this->_pdf->setPrintHeader(false);
+		}
+		if ($this->_setup['footer']){
+			$this->_pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+		} else {
+			$this->_pdf->setPrintFooter(false);
+		}
 		// set auto page breaks
 		$this->_pdf->SetAutoPageBreak(TRUE, $this->_setup['marginbottom']); // margin bottom
 		// add a page
@@ -219,58 +233,17 @@ class PDF{
 		return $this->return($content);
 	}
 
-	public function qrcodePDF($content = [], $type = 'sheet'){
+	public function qrcodePDF($content){
 		// create a pdf for a label sheet with qr code and plain text
 		// or label for label printer as selected or other available type as per config.ini
-		// $content is an array of [qrcode content, written text beside]
-		$_lang = new LANG();
+		// $content['content'] is an array of [qrcode content, written text beside]
+		$this->init($content);
 
-		/*$setup = [
-			'orientation' => isset(CONFIG['label'][$type]['orientation']) ? CONFIG['label'][$type]['orientation'] : 'portrait',
-			'format' => isset(CONFIG['label'][$type]['format']) ? CONFIG['label'][$type]['format'] : 'A4',
-			'title' => $_lang->GET('record.create_identifier', [], true),
-			'margin' => [
-				'top' => isset(CONFIG['label'][$type]['margintop']) ? CONFIG['label'][$type]['margintop'] : 0,
-				'right' => isset(CONFIG['label'][$type]['marginright']) ? CONFIG['label'][$type]['marginright'] : 0,
-				'bottom' => isset(CONFIG['label'][$type]['marginbottom']) ? CONFIG['label'][$type]['marginbottom'] : 0 ,
-				'left' => isset(CONFIG['label'][$type]['marginleft']) ? CONFIG['label'][$type]['marginleft'] : 0,
-			],
-			'rows' => isset(CONFIG['label'][$type]['rows']) ? CONFIG['label'][$type]['rows'] : 1,
-			'columns' => isset(CONFIG['label'][$type]['columns']) ? CONFIG['label'][$type]['columns'] : 1,
-			'fontsize' => isset(CONFIG['label'][$type]['fontsize']) ? CONFIG['label'][$type]['fontsize'] : 10,
-			'codesizeoffset' => isset(CONFIG['label'][$type]['codesizeoffset']) ? CONFIG['label'][$type]['codesizeoffset'] : 0
-		];*/
-		$customsetup = preg_split('/\D{1,}/', $this->_setup['format']);
-		if (count($customsetup) > 1){
-			$this->_setup['format'] = [$customsetup[0], $customsetup[1]];
-		}
-
-		// create new PDF document
-		$pdf = new TCPDF($this->_setup['orientation'], $this->_setup['unit'], $this->_setup['format'], true, 'UTF-8', false);
-
-		// set document information
-		$pdf->SetCreator(CONFIG['system']['caroapp']);
-		$pdf->SetAuthor($_SESSION['user']['name']);
-		$pdf->SetTitle($_lang->GET('record.create_identifier', [], true));
-		$pdf->setPrintHeader(false);
-		$pdf->setPrintFooter(false);
-		// set margins
-		$pdf->SetMargins($this->_setup['marginleft'], $this->_setup['margintop'], $this->_setup['marginright'], true);
-		// set auto page breaks
-		$pdf->SetAutoPageBreak(TRUE, $this->_setup['marginbottom']);
-		// set font
-		$pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
-		// add a page
-		$pdf->AddPage();
 		// set cell padding
-		$pdf->setCellPaddings(0, 0, 0, 0);
-		// set cell margins
-		$pdf->setCellMargins(0, 0, 0, 0);
-		// set color for background
-		$pdf->SetFillColor(255, 255, 255);
+		$this->_pdf->setCellPaddings(0, 0, 0, 0);
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-		$format = [$pdf->getPageWidth(), $pdf->getPageheight()];
+		$format = [$this->_pdf->getPageWidth(), $this->_pdf->getPageheight()];
 		$columnwidth = ($format[0] - ($this->_setup['marginleft'] + $this->_setup['marginright'])) / $this->_setup['columns'];
 		$rowheight = ($format[1] - ($this->_setup['margintop'] + $this->_setup['marginbottom'])) / $this->_setup['rows'];
 
@@ -285,21 +258,14 @@ class PDF{
 			'module_width' => 1, // width of a single module in points
 			'module_height' => 1 // height of a single module in points
 		);
-
 		for ($row = 0; $row < $this->_setup['rows']; $row++){
 			for ($column = 0; $column < $this->_setup['columns']; $column++){
-				$pdf->write2DBarcode($content[0], 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $this->_setup['marginleft'], $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
-				$pdf->MultiCell($columnwidth - $codesize, $rowheight, $content[1], 0, '', 0, intval($column === $this->_setup['columns'] - 1), $column * $columnwidth + $codesize + $this->_setup['marginleft'], $row * $rowheight + $this->_setup['margintop'], true, 0, false, true, 24, 'T', true);
+				$this->_pdf->write2DBarcode($content['content'][0], 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $this->_setup['marginleft'], $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
+				$this->_pdf->MultiCell($columnwidth - $codesize, $rowheight, $content['content'][1], 0, '', 0, intval($column === $this->_setup['columns'] - 1), $column * $columnwidth + $codesize + $this->_setup['marginleft'], $row * $rowheight + $this->_setup['margintop'], true, 0, false, true, 24, 'T', true);
 			}
 		}
-		// move pointer to last page
-		$pdf->lastPage();
 
-		//Close and output PDF document
-		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-		$filename = preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content[1]) . '.pdf';
-		$pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$filename, 'F');
-		return substr(UTILITY::directory('tmp') . '/' .$filename, 1);
+		return $this->return($content);
 	}
 
 	public function recordsPDF($content){
@@ -417,11 +383,12 @@ class RECORDTCPDF extends TCPDF {
 				$right_margin += 5;
 			}
 		}
-		$this->SetFont('helvetica', 'B', 20); // font size
-		$this->MultiCell(110 - $right_margin, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
-		$this->SetFont('helvetica', '', 10); // font size
-		$this->MultiCell(110 - $right_margin, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
-
+		if ($this->_setup['header']){
+			$this->SetFont('helvetica', 'B', 20); // font size
+			$this->MultiCell(110 - $right_margin, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
+			$this->SetFont('helvetica', '', 10); // font size
+			$this->MultiCell(110 - $right_margin, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
+		}
 		if ($this->qrcodecontent){
 			$style = array(
 				'border' => 0,
