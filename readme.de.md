@@ -1062,8 +1062,8 @@ In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty
 defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.XX.json-Dateien; Nutzer können im Profil individuell wählen
 issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
 order_auth = "token, signature" ; Optionen: token, signature; pin ist Standard, da dieser die Bestellberechtigung repräsentiert
-order_gtin_barcode = 1 ; 1: ja, 0: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
-require_complaint_selection = 1 ; 1: ja, 0: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
+order_gtin_barcode = no ; yes: ja, no: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
+require_complaint_selection = yes ; yes: ja, no: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
 timezone = "Europe/Berlin" ; Zeitzone für den Kalender
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
 
@@ -1184,39 +1184,64 @@ vendors = "ceo, qmo, purchase, prrc" ; Lieferanten anlegen und ändern
 ; Nach Belieben zu erweitern
 [label]
 sheet[format] = 'A4'
-sheet[orientation] = 'portrait' ; portrait oder landscape
+sheet[orientation] = 'portrait' ; portrait or landscape
 sheet[rows] = 11
 sheet[columns] = 5
 sheet[margintop] = 0 ; in mm
+sheet[marginright] = 0 ; in mm
 sheet[marginbottom] = 10 ; in mm
+sheet[marginleft] = 0 ; in mm
 sheet[fontsize] = 10
 sheet[codesizeoffset] = 10
+sheet[header] = no
+sheet[footer] = no
 
 label[format] = '85 x 35 Dymo' ; Breite und Höhe in mm, ggf Bezeichnung
-label[orientation] = 'landscape' ; portrait oder landscape
-label[rows] = 1
-label[colums] = 1
+label[orientation] = 'landscape' ; portrait or landscape
 label[margintop] = 2 ; in mm
 label[marginright] = 2 ; in mm
 label[marginbottom] = 2 ; in mm
 label[marginleft] = 1 ; in mm
-label[fontsize] = 12
+label[header] = no
+label[footer] = no
 
 ; Seiteneinstellungen für PDF-Aufzeichnungen
 [pdf]
 record[format] = 'A4'
-record[margintop] = 30 ; in mm
-record[marginright] = 15 ; in mm
-record[marginbottom] = 20 ; in mm
-record[marginleft] = 20 ; in mm
 record[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
 record[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
-exportimage[maxheight] = 75 ; Je nach typischen Seitenverhältnissen für Querformat, muss ausgetestet werden
+record[exportimage_maxheight] = 75 ; Je nach typischen Seitenverhältnissen für Querformat, muss ausgetestet werden
+
+appointment[format] = 'A5'
+appointment[orientation] = 'landscape' ; portrait or landscape
+appointment[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
+appointment[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
+appointment[codesizeoffset] = 40
 
 [splitresults]
 bundle_files_per_slide = 12
 products_per_slide = 6
 ```
+
+PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label und PDF-Einstellungen sind folgende Optionen verfügbar, wenngleich nicht zwingend für alle Anfragen verwendet:
+| Schlüssel | Optionen | Standard sofern nicht gesetzt |
+| --------- | -------- | ----------------------------- |
+| format | gebräuchliche Papierformate oder Länge und Breite als einfach Zahlen | A4 |
+| unit | mm oder point | mm |
+| orientation | portrait oder landscape | portrait |
+| margintop | einfache Zahl in *unit*, oberer Randabstand | 30 |
+| marginright | einfache Zahl in *unit*, rechter Randabstand | 15 |
+| marginbottom | einfache Zahl in *unit*, unterer Randabstand | 20 |
+| marginleft | einfache Zahl in *unit*, linker Randabstand | 20 |
+| header_image | Pfad zur Bilddatei in der oberen rechten Ecke | none |
+| footer_image | Pfad zur Bilddatei in der unteren rechten Ecke | none |
+| exportimage_maxheight | einfache Zahl in *unit* für maximale Höhe eingebetteter Bilder | 75 |
+| rows | wiederholende Zeilen desselben Inhalts | 1 |
+| columns | wiederholende Spalten desselben Inhalts | 1 |
+| fontsize | einfache Zahl der Schriftgröße in *unit* | 12 |
+| codesizeoffset | einfache Zahl in *unit* als zusätzlicher Abstand eines QR-Codes vom Rand | 0 |
+| header | yes oder no | yes |
+| footer | yes oder no | yes |
 
 ## Anmerkungen und Hinweise zur Nutzung
 

@@ -128,8 +128,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * import audit questions (importWidget)
     * compose_helper.newDocumentComponents || compose_helper.newAuditQuestions
     * field name comparison
-* export appointment qr code with readable text
-* mention available options for pdf settings in [runtime variables](#runtime-variables)
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1145,9 +1143,9 @@ Using the config.env-file you can also append labels, forbidden names, hide_offd
 [application]
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
 issue_mail = "dev@erroronline.one" ; address for application and security issues
-order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
-order_gtin_barcode = 0 ; 1: yes, 0: no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
-require_record_type_selection = 1 ; 1: yes, 0: no; require selection on records e.g. if this is related to a complaint 
+order_auth = "token, sigNature" ; available options: token, signature; pin is default, because it represents authorization
+order_gtin_barcode = no ; yes, no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
+require_record_type_selection = yes ; yes, no; require selection on records e.g. if this is related to a complaint 
 timezone = "Europe/Berlin" ; timezone for calendar handling
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
 
@@ -1271,53 +1269,60 @@ sheet[orientation] = 'portrait' ; portrait or landscape
 sheet[rows] = 11
 sheet[columns] = 5
 sheet[margintop] = 0 ; in mm
+sheet[marginright] = 0 ; in mm
 sheet[marginbottom] = 10 ; in mm
+sheet[marginleft] = 0 ; in mm
 sheet[fontsize] = 10
 sheet[codesizeoffset] = 10
+sheet[header] = no
+sheet[footer] = no
 
 label[format] = '85 x 35 Dymo' ; width and height in mm
 label[orientation] = 'landscape' ; portrait or landscape
-label[rows] = 1
-label[colums] = 1
 label[margintop] = 2 ; in mm
 label[marginright] = 2 ; in mm
 label[marginbottom] = 2 ; in mm
 label[marginleft] = 1 ; in mm
-label[fontsize] = 12
+label[header] = no
+label[footer] = no
 
 ; page settings for record pdf
 [pdf]
 record[format] = 'A4'
-record[margintop] = 30 ; in mm
-record[marginright] = 15 ; in mm
-record[marginbottom] = 20 ; in mm
-record[marginleft] = 20 ; in mm
 record[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
 record[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
-exportimage[maxheight] = 75 ; try what fits your typical aspect ratio for landscape
+record[exportimage_maxheight] = 75 ; try what fits your typical aspect ratio for landscape
+
+appointment[format] = 'A5'
+appointment[orientation] = 'landscape' ; portrait or landscape
+appointment[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
+appointment[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
+appointment[codesizeoffset] = 40
 
 [splitresults]
 bundle_files_per_slide = 12
 products_per_slide = 6
 ```
 
-Labels can be extended to desired formats. For labels and pdf setting following options are available, albeit not necessarily being used:
+PDF-labels can be extended to desired formats. For labels and pdf setting following options are available, albeit not necessarily being used on all requests:
 | Key | Options | Default if not provided |
 | --- | ------- | ----------------------- |
 | format | regular paper sheet sizes or dimensions as plain numbers | A4 |
-| unit | mm or points | points |
+| unit | mm or point | mm |
 | orientation | portrait or landscape | portrait |
-| margintop | plain number in mm, margin on top of page | 30 |
-| marginright | plain number in mm, margin on right side of page | 15 |
-| marginbottom | plain number in mm, margin on bottom of page | 20 |
-| marginleft | plain number in mm, margin on left side of page | 20 |
+| margintop | plain number in *unit*, margin on top of page | 30 |
+| marginright | plain number in *unit*, margin on right side of page | 15 |
+| marginbottom | plain number in *unit*, margin on bottom of page | 20 |
+| marginleft | plain number in *unit*, margin on left side of page | 20 |
 | header_image | path to image file for header in upper right corner | none |
 | footer_image | path to image file in lower right corner | none |
-| exportimage_maxheight | plain number in mm for maximum height of embedded images | 75 |
+| exportimage_maxheight | plain number in *unit* for maximum height of embedded images | 75 |
 | rows | repetitive rows of content | 1 |
 | columns | repetitive columns of content | 1 |
-| fontsize | plain number of font size | 12 |
-| codesizeoffset | plain number of mm of offset of a qr code from borders | 0 |
+| fontsize | plain number of font size in points | 12 |
+| codesizeoffset | plain number of *unit* of offset of a qr code from borders | 0 |
+| header | yes or no | yes |
+| footer | yes or no | yes |
 
 ## Useage notes and caveats
 
