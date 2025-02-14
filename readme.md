@@ -1301,6 +1301,24 @@ bundle_files_per_slide = 12
 products_per_slide = 6
 ```
 
+Labels can be extended to desired formats. For labels and pdf setting following options are available, albeit not necessarily being used:
+| Key | Options | Default if not provided |
+| --- | ------- | ----------------------- |
+| format | regular paper sheet sizes or dimensions as plain numbers | A4 |
+| unit | mm or points | points |
+| orientation | portrait or landscape | portrait |
+| margintop | plain number in mm, margin on top of page | 30 |
+| marginright | plain number in mm, margin on right side of page | 15 |
+| marginbottom | plain number in mm, margin on bottom of page | 20 |
+| marginleft | plain number in mm, margin on left side of page | 20 |
+| header_image | path to image file for header in upper right corner | none |
+| footer_image | path to image file in lower right corner | none |
+| exportimage_maxheight | plain number in mm for maximum height of embedded images | 75 |
+| rows | repetitive rows of content | 1 |
+| columns | repetitive columns of content | 1 |
+| fontsize | plain number of font size | 12 |
+| codesizeoffset | plain number of mm of offset of a qr code from borders | 0 |
+
 ## Useage notes and caveats
 
 ### Network connection handling
