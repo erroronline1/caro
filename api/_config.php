@@ -17,10 +17,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-$defaultconfig = parse_ini_file('config.ini', true);
+$defaultconfig = parse_ini_file('config.ini', true, INI_SCANNER_TYPED);
 if (is_file('config.env')){
 	// config.env must contain the same nesting and keys as config.ini to override default settings
-	$envconfig = parse_ini_file('config.env', true);
+	$envconfig = parse_ini_file('config.env', true, INI_SCANNER_TYPED);
 
 	/**
 	 * recursively overwrite and append default config.ini parameters with environment settings
