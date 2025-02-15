@@ -483,6 +483,7 @@
 			"userskills": "Mitarbeiter Qualifikationen",
 			"vendors": "Lieferantenliste"
 		},
+		"checks_update_button": "Aktualisiere Einträge seit dem angegeben Zeitpunkt",
 		"complaints_case_description": ":identifier von einem der Bereiche :units",
 		"complaints_closed": ", als abgeschlossen gekennzeichnet",
 		"complaints_summary": ":number Reklamationen in diesem Jahr, von denen :closed als abgeschlossen markiert sind",
@@ -498,6 +499,7 @@
 		"documentusage_link": "Dokument ansehen",
 		"documentusage_warning": "Die Bewertung der Angemessenheit kann nicht alleine anhand der Anzahl der Nutzungen bewertet werden, es ist aber eine zusätzliche Information. Im Folgenden stehen die Dokumente welche für Aufzeichnungen geeignet sind.",
 		"experience_points": ":number Erfahrungspunkte für das Jahr :year",
+		"incorporation_export_timestamp": "seit :timestamp",
 		"incorporation_link": "zum Artikel",
 		"incorporation_warning_content": "Beobachte Bestellungen und sensibilisiere für die Beachtung: :amount Produkte",
 		"incorporation_warning_description": "Manche bestellten Produkte benötigen noch eine Produkteinführung!",

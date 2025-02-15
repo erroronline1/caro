@@ -483,6 +483,7 @@
 			"userskills": "Employee skills and trainings",
 			"vendors": "Vendor list"
 		},
+		"checks_update_button": "Update entries from the given date/time",
 		"complaints_case_description": ":identifier within one of units :units",
 		"complaints_closed": ", marked as closed",
 		"complaints_summary": ":number complaints within this year, of those :closed records are marked as closed",
@@ -498,6 +499,7 @@
 		"documentusage_link": "Inspect document",
 		"documentusage_warning": "Assessment of appropriateness can not only be done based on usage, but it is an additional information. Following are documents available for records.",
 		"experience_points": ":number experience points for the year :year",
+		"incorporation_export_timestamp": "since :timestamp",
 		"incorporation_link": "to product",
 		"incorporation_warning_content": "Observe orders and sensitise for compliance: :amount products",
 		"incorporation_warning_description": "Some ordered products still have to be incorporated!",

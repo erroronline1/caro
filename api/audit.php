@@ -1068,24 +1068,21 @@ class AUDIT extends API {
 					'value' => $this->_requestedDate,
 					'id' => '_documents_date'
 				]
-			],
-			[
+			], [
 				'type' => 'time',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents_time'),
 					'value' => $this->_requestedTime,
 					'id' => '_documents_time' 
 				]
-			],
-			[
+			], [
 				'type' => 'button',
 				'attributes' => [
 					'data-type' => 'generateupdate',
 					'value' => $this->_lang->GET('audit.documents_update_button'),
 					'onclick' => "api.audit('get', 'checks', 'documents', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
 				]
-			],
-			[
+			], [
 				'type' => 'textsection',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents_in_use_documents')
@@ -1382,12 +1379,22 @@ class AUDIT extends API {
 	 */
 	private function incorporation(){
 		$content = $orderedunincorporated = $entries = $incorporated = [];
+
+		$this->_requestedDate = $this->_requestedDate ? : '2023-10-01';
+		$this->_requestedTime = $this->_requestedTime ? : '00:00';
+
 		// get unincorporated articles from approved orders
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 		foreach($products as $id => $row){
 			if (!$row['incorporated']) continue;
 			$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
 			if (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) continue;
+			$fullyapproved = null;
+			foreach(PERMISSION::permissionfor('incorporation', true) as $approved){
+				$date = $row['incorporated'][$approved]['date'];
+				if ($date > $fullyapproved) $fullyapproved = $date;
+			}
+			if ($fullyapproved < $this->_requestedDate . ' ' . $this->_requestedTime) continue;
 			$incorporated[] = $row;
 			unset($products[$id]);
 		}
@@ -1416,15 +1423,37 @@ class AUDIT extends API {
 				'content' => $this->_lang->GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
 			]
 		];
-		// add export button
-		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+		$content[] = [
 			[
+				'type' => 'date',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.documents_date'),
+					'value' => $this->_requestedDate,
+					'id' => '_documents_date'
+				]
+			], [
+				'type' => 'time',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.documents_time'),
+					'value' => $this->_requestedTime,
+					'id' => '_documents_time' 
+				]
+			], [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
-					'data-type' => 'download'
+					'data-type' => 'generateupdate',
+					'value' => $this->_lang->GET('audit.checks_update_button'),
+					'onclick' => "api.audit('get', 'checks', 'incorporation', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
 				]
+			],
+		];
+		// add export button
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+			'type' => 'button',
+			'attributes' => [
+				'value' => $this->_lang->GET('audit.record_export'),
+				'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
+				'data-type' => 'download'
 			]
 		];
 		// add incorporations
@@ -1435,6 +1464,13 @@ class AUDIT extends API {
 			return $a['incorporated'][$permission]['date'] < $b['incorporated'][$permission]['date'] ? -1: 1;
 		});
 
+		$entries[] = [
+			'type' => 'textsection',
+			'attributes' => [
+				'name' => $this->_lang->GET('audit.checks_type.incorporation')
+			],
+			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->_requestedDate . ' ' . $this->_requestedTime])
+		];
 		foreach($incorporated as $product){
 			$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 			foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
@@ -1470,9 +1506,11 @@ class AUDIT extends API {
 
 		for($i = 1; $i<count($documents); $i++){
 			foreach($documents[$i] as $item){
-				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])){
-					if (isset($item['content'])) $summary['content'][$item['attributes']['name']] = $item['content'];
-					elseif (isset($item['linkedcontent'])) $summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation_link') . '$/m','', strip_tags($item['linkedcontent']));
+				if (isset($item['content']) || isset($item['linkedcontent'])){
+					if (isset($item['content']) && isset($item['attributes']['name']))
+						$summary['content'][$item['attributes']['name']] = $item['content'];
+					elseif (isset($item['linkedcontent']) && isset($item['attributes']['name']))
+						$summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation_link') . '$/m','', strip_tags($item['linkedcontent']));
 				}
 			}
 		}
@@ -1506,6 +1544,10 @@ class AUDIT extends API {
 	 */
 	private function mdrsamplecheck(){
 		$content = $unchecked = $entries = [];
+
+		$this->_requestedDate = $this->_requestedDate ? : '2023-10-01';
+		$this->_requestedTime = $this->_requestedTime ? : '00:00';
+
 		// get unchecked articles for MDR §14 sample check
 		$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
 		$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
@@ -1525,13 +1567,37 @@ class AUDIT extends API {
 				'content' => $this->_lang->GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
 			]
 		];
+		$content[] = [
+			[
+				'type' => 'date',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.documents_date'),
+					'value' => $this->_requestedDate,
+					'id' => '_documents_date'
+				]
+			], [
+				'type' => 'time',
+				'attributes' => [
+					'name' => $this->_lang->GET('audit.documents_time'),
+					'value' => $this->_requestedTime,
+					'id' => '_documents_time' 
+				]
+			], [
+				'type' => 'button',
+				'attributes' => [
+					'data-type' => 'generateupdate',
+					'value' => $this->_lang->GET('audit.checks_update_button'),
+					'onclick' => "api.audit('get', 'checks', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
+					]
+			]
+		];
 		// add export button
 		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
 			]
@@ -1545,8 +1611,17 @@ class AUDIT extends API {
 			return $a['checked'] < $b['checked'] ? -1: 1;
 		});
 
+		$entries[] = [
+			'type' => 'textsection',
+			'attributes' => [
+				'name' => $this->_lang->GET('audit.checks_type.mdrsamplecheck')
+			],
+			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->_requestedDate . ' ' . $this->_requestedTime])
+		];
+
 		foreach($products as $product){
 			if (!$product['sample_checks']) continue;
+			if ($product['checked'] < $this->_requestedDate . ' ' . $this->_requestedTime . ':00') continue;
 
 			$product['sample_checks'] = json_decode($product['sample_checks'], true);
 			$checks = [];
@@ -1596,8 +1671,9 @@ class AUDIT extends API {
 
 		for($i = 1; $i<count($documents); $i++){
 			foreach($documents[$i] as $item){
-				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])){
-					if (isset($item['content'])) $summary['content'][$item['attributes']['name']] = $item['content'];
+				if (isset($item['content'])){
+					if (isset($item['content']) && isset($item['attributes']['name']))
+						$summary['content'][$item['attributes']['name']] = $item['content'];
 				}
 			}
 		}

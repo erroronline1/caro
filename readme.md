@@ -119,8 +119,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * audit templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* audit report (records)
-* optionally limit regulatory summaries export where possible (vendorlist per vendor, risks per process, incorporations and sample tests per timespan)
 * message unit and permissions on closed audits, how to access information without regulatory permission? message text? ISO 19011 6.4
 * measure management pictures
 * update readme pictures on tools menu, record menu, audit and regulatory
