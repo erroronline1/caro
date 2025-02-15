@@ -100,12 +100,48 @@ class AUDIT extends API {
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post', [
 					'values' => $audit
-				])) $this->response([
+				])) {
+					if ($audit[':closed']){
+						$audit[':content'] = json_decode($audit[':content'], true);
+						$summary = $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit[':unit']] . "\n \n";
+						$summary .= $audit[':last_user'] . "\n";
+						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit[':content']['objectives'];
+						foreach($audit[':content']['questions'] as $question){
+							$currentquestion = null;
+							// start with  question and direct response as initial value
+							foreach($question as $key => $values){
+								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
+								$summary .= "\n \n" .$key . ': ' . implode("\n", $values) . "\n";
+								break;
+							}
+							// assign question response as value
+							foreach($question as $key => $values){
+								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
+									$summary .=  "\n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
+									switch ($key){
+										case 'rating':
+											$summary .=  $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
+											break;
+										case 'regulatory':
+											$summary .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+											break;
+										default:
+										$summary .=  implode("\n", $values);
+									}
+								}
+							}
+						}
+						$summary .= "\n \n" . $this->_lang->GET('audit.audit.execute.summary', [], true) . ': ' . $audit[':content']['summary'];
+					}
+					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit[':unit']]], $summary);
+
+					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.execute.saved'),
 						'id' => $this->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.execute.not_saved'),
@@ -148,21 +184,55 @@ class AUDIT extends API {
 						// manual human template question
 						$audit['content']['questions'][intval($set[1])][$set[2]][0] = $value;
 				}
-				$audit['content'] = json_encode($audit['content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put', [
 					'values' => [
 						':id' => $audit['id'],
-						':content' => $audit['content'],
+						':content' => json_encode($audit['content']),
 						':last_user' => $audit['last_user'],
 						':closed' => $audit['closed']
 					]
-				])) $this->response([
+				])) {
+					if ($audit['closed']){
+						$summary = $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit['unit']] . "\n \n";
+						$summary .= $audit['last_user'] . "\n";
+						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit['content']['objectives'];
+						foreach($audit['content']['questions'] as $question){
+							$currentquestion = null;
+							// start with  question and direct response as initial value
+							foreach($question as $key => $values){
+								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
+								$summary .= "\n \n" .$key . ': ' . implode("\n", $values) . "\n";
+								break;
+							}
+							// assign question response as value
+							foreach($question as $key => $values){
+								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
+									$summary .=  "\n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
+									switch ($key){
+										case 'rating':
+											$summary .=  $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
+											break;
+										case 'regulatory':
+											$summary .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+											break;
+										default:
+										$summary .=  implode("\n", $values);
+									}
+								}
+							}
+						}
+						$summary .= "\n \n" . $this->_lang->GET('audit.audit.execute.summary', [], true) . ': ' . $audit['content']['summary'];
+					}
+					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit['unit']]], $summary);
+					
+					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.execute.saved'),
 						'id' => $this->_pdo->lastInsertId(),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.execute.not_saved'),
@@ -429,7 +499,7 @@ class AUDIT extends API {
 		$summary['content'][$this->_lang->GET('audit.audit.objectives', [], true)] = $audit['content']['objectives'];
 		foreach($audit['content']['questions'] as $question){
 			$currentquestion = null;
-			// assign question as key ancurrentquestiond direct response as initial value
+			// assign question as key and current question direct response as initial value
 			foreach($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 				$currentquestion = $key;
