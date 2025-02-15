@@ -78,8 +78,8 @@ export const compose_helper = {
 				[
 					{
 						type: "auditsection",
-						attributes:{
-							name: api._lang.GET("audit.audit.question")
+						attributes: {
+							name: api._lang.GET("audit.audit.question"),
 						},
 						content: question + "\n \n" + api._lang.GET("audit.audit.execute.regulatory") + "\n" + regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + hint,
 					},
@@ -518,8 +518,8 @@ export const compose_helper = {
 		for (const questions of chunks) {
 			question.push({
 				type: "auditsection",
-				attributes:{
-					name: api._lang.GET("audit.audit.question")
+				attributes: {
+					name: api._lang.GET("audit.audit.question"),
 				},
 				content: questions.question + "\n \n" + api._lang.GET("audit.audit.execute.regulatory") + "\n" + questions.regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + questions.hint,
 			});
@@ -674,35 +674,53 @@ export const compose_helper = {
 	},
 
 	/**
-	 * populates the respective components editor forms with widgets settings
+	 * populates the respective components or audit templates editor forms with widgets settings
 	 * @param {domNode} widgetcontainer event
-	 * @event populate components editor form with values
-	 * @see compose_helper.composeNewElementCallback()
+	 * @event populate components or audit templates editor form with values
+	 * @see compose helper.composeNewAuditQuestionCallback and compose_helper.composeNewElementCallback()
 	 */
 	importWidget: function (widgetcontainer) {
-		// this doesn't make sense for some types but idc. actually impossible for image type, so this is a exit case
+		// this may not make sense for some types but idc. actually impossible for image type, so this is a exit case
 
 		let type,
 			targetform,
-			forms = document.querySelectorAll("form");
+			forms = document.querySelectorAll("form"),
+			newElements,
+			element;
 
 		type = widgetcontainer.childNodes[0].dataset.type;
-		if (!type || !Object.keys(compose_helper.newDocumentComponents).includes(widgetcontainer.id)) {
+		if (!type) {
 			new Toast(api._lang.GET("assemble.compose.context_edit_error"), "error");
 			return;
 		}
-		// detect appropriate form
-		for (let f = 0; f < forms.length; f++) {
-			if (forms[f].childNodes[0] && type === forms[f].childNodes[0].dataset.type) {
-				targetform = forms[f];
-				break;
+
+		if (type === "auditsection") {
+			newElements = compose_helper.newAuditQuestions;
+			Object.keys(newElements).forEach((key) => {
+				newElements[key].type = "auditsection";
+			});
+			targetform = forms[0].childNodes[2]; // article containing questions inputs
+		} else {
+			// document components
+			newElements = compose_helper.newDocumentComponents;
+			// detect appropriate form
+			for (let f = 0; f < forms.length; f++) {
+				if (forms[f].childNodes[0] && type === forms[f].childNodes[0].dataset.type) {
+					targetform = forms[f];
+					break;
+				}
 			}
 		}
 		if (!targetform) return;
+
+		if (!(element = newElements[widgetcontainer.id])) {
+			new Toast(api._lang.GET("assemble.compose.context_edit_error"), "error");
+			return;
+		}
+
 		targetform.scrollIntoView();
 
-		// import attributes
-		const element = compose_helper.newDocumentComponents[widgetcontainer.id];
+		// import attributes/values
 		if (["image"].includes(element.type)) return;
 
 		if (element.type === type || (element.type === "identify" && type === "scanner")) {
@@ -765,9 +783,14 @@ export const compose_helper = {
 					if (siblingName === api._lang.GET("assemble.compose.component.range_step")) sibling.value = element.attributes.step;
 				} else {
 					// ...input
+
+					// document components
 					if (siblingName === api._lang.GET("assemble.compose.component.field_name")) {
 						sibling.value = element.attributes.name;
+						continue;
 					}
+					// audit question input
+					sibling.value = element[sibling.id.substring(1)];
 				}
 			}
 		}

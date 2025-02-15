@@ -681,7 +681,8 @@ class AUDIT extends API {
 							'id' => '_question',
 							'rows' => 4,
 							'data-loss' => 'prevent',
-							'maxlength' => 80
+							'maxlength' => 80,
+							'data-type' => 'auditsection' // for composer, not icon
 						],
 						'autocomplete' => array_values($datalist['questions']) ? : null
 					], [
