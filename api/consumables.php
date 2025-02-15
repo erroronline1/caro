@@ -1563,6 +1563,7 @@ class CONSUMABLES extends API {
 					':article_alias' => null,
 					':article_unit' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_unit']) ? : null,
 					':article_ean' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_ean']) ? : null,
+					':article_info' => null,
 					':hidden' => null,
 					':protected' => null,
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : null,
