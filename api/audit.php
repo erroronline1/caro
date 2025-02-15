@@ -555,7 +555,6 @@ class AUDIT extends API {
 	public function audits(){
 		$content = [];
 		$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
-
 		foreach ($audits as $audit){
 			if (!$audit['closed']) continue;
 			$audit['content'] = json_decode($audit['content'], true);
@@ -568,30 +567,38 @@ class AUDIT extends API {
 					'content' => $this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives']
 				]
 			];
-			$q = 0;
 			foreach($audit['content']['questions'] as $question){
-				$currentquestion = '';
+				// assign question as key and current question direct response as initial value
 				foreach($question as $key => $values){
-					$currentquestion .= (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ': ';
-					switch ($key){
-						case 'rating':
-							$currentquestion .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
-							break;
-						case 'regulatory':
-							$currentquestion .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
-							break;
-						default:
-							$currentquestion .= implode("\n", $values);
+					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
+					$currentquestion = $key;
+					$currentanswer = $summary['content'][$currentquestion] = implode("\n", $values) . "\n";
+					break;
+				}
+				// assign question response as value
+				foreach($question as $key => $values){
+					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
+						$currentanswer .= (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ': ';
+						switch ($key){
+							case 'rating':
+								$currentanswer .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
+								break;
+							case 'regulatory':
+								$currentanswer .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+								break;
+							default:
+								$currentanswer .= implode("\n", $values);
+						}
+						$currentanswer .= "\n";
 					}
-					$currentquestion .= "\n";
 				}
 				
 				$current[] = [
-					'type' => 'textsection',
+					'type' => 'auditsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('audit.audit.question', [], true) . ' ' . strval(++$q)
+						'name' => $currentquestion
 					],
-					'content' => $currentquestion
+					'content' => $currentanswer
 				];
 			}
 			$current[] = [
