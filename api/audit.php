@@ -405,6 +405,74 @@ class AUDIT extends API {
 		}
 		$this->response($result);
 	}
+	/**
+	 * creates and returns a download link to the export file for given audit
+	 */
+	private function exportaudit(){
+		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+		$audit = $audit ? $audit[0] : null;
+		if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
+
+		$audit['content'] = json_decode($audit['content'], true);
+
+		$summary = [
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $this->_lang->GET('audit.checks_type.audits', [], true) . '_' . $audit['last_touch']),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit['unit']],
+			'date' => $audit['last_touch']
+		];
+		
+		$summary['content'][$audit['last_user']] = '';
+		$summary['content'][$this->_lang->GET('audit.audit.objectives', [], true)] = $audit['content']['objectives'];
+		foreach($audit['content']['questions'] as $question){
+			$currentquestion = null;
+			// assign question as key ancurrentquestiond direct response as initial value
+			foreach($question as $key => $values){
+				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
+				$currentquestion = $key;
+				$summary['content'][$currentquestion] = implode("\n", $values) . "\n";
+				break;
+			}
+			// assign question response as value
+			foreach($question as $key => $values){
+				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
+					$summary['content'][$currentquestion] .= "\n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
+					switch ($key){
+						case 'rating':
+							$summary['content'][$currentquestion] .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
+							break;
+						case 'regulatory':
+							$summary['content'][$currentquestion] .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+							break;
+						default:
+							$summary['content'][$currentquestion] .= implode("\n", $values);
+					}
+				}
+			}
+		}
+		$summary['content'][$this->_lang->GET('audit.audit.execute.summary', [], true)] = $audit['content']['summary'];
+
+		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
+		$downloadfiles[$this->_lang->GET('audit.checks_type.audits')] = [
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
 
 	/**
 	 *             _ _ _       
@@ -455,13 +523,21 @@ class AUDIT extends API {
 					],
 					'content' => $currentquestion
 				];
-		}
+			}
 			$current[] = [
 				'type' => 'textsection',
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.audit.execute.summary', [], true)
 				],
 				'content' => $audit['content']['summary']
+			];
+			$current[] = [
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('audit.record_export'),
+					'onclick' => "api.audit('get', 'export', 'audit', " . $audit['id'] . ")",
+					'data-type' => 'download'
+				]
 			];
 			$content[] = $current;
 		}
@@ -895,7 +971,7 @@ class AUDIT extends API {
 	public function export(){
 		if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
 		$static = [
-			'audits',
+			'audit',
 			'mdrsamplecheck',
 			'incorporation',
 			'documents',
