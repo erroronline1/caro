@@ -1062,6 +1062,25 @@ export class Assemble {
 	 */
 
 	/**
+	 * creates a textarea whose content will be inserted into clipboard
+	 * @returns {domNodes}
+	 * @see this.textarea()
+	 */
+	textarea_copy() {
+		this.currentElement.attributes.onclick = "_client.application.toClipboard(this)";
+		return this.textarea();
+	}
+
+	/**
+	 * creates a text paragraph styled as question
+	 * @returns {domNodes} 
+	 * @see this.textsection()
+	 */
+	auditsection() {
+		return this.textsection();
+	}
+
+	/**
 	 * @returns {domNodes} br
 	 */
 	br() {

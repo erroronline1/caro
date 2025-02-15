@@ -77,8 +77,11 @@ export const compose_helper = {
 			content: [
 				[
 					{
-						type: "textsection",
-						content: api._lang.GET("audit.audit.question") + "\n" + question + "\n \n" + api._lang.GET("audit.audit.execute.regulatory") + "\n" + regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + hint,
+						type: "auditsection",
+						attributes:{
+							name: api._lang.GET("audit.audit.question")
+						},
+						content: question + "\n \n" + api._lang.GET("audit.audit.execute.regulatory") + "\n" + regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + hint,
 					},
 				],
 			],
@@ -514,8 +517,11 @@ export const compose_helper = {
 		let question = [];
 		for (const questions of chunks) {
 			question.push({
-				type: "textsection",
-				content: api._lang.GET("audit.audit.question") + "\n" + questions.question + "\n \n" + api._lang.GET("audit.audit.regulatory") + "\n" + questions.regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + questions.hint,
+				type: "auditsection",
+				attributes:{
+					name: api._lang.GET("audit.audit.question")
+				},
+				content: questions.question + "\n \n" + api._lang.GET("audit.audit.execute.regulatory") + "\n" + questions.regulatory + "\n \n" + api._lang.GET("audit.audit.hint") + "\n" + questions.hint,
 			});
 		}
 		let chunk = new Compose({

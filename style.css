@@ -1278,6 +1278,12 @@ button[data-type="additem"]::before {
 	mask-image: url("./media/bell.svg");
 }
 
+[data-type="auditsection"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/question-circle.svg");
+	mask-image: url("./media/question-circle.svg");
+}
+
 [data-type="calendar"]::before,
 [data-type="calendarbutton"]::before,
 [data-type="date"]::before {
