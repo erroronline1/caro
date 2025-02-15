@@ -506,6 +506,7 @@ class AUDIT extends API {
 				$summary['content'][$currentquestion] = implode("\n", $values) . "\n";
 				break;
 			}
+			if (!$currentquestion) continue;
 			// assign question response as value
 			foreach($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
@@ -569,12 +570,14 @@ class AUDIT extends API {
 			];
 			foreach($audit['content']['questions'] as $question){
 				// assign question as key and current question direct response as initial value
+				$currentquestion = $currentanswer = '';
 				foreach($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 					$currentquestion = $key;
-					$currentanswer = $summary['content'][$currentquestion] = implode("\n", $values) . "\n";
+					$currentanswer = implode("\n", $values) . "\n";
 					break;
 				}
+				if (!$currentquestion) continue;
 				// assign question response as value
 				foreach($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
