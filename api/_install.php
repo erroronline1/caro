@@ -47,6 +47,7 @@ define('DEFAULTSQL', [
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`hint` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -817,6 +818,7 @@ class INSTALL {
 
 				$insertions[] = [
 					':content' => $entry['content'],
+					':hint' => $entry['hint'] ? : null,
 					':objectives' => $entry['objectives'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
 					':content' => $entry['content']

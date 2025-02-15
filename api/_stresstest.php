@@ -297,6 +297,7 @@ class STRESSTEST extends INSTALL{
 				if (
 					isset($entry['unit']) &&
 					$dbentry['unit'] === $entry['unit'] &&
+					$dbentry['hint'] === $entry['hint'] &&
 					$dbentry['objectives'] === $entry['objectives']
 					// no checking if $dbentry['content'] === $entry['content'] for db-specific character encoding
 				){

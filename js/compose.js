@@ -328,6 +328,7 @@ export const compose_helper = {
 		// set dragged/dropped order of elements
 		const unit = document.getElementById("TemplateUnit").value,
 			objectives = document.getElementById("TemplateObjectives").value,
+			hint = document.getElementById("TemplateHint").value,
 			data = new FormData();
 
 		/**
@@ -357,6 +358,7 @@ export const compose_helper = {
 			data.append("unit", unit);
 			data.append("content", JSON.stringify(templateContent));
 			data.append("objectives", objectives);
+			data.append("hint", hint);
 			return data;
 		}
 		new Toast(api._lang.GET("audit.audit.template.not_saved_missing"), "error");

@@ -450,6 +450,8 @@
 				"delete_confirm_ok": "Ja, Vorlage löschen",
 				"delete_error": "Die Vorlage konnte nicht gelöscht werden",
 				"delete_success": "Die Vorlage wurde gelöscht",
+				"hint": "Hinweis",
+				"hint_hint": "zum Beispiel Teilbereich",
 				"import_summary": "Vorige Zusammenfassung importieren",
 				"import_summary_hint": "Es wird nur das letzte abgeschlossene Audit für den gewählten Bereich verwendet. Im geplanten Audit sollte auf die Ergebnisse des vorherigen Audits eingegangen werden.",
 				"new": "Neue Vorlage",

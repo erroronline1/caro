@@ -195,7 +195,7 @@ class AUDIT extends API {
 
 				//template selection
 				foreach($templates as $row){
-					$select['templates'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['date']] = ['value' => $row['id']];
+					$select['templates'][$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $row['date']] = ['value' => $row['id']];
 				}
 
 				// audit selections
@@ -573,6 +573,7 @@ class AUDIT extends API {
 					':objectives' => UTILITY::propertySet($this->_payload, 'objectives'),
 					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
+					':hint' =>  UTILITY::propertySet($this->_payload, 'hint'),
 				];
 				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives']) $this->response([], 400);
 
@@ -606,6 +607,7 @@ class AUDIT extends API {
 					':objectives' => UTILITY::propertySet($this->_payload, 'objectives'),
 					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
+					':hint' =>  UTILITY::propertySet($this->_payload, 'hint'),
 					':id' => $this->_requestedID
 				];
 				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives']) $this->response([], 400);
@@ -637,6 +639,7 @@ class AUDIT extends API {
 			case 'GET':
 				$result = [];
 				$datalist = ['objectives'=> [], 'questions' => [], 'hints' => []];
+				$templatehints = [];
 				$select = ['...' . $this->_lang->GET('audit.audit.template.new') => ['value' => '0']];
 				$calendar = new CALENDARUTILITY($this->_pdo);
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
@@ -650,7 +653,8 @@ class AUDIT extends API {
 						'unit' => '',
 						'objectives' => '',
 						'author' => '',
-						'date' => null
+						'date' => null,
+						'hint' => null
 					];
 				}
 
@@ -667,8 +671,10 @@ class AUDIT extends API {
 				}
 				
 				foreach($data as $row){
-					$select[$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
-					
+					// selection
+					$select[$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
+					// template hint datalist
+					$templatehints[] = $row['hint'];
 					// objective datalist
 					$datalist['objectives'][] = $row['objectives'];
 					// question datalist
@@ -682,9 +688,10 @@ class AUDIT extends API {
 				foreach($datalist as $data => &$values){
 					$values = array_filter($values, fn($v) => boolval($v));
 					ksort($values);
-					// for sanitation of template files:
-					//var_dump($data, array_values($values));
 				}
+				$templatehints = array_unique($templatehints);
+				$templatehints = array_filter($values, fn($v) => boolval($v));
+				ksort($templatehints);
 
 				// prepare and append content for editor rendering
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
@@ -722,6 +729,16 @@ class AUDIT extends API {
 							'data-loss' => 'prevent'
 						],
 						'content' => $units
+					], [
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.template.hint'),
+							'id' => 'TemplateHint',
+							'value' => $template['hint'],
+							'data-loss' => 'prevent'
+						],
+						'datalist' => $templatehints,
+						'hint' => $this->_lang->GET('audit.audit.template.hint_hint')
 					], [
 						'type' => 'textarea',
 						'attributes' => [
@@ -777,6 +794,7 @@ class AUDIT extends API {
 							'rows' => 4,
 							'data-loss' => 'prevent'
 						],
+						'numeration' => 'none',
 						'autocomplete' => array_values($datalist['hints']) ? : null
 					], [
 						'type' => 'button',
