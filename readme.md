@@ -121,6 +121,9 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * measure management pictures
 * update readme pictures on tools menu, record menu, audit and regulatory
+* pricelist import issues for possible fingerprint issue (character encoding) regarding thuasne, tigges, streifeneder, rebotec, protheseus, pochert, orthoservice, orthe reha neuhof, nowecor, russka, caroli, darco, bort
+* pricelist key error for possibly unsanitized content regarding busch
+* try performance comparison simplifying by one loop through article db instead of consumables_get_eligible_sample_check, consumables_get_valid_checked, consumables_get_not_reusable_checked.
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
