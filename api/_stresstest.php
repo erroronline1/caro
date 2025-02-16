@@ -95,7 +95,7 @@ class STRESSTEST extends INSTALL{
 					':affected_user_id' => 2,
 					':organizational_unit' => 'prosthetics2',
 					':subject' => $this->_prefix . random_int(0, 1000000),
-					':misc' => 'str (e.g. json_encoded whatnot)',
+					':misc' => 'str (e.g. UTILITY::json_encoded whatnot)',
 					':closed' => '',
 					':alert' => 0
 				]
@@ -150,7 +150,7 @@ class STRESSTEST extends INSTALL{
 					'author' => $this->_defaultUser,
 					'date' => $this->_currentdate->format('Y-m-d H:i:s'),
 					'document' => $document['id'],
-					'content' => json_encode($content)
+					'content' => UTILITY::json_encode($content)
 				];
 
 			}
@@ -165,7 +165,7 @@ class STRESSTEST extends INSTALL{
 						':identifier' => $identifier,
 						':last_user' => 2,
 						':last_document' => $document['name'],
-						':content' => json_encode($records),
+						':content' => UTILITY::json_encode($records),
 						':id' => $exists['id']
 					]
 				]);
@@ -177,7 +177,7 @@ class STRESSTEST extends INSTALL{
 					':identifier' => $identifier,
 					':last_user' => 2,
 					':last_document' => $document['name'],
-					':content' => json_encode($current_record),
+					':content' => UTILITY::json_encode($current_record),
 				]
 			]);
 		}
@@ -210,7 +210,7 @@ class STRESSTEST extends INSTALL{
 		for ($i = 0; $i < $this->_orderentries; $i++){
 			$product = $products[array_rand($products)];
 				$orders[] = [
-				':order_data' => json_encode(
+				':order_data' => UTILITY::json_encode(
 					[
 						'quantity_label' => random_int(1,10),
 						'unit_label' => random_int(0,1) ? $product['article_unit'] : '',
@@ -271,7 +271,7 @@ class STRESSTEST extends INSTALL{
 			foreach($DBall as $row){
 				SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
 					'values' => [
-						':approval' => json_encode($permissions),
+						':approval' => UTILITY::json_encode($permissions),
 						':id' => $row['id']
 					]
 				]);
@@ -513,7 +513,7 @@ class STRESSTEST extends INSTALL{
 				if (
 					isset($entry['name']) &&
 					$dbentry['name'] === $entry['name'] &&
-					json_decode($dbentry['info'], true) === $entry['info']
+					json_decode($dbentry['info'] ? : '', true) === $entry['info']
 				){
 					$deletion = [
 						'mysql' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbentry['id'],

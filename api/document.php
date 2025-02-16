@@ -80,7 +80,7 @@ class DOCUMENT extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
 					'values' => [
 						':id' => $approve['id'],
-						':approval' => json_encode($approve['approval']) ? : ''
+						':approval' => UTILITY::json_encode($approve['approval']) ? : ''
 					]
 				]) !== false) {
 					$pending_approvals = PERMISSION::pending('documentapproval', $approve['approval']);
@@ -341,7 +341,7 @@ class DOCUMENT extends API {
 							':unit' => $bundle[':unit'],
 							':author' => $exists['author'],
 							':content' => $exists['content'],
-							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 							':approval' => $exists['approval'],
 							':regulatory_context' => '',
 							':permitted_export' => null,
@@ -738,8 +738,8 @@ class DOCUMENT extends API {
 								':context' => 'component',
 								':unit' => $component_approve ? : null,
 								':author' => $_SESSION['user']['name'],
-								':content' => json_encode($component),
-								':hidden' => $component_hidden ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':content' => UTILITY::json_encode($component),
+								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -768,7 +768,7 @@ class DOCUMENT extends API {
 								':unit' => $component_approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => $component_hidden ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -805,7 +805,7 @@ class DOCUMENT extends API {
 						':context' => 'component',
 						':unit' => $component_approve,
 						':author' => $_SESSION['user']['name'],
-						':content' => json_encode($component),
+						':content' => UTILITY::json_encode($component),
 						':regulatory_context' => '',
 						':permitted_export' => NULL,
 						':restricted_access' => NULL
@@ -1459,7 +1459,7 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => implode(',', $this->_payload->content),
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
@@ -1488,7 +1488,7 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,

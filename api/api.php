@@ -376,7 +376,7 @@ class API {
 		$this->alertUserGroupSubmit();
 
 		if(is_array($data)) {
-			$data = json_encode($data);
+			$data = UTILITY::json_encode($data);
 			$this->_httpResponse = $status;
 		}
 		else {

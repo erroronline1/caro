@@ -74,7 +74,7 @@ class RECORD extends API {
 						'author' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i:s'),
 						'document' => 0,
-						'content' => json_encode([
+						'content' => UTILITY::json_encode([
 							$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET($this->_caseStateBoolean === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
 						])
 					];
@@ -85,12 +85,12 @@ class RECORD extends API {
 					else unset($case_state[$this->_caseState]);
 					if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 						'values' => [
-							':case_state' => json_encode($case_state) ? : null,
+							':case_state' => UTILITY::json_encode($case_state) ? : null,
 							':record_type' => $case['record_type'] ? : null,
 							':identifier' => $this->_requestedID,
 							':last_user' => $_SESSION['user']['id'],
 							':last_document' => null,
-							':content' => json_encode($records),
+							':content' => UTILITY::json_encode($records),
 							':id' => $case['id']
 						]
 					])) $this->response([
@@ -196,7 +196,7 @@ class RECORD extends API {
 
 		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
 			'values' => [
-				':closed' => json_encode($data['closed']),
+				':closed' => UTILITY::json_encode($data['closed']),
 				':identifier' => $this->_requestedID
 			]
 		]);
@@ -781,7 +781,7 @@ class RECORD extends API {
 					'author' => $_SESSION['user']['name'],
 					'date' => $entry_timestamp,
 					'document' => $document_id,
-					'content' => json_encode($this->_payload)
+					'content' => UTILITY::json_encode($this->_payload)
 				];
 				if (boolval((array) $this->_payload)){
 					$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
@@ -800,7 +800,7 @@ class RECORD extends API {
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
 								':last_document' => $document_name,
-								':content' => json_encode($records),
+								':content' => UTILITY::json_encode($records),
 								':id' => $case['id']
 							]
 						]);
@@ -813,7 +813,7 @@ class RECORD extends API {
 								':identifier' => $identifier,
 								':last_user' => $_SESSION['user']['id'],
 								':last_document' => $document_name,
-								':content' => json_encode([$current_record]),
+								':content' => UTILITY::json_encode([$current_record]),
 							]
 						]);
 					}
@@ -903,7 +903,7 @@ class RECORD extends API {
 				}
 				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', this.dataset.casestate, this.checked);"
 					. " new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.casestate_change_message') . "', render: JSON.parse('"
-					. json_encode([
+					. UTILITY::json_encode([
 						[
 							'type' => 'checkbox',
 							'attributes' => [
@@ -934,7 +934,7 @@ class RECORD extends API {
 						]
 					])
 					. "'.replace()), options: JSON.parse('"
-					. json_encode([
+					. UTILITY::json_encode([
 						$this->_lang->GET('general.cancel_button') => false,
 						$this->_lang->GET('general.submit_button') => ['value' => true, 'class'=> 'reducedCTA']
 					])
@@ -1070,7 +1070,7 @@ class RECORD extends API {
 						foreach ($this->_lang->_USER['record']['type'] as $record_type => $description){
 							$options[$description] = ['value' => $record_type];
 						}						
-						$typeaction = "<a href=\"javascript:void(0);\" onclick=\"new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . json_encode(
+						$typeaction = "<a href=\"javascript:void(0);\" onclick=\"new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . UTILITY::json_encode(
 							[[
 								'type' => 'radio',
 								'attributes' => [
@@ -1112,7 +1112,7 @@ class RECORD extends API {
 						'attributes' => [
 							'data-type' => 'merge',
 							'value' => $this->_lang->GET('record.reidentify'),
-							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
+							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . UTILITY::json_encode(
 								[
 									[
 										'type' => 'scanner',
@@ -1421,7 +1421,7 @@ class RECORD extends API {
 						'attributes' => [
 							'data-type' => 'merge',
 							'value' => $this->_lang->GET('record.reidentify'),
-							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . json_encode(
+							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.reidentify') . "', render: JSON.parse('" . UTILITY::json_encode(
 								[
 									[
 										'type' => 'scanner',
@@ -1490,7 +1490,7 @@ class RECORD extends API {
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
 					':last_document' => $merge['last_document'],
-					':content' => json_encode($merge['content']),
+					':content' => UTILITY::json_encode($merge['content']),
 					':id' => $merge['id']
 			]])) $this->response([
 				'response' => [
@@ -1514,7 +1514,7 @@ class RECORD extends API {
 					':last_user' => $_SESSION['user']['id'],
 					// get last considered document, offset -1 because pseudodocument has been added before by default
 					':last_document' => $original['content'][count($original['content']) - 2]['document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),
-					':content' => json_encode($original['content']),
+					':content' => UTILITY::json_encode($original['content']),
 					':id' => $original['id']
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
 				'values' => [
@@ -1572,7 +1572,7 @@ class RECORD extends API {
 					':identifier' => $original['identifier'],
 					':last_user' => $_SESSION['user']['id'],
 					':last_document' => $original['last_document'],
-					':content' => json_encode($original['content']),
+					':content' => UTILITY::json_encode($original['content']),
 					':id' => $original['id']
 			]])) $this->response([
 				'response' => [

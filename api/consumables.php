@@ -137,7 +137,7 @@ class CONSUMABLES extends API {
 		];
 		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'pricelistfilter.txt';
 		$file = fopen($tempFile, 'w');
-		fwrite($file, json_encode($filter, JSON_PRETTY_PRINT));
+		fwrite($file, UTILITY::json_encode($filter, JSON_PRETTY_PRINT));
 		fclose($file);
 		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
 			'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
@@ -241,7 +241,7 @@ class CONSUMABLES extends API {
 								if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 									'values' => [
 										':ids' => $product['id'],
-										':sample_checks' => json_encode($product['sample_checks'])
+										':sample_checks' => UTILITY::json_encode($product['sample_checks'])
 									],
 									'replacements' => [
 										':checked' => 'CURRENT_TIMESTAMP'
@@ -307,7 +307,7 @@ class CONSUMABLES extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
 					'replacements' => [
 						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $batchids)]),
-						':incorporated' => json_encode($approve)
+						':incorporated' => UTILITY::json_encode($approve)
 					]
 				])) $this->response([
 					'response' => [
@@ -553,7 +553,7 @@ class CONSUMABLES extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 					'values' => [
 						':ids' => $product['id'],
-						':sample_checks' => json_encode($product['sample_checks'])
+						':sample_checks' => UTILITY::json_encode($product['sample_checks'])
 					],
 					'replacements' => [
 						':checked' => 'CURRENT_TIMESTAMP'
@@ -633,7 +633,7 @@ class CONSUMABLES extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 					'values' => [
 						':checked' => null,
-						':sample_checks' => count($product['sample_checks']) ? json_encode($product['sample_checks']) : null
+						':sample_checks' => count($product['sample_checks']) ? UTILITY::json_encode($product['sample_checks']) : null
 					],
 					'replacements' => [
 						':ids' => intval($this->_requestedID)
@@ -716,7 +716,7 @@ class CONSUMABLES extends API {
 					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
 					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
 					'article_info' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null,
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 					'protected' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
@@ -788,7 +788,7 @@ class CONSUMABLES extends API {
 					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null;
 					$product['article_unit'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null;
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null;
-					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
+					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null;
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
@@ -807,7 +807,7 @@ class CONSUMABLES extends API {
 									'date' => $this->_currentdate->format('Y-m-d H:i')
 								];
 							}
-							$product['incorporated'] = json_encode($product['incorporated']);
+							$product['incorporated'] = UTILITY::json_encode($product['incorporated']);
 						}
 					}
 				}
@@ -832,9 +832,9 @@ class CONSUMABLES extends API {
 				// this could have been one block but parting of the respective states is considered relevent
 
 				// activate or deactivate selected similar products
-				$batchactive = UTILITY::propertySet($this->_payload, '_batchactive');
-				if (PERMISSION::permissionFor('products') && $batchactive){
-					$batchids = explode(',', $batchactive);
+				$_batchactive = UTILITY::propertySet($this->_payload, '_batchactive');
+				if (PERMISSION::permissionFor('products') && $_batchactive){
+					$batchids = explode(',', $_batchactive);
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
 							':value' => $product['hidden'],
@@ -897,7 +897,7 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'response' => [
 						'id' => $this->_requestedID,
-						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($batchactive || $_batchupdate ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): ''),
+						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($_batchactive || $_batchupdate ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): ''),
 						'type' => 'success'
 						],
 						'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
@@ -1475,7 +1475,7 @@ class CONSUMABLES extends API {
 	 */
 	private function selectSimilarDialog($target = '', $similarproducts = [], $substring = '0', $type = 'input'){
 		if (gettype($substring) === 'array') $substring = implode(',', $substring);
-		return "let similarproducts = " . json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
+		return "let similarproducts = " . UTILITY::json_encode($similarproducts) . "; selected = document.getElementById('" . $target . "').value.split(','); " .
 			"for (const [key, value] of Object.entries(similarproducts)){ if (selected.includes(value.name.substr(1))) similarproducts[key].checked = true; } " .
 			"new _client.Dialog({type: '" . $type . "', header: '" . $this->_lang->GET('consumables.product.batch', [':percent' => CONFIG['likeliness']['consumables_article_no_similarity']]) . 
 			"', render: [{type: 'checkbox', content: similarproducts}], options:{".
@@ -1635,7 +1635,7 @@ class CONSUMABLES extends API {
 				 */
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
@@ -1717,9 +1717,9 @@ class CONSUMABLES extends API {
 					'values' => [
 						':name' => $vendor['name'],
 						':hidden' => $vendor['hidden'],
-						':info' => $vendor['info'] ? json_encode($vendor['info']) : null,
-						':certificate' => $vendor['certificate'] ? json_encode($vendor['certificate']) : null,
-						':pricelist' => $vendor['pricelist'] ? json_encode($vendor['pricelist']) : null,
+						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
+						':certificate' => $vendor['certificate'] ? UTILITY::json_encode($vendor['certificate']) : null,
+						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
 						':immutable_fileserver' => $vendor['immutable_fileserver'],
 						':evaluation' => $vendor['evaluation']
 					]
@@ -1748,7 +1748,7 @@ class CONSUMABLES extends API {
 				if (!$vendor) $this->response(null, 406);
 
 				// update vendor data
-				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
+				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
 				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
@@ -1855,10 +1855,10 @@ class CONSUMABLES extends API {
 						':id' => $vendor['id'],
 						':hidden' => $vendor['hidden'],
 						':name' => $vendor['name'],
-						':info' => $vendor['info'] ? json_encode($vendor['info']) : null,
-						':certificate' => $vendor['certificate'] ? json_encode($vendor['certificate']) : null,
-						':pricelist' => $vendor['pricelist'] ? json_encode($vendor['pricelist']) : null,
-						':evaluation' => $vendor['evaluation'] ? json_encode($vendor['evaluation']) : null
+						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
+						':certificate' => $vendor['certificate'] ? UTILITY::json_encode($vendor['certificate']) : null,
+						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
+						':evaluation' => $vendor['evaluation'] ? UTILITY::json_encode($vendor['evaluation']) : null
 					]
 				]) !== false) $this->response([
 					'response' => [
@@ -2305,7 +2305,7 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'type' => 'button',
 								'value' => $this->_lang->GET('menu.communication.texttemplate_texts'),
-								'onclick' => "api.texttemplate('get', 'text', 'false', 'modal', '" . json_encode([
+								'onclick' => "api.texttemplate('get', 'text', 'false', 'modal', '" . UTILITY::json_encode([
 									':PRD' => 'select_special_attention_products',
 									':CID' => 'vendor_customer_id',
 									':ECR' => 'vendor_certificate_validity'

@@ -96,7 +96,7 @@ class AUDIT extends API {
 						// manual human template question
 						$audit[':content']['questions'][intval($set[1])][$set[2]][0] = $value;
 				}
-				$audit[':content'] = json_encode($audit[':content']);
+				$audit[':content'] = UTILITY::json_encode($audit[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post', [
 					'values' => $audit
@@ -188,7 +188,7 @@ class AUDIT extends API {
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put', [
 					'values' => [
 						':id' => $audit['id'],
-						':content' => json_encode($audit['content']),
+						':content' => UTILITY::json_encode($audit['content']),
 						':last_user' => $audit['last_user'],
 						':closed' => $audit['closed']
 					]
@@ -300,7 +300,7 @@ class AUDIT extends API {
 								'value' => $this->_lang->GET('audit.audit.execute.new'),
 								'type' => 'button',
 								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('audit.audit.execute.new') . "', render: JSON.parse('" . 
-									json_encode([[
+									UTILITY::json_encode([[
 										'type' => 'select',
 										'attributes' => [
 											'name' => $this->_lang->GET('audit.audit.template.select')
@@ -664,7 +664,7 @@ class AUDIT extends API {
 					$question['regulatory'] = explode(', ', $question['regulatory']);
 					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
-				$template[':content'] = json_encode($template[':content']);
+				$template[':content'] = UTILITY::json_encode($template[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', [
 					'values' => $template
@@ -699,7 +699,7 @@ class AUDIT extends API {
 					$question['regulatory'] = explode(', ', $question['regulatory']);
 					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
-				$template[':content'] = json_encode($template[':content']);
+				$template[':content'] = UTILITY::json_encode($template[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put_template', [
 					'values' => $template
@@ -1219,7 +1219,7 @@ class AUDIT extends API {
 					'type' => 'button',
 					'data-type' => 'download',
 					'value' => $this->_lang->GET('assemble.render.export'),
-					'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('assemble.render.export') . "', render: JSON.parse('" . json_encode(
+					'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('assemble.render.export') . "', render: JSON.parse('" . UTILITY::json_encode(
 						[
 							[
 								'type' => 'textsection',
@@ -2323,7 +2323,7 @@ class AUDIT extends API {
 					SQLQUERY::EXECUTE($this->_pdo, 'user_training_put', [
 						'values' => [
 							':id' => $this->_requestedID,
-							':evaluation' => json_encode([
+							':evaluation' => UTILITY::json_encode([
 								'user' => $_SESSION['user']['name'],
 								'date' => $this->_currentdate->format('Y-m-d H:i'),
 								'content' => (array) $this->_payload
@@ -2422,7 +2422,7 @@ class AUDIT extends API {
 						'attributes' => [
 							'type' => 'button',
 							'value' => $this->_lang->GET('audit.checks_type.trainingevaluation'),
-							'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . json_encode(
+							'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . UTILITY::json_encode(
 								$sharedfunction->populatedocument($evaluationdocument, $row['evaluation'] ? $row['evaluation']['content'] : [])
 							) . "'), options:{".
 							"'" . $this->_lang->GET('general.cancel_button') . "': false,".
@@ -2582,7 +2582,7 @@ class AUDIT extends API {
 				$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 				$training[':experience_points'] = 0;
 				$training[':file_path'] = '';
-				$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? json_encode([
+				$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 					'user' => $_SESSION['user']['name'],
 					'date' => $this->_currentdate->format('Y-m-d H:i'),
 					'content' => [$this->_lang->PROPERTY('user.add_training_evaluation', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
@@ -2733,7 +2733,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'type' => 'button',
 					'value' => $this->_lang->GET('audit.userskills_bulk_training'),
-					'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . json_encode(
+					'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . UTILITY::json_encode(
 						$skillmatrix
 					) . "'), options:{".
 					"'" . $this->_lang->GET('general.cancel_button') . "': false,".

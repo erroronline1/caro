@@ -301,7 +301,7 @@ class CSVFILTER extends API {
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_content')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 				];
 
 				// early exit

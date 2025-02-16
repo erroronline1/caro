@@ -97,7 +97,7 @@ class CALENDARUTILITY {
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
 				[
 					':id' => $this->_pdo->quote($entry['id']),
-					':closed' => $close ? $this->_pdo->quote(json_encode($close)) : null,
+					':closed' => $close ? $this->_pdo->quote(UTILITY::json_encode($close)) : null,
 					':alert' => $alert === null ? $entry['alert'] : (intval($alert) ? 1 : null)
 				]
 			));
@@ -197,8 +197,8 @@ class CALENDARUTILITY {
 	 * 	':affected_user_id' => int | null,
 	 * 	':organizational_unit' => str | null,
 	 * 	':subject' => str | null,
-	 * 	':misc' => str (e.g. json_encoded whatnot) | null,
-	 * 	':closed' => str (e.g. json_encoded when, by whom) | null,
+	 * 	':misc' => str (e.g. UTILITY::json_encoded whatnot) | null,
+	 * 	':closed' => str (e.g. UTILITY::json_encoded when, by whom) | null,
 	 * 	':alert' => int 1 | null
 	 * 	]
 	 * @return string dialog script
@@ -372,7 +372,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.pto_exemption'),
-							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . json_encode($setFieldVisibility) . "', this.value === 'regular')"
+							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . UTILITY::json_encode($setFieldVisibility) . "', this.value === 'regular')"
 						],
 						'content' => $ptoselect
 					],[
@@ -445,7 +445,7 @@ class CALENDARUTILITY {
 				break;
 		}
 
-		return "new _client.Dialog({type:'input', header: '', render: " . json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.schedule.cancel') . "': false, '" . $this->_lang->GET('calendar.schedule.submit') . "': {'value': true, class: 'reducedCTA'}}})" .
+		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.schedule.cancel') . "': false, '" . $this->_lang->GET('calendar.schedule.submit') . "': {'value': true, class: 'reducedCTA'}}})" .
 			".then(response => {if (response) {_client.calendar.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
 	}
 	
@@ -558,8 +558,8 @@ class CALENDARUTILITY {
 	 * 	':affected_user_id' => int | null,
 	 * 	':organizational_unit' => str | null,
 	 * 	':subject' => str | null,
-	 * 	':misc' => str (e.g. json_encoded whatnot) | null,
-	 * 	':closed' => str (e.g. json_encoded when, by whom) | null,
+	 * 	':misc' => str (e.g. UTILITY::json_encoded whatnot) | null,
+	 * 	':closed' => str (e.g. UTILITY::json_encoded when, by whom) | null,
 	 * 	':alert' => int 1 | null
 	 * 	]
 	 * @return int|bool insert id
@@ -587,8 +587,8 @@ class CALENDARUTILITY {
 	 * 	':affected_user_id' => int | null,
 	 * 	':organizational_unit' => str | null,
 	 * 	':subject' => str | null,
-	 * 	':misc' => str (e.g. json_encoded whatnot) | null,
-	 * 	':closed' => str (e.g. json_encoded when, by whom) | null,
+	 * 	':misc' => str (e.g. UTILITY::json_encoded whatnot) | null,
+	 * 	':closed' => str (e.g. UTILITY::json_encoded when, by whom) | null,
 	 * 	':alert' => int 1 | null
 	 * 	]
 	 * @return int affected rows

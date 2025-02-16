@@ -144,7 +144,7 @@ class FILE extends API {
 				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
 				$hidden = $this->_lang->PROPERTY('file.bundle.availability');
-				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.hidden') ?json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
+				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.hidden') ?UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
 				unset ($this->_payload->$hidden);
 				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
@@ -173,7 +173,7 @@ class FILE extends API {
 					if (SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_put', [
 						'values' => [
 						':author' => $_SESSION['user']['name'],
-						':content' => json_encode($this->_payload),
+						':content' => UTILITY::json_encode($this->_payload),
 						':id' => $existingbundle['id'],
 						':hidden' => $hidden
 						]
@@ -196,7 +196,7 @@ class FILE extends API {
 					'values' => [
 					':name' => $name,
 					':author' => $_SESSION['user']['name'],
-					':content' => json_encode($this->_payload),
+					':content' => UTILITY::json_encode($this->_payload),
 					':hidden' => $hidden
 					]
 				])) $this->response([

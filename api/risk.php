@@ -142,7 +142,7 @@ class RISK extends API {
 					':id' => intval($this->_requestedID),
 					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')) ? : null,
 					':proof' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.proof')) ? : null,
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.hidden') ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 					':probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.probability'))) ? : null,
 					':damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.damage'))) ? : null,
 					':measure_probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_probability'))) ? : null,

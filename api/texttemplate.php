@@ -54,7 +54,7 @@ class TEXTTEMPLATE extends API {
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.content')),
 					':language' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.language')),
 					':type' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.type')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.availability')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden')? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.availability')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 				];
 
 				// check forbidden names
@@ -343,7 +343,7 @@ class TEXTTEMPLATE extends API {
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
 					':type' => 'template',
-					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
 				];
 
 				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);

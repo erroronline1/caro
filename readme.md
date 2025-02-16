@@ -121,7 +121,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * measure management pictures
 * update readme pictures on tools menu, record menu, audit and regulatory
-* pricelist import issues for possible fingerprint issue (character encoding) regarding thuasne, tigges, streifeneder, rebotec, protheseus, pochert, orthoservice, orthe reha neuhof, nowecor, russka, caroli, darco, bort
+* csv filter issues on utf8 character encoding. database is unencoded, csv-data is encoded - how to handle umlauts etc? 
 * pricelist key error for possibly unsanitized content regarding busch
 * try performance comparison simplifying by one loop through article db instead of consumables_get_eligible_sample_check, consumables_get_valid_checked, consumables_get_not_reusable_checked.
 

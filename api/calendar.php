@@ -826,7 +826,7 @@ class CALENDAR extends API {
 				if ($homeoffice = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.homeoffice'))){
 					$misc['homeoffice'] = $homeoffice;
 				}
-				$event[':misc'] = json_encode($misc);
+				$event[':misc'] = UTILITY::json_encode($misc);
 
 				// match required properties
 				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.timesheet.error_missing'), 'type' => 'error']]);
@@ -882,7 +882,7 @@ class CALENDAR extends API {
 				if ($homeoffice = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.homeoffice'))){
 					$misc['homeoffice'] = $homeoffice;
 				}
-				$event[':misc'] = json_encode($misc);
+				$event[':misc'] = UTILITY::json_encode($misc);
 
 				// match required properties
 				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.timesheet.error_missing'), 'type' => 'error']]);

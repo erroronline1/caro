@@ -131,7 +131,7 @@ class USER extends API {
 						':token' => $user['token'],
 						':orderauth' => $user['orderauth'],
 						':image' => $user['image'],
-						':app_settings' => json_encode($user['app_settings']),
+						':app_settings' => UTILITY::json_encode($user['app_settings']),
 						':skills' => $user['skills']
 					]
 				]) !== false) {
@@ -518,7 +518,7 @@ class USER extends API {
 					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? json_encode([
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 						'user' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i'),
 						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
@@ -540,7 +540,7 @@ class USER extends API {
 						':token' => $user['token'],
 						':orderauth' => $user['orderauth'],
 						':image' => $user['image'],
-						':app_settings' => json_encode($user['app_settings']),
+						':app_settings' => UTILITY::json_encode($user['app_settings']),
 						':skills' => implode(',', $user['skills'])
 					]
 				])) {
@@ -708,7 +708,7 @@ class USER extends API {
 					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? json_encode([
+					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 						'user' => $_SESSION['user']['name'],
 						'date' => $this->_currentdate->format('Y-m-d H:i'),
 						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
@@ -750,7 +750,7 @@ class USER extends API {
 						':token' => $user['token'],
 						':orderauth' => $user['orderauth'],
 						':image' => $user['image'],
-						':app_settings' => json_encode($user['app_settings']),
+						':app_settings' => UTILITY::json_encode($user['app_settings']),
 						':skills' => implode(',', $user['skills'])
 					]
 				]) !== false) {

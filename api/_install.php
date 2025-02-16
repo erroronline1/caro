@@ -665,7 +665,7 @@ class INSTALL {
 	 * @param string|array $item entry item from source
 	 */
 	public function printError($message = '', $item = []){
-		echo '<br />[X] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? json_encode($item) : $item) . '</code>' : '') . '<br />';
+		echo '<br />[X] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
 	}
 
 	/**
@@ -674,7 +674,7 @@ class INSTALL {
 	 * @param string|array $item entry item from source
 	 */
 	public function printSuccess($message = '', $item = []){
-		echo '<br />[*] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? json_encode($item) : $item) . '</code>' : '') . '<br />';
+		echo '<br />[*] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
 	}
 
 	/**
@@ -683,7 +683,7 @@ class INSTALL {
 	 * @param string|array $item entry item from source
 	 */
 	public function printWarning($message = '', $item = []){
-		echo '<br />[!] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? json_encode($item) : $item) . '</code>' : '') . '<br />';
+		echo '<br />[!] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
 	}
 
 	/**
@@ -811,7 +811,7 @@ class INSTALL {
 					// ensure proper formatting
 					if (isset($question['regulatory']) && $question['regulatory']) $question['regulatory'] = implode(',', preg_split('/[^\w\d]+/m', $question['regulatory']));
 				}
-				if (($entry['content'] = json_encode($entry['content'])) === false){
+				if (($entry['content'] = UTILITY::json_encode($entry['content'])) === false){
 					$this->printError('A question set is malformed. This item will be skipped:', $entry);
 					continue;
 				}
@@ -908,7 +908,7 @@ class INSTALL {
 					':context' => $entry['context'],
 					':unit' => $entry['unit'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content'], JSON_INVALID_UTF8_IGNORE) : $entry['content'],
+					':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
 					':regulatory_context' => $entry['regulatory_context'] ? : '',
 					':permitted_export' => $entry['permitted_export'] ? $entry['permitted_export'] : null,
 					':restricted_access' => $entry['restricted_access'] ? $entry['restricted_access'] : null
@@ -1124,7 +1124,7 @@ class INSTALL {
 					':name' => $entry['name'],
 					':unit' => $entry['unit'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-					':content' => gettype($entry['content']) === 'array' ? json_encode($entry['content'], JSON_INVALID_UTF8_IGNORE) : $entry['content'],
+					':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
 					':type' => $entry['type'],
 					':hidden' => null
 				];
@@ -1206,7 +1206,7 @@ class INSTALL {
 					':token' => $entry['token'],
 					':orderauth' => $entry['orderauth'],
 					':image' => $entry['image'],
-					':app_settings' => json_encode($entry['app_settings']),
+					':app_settings' => UTILITY::json_encode($entry['app_settings']),
 					':skills' => ''
 				];
 			}
@@ -1249,9 +1249,9 @@ class INSTALL {
 				$names[] = $entry['name'];
 				$insertions[] = [
 					':name' => $entry['name'],
-					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? json_encode($entry['info'], JSON_INVALID_UTF8_IGNORE) : null,
-					':certificate' => json_encode([]),
-					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? json_encode(['filter' => json_encode($entry['pricelist'], JSON_PRETTY_PRINT | JSON_INVALID_UTF8_IGNORE)]) : null,
+					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
+					':certificate' => UTILITY::json_encode([]),
+					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode(['filter' => UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT)]) : null,
 					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', $entry['name']) . $this->_currentdate->format('Ymd'),
 					':evaluation' => null,
 					':hidden' => null

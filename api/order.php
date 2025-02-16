@@ -170,7 +170,7 @@ class ORDER extends API {
 							// add to prepared orders
 							SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
 								'values' => [
-									':order_data' => json_encode($prepared, JSON_UNESCAPED_SLASHES)
+									':order_data' => UTILITY::json_encode($prepared)
 								]
 							]);
 
@@ -207,7 +207,7 @@ class ORDER extends API {
 
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_addinformation', [
 								'values' => [
-									':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
+									':order_data' => UTILITY::json_encode($decoded_order_data),
 									':id' => intval($this->_requestedID)
 								]
 							]);
@@ -244,7 +244,7 @@ class ORDER extends API {
 							// rewrite order as cancelled type
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
 								'values' => [
-									':order_data' => json_encode($decoded_order_data, JSON_UNESCAPED_SLASHES),
+									':order_data' => UTILITY::json_encode($decoded_order_data),
 									':id' => intval($this->_requestedID)
 								]
 							]);
@@ -266,7 +266,7 @@ class ORDER extends API {
 							// create a new order as return
 							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
 								'values' => [
-								':order_data' => json_encode($decoded_order_data),
+								':order_data' => UTILITY::json_encode($decoded_order_data),
 								':organizational_unit' => $order['organizational_unit'],
 								':approval' => $order['approval'],
 								':ordertype' => 'return'
@@ -631,7 +631,7 @@ class ORDER extends API {
 				if (!$processedOrderData['approval']){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
 						'values' => [
-							':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES)
+							':order_data' => UTILITY::json_encode($processedOrderData['order_data'])
 						]
 					]);
 					$result = [
@@ -656,7 +656,7 @@ class ORDER extends API {
 				if (!$processedOrderData['approval']){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_put_prepared_order', [
 						'values' => [
-							':order_data' => json_encode($processedOrderData['order_data'], JSON_UNESCAPED_SLASHES),
+							':order_data' => UTILITY::json_encode($processedOrderData['order_data']),
 							':id' => $this->_requestedID
 						]
 					]);
@@ -800,7 +800,7 @@ class ORDER extends API {
 								'value' => $this->_lang->GET('order.add_manually'),
 								'type' => 'button',
 								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
-								json_encode([
+								UTILITY::json_encode([
 									[
 										[
 											'type' => 'number',
@@ -1123,7 +1123,7 @@ class ORDER extends API {
 				'vendor_label',
 				'additional_info'])) unset($order['order_data'][$key]);
 		}
-		$order['order_data'] = json_encode($order['order_data']);
+		$order['order_data'] = UTILITY::json_encode($order['order_data']);
 		
 		// update or insert order statistics
 		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
@@ -1163,7 +1163,7 @@ class ORDER extends API {
 			}
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('order_post_approved_order'),
 			[
-				':order_data' => $this->_pdo->quote(json_encode($order_data2, JSON_UNESCAPED_SLASHES)),
+				':order_data' => $this->_pdo->quote(UTILITY::json_encode($order_data2)),
 				':organizational_unit' => $this->_pdo->quote($processedOrderData['order_data']['organizational_unit']),
 				':approval' => $this->_pdo->quote($processedOrderData['approval']),
 				':ordertype' => $this->_pdo->quote($processedOrderData['order_data']['order_type'])

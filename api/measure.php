@@ -87,7 +87,7 @@ class MEASURE extends API {
 					boolval($measure['closed']) == boolval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')))
 				);
 				$measure['measures'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure'));
-				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? json_encode(['date' => $this->_currentdate->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
+				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? UTILITY::json_encode(['date' => $this->_currentdate->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
 				$measure['id'] = $this->_requestedID;
 				$measure['last_user'] = $_SESSION['user']['name'];
 
@@ -149,7 +149,7 @@ class MEASURE extends API {
 							'value' => $this->_lang->GET('measure.new'),
 							'type' => 'button',
 							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.new') ."', render: JSON.parse('".
-								json_encode([
+								UTILITY::json_encode([
 									[
 										[
 											'type' => 'textarea',
@@ -236,7 +236,7 @@ class MEASURE extends API {
 								'value' => $this->_lang->GET('measure.measure'),
 								'type' => 'button',
 								'onclick' => "if (!this.disabled) new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
-									json_encode([
+									UTILITY::json_encode([
 										[
 											[
 												'type' => 'textarea',
@@ -293,7 +293,7 @@ class MEASURE extends API {
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_vote', [
 					'values' => [
-						':votes' => json_encode($measure['votes']),
+						':votes' => UTILITY::json_encode($measure['votes']),
 						':id' => $measure['id']
 					]
 				])) $this->response([
