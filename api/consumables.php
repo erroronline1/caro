@@ -1576,7 +1576,7 @@ class CONSUMABLES extends API {
 
 			foreach ($sqlchunks as $chunk){
 				try {
-					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_currentdate->format("d.m.Y");
+					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_currentdate->format("Y-m-d");
 				}
 				catch (Exception $e) {
 					echo $e, $chunk;
