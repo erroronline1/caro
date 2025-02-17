@@ -310,7 +310,7 @@
 					"trading_good": "1",
 					"has_expiry_date": "0"
 				},
-				"conditional_or": [["trading_good", "0", ["Bezeichnung", "ersatz|für|tausch|bezug|luft"], ["Größe", ""]]],
+				"conditional_or": [["trading_good", "0", ["Bezeichnung", "ersatz|f[üÜ]r|tausch|bezug|luft"], ["Größe", ""]]],
 				"remove": ["CCL"],
 				"rewrite": [
 					{
@@ -452,7 +452,7 @@
 				"add": {
 					"trading_good": "1"
 				},
-				"conditional_or": [["trading_good", "0", ["Kategorie", "zubehör|tapes|Sohlensysteme"]]],
+				"conditional_or": [["trading_good", "0", ["Kategorie", "zubeh[öÖ]r|tapes|Sohlensysteme"]]],
 				"remove": ["Kategorie"],
 				"rewrite": [
 					{
@@ -900,7 +900,7 @@
 						"1",
 						[
 							"NAME1",
-							"aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|tübinger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"
+							"aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|t[üÜ]binger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"
 						]
 					]
 				],
@@ -1073,7 +1073,7 @@
 						"1",
 						[
 							"Bezeichnung",
-							"liner|kniekappe|strumpf|wilmer|fersenkissen|tobisil|gelenksorthese|schuh|peroneusschiene|walker|kniebandage|knieorthese|lagerungsschiene|rotationsorthese|spreizhose|daumenorthese|handgelenksorthese|immobilisations|immobilisierung|ellenbogen.*bandage|ellenbogenorthese|schulterbandage|humerusorthese|cervicalorthese|rippengürtel|mieder|lumbalbandage|lumbalorthese|elite pro|rumpforthese|extensionsorthese|rückenorthese|"
+							"liner|kniekappe|strumpf|wilmer|fersenkissen|tobisil|gelenksorthese|schuh|peroneusschiene|walker|kniebandage|knieorthese|lagerungsschiene|rotationsorthese|spreizhose|daumenorthese|handgelenksorthese|immobilisations|immobilisierung|ellenbogen.*bandage|ellenbogenorthese|schulterbandage|humerusorthese|cervicalorthese|rippeng[üÜ]rtel|mieder|lumbalbandage|lumbalorthese|elite pro|rumpforthese|extensionsorthese|r[üÜ]ckenorthese|"
 						]
 					],
 					["has_expiry_date", "1", ["Bezeichnung", "neofast"]],
@@ -1221,7 +1221,7 @@
 					"trading_good": "1",
 					"has_expiry_date": "0"
 				},
-				"conditional_or": [["trading_good", "0", ["HMV-NR ", "^komponente|^zubehör"], ["Bezeichnung3 = Langtext (kein muss)", "zubehör"]]],
+				"conditional_or": [["trading_good", "0", ["HMV-NR ", "^komponente|^zubeh[öÖ]r"], ["Bezeichnung3 = Langtext (kein muss)", "zubeh[öÖ]r"]]],
 				"remove": ["HMV-NR "],
 				"rewrite": [
 					{
@@ -1256,7 +1256,7 @@
 					"special_attention": "0"
 				},
 				"conditional_or": [
-					["trading_good", "1", ["Materialtext", "knee comfort|strumpf|tübinger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
+					["trading_good", "1", ["Materialtext", "knee comfort|strumpf|t[üÜ]binger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
 					["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|617s\\d=|85h.+|636K.+|616T111|453h10|646m453"]],
 					["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen|innenlack|thermolyn"]]
 				],
@@ -1327,7 +1327,7 @@
 					"match": {
 						"any": {
 							"Menge": ".+",
-							"Matchcode": "^$|einl[ea]ge|schuh|sandale|sicherheit|rohl.|gr\\.\\d|schild|plakat|aufsteller|muster|katalog|bilderrahmen|kosten|schlag|ziel|leisten|deckso|futter|schl[oö][ßs]{1,}|abs[aä]tz|sohle|fleck|gürtel"
+							"Matchcode": "^$|einl[ea]ge|schuh|sandale|sicherheit|rohl.|gr\\.\\d|schild|plakat|aufsteller|muster|katalog|bilderrahmen|kosten|schlag|ziel|leisten|deckso|futter|schl[oö][ßs]{1,}|abs[aäÄ]tz|sohle|fleck|g[üÜ]rtel"
 						}
 					}
 				}
@@ -1339,7 +1339,7 @@
 					"expiry_date": "0"
 				},
 				"conditional_or": [
-					["trading_good", "1", ["Matchcode", "Compression|Weste|Peronäusschiene|Stax|liner"]],
+					["trading_good", "1", ["Matchcode", "Compression|Weste|Peron[äÄ]usschiene|Stax|liner"]],
 					["special_attention", "1", ["Matchcode", "prosil"]],
 					["expiry_date", "1", ["Matchcode", "prosil"]]
 				],
@@ -1375,7 +1375,7 @@
 				"add": {
 					"trading_good": "0"
 				},
-				"conditional_or": [["trading_good", "1", ["article_name", "Compression|Weste|Peronäusschiene|Stax|liner"]]],
+				"conditional_or": [["trading_good", "1", ["article_name", "Compression|Weste|Peron[äÄ]usschiene|Stax|liner"]]],
 				"rewrite": [
 					{
 						"article_no": ["article_no"],
@@ -1439,7 +1439,7 @@
 				"add": {
 					"trading_good": "0"
 				},
-				"conditional_or": [["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehstütze|achselstütze|toiletten|gehgestell|vierfuß|fischer"]]],
+				"conditional_or": [["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehst[üÜ]tze|achselst[üÜ]tze|toiletten|gehgestell|vierfuß|fischer"]]],
 				"rewrite": [
 					{
 						"article_no": ["Art-Nr"],
@@ -1526,7 +1526,7 @@
 				"add": {
 					"trading_good": "0"
 				},
-				"conditional_or": [["trading_good", "1", ["Artikelbezeichnung", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|stützschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]],
+				"conditional_or": [["trading_good", "1", ["Artikelbezeichnung", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|st[üÜ]tzschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]],
 				"rewrite": [
 					{
 						"article_no": ["Artikelnummer "],
@@ -1630,7 +1630,7 @@
 						"1",
 						[
 							"Bezeichnung",
-							"fersenkeil|schutzhülle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"
+							"fersenkeil|schutzh[üÜ]lle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"
 						]
 					],
 					["has_expiry_date", "1", ["Bezeichnung", "silikonspray|sekundenkleber"]],
@@ -1714,7 +1714,7 @@
 					"special_attention": "0",
 					"has_expiry_date": "1"
 				},
-				"conditional_or": [["trading_good", "0", ["Art.-Bez. 1 NEU", "COTTON SHORT STRETCH|LOMBAMUM|binden|spray|biplast|pelotte|kulanz|pauschale|wechselpolster|flexi-pads|ersatz|verlängerungs|haftpad"]]],
+				"conditional_or": [["trading_good", "0", ["Art.-Bez. 1 NEU", "COTTON SHORT STRETCH|LOMBAMUM|binden|spray|biplast|pelotte|kulanz|pauschale|wechselpolster|flexi-pads|ersatz|verl[Ää]ngerungs|haftpad"]]],
 				"rewrite": [
 					{
 						"article_no": ["Artikel-Nummer"],
@@ -1746,7 +1746,7 @@
 				"add": {
 					"trading_good": "0"
 				},
-				"conditional_and": [["trading_good", "1", ["article_name", "WS-Bandage|Wirbelsäulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]]],
+				"conditional_and": [["trading_good", "1", ["article_name", "WS-Bandage|Wirbels[äÄ]ulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]]],
 				"rewrite": [
 					{
 						"article_no": ["Bestellnr"],
