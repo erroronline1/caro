@@ -1759,6 +1759,8 @@ A generic sample:
 }
 ```
 
+RegEx-patterns are processed case insensitive, however note this only applies to a-z not taking specialchars into account. If you trying to match `verlängerung` your pattern needs to look for `verl[äÄ]ngerung`.
+
 [Content](#content)
 
 # Regulatory software requirements

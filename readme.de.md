@@ -1681,6 +1681,8 @@ Ein beliebiges Beispiel:
 }
 ```
 
+RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es ist jedoch zu beachten, dass dies nur für a-z gilt. Wenn nach `verlängerung` gesucht wird, muss das Muster `verl[äÄ]ngerung` lauten.
+
 [Übersicht](#übersicht)
 
 # Regulatorische Anforderungen an die Software
