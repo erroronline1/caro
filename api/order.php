@@ -346,12 +346,51 @@ class ORDER extends API {
 				}
 
 				// get unchecked articles for MDR §14 sample check
-				$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
-				$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
-				$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_check', ['replacements' => [
-					':valid_checked' => implode(',', array_column($validChecked, 'vendor_id')),
-					':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
-				]]);
+/*
+$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
+$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
+$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_check', ['replacements' => [
+	':valid_checked' => implode(',', array_column($validChecked, 'vendor_id')),
+	':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
+]]);
+*/
+				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+				foreach($vendors as &$vendor){
+					$vendor['pricelist'] = json_decode($vendor['pricelist'], true); 
+				}
+				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
+					'replacements' => [
+						':ids' => implode(",", array_column($vendors, 'id'))
+					]
+				]);
+				// get all checkable products
+				$checkable = [];
+				foreach($products as $product){
+					if (!isset($checkable[$product['vendor_id']])) $checkable[$product['vendor_id']] = [];
+					if (!$product['checked']){
+						$checkable[$product['vendor_id']][] = $product['id'];
+						continue;
+					}
+					$vendor = $vendors[array_search($product['vendor_id'], array_column($vendors, 'id'))];
+					$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
+					if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_currentdate)->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
+						$checkable[$product['vendor_id']][] = $product['id'];
+					}
+				}
+				// drop vendors that have been checked within their sample check interval
+				foreach($products as $product){
+					if (!isset($checkable[$product['vendor_id']]) || !$product['checked']) continue;
+					$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
+					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_currentdate)->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
+						unset($checkable[$product['vendor_id']]);
+					}
+				}
+				// merge all remaining ids
+				$sampleCheck = [];
+				foreach ($checkable as $ids){
+					array_merge($sampleCheck, $ids);
+				}
+
 
 				// gather applicable order states
 				$statechange = ['...' => ['value' => '']];
@@ -506,7 +545,8 @@ class ORDER extends API {
 					}
 					
 					// request MDR §14 sample check
-					if ($product && array_search($product['id'], array_column($sampleCheck, 'id')) !== false){
+//if ($product && array_search($product['id'], array_column($sampleCheck, 'id')) !== false){
+if ($product && in_array($product['id'], $sampleCheck)){
 						if (!in_array('group', $_SESSION['user']['permissions'])){
 							$data['samplecheck']['item'] = $product['id'];
 						} else {
