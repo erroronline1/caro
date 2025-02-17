@@ -301,7 +301,7 @@ define('DEFAULTSQL', [
 				"	last_touch smalldatetime NOT NULL," .
 				"	last_user varchar(255) NOT NULL," .
 				"	closed tinyint NULL DEFAULT NULL," .
-				"	notified int NULL DEFAULT NULL," .
+				"	notified int NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_audit_templates', N'U') IS NULL " .
@@ -312,6 +312,7 @@ define('DEFAULTSQL', [
 				"	unit varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NULL DEFAULT NULL," .
+				"	hint varchar(255) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .
@@ -394,7 +395,7 @@ define('DEFAULTSQL', [
 				"	certificate varchar(MAX) NULL DEFAULT NULL," .
 				"	pricelist varchar(MAX) NULL DEFAULT NULL," .
 				"	immutable_fileserver varchar(MAX) NOT NULL," .
-				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
+				"	evaluation varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_csvfilter', N'U') IS NULL " .
@@ -556,7 +557,7 @@ define('DEFAULTSQL', [
 				"	expires date NULL," .
 				"	experience_points int NULL," .
 				"	file_path varchar(MAX) NULL DEFAULT NULL," .
-				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
+				"	evaluation varchar(MAX) NULL DEFAULT NULL" .
 				");"
 		],
 
