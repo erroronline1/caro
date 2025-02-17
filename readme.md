@@ -121,7 +121,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * measure management pictures
 * update readme pictures on tools menu, record menu, audit and regulatory
-* csv filter issues on utf8 character encoding. database is unencoded, csv-data is encoded - how to handle umlauts etc? 
 * pricelist key error for possibly unsanitized content regarding busch
 * try performance comparison simplifying by one loop through article db instead of consumables_get_eligible_sample_check, consumables_get_valid_checked, consumables_get_not_reusable_checked.
 
@@ -1759,7 +1758,7 @@ A generic sample:
 }
 ```
 
-RegEx-patterns are processed case insensitive, however note this only applies to a-z not taking specialchars into account. If you trying to match `verlängerung` your pattern needs to look for `verl[äÄ]ngerung`.
+RegEx-patterns are processed case insensitive, however note this only applies to a-z not taking specialchars into account. If you trying to match `verlängerung` your pattern needs to look for `verl(?:ä|Ä)ngerung`. Character encoding resolves this to `verl(?:Ã¤|Ã„)ngerung`, thus failing if just using `[äÄ]` grouping being resolved to `[Ã¤Ã„]`.
 
 [Content](#content)
 
