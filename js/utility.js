@@ -17,6 +17,7 @@
  */
 
 import { Assemble, Dialog, Toast } from "./assemble.js";
+import QrCreator from "../libraries/qr-creator.js";
 
 export const _serviceWorker = {
 	worker: null,
@@ -257,6 +258,87 @@ export const _client = {
 				}
 			}
 			return formdata;
+		},
+
+		lazyload: {
+			qrCodes: [], // reset on assemble init
+			barCodes: [], // reset on assemble init
+			images: [], // reset on assemble init
+			load: function () {
+				let content;
+				if (_client.application.lazyload.qrCodes.length) {
+					for (let i = 0; i < _client.application.lazyload.qrCodes.length; i++) {
+						if (!(content = _client.application.lazyload.qrCodes[i])) continue;
+						var rect = document.getElementById(content.id).getBoundingClientRect();
+						if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
+							// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
+							QrCreator.render(
+								{
+									text: content.content,
+									size: 1024,
+									ecLevel: api._settings.config.limits && api._settings.config.limits.qr_errorlevel ? api._settings.config.limits.qr_errorlevel : "M",
+									background: null,
+									fill: "#000000",
+									radius: 0,
+								},
+								document.getElementById(content.id)
+							);
+							delete _client.application.lazyload.qrCodes[i]; // prevent repeatedly rendering
+						}
+					}
+				}
+				if (_client.application.lazyload.barCodes.length) {
+					for (let i = 0; i < _client.application.lazyload.barCodes.length; i++) {
+						if (!(content = _client.application.lazyload.barCodes[i])) continue;
+						var rect = document.getElementById(content.id).getBoundingClientRect();
+						if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
+							try {
+								JsBarcode("#" + content.id, content.content.value, {
+									format: content.content.format || "CODE128",
+									background: "transparent",
+									displayValue: content.content.displayValue != undefined ? content.content.displayValue : true,
+								});
+							} catch (e) {
+								new Toast(api._lang.GET("jsbarcode.error"), "error");
+							}
+							delete _client.application.lazyload.barCodes[i]; // prevent repeatedly rendering
+						}
+					}
+				}
+				if (_client.application.lazyload.images.length) {
+					for (let i = 0; i < _client.application.lazyload.images.length; i++) {
+						if (!(content = _client.application.lazyload.images[i])) continue;
+						var rect = document.getElementById(content.id).getBoundingClientRect();
+						if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
+							let imgcanvas = document.getElementById(content.id),
+								img = new Image();
+							img.src = content.content;
+							img.addEventListener("load", function (e) {
+								let x = imgcanvas.width,
+									y = imgcanvas.height,
+									w = this.width,
+									h = this.height,
+									xoffset = 0,
+									yoffset = 0;
+								if (imgcanvas.width > w || imgcanvas.height > h) {
+									// aka square by default if dimensions have not been passed
+									if (w >= h) {
+										y = (imgcanvas.height * h) / w;
+										yoffset = (x - y) / 2;
+									} else {
+										x = (imgcanvas.width * w) / h;
+										xoffset = (y - x) / 2;
+									}
+								}
+								imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
+							});
+							img.dispatchEvent(new Event("load"));
+							URL.revokeObjectURL(img.src);
+							delete _client.application.lazyload.images[i]; // prevent repeatedly rendering
+						}
+					}
+				}
+			},
 		},
 
 		/**

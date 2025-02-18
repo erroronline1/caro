@@ -20,7 +20,6 @@
 this module helps to assemble content according to the passed simplified object notation.
 */
 import SignaturePad from "../libraries/signature_pad.umd.js";
-import QrCreator from "../libraries/qr-creator.js";
 
 var ElementID = 0,
 	signaturecanvas = null;
@@ -504,6 +503,7 @@ export class Assemble {
 		this.imageUrl = [];
 		this.names = setup.names || {};
 		this.composer = setup.composer;
+		_client.application.lazyload.qrCodes = _client.application.lazyload.barCodes = _client.application.lazyload.images = [];
 	}
 
 	/**
@@ -581,63 +581,17 @@ export class Assemble {
 		if (this.signaturePad) {
 			this.initialize_SignaturePad();
 		}
-		if (this.imageQrCode.length) {
-			// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
-			for (const image of this.imageQrCode) {
-				QrCreator.render(
-					{
-						text: image.content,
-						size: 1024,
-						ecLevel: api._settings.config.limits && api._settings.config.limits.qr_errorlevel ? api._settings.config.limits.qr_errorlevel : "M",
-						background: null,
-						fill: "#000000",
-						radius: 0,
-					},
-					document.getElementById(image.id)
-				);
-			}
+
+		if (this.imageQrCode.length) _client.application.lazyload.qrCodes = this.imageQrCode;
+		if (this.imageBarCode.length) _client.application.lazyload.barCodes = this.imageBarCode;
+		if (this.imageUrl.length) _client.application.lazyload.images = this.imageUrl;
+		if (this.imageQrCode.length || this.imageBarCode.length || this.imageUrl.length) {
+			_client.application.lazyload.load();
+			window.addEventListener("scroll", _client.application.lazyload.load, false);
+		} else {
+			window.removeEventListener("scroll", _client.application.lazyload.load);
 		}
-		if (this.imageBarCode.length) {
-			for (const image of this.imageBarCode) {
-				try {
-					JsBarcode("#" + image.id, image.content.value, {
-						format: image.content.format || "CODE128",
-						background: "transparent",
-						displayValue: image.content.displayValue != undefined ? image.content.displayValue : true,
-					});
-				} catch (e) {
-					new Toast(api._lang.GET("jsbarcode.error"), "error");
-				}
-			}
-		}
-		if (this.imageUrl.length) {
-			for (const image of this.imageUrl) {
-				let imgcanvas = document.getElementById(image.id),
-					img = new Image();
-				img.src = image.content;
-				img.addEventListener("load", function (e) {
-					let x = imgcanvas.width,
-						y = imgcanvas.height,
-						w = this.width,
-						h = this.height,
-						xoffset = 0,
-						yoffset = 0;
-					if (imgcanvas.width > w || imgcanvas.height > h) {
-						// aka square by default if dimensions have not been passed
-						if (w >= h) {
-							y = (imgcanvas.height * h) / w;
-							yoffset = (x - y) / 2;
-						} else {
-							x = (imgcanvas.width * w) / h;
-							xoffset = (y - x) / 2;
-						}
-					}
-					imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
-				});
-				img.dispatchEvent(new Event("load"));
-				URL.revokeObjectURL(img.src);
-			}
-		}
+
 		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
 	}
 
@@ -1073,7 +1027,7 @@ export class Assemble {
 
 	/**
 	 * creates a text paragraph styled as question
-	 * @returns {domNodes} 
+	 * @returns {domNodes}
 	 * @see this.textsection()
 	 */
 	auditsection() {
