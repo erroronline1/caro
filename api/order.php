@@ -346,14 +346,7 @@ class ORDER extends API {
 				}
 
 				// get unchecked articles for MDR §14 sample check
-/*
-$validChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_valid_checked');
-$notReusableChecked = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_not_reusable_checked');
-$sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_check', ['replacements' => [
-	':valid_checked' => implode(',', array_column($validChecked, 'vendor_id')),
-	':not_reusable' => implode(',', array_column($notReusableChecked, 'id'))
-]]);
-*/
+				// this is actually faster than a nested sql query
 				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				foreach($vendors as &$vendor){
 					$vendor['pricelist'] = json_decode($vendor['pricelist'], true); 
@@ -545,8 +538,7 @@ $sampleCheck = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_eligible_sample_c
 					}
 					
 					// request MDR §14 sample check
-//if ($product && array_search($product['id'], array_column($sampleCheck, 'id')) !== false){
-if ($product && in_array($product['id'], $sampleCheck)){
+					if ($product && in_array($product['id'], $sampleCheck)){
 						if (!in_array('group', $_SESSION['user']['permissions'])){
 							$data['samplecheck']['item'] = $product['id'];
 						} else {
