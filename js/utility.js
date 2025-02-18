@@ -561,6 +561,9 @@ export const _client = {
 			for (const element of data.order) {
 				// reinstatiate with order id for filtering
 				collapsible = [{ type: "hidden", description: "filter", attributes: { "data-filtered": element.id } }];
+				["unit", "ordernumber", "name", "vendor"].forEach((e) => {
+					if (!element[e]) element[e] = "";
+				});
 
 				// append ordertext
 				collapsible.push({
@@ -614,6 +617,7 @@ export const _client = {
 					// copy- and label-option
 					collapsible.push({
 						type: "text_copy",
+						numeration: "prevent",
 						attributes: {
 							value: element.commission,
 							name: api._lang.GET("order.commission"),
@@ -643,7 +647,7 @@ export const _client = {
 								});
 							}
 								.toString()
-								._replaceArray(["labels", "element.commission", "buttons"], [JSON.stringify(labels), element.commission, JSON.stringify(buttons)]),
+								._replaceArray(["labels", "element.commission", "buttons"], [JSON.stringify(labels), element.commission.replaceAll('"', '\\"'), JSON.stringify(buttons)]),
 						},
 						hint: api._lang.GET("order.copy_or_labelsheet"),
 					});
@@ -655,7 +659,7 @@ export const _client = {
 							imageonly: {},
 							qrcode: element.commission,
 							class: "order2dcode",
-							name:api._lang.GET("order.commission")
+							name: api._lang.GET("order.commission"),
 						},
 					});
 				}
@@ -720,6 +724,7 @@ export const _client = {
 					// copy- and label-option
 					collapsible.push({
 						type: "text_copy",
+						numeration: "prevent",
 						attributes: {
 							value: element.ordernumber,
 							name: api._lang.GET("order.ordernumber_label"),
@@ -752,7 +757,7 @@ export const _client = {
 								.toString()
 								._replaceArray(
 									["labels", "element.ordernumber", "element.name", "element.commission", "element.vendor", "buttons"],
-									[JSON.stringify(labels), element.ordernumber, element.name, element.commission, element.vendor, JSON.stringify(buttons)]
+									[JSON.stringify(labels), element.ordernumber.replaceAll('"', '\\"'), element.name.replaceAll('"', '\\"'), element.commission.replaceAll('"', '\\"'), element.vendor, JSON.stringify(buttons)]
 								),
 						},
 						hint: api._settings.user.permissions.orderprocessing && element.state.ordered && element.state.ordered["data-ordered"] === "true" ? api._lang.GET("order.copy_or_labelsheet") : api._lang.GET("order.copy_value"),
@@ -766,7 +771,7 @@ export const _client = {
 								imageonly: {},
 								barcode: { value: element.barcode },
 								class: "order2dcode",
-								name:api._lang.GET("order.ordernumber_label")
+								name: api._lang.GET("order.ordernumber_label"),
 							},
 						});
 					else
@@ -776,7 +781,7 @@ export const _client = {
 								imageonly: {},
 								qrcode: element.ordernumber,
 								class: "order2dcode",
-								name:api._lang.GET("order.ordernumber_label")
+								name: api._lang.GET("order.ordernumber_label"),
 							},
 						});
 
