@@ -385,9 +385,9 @@ class RECORDTCPDF extends TCPDF {
 		}
 		if ($this->_setup['header']){
 			$this->SetFont('helvetica', 'B', 20); // font size
-			$this->MultiCell(110 - $right_margin, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
+			if ($this->header['title']) $this->MultiCell(110 - $right_margin, 0, $this->header['title'], 0, 'R', 0, 1, 90, 10, true, 0, false, true, 10, 'T', true);
 			$this->SetFont('helvetica', '', 10); // font size
-			$this->MultiCell(110 - $right_margin, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
+			if ($this->header['date']) $this->MultiCell(110 - $right_margin, 0, $this->header['date'], 0, 'R', 0, 1, 90, 20, true, 0, false, true, 10, 'T', true);
 		}
 		if ($this->qrcodecontent){
 			$style = array(
