@@ -261,9 +261,18 @@ export const _client = {
 		},
 
 		lazyload: {
-			qrCodes: [], // reset on assemble init
-			barCodes: [], // reset on assemble init
-			images: [], // reset on assemble init
+			qrCodes: [], // array of objects with canvas id and content, reset on assemble init
+			barCodes: [], // array of objects with canvas id and content, reset on assemble init
+			images: [], // array of objects with canvas id and content, reset on assemble init
+			/**
+			 * event handler onscroll
+			 * iterates over the above arrays to populate the canvasses if within viewport
+			 * removes entries once being handled
+			 * neccessary e.g. on thousands of approved orders where repeatedly calling the libraries crashes the browser
+			 * 
+			 * @requires Assemble populated arrays
+			 * @event QrCreator, JsBarcode and/or proprietary img2canvas
+			 */
 			load: function () {
 				let content;
 				if (_client.application.lazyload.qrCodes.length) {
@@ -286,6 +295,7 @@ export const _client = {
 							delete _client.application.lazyload.qrCodes[i]; // prevent repeatedly rendering
 						}
 					}
+					_client.application.lazyload.qrCodes=_client.application.lazyload.qrCodes.filter(v => v);
 				}
 				if (_client.application.lazyload.barCodes.length) {
 					for (let i = 0; i < _client.application.lazyload.barCodes.length; i++) {
@@ -304,6 +314,7 @@ export const _client = {
 							delete _client.application.lazyload.barCodes[i]; // prevent repeatedly rendering
 						}
 					}
+					_client.application.lazyload.barCodes=_client.application.lazyload.barCodes.filter(v => v);
 				}
 				if (_client.application.lazyload.images.length) {
 					for (let i = 0; i < _client.application.lazyload.images.length; i++) {
@@ -337,6 +348,7 @@ export const _client = {
 							delete _client.application.lazyload.images[i]; // prevent repeatedly rendering
 						}
 					}
+					_client.application.lazyload.images=_client.application.lazyload.images.filter(v => v);
 				}
 			},
 		},
