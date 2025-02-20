@@ -1642,6 +1642,7 @@ class AUDIT extends API {
 		// get all checkable products
 		$checkable = [];
 		foreach($products as $product){
+			if (!$product['trading_good']) continue;
 			if (!isset($checkable[$product['vendor_name']])) $checkable[$product['vendor_name']] = [];
 			if (!$product['checked']){
 				$checkable[$product['vendor_name']][] = $product['id'];
@@ -1655,7 +1656,7 @@ class AUDIT extends API {
 		}
 		// drop vendors that have been checked within their sample check interval
 		foreach($products as $product){
-			if (!isset($checkable[$product['vendor_name']]) || !$product['checked']) continue;
+			if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_name']])) continue;
 			$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
 			if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_currentdate)->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 				unset($checkable[$product['vendor_name']]);
@@ -1663,6 +1664,7 @@ class AUDIT extends API {
 		}
 
 		$unchecked = array_keys($checkable);
+		sort($unchecked);
 		// display warning
 		if ($unchecked) $content[] = [
 			[

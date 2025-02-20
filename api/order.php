@@ -359,6 +359,7 @@ class ORDER extends API {
 				// get all checkable products
 				$checkable = [];
 				foreach($products as $product){
+					if (!$product['trading_good']) continue;
 					if (!isset($checkable[$product['vendor_id']])) $checkable[$product['vendor_id']] = [];
 					if (!$product['checked']){
 						$checkable[$product['vendor_id']][] = $product['id'];
@@ -372,7 +373,7 @@ class ORDER extends API {
 				}
 				// drop vendors that have been checked within their sample check interval
 				foreach($products as $product){
-					if (!isset($checkable[$product['vendor_id']]) || !$product['checked']) continue;
+					if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_id']])) continue;
 					$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
 					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_currentdate)->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 						unset($checkable[$product['vendor_id']]);
@@ -381,9 +382,8 @@ class ORDER extends API {
 				// merge all remaining ids
 				$sampleCheck = [];
 				foreach ($checkable as $ids){
-					array_merge($sampleCheck, $ids);
+					$sampleCheck = array_merge($sampleCheck, $ids);
 				}
-
 
 				// gather applicable order states
 				$statechange = ['...' => ['value' => '']];
