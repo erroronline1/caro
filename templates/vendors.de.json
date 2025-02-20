@@ -339,10 +339,10 @@
 				"columns": ["article_no", "Bezeichnung", "Einheit"],
 				"headerrowindex": 14
 			},
-			"add": {
-				"special_attention": 0
-			},
 			"modify": {
+				"add": {
+					"special_attention": 0
+				},
 				"conditional_or": [["special_attention", "1", ["Bezeichnung", "Ziegen-Narbenleder|macanta|liegeschalen|neoprene|nappa|multiform"]]],
 				"rewrite": [
 					{

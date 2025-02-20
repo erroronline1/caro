@@ -372,7 +372,7 @@
 		"name": "Lieferanten_Preisliste",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Bitte übermitteln Sie uns Ihre aktuellen Preislisten bevorzugt als Excel-Tabelle."
+		"content": "Bitte übermitteln Sie uns Ihre aktuellen Preislisten bevorzugt als Excel-Tabelle au der Artikelnummer, Produktbezeichnung und ggf. Liefereinheit hervorgeht."
 	},
 	{
 		"type": "text",
