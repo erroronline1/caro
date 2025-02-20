@@ -585,162 +585,6 @@ class Listprocessor {
 	}
 	
 	/**
-	 *   _                   _   ___ _ _
-	 *  |_|_____ ___ ___ ___| |_|  _|_| |___
-	 *  | |     | . | . |  _|  _|  _| | | -_|
-	 *  |_|_|_|_|  _|___|_| |_| |_| |_|_|___|
-	 *          |_|
-	 */
-	public function importFile(){
-		/* import file and create an associative array from rows
-		{
-			"source": "Export.csv",
-			"headerrowindex": 0,
-			"dialect": {
-				"separator": ";",
-				"enclosure": "\"",
-				"escape": ""
-			},
-			"columns": [
-				"ORIGININDEX",
-				"SOMEDATE",
-				"CUSTOMERID",
-				"NAME",
-				"DEATH",
-				"AID",
-				"PRICE",
-				"DELIVERED",
-				"DEPARTMENT",
-				"SOMEFILTERCOLUMN"
-			]
-		}		
-		*/
-		$this->_list = new SplFixedArray(0);
-		$i = 0;
-		$csvfile = fopen($this->_setting['filesetting']['source'], 'r');
-		if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
-		while(($row = fgetcsv($csvfile, null, $this->_setting['filesetting']['dialect']['separator'], $this->_setting['filesetting']['dialect']['enclosure'], $this->_setting['filesetting']['dialect']['escape'])) !== false) {
-			// import headers
-			if ($i++ < $this->_setting['filesetting']['headerrowindex'] + 1) $this->_headers = $row;
-			else {
-				if (boolval(array_diff($this->_setting['filesetting']['columns'], array_intersect($this->_setting['filesetting']['columns'], $this->_headers)))) {
-					$this->_log[] = '[~] File Import Error: not all required columns were found, filter aborted... Required: ' . implode(', ', $this->_setting['filesetting']['columns']) . '; Found: ' . implode(', ', $this->_headers);
-					break;
-				}
-				// kindly ignore corrupt formatted and empty lines
-				$unique = array_unique($row);
-				if (count($this->_headers) === count($row) && count($unique) > 0 && end($unique) !== null){
-					$this->_list->setSize(count($this->_list) + 1);
-					$this->_list[count($this->_list) - 1] = array_combine($this->_headers, $row);
-				}
-			}
-		}
-		fclose($csvfile);
-
-		foreach ($this->_list as $row => $values){
-			foreach($values as $column => &$columnvalue){
-				$columnvalue = @mb_convert_encoding($columnvalue, 'UTF-8', $this->_setting['filesetting']['encoding']);
-			}
-			$this->_list[$row] = $values; // SplFixedArray has problems accessing nested elements, must assign array to key directly
-		}
-		return true;
-	}
-	
-	/**
-	 *                 _   _     _     _ _
-	 *   _____ ___ ___| |_| |_ _| |___| | |_ ___
-	 *  |     | . |   |  _|   | . | -_| |  _| .'|
-	 *  |_|_|_|___|_|_|_| |_|_|___|___|_|_| |__,|
-	 *
-	 * adds a month delta to a passed date
-	 * @param array $date [Y, m, d]
-	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
-	 * @param int $delta number of months 
-	 * @return array new date
-	 */
-	public function monthdelta($date = [], $dateformat = [], $delta = 0){
-		// force days and months two digit
-		$day = array_search('d', $dateformat);
-		$date[$day] = '01';//strlen($date[$day]) < 2 ? '0' . $date[$day] : $date[$day];
-		$month = array_search('m', $dateformat);
-		$date[$month] = strlen($date[$month]) < 2 ? '0' . $date[$month] : $date[$month];
-
-		$date = implode('-', $date);
-		$dateformat = implode('-', $dateformat);
-		$offset_date = new DateTime(DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
-		$day = $offset_date->format('j');
-		$offset_date->modify('first day of ' . ($delta === 0 ? 'this' : ($delta > 1 ? '+' . $delta : '-' . $delta)) . ' month' . ($delta !==0 ? 's': ''));
-		return explode('-', $offset_date->format($dateformat));
-	}
-	
-	/**
-	 *                 _   _     _ _ ___ ___
-	 *   _____ ___ ___| |_| |_ _| |_|  _|  _|
-	 *  |     | . |   |  _|   | . | |  _|  _|
-	 *  |_|_|_|___|_|_|_| |_|_|___|_|_| |_|
-	 *
-	 * determine approximately difference of months (not taking leap years into account)
-	 * @param array $first [Y, m, d]
-	 * @param array $last [Y, m, d]
-	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
-	 * @return float difference
-	 */
-	public function monthdiff($first = [], $last = [], $dateformat = []){
-		// force days and months two digit
-		$day = array_search('d', $dateformat);
-		$first[$day] = '01';//strlen($first[$day]) < 2 ? '0' . $first[$day] : $first[$day];
-		$last[$day] = '01';//strlen($last[$day]) < 2 ? '0' . $last[$day] : $last[$day];
-		$month = array_search('m', $dateformat);
-		$first[$month] = strlen($first[$month]) < 2 ? '0' . $first[$month] : $first[$month];
-		$last[$month] = strlen($last[$month]) < 2 ? '0' . $last[$month] : $last[$month];
-		
-		$first = implode('-', $first);
-		$last = implode('-', $last);
-		$dateformat = implode('-', $dateformat);
-		$backthen = new DateTime(DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
-		$processedmonth = new DateTime(DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
-		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 0);
-	}
-
-	/**
-	 *           _ _ _
-	 *   ___ ___| |_| |_
-	 *  |_ -| . | | |  _|
-	 *  |___|  _|_|_|_|
-	 *      |_|
-	 */
-	public function split() {
-		/* split list as desired or at least nest one layer */
-		$split_list = [];
-		foreach ($this->_list as $i => $row){
-			if (!$row) continue;
-
-			if (isset($this->_setting['split'])){
-				// create sorting key by matched patterns, mandatory translated if applicable
-				$sorting = '';
-				foreach ($this->_setting['split'] as $key => $pattern){
-					preg_match_all('/' . $pattern . '/mi', $row[$key], $match, PREG_OFFSET_CAPTURE);
-					// "special company" matched by (special).+(company).+ or by .*
-					// (.+) may be critical for matching line end as well and having indifferent results
-					foreach($match as $index => $submatch){
-						if (count($match)>1 && $index === 0) continue;
-						if (!trim($submatch[0][0])) continue;
-						$sorting .= ' ' . $submatch[0][0];
-					}
-				}
-				$sorting = trim($sorting);
-				if (!isset($split_list[$sorting])) $split_list[$sorting] = [$row];
-				else array_push($split_list[$sorting], $row);
-			} else {
-				if (!isset($split_list[1])) $split_list[1] = [$row];
-				else array_push($split_list[1], $row);
-			}
-		}
-		$this->_list = $split_list;
-	}
-
-
-	/**
 	 *   ___ _ _ _                 _                           _   _   _     _                   _
 	 *  |  _|_| | |_ ___ ___      | |_ _ _       _____ ___ ___| |_| |_|_|___| |_ ___ ___ _ _ ___| |
 	 *  |  _| | |  _| -_|  _|     | . | | |     |     | . |   |  _|   | |   |  _| -_|  _| | | .'| |
@@ -849,6 +693,68 @@ class Listprocessor {
 	}
 
 	/**
+	 *   _                   _   ___ _ _
+	 *  |_|_____ ___ ___ ___| |_|  _|_| |___
+	 *  | |     | . | . |  _|  _|  _| | | -_|
+	 *  |_|_|_|_|  _|___|_| |_| |_| |_|_|___|
+	 *          |_|
+	 */
+	public function importFile(){
+		/* import file and create an associative array from rows
+		{
+			"source": "Export.csv",
+			"headerrowindex": 0,
+			"dialect": {
+				"separator": ";",
+				"enclosure": "\"",
+				"escape": ""
+			},
+			"columns": [
+				"ORIGININDEX",
+				"SOMEDATE",
+				"CUSTOMERID",
+				"NAME",
+				"DEATH",
+				"AID",
+				"PRICE",
+				"DELIVERED",
+				"DEPARTMENT",
+				"SOMEFILTERCOLUMN"
+			]
+		}		
+		*/
+		$this->_list = new SplFixedArray(0);
+		$i = 0;
+		$csvfile = fopen($this->_setting['filesetting']['source'], 'r');
+		if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
+		while(($row = fgetcsv($csvfile, null, $this->_setting['filesetting']['dialect']['separator'], $this->_setting['filesetting']['dialect']['enclosure'], $this->_setting['filesetting']['dialect']['escape'])) !== false) {
+			// import headers
+			if ($i++ < $this->_setting['filesetting']['headerrowindex'] + 1) $this->_headers = $row;
+			else {
+				if (boolval(array_diff($this->_setting['filesetting']['columns'], array_intersect($this->_setting['filesetting']['columns'], $this->_headers)))) {
+					$this->_log[] = '[~] File Import Error: not all required columns were found, filter aborted... Required: ' . implode(', ', $this->_setting['filesetting']['columns']) . '; Found: ' . implode(', ', $this->_headers);
+					break;
+				}
+				// kindly ignore corrupt formatted and empty lines
+				$unique = array_unique($row);
+				if (count($this->_headers) === count($row) && count($unique) > 0 && end($unique) !== null){
+					$this->_list->setSize(count($this->_list) + 1);
+					$this->_list[count($this->_list) - 1] = array_combine($this->_headers, $row);
+				}
+			}
+		}
+		fclose($csvfile);
+
+		foreach ($this->_list as $row => $values){
+			foreach($values as $column => &$columnvalue){
+				$columnvalue = @mb_convert_encoding($columnvalue, 'UTF-8', $this->_setting['filesetting']['encoding']);
+			}
+			$this->_list[$row] = $values; // SplFixedArray has problems accessing nested elements, must assign array to key directly
+		}
+		return true;
+	}
+	
+	/**
 	 *               _ _ ___
 	 *   _____ ___ _| |_|  _|_ _
 	 *  |     | . | . | |  _| | |
@@ -885,7 +791,7 @@ class Listprocessor {
 				switch ($modify){
 					case 'add':
 						if (!in_array($rule, $this->_setting['filesetting']['columns']))
-								$this->_setting['filesetting']['columns'][] = $key;
+						$this->_setting['filesetting']['columns'][] = $key;
 						foreach ($this->_list as $i => $row){
 							if (!$row) continue;
 
@@ -973,6 +879,7 @@ class Listprocessor {
 							for ($condition = 2; $condition < count($rule); $condition++){
 								if (isset($row[$rule[$condition][0]]) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
 							}
+							if (!isset($row[$rule[0]])) $row[$rule[0]] = '';
 							if ($matches == (count($rule) - 2)) $row[$rule[0]] = $rule[1];
 							else $row[$rule[0]] = strlen($row[$rule[0]]) ? $row[$rule[0]] : '';
 							$this->_list[$i] = $row;
@@ -987,6 +894,7 @@ class Listprocessor {
 							for ($condition = 2; $condition < count($rule); $condition++){
 								if (isset($row[$rule[$condition][0]]) && boolval(preg_match('/' . $rule[$condition][1] . '/mi', $row[$rule[$condition][0]]))) $matches++;
 							}
+							if (!isset($row[$rule[0]])) $row[$rule[0]] = '';
 							if ($matches) $row[$rule[0]] = $rule[1];
 							else $row[$rule[0]] = strlen($row[$rule[0]]) ? $row[$rule[0]] : '';
 							$this->_list[$i] = $row;
@@ -995,6 +903,99 @@ class Listprocessor {
 					}
 			}
 		}
+	}
+
+	/**
+	 *                 _   _     _     _ _
+	 *   _____ ___ ___| |_| |_ _| |___| | |_ ___
+	 *  |     | . |   |  _|   | . | -_| |  _| .'|
+	 *  |_|_|_|___|_|_|_| |_|_|___|___|_|_| |__,|
+	 *
+	 * adds a month delta to a passed date
+	 * @param array $date [Y, m, d]
+	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
+	 * @param int $delta number of months 
+	 * @return array new date
+	 */
+	public function monthdelta($date = [], $dateformat = [], $delta = 0){
+		// force days and months two digit
+		$day = array_search('d', $dateformat);
+		$date[$day] = '01';//strlen($date[$day]) < 2 ? '0' . $date[$day] : $date[$day];
+		$month = array_search('m', $dateformat);
+		$date[$month] = strlen($date[$month]) < 2 ? '0' . $date[$month] : $date[$month];
+
+		$date = implode('-', $date);
+		$dateformat = implode('-', $dateformat);
+		$offset_date = new DateTime(DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
+		$day = $offset_date->format('j');
+		$offset_date->modify('first day of ' . ($delta === 0 ? 'this' : ($delta > 1 ? '+' . $delta : '-' . $delta)) . ' month' . ($delta !==0 ? 's': ''));
+		return explode('-', $offset_date->format($dateformat));
+	}
+	
+	/**
+	 *                 _   _     _ _ ___ ___
+	 *   _____ ___ ___| |_| |_ _| |_|  _|  _|
+	 *  |     | . |   |  _|   | . | |  _|  _|
+	 *  |_|_|_|___|_|_|_| |_|_|___|_|_| |_|
+	 *
+	 * determine approximately difference of months (not taking leap years into account)
+	 * @param array $first [Y, m, d]
+	 * @param array $last [Y, m, d]
+	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
+	 * @return float difference
+	 */
+	public function monthdiff($first = [], $last = [], $dateformat = []){
+		// force days and months two digit
+		$day = array_search('d', $dateformat);
+		$first[$day] = '01';//strlen($first[$day]) < 2 ? '0' . $first[$day] : $first[$day];
+		$last[$day] = '01';//strlen($last[$day]) < 2 ? '0' . $last[$day] : $last[$day];
+		$month = array_search('m', $dateformat);
+		$first[$month] = strlen($first[$month]) < 2 ? '0' . $first[$month] : $first[$month];
+		$last[$month] = strlen($last[$month]) < 2 ? '0' . $last[$month] : $last[$month];
+		
+		$first = implode('-', $first);
+		$last = implode('-', $last);
+		$dateformat = implode('-', $dateformat);
+		$backthen = new DateTime(DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
+		$processedmonth = new DateTime(DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
+		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 0);
+	}
+
+	/**
+	 *           _ _ _
+	 *   ___ ___| |_| |_
+	 *  |_ -| . | | |  _|
+	 *  |___|  _|_|_|_|
+	 *      |_|
+	 */
+	public function split() {
+		/* split list as desired or at least nest one layer */
+		$split_list = [];
+		foreach ($this->_list as $i => $row){
+			if (!$row) continue;
+
+			if (isset($this->_setting['split'])){
+				// create sorting key by matched patterns, mandatory translated if applicable
+				$sorting = '';
+				foreach ($this->_setting['split'] as $key => $pattern){
+					preg_match_all('/' . $pattern . '/mi', $row[$key], $match, PREG_OFFSET_CAPTURE);
+					// "special company" matched by (special).+(company).+ or by .*
+					// (.+) may be critical for matching line end as well and having indifferent results
+					foreach($match as $index => $submatch){
+						if (count($match)>1 && $index === 0) continue;
+						if (!trim($submatch[0][0])) continue;
+						$sorting .= ' ' . $submatch[0][0];
+					}
+				}
+				$sorting = trim($sorting);
+				if (!isset($split_list[$sorting])) $split_list[$sorting] = [$row];
+				else array_push($split_list[$sorting], $row);
+			} else {
+				if (!isset($split_list[1])) $split_list[1] = [$row];
+				else array_push($split_list[1], $row);
+			}
+		}
+		$this->_list = $split_list;
 	}
 }
 ?>
