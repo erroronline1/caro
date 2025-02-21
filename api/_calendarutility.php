@@ -738,8 +738,8 @@ class CALENDARUTILITY {
 					$settingentries = explode(';', $user['app_settings'][$setting]);
 					natsort($settingentries);
 					foreach($settingentries as $line){
-						// match start date of contract settings, days of annual vacation or weekly hours
-						preg_match('/(\d{4}\-\d{2}\-\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+						// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
+						preg_match('/(\d{4}\.\d{2}\.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						// append datetime value and contract value
 						$hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
