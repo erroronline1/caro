@@ -171,7 +171,11 @@ As records intend to save the submitting users name, group accounts are unrecomm
 
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
-Documents can contain a digital signature pad. Please note this is not legally document proof for lacking certification. You can define where this might be suitable enough for your processes.
+An encoded user identifier is added to the payload of submitted form data, the server verifies the identity and data integrity with a checksum.
+
+Documents can contain a digital signature pad. Please note due to lacking certification this is only a simple electronic signature (SES) according to eIDAS. You can define where this might be suitable enough for your processes.
+
+Timestamps are not qualified. A reduced validity than manual or stamped dates on paper documents is currently not discernible.
 
 [Content](#content)
 
@@ -606,13 +610,13 @@ Off duty events are displayed with the scheduled events, but scheduled events ar
 
 Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
 
-For a correct calculation it is neccessary to provide values as *start-date and annual vacation/weekly hours* in the format `yyyy-mm-dd hh`. If entering the calculation during a calendar year, actual remaining annual vacation days have to be the initial value. Then the full annual vacation days can be applied by adding a setting for the next year starting on January 1st. On exiting the calculation another setting sould be applied with the annual vacation days up to the exit date. An example for a three years period starting and ending in summer with 30 days of annual vacation per contract would look like:
+For a correct calculation it is neccessary to provide values as *start-date and annual vacation/weekly hours* in the ISO 8601 format `yyyy-mm-dd XX`, where `XX` stands for number of vacation days or weekly hours. If entering the calculation during a calendar year, actual remaining annual vacation days have to be the initial value. Then the full annual vacation days can be applied by adding a setting for the next year starting on January 1st. On exiting the calculation another setting sould be applied with the annual vacation days up to the exit date. An example for a three years period starting and ending in summer with 30 days of annual vacation per contract would look like:
 ```
-2023-07-01 15
-2024-01-01 30
-2026-01-01 15
+2023-07-01; 15
+2024-01-01; 30
+2026-01-01; 15
 ```
-Weekly hours look similar like `2023-07-01 39,5` with allowed decimal values.
+Weekly hours look similar like `2023-07-01; 39.5` with allowed decimal values and comma or period as delimiter. The separator between date and value is freely choosable except numbers.
 
 Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
@@ -708,7 +712,7 @@ Disabled products are not accessible through the order module. Products can be d
 
 Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
 
-Vendors can be enriched with certificate files. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
+Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default. Here certificate files can be added too. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
 > Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
@@ -801,7 +805,7 @@ Sometimes purchase knows better about favourable terms. If an ordering user does
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin, personal access token or signature, based on [configuration settings](#runtime-variables).
 
-Approved orders can be marked as *ordered*, *received*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.
+Approved orders can be marked as *ordered*, *partially received*, *received*, *partially delivered*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.
 If purchase is allowed to order something similar there will be a reminder to update the order for the correct product if necessary, to not mess up the system im terms of incorporation, sample checks or traceability. 
 
 Information can be added anytime.
@@ -1054,7 +1058,7 @@ Application support legend:
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
 * Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
-* Occasionally FTP-access to the server for updates of [language files](#customisation) during runtime.
+* Occasionally FTP-access to the server for updates of [runtime variables](#runtime-variables) and [language files](#customisation)
 
 Tested server environments:
 * Apache [Uniform Server Zero XV](https://unidocumentserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
@@ -1073,7 +1077,7 @@ External scanners must be able to scan 2D-Codes and read UTF-8 character encodin
 
 Firefox, Edge and most probably any chromium browser, as well as Safari have previews for input datalists that help with selecting available options (e.g. message recipients) which is very convenient. Other browsers have not been tested.
 
-Technically the application is being usable on any webserver but this is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).
+Technically the application is being usable on any webserver but the use on a public accessible server is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).
 
 [Content](#content)
 
@@ -1941,6 +1945,7 @@ Stakeholder identification:
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO |  |  |
 
 [Content](#content)
 
@@ -4627,12 +4632,12 @@ I welcome any constructive input on this topic.
     * processes qr- and barcodes from image ressource on the client side
     * v2.3.8
     * \> 5k stars
-    * \> 950 forks
-    * slightly modified for multi-language integration of applications language model
+    * \> 1k forks
+    * [https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * v5.0.4
-    * \> 10k stars
+    * \> 11k stars
     * \> 2k forks
     * [https://www.jsdelivr.com/package/npm/signature_pad](https://www.jsdelivr.com/package/npm/signature_pad) slightly modified for easier import, comment out UMD module wrapper and define export default class SignaturePad, delete sourceMappingURL (Safari)
 * [https://github.com/nimiq/qr-creator](https://github.com/nimiq/qr-creator)
@@ -4648,7 +4653,7 @@ I welcome any constructive input on this topic.
     * renders stl files on the client side
     * v1.13
     * \> 200 stars
-    * \> 40 forks
+    * \> 50 forks
 * [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
     * creates XLSX-files on the server side
     * v0.39

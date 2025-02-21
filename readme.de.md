@@ -99,7 +99,11 @@ Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen
 
 Formulardaten und Serveranfragen beinhalten teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
 
-Dokumente können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nicht um ein dokumentenechtes Verfahren handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
+Die Übermittlung von Formulardaten fügt dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu, der Server verifiziert die Identität und Datenintegrität durch eine Prüfsumme.
+
+Dokumente können ein digitales Unterschriftenfeld beinhalten. Dabei ist zu beachten, dass es sich hierbei mangels Zertifizierung nur um eine einfache elektronische Signatur (EES) gemäß eIDAS handelt. Ob das Verfahren innerhalb festgelegter Prozesse angemessen ist, ist eine persönliche Ermessenssache.
+
+Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftliche oder gestempelte Datumsangaben auf Papierdokumenten kann jedoch aktuell nicht erkannt werden.
 
 [Übersicht](#übersicht)
 
@@ -271,9 +275,9 @@ graph TD;
 [Übersicht](#übersicht)
 
 ### Verbesserungsvorschläge
-Jeder Nutzer kann öffentlich Verbessungsvorschläge zu beliebigen Themen einreichen, auch Prozessen. Selbst anonyme Einreichungen sind möglich. Bei neuen Vorschlägen wird eine Systemnachricht an alle Nutzer versandt. Nutzer können ihre Meinung zu den Themen ausdrücken. Berechtigte Nutzer können Maßnahmen beschreiben oder Bewerten und die Themen abschließen. Der Vorschlagende wird per nachricht darüber informiert, dass sein Anliegen bearbeitet wurde.
+Jeder Nutzer kann öffentlich Verbesserungsvorschläge zu beliebigen Themen einreichen, auch Prozessen. Selbst anonyme Einreichungen sind möglich. Bei neuen Vorschlägen wird eine Systemnachricht an alle Nutzer versandt. Nutzer können ihre Zustimmung zu den Themen ausdrücken. Berechtigte Nutzer können Maßnahmen beschreiben oder Bewerten und die Themen abschließen. Der Vorschlagende wird per Nachricht darüber informiert, dass sein Anliegen bearbeitet wurde.
 
-Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, können Vorschläge gelöscht werden, wenngleich dies Standardmäßig nicht empfohlen wird. beiträge haben keinen Aufzeichnungscharakter, beabsichtigen aber Meinungsbilder einzusammeln und als Eingabe für Qualitätsverbesserungen und die Managementbewertung zu dienen.
+Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, können Vorschläge gelöscht werden, wenngleich dies Standardmäßig nicht empfohlen wird. Beiträge haben keinen Aufzeichnungscharakter, beabsichtigen aber Meinungsbilder einzusammeln und als Eingabe für Qualitätsverbesserungen und die Managementbewertung zu dienen.
 
 [Übersicht](#übersicht)
 
@@ -524,13 +528,13 @@ Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten
 
 Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
 
-Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und jahresurlaub/Wochenarbeitszeit* im Format `yyyy-mm-dd hh` anzugeben. Falls unterjährig in die Berechnung eingestiegen werden soll muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
+Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahresurlaub/Wochenarbeitszeit* im ISO 8601 Format `yyyy-mm-dd XX` anzugeben, wobei `XX`für die Anzahl an Urlaubstagen oder Wochenarbeitszeitstunden steht. Falls unterjährig in die Berechnung eingestiegen werden soll muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
 ```
-2023-07-01 15
-2024-01-01 30
-2026-01-01 15
+2023-07-01; 15
+2024-01-01; 30
+2026-01-01; 15
 ```
-Die Wochenarbeitszeit sieht mit `2023-07-01 39,5` ähnlich aus, Dezimalwerte sind erlaubt.
+Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte sind erlaubt, als Trennzeichen gelten Komma oder Punkt. Die Trennung zwischen Datum und Wert ist mit Ausnahme von Zahlen frei wählbar.
 
 Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
@@ -627,7 +631,7 @@ Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Art
 
 Besondere berechtigte Nutzer (z.B. *Einkaufsassistent*) können Aliasbezeichnungen von Artikeln anpassen um den Einkauf zu entlasten und die Identifikation von Artikeln mit betriebsinternen Gepflogenheiten zu verbessern.
 
-Lieferanten können Zertifikate beigefügt werden. Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
+Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus. Hier können auch Zertifikate beigefügt werden. Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
 Die Bearbeitungsansicht für Lieferanten erlaubt die Auswahl von [Textvorschlägen](#textvorschläge). Sofern diese ordnungsgemäß vorbereitet sind können vorbereitete Werte einfach in die Platzhalter eingefügt werden. 
 Kleinere Lieferantenportfolios könnten primär oder anfänglich innerhalb der Anwendung verwaltet werden. Artikellisten können zusammen mit dem Import-Filter exportiert werden. Letzterer [wird erzeugt](#standardfilter-bei-export) sofern nicht definiert.
 > Erzeugte Filter funktionieren nicht mit Herstellerpreislisten, exportierte Artikellisten funktionieren nicht mit angepassten Filterregeln!
@@ -717,7 +721,7 @@ Manchmal weiß der Einkauf besser über Lieferkonditionen bescheid. Falls es dem
 
 Bestellungen müssen freigegeben werden, vorbereitete Bestellungen sammeln sich an und können von einem Nutzer mit Bestellberechtigung (z.B. PIN, Zugangstoken, Unterschrift, je nach [Konfiguration](#laufzeitvariablen)) gesammelt freigegeben werden.
 
-Freigegebene Bestellungen können als *bestellt*, *vollständig erhalten*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert. Bestellungen die verarbeitet aber noch nicht als erhalten markiert sind werden regelmäßig gemäß [config.ini](#laufzeitvariablen) erinnert um beim Lieferanten ein Lieferdatum zu erfragen.
+Freigegebene Bestellungen können als *bestellt*, *teilweise erhalten*, *vollständig erhalten*, *teilweise ausgeliefert*, *ausgeliefert* und *archiviert* markiert werden. Ausgelieferte Bestellungen welche nicht archiviert sind werden nach einer definierten Zeitspanne automatisch gelöscht. Der Einkauf kann Bestellungen auch unter Angabe von Gründen zurückweisen. In diesem Fall werden alle Nutzer des bestellenden Bereichs über die fehlgeschlagene Bearbeitung der Bestellung informiert. Bestellungen die verarbeitet aber noch nicht als erhalten markiert sind werden regelmäßig gemäß [config.ini](#laufzeitvariablen) erinnert um beim Lieferanten ein Lieferdatum zu erfragen.
 Falls der Einkauf auch ein ähnliches Produkt bestellen kann, wird daran erinnert gegebenenfalls die Bestellung zu korrigieren um das System in Bezug auf Produkteinführungen, Stichprobenprüfungen und Rückverfolgung nicht durcheinanderzubringen.
 
 Jeder Bestellung kann jederzeit Informationen angehängt werden.
@@ -979,7 +983,7 @@ Anwendungsunterstützung Legende:
     * bestenfalls [keine Löschung der Browserdaten](#handhabe-der-netzwerkverbindung) (Cache, indexedDB) beim Beenden
     * Druckerzugang für alle Endgeräte
 * Lieferantenpreislisten als CSV-Dateien ([siehe Details](#importierung-von-lieferantenpreislisten))
-* Gelegentlich FTP-Zugang zum Server für [Anpassungen der Sprachdateien](#anpassung) während der Laufzeit
+* Gelegentlich FTP-Zugang zum Server für Anpassungen der [Laufzeitvariablen](#laufzeitvariablen) und [Sprachdateien](#anpassung)
 
 Getestete Serverumgebungen:
 * Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
@@ -998,7 +1002,7 @@ Externe Scanner müssen 2D-Codes scannen und UTF-8 Zeichencodierung auswerten k�
 
 Firefox, Edge und vermutlich jeder andere Chromium-Browser sowie Safari haben für Datenlisten bei Eingaben eine Vorschau, welche die Auswahl verfügbarer Optionen (z.B. Wahl von Nachrichtenempfängern) vereinfacht. Andere Browser wurden nicht getestet.
 
-Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert, können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist diese Verwendung ausdrücklich **nicht empfohlen**.
+Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert, können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist die Verwendung auf einem öffentlich zugänglichen Server ausdrücklich **nicht empfohlen**.
 
 [Übersicht](#übersicht)
 
