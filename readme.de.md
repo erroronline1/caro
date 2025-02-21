@@ -1100,7 +1100,7 @@ names[length] = "^.{0,3}$" ; weniger als 4 Zeichen
 
 ; unveränderliche fest einprogrammierte reservierte Begriffe
 names[numeric] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
-names[underscorestrat] = "^_" ; Namen dürfen nicht mit _ beginnen
+names[underscorestart] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
@@ -1245,6 +1245,11 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 | footer | yes oder no | yes |
 
 ## Anmerkungen und Hinweise zur Nutzung
+
+### Allgemein
+Diese Software wurde in bester Absicht entwickelt. Sie soll die Bearbeitung regulatorischer Anforderungen etwas weniger anstrengend machen. Das Nutzungsszenario ist jedoch auf die persönlichen Erfahrungen des [Teams](#das-team) in einem Medizinprodukte herstellenden Betrieb zugeschnitten, hoffentlich aber auch an jemand anderens Grundbedürfnisse anpassbar.
+
+Das Leben, das medizinische Feld und regulatorische Anforderungen sind kompliziert, agil und unvorhersehbar. Hinter jeder Ecke verbirgt sich möglicherweise eine neue Anordnung. Daher versucht die CARO App ebenso agil zu sein um auch den nächsten Einfall der Auditorin schnell abbilden zu können. Dies kann kaum vollständig in eine einfach verständliche Nutzeroberfläche eingebunden werden. Die persönliche Erfahrung zeigt, dass weniger als ein Prozent der Beschäftigten reguläre Ausdrücke und die bloße Menge and Einstellungen, die eine solche Software zur Bewältigung der vorgesehenen Aufgaben benötigt, verstehen können. Daher wurde nach etlichen fruchtlosen Versuchen letztlich die Entscheidung getroffen diese Stellrädchen so zu belassen. Insbesondere die Datenverarbeitung unterschiedlichster Tabellen mit dem [CSV Prozessor](#csv-prozessor) und die Definition der [Laufzeitvariablen](#laufzeitvariablen) benötigen wahrscheinlich eine einigermaßen fortgeschrittene computerbegeisterte Person.
 
 ### Handhabe der Netzwerkverbindung
 * Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Dokumentenversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
