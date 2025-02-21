@@ -16,143 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Dialog, Toast, Assemble } from "../js/assemble.js";
-
-//test assembling
-//api.getForms('qr', 'template', 'qr');
-
-//test api
-//api.user('user_new');
-
-//test composing
-/*const createForm = {
-	"content": [
-		[{
-			"type": "text",
-			"description": "what to do",
-			"content": "choose available elements from this panel. set your parameters and add fields. advanced attributes (href, value, events, etc) have to be set in json-format with double-quotes. change your order by dragging the elements. during composing indicators for containers are not available. dragging is available on devies with mice only."
-		}, {
-			"form": true,
-			"type": "compose_text",
-			"description": "add an informative text"
-		}, {
-			"form": true,
-			"type": "compose_textinput",
-			"description": "add a single line text input"
-		}, {
-			"form": true,
-			"type": "compose_textarea",
-			"description": "add a multiline text input"
-		}, {
-			"form": true,
-			"type": "compose_numberinput",
-			"description": "add a number input"
-		}, {
-			"form": true,
-			"type": "compose_dateinput",
-			"description": "add a date input"
-		}, {
-			"form": true,
-			"type": "compose_links",
-			"description": "add a list of links"
-		}, {
-			"form": true,
-			"type": "compose_radio",
-			"description": "add a set of single selection options"
-		}, {
-			"form": true,
-			"type": "compose_checkbox",
-			"description": "add a set of multiple selection options"
-		}, {
-			"form": true,
-			"type": "compose_select",
-			"description": "add a dropdown"
-		}, {
-			"form": true,
-			"type": "compose_file",
-			"description": "add a file upload"
-		}, {
-			"form": true,
-			"type": "compose_photo",
-			"description": "add a photo upload"
-		}, {
-			"form": true,
-			"type": "compose_signature",
-			"description": "add a signature pad"
-		}, {
-			"form": true,
-			"type": "compose_qr",
-			"description": "add a qr scanner field"
-		}],
-		[{
-			"type": "button",
-			"description":"generate/update form object",
-			"attributes": {
-				"data-type": "generateupdate",
-				"onclick": "console.log(compose_helper.composeNewForm())"
-			}
-		}],
-		[{
-			"type": "trash",
-			"description": "drop panel here to delete"
-		}]
-	]
-};
-new Compose(createForm);
-/*
-const oldform = {
-	"name":"oldform",
-	"content": [
-		[{
-			"type": "radio",
-			"description": "strength",
-			"content": {
-				"1": {},
-				"2": {},
-				"3": {},
-				"4": {},
-				"5": {}
-			}
-		}],
-		[{
-			"type": "select",
-			"description": "strength",
-			"content": {
-				"1": {},
-				"2": {},
-				"3": {},
-				"4": {},
-				"5": {},
-				"6": {}
-			}
-		}, {
-			"type": "textinput",
-			"description": "comment",
-			"attributes": {
-				"placeholder": " ",
-				"onclick": "alert('hello')"
-			}
-		}],
-		[{
-			"type": "text",
-			"description": "dfhgdfgh",
-			"content": "dfghdfghdfhg"
-		}]
-	]
-};
-//compose_helper.importForm(oldform);
-
-const oldform2 = {
-	"name":"oldform2",
-	"content": [
-		[{
-			"type": "text",
-			"description": "dfhgdfgh1398172693876123",
-			"content": "dfghdfghdfhg349871239487 123874 237641 723872o 3479817234871t234 87129873 4"
-		}]
-	]
-};
-*/
+import {Assemble } from "../js/assemble.js";
 
 export function rendertest(element) {
 	let tests = {
@@ -260,6 +124,14 @@ export function rendertest(element) {
 						},
 						hint: "Popular browsers",
 					},
+					{
+						type:"image",
+						description:"Embedded images can be downloaded",
+						attributes:{
+							name:"CARO App Logo",
+							url:"./media/favicon/windows11/SmallTile.scale-100.png"
+						}
+					}
 				],
 				[
 					{
@@ -422,6 +294,14 @@ export function rendertest(element) {
 						},
 						hint: "Bekannte Browser",
 					},
+					{
+						type:"image",
+						description:"Eingebundene Bilder können heruntergeladen werden",
+						attributes:{
+							name:"CARO App Logo",
+							url:"./media/favicon/windows11/SmallTile.scale-100.png"
+						}
+					}
 				],
 				[
 					{
