@@ -808,21 +808,26 @@ class INSTALL {
 			if ((isset($entry['unit']) && $entry['unit'] && !in_array($entry['unit'], array_column($DBall, 'unit'))) &&
 				isset($entry['objectives']) && $entry['objectives'] && !in_array($entry['objectives'], array_column($DBall, 'objectives'))
 			) {
-				foreach($entry['content'] as &$question){
+				foreach($entry['content'] as $key => &$question){
+					// filter empty sets
+					if (!$question['question']){
+						unset ($entry['content'][$key]);
+						continue;
+					}
 					// ensure proper formatting
 					if (isset($question['regulatory']) && $question['regulatory']) $question['regulatory'] = implode(',', preg_split('/[^\w\d]+/m', $question['regulatory']));
 				}
-				if (($entry['content'] = UTILITY::json_encode($entry['content'])) === false){
+				if (!array_filter($entry['content'], fn($q) => boolval($q)) || ($entry['content'] = UTILITY::json_encode($entry['content'])) === false){
 					$this->printError('A question set is malformed. This item will be skipped:', $entry);
 					continue;
 				}
 
 				$insertions[] = [
 					':content' => $entry['content'],
-					':hint' => $entry['hint'] ? : null,
 					':objectives' => $entry['objectives'],
+					':unit' => $entry['unit'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-					':content' => $entry['content']
+					':hint' => $entry['hint'] ? : null,
 				];
 			}
 		}
