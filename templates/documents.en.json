@@ -120,7 +120,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1",
+		"regulatory_context": "iso13485_7_2_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identify,basic"

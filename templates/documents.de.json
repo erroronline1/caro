@@ -1370,7 +1370,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1",
+		"regulatory_context": "iso13485_7_2_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,basisdaten"
@@ -1381,7 +1381,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_3,sgb5_33",
+		"regulatory_context": "iso13485_7_2_3,sgb5_33",
 		"permitted_export": 1,
 		"restricted_access": null,
 		"content": "identifikator,datenverarbeitung auftragserteilung schweigepflichtentbindung"
@@ -1392,7 +1392,7 @@
 		"context": "casedocumentation",
 		"unit": "silicone",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1,iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,silikonfertigungsauftrag"
@@ -1403,7 +1403,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_3,mdr_annex1,mdr_annex4",
+		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": 1,
 		"restricted_access": null,
 		"content": "identifikator,empfangsbestätigung"
@@ -1414,7 +1414,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_3",
+		"regulatory_context": "iso13485_7_2_3",
 		"permitted_export": 1,
 		"restricted_access": null,
 		"content": "identifikator,erlaubnis zur ausstellung und veröffentlichung"
@@ -1425,7 +1425,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1,iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,versorgungsmaßnahme"
@@ -1436,7 +1436,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1,iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,versorgungsausführung"
@@ -1447,7 +1447,7 @@
 		"context": "casedocumentation",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1,iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,vorgangsprotokoll"
@@ -1458,7 +1458,7 @@
 		"context": "product_incorporation_document",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_4_1,iso134857_4_2,iso134857_4_3",
+		"regulatory_context": "iso13485_7_4_1,iso13485_7_4_2,iso13485_7_4_3",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "produkteinführung"
@@ -1469,7 +1469,7 @@
 		"context": "mdr_sample_check_document",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_4_3,mdr14",
+		"regulatory_context": "iso13485_7_4_3,mdr14",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "stichprobenprüfung"
@@ -1480,7 +1480,7 @@
 		"context": "training_evaluation_document",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134856_2",
+		"regulatory_context": "iso13485_6_2",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "schulungsbewertung"
@@ -1491,7 +1491,7 @@
 		"context": "vendor_evaluation_document",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_4_1,iso134854_1_3,iso134855_6_1,iso134855_6_2",
+		"regulatory_context": "iso13485_7_4_1,iso13485_4_1_3,iso13485_5_6_1,iso13485_5_6_2",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "lieferantenbewertung"
@@ -1502,7 +1502,7 @@
 		"context": "incident",
 		"unit": "common",
 		"author": "Caro App",
-		"regulatory_context": "iso134858_2_2,iso134858_2_3",
+		"regulatory_context": "iso13485_8_2_2,iso13485_8_2_3",
 		"permitted_export": null,
 		"restricted_access": "prrc,qmo,ceo",
 		"content": "identifikator,vorkommnismeldung"
@@ -3622,7 +3622,7 @@
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1,iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,anamnese prothetik ii"
@@ -3633,7 +3633,7 @@
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1,iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,maßblatt prothetik ii"
@@ -3644,7 +3644,7 @@
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_5_1",
+		"regulatory_context": "iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,kunststofffertigungsauftrag prothetik ii"
@@ -3655,7 +3655,7 @@
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_1,iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,versorgungsplanung prothetik ii"
@@ -3666,7 +3666,7 @@
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,checkliste prothetik ii"
@@ -3677,7 +3677,7 @@
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_2,iso134857_5_1",
+		"regulatory_context": "iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,abgabeprotokoll prothetik ii"
@@ -3688,7 +3688,7 @@
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"regulatory_context": "iso134857_2_3,mdr_annex1,mdr_annex4",
+		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,konformitätserklärung,gebrauchsanweisung allgemein,gebrauchsanweisung warnungen einsatzbereich prothetik ii,gebrauchsanweisung handhabung,gebrauchsanweisung beschreibung komponenten prothetik ii,gebrauchsanweisung medizinische aspekte prothetik ii,gebrauchsanweisung körperpflege,gebrauchsanweisung reinigung,gebrauchsanweisung instandhaltung,gebrauchsanweisung entsorgung,gebrauchsanweisung therapeuteninformation"
