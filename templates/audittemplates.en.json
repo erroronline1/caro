@@ -1,5 +1,62 @@
 [
 	{
+		"unit": "office",
+		"hint": "purchase",
+		"objectives": "The internal audit is supposed to check if this unit complies to relevant regulatory requirements and processes according to ISO 13485.\n \nAudit goals:\n- Assessment of management system conformity grade\n- Assessment of ability of management system to ensure regulatory requirements fulfilment\n- Assessment of effectiveness of management system reaching the defined goals\n- Assessment of ability of management system to provide compliant products\n- Possible improvements\n \nBasis:\n- EN ISO 13485\n- QM-handbook and appending documents",
+		"content": [
+			{
+				"question": "How is an order processed?",
+				"regulatory": "iso13485_7_4_1,iso13485_7_4_2",
+				"hint": ""
+			},
+			{
+				"question": "Exist open orders and are these reminded of?",
+				"regulatory": "iso13485_7_4_1",
+				"hint": "proof if applicable"
+			},
+			{
+				"question": "How is the definition of a product being allowed to be ordered?",
+				"regulatory": "iso13485_7_4_1,iso13485_7_4_3",
+				"hint": "e.g. incorporation notes"
+			},
+			{
+				"question": "How are incoming goods processed?",
+				"regulatory": "iso13485_7_4_3,iso13485_7_5_8,iso13485_7_5_9",
+				"hint": "see case, e.g. serial number documentation"
+			},
+			{
+				"question": "How are materials with skin contact traced?",
+				"regulatory": "iso13485_7_5_9",
+				"hint": "e.g. LOT number tracing"
+			},
+			{
+				"question": "Are there products with peculiar storage conditions?",
+				"regulatory": "iso13485_6_4_1,iso13485_7_5_11",
+				"hint": "e.g. hazardous goods, to-be-cooled materials"
+			},
+			{
+				"question": "Are there Products with a maximum shelf life?",
+				"regulatory": "iso13485_7_5_11",
+				"hint": "check protocol if applicable"
+			},
+			{
+				"question": "How are mix-ups of returns prevented?",
+				"regulatory": "iso13485_7_5_8,iso13485_7_5_10",
+				"hint": ""
+			},
+			{
+				"question": "How and how long are delivery notes stored?",
+				"regulatory": "iso13485_4_2_5",
+				"hint": "consider retention period"
+			},
+			{
+				"question": "How is degradation due to long term storage prevented?",
+				"regulatory": "iso13485_7_5_11",
+				"hint": ""
+			}
+		]
+	},
+	{
 		"unit": "",
 		"hint": "",
 		"objectives": "",
