@@ -1899,7 +1899,7 @@ class DOCUMENT extends API {
 
 		// prepare existing documents lists grouped by context
 		foreach($documents as $row) {
-			if (in_array($row['context'],array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
+			if (in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
 			if (!in_array($row['name'], $documentdatalist)) {
 				$documentdatalist[] = $row['name'];
 				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) if ($alias) $documentdatalist[] = $alias;
@@ -1907,7 +1907,7 @@ class DOCUMENT extends API {
 
 				// filter by unit
 				if (($this->_unit && $this->_unit !== $row['unit'])) continue;
-				if (!$this->_unit && !in_array($row['unit'], $_SESSION['user']['units'])) continue;
+				if (!$this->_unit && !in_array($row['unit'], ['common', ...$_SESSION['user']['units']])) continue;
 
 				// add to result
 				$displayeddocuments[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
