@@ -1,12 +1,139 @@
 [
 	{
-		"unit": "",
+		"unit": "prosthetics2",
 		"hint": "",
-		"objectives": "",
+		"objectives": "Das interne Audit des Bereichs Prothetik II - Armprothetik soll prüfen, ob der Bereich alle relevanten regulatorischen Anforderungen und Prozessabläufe gemäß ISO 13485 erfüllt.\n \nAuditziele:\n- Feststellung des Grades der Konformität des Managementsystems\n- Beurteilung der Fähigkeit des Managementsystems die Erfüllung regulatorischer Anforderungen sicherzustellen\n- Beurteilung der Wirksamkeit des Managementsystems die festgelegten Ziele zu erreichen\n- Beurteilung der Fähigkeit des Managementsystems konforme Produkte bereitzustellen\n- Nennung möglicher Verbesserungen\n \nGrundlagen:\n- EN ISO 13485\n- QM-Handbuch und anhängige Dokumente",
 		"content": [
 			{
-				"question": "",
-				"regulatory": "",
+				"question": "Gab es neue Produkte, die in Versorgungen eingesetzt werden?",
+				"regulatory": "iso13485_7_4_3,iso13485_7_3_1",
+				"hint": "ggf. Nachweis der Produkteinführung oder von Entwicklungsakten"
+			},
+			{
+				"question": "Gab es Produkte, die bewusst nicht eingesetzt werden?",
+				"regulatory": "iso13485_8_3_2",
+				"hint": ""
+			},
+			{
+				"question": "Wann war die letzte Schulung der Mitarbeiter?",
+				"regulatory": "iso13485_6_2",
+				"hint": "ggf. Teilnahmezertifikate"
+			},
+			{
+				"question": "Wie wurde die Schulung bewertet?",
+				"regulatory": "iso13485_6_2",
+				"hint": "Schulungsbewertung gemäß VA ggf. Besprechungsprotokolle"
+			},
+			{
+				"question": "Welche Dokumente werden für eine Versorgungsdokumentation verwendet?",
+				"regulatory": "iso13485_4_2_3,iso13485_4_2_4",
+				"hint": "Fall einsehen"
+			},
+			{
+				"question": "Wie wurde die Entscheidung für die Ausführung getroffen?",
+				"regulatory": "iso13485_7_2_1,iso13485_7_2_2",
+				"hint": "Anamnese, Versorgungsplanung"
+			},
+			{
+				"question": "Wie wurde festgestellt ob das Konzept schlüssig ist?",
+				"regulatory": "iso13485_7_2_2,iso13485_7_3_7",
+				"hint": "Anprobeprotokoll"
+			},
+			{
+				"question": "Wie werden die Komponenten während der Herstellung verwahrt?",
+				"regulatory": "iso13485_7_5_2,iso13485_7_5_8,iso13485_7_5_10,iso13485_7_5_11",
+				"hint": ""
+			},
+			{
+				"question": "Welche Teile und Materialien sind in der Versorgung verbaut?",
+				"regulatory": "iso13485_7_5_9",
+				"hint": "ggf. Bereichslager Rückverfolgbarkeit"
+			},
+			{
+				"question": "Welche Dokumente werden im Rahmen einer Reparatur/Reklamation verwendet?",
+				"regulatory": "iso13485_4_2_3,iso13485_4_2_4,iso13485_8_3_4",
+				"hint": "Fall einsehen"
+			},
+			{
+				"question": "Wie wird eine Verwechslung verhindert?",
+				"regulatory": "iso13485_7_5_8,iso13485_7_5_10",
+				"hint": ""
+			},
+			{
+				"question": "Warum ist die Reparatur/Reklamation erforderlich und was wird gemacht?",
+				"regulatory": "iso13485_7_5_4,iso13485_8_3_4,iso13485_6_4_2",
+				"hint": ""
+			},
+			{
+				"question": "Welche Messmittel werden verwendet?",
+				"regulatory": "iso13485_7_6",
+				"hint": "ggf. Prüfprotokolle"
+			},
+			{
+				"question": "Gibt es Leihteile?",
+				"regulatory": "mpbetreibv",
+				"hint": "ggf. Bestandsverzeichnis"
+			},
+			{
+				"question": "Welche Software kommt zum Einsatz und wie wird die Funktion sichergestellt?",
+				"regulatory": "iso13485_4_1_6",
+				"hint": "ggf. Protokolle, Versionsstand abgleichen"
+			}
+		]
+	},
+	{
+		"unit": "office",
+		"hint": "Beschaffung",
+		"objectives": "Das interne Audit des Bereichs Beschaffung soll prüfen, ob der Bereich alle relevanten regulatorischen Anforderungen und Prozessabläufe gemäß ISO 13485 erfüllt.\n \nAuditziele:\n- Feststellung des Grades der Konformität des Managementsystems\n- Beurteilung der Fähigkeit des Managementsystems die Erfüllung regulatorischer Anforderungen sicherzustellen\n- Beurteilung der Wirksamkeit des Managementsystems die festgelegten Ziele zu erreichen\n- Beurteilung der Fähigkeit des Managementsystems konforme Produkte bereitzustellen\n- Nennung möglicher Verbesserungen\n \nGrundlagen:\n- EN ISO 13485\n- QM-Handbuch und anhängige Dokumente",
+		"content": [
+			{
+				"question": "Wie läuft eine Bestellung ab?",
+				"regulatory": "iso13485_7_4_1,iso13485_7_4_2",
+				"hint": ""
+			},
+			{
+				"question": "Gibt es offene Bestellungen und werden diese erinnert?",
+				"regulatory": "iso13485_7_4_1",
+				"hint": "ggf. Nachweise"
+			},
+			{
+				"question": "Wie ist festgelegt ob das Produkt bestellt werden darf?",
+				"regulatory": "iso13485_7_4_1,iso13485_7_4_3",
+				"hint": "z.B. Einführung"
+			},
+			{
+				"question": "Wie wird der Wareneingang bearbeitet?",
+				"regulatory": "iso13485_7_4_3,iso13485_7_5_8,iso13485_7_5_9",
+				"hint": "Fall einsehen, z.B. Seriennummern-Dokumentation"
+			},
+			{
+				"question": "Wie werden Materialien im Hautkontakt verfolgt?",
+				"regulatory": "iso13485_7_5_9",
+				"hint": "z.B. Chargennummer Rückverfolgung"
+			},
+			{
+				"question": "Gibt es Produkte mit besonderen Lagerbedingungen?",
+				"regulatory": "iso13485_6_4_1,iso13485_7_5_11",
+				"hint": "z.B. Gefahrstoffe, Kühlpflicht"
+			},
+			{
+				"question": "Gibt es Produkte mit Haltbarkeitsdatum?",
+				"regulatory": "iso13485_7_5_11",
+				"hint": "ggf. Prüfprotokoll"
+			},
+			{
+				"question": "Wie werden Verwechslungen bei Rücksendungen vermieden?",
+				"regulatory": "iso13485_7_5_8,iso13485_7_5_10",
+				"hint": ""
+			},
+			{
+				"question": "Wie und wie lange werden Lieferscheine aufbewahrt?",
+				"regulatory": "iso13485_4_2_5",
+				"hint": "Aufbewahrungsfristen beachten"
+			},
+			{
+				"question": "Wie wird eine Überlagerung verhindert?",
+				"regulatory": "iso13485_7_5_11",
 				"hint": ""
 			}
 		]
