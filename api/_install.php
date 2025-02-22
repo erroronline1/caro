@@ -815,7 +815,7 @@ class INSTALL {
 						continue;
 					}
 					// ensure proper formatting
-					if (isset($question['regulatory']) && $question['regulatory']) $question['regulatory'] = implode(',', preg_split('/[^\w\d]+/m', $question['regulatory']));
+					if (isset($question['regulatory']) && $question['regulatory']) $question['regulatory'] = implode(',', preg_split('/[^\w\d]+/m', $question['regulatory'] ? : ''));
 				}
 				if (!array_filter($entry['content'], fn($q) => boolval($q)) || ($entry['content'] = UTILITY::json_encode($entry['content'])) === false){
 					$this->printError('A question set is malformed. This item will be skipped:', $entry);
@@ -904,8 +904,8 @@ class INSTALL {
 				}
 
 				// ensure proper formatting
-				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context']));
-				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access']));
+				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context'] ? : ''));
+				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
 				$names[] = $entry['name'];
 				$insertions[] = [
@@ -960,7 +960,7 @@ class INSTALL {
 				}
 
 				// ensure proper formatting
-				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 
 				$names[] = $entry['title'];
 				$insertions[] = [
@@ -1045,7 +1045,7 @@ class INSTALL {
 
 				if ($valid){
 					// ensure proper formatting
-					$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk']));
+					$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk'] ? : ''));
 
 					if (!in_array($entry['process'].$entry['risk'].$entry['cause'].$entry['measure'], $DBall))
 					$insertions[] = [
@@ -1201,8 +1201,8 @@ class INSTALL {
 				$entry['app_settings']['initialovertime'] = 0;
 				
 				// ensure proper formatting
-				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
-				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units']));
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
+				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units'] ? : ''));
 
 				$names[] = $entry['name'];
 				$insertions[] = [

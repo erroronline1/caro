@@ -329,8 +329,8 @@ class STRESSTEST extends INSTALL{
 		foreach($DBall as $dbentry){
 			foreach($json as $entry){
 				//ensure proper formatting
-				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context']));
-				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access']));
+				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context'] ? : ''));
+				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
 				if (
 					isset($entry['name']) &&
@@ -369,7 +369,7 @@ class STRESSTEST extends INSTALL{
 		foreach($DBall as $dbentry){
 			foreach($json as $entry){
 				//ensure proper formatting
-				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 
 				if (
 					isset($entry['title']) &&
@@ -398,7 +398,7 @@ class STRESSTEST extends INSTALL{
 		foreach($DBall as $dbentry){
 			foreach($json as $entry){
 				//ensure proper formatting
-				$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk']));
+				$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk'] ? : ''));
 				if (
 					isset($entry['type']) &&
 					$dbentry['type'] === $entry['type'] &&
@@ -465,8 +465,8 @@ class STRESSTEST extends INSTALL{
 		foreach($DBall as $dbentry){
 			foreach($json as $entry){
 				//ensure proper formatting
-				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions']));
-				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units']));
+				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
+				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units'] ? : ''));
 				
 				if (
 					isset($entry['name']) &&
