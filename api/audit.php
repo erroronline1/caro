@@ -396,7 +396,7 @@ class AUDIT extends API {
 							], [
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => implode(', ' , array_map(fn($r) => $this->_lang->_USER['regulatory'][$r], explode(',', $question['regulatory'])))
+									'name' => implode(', ' , array_map(fn($r) => isset($this->_lang->_USER['regulatory'][$r]) ? $this->_lang->_USER['regulatory'][$r] : $r, explode(',', $question['regulatory'])))
 								],
 								'content' => $question['hint'] ? : ' '
 							], [
@@ -777,7 +777,7 @@ class AUDIT extends API {
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
 					foreach($template['content'] as &$question){
 						$question['regulatory'] = explode(',', $question['regulatory']);
-						$question['regulatory'] = implode(', ', array_map(fn($r) => $this->_lang->_USER['regulatory'][$r], $question['regulatory']));
+						$question['regulatory'] = implode(', ', array_map(fn($r) => isset($this->_lang->_USER['regulatory'][$r]) ? $this->_lang->_USER['regulatory'][$r] : $r, $question['regulatory']));
 					}
 					$result['selected'] = $template['content'];
 				}
@@ -1199,7 +1199,7 @@ class AUDIT extends API {
 				}
 			}
 			foreach(explode(',', $document['regulatory_context'] ? : '') as $context){
-				if (isset($this->_lang->_USER['regulatory'][$context])) $entry .= "\n" . $this->_lang->_USER['regulatory'][$context];
+				$entry .= "\n" . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
 			}
 
 			$documentscontent[] = [
@@ -1403,7 +1403,7 @@ class AUDIT extends API {
 		foreach($usedname as $name => $count){
 			$document = $documents[array_search($name, array_column($documents, 'name'))]; // since the document datalist is ordered by date desc the first match is suitable
 
-			if ($document['regulatory_context']) $document['regulatory_context'] = array_map(fn($c) => $this->_lang->_USER['regulatory'][$c], explode(',', $document['regulatory_context']));
+			if ($document['regulatory_context']) $document['regulatory_context'] = array_map(fn($c) => isset($this->_lang->_USER['regulatory'][$c]) ? $this->_lang->_USER['regulatory'][$c] : $c, explode(',', $document['regulatory_context']));
 
 			$color = end($usedname) ? 200 * $count / end($usedname) : 0; // avoid division by zero
 			$content[] = [
