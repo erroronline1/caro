@@ -276,7 +276,7 @@ class AUDIT extends API {
 				}
 
 				if ($this->_requestedTemplate && $this->_requestedTemplate !== 'null' && !$audit){
-					$template = $templates[array_search($this->_requestedID, array_column($templates, 'id'))];
+					$template = $templates[array_search($this->_requestedTemplate, array_column($templates, 'id'))];
 				}
 				elseif ($audit){
 					$template = $templates[array_search($audit['template'], array_column($templates, 'id'))];
