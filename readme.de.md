@@ -279,6 +279,8 @@ Jeder Nutzer kann öffentlich Verbesserungsvorschläge zu beliebigen Themen einr
 
 Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, können Vorschläge gelöscht werden, wenngleich dies Standardmäßig nicht empfohlen wird. Beiträge haben keinen Aufzeichnungscharakter, beabsichtigen aber Meinungsbilder einzusammeln und als Eingabe für Qualitätsverbesserungen und die Managementbewertung zu dienen.
 
+![measure management screenshot](http://toh.erroronline.one/caro/measure%20management%20de.png)
+
 [Übersicht](#übersicht)
 
 ## Aufzeichnungen
@@ -286,6 +288,10 @@ Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, k
 
 ### Dokumente
 Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Es ist (ohne größere Nachforschungen betrieben zu haben) nicht erkenntlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: die Dokumente und internen Dokumente sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies dient dem Ziel einer papierlosen Lösung bereits ausreichend, dennoch sind zusätzlich Exporte als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
+
+Nur nicht so. Bitte vorher Hilfe aufsuchen:
+
+![cloud storage meme](http://toh.erroronline.one/caro/cloudstoragememe.jpg)
 
 Um gelenkte und versionierte Dokumente und Dokumente anzulegen, müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Dokumente anschließend zusammensetzen lassen. Komponenten und Dokumente müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Dokumente für den jeweiligen Anwendungsfall berücksichtigt wurden.
 
@@ -501,7 +507,11 @@ Die Einträge können nicht gelöscht und durch das [Regulatorische Auswertungen
 Die Anwendung ermöglicht die Vorbereitung von internen Audits, inklusive der Ziele und eines Imports vorausgegangener Zusammenfassungen des gewählten Bereichs. Die Formulierung von Fragen anderer Vorlagen kann wiederverwendet und den Fragen der regulatorische Zusammenhang zugeordnet werden. Bei der Erstellung eines Auditprogramms können Fragen hinzugefügt, entfernt und umsortiert werden. Die Zusammenfassung des vorherigen Audits für den jeweiligen Bereich kann importiert werden um beim bevorstehenden Audit Bezug zu nehmen.
 Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt werden um die jeweiligen Bereiche zu informieren.
 
+![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20de.png)
+
 Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Unterbrechungen, und Bearbeitungen laufender Audits sind jederzeit möglich solange das Audit nicht als abgeschlossen markiert ist. Danach ist eine Bearbeitung oder Löschung des Audits nicht mehr möglich und es wird zu einer systemseitigen Aufzeichnung. Bei Abschluss eines Audits wird der Auditbericht über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) und alle Mitglieder des auditierten Bereichs umgesetzt. Abgeschlossene Audits können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
+
+![audit screenshot](http://toh.erroronline.one/caro/audit%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -858,7 +868,7 @@ Ferner hoffentlich hilfreiche Informationen zu
 * der Angemessenheit aktueller Dokumente incl. einem Nutzungszähler gemäß Aufzeichnungen
 * Bestellstatistiken in Form eines strukturierten Excel-Export um die Lieferantenbewertung basierend auf Lieferdaten zu ergänzen
 
-![audit screenshot](http://toh.erroronline.one/caro/audit%20de.png)
+![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20de.png)
 
 [Übersicht](#übersicht)
 

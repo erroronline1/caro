@@ -116,10 +116,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * vendor templates
 * text recommendation templates
 * document templates
-* audit templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* measure management pictures
 * update readme pictures on tools menu, record menu, audit and regulatory
 
 # Aims
@@ -347,6 +345,8 @@ All users can publicy suggest improvements to any topic, including processes. Ev
 
 To reduce pointless data and possible malignant spam, suggestions can be deleted although by default it is not recommended to do so. Entries have no record character but are supposed to gather opinion formation and serve as a source for quality improvement and management reporting.
 
+![measure management screenshot](http://toh.erroronline.one/caro/measure%20management.png)
+
 [Content](#content)
 
 ## Records
@@ -354,6 +354,10 @@ To reduce pointless data and possible malignant spam, suggestions can be deleted
 
 ### Documents
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be suitable enough; documents can still be exported as editable or prefilled PDFs within boundaries though.
+
+Just don't do it like this. Seek help before doing this:
+
+![cloud storage meme](http://toh.erroronline.one/caro/cloudstoragememe.jpg)
 
 To create tracked and versioned documents and documents, create reusable document components and assemble documents from components. Components and documents have to be approved by defined authorized users to take effect. Furthermore documents can be grouped to document bundles. This way anyone can check if all necessary documents have been taken into account for defined use cases.
 
@@ -583,7 +587,11 @@ Entries are persistent and can be exported if desired through the [evaluation an
 The application enables you to prepare internal audits, including programme objectives and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted and reordered. The summary of a previous audit for the respective unit can be imported for upcoming reference.
 Audits can be added to the calendar from the form as well, informing selected units.
 
+![audit template screenshot](http://toh.erroronline.one/caro/audit%20template.png)
+
 Executing an audit starts by selecting one of the prepared templates. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. On finishing an audit the report is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables) and all members of the audited unit. Closed audits can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
+
+![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 
 [Content](#content)
 
@@ -933,7 +941,7 @@ Furthermore hopefully beneficial information on
 * appropriateness of current documents including a use count gathered from records
 * order statistics as a structured Excel-export to support vendor evaluation based on delivery data
 
-![audit screenshot](http://toh.erroronline.one/caro/audit.png)
+![regulatory screenshot](http://toh.erroronline.one/caro/regulatory.png)
 
 [Content](#content)
 
