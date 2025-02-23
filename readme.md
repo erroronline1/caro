@@ -4637,44 +4637,52 @@ I welcome any constructive input on this topic.
 ## External libraries
 * [https://github.com/mebjas/html5-qrcode](https://github.com/mebjas/html5-qrcode)
     * processes qr- and barcodes from image ressource on the client side
+    * Justification: this library enables the application to handle 2D-codes for transfer of physical to digital data. This is used for the login process and a safe way of consistent tracing of records and products.
     * v2.3.8
     * \> 5k stars
     * \> 1k forks
     * [https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
+* [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
+    * creates PDF-files on the server side
+    * Justification: this library enables consistent and correct creation of the widely accessible PDF-format for data transfers from the application.
+    * \> 4k stars
+    * \> 1k forks
+* [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
+    * creates XLSX-files on the server side
+    * Justification: this library enables consistent and correct creation of the widely accessible XLSX-format for data transfers from the application.
+    * v0.39
+    * \> 1k stars
+    * \> 650 forks
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
+    * Justification: this library enables the use of simple electronic signature (SES) according to eIDAS.
     * v5.0.4
     * \> 11k stars
     * \> 2k forks
     * [https://www.jsdelivr.com/package/npm/signature_pad](https://www.jsdelivr.com/package/npm/signature_pad) slightly modified for easier import, comment out UMD module wrapper and define export default class SignaturePad, delete sourceMappingURL (Safari)
 * [https://github.com/nimiq/qr-creator](https://github.com/nimiq/qr-creator)
     * creates qr codes on the client side
+    * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
     * \> 200 stars
     * \> 20 forks
 * [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode/)
     * creates barcodes on the client side
+    * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
     * v3.11.6
     * \> 5k stars
     * \> 1k forks
 * [https://github.com/omrips/viewstl](https://github.com/omrips/viewstl)
     * renders stl files on the client side
+    * Justification: this library reduces the need of additional software for physically distant units communicating on digital models
     * v1.13
     * \> 200 stars
     * \> 50 forks
-* [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
-    * creates XLSX-files on the server side
-    * v0.39
-    * \> 1k stars
-    * \> 650 forks
-* [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
-    * creates PDF-files on the server side
-    * \> 4k stars
-    * \> 1k forks
 * [Font Awesome 5](https://fontawesome.com/)
     * SVG ui-icon files, not executable
+    * Justification: "Der Mensch ist doch ein Augentier, schöne Dinge wünsch ich mir!"
     * author has professional license
 
-All libraries are embedded locally to avoid web requests and ensure availability of tested and approved functionality, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries are reviewed to adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
+All libraries are embedded locally to avoid external, probably prohibited web requests and ensure availability of tested and approved functionality, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries are reviewed to adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
 
 ## Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
