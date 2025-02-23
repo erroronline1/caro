@@ -64,8 +64,12 @@ class API {
 	/**
 	 * make languagemodel LANG class and its methods available
 	 */
-	public $_lang = [];
+	public $_lang = null;
 
+	/**
+	 * public preset of descendant classes property to ececute requested method as per REQUEST[1]
+	 */
+	 public $_requestedMethod = null;
 	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response

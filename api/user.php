@@ -41,7 +41,7 @@ class USER extends API {
 	 * create a default user profile picture from initials
 	 * @param string $name username
 	 * 
-	 * @return binary image data
+	 * @return string image data
 	 */
 	private function defaultPic($name){
 		$names = explode(' ', $name);

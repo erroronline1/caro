@@ -31,7 +31,7 @@ class UTILITY {
 	 *                                |___|
 	 * @param string $file filename
 	 * @param int $maxSize max pixels on longest side, 0 keeps original size
-	 * @param flag $destination UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
+	 * @param int $destination const 2^n UTILITY_IMAGE_REPLACE | UTILITY_IMAGE_STREAM | UTILITY_IMAGE_RESOURCE 
 	 * @param string|bool $forceOutputType gif|jpeg|png|jpg
 	 * @param string $label written on the image
 	 * @param string $watermark path to image for watermarking
@@ -539,7 +539,7 @@ class UTILITY {
 	 * @param object|array $object to look within
 	 * @param string $property to look for
 	 * 
-	 * @return string|bool property value or false
+	 * @return array|string|bool property value or false
 	 */
 	public static function propertySet($object, $property){
 		if (gettype($object) === 'array') return isset($object[$property]) ? $object[$property] : false;

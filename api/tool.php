@@ -46,9 +46,9 @@ class TOOL extends API {
 	public function calculator(){
 		/**
 		 * resin rigid/soft, destination weight -> weight rigid / weight soft
-		 * @param str $parts '70/30' \D beside decimal point will be stripped
-		 * @param str $weight '730' , replaced by decimal point, other \D will be stripped
-		 * @return str '511 / 219'
+		 * @param string $parts '70/30' \D beside decimal point will be stripped
+		 * @param string $weight '730' , replaced by decimal point, other \D will be stripped
+		 * @return string '511 / 219'
 		 */
 		function parts_of_weight($parts = '', $weight = '0'){
 			$parts = preg_split('/[^\d\.]+/', $parts);
@@ -61,9 +61,9 @@ class TOOL extends API {
 
 		/**
 		 * silicone shore stiffness 20/35/65, destination shore -> parts, percent
-		 * @param str $attributes '20,65' \D will be stripped
-		 * @param str $target '35' , replaced by decimal point, other \D will be stripped
-		 * @return str '1 x 65 (33.33 %) / 2 x 20 (66.67 %)'
+		 * @param string $attributes '20,65' \D will be stripped
+		 * @param string $target '35' , replaced by decimal point, other \D will be stripped
+		 * @return string '1 x 65 (33.33 %) / 2 x 20 (66.67 %)'
 		 */
 		function parts_of_attribute($attributes = '', $target = '0'){
 			$attributes = preg_split('/\D+/', $attributes);
@@ -92,9 +92,9 @@ class TOOL extends API {
 
 		/**
 		 * circular distance diameter, holes -> distance
-		 * @param str $diameter '22.7' , replaced by decimal point, other \D will be stripped
-		 * @param str $holes '3' converted to int
-		 * @return str '23.77'
+		 * @param string $diameter '22.7' , replaced by decimal point, other \D will be stripped
+		 * @param string $holes '3' converted to int
+		 * @return string '23.77'
 		 */
 		function circular_distance($diameter = '', $holes = '1'){
 			$diameter = floatval(str_replace(',', '.', $diameter));
