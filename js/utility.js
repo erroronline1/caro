@@ -32,9 +32,9 @@ export const _serviceWorker = {
 		calendar: function (data) {
 			let notif;
 			if ("calendar_uncompletedevents" in data) {
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.calendar.header").replace(" ", "_") + "]");
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.calendar.header").replace(" ", "_") + "]"); // main menu label
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.calendar.scheduling").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.calendar.scheduling").replace(" ", "_") + "]"); // button
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			}
 		},
@@ -51,16 +51,16 @@ export const _serviceWorker = {
 				let document_approval = 0,
 					audit_closing = 0;
 				if ("document_approval" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.documents_manage_approval").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.documents_manage_approval").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.document_approval);
 					document_approval = data.document_approval;
 				}
 				if ("audit_closing" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.audit").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.audit").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.audit_closing);
 					audit_closing = data.audit_closing;
 				}
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.records.header").replace(" ", "_") + "]");
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.records.header").replace(" ", "_") + "]"); // main menu label
 				if (notif) notif.setAttribute("data-notification", parseInt(document_approval, 10) + parseInt(audit_closing, 10));
 			}
 		},
@@ -76,14 +76,14 @@ export const _serviceWorker = {
 		communication: function (data) {
 			let notif;
 			if ("message_unseen" in data) {
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]");
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]"); // labmain menu labelel
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]"); // button
 				if (notif) notif.setAttribute("data-notification", data.message_unseen);
 			}
 			if ("measure_unclosed" in data) {
 				// no appending number to userMenu to avoid distracting from unread messages
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.measure").replace(" ", "_") + "]");
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.measure").replace(" ", "_") + "]"); // button
 				if (notif) notif.setAttribute("data-notification", data.measure_unclosed);
 			}
 		},
@@ -101,22 +101,22 @@ export const _serviceWorker = {
 					order_unprocessed = 0,
 					consumables_pendingincorporation = 0;
 				if ("order_prepared" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.prepared_orders").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.prepared_orders").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.order_prepared);
 					order_prepared = data.order_prepared;
 				}
 				if ("order_unprocessed" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.approved_orders").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.approved_orders").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 					order_unprocessed = data.order_unprocessed;
 				}
 				if ("consumables_pendingincorporation" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.incorporated_pending").replace(" ", "_") + "]");
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.incorporated_pending").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 					consumables_pendingincorporation = data.consumables_pendingincorporation;
 				}
-				notif = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.purchase.header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", parseInt(order_prepared, 10) + parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10));
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.purchase.header").replace(" ", "_") + "]");
+				if (notif) notif.setAttribute("data-notification", parseInt(order_prepared, 10) + parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10)); // main menu label
 			}
 		},
 	},
@@ -269,7 +269,7 @@ export const _client = {
 			 * iterates over the above arrays to populate the canvasses if within viewport
 			 * removes entries once being handled
 			 * neccessary e.g. on thousands of approved orders where repeatedly calling the libraries crashes the browser
-			 * 
+			 *
 			 * @requires Assemble populated arrays
 			 * @event QrCreator, JsBarcode and/or proprietary img2canvas
 			 */
@@ -295,7 +295,7 @@ export const _client = {
 							delete _client.application.lazyload.qrCodes[i]; // prevent repeatedly rendering
 						}
 					}
-					_client.application.lazyload.qrCodes=_client.application.lazyload.qrCodes.filter(v => v);
+					_client.application.lazyload.qrCodes = _client.application.lazyload.qrCodes.filter((v) => v);
 				}
 				if (_client.application.lazyload.barCodes.length) {
 					for (let i = 0; i < _client.application.lazyload.barCodes.length; i++) {
@@ -314,7 +314,7 @@ export const _client = {
 							delete _client.application.lazyload.barCodes[i]; // prevent repeatedly rendering
 						}
 					}
-					_client.application.lazyload.barCodes=_client.application.lazyload.barCodes.filter(v => v);
+					_client.application.lazyload.barCodes = _client.application.lazyload.barCodes.filter((v) => v);
 				}
 				if (_client.application.lazyload.images.length) {
 					for (let i = 0; i < _client.application.lazyload.images.length; i++) {
@@ -348,7 +348,7 @@ export const _client = {
 							delete _client.application.lazyload.images[i]; // prevent repeatedly rendering
 						}
 					}
-					_client.application.lazyload.images=_client.application.lazyload.images.filter(v => v);
+					_client.application.lazyload.images = _client.application.lazyload.images.filter((v) => v);
 				}
 			},
 		},

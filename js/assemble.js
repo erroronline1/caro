@@ -62,9 +62,11 @@ export const assemble_helper = {
 
 			// set up label and notification element
 			label.htmlFor = "userMenu" + group;
-			label.style.maskImage = label.style.webkitMaskImage = icons[group];
-			label.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
 			label.setAttribute("data-notification", 0);
+			div = document.createElement("div");
+			div.style.maskImage = div.style.webkitMaskImage = icons[group];
+			div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
+			label.append(div);
 
 			// set up radio input for css checked condition
 			input = document.createElement("input");
