@@ -113,7 +113,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-* vendor templates
 * text recommendation templates
 * document templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?

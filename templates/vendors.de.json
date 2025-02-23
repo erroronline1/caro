@@ -1,5 +1,23 @@
 [
 	{
+		"name": "Achim Ruthner GmbH",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Ersheimer Strasse 48, 69434 Hirschhorn",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "AET GmbH (TSM)",
 		"info": {
 			"purchase_info": "Preislistenimport: CSV Kopfzeile Liefereinheit anpassen, Tierbandagen löschen, mittlere Kopfzeilen und alles oberhalb der ersten Zeile löschen, Hilfsmittelbezeichnung an Optionen anhängen.",
@@ -44,6 +62,24 @@
 		}
 	},
 	{
+		"name": "Aidamed",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Fröbelstrasse 10, 90489 Nürnberg",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Albrecht GmbH",
 		"info": {
 			"purchase_info": "",
@@ -84,6 +120,24 @@
 						"article_ean": ["EAN"]
 					}
 				]
+			}
+		}
+	},
+	{
+		"name": "Alps South",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Božkovské náměstí 17/21, 32600 Plzeň - Czech Republic",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
 			}
 		}
 	},
@@ -246,6 +300,24 @@
 		}
 	},
 	{
+		"name": "Bauerfeind",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Triebeser Straße 16, 07937 Zeulenroda-Triebes",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Blatchford Europe GmbH (Endolite)",
 		"info": {
 			"purchase_info": "",
@@ -320,6 +392,24 @@
 						"article_ean": ["EAN"]
 					}
 				]
+			}
+		}
+	},
+	{
+		"name": "BSN Jobst / Essity",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Beiersdorfstraße 1, 46446 Emmerich am Rhein",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
 			}
 		}
 	},
@@ -462,6 +552,24 @@
 						"article_ean": ["EAN 13"]
 					}
 				]
+			}
+		}
+	},
+	{
+		"name": "Dirame",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Legeweg 157 A, B-8020 Oostkamp",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
 			}
 		}
 	},
@@ -629,6 +737,42 @@
 		}
 	},
 	{
+		"name": "Kaupo",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Carl-Benz-Str. 4, 78549 Spaichingen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
+		"name": "Krewi",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Siemensring 78a, 47877 Willich",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Erwin Kowsky GmbH",
 		"info": {
 			"purchase_info": "",
@@ -662,6 +806,24 @@
 		}
 	},
 	{
+		"name": "Leder Haag",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Plöck 6, 69117 Heidelberg",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Lohmann und Rauscher GmbH",
 		"info": {
 			"purchase_info": "",
@@ -689,6 +851,42 @@
 						"article_ean": [""]
 					}
 				]
+			}
+		}
+	},
+	{
+		"name": "Ludwig Leiner",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Amerikanerstr. 1-7, 68165 Mannheim",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
+		"name": "Ludwig Müller",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Weinheimer Str. 26, 68309 Mannheim",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
 			}
 		}
 	},
@@ -1034,6 +1232,24 @@
 		}
 	},
 	{
+		"name": "Ormed Enovis",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Bötzinger Straße 90, 79111 Freiburg",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Ortho-Reha Neuhof GmbH",
 		"info": {
 			"purchase_info": "",
@@ -1235,6 +1451,24 @@
 		}
 	},
 	{
+		"name": "Ossenberg GmbH",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Kanalstraße 79, 48432 Rheine",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Otto Bock HealthCare Deutschland GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: Tabellen zusammenführen, müssen eventuell spaltenweise umsortiert werden",
@@ -1420,6 +1654,24 @@
 		}
 	},
 	{
+		"name": "Qualiserve",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Urtlangerstraße 27, 82396 Pähl",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Rebotec GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: CSV letzte Zeile löschen ",
@@ -1491,6 +1743,24 @@
 						"article_ean": ["EAN"]
 					}
 				]
+			}
+		}
+	},
+	{
+		"name": "Ruck medicaltec",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Bahnhofstraße 65, 48341 Altenberge",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
 			}
 		}
 	},
@@ -1681,6 +1951,24 @@
 		}
 	},
 	{
+		"name": "Wilhelm Julius Teufel",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Robert-Bosch-Str. 15, 73117 Wangen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
 		"name": "Thuasne Deutschland GmbH",
 		"info": {
 			"purchase_info": "",
@@ -1823,6 +2111,42 @@
 						"article_ean": ["EAN"]
 					}
 				]
+			}
+		}
+	},
+	{
+		"name": "Unyq",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Isaac Newton 4, ES-41092 Seville",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			}
+		}
+	},
+	{
+		"name": "Wagner Polymertechnik",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Neuer Weg 4, 37345 Sonnenstein/Silkerode",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filesetting": {
+				"headerrowindex": 0,
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
 			}
 		}
 	},
