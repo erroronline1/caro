@@ -357,9 +357,9 @@ in the output files if it is not possible to edit the following filter according
 			"246": "Eimer",
 			"247": "Platte á 2,8 qm",
 			"248": "Packung á 250 Stück",
-			"240": "Rolle á 500 Stück",
+			"249": "Rolle á 500 Stück",
 			"250": "Platte á 1,4 qm",
-			"2451": "Packung á 8 Stück"
+			"251": "Packung á 8 Stück"
 		}
 	}
 }
