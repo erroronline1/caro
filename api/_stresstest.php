@@ -51,7 +51,7 @@ class STRESSTEST extends INSTALL{
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
-			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION, USER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.';
+			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION, USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.';
 			echo '<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
@@ -314,6 +314,36 @@ class STRESSTEST extends INSTALL{
 	}
 
 	/**
+	 * deletes all csv filters according to template file
+	 */
+	public function removeCSVFilter(){
+		$file = '../templates/csvfilter';
+		$json = $this->importJSON($file);
+
+		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
+
+		$matches = 0;
+		foreach($DBall as $dbentry){
+			foreach($json as $entry){
+				if (
+					isset($entry['name']) &&
+					$dbentry['name'] === $entry['name'] &&
+					json_decode($dbentry['content'] ? : '', true) === $entry['content']
+				){
+					$deletion = [
+						'mysql' => "DELETE FROM caro_csvfilter WHERE id = " . $dbentry['id'],
+						'sqlsrv' => "DELETE FROM caro_csvfilter WHERE id = " . $dbentry['id']
+					];
+					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+						$matches++;
+				}
+			}
+		}
+		echo '[*] ' . $matches . ' filters according to template file deleted.';
+	}
+
+
+	/**
 	 * deletes all documents, components and bundles according to template file
 	 */
 	public function removeDocuments(){
@@ -449,7 +479,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' manual entries according to template file deleted.';
+		echo '[*] ' . $matches . ' text template entries according to template file deleted.';
 	}
 
 	/**

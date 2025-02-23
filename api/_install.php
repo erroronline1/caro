@@ -793,9 +793,8 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates'),
 		];
 
-		$insertions = $names = [];
+		$insertions = [];
 		foreach ($json as $entry){
-			// documents are only transferred if the title is not already taken
 			if (!(
 				isset($entry['unit']) && $entry['unit'] &&
 				isset($entry['objectives']) && $entry['objectives'] &&
@@ -833,6 +832,45 @@ class INSTALL {
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('audit_post_template'), $insertions)))
 			$this->printSuccess('novel entries by unit and objectives from ' . $file . ' have been installed.');
+		else $this->printWarning('there were no novelties to install from '. $file . '.');
+	}
+	
+	/**
+	 * installs csv filter
+	 */
+	public function installCSVFilter(){
+		$file = '../templates/csvfilter';
+		$json = $this->importJSON($file);
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist'),
+		];
+
+		$insertions = $names = [];
+		foreach ($json as $entry){
+			// filters are only transferred if the name is not already taken
+			if (!(
+				isset($entry['name']) && $entry['name'] &&
+				isset($entry['content']) && $entry['content'] && UTILITY::json_encode($entry['content'], JSON_PRETTY_PRINT)
+				)){
+				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				continue;
+			}
+			$entry['content'] = UTILITY::json_encode($entry['content'], JSON_PRETTY_PRINT);
+			if ((isset($entry['name']) && $entry['name'] && !in_array($entry['name'], array_column($DBall, 'name'))) &&
+				!in_array($entry['content'], array_column($DBall, 'content'))
+			) {
+
+				$insertions[] = [
+					':name' => $entry['name'],
+					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
+					':content' => $entry['content'],
+					':hidden' => null,
+				];
+			}
+		}
+		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('csvfilter_post'), $insertions)))
+			$this->printSuccess('novel entries by name and content from ' . $file . ' have been installed.');
 		else $this->printWarning('there were no novelties to install from '. $file . '.');
 	}
 	
