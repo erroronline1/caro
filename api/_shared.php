@@ -23,7 +23,7 @@
 class SHARED {
     private $_pdo = null;
 	private $_currentdate = null;
-	public $_lang = [];
+	public $_lang = null;
 
 	public function __construct($pdo = null){
         $this->_pdo = $pdo;
@@ -299,7 +299,6 @@ class SHARED {
 		// order of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
-				$content;
 				if (!isset($parameter['search'])) {
 					$content = [];
 					break;
@@ -505,7 +504,7 @@ class SHARED {
 				$contentBody = $content['content']['content'];
 			}
 			elseif ($content['context'] === 'bundle') {
-				$contentBody = explode(',', $component['content']);
+				$contentBody = explode(',', $content['content']);
 			}
 			else {
 				foreach(explode(',', $content['content']) as $usedcomponent) {

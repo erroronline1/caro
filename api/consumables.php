@@ -1697,7 +1697,7 @@ class CONSUMABLES extends API {
 				}
 				if ($vendor['evaluation'] = $evaluation){
 					$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
-					$vendor['evaluation']['_date'] = $this-_currentdate->format('Y-m-d');
+					$vendor['evaluation']['_date'] = $this->_currentdate->format('Y-m-d');
 				}
 				else $vendor['evaluation'] = null;
 

@@ -373,7 +373,7 @@ class TEXTTEMPLATE extends API {
 						]]);	
 				}
 				//check forbidden names
-				if (UTILITY::forbiddenName($template[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
+				if ($pattern = UTILITY::forbiddenName($template[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $template[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 
 				// else post new template
 				if (SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_post', [

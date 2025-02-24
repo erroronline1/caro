@@ -272,7 +272,6 @@ class MESSAGE extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
 	}
 	
 	/**

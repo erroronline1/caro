@@ -578,7 +578,7 @@ class INSTALL {
 	/**
 	 * make languagemodel LANG class and its methods available
 	 */
-	public $_lang = [];
+	public $_lang = null;
 
 	/**
 	 * current settings for install
@@ -638,7 +638,7 @@ class INSTALL {
 	 * duplicate from user.php
 	 * @param string $name username
 	 * 
-	 * @return binary image data
+	 * @return string image data
 	 */
 	public function defaultPic($name){
 		$names = explode(' ', $name);
@@ -902,7 +902,7 @@ class INSTALL {
 				} else {					
 					if (isset($element['type']) && $element['type'] !== 'textsection'
 						&& isset($element['attributes']) && isset($element['attributes']['name'])){
-						if (UTILITY::forbiddenName($element['attributes']['name'])) {
+						if ($pattern = UTILITY::forbiddenName($element['attributes']['name'])) {
 							$forbidden = ['name' => $element['attributes']['name'], 'pattern' => $pattern];
 						}
 						if ($forbidden) break;
@@ -926,7 +926,7 @@ class INSTALL {
 			}
 
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				if(UTILITY::forbiddenName($entry['name'])){
+				if($pattern = UTILITY::forbiddenName($entry['name'])){
 					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
@@ -988,7 +988,7 @@ class INSTALL {
 			}
 
 			if (isset($entry['title']) && $entry['title'] && !in_array($entry['title'], array_column($DBall, 'title'))) {
-				if(UTILITY::forbiddenName($entry['title'])){
+				if($pattern = UTILITY::forbiddenName($entry['title'])){
 					$this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
@@ -1152,7 +1152,7 @@ class INSTALL {
 			}
 
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				if (UTILITY::forbiddenName($entry['name'], $entry['type'] === 'template' ? [] : ['characters' => $allowed])){
+				if ($pattern = UTILITY::forbiddenName($entry['name'], $entry['type'] === 'template' ? [] : ['characters' => $allowed])){
 					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
@@ -1200,7 +1200,7 @@ class INSTALL {
 				continue;
 			}
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				if(UTILITY::forbiddenName($entry['name'])){
+				if($pattern = UTILITY::forbiddenName($entry['name'])){
 					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
@@ -1281,7 +1281,7 @@ class INSTALL {
 				continue;
 			}
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				if(UTILITY::forbiddenName($entry['name'])){
+				if($pattern = UTILITY::forbiddenName($entry['name'])){
 					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}

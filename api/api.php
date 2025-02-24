@@ -37,7 +37,7 @@ class API {
 	/**
 	 * preset all passed parameters
 	 */
-	public $_payload = [];
+	public $_payload = null;
 
 	/**
 	 * preset database connection

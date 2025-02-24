@@ -42,7 +42,7 @@ class CALENDARUTILITY {
 	/**
 	 * make languagemodel LANG class and its methods available
 	 */
-	public $_lang = [];
+	public $_lang = null;
 
 	/**
 	 * ini settings avoiding repetitive calls

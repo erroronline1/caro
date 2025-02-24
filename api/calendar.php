@@ -50,10 +50,18 @@ class CALENDAR extends API {
 	 * $this->_requestedId string with eventually comma separated integers
 	 */
 	public function complete(){
+		$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+			'replacements' => [
+				':id' => $this->_requestedId
+			]
+		]);
+		$calendarentry = $calendarentry ? $calendarentry[0] : null;
+		if (!$calendarentry) $this->response([], 404);
+
 		if ($this->_requestedCalendarType === 'timesheet'
 			&& !(PERMISSION::permissionFor('calendarfullaccess')
 			|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
-			&& array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
+			&& array_intersect(explode(',', $calendarentry['organizational_unit']), $_SESSION['user']['units'])))) $this->response([], 401);
 		// early preparation of responses
 		$response = [
 			'schedule' => [
@@ -296,7 +304,7 @@ class CALENDAR extends API {
 			$rows = [];
 			if (PERMISSION::permissionFor('calendarfulltimesheetexport')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
-				|| $id === $_SESSION['user']['id']
+				|| $user['user_id'] === $_SESSION['user']['id']
 			){
 				// user summary
 				$rows[] = [
@@ -488,7 +496,7 @@ class CALENDAR extends API {
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.content')),
 					':misc' => null,
 					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : numfmt_get_locale
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.schedule.error_missing'), 'type' => 'error']]);
 
@@ -855,8 +863,16 @@ class CALENDAR extends API {
 					]
 				])) $affected_user = $affected_user[0];
 
+				$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+					'replacements' => [
+						':id' => UTILITY::propertySet($this->_payload, 'calendarEventId')
+					]
+				]);
+				$calendarentry = $calendarentry ? $calendarentry[0] : null;
+				if (!$calendarentry) $this->response([], 404);
+				
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || 
-				($affected_user['id'] === $_SESSION['user']['id'] && !$row['closed']))
+				($affected_user['id'] === $_SESSION['user']['id'] && !$calendarentry['closed']))
 				) $this->response([], 401);
 				
 				// set up event properties with payload
@@ -1065,8 +1081,16 @@ class CALENDAR extends API {
 				}
 				break;
 			case 'DELETE':
+				$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+					'replacements' => [
+						':id' => $this->_requestedId
+					]
+				]);
+				$calendarentry = $calendarentry ? $calendarentry[0] : null;
+				if (!$calendarentry) $this->response([], 404);
+
 				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || 
-					($row['affected_user_id'] === $_SESSION['user']['id'] && !$row['closed']))
+					($calendarentry['affected_user_id'] === $_SESSION['user']['id'] && !$calendarentry['closed']))
 				) $this->response([], 401);
 
 				if ($calendar->delete($this->_requestedId)) $this->response([

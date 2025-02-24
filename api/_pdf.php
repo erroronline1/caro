@@ -161,7 +161,7 @@ class PDF{
 					case 'image':
 						if (array_key_exists($document, $content['images']) && in_array($value['value'], $content['images'][$document])) {
 							$imagedata = pathinfo($value['value']);
-							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
+							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $value['value']);
 							$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 							$this->_pdf->MultiCell(50, CONFIG['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
 							if ($img_width && CONFIG['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / CONFIG['pdf']['exportimage']['maxheight']))

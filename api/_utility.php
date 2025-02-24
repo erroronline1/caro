@@ -36,7 +36,7 @@ class UTILITY {
 	 * @param string $label written on the image
 	 * @param string $watermark path to image for watermarking
 	 * 
-	 * @return object|null a GdImage ressource or no return
+	 * @return string|object|null a GdImage ressource or no return
 	 */
 	public static function alterImage($file, $maxSize = 1024, $destination = UTILITY_IMAGE_REPLACE, $forceOutputType = false, $label = '', $watermark = ''){
 		if (is_file($file)){

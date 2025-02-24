@@ -131,11 +131,15 @@ class Listprocessor {
 
 	/**
 	 * define result
+	 * 
+	 * @var object
+	 */
+	public $_list = null; // https://www.php.net/SplFixedArray
+	/**
 	 * define original import result for lossless recursive comparison
 	 * 
 	 * @var array
 	 */
-	public $_list = []; // https://www.php.net/SplFixedArray
 	public $_originallist = []; // dito
 
 	/**
@@ -383,10 +387,10 @@ class Listprocessor {
 		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
 		if (isset($rule['transfer'])){
 			foreach ($rule['transfer'] as $newcolumn => $from){
-				if (!isset($this->setting['filesetting']['columns'][$newcolumn])) $this->setting['filesetting']['columns'][] = $newcolumn;
+				if (!isset($this->setting['filesetting']['columns'][$newcolumn])) $this->_setting['filesetting']['columns'][] = $newcolumn;
 				foreach (array_uintersect(array_column($thislistwithoutempty, $column), array_column($compare_list->_list[1], $cmp_column), fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
 					$self_row = $this->_list[$index];						
-					$self_row[$newcolumn] = $cmp_row[$from];
+					$self_row[$newcolumn] = $columnvalue; //$cmp_row[$from];
 					$this->_list[$index] = $self_row;
 				}
 			}

@@ -79,7 +79,7 @@ class MEASURE extends API {
 					'values' => [':id' => $this->_requestedID]
 				]);
 				$measure = $measure ? $measure[0] : null;
-				if (!$measure) $this->respond([], 404);
+				if (!$measure) $this->response([], 404);
 
 				// check for changes as put request is always triggered through the frontend since empty values are legit
 				$changed = !(
@@ -286,7 +286,7 @@ class MEASURE extends API {
 					'values' => [':id' => $this->_requestedID]
 				]);
 				$measure = $measure ? $measure[0] : null;
-				if (!$measure) $this->respond([], 404);
+				if (!$measure) $this->response([], 404);
 				$measure['votes'] = json_decode($measure['votes'] ? : '', true);
 				if (isset($measure['votes'][$_SESSION['user']['id']]) && $measure['votes'][$_SESSION['user']['id']] === $this->_requestedVote) unset($measure['votes'][$_SESSION['user']['id']]); // revoke vote
 				else $measure['votes'][$_SESSION['user']['id']] = $this->_requestedVote; // insert or update vote
@@ -309,7 +309,6 @@ class MEASURE extends API {
 
 				break;
 		}
-		$this->response($result);
 	}
 }
 ?>
