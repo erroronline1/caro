@@ -1523,7 +1523,7 @@ class DOCUMENT extends API {
 						':author' => $_SESSION['user']['name'],
 						':content' => implode(',', $this->_payload->content),
 						':regulatory_context' => implode(',', $regulatory_context),
-						':permitted_export' => $this->_payload->permitted_export ? : null,
+						':permitted_export' => $this->_payload->permitted_export ? 1 : null,
 						':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL
 					]
 				])) {
