@@ -966,6 +966,97 @@
 		}
 	},
 	{
+		"name": "konfektionsversorgung",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Name",
+							"required": true
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Geburtsdatum"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Adresse"
+						}
+					},
+					{
+						"type": "tel",
+						"attributes": {
+							"name": "Telefonnummer"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Kostenträger"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Info"
+						},
+						"hint": "Kontaktperson, Adressbesonderheiten"
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Leistung, Produkt oder Verordnungstext"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Verordner"
+						},
+						"hint": "namentlich"
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Maße, Einstellungen"
+						}
+					},
+					{
+						"type": "scanner",
+						"attributes": {
+							"name": "UDI, LOT"
+						},
+						"hint": "sofern zutreffend"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Arbeitszeit, Material"
+						},
+						"hint": "sofern zutreffend"
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "produkteinführung",
 		"alias": "",
 		"context": "component",
@@ -1451,6 +1542,17 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "identifikator,vorgangsprotokoll"
+	},
+	{
+		"name": "Konfektionsversorgung",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "identifikator,konfektionsversorgung"
 	},
 	{
 		"name": "Produkteinführung",
