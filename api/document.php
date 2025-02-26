@@ -1200,7 +1200,7 @@ class DOCUMENT extends API {
 			////////////////////////////////////////
 			if (!$value || $value == 'on') unset($this->_payload->$key);
 		}
-		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier'): null;
+		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier', [] , true): null;
 		$summary = [
 			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $document['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $identifier,
@@ -1208,7 +1208,7 @@ class DOCUMENT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $document['name'],
-			'date' => $this->_lang->GET('assemble.render.export_exported', [':version' => substr($document['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')])
+			'date' => $this->_lang->GET('assemble.render.export_exported', [':version' => substr($document['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')], true)
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){
@@ -1331,7 +1331,6 @@ class DOCUMENT extends API {
 			return $content;
 		};
 
-		$componentscontent = [];
 		$enumerate = [];
 		$fillable = false;
 		// iterate over components and fill fields with provided values if any
@@ -1351,12 +1350,12 @@ class DOCUMENT extends API {
 		if ($fillable){
 			if (in_array($document['context'], ['casedocumentation'])) {
 				$type = ['type' => 'selection', 'value' => []];
-				foreach ($this->_lang->_USER['record']['type'] as $key => $value){
+				foreach ($this->_lang->_DEFAULT['record']['type'] as $key => $value){
 					$type['value'][] = ($record_type === $key ? '_____': '') . $value;
 				}
-				$summary['content'] = array_merge([$this->_lang->GET('record.type_description') . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
+				$summary['content'] = array_merge([$this->_lang->GET('record.type_description', [], true) . (CONFIG['application']['require_record_type_selection'] ? ' *' : '') => $type], $summary['content']);
 			}
-			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => $this->_lang->GET('assemble.render.required_asterisk')], $this->_lang->GET('assemble.render.export_by') . ' *' => [
+			$summary['content'] = array_merge(['' => ['type' => 'text', 'value' => $this->_lang->GET('assemble.render.required_asterisk', [], true)], $this->_lang->GET('assemble.render.export_by', [], true) . ' *' => [
 				'type' => 'text',
 				'value' => ''
 			]], $summary['content']);
