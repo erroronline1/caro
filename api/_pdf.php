@@ -142,9 +142,9 @@ class PDF{
 			foreach($entries as $key => $value){
 				// make sure to write on next page if multiline textfield would reach into footer
 				if ($value['type'] === "multiline" && !$value['value']
-					&& $this->_pdf->GetY() > $this->_pdf->getPageHeight() - CONFIG['pdf']['record']['marginbottom'] - $height['multiline']) {
+					&& $this->_pdf->GetY() > $this->_pdf->getPageHeight() - $this->_setup['marginbottom'] - $height['multiline']) {
 						$this->_pdf->AddPage();
-						$this->_pdf->SetY(CONFIG['pdf']['record']['margintop']);
+						$this->_pdf->SetY($this->_setup['margintop']);
 				}
 				// name column
 				$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
@@ -163,12 +163,12 @@ class PDF{
 							$imagedata = pathinfo($value['value']);
 							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $value['value']);
 							$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
-							$this->_pdf->MultiCell(50, CONFIG['pdf']['exportimage']['maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-							if ($img_width && CONFIG['pdf']['exportimage']['maxheight'] && ($img_height / $img_width > 145 / CONFIG['pdf']['exportimage']['maxheight']))
-								$this->_pdf->Image('.' . $value['value'], null, null, 0, CONFIG['pdf']['exportimage']['maxheight'] - 1, '', '', 'R', true, 300, 'R');
+							$this->_pdf->MultiCell(50, $this->_setup['exportimage-maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+							if ($img_width && $this->_setup['exportimage-maxheight'] && ($img_height / $img_width > 145 / $this->_setup['exportimage-maxheight']))
+								$this->_pdf->Image('.' . $value['value'], null, null, 0, $this->_setup['exportimage-maxheight'] - 1, '', '', 'R', true, 300, 'R');
 							else
 								$this->_pdf->Image('.' . $value['value'], null, null, 145, 0, '', '', 'R', true, 300, 'R');
-							$this->_pdf->Ln(CONFIG['pdf']['exportimage']['maxheight'] + 4);
+							$this->_pdf->Ln($this->_setup['exportimage-maxheight'] + 4);
 						}
 						break;
 					case 'selection':
