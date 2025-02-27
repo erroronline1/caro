@@ -344,7 +344,7 @@ export const _client = {
 								imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
 							});
 							img.dispatchEvent(new Event("load"));
-							URL.revokeObjectURL(img.src);
+							// DO NOT URL.revokeObjectURL(img.src);
 							delete _client.application.lazyload.images[i]; // prevent repeatedly rendering
 						}
 					}
