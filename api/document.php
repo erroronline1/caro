@@ -726,13 +726,14 @@ class DOCUMENT extends API {
 				if (isset($exists['id'])){ 
 					if (!$approved) {
 						// update anything, delete unused images, reset approval
-						$component['content'] = fileupload($component['content'], $exists['name'], $exists['date']);
+						$exists_date = new DateTime($exists['date'], new DateTimeZone(CONFIG['application']['timezone']));
+						$component['content'] = fileupload($component['content'], $exists['name'], $exists_date->format('YmdHis'));
 
 						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));
 						$new_images = array_unique(usedImages($component['content']));
 						foreach(array_diff($former_images, $new_images) as $path) UTILITY::delete($path);
 
-						if (SQLQUERY::EXECUTE($this->_pdo, 'form_put', [
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
 							'values' => [
 								':alias' => '',
 								':context' => 'component',

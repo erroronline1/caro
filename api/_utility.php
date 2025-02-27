@@ -590,7 +590,7 @@ class UTILITY {
 			$target = self::enumerate($target, $files);
 		}
 		// move_uploaded_file is for post only, else rename for put files
-		if ($tmpname && (move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
+		if ($tmpname && (@move_uploaded_file( $tmpname, $target) || rename( $tmpname, $target))){
 			return $target;
 		}
 	}
