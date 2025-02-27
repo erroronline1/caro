@@ -86,7 +86,8 @@ class AUDIT extends API {
 				// iterate over payload, match template question index, input name and possible multiples
 				// values always will be stored within an array to handle multiples by default
 				foreach($this->_payload as $key => $value){
-					if (!$value) continue;
+					if ($key === 'null') continue;
+					if (!$value) $value = ''; // the audit has to contain all questions as planned
 					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // [1] setindex, [2] input, isset [3] possible multiple field
 					$set[2] = str_replace('_', ' ', $set[2]);
 					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
@@ -107,7 +108,6 @@ class AUDIT extends API {
 						$summary .= $audit[':last_user'] . "\n";
 						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit[':content']['objectives'];
 						foreach($audit[':content']['questions'] as $question){
-							$currentquestion = null;
 							// start with  question and direct response as initial value
 							foreach($question as $key => $values){
 								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
@@ -123,7 +123,7 @@ class AUDIT extends API {
 											$summary .=  $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 											break;
 										case 'regulatory':
-											$summary .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+											$summary .= implode(', ' , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
 											break;
 										default:
 										$summary .=  implode("\n", $values);
@@ -132,8 +132,8 @@ class AUDIT extends API {
 							}
 						}
 						$summary .= "\n \n" . $this->_lang->GET('audit.audit.execute.summary', [], true) . ': ' . $audit[':content']['summary'];
+						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit[':unit']]], $summary);
 					}
-					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit[':unit']]], $summary);
 
 					$this->response([
 					'response' => [
@@ -174,7 +174,8 @@ class AUDIT extends API {
 				// iterate over payload, match template question index, input name and possible multiples
 				// values always will be stored within an array to handle multiples by default
 				foreach($this->_payload as $key => $value){
-					if (!$value || $key === 'null') continue;
+					if ($key === 'null') continue;
+					if (!$value) $value = ''; // the audit has to contain all questions as planned
 					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // [1] setindex, [2] input, isset [3] possible multiple field
 					$set[2] = str_replace('_', ' ', $set[2]);
 					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
@@ -198,7 +199,6 @@ class AUDIT extends API {
 						$summary .= $audit['last_user'] . "\n";
 						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit['content']['objectives'];
 						foreach($audit['content']['questions'] as $question){
-							$currentquestion = null;
 							// start with  question and direct response as initial value
 							foreach($question as $key => $values){
 								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
@@ -214,7 +214,7 @@ class AUDIT extends API {
 											$summary .=  $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 											break;
 										case 'regulatory':
-											$summary .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+											$summary .= implode(', ' , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
 											break;
 										default:
 										$summary .=  implode("\n", $values);
@@ -516,7 +516,7 @@ class AUDIT extends API {
 							$summary['content'][$currentquestion] .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 							break;
 						case 'regulatory':
-							$summary['content'][$currentquestion] .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+							$summary['content'][$currentquestion] .= implode(', ' , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
 							break;
 						default:
 							$summary['content'][$currentquestion] .= implode("\n", $values);
@@ -587,7 +587,7 @@ class AUDIT extends API {
 								$currentanswer .= $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
 								break;
 							case 'regulatory':
-								$currentanswer .= implode(', ' , array_map(fn($r) => $this->_lang->_DEFAULT['regulatory'][$r], explode(',', $values[0])));
+								$currentanswer .= implode(', ' , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
 								break;
 							default:
 								$currentanswer .= implode("\n", $values);
@@ -777,7 +777,7 @@ class AUDIT extends API {
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
 					foreach($template['content'] as &$question){
 						$question['regulatory'] = explode(',', $question['regulatory']);
-						$question['regulatory'] = implode(', ', array_map(fn($r) => isset($this->_lang->_USER['regulatory'][$r]) ? $this->_lang->_USER['regulatory'][$r] : $r, $question['regulatory']));
+						$question['regulatory'] = implode(', ', array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, $question['regulatory']));
 					}
 					$result['selected'] = $template['content'];
 				}
