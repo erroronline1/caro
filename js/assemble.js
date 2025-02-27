@@ -261,7 +261,7 @@ export class Dialog {
 				}
 				scanner.scanner.render(scanSuccess);
 			}
-			if (this.assemble) this.assemble.processAfterInsertion();
+			if (this.assemble) this.assemble.processAfterInsertion(dialog);
 
 			return new Promise((resolve, reject) => {
 				dialog.showModal();
@@ -564,12 +564,13 @@ export class Assemble {
 
 	/**
 	 * initialize events after insertion to access rendered nodes
+	 * @param {domNode} eventListenerTarget
 	 * @event scroll events to process number of sections
 	 * @event add trash drag events
 	 * @event initialize signature pad
 	 * @event populate canvases for barcodes, qr-codes or images if applicable
 	 */
-	processAfterInsertion() {
+	processAfterInsertion(eventListenerTarget = window) {
 		const scrollables = document.querySelectorAll("section");
 		for (const section of scrollables) {
 			if (section.childNodes.length > 1) section.addEventListener("scroll", this.sectionScroller);
@@ -589,9 +590,9 @@ export class Assemble {
 		if (this.imageUrl.length) _client.application.lazyload.images = this.imageUrl;
 		if (this.imageQrCode.length || this.imageBarCode.length || this.imageUrl.length) {
 			_client.application.lazyload.load();
-			window.addEventListener("scroll", _client.application.lazyload.load, false);
+			eventListenerTarget.addEventListener("scroll", _client.application.lazyload.load, false);
 		} else {
-			window.removeEventListener("scroll", _client.application.lazyload.load);
+			eventListenerTarget.removeEventListener("scroll", _client.application.lazyload.load);
 		}
 
 		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
