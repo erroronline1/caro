@@ -218,7 +218,7 @@ class RECORD extends API {
 	public function document(){
 		// prepare existing documents lists
 		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
-		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document__not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $document['name'], 'render' => [
 			'content' => []
