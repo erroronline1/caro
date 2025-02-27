@@ -432,16 +432,16 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, hidden = :hidden WHERE id = :id"
 		],
 		'file_bundles_datalist' => [
-			'mysql' => "SELECT name, hidden FROM caro_file_bundles GROUP BY name ORDER BY name ASC",
-			'sqlsrv' => "SELECT name, hidden FROM caro_file_bundles GROUP BY name ORDER BY name ASC"
+			'mysql' => "SELECT DISTINCT name, hidden FROM caro_file_bundles ORDER BY name ASC",
+			'sqlsrv' => "SELECT DISTINCT name, hidden FROM caro_file_bundles ORDER BY name ASC"
 		],
 		'file_bundles_get' => [
 			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
 		],
 		'file_bundles_get_active' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE hidden IS NOT NULL GROUP BY name",
-			'sqlsrv' => "SELECT * from caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE hidden IS NOT NULL GROUP BY name) ORDER BY name"
+			'mysql' => "SELECT * FROM caro_file_bundles WHERE hidden IS NULL GROUP BY name",
+			'sqlsrv' => "SELECT * FROM caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE hidden IS NULL GROUP BY name) ORDER BY name"
 		],
 		'file_external_documents_get' => [
 			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",

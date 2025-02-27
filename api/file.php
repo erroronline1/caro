@@ -76,7 +76,6 @@ class FILE extends API {
 		];
 		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
 		$external = array_map(Fn($path) => substr($path, 1), $this->activeexternalfiles());
-
 		foreach($bundles as $row) {
 			$list = [];
 			// construct file links to external files per bundle
@@ -144,8 +143,8 @@ class FILE extends API {
 				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
 				$hidden = $this->_lang->PROPERTY('file.bundle.availability');
-				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.hidden') ?UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
-				unset ($this->_payload->$hidden);
+				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
+				unset ($this->_payload->{$this->_lang->PROPERTY('file.bundle.availability')});
 				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
 				foreach($this->_payload as $key => $value){
