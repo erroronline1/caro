@@ -2236,19 +2236,15 @@
 						},
 						"content": {
 							"...": [],
-							"Armierungsplan Prothetik II 5.1": [],
-							"Armierungsplan Prothetik II 5.2": [],
-							"Armierungsplan Prothetik II 5.3": [],
-							"Armierungsplan Prothetik II 5.4": [],
-							"Armierungsplan Prothetik II 5.5": [],
-							"Armierungsplan Prothetik II 5.6": []
+							"Armierungsplan Prothetik II Unterarmtestschaft": [],
+							"Armierungsplan Prothetik II Oberarm": []
 						}
 					},
 					{
 						"type": "documentbutton",
 						"attributes": {
 							"value": "Armierungsplan Prothetik II anzeigen",
-							"onpointerup": "api.record('get','displayonly', 'Armierungsplan Prothetik II')"
+							"onclick": "api.record('get','displayonly', 'Armierungsplan Prothetik II')"
 						}
 					},
 					{
@@ -3716,6 +3712,68 @@
 		}
 	},
 	{
+		"name": "armierungsplan prothetik ii",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Zweck"
+						},
+						"content": "Diese Arbeitsanweisung beschreibt die Armierung von Schäften und Verbindungssegmenten für Prothesen der oberen Extremität. Dabei definiert sie bewährte Standardarmierungen. Eine Anpassung der Armierung an die individuellen Anforderungen ist weiterhin zulässig und nach Rücksprache mit dem fachlichen Leiter durchzuführen."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Geltungsbereich"
+						},
+						"content": "Diese Arbeitsanweisung gilt für alle Mitarbeiter."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Zuständigkeiten"
+						},
+						"content": "Zuständig für die Armierung von Prothesen der oberen Extremität sind alle hierfür qualifizierten Mitarbeiter. Jeder Mitarbeiter ist für die korrekte Ausführung seiner ihm übertragenen Tätigkeiten sowie der erforderlichen Dokumentation selbst verantwortlich."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Beschreibung"
+						},
+						"content": "Die Ausführung der Armierungen legt die Lagen und Reihenfolge der Armierungsgewebe sowie möglicher einzugießender Komponenten fest. Dummies, Gießabdeckungen, Aufschneidhilfen, Drainage-Trikos, Folienschläuche oder Flüssigfolie sind gesondert und typischerweise im Vorfeld der Armierung zu berücksichtigen. Die Abbildungen dienen der Veranschaulichung unidirektionaler Verstärkungen gemäß typischer Belastungsverläufe. Eingussringe mit Nuten sind entsprechend zu berücksichtigen, hier gilt grundsätzlich, dass die belastungsrelevanten Armierungsfasern wie Carbon oder Glas in einzelnen Lagen in den Nuten abgebunden werden um eine sichere Verankerung zu gewährleisten."
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Unterarmtestschaft"
+						},
+						"content": "1 Perlon\n1 Glasmatte 90° komplett\n1 Perlon\n1 Glasmatte 45° komplett\n1 Perlon"
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Oberarm"
+						},
+						"content": "1 Perlon\n1 Carbonmatte komplett 90°\n1 Carbon uni 50mm Mitte vordere Abstemmplatte, zirkulär unter Achselbank, Mitte hintere Abstemmplatte, lateral gekreuzt\n1 Carbon uni 25mm Verlauf wie zuvor\n2 Nylglas\n 1 Carbon uni 25mm Verlauf wie zuvor\n1 Carbon uni 50mm Verlauf wie zuvor\n1 Carbonmatte komplett 45°\n1 Perlon"
+					}
+				]
+			]
+		}
+	},
+	{
 		"comment": "following are prosthetics ii forms #################################################################################################"
 	},
 	{
@@ -3805,5 +3863,16 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik II,Maßblatt Prothetik II,Versorgungsplanung Prothetik II,Kunststofffertigungsauftrag Prothetik II,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik II,Abgabeprotokoll Prothetik II,Gebrauchsanweisung Prothetik II,Empfangsbestätigung"
+	},
+	{
+		"name": "Armierungsplan Prothetik II",
+		"alias": "",
+		"context": "descriptions",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "armierungsplan prothetik ii"
 	}
 ]
