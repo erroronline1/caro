@@ -1,0 +1,79 @@
+{
+	"filesetting": {
+		"source": "sample-csv-files-sample-6.csv",
+		"headerrowindex": 1,
+		"destination": "testresult.csv",
+		"columns": ["first", "last", "date"]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_expression",
+			"comment": "drop empty, all garys and all surnames starting with ba",
+			"keep": false,
+			"match": {
+				"any": {
+					"first": "^$|(gary)",
+					"last": "^ba"
+				}
+			}
+		},
+		{
+			"apply": "filter_by_comparison_file",
+			"comment": "compare with self, drop all tates",
+			"keep": true,
+			"filesetting": {
+				"source": "SELF",
+				"headerrowindex": 1,
+				"columns": ["last"]
+			},
+			"filter": [
+				{
+					"apply": "filter_by_expression",
+					"comment": "drop all surnames tate",
+					"keep": false,
+					"match": {
+						"any": {
+							"last": "tate"
+						}
+					}
+				}
+			],
+			"modify": {
+				"add": {
+					"hello": "hello from comparison"
+				}
+			},
+			"match": {
+				"any": {
+					"last": "last"
+				}
+			},
+			"transfer": {
+				"greetings": "hello"
+			}
+		},
+		{
+			"apply": "filter_by_monthinterval",
+			"comment": "keep only entries from current month (jan-dec, all years)",
+			"keep": true,
+			"interval": {
+				"column": "date",
+				"format": ["dd", "mm", "yyyy"],
+				"interval": 12,
+				"offset": 0
+			}
+		}
+	],
+	"modify": {
+		"rewrite": [
+			{
+				"full": ["first", " ", "last"]
+			}
+		],
+		"replace": [["last", "Sharp", "Dull"]],
+		"add": {
+			"new_column": "hooray"
+		},
+		"remove": ["first"]
+	}
+}

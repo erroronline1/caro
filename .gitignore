@@ -1,5 +1,6 @@
 *.csv
 !shadow*
+!unittests/*
 fileserver
 *.log
 *.pdf

@@ -28,6 +28,7 @@ class STRESSTEST extends INSTALL{
 	public $_recordentries = 20000;
 	public $_orderentries = 1000;
 	public $_autopermission = true;
+	public $_csvInput = '../unittests/sample-csv-files-sample-6.csv';
 
 	// optional overrides of parent properties
 	public $_defaultUser = "Caro App";
@@ -77,6 +78,25 @@ class STRESSTEST extends INSTALL{
 				}
 			echo '<br /><br /><a href="../../index.html">exit</a>';
 		}
+	}
+
+	/**
+	 * csvfilter unittest
+	 */
+	public function csvFilterTest(){
+		require_once('./_csvprocessor.php');
+		$file = '../unittests/csvfilter';
+		$content = $this->importJSON($file);
+		$content['filesetting']['source'] = $this->_csvInput;
+		if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
+		$content['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
+		
+		$datalist = new Listprocessor($content, [
+			'processedMonth' => $this->_currentdate->format("m"),
+			'processedYear' => $this->_currentdate->format("Y")
+		]);
+
+		echo '<pre>' . var_export($datalist, true) . '</pre>';
 	}
 
 	/**
