@@ -1234,8 +1234,8 @@ class INSTALL {
 				$entry['image'] = substr($entry['image'], 3);
 
 				// gather timesheet setup
-				$entry['app_settings']['annualvacation'] = $this->_currentdate->format('Y-m-d'). ' 30';
-				$entry['app_settings']['weeklyhours'] =  $this->_currentdate->format('Y-m-d'). ' 38,5';
+				$entry['app_settings']['annualvacation'] = $this->_currentdate->format('Y-m-d'). '; 30';
+				$entry['app_settings']['weeklyhours'] =  $this->_currentdate->format('Y-m-d'). '; 38,5';
 				$entry['app_settings']['initialovertime'] = 0;
 				
 				// ensure proper formatting
