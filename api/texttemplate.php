@@ -114,9 +114,7 @@ class TEXTTEMPLATE extends API {
 					]]);
 				break;
 			case 'GET':
-				$chunkdatalist = [];
-				$options = [];
-				$alloptions = [];
+				$chunkdatalist = $replacements = $options = $alloptions = [];
 				$insertreplacement = ['...' . $this->_lang->GET('texttemplate.chunk.insert_default') => ['value' => ' ']];
 				$return = [];
 
@@ -166,7 +164,10 @@ class TEXTTEMPLATE extends API {
 					if (!isset($options[$row['unit']][$display]) && !in_array($row['name'], $hidden)) {
 						$chunkdatalist[] = $row['name'];
 						$options[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-						if ($row['type'] === 'replacement') $insertreplacement[$this->_lang->GET('units.' . $row['unit']) . ' '. $row['name']] = ['value' => ':' . $row['name']];
+						if ($row['type'] === 'replacement') {
+							$insertreplacement[$this->_lang->GET('units.' . $row['unit']) . ' '. $row['name']] = ['value' => ':' . $row['name']];
+							$replacements[] = ':' . $row['name'];
+						}
 					}
 
 					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
@@ -285,7 +286,8 @@ class TEXTTEMPLATE extends API {
 									'id' => 'content',
 									'required' => true,
 									'data-loss' => 'prevent'
-								]
+								],
+								'autocomplete' => $replacements
 							], [
 								'type' => 'select',
 								'attributes' => [

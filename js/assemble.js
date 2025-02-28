@@ -21,11 +21,12 @@ this module helps to assemble content according to the passed simplified object 
 */
 import SignaturePad from "../libraries/signature_pad.umd.js";
 
-var ElementID = 0,
-	signaturecanvas = null;
+var ELEMENT_ID = 0,
+	SIGNATURE_CANVAS = null,
+	TEXTAREA_AUTOCOMPLETE_INDEX = null;
 
 export function getNextElementID() {
-	return "elementID" + ++ElementID;
+	return "elementID" + ++ELEMENT_ID;
 }
 
 const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown"];
@@ -853,8 +854,8 @@ export class Assemble {
 	 */
 
 	initialize_SignaturePad() {
-		signaturecanvas = document.getElementById("signaturecanvas");
-		window.signaturePad = new SignaturePad(signaturecanvas, {
+		SIGNATURE_CANVAS = document.getElementById("signaturecanvas");
+		window.signaturePad = new SignaturePad(SIGNATURE_CANVAS, {
 			// It's Necessary to use an opaque color when saving image as JPEG;
 			// this option can be omitted if only saving as PNG or SVG
 			//backgroundColor: 'rgb(255, 255, 255)'
@@ -874,9 +875,9 @@ export class Assemble {
 		// and only part of the canvas is cleared then.
 		const ratio = Math.max(window.devicePixelRatio || 1, 1);
 		// This part causes the canvas to be cleared
-		signaturecanvas.width = signaturecanvas.offsetWidth * ratio;
-		signaturecanvas.height = signaturecanvas.offsetHeight * ratio;
-		signaturecanvas.getContext("2d").scale(ratio, ratio);
+		SIGNATURE_CANVAS.width = SIGNATURE_CANVAS.offsetWidth * ratio;
+		SIGNATURE_CANVAS.height = SIGNATURE_CANVAS.offsetHeight * ratio;
+		SIGNATURE_CANVAS.getContext("2d").scale(ratio, ratio);
 		// This library does not listen for canvas changes, so after the canvas is automatically
 		// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
 		// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
@@ -2680,37 +2681,45 @@ export class Assemble {
 			 * adds a *simple* autocomplete option for textareas with keyup event listener
 			 * appends rest of match if the input so far matches one of the datalist options.
 			 * use Alt and AltGr to navigate within results for being the most unintrusive key
-			 * has to be provided with lowercase unique entries!
+			 * has to be provided with unique entries!
 			 */
 			let autocomplete = this.currentElement.autocomplete;
 			textarea.addEventListener("keyup", (event) => {
 				if (!event.target.value || (event.key.length > 2 && !["Alt", "AltGraph"].includes(event.key))) return;
 				if (["Alt", "AltGraph"].includes(event.key)) event.preventDefault();
-				let cPos = event.target.selectionStart,
+				let cursorPosition = event.target.selectionStart,
 					matches = [],
-					matchesLC = [],
-					index = 0,
-					typed = event.target.value.substring(0, event.target.selectionStart);
+					start = event.target.value.substring(0, event.target.selectionStart),
+					end = event.target.value.substring(event.target.selectionEnd),
+					words,
+					tail;
+
 				// gather possible matches
-				for (const option of autocomplete) {
-					if (option.toLowerCase().startsWith(typed.toLowerCase())) {
-						matches.push(option);
-						matchesLC.push(option.toLowerCase());
+				// to handle adding at the end the content is rewinded from the back
+				words = start.split(" ");
+				for (let i = 0; i < words.length; i++) {
+					tail = words.slice(i * -1).join(" ");
+					if (!tail.length) continue;
+					for (const option of autocomplete) {
+						if (option.startsWith(tail)) {
+							matches.push(option.substring(tail.length));
+						}
 					}
 				}
 				if (matches.length) {
 					// navigate through matches with alt key
-					index = matchesLC.indexOf(event.target.value.toLowerCase());
-					if (index > -1 && ["Alt", "AltGraph"].includes(event.key)) {
-						if (event.key === "Alt") index++;
-						if (event.key === "AltGraph") index--;
+					if (TEXTAREA_AUTOCOMPLETE_INDEX === null) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
+					if (TEXTAREA_AUTOCOMPLETE_INDEX > -1 && ["Alt", "AltGraph"].includes(event.key)) {
+						if (event.key === "Alt") TEXTAREA_AUTOCOMPLETE_INDEX++;
+						if (event.key === "AltGraph") TEXTAREA_AUTOCOMPLETE_INDEX--;
 						// out of bound
-						if (index > matches.length - 1) index = 0;
-						if (index < 0) index = matches.length - 1;
-					} else index = 0; // fallback
-					event.target.value = typed + matches[index].substring(event.target.selectionStart);
-				}
-				event.target.selectionStart = cPos;
+						if (TEXTAREA_AUTOCOMPLETE_INDEX > matches.length - 1) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
+						if (TEXTAREA_AUTOCOMPLETE_INDEX < 0) TEXTAREA_AUTOCOMPLETE_INDEX = matches.length - 1;
+					} else TEXTAREA_AUTOCOMPLETE_INDEX = 0; // fallback
+					event.target.value = start + matches[TEXTAREA_AUTOCOMPLETE_INDEX] + end;
+					event.target.selectionEnd = (start + matches[TEXTAREA_AUTOCOMPLETE_INDEX]).length;
+				} else TEXTAREA_AUTOCOMPLETE_INDEX = null;
+				event.target.selectionStart = cursorPosition;
 			});
 			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.render.textarea_autocomplete") : api._lang.GET("assemble.render.textarea_autocomplete");
 		}
