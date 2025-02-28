@@ -388,9 +388,9 @@ class Listprocessor {
 		if (isset($rule['transfer'])){
 			foreach ($rule['transfer'] as $newcolumn => $from){
 				if (!isset($this->setting['filesetting']['columns'][$newcolumn])) $this->_setting['filesetting']['columns'][] = $newcolumn;
-				foreach (array_uintersect(array_column($thislistwithoutempty, $column), array_column($compare_list->_list[1], $cmp_column), fn($v1, $v2) => $v1 <=> $v2) as $index => $columnvalue){
-					$self_row = $this->_list[$index];						
-					$self_row[$newcolumn] = $columnvalue; //$cmp_row[$from];
+				$cmpindex = 0;
+				foreach ($thislistwithoutempty as $index => $self_row){
+					$self_row[$newcolumn] = $compare_list->_list[1][$cmpindex++][$from]; //$cmp_row[$from];
 					$this->_list[$index] = $self_row;
 				}
 			}
