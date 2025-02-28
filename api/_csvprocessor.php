@@ -50,7 +50,7 @@ filters and returns a named array according to setup.
 		"date": filter by identifier and date diff in months
 			"identifier": column name with recurring values, e.g. customer id
 			"column": column name with date to process,
-			"format": list/array of date format order e.g. ["d", "m", "y"],
+			"format": list/array of date format order e.g. ["dd", "mm", "yyyy"],
 			"threshold": integer for months,
 			"bias": < less than, > greater than threshold
 
@@ -80,7 +80,7 @@ filters and returns a named array according to setup.
 		"keep": boolean if matches are kept or omitted
 		"interval": discard by not matching interval in months, optional offset from initial column value
 			"column": column name with date to process,
-			"format": list/array of date format order e.g. ["d", "m", "y"],
+			"format": list/array of date format order e.g. ["dd", "mm", "yyyy"],
 			"interval": integer for months,
 			"offset": optional offset in months
 
@@ -547,14 +547,29 @@ class Listprocessor {
 	 *		"keep": False,
 	 *		"date": {
 	 *			"column": "SOMEDATE",
-	 *			"format": ["d", "m", "y"],
+	 *			"format": ["dd", "mm", "yyyy"],
 	 *			"threshold": 6,
 	 *			"bias": "<"
 	 *		}
 	 *	},
 	*/
 	public function filter_by_monthdiff($rule){
-		if (($key = array_search('y', $rule['date']['format'])) !== false) $rule['date']['format'][$key] = 'Y'; // make year format 4 digits
+		foreach($rule['interval']['format'] as &$unit){
+			switch ($unit){
+				case 'dd':
+					$unit = 'd';
+					break;
+				case 'mm':
+					$unit = 'm';
+					break;
+				case 'yy':
+					$unit = 'y';
+					break;
+				case 'yyyy':
+					$unit = 'Y';
+					break;
+				}
+		}
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
@@ -602,21 +617,35 @@ class Listprocessor {
 	 *		"keep": False,
 	 *		"interval": {
 	 *			"column": "SOMEDATE",
-	 *			"format": ["d", "m", "y"],
+	 *			"format": ["dd", "mm", "yyyy"],
 	 *			"interval": 6,
 	 *			"offset": 0
 	 *		}
 	 *	},
 	 */
 	public function filter_by_monthinterval($rule){
-		if (($key = array_search('y', $rule['interval']['format'])) !== false) $rule['interval']['format'][$key] = 'Y'; // make year format 4 digits
+		foreach($rule['interval']['format'] as &$unit){
+			switch ($unit){
+				case 'dd':
+					$unit = 'd';
+					break;
+				case 'mm':
+					$unit = 'm';
+					break;
+				case 'yy':
+					$unit = 'y';
+					break;
+				case 'yyyy':
+					$unit = 'Y';
+					break;
+				}
+		}
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
 			preg_match_all('/\d+/mi', $row[$rule['interval']['column']], $entrydate);
 			if (count($entrydate[0]) < 1) continue;
 			$entrydate[0][array_search('d', $rule['interval']['format'])] = '01';
-			$d = 0;
 			$thismonth = [];
 			foreach ($rule['interval']['format'] as $key){
 				switch($key){
@@ -633,14 +662,14 @@ class Listprocessor {
 			}
 			$offset_edate = $this->monthdelta($entrydate[0], $rule['interval']['format'], $rule['interval']['offset']);
 			$timespan = $this->monthdiff($offset_edate, $thismonth, $rule['interval']['format']);
-			$filtermatch = @boolval($timespan % $rule['interval']['interval']); // Implicit conversion from float XX.XX to int loses precision
+			$filtermatch = !@boolval($timespan % $rule['interval']['interval']); // Implicit conversion from float XX.XX to int loses precision
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track = [
 					'filter' => 'filter_by_monthinterval',
 					'column' => $rule['interval']['column'],
 					'value' => $row[$rule['interval']['column']],
 					'filtered_by' => $rule['interval']['interval'] . ' remainder ' . $filtermatch];
-				$this->delete($i);
+				$this->delete($i, $track);
 			}
 		}
 	}

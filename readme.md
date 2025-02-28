@@ -1543,7 +1543,7 @@ Description of options:
 		"date": Filter by identifier and date diff in months
 			"identifier": Column name with recurring values, e.g. customer id
 			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
 			"threshold": Integer for months,
 			"bias": < less than, > greater than threshold
 
@@ -1573,7 +1573,7 @@ Description of options:
 		"keep": Boolean if matches are kept or omitted
 		"interval": Discard by not matching interval in months, optional offset from initial column value
 			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["d", "m", "y"],
+			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
 			"interval": Integer for months,
 			"offset": Optional offset in months
 
@@ -1669,7 +1669,7 @@ A generic sample:
             "keep": false,
             "date": {
                 "column": "SOMEDATE",
-                "format": ["d", "m", "y"],
+                "format": ["dd", "mm", "yyyy"],
                 "threshold": 6,
                 "bias": "<"
             }
@@ -1715,7 +1715,7 @@ A generic sample:
             "keep": false,
             "interval": {
                 "column": "SOMEDATE",
-                "format": ["d", "m", "y"],
+                "format": ["dd", "mm", "yyyy"],
                 "interval": 6,
                 "offset": 0
             }

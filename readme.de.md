@@ -37,7 +37,7 @@
     * [Anmerkungen und Hinweise zur Nutzung](#anmerkungen-und-hinweise-zur-nutzung)
     * [Anpassung](#anpassung)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
-* [CSV Processor](#csv-prozessor)
+* [CSV Prozessor](#csv-prozessor)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
     * [Risikoanalyse](#risikoanalyse)
     * [Erklärung zur Barrierefreiheit](#erklärung-zur-barrierefreiheit)
@@ -1472,7 +1472,7 @@ Beschreibung der Optionen:
 		"date": Filtert nach identifier und Unterschied zweier Daten in Monaten
 			"identifier": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer,
 			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": Liste des Datum-Formats, z.B. ["d", "m", "y"],
+			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
 			"threshold": Ganzzahl für Monate,
 			"bias": < kleiner als, > größer als threshold
 
@@ -1502,7 +1502,7 @@ Beschreibung der Optionen:
 		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
 		"interval": Behalte oder lösche Zeilen bei denen ein Monats-Interval nicht zutrifft, mit optionaler Verschiebung vom ursprünglichen Spaltenwert
 			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": Liste des Datum-Formats, z.B. ["d", "m", "y"],
+			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
 			"interval": Ganzzahl für Monate,
 			"offset": optionale Verschiebung in Monaten (Ganzzahl)
 
@@ -1598,7 +1598,7 @@ Ein beliebiges Beispiel:
             "keep": false,
             "date": {
                 "column": "SOMEDATE",
-                "format": ["d", "m", "y"],
+                "format": ["dd", "mm", "yyyy"],
                 "threshold": 6,
                 "bias": "<"
             }
@@ -1644,7 +1644,7 @@ Ein beliebiges Beispiel:
             "keep": false,
             "interval": {
                 "column": "SOMEDATE",
-                "format": ["d", "m", "y"],
+                "format": ["dd", "mm", "yyyy"],
                 "interval": 6,
                 "offset": 0
             }
