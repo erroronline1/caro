@@ -390,7 +390,7 @@ class API {
 		SQLQUERY::CLOSE($this->_pdo);
 		$this->set_headers();
 		echo $data;
-		exit;
+		exit();
 	}
 }
 
