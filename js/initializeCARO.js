@@ -31,7 +31,7 @@ import { compose_helper } from "./compose.js";
 window.compose_helper = compose_helper;
 
 // during development, can be deleted during production, doesn't mess up the application though
-import { rendertest, screenshot } from "./unittests.js";
+import { rendertest, screenshot } from "../unittests/unittests.js";
 window.rendertest = rendertest;
 window.screenshot = screenshot;
 
