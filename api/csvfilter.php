@@ -110,7 +110,7 @@ class CSVFILTER extends API {
 							// write each to temp file
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
 							$subsetname = preg_replace(CONFIG['forbidden']['names']['characters'], '_', $subsetname);
-							$tempFile = UTILITY::directory('tmp') . '/' . time() . $subsetname . '.csv';
+							$tempFile = UTILITY::directory('tmp') . '/' . $this->_currentdate->format('Y-m-d H-i-s ') . $subsetname . '.csv';
 							$file = fopen($tempFile, 'w');
 							fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 							fputcsv($file, $datalist->_setting['filesetting']['columns'],
@@ -133,7 +133,7 @@ class CSVFILTER extends API {
 						break;
 					case 'xls': // do nothing, let xlsx catch
 					case 'xlsx':
-						$tempFile = UTILITY::directory('tmp') . '/' . time() . '.xlsx';
+						$tempFile = UTILITY::directory('tmp') . '/' . $this->_currentdate->format('Y-m-d H-i-s ') . '.xlsx';
 						$writer = new XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']); 
 						foreach($datalist->_list as $subsetname => $subset){
