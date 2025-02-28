@@ -1278,6 +1278,7 @@ Das Leben, das medizinische Feld und regulatorische Anforderungen sind komplizie
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es wird nur eine Zeitzone unterstützt.
+* Bilder werden immer als PNG exportiert, wodurch sie gelegentlich größer als JPG sind, dabei aber verlustfrei. Eine Anpassung im Quelltext kann in der image()-Methode der Assemble-Klasse erfolgen.
 
 ### Safaris besondere Bedürfnisse
 im Gegensatz zu richtigen Browsern, zumindest auf macOS.

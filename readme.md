@@ -119,7 +119,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests (sample tables for csv filtering, embed into _stresstest to pass a suitable filter)
 * update readme pictures on tools menu, record menu, audit and regulatory
 * autocomplete for texttemplate placeholders per word starting with : (assemble.textarea)
-* downloaded resized images are bigger than generated within temp, also jpg always exported to png -> fix original file extension
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1351,6 +1350,7 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * Only one timezone is supported.
+* Images are always exported as PNG which may be occasionally bigger in size than JPG but lossless. A behavioural change can be done within the image()-method of the Assemble-class.
 
 ### Safaris special needs
 as opposed to proper browsers. At least on macOS.
