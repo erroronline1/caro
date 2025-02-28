@@ -119,7 +119,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests (sample tables for csv filtering, embed into _stresstest to pass a suitable filter)
 * update readme pictures on tools menu, record menu, audit and regulatory
 * autocomplete for texttemplate placeholders per word starting with : (assemble.textarea)
-* server responds with 413 after a few successful image tool queries, has to be restarted
 * downloaded resized images are bigger than generated within temp, also jpg always exported to png -> fix original file extension
 
 # Aims
@@ -1097,7 +1096,7 @@ Technically the application is being usable on any webserver but the use on a pu
 * php.ini memory_limit ~4096M for [processing of large CSV-files and pricelist imports](#csv-processor), disable open_basedir at least for local IIS for file handlers.
     * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
-* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB.
+* php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB. On IIS [uploadReadAheadSize](#https://techcommunity.microsoft.com/blog/iis-support-blog/solution-for-%E2%80%9Crequest-entity-too-large%E2%80%9D-error/501134) should be configured accordingly.
 * php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
 * php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
