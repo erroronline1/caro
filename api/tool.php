@@ -466,8 +466,9 @@ class TOOL extends API {
 					$result['render']['content'][] = [];
 					$images = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('tool.image.source')], UTILITY::directory('tmp'), [$size]);
 					$size = explode(' x ', $size);
+					$size = isset ($size[1]) ? max(intval($size[0]), intval($size[1])) : 0;
 					foreach($images as $image){
-						UTILITY::alterImage($image, max(intval($size[0]), intval($size[1])), UTILITY_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
+						UTILITY::alterImage($image, $size, UTILITY_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
 						$result['render']['content'][count($result['render']['content']) - 1][] = [
 							'type' => 'image',
 							'description' => pathinfo($image)['basename'],
