@@ -116,8 +116,9 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * text recommendation templates
 * document templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* unittests
+* unittests (sample tables for csv filtering, embed into _stresstest to pass a suitable filter)
 * update readme pictures on tools menu, record menu, audit and regulatory
+* autocomplete for texttemplate placeholders per word starting with : (assemble.textarea)
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -140,7 +141,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard.png)
 
 ## Necessary infrastructure 
-You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation and text templates).
+You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation, text templates and audit templates).
 
 Main goal is a distribution of mobile devices to the whole staff or at least key positions and workspaces. After all, administration can not demand going digital without providing a decent infrastructure. Scanning devices are optional but all scanning could be achieved with inbuilt cameras as well. 
 
@@ -583,7 +584,7 @@ Entries are persistent and can be exported if desired through the [evaluation an
 [Content](#content)
 
 ### Audit
-The application enables you to prepare internal audits, including programme objectives and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted and reordered. The summary of a previous audit for the respective unit can be imported for upcoming reference.
+The application enables you to prepare internal audits, including programme objectives and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted, reordered by [dragging and dropping](#miscellaneous) and reimported. The summary of a previous audit for the respective unit can be imported for upcoming reference.
 Audits can be added to the calendar from the form as well, informing selected units.
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template.png)
@@ -1128,7 +1129,7 @@ If you are comfortable enough with text editing JSON-files to modify the languag
 * texttemplates.XX.env/.json
 * users.env/.json
 
-within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro/tree/master/templates) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though.
+within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro/tree/master/templates) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though. Also the templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
 
 ### Installation procedure
 * Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
@@ -1222,7 +1223,8 @@ order_approvalsignature_image = 2048 ; max pixels on longer side
 order_approved_archived = 512 ; schedules a review to delete unused archived orders to free up space
 qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` or `'H'` - H for maximum error tolerance but higher pixel density
 record_image = 2048 ; max pixels on longer side
-risk_acceptance_level = 4 ; product of probability times damage to be highlighted 
+risk_acceptance_level = 4 ; product of probability times damage to be highlighted
+storage_warning = 10 ; gigabyte, lower value of remaining space raises a dashboard warning
 user_image = 256 ; max pixels on longer side
 
 ; permissions based of and matching language.XX.json permissions

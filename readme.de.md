@@ -71,7 +71,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 ![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20de.png)
 
 ## Erforderliche Infrastruktur 
-Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Dokumenten oder Textvorschlägen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
+Es wird ein Server zur Speicherung und Ausführung der Web-Anwendung, sowie Netzwerkzugriff für alle Endgeräte benötigt. Die Anwendung ist dafür ausgelegt primär auf mobilen Geräten wie beispielsweise Android-Tablets oder iPads genutzt zu werden, kann aber auch auf Desktop-Computern genutzt werden. Manche Funktionen wie die Erstellung von Dokumenten, Textvorschlägen und Auditvorlagen sind primär nur auf Desktop-Computern mit Maus-Eingabegeräten möglich.
 
 Das oberste Ziel ist die Ausstattung der gesamten Belegschaft oder zumindest von Schlüsselpositionen und Arbeitsplätzen mit mobilen Geräten. Schließlich kann die Administration nicht nach Digitalisierung verlangen ohne eine geeignete Infrastruktur zur Verfügung zu stellen. Scanner sind optional, da Scannen ebensogut mit in den Geräten eingebauten Kameras umgesetzt werden kann.
 
@@ -492,7 +492,7 @@ Exportierte reduzierte Aufzeichnung
 [Übersicht](#übersicht)
 
 ### Risikomanagement
-Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org). Identifizierte Risiken die je Prozess beachtung finden können, sind in den [Sprachdateien definiert](#anpassung) (siehe auch [hier](#laufzeitvariablen)).
+Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 14971 und richtet sich nach den Empfehlungen der [DGIHV](https://www.dgihv.org). Identifizierte Risiken die je Prozess Beachtung finden können, sind in den [Sprachdateien definiert](#anpassung) (siehe auch [hier](#laufzeitvariablen)).
 
 Wie in der ISO 14971 gefordert können Eigenschaften von Medizinprodukten und dahingehend anwendbare Risiken beschrieben werden. Da die DGIHV erfreulicherweise die Definition von Eigenschaften und Risiken für Gruppen von Medizinprodukten (z.B. Prothesen und Orthesen im allgemeinen) als angemessen betrachtet, werden alle Bewertungen prozessweise zugeordnet. 
 Ferner werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [config.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt. Die Schwelle ist das Produkt aus Wahrscheinlichkeit x Schaden gemäß der jeweiligen Positionen in den Auflistungen der Sprachdateien für risk.probabilities und risk.damages. Diese Methode ist der praktischste Weg einer algorithmischen Verarbeitung und Hervorhebung des Akzeptanzbereichs.
@@ -504,7 +504,7 @@ Die Einträge können nicht gelöscht und durch das [Regulatorische Auswertungen
 [Übersicht](#übersicht)
 
 ### Audit
-Die Anwendung ermöglicht die Vorbereitung von internen Audits, inklusive der Ziele und eines Imports vorausgegangener Zusammenfassungen des gewählten Bereichs. Die Formulierung von Fragen anderer Vorlagen kann wiederverwendet und den Fragen der regulatorische Zusammenhang zugeordnet werden. Bei der Erstellung eines Auditprogramms können Fragen hinzugefügt, entfernt und umsortiert werden. Die Zusammenfassung des vorherigen Audits für den jeweiligen Bereich kann importiert werden um beim bevorstehenden Audit Bezug zu nehmen.
+Die Anwendung ermöglicht die Vorbereitung von internen Audits, inklusive der Ziele und eines Imports vorausgegangener Zusammenfassungen des gewählten Bereichs. Die Formulierung von Fragen anderer Vorlagen kann wiederverwendet und den Fragen der regulatorische Zusammenhang zugeordnet werden. Bei der Erstellung eines Auditprogramms können Fragen hinzugefügt, entfernt, [umsortiert](#verschiedenes) und reimportiert werden. Die Zusammenfassung des vorherigen Audits für den jeweiligen Bereich kann importiert werden um beim bevorstehenden Audit Bezug zu nehmen.
 Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt werden um die jeweiligen Bereiche zu informieren.
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20de.png)
@@ -1056,7 +1056,7 @@ Sofern keine Berührungsängste bestehen JSON-Dateien wie die Sprachdateien oder
 * texttemplates.XX.env/.json
 * users.env/.json
 
-innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original Templates](https://github.com/erroronline1/caro/tree/master/templates) (für den Fall dass diese nicht zur Verfügung gestellt wurden) entsprechen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden.
+innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original Templates](https://github.com/erroronline1/caro/tree/master/templates) (für den Fall dass diese nicht zur Verfügung gestellt wurden) entsprechen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
 
 ### Installation
 * Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*, Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind.
@@ -1150,7 +1150,8 @@ order_approvalsignature_image = 2048 ; maximale Pixel für längste Seite
 order_approved_archived = 512 ; Plant eine Überprüfung der archivierten Bestellungen um aufzuräumen
 qr_errorlevel = 'L'; `'L'`, `'M'`, `'Q'` oder `'H'` - H für höchste Fehlertoleranz, aber auch höhere Pixeldichte
 record_image = 2048 ; maximale Pixel für längste Seite
-risk_acceptance_level = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe 
+risk_acceptance_level = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe
+storage_warning = 10 ; Gigabyte, ein niedrigerer Wert für verbleibenden Speicherplatz erzeugt eine Warnung auf der Startseite
 user_image = 256 ; maximale Pixel für längste Seite
 
 ; Berechtigungen gemäß der in den Sprachdateien aufgeführten permissions
@@ -1336,6 +1337,7 @@ Im Falle einer Anpassung des Quelltexts:
 *  Die Anwendung ist für die Verwendung auf Apache2 mit MySQL/MariaDB und IIS mit SQL Server gestaltet und [getested](#voraussetzungen). Für andere Server/Datenbank-Konfigurationen müssen gegebenenfalls zusätzliche vorbereitete Datenbankabfragen und Zugangsbeschränkungen zum Dateispeicher (`UTILITY::createDirectory()`) eingepflegt werden.
 * der [CSV-Prozessor](#csv-prozessor) liefert ein assoziatives Array, daher muss eine nachgelagerte Verarbeitung der Daten selbst implementiert werden.
 * Änderungen der Datenbankstruktur während der Laufzeit ist bei Nutzung von SQL Server eine Herausforderung, da hier Änderungen an der Struktur verhindert werden (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Das Hinzufügen von Spalten an das Ende erscheint einfacher als zwischen vorhandene. Dynamisch hinzugefügte Spalten müssen nullbar sein, was zu beachten ist, sollen Null-Werte eine Bedeutung erhalten. Während der Entwicklung kann die Änderung von Tabellen [aktiviert werden, falls sie standardmäßig deaktiviert ist](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
+* Einstellungen um einen lokalen Server der Entwicklungsumgebung zu erreichen: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 
 [Übersicht](#übersicht)
