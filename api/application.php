@@ -49,7 +49,7 @@ class APPLICATION extends API {
 		foreach (['../', '../js', '../api', '../templates'] as $dir){
 			foreach (scandir($dir) as $file){
 				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json'])) continue;
-				foreach(file($dir.'/'.$file) as $row){
+				foreach(file($dir . '/' . $file) as $row){
 					if (in_array(pathinfo($file)['extension'], ['php','ini'])){
 						$lines['backend']++;
 						$lines['code']++;
@@ -66,6 +66,7 @@ class APPLICATION extends API {
 					if (in_array(pathinfo($file)['extension'], ['md'])){
 						$lines['documentation']++;				
 					}
+					//$byte+= strlen($row);
 				}
 			}
 		}
@@ -763,6 +764,18 @@ class APPLICATION extends API {
 			];
 		}
 		if (count($tiles)) $result['render']['content'][] = $tiles;
+
+		// storage warning
+		$storage = round(disk_free_space("/") / pow(1024, 3), 3);
+		if ($storage < CONFIG['limits']['storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
+			$result['render']['content'][] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
+					'class' => 'red'
+				]
+			];
+		}
 
 		// append search function to landing page
 		$searchelements = [
