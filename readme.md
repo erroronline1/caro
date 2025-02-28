@@ -119,6 +119,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests (sample tables for csv filtering, embed into _stresstest to pass a suitable filter)
 * update readme pictures on tools menu, record menu, audit and regulatory
 * autocomplete for texttemplate placeholders per word starting with : (assemble.textarea)
+* server responds with 413 after a few successful image tool queries, has to be restarted
+* downloaded resized images are bigger than generated within temp
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
