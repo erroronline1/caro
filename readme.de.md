@@ -376,10 +376,12 @@ Verfügbare Elemente für Dokumente sind:
 * Foto-Upload, optional als Mehrfachauswahl. Mobile Geräte greifen auf die Kamera zu, Desktop-Geräte öffnen eine Dateiauswahl
 * Unterschriftenfeld
 * Kalenderschaltfläche
-* Dokumentenverknüpfung, nur zur Ansicht oder als Weiterleitung mit übernahme eines Identifikators 
+* Dokumentenverknüpfung, nur zur Ansicht oder als Weiterleitung mit Übernahme eines Identifikators 
 
 Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren.
 Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
+
+> [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Dieser Export beinhaltet die jeweils neusten Daten der verschiedenen Fragestellungen innerhalb der Dokumente in einer entsprechenden Tabellenspalte. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
 
 #### *Caveat:*
 Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
@@ -867,6 +869,7 @@ Dieses Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen
 Ferner hoffentlich hilfreiche Informationen zu
 * der Angemessenheit aktueller Dokumente incl. einem Nutzungszähler gemäß Aufzeichnungen
 * Bestellstatistiken in Form eines strukturierten Excel-Export um die Lieferantenbewertung basierend auf Lieferdaten zu ergänzen
+* Versorgungsstatistiken, bei Export aller verfügbaren Versorgungsaufzeichnungen innerhalb eines wählbaren Zeitraumes, deren Inhalte beliebig ausgewertet werden können, vorausgesetzt die [Dokumente](#dokumente) haben einzigartige Fragestellungen
 
 ![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20de.png)
 

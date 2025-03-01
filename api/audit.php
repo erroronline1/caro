@@ -1962,14 +1962,27 @@ class AUDIT extends API {
 			// add export button
 			$content[] = [
 				[
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records_start_date'),
+						'value' => '2023-10-01',
+						'id' => '_records_start_date'
+					]
+				], [
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.records_end_date'),
+						'value' => $this->_currentdate->format('Y-m-d'),
+						'id' => '_records_end_date'
+					]
+				], [
 					'type' => 'textsection',
 					'content' => $this->_lang->GET('audit.records_hint')
-				],
-				[
+				], [
 					'type' => 'button',
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.record_export_csv'),
-						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_records_start_date').value, document.getElementById('_records_end_date').value)",
 						'data-type' => 'download'
 					]
 				]
@@ -1982,35 +1995,88 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for all of records
 	 */
 	private function exportrecords(){
+		$startDate = $this->_requestedDate ? : '2023-10-01';
+		$endDate = $this->_requestedTime ? : $this->_currentdate->format('Y-m-d');
+
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
-		$tempFile = UTILITY::directory('tmp') . '/' . $this->_currentdate->format('Y-m-d H-i-s ') . '.csv';
-		// iterate over all entries and detect all possible keys aka document fields
-		$keys = ['identifier', 'units'];
+		$result = [];
+		// initiate all possible keys aka document fields
+		$keys = [];
+		$defaultColumn = [
+			'identifier' => '_' . $this->_lang->_DEFAULT['audit']['records_identifier'],
+			'units' => '_' . $this->_lang->_DEFAULT['audit']['records_units'],
+			'from' => '_' . $this->_lang->_DEFAULT['audit']['records_start_date'],
+			'until' => '_' . $this->_lang->_DEFAULT['audit']['records_end_date']
+		];
+		// iterate over all entries, create arrays with all available keys and append to result
 		foreach($records as $row){
+			if (!in_array($row['context'], ['casedocumentation'])) continue;
+
+			$line = [];
+			$skip = false;
 			$row['content'] = json_decode($row['content'], true);
 			foreach($row['content'] as $entry){
+				$currentdate = substr($entry['date'], 0, 10);
+				// check if entry is out of requested timestamp bound
+				if ($currentdate < $startDate || $currentdate > $endDate) {
+					$skip = true;
+					break;
+				}
+				// set timespan information for record
+				if (!isset($line[$defaultColumn['from']])) $line[$defaultColumn['from']] = $currentdate;
+				$line[$defaultColumn['until']] = $currentdate;
+
 				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
-				array_push($keys, ...array_keys($entry['content']));
+				// iterate over all entries, fill up result line with the most recent value
+				foreach($entry['content'] as $field => $input){
+					$field = str_replace('_', ' ', $field);
+					if ($input) {
+						if (!in_array($field, $keys)) $keys[] = $field;
+						$line[$field] = $input;
+					}
+				}
 			}
+			if ($skip) continue;
+
+			// complete default columns and append to result
+			$line[$defaultColumn['identifier']] = $row['identifier'];
+			$line[$defaultColumn['units']] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, explode(',', $row['units'])));
+			$result[] = $line;
 		}
-		// iterate over all entries, create array with all keys
+
+		// sort keys and unshift leading default columns
+		sort($keys, SORT_REGULAR);
+		array_unshift($keys,
+			$defaultColumn['identifier'],
+			$defaultColumn['units'],
+			$defaultColumn['from'],
+			$defaultColumn['until']
+		);
+	
+		// write csv file
+		$tempFile = UTILITY::directory('tmp') . '/' . $this->_currentdate->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+		// header
 		fputcsv($file, $keys,
 			CONFIG['csv']['dialect']['separator'],
 			CONFIG['csv']['dialect']['enclosure'],
 			CONFIG['csv']['dialect']['escape']);
-		foreach($records as $row){
-			$line = array_fill_keys($keys, '');
-			$line['identifier'] = $row['identifier'];
-			$line['units'] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, explode(',', $row['units'])));
-			$row['content'] = json_decode($row['content'], true);
-			foreach($row['content'] as $entry){
-				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
-				foreach($entry['content'] as $field => $input){
-					if ($input) $line[$field] = $input;
-				}
+		// rows
+		foreach($result as $line){
+			// complete and sort line columns, unshift default columns
+			foreach(array_diff($keys, array_keys($line)) as $nkey){
+				$line[$nkey] = '';
 			}
+			ksort($line, SORT_REGULAR);
+			$line = array_merge([
+				$defaultColumn['identifier'] => $line[$defaultColumn['identifier']],
+				$defaultColumn['units'] => $line[$defaultColumn['units']],
+				$defaultColumn['from'] => $line[$defaultColumn['from']],
+				$defaultColumn['until'] => $line[$defaultColumn['until']]
+			], $line);
+
+			// write to file
 			fputcsv($file, $line,
 			CONFIG['csv']['dialect']['separator'],
 			CONFIG['csv']['dialect']['enclosure'],
@@ -2019,9 +2085,9 @@ class AUDIT extends API {
 		fclose($file);
 
 		// provide downloadfile
-		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => 'Export.csv'])] = [
+		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'])] = [
 			'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-			'download' => 'Export.csv'
+			'download' => $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv'
 		];
 
 		$body = [];

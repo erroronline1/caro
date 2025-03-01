@@ -179,7 +179,7 @@
 		},
 		"search": "Search documents, records and files",
 		"search_empty": "Nothing found...",
-		"storage_warning" : "There are only :space left for storage! Please take care of a storage extension as soon as possible!",
+		"storage_warning": "There are only :space left for storage! Please take care of a storage extension as soon as possible!",
 		"terms_of_service": {
 			"Data safety": "This application contains sensitive data. Please do not leave the device unattended while being logged in to avoid unintended data dissemination. Be aware sensitive data can be compromised by taking screenshots or switching apps, avoid exposure of the contents outside of the application. If you export sensitive data outside of the application you are responsible for a secure handling. Even with a disabled device the application may be still active in the background. On connection loss sensitive data is stored on the device. Please make sure to gain network access as soon as possible to flush the data to the server for safety and consistent documentation reasons. Log out of the application if unused and do not leave it unattended. Use only valid devices to ensure a safe data handling. In case of a lost access token inform a user of following permission groups immediately: :permissions",
 			"Your data": "This application is part of quality management control. Your data is necessary for documentation and ressource management. You can check your data within your profile. Some data may have to be set by a member of the administration, other can be set and appended by yourself. In case your account is deleted, sent messages and common used information (orders, checks, approvals, your name as author and contributor to documentation) remain within the system due to legitimate interest of consistent documentation and operational procedures.",
@@ -520,7 +520,11 @@
 		"record_export": "Export record as PDF",
 		"record_export_csv": "Export record as CSV",
 		"record_export_xlsx": "Export record as XLSX",
-		"records_hint": "The most recent entries of all treatment documentations are about to be exported. These can be statistically analysed.",
+		"records_end_date": "Until",
+		"records_hint": "The most recent entries of all treatment documentations starting within the given time period are about to be exported. These can be statistically analysed.",
+		"records_identifier": "Identifier",
+		"records_start_date": "From",
+		"records_units": "Units",
 		"regulatory_warning_content": "This regulatory issue has no assigned documents!",
 		"risk_export_column": {
 			"acceptancelevel": "Acceptance level",

@@ -109,7 +109,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * recall option (how?)
 * post-market surveillance (how?)
 * post-market evaluation (how?)
-* statistics on documentation entries -> csv export
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
@@ -447,7 +446,7 @@ Available elements for documents are:
 * links
 * multiple selection options
 * single selection options (buttons)
-* single selection options (list), optional as multiple. Entries are displayed in the given order. If provided in alphabetical order (punctiation, A-Z, a-z) the list will be grouped by initials on more than 12 entries. 
+* single selection options (list), optional as multiple. Entries are displayed in the given order. If provided in alphabetical order (punctuation, A-Z, a-z) the list will be grouped by initials on more than 12 entries. 
 * file upload, optional as multiple
 * photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
 * signature field
@@ -456,6 +455,8 @@ Available elements for documents are:
 
 Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
 Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
+
+> [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) allow for an export of records data. This export contains the most recent data of distinct document issues in their respective table column. It is beneficial and recommended that document issues do not repeat themself within components and documents. Repetitions do not harm the documentation per se, but limit the analytical possibilities for the data dump.
 
 #### *Caveat:*
 Some elements are only processible as proper records.
@@ -939,6 +940,7 @@ This module gathers data from the application in regards of proofing lists for f
 Furthermore hopefully beneficial information on
 * appropriateness of current documents including a use count gathered from records
 * order statistics as a structured Excel-export to support vendor evaluation based on delivery data
+* treatment statistics, as all treatment-records within a given timespan can be exported for analysis of distinct record topics, given the [documents](#documents) provide distinct issues
 
 ![regulatory screenshot](http://toh.erroronline.one/caro/regulatory.png)
 
@@ -2402,15 +2404,15 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | optional | adds contents based on given type to response |
-| {date} | path parameter | optional | e.g. documents validity limited to date/time |
-| {time} | path parameter | optional | e.g. documents validity limited to date/time |
+| {date} | path parameter | optional | e.g. contents validity limited to date/time |
+| {time} | path parameter | optional | e.g. contents validity limited to date/time |
 
 Sample response
 ```
 {"render":{"content":[[{"type":"select","content":{"Incorporated articles":{"value":"incorporation"},"Current documents in use":{"value":"documents"},"User certificates and other files":{"value":"userskills"},"Vendor list":{"value":"vendors"},"Regulatory issues considered by documents and documents":{"value":"regulatory"}},"attributes":{"name":"Select type of data","onchange":"api.audit('get', 'checks', this.value)"}}]]}}
 ```
 
-> GET ./api/api.php/audit/export/{type}/{date}/{time}
+> GET ./api/api.php/audit/export/{type}/{date}/{date/time}
 
 Returns a download link to a temporary file based on type.
 
@@ -2418,8 +2420,8 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | {type} | path parameter | required | defines the response, none if omitted |
-| {date} | path parameter | optional | e.g. documents validity limited to date/time |
-| {time} | path parameter | optional | e.g. documents validity limited to date/time |
+| {date} | path parameter | optional | e.g. contents validity limited to date/time |
+| {date/time} | path parameter | optional | e.g. contents validity limited to date/time |
 
 Sample response
 ```

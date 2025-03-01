@@ -520,7 +520,11 @@
 		"record_export": "Aufzeichnung als PDF exportieren",
 		"record_export_csv": "Aufzeichnung als CSV exportieren",
 		"record_export_xlsx": "Aufzeichnung als XLSX exportieren",
-		"records_hint": "Es werden die jeweils neuesten Einträge aller Versorgungsdokumentationen exportiert. Diese können im Anschluss statistisch ausgewertet werden.",
+		"records_end_date": "Bis",
+		"records_hint": "Es werden die jeweils neuesten Einträge aller Versorgungsdokumentationen, die im angegebenen Zeitraum begonnen wurden, exportiert. Diese können im Anschluss statistisch ausgewertet werden.",
+		"records_identifier": "Identifikator",
+		"records_start_date": "Von",
+		"records_units": "Bereiche",
 		"regulatory_warning_content": "Dieses regulatorische Thema hat kein zugeordenes Dokument!",
 		"risk_export_column": {
 			"acceptancelevel": "Akzeptanzlevel",
