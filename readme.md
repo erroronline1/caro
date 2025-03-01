@@ -109,14 +109,14 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * recall option (how?)
 * post-market surveillance (how?)
 * post-market evaluation (how?)
-* statistics on documentation entries
+* statistics on documentation entries -> csv export
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
 * text recommendation templates
 * document templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* unittests (sample tables for csv filtering, embed into _stresstest to pass a suitable filter)
+* unittests
 * update readme pictures on tools menu, record menu, audit and regulatory
 
 # Aims

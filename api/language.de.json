@@ -179,7 +179,7 @@
 		},
 		"search": "Suche nach Dokumenten, Aufzeichnungen und Dateien",
 		"search_empty": "Es wurde nichts passendes gefunden...",
-		"storage_warning" : "Es sind nur noch :space für eine Speicherung verfügbar! Bitte kümmere dich schnellstmöglich um eine Speichererweiterung!",
+		"storage_warning": "Es sind nur noch :space für eine Speicherung verfügbar! Bitte kümmere dich schnellstmöglich um eine Speichererweiterung!",
 		"terms_of_service": {
 			"Datenschutz": "Diese Anwendung enthält sensible Daten. Bitte lass das Gerät nicht unbeaufsichtigt während du angemeldet bist um eine unbeabsichtigte Verbeitung der Daten zu vermeiden. Beachte, dass sensible Daten durch Bildschirmaufnahmen und Anwendungswechsel kompromittiert werden können und vermeide die Verbreitung außerhalb der Anwendung. Wenn du sensible Daten aus der Anwendung exportierst bist du selbst für eine sichere Behandlung verantwortlich. Auch bei einer Gerätesperre kann die Anwendung im Hintergrund aktiv sein. Bei Verbdingunsabbrüchen werden sensible Daten auf dem Gerät gespeichert. Bitte stelle schnellstmöglich eine Netzwerkverbindung her, damit die Daten bereinigt und auf dem Server im Sinne der Datensicherheit und durchgängigen Dokumentation verarbeitet werden können. Melde dich ab, wenn du die Anwendung nicht verwendest und lasse das Gerät nicht unbeaufsichtigt. Verwende nur zugelassene Geräte um die Datensicherheit zu gewährleisten. Informiere im Falle eines Verlusts deiner Zugangskennung für eine Neuvergabe unverzüglich einen Mitarbeiter der folgenden Berechtigungsgruppen: :permissions",
 			"Personenbezoge Daten (Nutzer)": "Diese Anwendung ist Bestandteil des Qualitätsmanagements. Deine Daten sind für die Dokumentation und die Ressourceplanung erforderlich. Deine Daten sind in deinem Profil einsehbar. Manche Daten können nur durch die Leitung bearbeitet werden, andere von dir selbst. Im Falle einer Löschung deines Nutzerprofils verbleiben gesendete Nachrichten und allgemein genutzte Informationen (Bestellungen, Prüfungen, dein Name als Verfasser und Mitarbeiter für die Dokumentation) aufgrund berechtigten Interesses im Sinne einer durchgängigen Dokumentation und operativer Prozesse im System.",
@@ -476,6 +476,7 @@
 			"incorporation": "Produkte - Einführungen",
 			"mdrsamplecheck": "Produkte - MDR Stichprobenprüfung",
 			"orderstatistics": "Lieferanten Bestellstatistik",
+			"records": "Aufzeichnungsexport",
 			"regulatory": "Gültige Dokumente - Erfüllung regulatorischer Anforderungen",
 			"risks": "Risikomanagement",
 			"skillfulfilment": "Mitarbeiter Qualifikationserfüllung",
@@ -517,7 +518,9 @@
 		"orderstatistics_truncate_confirm": "Ja, unwiderruflich löschen",
 		"orderstatistics_truncate_success": "Bestellstatistiken wurden gelöscht.",
 		"record_export": "Aufzeichnung als PDF exportieren",
+		"record_export_csv": "Aufzeichnung als CSV exportieren",
 		"record_export_xlsx": "Aufzeichnung als XLSX exportieren",
+		"records_hint": "Es werden die jeweils neuesten Einträge aller Versorgungsdokumentationen exportiert. Diese können im Anschluss statistisch ausgewertet werden.",
 		"regulatory_warning_content": "Dieses regulatorische Thema hat kein zugeordenes Dokument!",
 		"risk_export_column": {
 			"acceptancelevel": "Akzeptanzlevel",

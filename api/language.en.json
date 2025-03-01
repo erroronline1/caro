@@ -476,6 +476,7 @@
 			"incorporation": "Products - incorporations",
 			"mdrsamplecheck": "Products - MDR sample check",
 			"orderstatistics": "Vendor order statistics",
+			"records": "Record export",
 			"regulatory": "Current documents - regulatory issues considered",
 			"risks": "Risk management",
 			"skillfulfilment": "Employee skill fulfilment",
@@ -517,7 +518,9 @@
 		"orderstatistics_truncate_confirm": "Yes, irreversibly delete",
 		"orderstatistics_truncate_success": "Order statistics have been deleted.",
 		"record_export": "Export record as PDF",
+		"record_export_csv": "Export record as CSV",
 		"record_export_xlsx": "Export record as XLSX",
+		"records_hint": "The most recent entries of all treatment documentations are about to be exported. These can be statistically analysed.",
 		"regulatory_warning_content": "This regulatory issue has no assigned documents!",
 		"risk_export_column": {
 			"acceptancelevel": "Acceptance level",

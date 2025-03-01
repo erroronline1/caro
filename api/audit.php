@@ -974,6 +974,7 @@ class AUDIT extends API {
 					'vendors', // vendor list
 					'orderstatistics', // order statistics
 					'complaints', // complaints within records
+					'records',
 					'regulatory', // regulatory issues
 					'risks', // risks
 					'trainingevaluation', // training evaluation
@@ -1079,6 +1080,7 @@ class AUDIT extends API {
 			'vendors',
 			'orderstatistics',
 			'complaints',
+			'records',
 			'regulatory',
 			'risks'
 		];
@@ -1834,7 +1836,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'value' => $this->_lang->GET('audit.record_export_xlsx'),
 						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
-					'data-type' => 'download'
+						'data-type' => 'download'
 					]
 				]
 			];
@@ -1942,6 +1944,96 @@ class AUDIT extends API {
 				'msg' => $this->_lang->GET('audit.orderstatistics_truncate_success'),
 				'type' => 'success'
 			]
+		]);
+	}
+
+	/**
+	 *                         _     
+	 *   ___ ___ ___ ___ ___ _| |___ 
+	 *  |  _| -_|  _| . |  _| . |_ -|
+	 *  |_| |___|___|___|_| |___|___|
+	 *
+	 * creates an xlsx-file with all recent record parameters combined, suitable for data analysis
+	 */
+	private function records(){
+		$content = [];
+
+		if (PERMISSION::permissionFor('regulatoryoperation')){
+			// add export button
+			$content[] = [
+				[
+					'type' => 'textsection',
+					'content' => $this->_lang->GET('audit.records_hint')
+				],
+				[
+					'type' => 'button',
+					'attributes' => [
+						'value' => $this->_lang->GET('audit.record_export_csv'),
+						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+						'data-type' => 'download'
+					]
+				]
+			];
+		}
+		return $content;
+	}
+
+	/**
+	 * creates and returns a download link to the export file for all of records
+	 */
+	private function exportrecords(){
+		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$tempFile = UTILITY::directory('tmp') . '/' . $this->_currentdate->format('Y-m-d H-i-s ') . '.csv';
+		// iterate over all entries and detect all possible keys aka document fields
+		$keys = ['identifier', 'units'];
+		foreach($records as $row){
+			$row['content'] = json_decode($row['content'], true);
+			foreach($row['content'] as $entry){
+				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
+				array_push($keys, ...array_keys($entry['content']));
+			}
+		}
+		// iterate over all entries, create array with all keys
+		$file = fopen($tempFile, 'w');
+		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+		fputcsv($file, $keys,
+			CONFIG['csv']['dialect']['separator'],
+			CONFIG['csv']['dialect']['enclosure'],
+			CONFIG['csv']['dialect']['escape']);
+		foreach($records as $row){
+			$line = array_fill_keys($keys, '');
+			$line['identifier'] = $row['identifier'];
+			$line['units'] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, explode(',', $row['units'])));
+			$row['content'] = json_decode($row['content'], true);
+			foreach($row['content'] as $entry){
+				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
+				foreach($entry['content'] as $field => $input){
+					if ($input) $line[$field] = $input;
+				}
+			}
+			fputcsv($file, $line,
+			CONFIG['csv']['dialect']['separator'],
+			CONFIG['csv']['dialect']['enclosure'],
+			CONFIG['csv']['dialect']['escape']);
+		}
+		fclose($file);
+
+		// provide downloadfile
+		$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => 'Export.csv'])] = [
+			'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+			'download' => 'Export.csv'
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
 		]);
 	}
 
