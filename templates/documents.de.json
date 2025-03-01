@@ -71,7 +71,8 @@
 						"type": "text",
 						"attributes": {
 							"name": "Kostenträger"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "textarea",
@@ -86,14 +87,16 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Leistung, Produkt oder Verordnungstext"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "text",
 						"attributes": {
 							"name": "Verordner"
 						},
-						"hint": "namentlich"
+						"hint": "namentlich",
+						"autocomplete": true
 					},
 					{
 						"type": "text",
@@ -150,7 +153,8 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Leistung"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "checkbox",
@@ -406,7 +410,8 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Hilfsmittel"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "checkbox",
@@ -599,7 +604,8 @@
 						"attributes": {
 							"name": "Anmerkungen zur Anprobe"
 						},
-						"hint": "z.B. weitere Ergebnisse, Dauer, Vereinbarungen"
+						"hint": "z.B. weitere Ergebnisse, Dauer, Vereinbarungen",
+						"autocomplete": true
 					},
 					{
 						"type": "calendarbutton",
@@ -908,7 +914,8 @@
 							"name": "Verordner",
 							"required": true
 						},
-						"hint": "namentlich"
+						"hint": "namentlich",
+						"autocomplete": true
 					},
 					{
 						"type": "textsection",
@@ -1021,14 +1028,16 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Leistung, Produkt oder Verordnungstext"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "text",
 						"attributes": {
 							"name": "Verordner"
 						},
-						"hint": "namentlich"
+						"hint": "namentlich",
+						"autocomplete": true
 					}
 				],
 				[
@@ -1050,7 +1059,8 @@
 						"attributes": {
 							"name": "Arbeitszeit, Material"
 						},
-						"hint": "sofern zutreffend"
+						"hint": "sofern zutreffend",
+						"autocomplete": true
 					}
 				]
 			]
@@ -1207,7 +1217,8 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Kommentar"
-						}
+						},
+						"autocomplete": true
 					}
 				]
 			]
@@ -1639,7 +1650,8 @@
 						"type": "text",
 						"attributes": {
 							"name": "Diagnose"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "text",
@@ -1891,20 +1903,23 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Maßnahmen zur Stumpfformung"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "textarea",
 						"attributes": {
 							"name": "Vorversorgungen"
 						},
-						"hint": "Ggf. Ausführungsbeschreibung"
+						"hint": "Ggf. Ausführungsbeschreibung",
+						"autocomplete": true
 					},
 					{
 						"type": "text",
 						"attributes": {
 							"name": "Tragedauer"
-						}
+						},
+						"autocomplete": true
 					}
 				],
 				[
@@ -1919,7 +1934,8 @@
 						"attributes": {
 							"name": "Wohnumfeld"
 						},
-						"hint": "z.b. Familie, Kinder, pflegebedürftige Angehörige, Wohn-, Betreuungssituation"
+						"hint": "z.b. Familie, Kinder, pflegebedürftige Angehörige, Wohn-, Betreuungssituation",
+						"autocomplete": true
 					},
 					{
 						"type": "text",
@@ -1936,7 +1952,8 @@
 					{
 						"type": "textarea",
 						"attributes": {
-							"name": "Therapieziel oder Patientenerwartung"
+							"name": "Therapieziel oder Patientenerwartung",
+							"autocomplete": true
 						}
 					},
 					{
@@ -2192,7 +2209,8 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Material, Stärke, sonstige Polster"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "checkbox",
@@ -2208,7 +2226,8 @@
 						"type": "text",
 						"attributes": {
 							"name": "Material, Stärke"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "checkbox",
@@ -2225,7 +2244,8 @@
 						"type": "text",
 						"attributes": {
 							"name": "Dekopapier, Stoff, Farbe"
-						}
+						},
+						"autocomplete": true
 					}
 				],
 				[
@@ -2251,7 +2271,8 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "individueller Armierungsplan"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "photo",

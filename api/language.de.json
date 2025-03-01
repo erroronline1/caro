@@ -226,6 +226,7 @@
 				"unit": "Typischerweise verwendet von"
 			},
 			"component": {
+				"autocomplete":"Bisherige Eingaben vorschlagen",
 				"availability": "Komponente verbergen",
 				"availability_hint": "Verborgene Komponenten werden in der Auswahl der freigegebenen Komponenten nicht angezeigt.",
 				"calendarbutton": "Füge eine Kalenderschaltfläche hinzu",

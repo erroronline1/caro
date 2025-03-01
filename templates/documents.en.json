@@ -71,7 +71,8 @@
 						"type": "text",
 						"attributes": {
 							"name": "Insurance"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "textarea",
@@ -86,14 +87,16 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Service, aid or recipe"
-						}
+						},
+						"autocomplete": true
 					},
 					{
 						"type": "text",
 						"attributes": {
 							"name": "Prescriber"
 						},
-						"hint": "named"
+						"hint": "named",
+						"autocomplete": true
 					},
 					{
 						"type": "text",

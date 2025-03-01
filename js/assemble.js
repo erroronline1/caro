@@ -1631,6 +1631,7 @@ export class Assemble {
 	 * 		},
 	 * 		"datalist": ["some", "predefined", "values"]
 	 * 	}
+	 * the optional autocomplete-property in composed widgets for documents will be populated with a datalist from the api side if respective contents are found based on the widgets name
 	 */
 	input(type) {
 		let input = document.createElement("input"),
@@ -2637,6 +2638,7 @@ export class Assemble {
 	 * 		},
 	 * 		"autocomplete": [...string values]
 	 * 	}
+	 * the optional autocomplete-property in composed widgets for documents will be populated with a autocomplete data set from the api side if respective contents are found based on the widgets name
 	 * ```
 	 */
 	textarea() {

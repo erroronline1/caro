@@ -434,8 +434,8 @@ Available elements for documents are:
 * scanner field, optional as multiple and context identifier
 * text section for information purpose without input
 * image for including e.g. infographics
-* single line text input, optional as multiple
-* multi line text input, optional access to text templates
+* single line text input, optional as multiple and with former inputs recommended
+* multi line text input, optional access to text templates and with former inputs recommended
 * number input, optional as multiple. Controls appearance of keypad on mobile devices
 * date input. Controls appearance of input options
 * phone input. Controls appearance of keypad on mobile devices
@@ -466,7 +466,7 @@ Some elements are only processible as proper records.
 * signature and
 * calendarbutton
 
-are not processable for document-contexts within the [languagefiles](#customisation) group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored.
+are not processable for document-contexts within the [languagefiles](#customisation) group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored. Former input recommendations are not available.
 
 Screen document
 
@@ -4384,7 +4384,7 @@ I welcome any constructive input on this topic.
 * O.Data_17 Für alle Cookies, die sensible Daten enthalten, MUSS das Secure-Flag gesetzt sein.
     > [Installation](#installation)
 * O.Data_18 Für alle Formularfelder mit sensiblen Eingabedaten MUSS die Autocomplete-Funktion abgeschaltet sein.
-    > All inputs are rendered without autocomplete by default.
+    > All inputs are rendered without autocomplete by default. Datalists may be provided with former inputs to ensure a consistent documentation. Datalists are provided by the backend and relate only fields namewise. The browser will not store single and collections of inputs.
 * O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein (d.h. Vermeidung von Domain-Cookies).
     > Only a session cookie is created, IndexedDB has same-origin principle by default.
 

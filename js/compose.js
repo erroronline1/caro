@@ -224,6 +224,7 @@ export const compose_helper = {
 			if (siblingName === api._lang.GET("assemble.compose.component.field_hint") && siblingValue) element.hint = siblingValue;
 			if (siblingName === api._lang.GET("assemble.compose.component.required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
+			if (siblingName === api._lang.GET("assemble.compose.component.autocomplete") && sibling.checked && !("autocomplete" in element)) element.autocomplete = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
 				element.attributes.onclick = "api.record('get','displayonly', '" + element.attributes.value + "')";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_display_button", { ":document": element.attributes.value });
@@ -745,6 +746,7 @@ export const compose_helper = {
 				if (siblingName === api._lang.GET("assemble.compose.component.texttemplate")) sibling.checked = Boolean(element.texttemplates);
 				if (siblingName === api._lang.GET("assemble.compose.component.required")) sibling.checked = Boolean("required" in element.attributes && element.attributes.required);
 				if (siblingName === api._lang.GET("assemble.compose.component.multiple")) sibling.checked = Boolean("multiple" in element.attributes && element.attributes.multiple);
+				if (siblingName === api._lang.GET("assemble.compose.component.autocomplete")) sibling.checked = Boolean("autocomplete" in element && element.autocomplete);
 				if (siblingName === api._lang.GET("assemble.compose.component.context_identify")) sibling.checked = Boolean(element.type === "identify");
 
 				if (["links", "radio", "select", "checkbox"].includes(element.type)) {
@@ -1803,6 +1805,11 @@ export class Compose extends Assemble {
 				name: api._lang.GET("assemble.compose.component.multiple"),
 				"data-loss": "prevent",
 			};
+		if (type.autocomplete)
+			this.currentElement.content[api._lang.GET("assemble.compose.component.autocomplete")] = {
+				name: api._lang.GET("assemble.compose.component.autocomplete"),
+				"data-loss": "prevent",
+			};
 		if (type.type === "textarea")
 			this.currentElement.content[api._lang.GET("assemble.compose.component.texttemplate")] = {
 				name: api._lang.GET("assemble.compose.component.texttemplate"),
@@ -2271,6 +2278,7 @@ export class Compose extends Assemble {
 			type: "text",
 			description: api._lang.GET("assemble.compose.component.text"),
 			multiple: "optional",
+			autocomplete: "optional"
 		});
 	}
 
@@ -2287,6 +2295,7 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "textarea",
 			description: api._lang.GET("assemble.compose.component.textarea"),
+			autocomplete: "optional"
 		});
 	}
 

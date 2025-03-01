@@ -224,13 +224,14 @@ class RECORD extends API {
 			'content' => []
 		]];
 
-		// prefill identify if passed, prepare calendar button if part of the document
+		// prefill identify if passed, prepare calendar button and autocomplete if part of the document
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		function setidentifier($element, $identify, $calendar, $_lang){
+		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get');
+		function setidentifier($element, $identify, $calendar, $_lang, $datalists){
 			$content = [];
 			foreach($element as $subs){
 				if (!isset($subs['type'])){
-					$content[] = setidentifier($subs, $identify, $calendar, $_lang);
+					$content[] = setidentifier($subs, $identify, $calendar, $_lang, $datalists);
 				}
 				else {
 					if ($subs['type'] === 'identify'){
@@ -238,7 +239,21 @@ class RECORD extends API {
 					}
 					if ($subs['type'] === 'calendarbutton'){
 						$subs['attributes']['value'] = $_lang->GET('calendar.schedule.new');
-						$subs['attributes']['onclick'] = $calendar->dialog([':type'=>'schedule']);
+						$subs['attributes']['onclick'] = $calendar->dialog([':type' => 'schedule']);
+					}
+					if (isset($subs['autocomplete'])){
+						// translate name as payloadencoded according to LANG::PROPERTY
+						$issue = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+						if (($index = array_search($issue, array_column($datalists, 'issue'))) !== false){
+							if ($subs['type'] === 'text') {
+								$subs['datalist'] = json_decode($datalists[$index]['datalist'], true);
+								unset($subs['autocomplete']);
+							}
+							elseif  ($subs['type'] === 'textarea') {
+								$subs['autocomplete'] = json_decode($datalists[$index]['datalist'], true);
+							}
+						}
+						else unset($subs['autocomplete']);
 					}
 					if (in_array($subs['type'], [
 							'checkbox',
@@ -268,7 +283,7 @@ class RECORD extends API {
 			if ($component){
 				$has_components = true;
 				$component['content'] = json_decode($component['content'], true);
-				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar, $this->_lang));
+				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar, $this->_lang, $datalists));
 			}
 		}
 		if (!$has_components) array_push($return['render']['content'], [[
@@ -776,14 +791,74 @@ class RECORD extends API {
 					$this->_payload->$input = implode(', ', $files);
 				}
 
-				// set up record
-				$current_record = [
-					'author' => $_SESSION['user']['name'],
-					'date' => $entry_timestamp,
-					'document' => $document_id,
-					'content' => UTILITY::json_encode($this->_payload)
-				];
 				if (boolval((array) $this->_payload)){
+					// update record datalists if passed document contains issues permitting autocompletion
+					require_once('_shared.php');
+					$documentfinder = new SHARED($this->_pdo);
+					if ($useddocument = $documentfinder->recentdocument('document_get', [
+						'values' => [
+							':id' => $document_id
+						]])){
+
+						// recursive check for names that permit autocompletion
+						function autocomplete($element){
+							$content = [];
+							foreach($element as $subs){
+								if (!isset($subs['type'])){
+									$content = array_merge($content, autocomplete($subs));
+								}
+								else {
+									if (isset($subs['autocomplete']) && isset($subs['attributes']['name'])) $content[] = $subs['attributes']['name'];
+								}
+							}
+							return $content;
+						};
+
+						if ($issues = autocomplete($useddocument['content'])){
+							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get');
+							foreach($issues as $issue){
+								// translate issue as payloadencoded according to LANG::PROPERTY
+								$issue = preg_replace('/[\s\.]/', '_', $issue);
+								// gather values even for enumerated submissions
+								$values = [];
+								foreach(array_keys((array) $this->_payload) as $key){
+									preg_match('/' . $issue . '(?:$|\()/m', $key, $matches);
+									if ($matches) $values[] = $this->_payload->$key;
+								}
+								if (!$values) continue;
+								// update or create datalist for issue
+								if (($index = array_search($issue, array_column($datalists, 'issue'))) !== false){
+									// issue found, update unique and sorted datalist
+									$datalist = json_decode($datalists[$index]['datalist'], true);
+									array_push($datalist, ...$values);
+									$datalist = array_values(array_unique($datalist));
+									sort($datalist);
+									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_put', ['values' => [
+										':issue' => $issue,
+										':datalist' => UTILITY::json_encode($datalist)
+									]]);
+								}
+								else {
+									// issue not found, add unique and sorted datalist
+									$datalist = array_values(array_unique($values));
+									sort($datalist);
+									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_post', ['values' => [
+										':issue' => $issue,
+										':datalist' => UTILITY::json_encode($datalist)
+									]]);
+								}
+							}
+						}
+					}
+
+					// set up record
+					$current_record = [
+						'author' => $_SESSION['user']['name'],
+						'date' => $entry_timestamp,
+						'document' => $document_id,
+						'content' => UTILITY::json_encode($this->_payload)
+					];
+					
 					$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 						'values' => [
 							':identifier' => $identifier

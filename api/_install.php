@@ -222,10 +222,15 @@ define('DEFAULTSQL', [
 				"	`last_user` int NOT NULL," .
 				"	`last_touch` datetime NOT NULL," .
 				"	`last_document` text COLLATE utf8mb4_unicode_ci NULL," .
-				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`content` longtext COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`notified` int NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
+				.
+				"CREATE TABLE IF NOT EXISTS `caro_records_datalist` (" .
+				"	`issue` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`datalist` longtext COLLATE utf8mb4_unicode_ci NOT NULL" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_risks` (" .
@@ -491,6 +496,12 @@ define('DEFAULTSQL', [
 				"	content varchar(MAX) NOT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_records_datalist', N'U') IS NULL " .
+				"CREATE TABLE caro_records_datalist (" .
+				"	issue varchar(MAX) NOT NULL," .
+				"	datalist varchar(MAX) NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_risks', N'U') IS NULL " .

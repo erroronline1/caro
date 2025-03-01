@@ -743,6 +743,21 @@ class SQLQUERY {
 
 
 
+		'records_datalist_post' => [
+			'mysql' => "INSERT INTO caro_records_datalist (issue, datalist) VALUES (:issue, :datalist)",
+			'sqlsrv' => "INSERT INTO caro_records_datalist (issue, datalist) VALUES (:issue, :datalist)"
+		],
+		'records_datalist_put' => [
+			'mysql' => "UPDATE caro_records_datalist SET datalist = :datalist WHERE issue = :issue",
+			'sqlsrv' => "UPDATE caro_records_datalist SET datalist = :datalist WHERE issue = :issue"
+		],
+		'records_datalist_get' => [
+			'mysql' => "SELECT * FROM caro_records_datalist",
+			'sqlsrv' => "SELECT * FROM caro_records_datalist"
+		],
+		
+
+
 		'risk_post' => [
 			'mysql' => "INSERT INTO caro_risks (id, type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) VALUES (NULL, :type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author)",
 			'sqlsrv' => "INSERT INTO caro_risks (type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) VALUES (:type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author)"

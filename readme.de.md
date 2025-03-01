@@ -359,8 +359,8 @@ Verfügbare Elemente für Dokumente sind:
 * Scannerfeld, optional als Mehrfachauswahl und Identifikator
 * Textabschnitt für informative Zwecke ohne Eingabe
 * Bild um beispielsweise Informationgrafiken einzubinden
-* einfaches Textfeld, optional als Mehrfachauswahl
-* mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge
+* einfaches Textfeld, optional als Mehrfachauswahl und mit Vorschlag vorheriger Eingaben
+* mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge und mit Vorschlag vorheriger Eingaben
 * Nummernfeld, optional als Mehrfachauswahl. Steuert das Erscheinungbild der Tastatur auf mobilen Geräten
 * Datumsfeld. Steuert das Erscheinungbild der Eingabeoptionen
 * Telefonnummernfeld. Steuert das Erscheinungsbild der Tastatur auf mobilen Geräten
@@ -391,7 +391,7 @@ Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
 * Unterschriftenfelder und
 * Kalenderschaltflächen
 
-sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert.
+sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert. Vorschläge vorheriger Eingaben sind hier nicht verfügbar.
 
 Bildschirmformular
 

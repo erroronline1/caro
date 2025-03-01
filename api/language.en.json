@@ -225,7 +225,8 @@
 				"saved": "Bundle saved. Hidden bundles are not reachable",
 				"unit": "Likely used by"
 			},
-			"component": {
+			"component": {				
+				"autocomplete":"Recommend former inputs",
 				"availability": "Component availability",
 				"availability_hint": "Hidden components are not displayed within the selection of latest components above.",
 				"calendarbutton": "Add a calendar button",
