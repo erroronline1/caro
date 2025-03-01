@@ -744,16 +744,16 @@ class SQLQUERY {
 
 
 		'records_datalist_post' => [
-			'mysql' => "INSERT INTO caro_records_datalist (issue, datalist) VALUES (:issue, :datalist)",
-			'sqlsrv' => "INSERT INTO caro_records_datalist (issue, datalist) VALUES (:issue, :datalist)"
+			'mysql' => "INSERT INTO caro_records_datalist (id, issue, unit, datalist) VALUES (NULL, :issue, :unit, :datalist)",
+			'sqlsrv' => "INSERT INTO caro_records_datalist (issue, unit, datalist) VALUES (:issue, :unit, :datalist)"
 		],
 		'records_datalist_put' => [
-			'mysql' => "UPDATE caro_records_datalist SET datalist = :datalist WHERE issue = :issue",
-			'sqlsrv' => "UPDATE caro_records_datalist SET datalist = :datalist WHERE issue = :issue"
+			'mysql' => "UPDATE caro_records_datalist SET datalist = :datalist WHERE issue = :issue AND unit = :unit",
+			'sqlsrv' => "UPDATE caro_records_datalist SET datalist = :datalist WHERE issue = :issue AND unit = :unit"
 		],
 		'records_datalist_get' => [
-			'mysql' => "SELECT * FROM caro_records_datalist",
-			'sqlsrv' => "SELECT * FROM caro_records_datalist"
+			'mysql' => "SELECT * FROM caro_records_datalist WHERE unit = :unit",
+			'sqlsrv' => "SELECT * FROM caro_records_datalist WHERE unit = :unit"
 		],
 		
 

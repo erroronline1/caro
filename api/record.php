@@ -226,7 +226,7 @@ class RECORD extends API {
 
 		// prefill identify if passed, prepare calendar button and autocomplete if part of the document
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get');
+		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $document['unit']]]);
 		function setidentifier($element, $identify, $calendar, $_lang, $datalists){
 			$content = [];
 			foreach($element as $subs){
@@ -815,7 +815,7 @@ class RECORD extends API {
 						};
 
 						if ($issues = autocomplete($useddocument['content'])){
-							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get');
+							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $useddocument['unit']]]);
 							foreach($issues as $issue){
 								// translate issue as payloadencoded according to LANG::PROPERTY
 								$issue = preg_replace('/[\s\.]/', '_', $issue);
@@ -835,6 +835,7 @@ class RECORD extends API {
 									sort($datalist);
 									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_put', ['values' => [
 										':issue' => $issue,
+										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
 									]]);
 								}
@@ -844,6 +845,7 @@ class RECORD extends API {
 									sort($datalist);
 									SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_post', ['values' => [
 										':issue' => $issue,
+										':unit' => $useddocument['unit'],
 										':datalist' => UTILITY::json_encode($datalist)
 									]]);
 								}

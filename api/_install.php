@@ -229,8 +229,11 @@ define('DEFAULTSQL', [
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_records_datalist` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`issue` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`datalist` longtext COLLATE utf8mb4_unicode_ci NOT NULL" .
+				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`datalist` longtext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_risks` (" .
@@ -500,7 +503,9 @@ define('DEFAULTSQL', [
 				.
 				"IF OBJECT_ID(N'caro_records_datalist', N'U') IS NULL " .
 				"CREATE TABLE caro_records_datalist (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
 				"	issue varchar(MAX) NOT NULL," .
+				"	unit varchar(255) NOT NULL," .
 				"	datalist varchar(MAX) NOT NULL" .
 				");"
 				.
