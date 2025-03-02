@@ -1999,6 +1999,7 @@ class AUDIT extends API {
 		$endDate = $this->_requestedTime ? : $this->_currentdate->format('Y-m-d');
 
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$result = [];
 		// initiate all possible keys aka document fields
 		$keys = [];
@@ -2025,11 +2026,17 @@ class AUDIT extends API {
 				// set timespan information for record
 				if (!isset($line[$defaultColumn['from']])) $line[$defaultColumn['from']] = $currentdate;
 				$line[$defaultColumn['until']] = $currentdate;
+				$document_unit = '';
+				if ($docid = array_search($entry['document'], array_column($documents, 'id'))){
+					// add unit to issue for improved distinguishability.
+					// document title would be even better but possibly just too long for a header
+					$document_unit = isset($this->_lang->_DEFAULT['units'][$documents[$docid]['unit']]) ? $this->_lang->_DEFAULT['units'][$documents[$docid]['unit']] . ' - ' : '';
+				}
 
 				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
 				// iterate over all entries, fill up result line with the most recent value
 				foreach($entry['content'] as $field => $input){
-					$field = str_replace('_', ' ', $field);
+					$field = $document_unit . str_replace('_', ' ', $field);
 					if ($input) {
 						if (!in_array($field, $keys)) $keys[] = $field;
 						$line[$field] = $input;
