@@ -108,6 +108,9 @@ class USER extends API {
 				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_homeoffice'));
 				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_language')) ? : 'en';
 				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_theme'));
+				$user['app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_forth'));
+				$user['app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_back'));
+
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, $this->_lang->_USER['units']);
 				}
@@ -380,6 +383,22 @@ class USER extends API {
 							'name' => $this->_lang->GET('user.settings_theme')
 						],
 						'content' => $theme
+					],[
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.settings_autocomplete_forth'),
+							'value' => isset($user['app_settings']['autocomplete_forth']) ? $user['app_settings']['autocomplete_forth'] : 'Alt',
+							'onkeydown' => 'event.preventDefault(); this.value = event.key',
+							'onkeyup' => 'event.preventDefault()'
+						]
+					],[
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.settings_autocomplete_back'),
+							'value' => isset($user['app_settings']['autocomplete_back']) ? $user['app_settings']['autocomplete_back'] : 'AltGraph',
+							'onkeydown' => 'event.preventDefault(); this.value = event.key',
+							'onkeyup' => 'event.preventDefault()'
+						]
 					]
 				];
 				// append primary unit selection for orders

@@ -225,8 +225,8 @@
 				"saved": "Bundle saved. Hidden bundles are not reachable",
 				"unit": "Likely used by"
 			},
-			"component": {				
-				"autocomplete":"Recommend former inputs",
+			"component": {
+				"autocomplete": "Recommend former inputs",
 				"availability": "Component availability",
 				"availability_hint": "Hidden components are not displayed within the selection of latest components above.",
 				"calendarbutton": "Add a calendar button",
@@ -410,7 +410,7 @@
 			"scan_button": "Scan a Code for :field",
 			"scan_multiple": "Another scan option will appear after success or input.",
 			"select_multiple": "Another selection will appear after input.",
-			"textarea_autocomplete": "Press the Alt- or AltGr-key to toggle through available options."
+			"textarea_autocomplete": "Press the :forth- or :back-key to toggle through available options."
 		}
 	},
 	"audit": {
@@ -1343,6 +1343,8 @@
 		"settings": "Application settings",
 		"settings_annual_vacation": "Annual vacation days",
 		"settings_annual_vacation_hint": "YYYY-MM-DD days within every new line\nFirst entry recommended with start date of tracking and left days on this date, earlier entries will be ignored",
+		"settings_autocomplete_back": "Key for former option on multiline text inputs (if available)",
+		"settings_autocomplete_forth": "Key for next option on multiline text inputs (if available)",
 		"settings_force_desktop": "Force desktop mode",
 		"settings_hint": "Some settings require a reload.",
 		"settings_homeoffice": "Homeoffice",

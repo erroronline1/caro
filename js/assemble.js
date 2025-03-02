@@ -2686,16 +2686,24 @@ export class Assemble {
 			 * has to be provided with unique entries!
 			 */
 			let autocomplete = this.currentElement.autocomplete;
+			const forthKey = api._settings.user.app_settings.autocomplete_forth || "Alt",
+				backKey = api._settings.user.app_settings.autocomplete_back || "AltGraph";
+			textarea.addEventListener("keydown", (event) => {
+				if ([forthKey, backKey].includes(event.key)) {
+					event.preventDefault();
+				}
+			});
 			textarea.addEventListener("keyup", (event) => {
-				if (!event.target.value || (event.key.length > 2 && !["Alt", "AltGraph"].includes(event.key))) return;
-				if (["Alt", "AltGraph"].includes(event.key)) event.preventDefault();
+				if ((event.key.startsWith("Arrow") || event.key.startsWith("Back")) && ![forthKey, backKey].includes(event.key)) return;
+				if ([forthKey, backKey].includes(event.key)) {
+					event.preventDefault();
+				}
 				let cursorPosition = event.target.selectionStart,
 					matches = [],
 					start = event.target.value.substring(0, event.target.selectionStart),
 					end = event.target.value.substring(event.target.selectionEnd),
 					words,
 					tail;
-
 				// gather possible matches
 				// to handle adding at the end the content is rewinded from the back
 				words = start.split(" ");
@@ -2711,9 +2719,9 @@ export class Assemble {
 				if (matches.length) {
 					// navigate through matches with alt key
 					if (TEXTAREA_AUTOCOMPLETE_INDEX === null) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
-					if (TEXTAREA_AUTOCOMPLETE_INDEX > -1 && ["Alt", "AltGraph"].includes(event.key)) {
-						if (event.key === "Alt") TEXTAREA_AUTOCOMPLETE_INDEX++;
-						if (event.key === "AltGraph") TEXTAREA_AUTOCOMPLETE_INDEX--;
+					if (TEXTAREA_AUTOCOMPLETE_INDEX > -1 && [forthKey, backKey].includes(event.key)) {
+						if (event.key === forthKey) TEXTAREA_AUTOCOMPLETE_INDEX++;
+						if (event.key === backKey) TEXTAREA_AUTOCOMPLETE_INDEX--;
 						// out of bound
 						if (TEXTAREA_AUTOCOMPLETE_INDEX > matches.length - 1) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
 						if (TEXTAREA_AUTOCOMPLETE_INDEX < 0) TEXTAREA_AUTOCOMPLETE_INDEX = matches.length - 1;
@@ -2723,7 +2731,9 @@ export class Assemble {
 				} else TEXTAREA_AUTOCOMPLETE_INDEX = null;
 				event.target.selectionStart = cursorPosition;
 			});
-			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + api._lang.GET("assemble.render.textarea_autocomplete") : api._lang.GET("assemble.render.textarea_autocomplete");
+			this.currentElement.hint = this.currentElement.hint
+				? this.currentElement.hint + " " + api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey })
+				: api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey });
 		}
 
 		label.dataset.type = this.currentElement.type;
