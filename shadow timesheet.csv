@@ -261,4 +261,5 @@
 22.02.23,5,"documentation, ui, templates"
 24.02.25,1,code maintenance
 28.02.25,7,"ui, csv-processor, unittests, audit-api"
-01.03.25,7,"audit-api, record-api, user-api"
+01.03.25,8,"audit-api, record-api, user-api"
+04.03.25,2,"server config"

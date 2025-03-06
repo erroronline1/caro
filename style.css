@@ -968,14 +968,23 @@ section > div > article {
 	background: none;
 }
 
-article > article {
-	/*tile*/
-	width: calc(33% - 1em);
-	min-width: 13em;
-	margin: 0.5em;
-	height: max-content;
-	vertical-align: top;
-	overflow: hidden;
+article:has(> article) {
+	/* tile container */
+	display: flex;
+	flex-wrap: wrap;
+	align-content: stretch;
+
+	article {
+		/*tile*/
+		width: calc(33% - 1em);
+		min-width: 13em;
+		margin: 0.5em;
+		vertical-align: top;
+		overflow: hidden;
+	}
+	*:not(article) {
+		width: 90%;
+	}
 }
 
 .collapsible {
