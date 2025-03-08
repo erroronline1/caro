@@ -869,7 +869,7 @@ Dieses Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen
 Ferner hoffentlich hilfreiche Informationen zu
 * der Angemessenheit aktueller Dokumente incl. einem Nutzungszähler gemäß Aufzeichnungen
 * Bestellstatistiken in Form eines strukturierten Excel-Export um die Lieferantenbewertung basierend auf Lieferdaten zu ergänzen
-* Versorgungsstatistiken, bei Export aller verfügbaren Versorgungsaufzeichnungen innerhalb eines wählbaren Zeitraumes, deren Inhalte beliebig ausgewertet werden können, vorausgesetzt die [Dokumente](#dokumente) haben einzigartige Fragestellungen
+* Versorgungsstatistiken, bei Export aller verfügbaren Versorgungsaufzeichnungen innerhalb eines wählbaren Zeitraumes, deren Inhalte beliebig ausgewertet werden können, vorausgesetzt die [Dokumente](#dokumente) haben einzigartige Fragestellungen. Die Ausgabedatei ist eine CSV-Datei die unter anderem mit einem entsprechenden Filter auch durch den [CSV-Prozessor](#csv-prozessor) verarbeitet werden kann.
 
 ![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20de.png)
 

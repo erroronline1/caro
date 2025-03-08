@@ -940,7 +940,7 @@ This module gathers data from the application in regards of proofing lists for f
 Furthermore hopefully beneficial information on
 * appropriateness of current documents including a use count gathered from records
 * order statistics as a structured Excel-export to support vendor evaluation based on delivery data
-* treatment statistics, as all treatment-records within a given timespan can be exported for analysis of distinct record topics, given the [documents](#documents) provide distinct issues
+* treatment statistics, as all treatment-records within a given timespan can be exported for analysis of distinct record topics, given the [documents](#documents) provide distinct issues. The export file is a CSV that can be processed with a suitable filter using the [CSV-processor](#csv-processor) too.
 
 ![regulatory screenshot](http://toh.erroronline.one/caro/regulatory.png)
 
