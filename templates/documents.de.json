@@ -1287,6 +1287,12 @@
 					{
 						"type": "textarea",
 						"attributes": {
+							"name": "Ausgelagerte Prozesse"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
 							"name": "Bemerkung zur Evaluation"
 						}
 					}
