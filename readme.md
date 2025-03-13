@@ -119,13 +119,14 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * unittests
 * update readme pictures on tools menu, record menu, audit and regulatory
 * group language consumables.vendor form chunks and check against these on document context vendor_evaluation_document for not being usable on unsetting payload keys
-* record type within dump (e.g. complaints)
+* form name, record type (e.g. complaints) within dump
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
 * management review with templates like audits? fixed paragraphs for required iso issues
 * append vendor evaluation for record safety according to 13485 7.4.1, do not overwrite
 * timesheet correction value e.g. for overtime payout
 * compression calculator (multiple number input, start reduction, max reduction)
+* display approvals by role, name and date on components and documents (editor) instead of simple statement
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
