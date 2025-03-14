@@ -1002,7 +1002,17 @@ class DOCUMENT extends API {
 			$approve['content'][$value] = $component['unit'] === $key ? ['selected' => true] : [];
 		}
 
-		$pending_approvals = PERMISSION::pending('documentapproval', $component['approval']);
+		$fullyapproved = '';
+		if (!($pending_approvals = PERMISSION::pending('documentapproval', $component['approval']))){
+			foreach(json_decode($component['approval'], true) as $position => $data){
+				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
+					':permission' => $this->_lang->GET('permissions.' . $position),
+					':name' => $data['name'],
+					':date' => $data['date'],
+				]) . "\n";
+			}
+		}
+
 		$return['render'] = [
 			'content' => [
 				[
@@ -1109,7 +1119,7 @@ class DOCUMENT extends API {
 					'type' => 'compose_component',
 					'value' => $component['name'],
 					'hint' => ($component['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $component['author'], ':date' => substr($component['date'], 0, -3)]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
-						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.approve.completed')) . '\n \n' .
+						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
 						($dependeddocuments ? $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(',', $dependeddocuments)]) : ''),
 					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : null,
 					'approve' => $approve
@@ -1793,7 +1803,17 @@ class DOCUMENT extends API {
 			if (in_array($value, $document['restricted_access'])) $restricted_access['content'][$translation]['checked'] = true;
 		}
 
-		$pending_approvals = PERMISSION::pending('documentapproval', $document['approval']);
+		$fullyapproved = '';
+		if (!($pending_approvals = PERMISSION::pending('documentapproval', $document['approval']))){
+			foreach(json_decode($document['approval'], true) as $position => $data){
+				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
+					':permission' => $this->_lang->GET('permissions.' . $position),
+					':name' => $data['name'],
+					':date' => $data['date'],
+				]) . "\n";
+			}
+		}
+
 		$return['render'] = [
 			'content' => [
 				[
@@ -1855,7 +1875,7 @@ class DOCUMENT extends API {
 							'hint' => $this->_lang->GET('assemble.compose.document.document_context_hint')
 						],
 						'hint' => ($document['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => substr($document['date'], 0, -3)]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
-						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $this->_lang->GET('assemble.approve.completed')) . '\n \n' .
+						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
 						($dependedbundles ? $this->_lang->GET('assemble.compose.document.document_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
 						($dependedcomponents ? $this->_lang->GET('assemble.compose.document.document_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
 						,
