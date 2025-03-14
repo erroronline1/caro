@@ -1395,17 +1395,19 @@ class DOCUMENT extends API {
 				// check for forbidden names
 				if(UTILITY::forbiddenName($this->_payload->name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 
-				// recursively check for identifier
-				function check4identifier($element, $hasidentifier = false){
-					if ($hasidentifier) return true;
+				// recursively retrieve input names and check for identifier withon component
+				function componentAttributes($element, $result = ['names' => [], 'hasidentifier' => false]){
 					foreach($element as $sub){
 						if (array_is_list($sub)){
-							$hasidentifier = check4identifier($sub, $hasidentifier);
+							$subresult = componentAttributes($sub, $result);
+							$result['names'] = array_merge($result['names'], $subresult['names']);
+							if ($subresult['hasidentifier']) $result['hasidentifier'] = true;
 						} else {
-							if (isset($sub['type']) && $sub['type'] === 'identify') $hasidentifier = true;
+							if (isset($sub['type']) && $sub['type'] === 'identify') $result['hasidentifier'] = true;
+							if (isset($sub['attributes']['name'])) $result['names'][] = $sub['attributes']['name'];
 						}
 					}
-					return $hasidentifier;
+					return $result;
 				}
 				// check for identifier if context makes it mandatory
 				// do this in advance of updating in case of selecting such a context
@@ -1417,10 +1419,33 @@ class DOCUMENT extends API {
 					foreach($this->_payload->content as $component){
 						// get latest approved by name
 						$latestcomponent = $this->latestApprovedName('document_component_get_by_name', $component);
-						if (check4identifier(json_decode($latestcomponent['content'], true)['content'])) $hasidentifier = true;
+						if (componentAttributes(json_decode($latestcomponent['content'], true)['content'])['hasidentifier']) $hasidentifier = true;
 					}
 					if (!$hasidentifier) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.context_missing_identifier'), 'type' => 'error']]);
 				}
+				// check for reserved input names if context makes it mandatory
+				elseif ($this->_payload->context === 'vendor_evaluation_document'){
+					// vendor evaluation documents must not have any of the system language chunks of consumables.vendor
+					// as payload will be filtered for these, missing within evaluation document afterwards
+					// see consumables.php vendor method
+					$hasreservednames = [];
+					$reservednames = [];
+					// get all language values from available languagefiles (json, env)
+					foreach(glob('./language.*') as $file){
+						$file = file_get_contents($file);
+						$filecontent = json_decode($file, true);
+						if (isset($filecontent['consumables']['vendor'])) array_push($reservednames, ...array_values($filecontent['consumables']['vendor']));
+					}
+					// iterate over components and compare name attributes with reservednames
+					foreach($this->_payload->content as $component){
+						// get latest approved by name
+						$latestcomponent = $this->latestApprovedName('document_component_get_by_name', $component);
+						array_push($hasreservednames, ...array_intersect(componentAttributes(json_decode($latestcomponent['content'], true)['content'])['names'], $reservednames));
+					}
+					$hasreservednames = array_unique($hasreservednames);
+					if ($hasreservednames) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.context_forbidden_names', [':names' => implode(', ', $hasreservednames)]), 'type' => 'error']]);
+				}
+
 				// convert values to keys for regulatory_context
 				$regulatory_context = [];
 				if ($this->_payload->regulatory_context) {

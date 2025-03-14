@@ -118,7 +118,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * update readme pictures on tools menu, record menu, audit and regulatory
-* group language consumables.vendor form chunks and check against these on document context vendor_evaluation_document for not being usable on unsetting payload keys
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
 * management review with templates like audits? fixed paragraphs for required iso issues

@@ -252,6 +252,7 @@
 				"component_saved": "Component :name has been saved",
 				"components_info_content": "Choose available elements from this panel. Set your parameters and add fields. Be specific with input names and try to avoid repeating names within components and documents. Add a hint when in doubt.\n \nChange your order by dragging the elements. During composing indicators for containers might not be available. Dragging is available on devices with mice only. You can relocate or delete elements with right-click as well. Reordered images will disappear but still saved.\n \nTo edit an existing element you can drag it onto its creation mask to import its values. You have to delete and reinsert the element, and it doesn't work for images though.",
 				"components_info_description": "What to do",
+				"context_forbidden_names": "This context forbids following names: :names. Please revise used components!",
 				"context_identify": "Context identifier",
 				"context_missing_identifier": "This context requires an identifier field. Please add a component with an identifier!",
 				"date": "Add a date input",
