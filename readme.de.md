@@ -15,7 +15,7 @@
         * [Anleitung](#Anleitung)
     * [Kommunikation](#kommunikation)
         * [Unterhaltungen](#unterhaltungen)
-        * [Verzeichnis](#verzeichnis)
+        * [Mitarbeiterverzeichnis](#mitarbeiterverzeichnis)
         * [Textvorschläge](#textvorschläge)
         * [Verbesserungsvorschläge](#verbesserungsvorschläge)
     * [Aufzeichnungen](#aufzeichnungen)
@@ -206,8 +206,8 @@ Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und 
 
 [Übersicht](#übersicht)
 
-### Verzeichnis
-Das Verzeichnis stellt eine Übersicht über die registrierten Nutzer dar, gruppiert nach Bereichen und Berechtigungen. Nutzern und ganzen Bereichen und Berechtigungsgruppen können direkt von dort aus Nachrichten zugesandt werden.
+### Mitarbeiterverzeichnis
+Das Mitarbeiterverzeichnis stellt eine Übersicht über die registrierten Nutzer dar, gruppiert nach Bereichen und Berechtigungen. Nutzern und ganzen Bereichen und Berechtigungsgruppen können direkt von dort aus Nachrichten zugesandt werden.
 
 [Übersicht](#übersicht)
 
@@ -901,7 +901,7 @@ Anwendungsunterstützung Legende:
 | ISO 13485 5.3 Qualitätspolitik | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 5.4.1 Qualitätsziele | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 5.4.2 Planung des Qualitäts-managementsystems | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
-| ISO 13485 5.5.1 Verantwortung und Befugnis | strukturell | &bull; Nutzern werden [Berechtigungen](#nutzer) erteilt, die spezielle Zugriffe ausdrücklich erlauben oder das Menü vereinfachen.<br/>&bull; Berechtigungen definieren den Zugriff auf Funktionen der Anwendung.<br/>&bull; Nutzer können eine PIN erhalten um Bestellungen freizugeben.<br/>&bull; Das Nutzerverzeichnis listet alle Nutzer auch gruppiert nach organisatorischen Bereichen und Berechtigungen auf.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Nutzer](#nutzer), [Verzeichnis](#verzeichnis), [Laufzeitvariablen](#laufzeitvariablen) |
+| ISO 13485 5.5.1 Verantwortung und Befugnis | strukturell | &bull; Nutzern werden [Berechtigungen](#nutzer) erteilt, die spezielle Zugriffe ausdrücklich erlauben oder das Menü vereinfachen.<br/>&bull; Berechtigungen definieren den Zugriff auf Funktionen der Anwendung.<br/>&bull; Nutzer können eine PIN erhalten um Bestellungen freizugeben.<br/>&bull; Das Mitarbeiterverzeichnis listet alle Nutzer auch gruppiert nach organisatorischen Bereichen und Berechtigungen auf.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Nutzer](#nutzer), [Mitarbeiterverzeichnis](#mitarbeiterverzeichnis), [Laufzeitvariablen](#laufzeitvariablen) |
 | ISO 13485 5.5.2 Beauftragter der Leitung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 5.5.3 Interne Kommunikation | ja, strukturell | &bull; Die Anwendung hat einen internen [Nachrichtendienst](#unterhaltungen). Dieser Dienst wird von internen Modulen genutzt um eine zielführende Datenübermittlung sicherzustellen, z.B. für die Benachrichtigung von Nutzergruppen für die Freigabe von Dokumenten und deren Komponenten, die Benachrichtigung von Nutzergruppen über zurückgewiesene Bestellungen und geänderten Bestellstati, Benachrichtigungen zu zusätzlich erforderlichen Rechechen zu einer Bestellung an den Besteller, Benachrichtigung von Nutzergruppen zu geplanten Ereignissen, Benachrichtigungen über länger unbearbeitete Vorgänge<br/>&bull; Die Anwendung hat einen integrierten Kalender. Dieser soll die Aufgabenplanung und Bearbeitung zeitkritischer wiederkehrender Ereignisse wie Kalibrationsmaßnahmen und dergleichen unterstützen.<br/>&bull; Die Anwendung hat ein Bestellmodul. Bestellungen können vorbereitet und freigegeben werden. Der Einkauf hat alle erforderlichen Daten aus der Lieferantenpreisliste vorliegen um die Bestellung bearbeiten zu können; die Markierung des Bestellstatus erlaubt eine zeitnahe Rückmeldung an den Besteller.<br/>&bull; Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, welche die Möglichkeiten des Nachrichtendienstes übersteigen.<br/>&bull; Die Oberfläche informiert über neue Nachrichten, freigegebene neue Bestellungen (Einkauf) und unerledigte Kalenderereignisse. Die Startseite zeigt zudem eine kurze Zusammenfassung offener Versorgungsfälle und geplanter Ereignisse der aktuellen Kalenderwoche sowie unerledigter Ereignisse.<br/>&bull; Dokumente können auf andere Dokumente verweisen. Dabei können diese nur angezeigt werden (z.B. Verfahrens- oder Arbeitsanweisungen) oder mit Übernahme des Identifikators für einen reibungslosen Transfer sorgen.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Unterhaltungen](#unterhaltungen), [Kalender](#kalender), [Bestellung](#bestellung), [Dateien](#dateien), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
 | ISO 13485 5.6.1 Allgemeine Anforderung an Management-bewertung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
@@ -969,7 +969,7 @@ Anwendungsunterstützung Legende:
 | ISO 19011 6.4 Durchführen von Audittätigkeiten | teilweise | &bull; Die Bearbeitung und Abschlussbewertung ist jederzeit möglich, so lange das Audit noch nicht als abgeschlossen markiert wurde. | [Audit](#audit) |
 | ISO 19011 6.5 Erstellen und Verteilen des Auditberichts | teilweise | &bull; Der Auditbericht ist eine fest integrierte Eingabe die am Ende des Audits und vor dessen Abschluss vorgesehen ist.<br />&bull; Die Verteilung des Berichts wird bei Abschluss durch eine systeminterne Nachricht an alle Nutzer mit `regulatory`-Berechtigung und alle Mitglieder des auditierten Bereichs umgesetzt. | [Audit](#audit), [Laufzeitvariablen](#laufzeitvariablen), [Unterhaltungen](#unterhaltungen) |
 | ISO 19011 6.6 Abschließen des Audits | teilweise | &bull; Die Bearbeitung und Abschlussbewertung ist jederzeit möglich, so lange das Audit noch nicht als abgeschlossen markiert wurde. | [Audit](#audit) |
-| MPDG §83 Medizinprodukteberater | ja | &bull; Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Verzeichnis angezeigt. | [Nutzer](#nutzer) |
+| MPDG §83 Medizinprodukteberater | ja | &bull; Medizinprodukteberater werden durch die entsprechende Berechtigung in den Nutzereinstellungen festgelegt und als solche im Mitarbeiterverzeichnis angezeigt. | [Nutzer](#nutzer) |
 | SGB 5 §33 Zusätzliche Kosten | strukturell | &bull; *Aufzeichnung über Dokumente mit "Vorgangsdokumentation"-Kontext* | |
 | MDR Art. 14 Stichprobenprüfung | ja, teilweise | &bull; Eine Stichprobenprüfung ist implementiert. Ein entsprechendes Dokument muss erstellt werden, in Frage kommende Artikel geben sich bei Bestellung zu erkennen. | [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Bestellung](#bestellung), [Dokumente](#dokumente), [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten) |
 | MDR Art. 61 Klinische Bewertung | strukturell | &bull; *Aufzeichnung über Dokumente mit "Vorgangsdokumentation"-Kontext* | |

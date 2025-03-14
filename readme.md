@@ -15,7 +15,7 @@
         * [Manual](#manual)
     * [Communication](#communication)
         * [Conversations](#conversations)
-        * [Register](#register)
+        * [Personnel register](#personnel-register)
         * [Text recommendations](#text-recommendations)
         * [Improvement suggestions](#improvement-suggestions)
     * [Records](#records)
@@ -276,8 +276,8 @@ This is for internal communication and system alerts only and has no record aspe
 
 [Content](#content)
 
-### Register
-The user register gives an overview of all registered users, also grouped by organizational units and permissions. Users and whole units and permission groups can be sent a message directly from here.
+### Personnel register
+The personnel register gives an overview of all registered users, also grouped by organizational units and permissions. Users and whole units and permission groups can be sent a message directly from here.
 
 [Content](#content)
 
@@ -976,7 +976,7 @@ Application support legend:
 | ISO 13485 5.3 Quality policy | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.4.1 Quality goals | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.1 Responsibility and authority | partial, structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A user register summarizes all users, also grouped by organizational unit and permission<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Conversations](#conversations), [Runtime variables](#runtime-variables) |
+| ISO 13485 5.5.1 Responsibility and authority | partial, structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A personnel register summarizes all users, also grouped by organizational unit and permission<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Personnel register](#personnel-register), [Runtime variables](#runtime-variables) |
 | ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.1 General management assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
@@ -2248,7 +2248,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"Communication":{"Conversations":{"onpointerup":"api.message('get', 'conversation')","data-unreadmessages":"0"},"Register":{"onpointerup":"api.message('get', 'register')"},"Text recommendations":{"onpointerup":"api.texttemplate('get', 'text')"},"Manage text chunks":{"onpointerup":"api.texttemplate('get', 'chunk')"},"Manage text templates":{"onpointerup":"api.texttemplate('get', 'template')"}},....
+{"render":{"Communication":{"Conversations":{"onpointerup":"api.message('get', 'conversation')","data-unreadmessages":"0"},"Personnel register":{"onpointerup":"api.message('get', 'register')"},"Text recommendations":{"onpointerup":"api.texttemplate('get', 'text')"},"Manage text chunks":{"onpointerup":"api.texttemplate('get', 'chunk')"},"Manage text templates":{"onpointerup":"api.texttemplate('get', 'template')"}},....
 ```
 
 > GET ./api/api.php/application/start/{search}
