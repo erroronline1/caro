@@ -3080,10 +3080,12 @@ class AUDIT extends API {
 				$certificate = json_decode($vendor['certificate'] ? : '', true);
 				if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
 				if ($vendor['evaluation']){
-					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
-					$info .= $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']]) . "\n";
-					unset($vendor['evaluation']['_author'], $vendor['evaluation']['_date']);
-					foreach($vendor['evaluation'] as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";
+					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
+					foreach($vendor['evaluation'] as $evaluation){
+						$info .= " \n". $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $evaluation['_author'], ':date' => $evaluation['_date']]) . "\n";
+						unset($evaluation['_author'], $evaluation['_date']);
+						foreach($evaluation as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";	
+					}
 				}
 
 				$vendorlist[] = [

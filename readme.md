@@ -121,7 +121,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
 * management review with templates like audits? fixed paragraphs for required iso issues
-* append vendor evaluation for record safety according to 13485 7.4.1, do not overwrite
 * timesheet correction value e.g. for overtime payout
 * compression calculator (multiple number input, start reduction, max reduction)
 * display approvals by role, name and date on components and documents (editor) instead of simple statement

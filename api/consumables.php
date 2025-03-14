@@ -1608,13 +1608,13 @@ class CONSUMABLES extends API {
 		// dynamic vendor info fields with storage key and lang-property value
 		// only defined once here, audit.php and on output form (GET) for typing ?
 		$vendor_info = [
-			'purchase_info' => 'consumables.vendor.purchase_info',
 			'infotext' => 'consumables.vendor.info',
 			'mail' => 'consumables.vendor.mail',
 			'phone' => 'consumables.vendor.phone',
 			'address' => 'consumables.vendor.address',
 			'sales_representative' => 'consumables.vendor.sales_representative',
 			'customer_id' => 'consumables.vendor.customer_id',
+			'purchase_info' => 'consumables.vendor.purchase_info',
 		];
 
 		// retrieve vendor evaluation document
@@ -1640,7 +1640,7 @@ class CONSUMABLES extends API {
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
 					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_currentdate->format('Ymd'),
-					'evaluation' => null
+					'evaluation' => []
 				];
 				
 				// check forbidden names
@@ -1666,9 +1666,12 @@ class CONSUMABLES extends API {
 					'consumables.vendor.availability',
 					'consumables.vendor.available',
 					'consumables.vendor.certificate_validity',
-					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.certificate_update',
 					'consumables.vendor.documents_update',
+					'consumables.vendor.pricelist_filter',
+					'consumables.vendor.message_vendor_select_special_attention_products',
+					'consumables.vendor.samplecheck_interval',
+					'consumables.vendor.samplecheck_interval_reusable',
 					'consumables.vendor.message_vendor_select_special_attention_products'
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
@@ -1695,9 +1698,10 @@ class CONSUMABLES extends API {
 							'type' => 'error'
 						]]);
 				}
-				if ($vendor['evaluation'] = $evaluation){
-					$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
-					$vendor['evaluation']['_date'] = $this->_currentdate->format('Y-m-d');
+				if ($evaluation){
+					$evaluation['_author'] = $_SESSION['user']['name'];
+					$evaluation['_date'] = $this->_currentdate->format('Y-m-d');
+					$vendor['evaluation'][] = $evaluation;
 				}
 				else $vendor['evaluation'] = null;
 
@@ -1797,9 +1801,12 @@ class CONSUMABLES extends API {
 					'consumables.vendor.availability',
 					'consumables.vendor.available',
 					'consumables.vendor.certificate_validity',
-					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.certificate_update',
 					'consumables.vendor.documents_update',
+					'consumables.vendor.pricelist_filter',
+					'consumables.vendor.message_vendor_select_special_attention_products',
+					'consumables.vendor.samplecheck_interval',
+					'consumables.vendor.samplecheck_interval_reusable',
 					'consumables.vendor.message_vendor_select_special_attention_products'
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
@@ -1826,15 +1833,16 @@ class CONSUMABLES extends API {
 							'type' => 'error'
 						]]);
 				}
-				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
-				$vendor_evaluation_copy = $vendor['evaluation'];
-				if (isset($vendor_evaluation_copy['_author'])) unset($vendor_evaluation_copy['_author'], $vendor_evaluation_copy['_date']);
-				if ($vendor_evaluation_copy != $evaluation) {
-					if ($vendor['evaluation'] = $evaluation){
-						$vendor['evaluation']['_author'] = $_SESSION['user']['name'];
-						$vendor['evaluation']['_date'] = $this->_currentdate->format('Y-m-d');
+				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
+				// get latest evaluation to compare if any novel entries have been made, append in this case 
+				$latest_vendor_evaluation = isset($vendor['evaluation'][count($vendor['evaluation']) - 1]) ? $vendor['evaluation'][count($vendor['evaluation']) - 1] : null;
+				if ($latest_vendor_evaluation) unset($latest_vendor_evaluation['_author'], $latest_vendor_evaluation['_date']);
+				if ($latest_vendor_evaluation != $evaluation) {
+					if ($evaluation){
+						$evaluation['_author'] = $_SESSION['user']['name'];
+						$evaluation['_date'] = $this->_currentdate->format('Y-m-d');
+						$vendor['evaluation'][] = $evaluation;
 					}
-					else $vendor['evaluation'] = null;
 				}
 			
 				// tidy up unused properties
@@ -2038,14 +2046,14 @@ class CONSUMABLES extends API {
 				}
 				else {
 					// display form for adding a new or edit a current vendor
-					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true);
-
+					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
+					$latest_vendor_evaluation = isset($vendor['evaluation'][count($vendor['evaluation']) - 1]) ? $vendor['evaluation'][count($vendor['evaluation']) - 1] : [];
 					// fill evaluation document with last vendor values
-					$evaluationdocument = $sharedfunction->populatedocument($evaluationdocument, $vendor['evaluation']);
-					if (isset($vendor['evaluation']['_author'])) $evaluationdocument[0][] = [
+					$evaluationdocument = $sharedfunction->populatedocument($evaluationdocument, $latest_vendor_evaluation);
+					if (isset($latest_vendor_evaluation['_author'])) $evaluationdocument[0][] = [
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $vendor['evaluation']['_author'], ':date' => $vendor['evaluation']['_date']])
+							'name' => $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $latest_vendor_evaluation['_author'], ':date' => $latest_vendor_evaluation['_date']])
 						]
 					];
 
