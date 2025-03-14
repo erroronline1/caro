@@ -103,6 +103,27 @@ class TOOL extends API {
 			return strval(round(pi() * $diameter / $holes, 2));
 		}
 
+		/**
+		 * evenly distributed measure reduction
+		 * @param array $measures ['22.7', '21', ...] , replaced by decimal point, other \D will be stripped
+		 * @param string $proximal '1' converted to float
+		 * @param string $distal '5' converted to float
+		 * @return string '23.77'
+		 */
+		function measure_adjustment($measures = [], $proximal = '1', $distal = '5'){
+			if (count($measures) < 2) return '';
+			$result = [];
+			$distal = floatval(str_replace(',', '.', $distal));
+			$proximal = floatval(str_replace(',', '.', $proximal));
+			for ($i = 0; $i < count($measures); $i++){
+				$percent = $proximal + (($distal - $proximal) / (count($measures) - 1)) * $i;
+				$measures[$i] = floatval(str_replace(',', '.', $measures[$i]));
+				$result[] = strval($measures[$i]) . " - " . strval(round($percent, 2)) . "% -> " . strval(round($measures[$i] * (100-$percent) / 100, 2));
+			}
+			return implode("\n", $result);
+		}
+
+
 		$types = [
 			'pow' => [
 				[
@@ -152,6 +173,35 @@ class TOOL extends API {
 					]
 				]
 			],
+			'ma' => [
+				[
+					'type' => 'number',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.ma_start'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_start')) ? : ''
+					]
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.ma_end'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_end')) ? : '',
+					],
+					'hint' => $this->_lang->GET('tool.calculator.ma_hint')
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.ma_measure'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_measure')) ? : '',
+					]
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.ma_measure'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_measure') . '(2)') ? : '',
+						'multiple' => true
+					]
+				]
+			]
 		];
 
 		$result['render'] = ['form' => [
@@ -170,6 +220,7 @@ class TOOL extends API {
 						$this->_lang->GET('tool.calculator.pow') => $this->_requestedType === 'pow' ? ['value' => 'pow', 'selected' => true] : ['value' => 'pow'],
 						$this->_lang->GET('tool.calculator.poa') => $this->_requestedType === 'poa' ? ['value' => 'poa', 'selected' => true] : ['value' => 'poa'],
 						$this->_lang->GET('tool.calculator.cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
+						$this->_lang->GET('tool.calculator.ma') => $this->_requestedType === 'ma' ? ['value' => 'ma', 'selected' => true] : ['value' => 'ma'],
 					]
 				],
 				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
@@ -189,15 +240,34 @@ class TOOL extends API {
 					case 'cd':
 						$calculation = circular_distance(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.cd_diameter')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.cd_bores')));
 						break;
+					case 'ma':
+						$measures = [
+							UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_measure')),
+							UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_measure') . '(2)')
+						];
+						foreach($this->_payload as $key => $value){
+							if (!in_array($key, [$this->_lang->GET('tool.calculator.ma_measure'), $this->_lang->GET('tool.calculator.ma_measure') . '(2)']) && str_starts_with($key, $this->_lang->GET('tool.calculator.ma_measure'))){
+								if ($value) $measures[] = $value;
+								$result['render']['content'][count($result['render']['content']) -1][] = [
+									'type' => 'number',
+									'attributes' => [
+										'name' => $key,
+										'value' => $value,
+										'multiple' => true
+									]
+								];
+							}
+						}
+						$calculation = measure_adjustment($measures, UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_start')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_end')));
+						break;
 				}
 				$result['render']['content'][] = [
 					[
-						'type' => 'text',
+						'type' => 'textsection',
 						'attributes' => [
-							'name' => $this->_lang->GET('tool.calculator.result'),
-							'value' => $calculation,
-							'readonly' => true
-						]
+							'name' => $this->_lang->GET('tool.calculator.result')
+						],
+						'content' => $calculation
 					]
 				];
 				break;
