@@ -359,12 +359,13 @@ class CALENDARUTILITY {
 						]
 					];
 				}
-				// name => required bool
+				// name => required bool as per _client.calendar.setFieldVisibilityByNames()
 				$setFieldVisibility = [
 					$this->_lang->GET('calendar.timesheet.start_time') => true,
 					$this->_lang->GET('calendar.timesheet.end_time') => true,
 					$this->_lang->GET('calendar.timesheet.break_time') => true,
-					$this->_lang->GET('calendar.timesheet.homeoffice') => true
+					$this->_lang->GET('calendar.timesheet.homeoffice') => true,
+					$this->_lang->GET('calendar.timesheet.pto.workinghourscorrection') => false,
 				];
 				// add inputs
 				array_push($inputs, ...[
@@ -409,6 +410,12 @@ class CALENDARUTILITY {
 								'name' => $this->_lang->GET('calendar.timesheet.break_time'),
 								'value' => isset($misc['break']) ? $misc['break'] : '',
 								'required' => true
+							]
+						],[
+							'type' => 'number',
+							'attributes' => [
+								'name' => $this->_lang->GET('calendar.timesheet.pto.workinghourscorrection'),
+								'value' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : ''
 							]
 						],[
 							'type' => 'text',
@@ -778,6 +785,7 @@ class CALENDARUTILITY {
 				$hours = iterator_count($periods) / 60;
 				if (isset($misc['homeoffice'])) $hours += $this->timeStrToFloat($misc['homeoffice']);
 				if (isset($misc['break'])) $hours -= $this->timeStrToFloat($misc['break']);
+				if (isset($misc['workinghourscorrection'])) $hours += floatval(str_replace(',', '.', $misc['workinghourscorrection']));
 				$users[$row]['timesheet']['_performed'] += $hours;
 			} else {
 

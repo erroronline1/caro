@@ -609,7 +609,8 @@
 				"sheet_daily": {
 					"break": "Break",
 					"homeoffice": "Homeoffice",
-					"hours": "Hours"
+					"hours": "Hours",
+					"workinghourscorrection": "Working hours correction"
 				},
 				"sheet_exemption_days": ":number Days",
 				"sheet_left_vacation": ":number Days of unused vacation",
@@ -632,6 +633,7 @@
 				"businesstrip": "Business trip",
 				"vocationalschool": "Vocational school",
 				"publicholiday": "Public holiday",
+				"workinghourscorrection": "Working hours correction",
 				"misc": "See note"
 			},
 			"pto_exemption": "Entry type",
@@ -1265,11 +1267,11 @@
 			"cd_bores": "Bores",
 			"cd_diameter": "Diameter",
 			"cd_hint": "Distance between holes around a cylinder",
-			"ma":"Measure adjustment",
-			"ma_end":"End reduction in percent",
-			"ma_hint":"Reduction will be evenly distributed",
-			"ma_measure":"Measure",
-			"ma_start":"Start reduction in percent",
+			"ma": "Measure adjustment",
+			"ma_end": "End reduction in percent",
+			"ma_hint": "Reduction will be evenly distributed",
+			"ma_measure": "Measure",
+			"ma_start": "Start reduction in percent",
 			"poa": "Parts of attribute",
 			"poa_hint": "e.g. silicone shore mixing 20,35,65, no decimals",
 			"poa_parts": "Parts",

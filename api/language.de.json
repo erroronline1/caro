@@ -609,7 +609,8 @@
 				"sheet_daily": {
 					"break": "Pause",
 					"homeoffice": "Homeoffice",
-					"hours": "Stunden"
+					"hours": "Stunden",
+					"workinghourscorrection": "Working hours correction"
 				},
 				"sheet_exemption_days": ":number Tage",
 				"sheet_left_vacation": ":number Tage ungenutzten Urlaubs",
@@ -632,6 +633,7 @@
 				"businesstrip": "Dienstreise",
 				"vocationalschool": "Berufsschule",
 				"publicholiday": "Feiertag",
+				"workinghourscorrection": "Arbeitszeitkorrektur",
 				"misc": "siehe Anmerkung"
 			},
 			"pto_exemption": "Begründung",
@@ -1265,11 +1267,11 @@
 			"cd_bores": "Bohrungen",
 			"cd_diameter": "Durchmesser",
 			"cd_hint": "Abstand zwischen Löchern um einen Zylinder",
-			"ma":"Maßanpassung",
-			"ma_end":"Endreduzierung in Prozent",
-			"ma_hint":"Die Reduzierung wird gleichmäßig verteilt",
-			"ma_measure":"Maß",
-			"ma_start":"Startreduzierung in Prozent",
+			"ma": "Maßanpassung",
+			"ma_end": "Endreduzierung in Prozent",
+			"ma_hint": "Die Reduzierung wird gleichmäßig verteilt",
+			"ma_measure": "Maß",
+			"ma_start": "Startreduzierung in Prozent",
 			"poa": "Anteile von Eigenschaften",
 			"poa_hint": "z.B. Silikonshorehärten mischen 20,35,65, keine Kommazahlen",
 			"poa_parts": "Teile",

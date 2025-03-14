@@ -202,6 +202,7 @@ class CALENDAR extends API {
 							'subject' => ($span_start < $firstday ? $firstday->format('H:i') : $span_start->format('H:i')) . ' - ' . ($span_end > $lastday ? $lastday->format('H:i') : $span_end->format('H:i')),
 							'break' => isset($misc['break']) ? $misc['break'] : '',
 							'homeoffice' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
+							'workinghourscorrection' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : '',
 							'note' => isset($misc['note']) ? $misc['note'] : '',
 							'hours' => $dailyhours,
 						];
@@ -291,8 +292,8 @@ class CALENDAR extends API {
 	 * 				str work hours, overtime and remaining vacation days
 	 * 			],
 	 * 			[
-	 * 				[str summary, bool false],
-	 * 				str work hours, overtime and remaining vacation days
+	 * 				[str signature, bool false],
+	 * 				str _____________________
 	 * 			]
 	 * 		],
 	 * 		...
@@ -831,6 +832,9 @@ class CALENDAR extends API {
 					'note' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_note')) ? : '',
 					'break' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.break_time'))
 				];
+				if ($workinghourscorrection = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto.workinghourscorrection'))){
+					$misc['workinghourscorrection'] = $workinghourscorrection;
+				}
 				if ($homeoffice = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.homeoffice'))){
 					$misc['homeoffice'] = $homeoffice;
 				}
@@ -859,7 +863,8 @@ class CALENDAR extends API {
 				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id'];
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
-						':id' => $affected_user_id
+						':id' => $affected_user_id,
+						':name' => ''
 					]
 				])) $affected_user = $affected_user[0];
 
@@ -895,6 +900,9 @@ class CALENDAR extends API {
 					'note' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_note')) ? : '',
 					'break' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.break_time'))
 				];
+				if ($workinghourscorrection = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto.workinghourscorrection'))){
+					$misc['workinghourscorrection'] = $workinghourscorrection;
+				}
 				if ($homeoffice = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.homeoffice'))){
 					$misc['homeoffice'] = $homeoffice;
 				}
@@ -1149,6 +1157,7 @@ class CALENDAR extends API {
 				$misc = json_decode($row['misc'], true);
 				if (!$row['subject'] && isset($misc['break'])) $display .= $this->_lang->GET('calendar.timesheet.break') . ': ' . $misc['break'] . "\n";
 				if (!$row['subject'] && isset($misc['homeoffice'])) $display .= $this->_lang->GET('calendar.timesheet.homeoffice') . ': ' . $misc['homeoffice'] . "\n";
+				if (!$row['subject'] && isset($misc['workinghourscorrection'])) $display .= $this->_lang->GET('calendar.timesheet.pto.workinghourscorrection') . ': ' . $misc['workinghourscorrection'] . "\n";
 				if ($row['author_id'] != $row['affected_user_id']) {
 					$hint = $this->_lang->GET('calendar.timesheet.foreign_contributor') . ': ' . $row['author'] . "\n";
 				}
