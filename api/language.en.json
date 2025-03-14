@@ -525,6 +525,7 @@
 		"records_hint": "The most recent entries of all treatment documentations starting within the given time period are about to be exported. These can be statistically analysed.",
 		"records_identifier": "Identifier",
 		"records_start_date": "From",
+		"records_type": "Type",
 		"records_units": "Units",
 		"regulatory_warning_content": "This regulatory issue has no assigned documents!",
 		"risk_export_column": {

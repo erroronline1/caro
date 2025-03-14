@@ -2007,7 +2007,8 @@ class AUDIT extends API {
 			'identifier' => '_' . $this->_lang->_DEFAULT['audit']['records_identifier'],
 			'units' => '_' . $this->_lang->_DEFAULT['audit']['records_units'],
 			'from' => '_' . $this->_lang->_DEFAULT['audit']['records_start_date'],
-			'until' => '_' . $this->_lang->_DEFAULT['audit']['records_end_date']
+			'until' => '_' . $this->_lang->_DEFAULT['audit']['records_end_date'],
+			'type' => '_' . $this->_lang->_DEFAULT['audit']['records_type']
 		];
 		// iterate over all entries, create arrays with all available keys and append to result
 		foreach($records as $row){
@@ -2026,17 +2027,16 @@ class AUDIT extends API {
 				// set timespan information for record
 				if (!isset($line[$defaultColumn['from']])) $line[$defaultColumn['from']] = $currentdate;
 				$line[$defaultColumn['until']] = $currentdate;
-				$document_unit = '';
+				$document_name = '';
 				if ($docid = array_search($entry['document'], array_column($documents, 'id'))){
-					// add unit to issue for improved distinguishability.
-					// document title would be even better but possibly just too long for a header
-					$document_unit = isset($this->_lang->_DEFAULT['units'][$documents[$docid]['unit']]) ? $this->_lang->_DEFAULT['units'][$documents[$docid]['unit']] . ' - ' : '';
+					// get document title to add to issue
+					$document_name = $documents[$docid]['name'] . ' - ';
 				}
 
 				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
 				// iterate over all entries, fill up result line with the most recent value
 				foreach($entry['content'] as $field => $input){
-					$field = $document_unit . str_replace('_', ' ', $field);
+					$field = $document_name . str_replace('_', ' ', $field);
 					if ($input) {
 						if (!in_array($field, $keys)) $keys[] = $field;
 						$line[$field] = $input;
@@ -2048,6 +2048,7 @@ class AUDIT extends API {
 			// complete default columns and append to result
 			$line[$defaultColumn['identifier']] = $row['identifier'];
 			$line[$defaultColumn['units']] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, explode(',', $row['units'])));
+			$line[$defaultColumn['type']] = isset($this->_lang->_DEFAULT['record']['type'][$row['record_type']]) ? $this->_lang->_DEFAULT['record']['type'][$row['record_type']] : '';
 			$result[] = $line;
 		}
 
@@ -2057,7 +2058,8 @@ class AUDIT extends API {
 			$defaultColumn['identifier'],
 			$defaultColumn['units'],
 			$defaultColumn['from'],
-			$defaultColumn['until']
+			$defaultColumn['until'],
+			$defaultColumn['type'],
 		);
 	
 		// write csv file
@@ -2080,7 +2082,8 @@ class AUDIT extends API {
 				$defaultColumn['identifier'] => $line[$defaultColumn['identifier']],
 				$defaultColumn['units'] => $line[$defaultColumn['units']],
 				$defaultColumn['from'] => $line[$defaultColumn['from']],
-				$defaultColumn['until'] => $line[$defaultColumn['until']]
+				$defaultColumn['until'] => $line[$defaultColumn['until']],
+				$defaultColumn['type'] => $line[$defaultColumn['type']]
 			], $line);
 
 			// write to file
