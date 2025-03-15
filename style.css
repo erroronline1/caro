@@ -517,6 +517,8 @@ label {
 		margin-left: 0.5em;
 		padding: 0 0.5em;
 		background: var(--article);
+		max-width:94%;
+		display:inline-block
 	}
 
 	input[type="text"],
