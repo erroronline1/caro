@@ -528,7 +528,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.render) {
-								api.update_header(title[request[1]] + (request[2] ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
+								api.update_header(title[request[1]] + (request[2] && request[2] !== 'null' ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
