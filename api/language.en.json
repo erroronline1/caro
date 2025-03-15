@@ -509,6 +509,7 @@
 		"incorporation_warning_content": "Observe orders and sensitise for compliance: :amount products",
 		"incorporation_warning_description": "Some ordered products still have to be incorporated!",
 		"managementreview": {
+			"alert":"A management review has been closed and can be inspected at :link.",
 			"close": "completed",
 			"close_confirm": "After closing editing is not longer possible. Proceed?",
 			"delete_confirm_cancel": "No, thank you",
