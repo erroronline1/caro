@@ -550,7 +550,9 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('audit')){
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit')] = ['onclick' => "api.audit('get', 'audit')"];
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit_templates')] = ['onclick' => "api.audit('get', 'audittemplate')"];
+			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.management_review')] = ['onclick' => "api.audit('get', 'managementreview')"];
 		}
+
 		if (PERMISSION::permissionFor('filebundles')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.bundle_manager')] = ['onclick' => "api.file('get', 'bundlemanager')"];
 		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onclick' => "api.user('get', 'user')"];
 		if (PERMISSION::permissionFor('texttemplates')) {

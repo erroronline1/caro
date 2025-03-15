@@ -482,6 +482,7 @@ export const api = {
 				audit: api._lang.GET("menu.records.audit"),
 				audittemplate: api._lang.GET("menu.records.audit_templates"),
 				checks: api._lang.GET("menu.tools.regulatory"),
+				managementreview: api._lang.GET("menu.records.management_review"),
 			};
 		switch (method) {
 			case "get":

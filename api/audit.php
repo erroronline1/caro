@@ -99,7 +99,7 @@ class AUDIT extends API {
 				}
 				$audit[':content'] = UTILITY::json_encode($audit[':content']);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', [
 					'values' => $audit
 				])) {
 					if ($audit[':closed']){
@@ -153,7 +153,7 @@ class AUDIT extends API {
 				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', ['values' => [':id' => $this->_requestedTemplate]]);
 				$template = $template ? $template[0] : null;
 				if (!$template) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
-				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
 				$audit = $audit ? $audit[0] : null;
 				if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
@@ -186,7 +186,7 @@ class AUDIT extends API {
 						$audit['content']['questions'][intval($set[1])][$set[2]][0] = $value;
 				}
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_put', [
 					'values' => [
 						':id' => $audit['id'],
 						':content' => UTILITY::json_encode($audit['content']),
@@ -242,7 +242,6 @@ class AUDIT extends API {
 				break;
 			case 'GET':
 				$result = [];
-				$datalist = ['user'=> []];
 				$audit = $template = null;
 				$select = [
 					'edit' => [
@@ -459,7 +458,7 @@ class AUDIT extends API {
 				}
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_delete', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_delete', [
 					'values' => [
 						':id' => $this->_requestedID
 					]
@@ -479,7 +478,7 @@ class AUDIT extends API {
 	 * creates and returns a download link to the export file for given audit
 	 */
 	private function exportaudit(){
-		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+		$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
 		$audit = $audit ? $audit[0] : null;
 		if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
@@ -964,6 +963,7 @@ class AUDIT extends API {
 				
 				foreach([
 					'audits', // internal audits
+					'managementreviews',
 					'mdrsamplecheck', // sample checks on products
 					'incorporation', // incorporated products
 					'documents', // documents and components
@@ -1071,6 +1071,7 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
 		$static = [
 			'audit',
+			'managementreview',
 			'mdrsamplecheck',
 			'incorporation',
 			'documents',
@@ -1613,6 +1614,154 @@ class AUDIT extends API {
 		$this->response([
 			'render' => $body,
 		]);
+	}
+
+	 /**
+	 *                                           _               _           
+	 *   _____ ___ ___ ___ ___ ___ _____ ___ ___| |_ ___ ___ _ _|_|___ _ _ _ 
+	 *  |     | .'|   | .'| . | -_|     | -_|   |  _|  _| -_| | | | -_| | | |
+	 *  |_|_|_|__,|_|_|__,|_  |___|_|_|_|___|_|_|_| |_| |___|\_/|_|___|_____|
+	 *                    |___|
+	 * 
+	 */
+	public function managementreview(){
+		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				break;
+			case 'PUT';
+				break;
+			case 'GET':
+				$result = [];
+				$managementreview = null;
+				$select = [
+					'edit' => [
+						'...' => ['value' => '0']
+					]
+				];
+				$managementreviews = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
+
+				if($this->_requestedID && $this->_requestedID !== 'false' && ($managementreview = $managementreviews[array_search($this->_requestedID, array_column($managementreviews, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+
+				// managementreview selections
+				foreach($managementreviews as $row){
+					if (!$row['closed']){
+						$select['edit'][$row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					}
+				}
+
+				if (!$managementreview){
+					$managementreview = [
+						'id' => null,
+						'template'=> null,
+						'content' => '',
+						'unit' => null,
+						'last_touch' => null,
+					];
+				}
+
+				// render template
+				$result['render']['form'] = [
+					'data-usecase' => 'audit',
+					'action' => "javascript:api.audit('" . ($managementreview['id'] ? 'put' : 'post') . "', 'managementreview', 'null', " . $managementreview['id'] . ")"
+				];
+				$managementreview['content'] = json_decode($managementreview['content'] ? : '', true);
+
+				// selection of open reviews
+				if (count(array_keys($select['edit']))>1){
+						$result['render']['content'][] = [
+						[
+							'type' => 'select',
+							'attributes' => [
+								'name' => $this->_lang->GET('audit.managementreview.edit')
+							],
+							'content' => $select['edit']
+						]
+					];
+				}
+				// display last edit
+				if ($managementreview['id']){
+					$result['render']['content'][] = [
+						[
+							'type' => 'textsection',
+							'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $managementreview['last_touch'], ':user' => $managementreview['last_user']]) : '')
+						]
+					];
+				}
+
+				// display issue inputs
+				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $issue){
+					$result['render']['content'][] = [
+						[
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => $issue,
+								'value' => isset($managementreview['content'][$key]) ? $managementreview['content'][$key] : ''
+							]
+						]
+					];
+				}
+
+				// append deletion and closing options
+				$result['render']['content'][] = [
+					[
+						'type' => 'checkbox',
+						'content' => [
+							$this->_lang->GET('audit.managementreview.close') => [
+								'onchange' => "if (this.checked) {new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.managementreview.close_confirm') ."', options:{".
+								"'".$this->_lang->GET('general.cancel_button')."': false,".
+								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
+								"}}).then(confirmation => {if (!confirmation) this.checked = false})}"
+							]
+						]
+					]
+				];
+
+				if ($managementreview['id']){
+					$result['render']['content'][count($result['render']['content']) - 1][] = [
+						'type' => 'deletebutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('audit.audit.delete'),
+							'type' => 'button',
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.managementreview.delete_confirm_header', [':unit' => '']) ."', options:{".
+							"'".$this->_lang->GET('audit.managementreview.delete_confirm_cancel')."': false,".
+							"'".$this->_lang->GET('audit.managementreview.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
+							"}}).then(confirmation => {if (confirmation) api.audit('delete', 'managementreview', 'null', " . $managementreview['id'] . ")})"
+						]
+					];
+				}
+				break;
+			case 'DELETE':
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_delete', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				])) $this->response(['response' => [
+					'msg' => $this->_lang->GET('audit.managementreview.delete_success'),
+					'type' => 'success'
+					]]);
+				else $this->response(['response' => [
+					'msg' => $this->_lang->GET('audit.managementreview.delete_error'),
+					'type' => 'error'
+					]]);
+				break;
+		}
+		$this->response($result);
+	}
+	private function exportmanagementreview(){
+
+	}
+
+	/**
+	 *                                           _               _               
+	 *   _____ ___ ___ ___ ___ ___ _____ ___ ___| |_ ___ ___ _ _|_|___ _ _ _ ___ 
+	 *  |     | .'|   | .'| . | -_|     | -_|   |  _|  _| -_| | | | -_| | | |_ -|
+	 *  |_|_|_|__,|_|_|__,|_  |___|_|_|_|___|_|_|_| |_| |___|\_/|_|___|_____|___|
+	 *                    |___|
+	 * 
+	 */
+	private function managementreviews(){
+
 	}
 
 	/**
