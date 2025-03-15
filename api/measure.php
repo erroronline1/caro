@@ -56,7 +56,7 @@ class MEASURE extends API {
 					// get users and trigger system message to all
 					$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					$this->alertUserGroup(['user' => array_column($user, 'name')], str_replace('\n', ', ', $this->_lang->GET('measure.alert_new', [
-						':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure'). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.measure(\'get\', \'measure\')">' . $this->_lang->GET('menu.communication.measure', [], true). '</a>',
 					], true)));
 
 					$this->response([
