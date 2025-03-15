@@ -1705,7 +1705,7 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'GET':
-				$result = [];
+				$result = $datalist = [];
 				$managementreview = null;
 				$select = [
 					'edit' => [
@@ -1716,11 +1716,19 @@ class AUDIT extends API {
 
 				if($this->_requestedID && $this->_requestedID !== 'false' && ($managementreview = $managementreviews[array_search($this->_requestedID, array_column($managementreviews, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				// managementreview selections
+				// managementreview selections and previous content as autocomplete datalists
 				foreach($managementreviews as $row){
-					if (!$row['closed']){
-						$select['edit'][$row['last_touch']] = $row['id'] == $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					foreach(json_decode($row['content'], true) as $key => $value){
+						if (!isset($datalist[$key])) $datalist[$key] = [];
+						$datalist[$key][] = $value;
 					}
+					if ($row['closed']) continue;
+					$select['edit'][$row['last_touch']] = $row['id'] == $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+				}
+				// sanitize datalists
+				foreach($datalist as $data => &$values){
+					$values = array_filter($values, fn($v) => boolval($v));
+					ksort($values);
 				}
 
 				if (!$managementreview){
@@ -1762,7 +1770,6 @@ class AUDIT extends API {
 						]
 					];
 				}
-
 				// display issue inputs
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $issue){
 					$result['render']['content'][] = [
@@ -1770,8 +1777,10 @@ class AUDIT extends API {
 							'type' => 'textarea',
 							'attributes' => [
 								'name' => $issue,
-								'value' => isset($managementreview['content'][$key]) ? $managementreview['content'][$key] : ''
-							]
+								'value' => isset($managementreview['content'][$key]) ? $managementreview['content'][$key] : '',
+								'dataloss' => 'prevent'
+							],
+							'autocomplete' => isset($datalist[$key]) ? array_values($datalist[$key]) : null
 						]
 					];
 				}

@@ -2678,7 +2678,7 @@ export class Assemble {
 			textarea = div;
 		}
 
-		if (this.currentElement.autocomplete) {
+		if (this.currentElement.autocomplete.length) {
 			/**
 			 * adds a *simple* autocomplete option for textareas with keyup event listener
 			 * appends rest of match if the input so far matches one of the datalist options.
