@@ -173,29 +173,33 @@ class SQLQUERY {
 		],
 
 		
-		'audit_post' => [
-			'mysql' => "INSERT INTO caro_audit (id, template, unit, content, last_touch, last_user, closed, notified) VALUES (NULL, :template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)",
-			'sqlsrv' => "INSERT INTO caro_audit (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)"
+		'audit_and_management_post' => [
+			'mysql' => "INSERT INTO caro_audit_and_management (id, template, unit, content, last_touch, last_user, closed, notified) VALUES (NULL, :template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)",
+			'sqlsrv' => "INSERT INTO caro_audit_and_management (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)"
 		],
-		'audit_put' => [
-			'mysql' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_audit SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id"
+		'audit_and_management_put' => [
+			'mysql' => "UPDATE caro_audit_and_management SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit_and_management SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id"
 		],
-		'audit_notified' => [
-			'mysql' => "UPDATE caro_audit SET notified = :notified WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_audit SET notified = :notified WHERE id = :id"
+		'audit_and_management_notified' => [
+			'mysql' => "UPDATE caro_audit_and_management SET notified = :notified WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit_and_management SET notified = :notified WHERE id = :id"
 		],
 		'audit_get' => [
-			'mysql' => "SELECT * FROM caro_audit ORDER BY last_touch DESC",
-			'sqlsrv' => "SELECT * FROM caro_audit ORDER BY last_touch DESC"
+			'mysql' => "SELECT * FROM caro_audit_and_management WHERE template IS NOT NULL ORDER BY last_touch DESC",
+			'sqlsrv' => "SELECT * FROM caro_audit_and_management WHERE template IS NOT NULL ORDER BY last_touch DESC"
 		],
-		'audit_get_by_id' => [
-			'mysql' => "SELECT * FROM caro_audit WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_audit WHERE id = :id"
+		'management_get' => [
+			'mysql' => "SELECT * FROM caro_audit_and_management WHERE template IS NULL ORDER BY last_touch DESC",
+			'sqlsrv' => "SELECT * FROM caro_audit_and_management WHERE template IS NULL ORDER BY last_touch DESC"
 		],
-		'audit_delete' => [
-			'mysql' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NULL",
-			'sqlsrv' => "DELETE FROM caro_audit WHERE id = :id AND closed IS NULL"
+		'audit_and_management_get_by_id' => [
+			'mysql' => "SELECT * FROM caro_audit_and_management WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_aucaro_audit_and_managementdit WHERE id = :id"
+		],
+		'audit_and_management_delete' => [
+			'mysql' => "DELETE FROM caro_audit_and_management WHERE id = :id AND closed IS NULL",
+			'sqlsrv' => "DELETE FROM caro_audit_and_management WHERE id = :id AND closed IS NULL"
 		],
 	
 		

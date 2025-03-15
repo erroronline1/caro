@@ -28,10 +28,10 @@ require_once('_language.php');
 
 define('DEFAULTSQL', [
 	'install_tables' => [
-		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_audit` (" .
+		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_audit_and_management` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
-				"	`template` int NOT NULL," .
-				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`template` int NULL DEFAULT NULL," .
+				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`last_touch` datetime NOT NULL," .
 				"	`last_user` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
@@ -300,11 +300,11 @@ define('DEFAULTSQL', [
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
-		'sqlsrv' => "IF OBJECT_ID(N'caro_audit', N'U') IS NULL " .
-				"CREATE TABLE caro_audit (" .
+		'sqlsrv' => "IF OBJECT_ID(N'caro_audit_and_management', N'U') IS NULL " .
+				"CREATE TABLE caro_audit_and_management (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	template int NOT NULL," .
-				"	unit varchar(255) NOT NULL," .
+				"	template int NULL DEFAULT NULL," .
+				"	unit varchar(255) NULL DEFAULT NULL," .
 				"	content varchar(MAX) NOT NULL," .
 				"	last_touch smalldatetime NOT NULL," .
 				"	last_user varchar(255) NOT NULL," .
