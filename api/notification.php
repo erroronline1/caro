@@ -47,6 +47,7 @@ class NOTIFICATION extends API {
 			'document_approval' => $this->documents(),
 			'order_unprocessed' => $this->order(),
 			'order_prepared' => $this->preparedorders(),
+			'managementreview' => $this->managementreview(),
 			'measure_unclosed' => $this->measures(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen()
@@ -295,6 +296,25 @@ class NOTIFICATION extends API {
 			}
 		}
 		return $unapproved;
+	}
+
+	/**
+	 *                                           _               _           
+	 *   _____ ___ ___ ___ ___ ___ _____ ___ ___| |_ ___ ___ _ _|_|___ _ _ _ 
+	 *  |     | .'|   | .'| . | -_|     | -_|   |  _|  _| -_| | | | -_| | | |
+	 *  |_|_|_|__,|_|_|__,|_  |___|_|_|_|___|_|_|_| |_| |___|\_/|_|___|_____|
+	 *                    |___|
+	 * notify on unclosed managementreviews
+	 */
+	public function managementreview(){
+		if (!PERMISSION::permissionFor('audit')) return 0;
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
+		$number = 0;
+		foreach ($data as $row){
+			if ($row['closed']) continue;
+			$number++;
+		} 
+		return $number;
 	}
 
 	/**
