@@ -3284,7 +3284,8 @@ class AUDIT extends API {
 		foreach ($users as $user){
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			foreach ($user['skills'] as $skill){
-				$allskills[substr($skill,0,strrpos($skill, '.'))][] = $user['name'];
+				$level = substr($skill, strrpos($skill, '.') + 1);
+				$allskills[substr($skill, 0, strrpos($skill, '.'))][] = $user['name'] . ($level ? ' ' . $this->_lang->_USER['skills']['_LEVEL'][$level] : '');
 			}
 		}
 		foreach ($allskills as $skill => $users){
