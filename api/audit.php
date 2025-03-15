@@ -1635,14 +1635,9 @@ class AUDIT extends API {
 					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null
 				];
-				unset($this->_payload->{$this->_lang->PROPERTY('audit.managementreview.close')});
-				// process content
-				// iterate over payload
-				foreach($this->_payload as $name => $value){
-					if ($name === 'null') continue;
-					if (!$value) $value = ''; // the review has to contain all questions as planned
-					if (!($key = array_search(str_replace('_', ' ', $name), $this->_lang->_USER['audit']['managementreview']['required']))) $key = str_replace('_', ' ', $name);
-					$managementreview[':content'][$key] = $value;
+				// process content according to required fields
+				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $value){
+					$managementreview[':content'][$key] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.required.' . $key)) ? : '';
 				}
 				$managementreview[':content'] = UTILITY::json_encode($managementreview[':content']);
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', [
@@ -1669,50 +1664,46 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'PUT';
-			$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
-			$managementreview = $managementreview ? $managementreview[0] : null;
-			if (!$managementreview) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
-			
-			// update general properties
-			$managementreview['last_user'] = $_SESSION['user']['name'];
-			$managementreview['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null;
-			unset($this->_payload->{$this->_lang->PROPERTY('audit.managementreview.close')});
-			$managementreview['content'] = json_decode($managementreview['content'], true);
-			// process content
-			// iterate over payload
-			foreach($this->_payload as $name => $value){
-				if (! $name || $name === 'null') continue;
-				if (!$value) $value = ''; // the review has to contain all questions as planned
-				if (!($key = array_search(str_replace('_', ' ', $name), $this->_lang->_USER['audit']['managementreview']['required']))) $key = str_replace('_', ' ', $name);
-				$managementreview['content'][$key] = $value;
-			}
-			if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_put', [
-				'values' => [
-					':id' => $managementreview['id'],
-					':content' => UTILITY::json_encode($managementreview['content']),
-					':last_user' => $managementreview['last_user'],
-					':closed' => $managementreview['closed']
-				]
-			])) {
-			if ($managementreview['closed']){
-					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
-						':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\',  \'managementreviews\')">' . $this->_lang->GET('menu.tools.regulatory', [], true). '</a>'],
-						true )
-					);
+				$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+				$managementreview = $managementreview ? $managementreview[0] : null;
+				if (!$managementreview) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
+				
+				// update general properties
+				$managementreview['last_user'] = $_SESSION['user']['name'];
+				$managementreview['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null;
+				$managementreview['content'] = json_decode($managementreview['content'], true);
+				// process content according to required fields
+				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $value){
+					$managementreview['content'][$key] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.required.' . $key)) ? : '';
 				}
-				$this->response([
-				'response' => [
-					'msg' => $this->_lang->GET('audit.managementreview.saved'),
-					'id' => $this->_pdo->lastInsertId(),
-					'type' => 'success'
-				]]);
-			}
-			else $this->response([
-				'response' => [
-					'msg' => $this->_lang->GET('audit.managementreview.not_saved'),
-					'id' => false,
-					'type' => 'error'
-				]]);				break;
+				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_put', [
+					'values' => [
+						':id' => $managementreview['id'],
+						':content' => UTILITY::json_encode($managementreview['content']),
+						':last_user' => $managementreview['last_user'],
+						':closed' => $managementreview['closed']
+					]
+				])) {
+				if ($managementreview['closed']){
+						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
+							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\',  \'managementreviews\')">' . $this->_lang->GET('menu.tools.regulatory', [], true). '</a>'],
+							true )
+						);
+					}
+					$this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.managementreview.saved'),
+						'id' => $this->_pdo->lastInsertId(),
+						'type' => 'success'
+					]]);
+				}
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('audit.managementreview.not_saved'),
+						'id' => false,
+						'type' => 'error'
+					]]);
+				break;
 			case 'GET':
 				$result = [];
 				$managementreview = null;
@@ -1831,8 +1822,50 @@ class AUDIT extends API {
 		}
 		$this->response($result);
 	}
+	/**
+	 * creates and returns a download link to the export file for given management review
+	 */
 	private function exportmanagementreview(){
+		$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+		$managementreview = $managementreview ? $managementreview[0] : null;
+		if (!$managementreview) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
 
+		$managementreview['content'] = json_decode($managementreview['content'], true);
+
+		$summary = [
+			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $this->_lang->GET('menu.records.management_review', [], true) . '_' . $managementreview['last_touch']),
+			'identifier' => null,
+			'content' => [],
+			'files' => [],
+			'images' => [],
+			'title' => $this->_lang->GET('menu.records.management_review', [], true),
+			'date' => $managementreview['last_touch']
+		];
+		
+		$summary['content'][$managementreview['last_user']] = '';
+		foreach($managementreview['content'] as $issue => $review){
+			// translate or keep issue if not found in languagefile 
+			$key = isset($this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue]) ? $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] : $issue;
+			$summary['content'][$key] = $review . "\n";
+		}
+
+		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
+		$downloadfiles[$this->_lang->GET('menu.records.management_review')] = [
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('record.export_proceed'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
 	}
 
 	/**
@@ -1844,7 +1877,47 @@ class AUDIT extends API {
 	 * 
 	 */
 	private function managementreviews(){
+		$content = [];
+		$managementreviews = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
+		foreach ($managementreviews as $managementreview){
+			if (!$managementreview['closed']) continue;
+			$managementreview['content'] = json_decode($managementreview['content'], true);
+			$current = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $managementreview['last_touch'] . ' ' . $managementreview['last_user']
+					]
+				]
+			];
 
+			foreach($managementreview['content'] as $issue => $review){
+				$currentquestion = $currentanswer = '';
+				// translate or keep issue if not found in languagefile 
+				$key = isset($this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue]) ? $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] : $issue;
+				$currentquestion = $key;
+				$currentanswer = $review . "\n";
+
+				$current[] = [
+					'type' => 'auditsection',
+					'attributes' => [
+						'name' => $currentquestion
+					],
+					'content' => $currentanswer
+				];
+			}
+
+			$current[] = [
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('audit.record_export'),
+					'onclick' => "api.audit('get', 'export', 'managementreview', " . $managementreview['id'] . ")",
+					'data-type' => 'download'
+				]
+			];
+			$content[] = $current;
+		}
+		return $content;
 	}
 
 	/**

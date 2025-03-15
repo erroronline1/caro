@@ -23,6 +23,7 @@
         * [Records](#records-1)
         * [Risk management](#risk-management)
         * [Audit](#audit)
+        * [Management review](#management-review)
     * [Calendar](#calendar)
     * [Files](#files)
     * [Purchase](#purchase)
@@ -120,8 +121,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * update readme pictures on tools menu, record menu, audit and regulatory
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
-* management review with templates like audits? fixed paragraphs for required iso issues
 * transfer schedule (apprentices)
+* management review import last? autocomplete? 
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -600,6 +601,12 @@ Executing an audit starts by selecting one of the prepared templates. Breaks and
 
 [Content](#content)
 
+### Management review
+Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. The default language-files contain all required issues, so no topic is forgotten. Currently reviews are text only, so no imgages, attachments or tables. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
+
+[Content](#content)
+
+
 ## Calendar
 ![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu.png)
 
@@ -980,9 +987,9 @@ Application support legend:
 | ISO 13485 5.5.1 Responsibility and authority | partial, structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A personnel register summarizes all users, also grouped by organizational unit and permission<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Personnel register](#personnel-register), [Runtime variables](#runtime-variables) |
 | ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
-| ISO 13485 5.6.1 General management assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
-| ISO 13485 5.6.2 Rating input | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
-| ISO 13485 5.6.3 Rating results | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 5.6.1 General management assessment | partial | &bull; The application has a form to add, edit or close management reviews, containing required issues by default. | [Management review](#management-review), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 5.6.2 Rating input | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
+| ISO 13485 5.6.3 Rating results | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 6.1 Provision of resources | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 6.3 Infrastructure | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context*<br/>&bull; *record with documents with the "Equipment surveillance"-context* | |
@@ -2479,6 +2486,62 @@ Sample response
 {"data":"...whatever text..."}
 ```
 
+> POST ./api/api.php/audit/managementreview/null
+
+Saves a new management review to database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Management review saved","id":"0","type":"success"}}
+```
+
+> PUT ./api/api.php/audit/managementreview/null/{managementreview_id}
+
+Updates an unclosed management review.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {managementreview_id} | path parameter | required | managementreview database id |
+| payload | form data | optional | input data |
+
+Sample response
+```
+{"response":{"msg":"Management review saved","id":"0","type":"success"}}
+```
+
+> GET ./api/api.php/audit/managementreview/null/{managementreview_id}
+
+Returns a selection to start or edit unclosed managementreviews or displays selected review.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {managementreview_id} | path parameter | optional | audit database id |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"audit","action":"javascript:api.audit('post', 'managementreview', 'null', )"},"content":[[{"type":"textarea","attributes":{"name":"Feedback","value":""}}],[{"type":"textarea","attributes":{"name":"Complaint handling","value":""}}],[{"type":"textarea","attributes":{"name":"Reporting to regulatory authorities","value":""}}],[{"type":"textarea","attributes":{"name":"Audits","value":""}}],....
+```
+
+> DELETE ./api/api.php/audit/managementreview/null/{managementreview_id}
+
+Deletes an unclosed managementreview.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {managementreview_id} | path parameter | required | managementreview database id |
+
+Sample response
+```
+{"response":{"msg":"Management review has been deleted.","type":"success"}}
+```
 ### Calendar endpoints
 
 > PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
