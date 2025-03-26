@@ -2882,6 +2882,42 @@ export class Assemble {
 		return this.input("time");
 	}
 
+	transfer() {
+		let cal = [],
+			units = Math.ceil(3.5 * 12 * 2),
+			current,
+			daytile,
+			header;
+		for (const [name, days] of Object.entries(this.currentElement.content)) {
+			header = document.createElement("header");
+			header.append(document.createTextNode(name));
+			cal.push(header);
+
+			for (let i = 0; i < units; i++) {
+				daytile = document.createElement("div");
+				daytile.style = "border:1px solid black; margin:0; width:calc(85% / " + units + "); height:1em; display:inline-block";
+				daytile.onclick = (e) => {
+					e.target.style.backgroundColor = document.getElementById("_current").value;
+				};
+				daytile.addEventListener("pointerdown", (e) => {
+					e.target.style.backgroundColor = document.getElementById("_current").value;
+					window.POINTERDOWN = true;
+				});
+				daytile.addEventListener("pointerup", (e) => {
+					delete window.POINTERDOWN;
+				});
+				daytile.onpointerenter = (e) => {
+					if (window.POINTERDOWN) e.target.style.backgroundColor = document.getElementById("_current").value;
+				};
+				cal.push(daytile);
+			}
+		}
+		current = document.createElement("input");
+		current.type = "color";
+		current.id = "_current";
+		return [...this.header(), ...cal, current];
+	}
+
 	/**
 	 * feature poor method but necessary to display the delete-area for composer or possibly other future use
 	 */

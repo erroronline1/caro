@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {Assemble } from "../js/assemble.js";
+import { Assemble } from "../js/assemble.js";
 
 export function rendertest(element) {
 	let tests = {
@@ -125,13 +125,13 @@ export function rendertest(element) {
 						hint: "Popular browsers",
 					},
 					{
-						type:"image",
-						description:"Embedded images can be downloaded",
-						attributes:{
-							name:"CARO App Logo",
-							url:"./media/favicon/windows11/SmallTile.scale-100.png"
-						}
-					}
+						type: "image",
+						description: "Embedded images can be downloaded",
+						attributes: {
+							name: "CARO App Logo",
+							url: "./media/favicon/windows11/SmallTile.scale-100.png",
+						},
+					},
 				],
 				[
 					{
@@ -295,13 +295,13 @@ export function rendertest(element) {
 						hint: "Bekannte Browser",
 					},
 					{
-						type:"image",
-						description:"Eingebundene Bilder können heruntergeladen werden",
-						attributes:{
-							name:"CARO App Logo",
-							url:"./media/favicon/windows11/SmallTile.scale-100.png"
-						}
-					}
+						type: "image",
+						description: "Eingebundene Bilder können heruntergeladen werden",
+						attributes: {
+							name: "CARO App Logo",
+							url: "./media/favicon/windows11/SmallTile.scale-100.png",
+						},
+					},
 				],
 				[
 					{
@@ -367,6 +367,19 @@ export function rendertest(element) {
 		},
 		app: {
 			content: [
+				[
+					{
+						type: "transfer",
+						attributes: {
+							name: "Transfer schedule",
+						},
+						hint: "Paint timespans",
+						content: {
+							"Name 1": [],
+							Name2: [],
+						},
+					},
+				],
 				[
 					{
 						type: "time",
