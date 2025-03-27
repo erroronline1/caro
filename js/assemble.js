@@ -2882,59 +2882,103 @@ export class Assemble {
 		return this.input("time");
 	}
 
+	/**
+	 * creates a transfer schedule input or display
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		type: "transfer",
+	 * 		attributes: {
+	 * 			name: "Transfer schedule",
+	 * 			readonly: true
+	 * 		},
+	 * 		hint: "Paint timespans",
+	 * 		content: {
+	 * 			"Name 1": [],
+	 * 			"Name 2": [],
+	 * 		},
+	 * 		preset: {
+	 * 			"#ff0000": "Unit 1",
+	 * 			"#00ff00": "Unit 2",
+	 * 			"#0000ff": "Unit 3",
+	 * 		}
+	 * 	}
+	 * ```
+	 */
 	transfer() {
 		let cal = [],
 			units = Math.ceil(3.5 * 12 * 2),
-			preset=[],
+			preset = [],
 			daytile,
 			header,
 			current;
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
+
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
 			header = document.createElement("header");
 			header.append(document.createTextNode(name));
 			cal.push(header);
-
 			for (let i = 0; i < units; i++) {
 				daytile = document.createElement("div");
-				daytile.style = "border:1px solid black; margin:0; width:calc(90% / " + units + "); height:1em; display:inline-block";
-				daytile.onclick = (e) => {
-					e.target.style.backgroundColor = document.getElementById("_current").value;
-				};
-				daytile.addEventListener("pointerdown", (e) => {
-					e.target.style.backgroundColor = document.getElementById("_current").value;
-					window.POINTERDOWN = true;
-				});
-				daytile.addEventListener("pointerup", (e) => {
-					delete window.POINTERDOWN;
-				});
-				daytile.addEventListener("pointerenter", (e) => {
-					if (window.POINTERDOWN) e.target.style.backgroundColor = document.getElementById("_current").value;
-				});
-				daytile.addEventListener("contextmenu", (e) => {
-					e.preventDefault();
-				});
+				daytile.style = "border:1px solid black; margin:0; width:calc(90% / " + units + "); height:1em; display:inline-block;";
+				if (timeunit[i]) daytile.style.backgroundColor= timeunit[i];
+				console.log(daytile.style);
+				if (!this.currentElement.attributes.readonly) {
+					daytile.addEventListener("click", (e) => {
+						e.target.style.backgroundColor = document.getElementById("_current").value;
+					});
+					daytile.addEventListener("pointerdown", (e) => {
+						e.target.style.backgroundColor = document.getElementById("_current").value;
+						window.POINTERDOWN = true;
+					});
+					daytile.addEventListener("pointerup", (e) => {
+						delete window.POINTERDOWN;
+					});
+					daytile.addEventListener("pointerenter", (e) => {
+						if (window.POINTERDOWN) e.target.style.backgroundColor = document.getElementById("_current").value;
+					});
+					daytile.addEventListener("contextmenu", (e) => {
+						e.preventDefault();
+					});
+				}
 				cal.push(daytile);
 			}
 		}
-		current = document.createElement("input");
-		current.type = "hidden";
-		current.id = "_current";
-		preset.push(current);
-		for (const [name, color] of Object.entries(this.currentElement.preset)) {
+		if (!this.currentElement.attributes.readonly) {
+			current = document.createElement("input");
+			current.type = "hidden";
+			current.id = "_current";
+			preset.push(current);
+
+			current = document.createElement("button");
+			current.type = "button";
+			current.append(document.createTextNode("DELETE"));
+			current.addEventListener("click", (e) => {
+				document.getElementById("_current").value = "inherit";
+			});
+			preset.push(current);
+		}
+		for (const [color, name] of Object.entries(this.currentElement.preset)) {
 			current = document.createElement("input");
 			current.type = "color";
 			current.name = name;
 			current.value = color;
-			current.addEventListener("click", (e) => {
-				document.getElementById("_current").value = e.target.value;
-			});
-			current.addEventListener("change", (e) => {
-				document.getElementById("_current").value = e.target.value;
-			});
+			if (!this.currentElement.attributes.readonly) {
+				current.addEventListener("click", (e) => {
+					document.getElementById("_current").value = e.target.value;
+				});
+				current.addEventListener("change", (e) => {
+					document.getElementById("_current").value = e.target.value;
+				});
+			} else {
+				current.addEventListener("click", (e) => {
+					e.preventDefault();
+				});
+			}
 			preset.push(current);
 		}
-		return [...this.header(), ...cal, ...preset];
+		return [...this.header(), ...cal, ...preset, ...this.hint()];
 	}
 
 	/**
