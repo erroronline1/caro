@@ -375,8 +375,8 @@ export function rendertest(element) {
 						},
 						hint: "Paint timespans",
 						content: {
-							"Name 1": [],
-							"Name 2": [],
+							"Name 1": ["#ff0000","#ff0000","#ff0000","#ff0000","#ff0000","inherit","inherit","inherit","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","inherit","inherit","#0000ff","#0000ff","#0000ff","#0000ff","#0000ff"],
+							"Name 2": ["inherit","inherit","inherit","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","#00ff00","inherit","inherit","#0000ff","#0000ff","#0000ff","#0000ff","#0000ff","#ff0000","#ff0000","#ff0000","#ff0000","#ff0000"],
 						},
 						preset: {
 							"#ff0000": "Unit 1",
