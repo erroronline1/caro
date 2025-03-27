@@ -378,11 +378,11 @@ export function rendertest(element) {
 							"Name 1": [],
 							"Name 2": [],
 						},
-						preset:{
-							"Unit 1": "#ff0000",
-							"Unit 2": "#00ff00",
-							"Unit 3": "#0000ff"
-						}
+						preset: {
+							"#ff0000": "Unit 1",
+							"#00ff00": "Unit 2",
+							"#0000ff": "Unit 3",
+						},
 					},
 				],
 				[
