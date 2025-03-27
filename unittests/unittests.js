@@ -376,8 +376,13 @@ export function rendertest(element) {
 						hint: "Paint timespans",
 						content: {
 							"Name 1": [],
-							Name2: [],
+							"Name 2": [],
 						},
+						preset:{
+							"Unit 1": "#ff0000",
+							"Unit 2": "#00ff00",
+							"Unit 3": "#0000ff"
+						}
 					},
 				],
 				[
