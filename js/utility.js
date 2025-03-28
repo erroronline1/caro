@@ -471,6 +471,7 @@ export const _client = {
 				result = { preset: {}, content: {} };
 			if (!names || !schedules) return false;
 			for (let i = 0; i < names.length; i++) {
+				if (!names[i].value) continue;
 				result.content[names[i].value] = {};
 				schedule = [];
 				headers = [];
