@@ -1089,6 +1089,12 @@ article:has(> article) {
 		height: 1em;
 		display: inline-block;
 	}
+	label{
+		writing-mode: vertical-lr;
+		margin:0;
+		padding:0;
+		border-left: 1px solid var(--foreground);
+	}
 }
 /*************************** messages ******************************/
 

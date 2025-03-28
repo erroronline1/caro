@@ -2908,25 +2908,26 @@ export class Assemble {
 	 */
 	transfer() {
 		let cal = [],
-			units = Math.ceil(3.5 * 12 * 2),
 			preset = [],
 			daytile,
 			header,
 			current,
+			labels,
 			label,
 			span;
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
 
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
+			labels=[];
 			current = document.createElement("div");
 			current.classList.add("schedule");
 			header = document.createElement("header");
 			header.append(document.createTextNode(name));
 			current.append(header);
-			for (let i = 0; i < units; i++) {
+			for (const key of Object.keys(timeunit)) {
 				daytile = document.createElement("div");
-				daytile.style.width = "calc(100% / " + units + ")";
-				if (timeunit[i]) daytile.style.backgroundColor = timeunit[i];
+				daytile.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
+				if (timeunit[key]) daytile.style.backgroundColor = timeunit[key];
 				if (!this.currentElement.attributes.readonly) {
 					daytile.addEventListener("click", (e) => {
 						e.target.style.backgroundColor = document.getElementById("_current").value;
@@ -2946,7 +2947,13 @@ export class Assemble {
 					});
 				}
 				current.append(daytile);
+
+				label = document.createElement("label");
+				label.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
+				if (!key.startsWith('_')) label.append(document.createTextNode(key));
+				labels.push(label);
 			}
+			current.append(...labels);
 			cal.push(current);
 		}
 		if (!this.currentElement.attributes.readonly) {
