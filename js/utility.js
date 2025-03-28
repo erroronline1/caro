@@ -459,15 +459,19 @@ export const _client = {
 			}
 		},
 
+		/**
+		 * converts painted transfer schedule into an object
+		 */
 		transferSchedule: () => {
 			let names = document.getElementsByName("_schedule[]"),
 				schedules = document.querySelectorAll("div.schedule"),
+				colors = document.querySelectorAll("input[type=color]"),
 				schedule,
 				headers,
-				result = {};
+				result = { preset: {}, content: {} };
 			if (!names || !schedules) return false;
 			for (let i = 0; i < names.length; i++) {
-				result[names[i].value] = {};
+				result.content[names[i].value] = {};
 				schedule = [];
 				headers = [];
 				for (let c = 0; c < schedules[i].childNodes.length; c++) {
@@ -481,8 +485,11 @@ export const _client = {
 					}
 				}
 				for (let h = 0; h < headers.length; h++) {
-					result[names[i].value][headers[h]] = schedule[h];
+					result.content[names[i].value][headers[h]] = schedule[h];
 				}
+			}
+			for (let c = 0; c < colors.length; c++) {
+				result.preset[colors[c].value] = colors[c].name;
 			}
 			return result;
 		},
