@@ -509,7 +509,7 @@
 		"incorporation_warning_content": "Beobachte Bestellungen und sensibilisiere für die Beachtung: :amount Produkte",
 		"incorporation_warning_description": "Manche bestellten Produkte benötigen noch eine Produkteinführung!",
 		"managementreview": {
-			"alert":"Ein Managementbericht wurde abgeschlossen und kann nun bei :link eingesehen werden.",
+			"alert": "Ein Managementbericht wurde abgeschlossen und kann nun bei :link eingesehen werden.",
 			"close": "abgeschlossen",
 			"close_confirm": "Nach dem Abschluss ist eine weitere Bearbeitung nicht mehr möglich. Fortfahren?",
 			"delete_confirm_cancel": "Nein danke!",
@@ -680,10 +680,12 @@
 			"start_date": "Startdatum",
 			"start_time": "Startzeit"
 		},
-		"transferschedule":{
-			"addcolor":"Farbauswahl hinzufügen",
-			"addcolor_name":"Neue Farbauswahl bezeichnen",
-			"delete":"Farbe der gewählten Spalten löschen",
+		"transferschedule": {
+			"addcolor": "Farbauswahl hinzufügen",
+			"addcolor_name": "Neue Farbauswahl bezeichnen",
+			"delete": "Farbe der gewählten Spalten löschen",
+			"deletecolor": "Farbauswahl löschen",
+			"hint": "Namen werden aus dem Ergebnis entfernt, sobald sie gelöscht werden. Farben können über die Kontextauswahl (Rechtsklick) entfernt werden.",
 			"name": "Name"
 		}
 	},

@@ -509,7 +509,7 @@
 		"incorporation_warning_content": "Observe orders and sensitise for compliance: :amount products",
 		"incorporation_warning_description": "Some ordered products still have to be incorporated!",
 		"managementreview": {
-			"alert":"A management review has been closed and can be inspected at :link.",
+			"alert": "A management review has been closed and can be inspected at :link.",
 			"close": "completed",
 			"close_confirm": "After closing editing is not longer possible. Proceed?",
 			"delete_confirm_cancel": "No, thank you",
@@ -680,10 +680,12 @@
 			"start_date": "Start date",
 			"start_time": "Start time"
 		},
-		"transferschedule":{
-			"addcolor":"Add another color selection",
-			"addcolor_name":"Name new color selection",
-			"delete":"Delete selected columns color",
+		"transferschedule": {
+			"addcolor": "Add another color selection",
+			"addcolor_name": "Name new color selection",
+			"delete": "Delete selected columns color",
+			"deletecolor": "Delete color selection",
+			"hint": "Names will be removed from result if left empty. Colors can be removed via context selection (right click).",
 			"name": "Name"
 		}
 	},
