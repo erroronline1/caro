@@ -679,6 +679,12 @@
 			"start": "Start",
 			"start_date": "Start date",
 			"start_time": "Start time"
+		},
+		"transferschedule":{
+			"addcolor":"Add another color selection",
+			"addcolor_name":"Name new color selection",
+			"delete":"Delete selected columns color",
+			"name": "Name"
 		}
 	},
 	"consumables": {
