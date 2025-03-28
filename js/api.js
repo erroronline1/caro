@@ -528,7 +528,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.render) {
-								api.update_header(title[request[1]] + (request[2] && request[2] !== 'null' ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
+								api.update_header(title[request[1]] + (request[2] && request[2] !== "null" ? " - " + api._lang.GET("audit.checks_type." + request[2]) : ""));
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
@@ -614,6 +614,7 @@ export const api = {
 			title = {
 				schedule: api._lang.GET("menu.calendar.scheduling"),
 				timesheet: api._lang.GET("menu.calendar.timesheet"),
+				longtermplanning: api._lang.GET("menu.calendar.longtermplanning"),
 			};
 		switch (method) {
 			case "get":
@@ -633,7 +634,13 @@ export const api = {
 				}
 				break;
 			case "post":
-				payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()
+				switch (request[1]) {
+					case "longtermplanning":
+						payload = _.getInputs("[data-usecase=longtermplanning]", true);
+						break;
+					default:
+						payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()
+				}
 				break;
 			case "put":
 				switch (request[1]) {
@@ -1633,7 +1640,7 @@ export const api = {
 						break;
 					case "code":
 						payload = _.getInputs("[data-usecase=tool_create_code]", true);
-						if (request[2] === "qrcode_appointment"){
+						if (request[2] === "qrcode_appointment") {
 							successFn = function (data) {
 								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 								if (data.render !== undefined) {
@@ -1645,7 +1652,7 @@ export const api = {
 										options: options,
 									});
 								}
-							}		
+							};
 						}
 						break;
 					case "image":

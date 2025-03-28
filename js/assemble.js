@@ -2905,7 +2905,7 @@ export class Assemble {
 	 * 	}
 	 * ```
 	 */
-	transfer() {
+	longtermplanning() {
 		let cal = [],
 			preset = [],
 			daytile,
@@ -2928,7 +2928,7 @@ export class Assemble {
 			label = document.createElement("label");
 			label.dataset.type = "text";
 			span = document.createElement("span");
-			span.appendChild(document.createTextNode(api._lang.GET("calendar.transferschedule.name")));
+			span.appendChild(document.createTextNode(api._lang.GET("calendar.longtermplanning.name")));
 
 			if (!this.currentElement.attributes.readonly) {
 				input = document.createElement("input");
@@ -2987,7 +2987,7 @@ export class Assemble {
 
 			current = document.createElement("button");
 			current.type = "button";
-			current.append(document.createTextNode(api._lang.GET("calendar.transferschedule.delete")));
+			current.append(document.createTextNode(api._lang.GET("calendar.longtermplanning.delete")));
 			current.addEventListener("click", (e) => {
 				document.getElementById("_current").value = "inherit";
 			});
@@ -3015,7 +3015,7 @@ export class Assemble {
 					const options = {};
 					options[api._lang.GET("general.cancel_button")] = false;
 					options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-					new Dialog({ type: "confirm", header: api._lang.GET("calendar.transferschedule.deletecolor"), options: options }).then((confirmation) => {
+					new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.deletecolor"), options: options }).then((confirmation) => {
 						if (confirmation) e.target.parentNode.remove();
 					});
 				});
@@ -3031,35 +3031,35 @@ export class Assemble {
 		// and hint
 		if (!this.currentElement.attributes.readonly) {
 			current = document.createElement("button");
-			current.append(document.createTextNode(api._lang.GET("calendar.transferschedule.addcolor")));
+			current.append(document.createTextNode(api._lang.GET("calendar.longtermplanning.addcolor")));
 			current.addEventListener("click", (e) => {
 				const options = {};
 				options[api._lang.GET("general.cancel_button")] = false;
 				options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
 				new Dialog({
 					type: "input",
-					header: api._lang.GET("calendar.transferschedule.addcolor_name"),
+					header: api._lang.GET("calendar.longtermplanning.addcolor_name"),
 					render: [
 						[
 							{
 								type: "text",
 								attributes: {
-									name: api._lang.GET("calendar.transferschedule.addcolor_name"),
+									name: api._lang.GET("calendar.longtermplanning.addcolor_name"),
 								},
 							},
 						],
 					],
 					options: options,
 				}).then((response) => {
-					if (response && response[api._lang.GET("calendar.transferschedule.addcolor_name")]) {
+					if (response && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
 						let label = document.createElement("label");
 						label.dataset.type = "color";
 						let span = document.createElement("span");
-						span.appendChild(document.createTextNode(response[api._lang.GET("calendar.transferschedule.addcolor_name")]));
+						span.appendChild(document.createTextNode(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]));
 
 						let input = document.createElement("input");
 						input.type = "color";
-						input.name = response[api._lang.GET("calendar.transferschedule.addcolor_name")];
+						input.name = response[api._lang.GET("calendar.longtermplanning.addcolor_name")];
 						input.addEventListener("click", (e) => {
 							document.getElementById("_current").value = e.target.value;
 						});
@@ -3071,7 +3071,7 @@ export class Assemble {
 							const options = {};
 							options[api._lang.GET("general.cancel_button")] = false;
 							options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-							new Dialog({ type: "confirm", header: api._lang.GET("calendar.transferschedule.deletecolor"), options: options }).then((confirmation) => {
+							new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.deletecolor"), options: options }).then((confirmation) => {
 								if (confirmation) e.target.parentNode.remove();
 							});
 						});
@@ -3081,7 +3081,7 @@ export class Assemble {
 				});
 			});
 			preset.push(current);
-			this.currentElement.hint = api._lang.GET("calendar.transferschedule.hint");
+			this.currentElement.hint = api._lang.GET("calendar.longtermplanning.hint");
 		}
 		return [...this.header(), ...cal, ...preset, ...this.hint()];
 	}

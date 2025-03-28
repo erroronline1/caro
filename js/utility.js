@@ -460,9 +460,9 @@ export const _client = {
 		},
 
 		/**
-		 * converts painted transfer schedule into an object
+		 * converts painted longtermplanning into an object
 		 */
-		transferSchedule: () => {
+		longtermplanning: () => {
 			let names = document.getElementsByName("_schedule[]"),
 				schedules = document.querySelectorAll("div.schedule"),
 				colors = document.querySelectorAll("input[type=color]"),
