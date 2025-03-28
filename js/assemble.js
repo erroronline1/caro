@@ -2918,13 +2918,14 @@ export class Assemble {
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
 
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
+			current = document.createElement("div");
+			current.classList.add("schedule");
 			header = document.createElement("header");
 			header.append(document.createTextNode(name));
-			cal.push(header);
+			current.append(header);
 			for (let i = 0; i < units; i++) {
 				daytile = document.createElement("div");
-				daytile.classList.add("schedule");
-				daytile.style.width = "calc(90% / " + units + ")";
+				daytile.style.width = "calc(100% / " + units + ")";
 				if (timeunit[i]) daytile.style.backgroundColor = timeunit[i];
 				if (!this.currentElement.attributes.readonly) {
 					daytile.addEventListener("click", (e) => {
@@ -2944,8 +2945,9 @@ export class Assemble {
 						e.preventDefault();
 					});
 				}
-				cal.push(daytile);
+				current.append(daytile);
 			}
+			cal.push(current);
 		}
 		if (!this.currentElement.attributes.readonly) {
 			current = document.createElement("input");
@@ -2963,7 +2965,7 @@ export class Assemble {
 		}
 		for (const [color, name] of Object.entries(this.currentElement.preset)) {
 			label = document.createElement("label");
-			label.dataset.type="color";
+			label.dataset.type = "color";
 			span = document.createElement("span");
 			span.appendChild(document.createTextNode(name));
 

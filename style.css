@@ -1081,11 +1081,14 @@ article:has(> article) {
 }
 
 .schedule {
-	border: 1px solid black;
-	border-radius: 2px;
-	margin: 0;
-	height: 1em;
-	display: inline-block;
+	margin: 0.5em 0.25em 0.5em 1.75em;
+	div {
+		border: 1px solid var(--foreground);
+		border-radius: 2px;
+		margin: 0;
+		height: 1em;
+		display: inline-block;
+	}
 }
 /*************************** messages ******************************/
 
