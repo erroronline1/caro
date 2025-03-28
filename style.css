@@ -1352,6 +1352,12 @@ button[data-type="calendarbutton"]::before {
 	mask-image: url("./media/brackets-curly.svg");
 }
 
+[data-type="color"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/palette.svg");
+	mask-image: url("./media/palette.svg");
+}
+
 [data-type="copy"]::before {
 	background-image: none;
 	background-color: var(--article);
