@@ -2686,8 +2686,8 @@ export class Assemble {
 			 * has to be provided with unique entries!
 			 */
 			let autocomplete = this.currentElement.autocomplete;
-			const forthKey = api._settings.user.app_settings.autocomplete_forth || "Alt",
-				backKey = api._settings.user.app_settings.autocomplete_back || "AltGraph";
+			const forthKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_forth ? api._settings.user.app_settings.autocomplete_forth : "Alt",
+				backKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_back ? api._settings.user.app_settings.autocomplete_back : "AltGraph";
 			textarea.addEventListener("keydown", (event) => {
 				if ([forthKey, backKey].includes(event.key)) {
 					event.preventDefault();
