@@ -680,13 +680,17 @@
 			"start_date": "Start date",
 			"start_time": "Start time"
 		},
-		"transferschedule": {
+		"longtermplanning": {
 			"addcolor": "Add another color selection",
 			"addcolor_name": "Name new color selection",
 			"delete": "Delete selected columns color",
 			"deletecolor": "Delete color selection",
+			"end": "End",
 			"hint": "Names will be removed from result if left empty. Colors can be removed via context selection (right click).",
-			"name": "Name"
+			"name": "Name",
+			"select": "Select",
+			"start": "Start",
+			"subject": "Subject"
 		}
 	},
 	"consumables": {
@@ -873,6 +877,7 @@
 		},
 		"calendar": {
 			"header": "Calendar",
+			"longtermplanning": "Transfer schedule",
 			"scheduling": "Scheduling",
 			"timesheet": "Timesheet"
 		},
