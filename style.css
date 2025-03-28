@@ -1089,7 +1089,7 @@ article:has(> article) {
 		height: 1em;
 		display: inline-block;
 	}
-	label{
+	label.schedule{
 		writing-mode: vertical-lr;
 		margin:0;
 		padding:0;

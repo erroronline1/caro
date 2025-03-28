@@ -2910,7 +2910,7 @@ export class Assemble {
 		let cal = [],
 			preset = [],
 			daytile,
-			header,
+			input,
 			current,
 			labels,
 			label,
@@ -2918,12 +2918,25 @@ export class Assemble {
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
 
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
-			labels=[];
+			labels = [];
 			current = document.createElement("div");
 			current.classList.add("schedule");
-			header = document.createElement("header");
-			header.append(document.createTextNode(name));
-			current.append(header);
+
+			label = document.createElement("label");
+			label.dataset.type = "text";
+			span = document.createElement("span");
+			span.appendChild(document.createTextNode(name));
+
+			input = document.createElement("input");
+			input.type = "text";
+			input.name = "_schedule[]";
+			input.value = name;
+			if (this.currentElement.attributes.readonly) {
+				input.disabled = true;
+			}
+			label.append(span, input);
+
+			cal.push(label);
 			for (const key of Object.keys(timeunit)) {
 				daytile = document.createElement("div");
 				daytile.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
@@ -2949,8 +2962,9 @@ export class Assemble {
 				current.append(daytile);
 
 				label = document.createElement("label");
+				label.classList.add("schedule");
 				label.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
-				if (!key.startsWith('_')) label.append(document.createTextNode(key));
+				if (!key.startsWith("_")) label.append(document.createTextNode(key));
 				labels.push(label);
 			}
 			current.append(...labels);
