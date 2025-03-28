@@ -2893,7 +2893,6 @@ export class Assemble {
 	 * 			name: "Transfer schedule",
 	 * 			readonly: true
 	 * 		},
-	 * 		hint: "Paint timespans",
 	 * 		content: {
 	 * 			"Name 1": [],
 	 * 			"Name 2": [],
@@ -2915,11 +2914,13 @@ export class Assemble {
 			labels,
 			label,
 			span,
-			every = 4;
+			every = 4,
+			labelcount;
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
 
 		// add paintable divs and labels like provided
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
+			labelcount = 0;
 			labels = [];
 			current = document.createElement("div");
 			current.classList.add("schedule");
@@ -2939,10 +2940,10 @@ export class Assemble {
 			label.append(span, input);
 
 			cal.push(label);
-			for (const key of Object.keys(timeunit)) {
+			for (const [lbl, clr] of Object.entries(timeunit)) {
 				daytile = document.createElement("div");
 				daytile.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
-				if (timeunit[key]) daytile.style.backgroundColor = timeunit[key];
+				if (clr) daytile.style.backgroundColor = clr;
 				if (!this.currentElement.attributes.readonly) {
 					daytile.addEventListener("click", (e) => {
 						e.target.style.backgroundColor = document.getElementById("_current").value;
@@ -2967,7 +2968,7 @@ export class Assemble {
 				label = document.createElement("label");
 				label.classList.add("schedule");
 				label.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
-				if (!key.startsWith("_")) label.append(document.createTextNode(key));
+				if (!(labelcount++ % every)) label.append(document.createTextNode(lbl));
 				labels.push(label);
 			}
 			current.append(...labels);
@@ -2988,7 +2989,7 @@ export class Assemble {
 			});
 			preset.push(current);
 		}
-		for (const [color, name] of Object.entries(this.currentElement.preset)) {
+		for (const [name, color] of Object.entries(this.currentElement.preset)) {
 			label = document.createElement("label");
 			label.dataset.type = "color";
 			span = document.createElement("span");
@@ -3005,6 +3006,15 @@ export class Assemble {
 				current.addEventListener("change", (e) => {
 					document.getElementById("_current").value = e.target.value;
 				});
+				current.addEventListener("contextmenu", (e) => {
+					e.preventDefault();
+					const options = {};
+					options[api._lang.GET("general.cancel_button")] = false;
+					options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+					new Dialog({ type: "confirm", header: api._lang.GET("calendar.transferschedule.deletecolor"), options: options }).then((confirmation) => {
+						if (confirmation) e.target.parentNode.remove();
+					});
+				});
 			} else {
 				current.addEventListener("click", (e) => {
 					e.preventDefault();
@@ -3016,10 +3026,10 @@ export class Assemble {
 		// add button to append another color selection
 		current = document.createElement("button");
 		current.append(document.createTextNode(api._lang.GET("calendar.transferschedule.addcolor")));
-		current.addEventListener("click",(e)=> {
+		current.addEventListener("click", (e) => {
 			const options = {};
-			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
-			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			options[api._lang.GET("general.cancel_button")] = false;
+			options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
 			new Dialog({
 				type: "input",
 				header: api._lang.GET("calendar.transferschedule.addcolor_name"),
@@ -3035,8 +3045,7 @@ export class Assemble {
 				],
 				options: options,
 			}).then((response) => {
-				if (response) {
-					console.log(response);
+				if (response && response[api._lang.GET("calendar.transferschedule.addcolor_name")]) {
 					let label = document.createElement("label");
 					label.dataset.type = "color";
 					let span = document.createElement("span");
@@ -3051,13 +3060,24 @@ export class Assemble {
 					input.addEventListener("change", (e) => {
 						document.getElementById("_current").value = e.target.value;
 					});
+					input.addEventListener("contextmenu", (e) => {
+						e.preventDefault();
+						const options = {};
+						options[api._lang.GET("general.cancel_button")] = false;
+						options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+						new Dialog({ type: "confirm", header: api._lang.GET("calendar.transferschedule.deletecolor"), options: options }).then((confirmation) => {
+							if (confirmation) e.target.parentNode.remove();
+						});
+					});
 					label.append(span, input);
 					e.target.parentNode.insertBefore(label, e.target);
 				}
 			});
 		});
 		preset.push(current);
-
+		if (!this.currentElement.attributes.readonly) {
+			this.currentElement.hint = api._lang.GET("calendar.transferschedule.hint");
+		}
 		return [...this.header(), ...cal, ...preset, ...this.hint()];
 	}
 
