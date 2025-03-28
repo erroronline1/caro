@@ -517,8 +517,8 @@ label {
 		margin-left: 0.5em;
 		padding: 0 0.5em;
 		background: var(--article);
-		max-width:94%;
-		display:inline-block
+		max-width: 94%;
+		display: inline-block;
 	}
 
 	input[type="text"],
@@ -529,6 +529,7 @@ label {
 	input[type="time"],
 	input[type="tel"],
 	input[type="email"],
+	input[type="color"],
 	textarea,
 	select,
 	.editor {
@@ -546,6 +547,10 @@ label {
 
 	input[type="number"] {
 		appearance: textfield;
+	}
+
+	input[type="color"] {
+		min-height: 3.5em;
 	}
 }
 
@@ -1075,6 +1080,13 @@ article:has(> article) {
 	opacity: 0.4;
 }
 
+.schedule {
+	border: 1px solid black;
+	border-radius: 2px;
+	margin: 0;
+	height: 1em;
+	display: inline-block;
+}
 /*************************** messages ******************************/
 
 .message {

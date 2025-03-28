@@ -2912,7 +2912,9 @@ export class Assemble {
 			preset = [],
 			daytile,
 			header,
-			current;
+			current,
+			label,
+			span;
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
 
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
@@ -2921,9 +2923,9 @@ export class Assemble {
 			cal.push(header);
 			for (let i = 0; i < units; i++) {
 				daytile = document.createElement("div");
-				daytile.style = "border:1px solid black; margin:0; width:calc(90% / " + units + "); height:1em; display:inline-block;";
-				if (timeunit[i]) daytile.style.backgroundColor= timeunit[i];
-				console.log(daytile.style);
+				daytile.classList.add("schedule");
+				daytile.style.width = "calc(90% / " + units + ")";
+				if (timeunit[i]) daytile.style.backgroundColor = timeunit[i];
 				if (!this.currentElement.attributes.readonly) {
 					daytile.addEventListener("click", (e) => {
 						e.target.style.backgroundColor = document.getElementById("_current").value;
@@ -2960,6 +2962,11 @@ export class Assemble {
 			preset.push(current);
 		}
 		for (const [color, name] of Object.entries(this.currentElement.preset)) {
+			label = document.createElement("label");
+			label.dataset.type="color";
+			span = document.createElement("span");
+			span.appendChild(document.createTextNode(name));
+
 			current = document.createElement("input");
 			current.type = "color";
 			current.name = name;
@@ -2976,7 +2983,8 @@ export class Assemble {
 					e.preventDefault();
 				});
 			}
-			preset.push(current);
+			label.append(span, current);
+			preset.push(label);
 		}
 		return [...this.header(), ...cal, ...preset, ...this.hint()];
 	}
