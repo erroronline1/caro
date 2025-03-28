@@ -2930,15 +2930,19 @@ export class Assemble {
 			span = document.createElement("span");
 			span.appendChild(document.createTextNode(api._lang.GET("calendar.transferschedule.name")));
 
-			input = document.createElement("input");
-			input.type = "text";
-			input.name = "_schedule[]";
-			input.value = name;
-			if (this.currentElement.attributes.readonly) {
-				input.disabled = true;
+			if (!this.currentElement.attributes.readonly) {
+				input = document.createElement("input");
+				input.type = "text";
+				input.name = "_schedule[]";
+				input.value = name;
+				if (this.currentElement.attributes.readonly) {
+					input.disabled = true;
+				}
+				label.append(span, input);
+			} else {
+				label = document.createElement("header");
+				label.append(document.createTextNode(name));
 			}
-			label.append(span, input);
-
 			cal.push(label);
 			for (const [lbl, clr] of Object.entries(timeunit)) {
 				daytile = document.createElement("div");
@@ -3024,58 +3028,59 @@ export class Assemble {
 			preset.push(label);
 		}
 		// add button to append another color selection
-		current = document.createElement("button");
-		current.append(document.createTextNode(api._lang.GET("calendar.transferschedule.addcolor")));
-		current.addEventListener("click", (e) => {
-			const options = {};
-			options[api._lang.GET("general.cancel_button")] = false;
-			options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-			new Dialog({
-				type: "input",
-				header: api._lang.GET("calendar.transferschedule.addcolor_name"),
-				render: [
-					[
-						{
-							type: "text",
-							attributes: {
-								name: api._lang.GET("calendar.transferschedule.addcolor_name"),
-							},
-						},
-					],
-				],
-				options: options,
-			}).then((response) => {
-				if (response && response[api._lang.GET("calendar.transferschedule.addcolor_name")]) {
-					let label = document.createElement("label");
-					label.dataset.type = "color";
-					let span = document.createElement("span");
-					span.appendChild(document.createTextNode(response[api._lang.GET("calendar.transferschedule.addcolor_name")]));
-
-					let input = document.createElement("input");
-					input.type = "color";
-					input.name = response[api._lang.GET("calendar.transferschedule.addcolor_name")];
-					input.addEventListener("click", (e) => {
-						document.getElementById("_current").value = e.target.value;
-					});
-					input.addEventListener("change", (e) => {
-						document.getElementById("_current").value = e.target.value;
-					});
-					input.addEventListener("contextmenu", (e) => {
-						e.preventDefault();
-						const options = {};
-						options[api._lang.GET("general.cancel_button")] = false;
-						options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-						new Dialog({ type: "confirm", header: api._lang.GET("calendar.transferschedule.deletecolor"), options: options }).then((confirmation) => {
-							if (confirmation) e.target.parentNode.remove();
-						});
-					});
-					label.append(span, input);
-					e.target.parentNode.insertBefore(label, e.target);
-				}
-			});
-		});
-		preset.push(current);
+		// and hint
 		if (!this.currentElement.attributes.readonly) {
+			current = document.createElement("button");
+			current.append(document.createTextNode(api._lang.GET("calendar.transferschedule.addcolor")));
+			current.addEventListener("click", (e) => {
+				const options = {};
+				options[api._lang.GET("general.cancel_button")] = false;
+				options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("calendar.transferschedule.addcolor_name"),
+					render: [
+						[
+							{
+								type: "text",
+								attributes: {
+									name: api._lang.GET("calendar.transferschedule.addcolor_name"),
+								},
+							},
+						],
+					],
+					options: options,
+				}).then((response) => {
+					if (response && response[api._lang.GET("calendar.transferschedule.addcolor_name")]) {
+						let label = document.createElement("label");
+						label.dataset.type = "color";
+						let span = document.createElement("span");
+						span.appendChild(document.createTextNode(response[api._lang.GET("calendar.transferschedule.addcolor_name")]));
+
+						let input = document.createElement("input");
+						input.type = "color";
+						input.name = response[api._lang.GET("calendar.transferschedule.addcolor_name")];
+						input.addEventListener("click", (e) => {
+							document.getElementById("_current").value = e.target.value;
+						});
+						input.addEventListener("change", (e) => {
+							document.getElementById("_current").value = e.target.value;
+						});
+						input.addEventListener("contextmenu", (e) => {
+							e.preventDefault();
+							const options = {};
+							options[api._lang.GET("general.cancel_button")] = false;
+							options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+							new Dialog({ type: "confirm", header: api._lang.GET("calendar.transferschedule.deletecolor"), options: options }).then((confirmation) => {
+								if (confirmation) e.target.parentNode.remove();
+							});
+						});
+						label.append(span, input);
+						e.target.parentNode.insertBefore(label, e.target);
+					}
+				});
+			});
+			preset.push(current);
 			this.currentElement.hint = api._lang.GET("calendar.transferschedule.hint");
 		}
 		return [...this.header(), ...cal, ...preset, ...this.hint()];
