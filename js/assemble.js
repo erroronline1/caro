@@ -2914,9 +2914,11 @@ export class Assemble {
 			current,
 			labels,
 			label,
-			span;
+			span,
+			every = 4;
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
 
+		// add paintable divs and labels like provided
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
 			labels = [];
 			current = document.createElement("div");
@@ -2925,7 +2927,7 @@ export class Assemble {
 			label = document.createElement("label");
 			label.dataset.type = "text";
 			span = document.createElement("span");
-			span.appendChild(document.createTextNode(name));
+			span.appendChild(document.createTextNode(api._lang.GET("calendar.transferschedule.name")));
 
 			input = document.createElement("input");
 			input.type = "text";
@@ -2945,6 +2947,10 @@ export class Assemble {
 					daytile.addEventListener("click", (e) => {
 						e.target.style.backgroundColor = document.getElementById("_current").value;
 					});
+					daytile.addEventListener("contextmenu", (e) => {
+						e.preventDefault();
+					});
+					// add constant drawing features
 					daytile.addEventListener("pointerdown", (e) => {
 						e.target.style.backgroundColor = document.getElementById("_current").value;
 						window.POINTERDOWN = true;
@@ -2954,9 +2960,6 @@ export class Assemble {
 					});
 					daytile.addEventListener("pointerenter", (e) => {
 						if (window.POINTERDOWN) e.target.style.backgroundColor = document.getElementById("_current").value;
-					});
-					daytile.addEventListener("contextmenu", (e) => {
-						e.preventDefault();
 					});
 				}
 				current.append(daytile);
@@ -2970,6 +2973,7 @@ export class Assemble {
 			current.append(...labels);
 			cal.push(current);
 		}
+		// add color selections
 		if (!this.currentElement.attributes.readonly) {
 			current = document.createElement("input");
 			current.type = "hidden";
@@ -2978,7 +2982,7 @@ export class Assemble {
 
 			current = document.createElement("button");
 			current.type = "button";
-			current.append(document.createTextNode("DELETE"));
+			current.append(document.createTextNode(api._lang.GET("calendar.transferschedule.delete")));
 			current.addEventListener("click", (e) => {
 				document.getElementById("_current").value = "inherit";
 			});
@@ -3009,6 +3013,51 @@ export class Assemble {
 			label.append(span, current);
 			preset.push(label);
 		}
+		// add button to append another color selection
+		current = document.createElement("button");
+		current.append(document.createTextNode(api._lang.GET("calendar.transferschedule.addcolor")));
+		current.addEventListener("click",(e)=> {
+			const options = {};
+			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({
+				type: "input",
+				header: api._lang.GET("calendar.transferschedule.addcolor_name"),
+				render: [
+					[
+						{
+							type: "text",
+							attributes: {
+								name: api._lang.GET("calendar.transferschedule.addcolor_name"),
+							},
+						},
+					],
+				],
+				options: options,
+			}).then((response) => {
+				if (response) {
+					console.log(response);
+					let label = document.createElement("label");
+					label.dataset.type = "color";
+					let span = document.createElement("span");
+					span.appendChild(document.createTextNode(response[api._lang.GET("calendar.transferschedule.addcolor_name")]));
+
+					let input = document.createElement("input");
+					input.type = "color";
+					input.name = response[api._lang.GET("calendar.transferschedule.addcolor_name")];
+					input.addEventListener("click", (e) => {
+						document.getElementById("_current").value = e.target.value;
+					});
+					input.addEventListener("change", (e) => {
+						document.getElementById("_current").value = e.target.value;
+					});
+					label.append(span, input);
+					e.target.parentNode.insertBefore(label, e.target);
+				}
+			});
+		});
+		preset.push(current);
+
 		return [...this.header(), ...cal, ...preset, ...this.hint()];
 	}
 
