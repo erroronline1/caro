@@ -490,7 +490,7 @@ export const _client = {
 				}
 			}
 			for (let c = 0; c < colors.length; c++) {
-				result.preset[colors[c].value] = colors[c].name;
+				result.preset[colors[c].name] = colors[c].value;
 			}
 			return result;
 		},

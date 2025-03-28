@@ -373,7 +373,6 @@ export function rendertest(element) {
 						attributes: {
 							name: "Transfer schedule",
 						},
-						hint: "Paint timespans",
 						content: {
 							"Name 1": {
 								"01.25": "#ff0000",
@@ -488,9 +487,9 @@ export function rendertest(element) {
 								_83: "#00ff00",				},
 						},
 						preset: {
-							"#ff0000": "Unit 1",
-							"#00ff00": "Unit 2",
-							"#0000ff": "Unit 3",
+							"Unit 1":"#ff0000",
+							"Unit 2":"#00ff00",
+							"Unit 3":"#0000ff",
 						},
 					},
 				],
