@@ -458,6 +458,34 @@ export const _client = {
 				}
 			}
 		},
+
+		transferSchedule: () => {
+			let names = document.getElementsByName("_schedule[]"),
+				schedules = document.querySelectorAll("div.schedule"),
+				schedule,
+				headers,
+				result = {};
+			if (!names || !schedules) return false;
+			for (let i = 0; i < names.length; i++) {
+				result[names[i].value] = {};
+				schedule = [];
+				headers = [];
+				for (let c = 0; c < schedules[i].childNodes.length; c++) {
+					if (schedules[i].childNodes[c].localName === "div") {
+						if (schedules[i].childNodes[c].style.backgroundColor && schedules[i].childNodes[c].style.backgroundColor !== "inherit") schedule.push(schedules[i].childNodes[c].style.backgroundColor);
+						else schedule.push(null);
+					}
+					if (schedules[i].childNodes[c].localName === "label") {
+						if (schedules[i].childNodes[c].childNodes.length) headers.push(schedules[i].childNodes[c].childNodes[0].textContent);
+						else headers.push(`_${c}`);
+					}
+				}
+				for (let h = 0; h < headers.length; h++) {
+					result[names[i].value][headers[h]] = schedule[h];
+				}
+			}
+			return result;
+		},
 	},
 	message: {
 		/**
