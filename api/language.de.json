@@ -688,6 +688,7 @@
 			"end": "Ende",
 			"hint": "Namen werden aus dem Ergebnis entfernt, sobald sie gelöscht werden. Farben können über die Kontextauswahl (Rechtsklick) entfernt werden.",
 			"name": "Name",
+			"new_hint":"Der Startmonat wird automatisch auf den ersten, der Endmonat auf den letzten Tag korrigiert. Die Planung erfolgt für halbe Monate.",
 			"select": "Auswählen",
 			"start": "Start",
 			"subject": "Betreff"

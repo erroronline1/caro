@@ -636,7 +636,8 @@ export const api = {
 			case "post":
 				switch (request[1]) {
 					case "longtermplanning":
-						payload = _.getInputs("[data-usecase=longtermplanning]", true);
+						if (!(payload = _client.calendar.longtermplanning()))
+							payload = _.getInputs("[data-usecase=longtermplanning]", true);
 						break;
 					default:
 						payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()

@@ -1069,7 +1069,6 @@ class CALENDAR extends API {
 				$today = new DateTime($this->_requestedDate, new DateTimeZone(CONFIG['application']['timezone']));
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
-					$uncompleted = [];
 					foreach ($pastEvents as $id => $row){
 						if ($row['type'] !== 'schedule' || ($row['affected_user_units'] && !array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) || $row['closed']) unset($pastEvents[$id]);
 					}
@@ -1241,6 +1240,132 @@ class CALENDAR extends API {
 			}
 		}
 		return $events;
+	}
+
+	public function longtermplanning(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
+				$result = ['render' => [
+					'form' => [
+						'data-usecase' => 'longtermplanning',
+						'action' => "javascript:api.calendar('post', 'longtermplanning')"
+					],
+					'content' => []]
+				];
+
+				// new planning
+				if (isset($this->_payload->{$this->_lang->PROPERTY('calendar.longtermplanning.select')})){
+					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')), new DateTimeZone(CONFIG['application']['timezone']));
+					$start->modify('first day of this month');
+					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')), new DateTimeZone(CONFIG['application']['timezone']));
+					$end->modify('last day of this month');
+					$span = $start->diff($end)->format('%m') * 2; // half months
+					if ($span < 2) $this->response([], 406);
+
+					$timeunits = [];
+					while ($start < $end){
+						$timeunits[$start->format('y-m-d')] = null;
+						$start->modify('+' . (floor($start->format('t') / 2)) . ' day'); // add approximately half a month
+						$timeunits[$start->format('y-m-d')] = null;
+						$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month 
+					}
+
+					$content = [];
+					foreach($this->_payload as $key => $value){
+						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
+							$content[$value] = $timeunits;
+						}
+					}
+					if (!$content) $this->response([], 406);
+
+
+					$result['render']['content'][] = [
+						[
+							'type' => 'longtermplanning',
+							'attributes' => [
+								'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.subject'))
+							],
+							'content' => $content
+						]
+					];
+				} 
+				// store planning
+				else {
+var_dump($this->_payload);
+				}
+				break;
+			case 'GET':
+				$result = ['render' => [
+					'form' => [
+						'data-usecase' => 'longtermplanning',
+						'action' => "javascript:api.calendar('post', 'longtermplanning')"
+					],
+					'content' => []]
+				];
+				$select = [
+					'edit' => [
+						'...' => ['value' => '0']
+					]
+				];
+				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', ['values' => [':type' => 'longtermplanning']]);
+
+				foreach($schedules as $schedule){
+					$select['edit'][$schedule['subject']] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
+				}
+
+				$result['render']['content'][] = [
+					[
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.longtermplanning.select'),
+							'onchange' => "if (this.value !== '0') api.calendar('get', 'longtermplanning', this.value);"
+						],
+						'content' => $select['edit']
+					]
+				];
+				if ($this->_requestedId){
+
+				}
+				else {
+					if (PERMISSION::permissionFor('longtermplanning')){
+						$result['render']['content'][] = [
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.subject'),
+									'required' => true
+								]
+							], [
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.start'),
+									'required' => true
+								]
+							], [
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.end'),
+									'required' => true
+								],
+								'hint' => $this->_lang->GET('calendar.longtermplanning.new_hint')
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.name'),
+									'multiple' => true
+								]
+							]
+						];
+					}
+				}
+
+				break;
+			case 'DELETE':
+				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
+				break;
+		}
+		$this->response($result);
 	}
 }
 ?>

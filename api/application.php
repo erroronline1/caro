@@ -499,7 +499,8 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.records.record_summary') => ['onclick' => "api.record('get', 'records')"]
 			],
 			$this->_lang->GET('menu.calendar.header') => [
-				$this->_lang->GET('menu.calendar.scheduling') => ['onclick' => "api.calendar('get', 'schedule')"]
+				$this->_lang->GET('menu.calendar.scheduling') => ['onclick' => "api.calendar('get', 'schedule')"],
+				$this->_lang->GET('menu.calendar.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
 			],
 			$this->_lang->GET('menu.application.header') => [
 				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('post', 'login', 'logout')"],

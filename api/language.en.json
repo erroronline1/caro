@@ -688,6 +688,7 @@
 			"end": "End",
 			"hint": "Names will be removed from result if left empty. Colors can be removed via context selection (right click).",
 			"name": "Name",
+			"new_hint":"The starting month will be set to the first, the ending month to the last day by default. Planning occurs for half months.",
 			"select": "Select",
 			"start": "Start",
 			"subject": "Subject"
@@ -877,7 +878,7 @@
 		},
 		"calendar": {
 			"header": "Calendar",
-			"longtermplanning": "Transfer schedule",
+			"longtermplanning": "Long term planning",
 			"scheduling": "Scheduling",
 			"timesheet": "Timesheet"
 		},
