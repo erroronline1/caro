@@ -1375,6 +1375,19 @@ class CALENDAR extends API {
 							],
 							'content' => $misc['content'],
 							'preset' => $misc['preset']
+						], [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('calendar.longtermplanning.author', [':author' => $planning['author']])
+							]
+						], [
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => $this->_lang->GET('calendar.longtermplanning.delete'),
+								'type' => 'button',
+								'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.longtermplanning.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('general.ok_button') . "': {'value': true, class: 'reducedCTA'}}})" .
+									".then(confirmation => {if (confirmation) api.calendar('delete', 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
+							]
 						]
 					];
 				}
@@ -1410,10 +1423,23 @@ class CALENDAR extends API {
 						];
 					}
 				}
-
 				break;
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
+				if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+					'values' => [
+						':id' => $this->_requestedId
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_error'),
+						'type' => 'error'
+					]]);
 				break;
 		}
 		$this->response($result);
