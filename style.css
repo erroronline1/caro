@@ -1094,6 +1094,9 @@ article:has(> article) {
 		margin: 0;
 		padding: 0;
 		border-left: 1px solid var(--foreground);
+		font-size: 0.5em;
+		max-height: 3.3em;
+		overflow: hidden;
 	}
 }
 /*************************** messages ******************************/
