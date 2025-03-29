@@ -2908,47 +2908,47 @@ export class Assemble {
 	longtermplanning() {
 		let cal = [],
 			preset = [],
-			daytile,
-			input,
 			current,
 			labels,
 			label,
-			span,
-			every = 4,
-			labelcount;
+			every = 4;
 		this.currentElement.description = this.currentElement.attributes.name !== undefined ? this.currentElement.attributes.name : "";
 
-		// add paintable divs and labels like provided
-		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
-			labelcount = 0;
-			labels = [];
-			current = document.createElement("div");
-			current.classList.add("schedule");
-
-			label = document.createElement("label");
-			label.dataset.type = "text";
-			span = document.createElement("span");
-			span.appendChild(document.createTextNode(api._lang.GET("calendar.longtermplanning.name")));
-
-			if (!this.currentElement.attributes.readonly) {
+		/**
+		 * create a name input for editing mode
+		 * @param {string} name
+		 * @returns {domNode} label containing span and input
+		 */
+		function namefield(name) {
+			let label = document.createElement("label"),
+				span = document.createElement("span"),
 				input = document.createElement("input");
-				input.type = "text";
-				input.name = "_schedule[]";
-				input.value = name;
-				if (this.currentElement.attributes.readonly) {
-					input.disabled = true;
-				}
-				label.append(span, input);
-			} else {
-				label = document.createElement("header");
-				label.append(document.createTextNode(name));
-			}
-			cal.push(label);
-			for (const [lbl, clr] of Object.entries(timeunit)) {
+			label.dataset.type = "text";
+			span.appendChild(document.createTextNode(api._lang.GET("calendar.longtermplanning.name")));
+			input.type = "text";
+			input.name = "_schedule[]";
+			input.value = name;
+			label.append(span, input);
+			return label;
+		}
+
+		/**
+		 * create a schedule display
+		 * @param {object} timeunits of label-color pairs
+		 * @param {*} readonly whatever compares to boolean
+		 * @returns array of dom nodes
+		 */
+		function schedules(timeunits, readonly = false, every = 4) {
+			let daytile,
+				label,
+				labels = [],
+				labelcount = 0,
+				result = [];
+			for (const [lbl, clr] of Object.entries(timeunits)) {
 				daytile = document.createElement("div");
-				daytile.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
+				daytile.style.width = "calc(100% / " + Object.entries(timeunits).length + ")";
 				if (clr) daytile.style.backgroundColor = clr;
-				if (!this.currentElement.attributes.readonly) {
+				if (!readonly) {
 					daytile.addEventListener("click", (e) => {
 						e.target.style.backgroundColor = document.getElementById("_current").value;
 					});
@@ -2967,20 +2967,119 @@ export class Assemble {
 						if (window.POINTERDOWN) e.target.style.backgroundColor = document.getElementById("_current").value;
 					});
 				}
-				current.append(daytile);
+				result.push(daytile);
 
 				label = document.createElement("label");
 				label.classList.add("schedule");
-				label.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
+				label.style.width = "calc(100% / " + Object.entries(timeunits).length + ")";
 				label.append(document.createTextNode(lbl));
 				if (labelcount++ % every) label.style.visibility = "hidden";
 				labels.push(label);
 			}
-			current.append(...labels);
+			result.push(...labels);
+			return result;
+		}
+
+		/**
+		 * create a color input to draw with
+		 * @param {string} name for input and label
+		 * @param {string} color hex-notation
+		 * @param {*} readonly whatever compares to boolean
+		 * @returns {domNode} label containing span and input
+		 */
+		function colorselection(name, color = "#000000", readonly = false) {
+			let label = document.createElement("label"),
+				span = document.createElement("span"),
+				input = document.createElement("input");
+			label.dataset.type = "color";
+			span.appendChild(document.createTextNode(name));
+
+			input.type = "color";
+			input.name = name;
+			input.value = color;
+			if (!readonly) {
+				input.addEventListener("click", (e) => {
+					document.getElementById("_current").value = e.target.value;
+				});
+				input.addEventListener("change", (e) => {
+					document.getElementById("_current").value = e.target.value;
+				});
+				input.addEventListener("contextmenu", (e) => {
+					e.preventDefault();
+					const options = {};
+					options[api._lang.GET("general.cancel_button")] = false;
+					options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+					new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.delete_color_header"), options: options }).then((confirmation) => {
+						if (confirmation) e.target.parentNode.remove();
+					});
+				});
+			} else {
+				input.addEventListener("click", (e) => {
+					e.preventDefault();
+				});
+			}
+			label.append(span, input);
+			return label;
+		}
+
+		// add paintable divs and labels like provided
+		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
+			current = document.createElement("div");
+			current.classList.add("schedule");
+
+			if (!this.currentElement.attributes.readonly) {
+				label = namefield(name);
+			} else {
+				label = document.createElement("header");
+				label.append(document.createTextNode(name));
+			}
+			cal.push(label);
+			current.append(...schedules(timeunit, this.currentElement.attributes.readonly, every));
+			labels = timeunit; // pass last timeunit to method scoped labels for reuse in case of appending another name
 			cal.push(current);
 		}
-		// add color selections
 		if (!this.currentElement.attributes.readonly) {
+			// add button to add a new name
+			current = document.createElement("button");
+			current.type = "button";
+			current.append(document.createTextNode(api._lang.GET("calendar.longtermplanning.addname")));
+			current.addEventListener("click", (e) => {
+				const options = {};
+				options[api._lang.GET("general.cancel_button")] = false;
+				options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("calendar.longtermplanning.addname"),
+					render: [
+						[
+							{
+								type: "text",
+								attributes: {
+									name: api._lang.GET("calendar.longtermplanning.addname"),
+								},
+							},
+						],
+					],
+					options: options,
+				}).then((response) => {
+					if (response && response[api._lang.GET("calendar.longtermplanning.addname")]) {
+						// add name input
+						e.target.parentNode.insertBefore(namefield(response[api._lang.GET("calendar.longtermplanning.addname")]), e.target);
+						// add schedule display
+						let div = document.createElement("div");
+						div.classList.add("schedule");
+						Object.keys(labels).forEach((key) => {
+							// unset colors
+							labels[key] = null;
+						});
+						div.append(...schedules(labels, false, every));
+						e.target.parentNode.insertBefore(div, e.target);
+					}
+				});
+			});
+			preset.push(current);
+
+			// add color selection and erase button
 			current = document.createElement("input");
 			current.type = "hidden";
 			current.id = "_current";
@@ -2994,40 +3093,11 @@ export class Assemble {
 			});
 			preset.push(current);
 		}
+		// add colors
 		if (this.currentElement.preset) {
 			for (const [name, color] of Object.entries(this.currentElement.preset)) {
-				label = document.createElement("label");
-				label.dataset.type = "color";
-				span = document.createElement("span");
-				span.appendChild(document.createTextNode(name));
-
-				current = document.createElement("input");
-				current.type = "color";
-				current.name = name;
-				current.value = color;
-				if (!this.currentElement.attributes.readonly) {
-					current.addEventListener("click", (e) => {
-						document.getElementById("_current").value = e.target.value;
-					});
-					current.addEventListener("change", (e) => {
-						document.getElementById("_current").value = e.target.value;
-					});
-					current.addEventListener("contextmenu", (e) => {
-						e.preventDefault();
-						const options = {};
-						options[api._lang.GET("general.cancel_button")] = false;
-						options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-						new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.delete_color_header"), options: options }).then((confirmation) => {
-							if (confirmation) e.target.parentNode.remove();
-						});
-					});
-				} else {
-					current.addEventListener("click", (e) => {
-						e.preventDefault();
-					});
-				}
-				label.append(span, current);
-				preset.push(label);
+				current = colorselection(name, color, this.currentElement.attributes.readonly);
+				preset.push(current);
 			}
 		}
 		// add button to append another color selection
@@ -3056,30 +3126,7 @@ export class Assemble {
 					options: options,
 				}).then((response) => {
 					if (response && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
-						let label = document.createElement("label");
-						label.dataset.type = "color";
-						let span = document.createElement("span");
-						span.appendChild(document.createTextNode(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]));
-
-						let input = document.createElement("input");
-						input.type = "color";
-						input.name = response[api._lang.GET("calendar.longtermplanning.addcolor_name")];
-						input.addEventListener("click", (e) => {
-							document.getElementById("_current").value = e.target.value;
-						});
-						input.addEventListener("change", (e) => {
-							document.getElementById("_current").value = e.target.value;
-						});
-						input.addEventListener("contextmenu", (e) => {
-							e.preventDefault();
-							const options = {};
-							options[api._lang.GET("general.cancel_button")] = false;
-							options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-							new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.delete_color_header"), options: options }).then((confirmation) => {
-								if (confirmation) e.target.parentNode.remove();
-							});
-						});
-						label.append(span, input);
+						let label = colorselection(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]);
 						e.target.parentNode.insertBefore(label, e.target);
 					}
 				});
