@@ -1364,7 +1364,19 @@ class CALENDAR extends API {
 					]
 				];
 				if ($this->_requestedId){
-
+					$planning = $schedules[array_search($this->_requestedId, array_column($schedules, 'id'))];
+					if (!$planning) $this->response([], 404);
+					$misc = json_decode($planning['misc'], true);
+					$result['render']['content'][] = [
+						[
+							'type' => 'longtermplanning',
+							'attributes' => [
+								'name' => $planning['subject']
+							],
+							'content' => $misc['content'],
+							'preset' => $misc['preset']
+						]
+					];
 				}
 				else {
 					if (PERMISSION::permissionFor('longtermplanning')){
