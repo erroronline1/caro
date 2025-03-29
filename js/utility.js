@@ -460,16 +460,18 @@ export const _client = {
 		},
 
 		/**
-		 * converts painted longtermplanning into an object
+		 * converts painted longtermplanning into formdata
 		 */
 		longtermplanning: () => {
 			let names = document.getElementsByName("_schedule[]"),
+				name = document.querySelector("[data-type=longtermplanning"),
 				schedules = document.querySelectorAll("div.schedule"),
 				colors = document.querySelectorAll("input[type=color]"),
 				schedule,
 				headers,
-				result = { preset: {}, content: {} };
-			if (!names || !schedules) return false;
+				result = { name: "", preset: {}, content: {} };
+			if (!names || !schedules || !name) return false;
+			result.name = name.textContent;
 			for (let i = 0; i < names.length; i++) {
 				if (!names[i].value) continue;
 				result.content[names[i].value] = {};
@@ -492,7 +494,12 @@ export const _client = {
 			for (let c = 0; c < colors.length; c++) {
 				result.preset[colors[c].name] = colors[c].value;
 			}
-			return result;
+
+			let response = new FormData();
+			response.append("name", result.name);
+			response.append("content", JSON.stringify(result.content));
+			response.append("preset", JSON.stringify(result.preset));
+			return response;
 		},
 	},
 	message: {
