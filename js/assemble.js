@@ -2993,44 +2993,47 @@ export class Assemble {
 			});
 			preset.push(current);
 		}
-		for (const [name, color] of Object.entries(this.currentElement.preset)) {
-			label = document.createElement("label");
-			label.dataset.type = "color";
-			span = document.createElement("span");
-			span.appendChild(document.createTextNode(name));
+		if (this.currentElement.preset) {
+			for (const [name, color] of Object.entries(this.currentElement.preset)) {
+				label = document.createElement("label");
+				label.dataset.type = "color";
+				span = document.createElement("span");
+				span.appendChild(document.createTextNode(name));
 
-			current = document.createElement("input");
-			current.type = "color";
-			current.name = name;
-			current.value = color;
-			if (!this.currentElement.attributes.readonly) {
-				current.addEventListener("click", (e) => {
-					document.getElementById("_current").value = e.target.value;
-				});
-				current.addEventListener("change", (e) => {
-					document.getElementById("_current").value = e.target.value;
-				});
-				current.addEventListener("contextmenu", (e) => {
-					e.preventDefault();
-					const options = {};
-					options[api._lang.GET("general.cancel_button")] = false;
-					options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-					new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.deletecolor"), options: options }).then((confirmation) => {
-						if (confirmation) e.target.parentNode.remove();
+				current = document.createElement("input");
+				current.type = "color";
+				current.name = name;
+				current.value = color;
+				if (!this.currentElement.attributes.readonly) {
+					current.addEventListener("click", (e) => {
+						document.getElementById("_current").value = e.target.value;
 					});
-				});
-			} else {
-				current.addEventListener("click", (e) => {
-					e.preventDefault();
-				});
+					current.addEventListener("change", (e) => {
+						document.getElementById("_current").value = e.target.value;
+					});
+					current.addEventListener("contextmenu", (e) => {
+						e.preventDefault();
+						const options = {};
+						options[api._lang.GET("general.cancel_button")] = false;
+						options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+						new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.deletecolor"), options: options }).then((confirmation) => {
+							if (confirmation) e.target.parentNode.remove();
+						});
+					});
+				} else {
+					current.addEventListener("click", (e) => {
+						e.preventDefault();
+					});
+				}
+				label.append(span, current);
+				preset.push(label);
 			}
-			label.append(span, current);
-			preset.push(label);
 		}
 		// add button to append another color selection
 		// and hint
 		if (!this.currentElement.attributes.readonly) {
 			current = document.createElement("button");
+			current.type = "button";
 			current.append(document.createTextNode(api._lang.GET("calendar.longtermplanning.addcolor")));
 			current.addEventListener("click", (e) => {
 				const options = {};
