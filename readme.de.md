@@ -622,6 +622,19 @@ graph TD;
     database2-.->summary;
     summary-......->select_day
 ```
+
+Der Kalender unterstützt eine Langzeitplanung, wie sie etwa für die Einteilung von Auszubildenden über die Bereiche hinweg genutzt werden kann. Hier können innerhalb festgelegter Zeiträume farbliche Markierungen genutzt werden um z.B. Zuordnungen darzustellen. Der Editor erlaubt dabei auch den Import von vorausgehenden Planungen in den neuen Zeitraum, sowie das Hinzufügen und Entfernen von Namen und Farbvorlagen. Dabei sind Namen nicht zwingend Personen zuzuordnen und Farben nicht notwendigerweise Bereichen - die Planung kann für beliebige Zwecke verwendet werden. Planungen sind von jedem Nutzer einsehbar, editierbar jedoch nur von Nutzern mit entsprechender Berechtigung. Die Planungen haben nur einen informellen Character und sind keine dauerhaften Aufzeichnungen.
+
+Die Planung ist einfach zu nutzen:
+* Bezeichnung und Zeitraum definieren
+* betroffene Personen oder Themen benennen
+* Farben für Bereiche oder Aufgaben definieren
+* den Zeitraum für Namen/Themen mit einer gewählten Farbe einfärben, mit der Maus oder einem geeigneten Zeiger
+
+Gewählte Zeiträume werden auf den ersten Tag des Startmonats und den letzten Tag des Endmonats korrigiert. Die Einfärbung erfolgt für halbe Monate.
+
+![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning%20de.png)
+
 [Übersicht](#übersicht)
 
 ## Dateien
@@ -1185,6 +1198,7 @@ formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Do
 documentcomposer = "ceo, qmo" ; Dokumente und Komponenten erstellen
 documentexport = "ceo, qmo, supervisor" ; Dokumente als PDF exportieren
 incorporation = "ceo, qmo, prrc" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
+longtermplanning = "ceo, qmo, supervisor" ; Anlegen, Ändern und Löschen von Langzeitplanungen
 measureedit = "ceo, qmo, prrc" ; Verbesserungsvorschläge bearbeiten, schließen und löschen
 mdrsamplecheck = "ceo, qmo, prrc"; Stichprobenprüfung zurücksetzen - müssen auch Zugriff auf regulatorische Auswertungen haben
 orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Bereiche hinzuzufügen
@@ -1738,7 +1752,7 @@ Diese Anwendung entspricht teilweise den Richtlinien für [barrierefreie Webinha
 Die Anwendung wurde zuletzt am 08. Februar 2025 getestet.
 
 #### Erstellung der Erklärung
-Diese Erklärung wurde am 08. Februar 2025 erstellt.
+Diese Erklärung wurde am 30. März 2025 erstellt.
 
 Die Erklärung basiert auf den automatisierten Analyseergebnissen des [axe DevTools Firefox Plugins](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/).
 
@@ -1767,6 +1781,7 @@ Bekannte Einschränkungen auf der CARO App:
 * Farbkontrast-Verhältnisse erreichen standardmäßig nicht die gewünschte Grenze. Sie können ein hoffentlich adäquates Farbschema im Nutzerprofil wählen.
 * Manche horizontal scrollbare Bereiche haben keine direkte Tastaturerreichbarkeit. Der Desktopmodus stellt Bedienelemente für die Navigation zur Verfügung. Für Bildschirmleser sind diese verborgen. Horizontal scrollbare Bereiche reduzieren die visuelle Informationsfülle für zweitranginge aber zugehörige Informationen und werden daher als insgesamt vorteilhaft betrachtet, auch trotz möglicher Konflikte mit dem Informationsfluss-Kriterium.
 * Der Ablauf von Verbindungen ist nicht individuell anpassbar, da dies eine Servereinstellung ist. Bitte besprechen sie diese [allgemein anpassbare Einstellung](#servereinrichtung) mit Ihrem Betreiber.
+* Langzeitplanungen werden durch die Einfärbung kleiner Bildschirmbereiche umgesetzt. Die Barrierefreiheit für diese spezielle Funktion kann aufgrund der Dimensionen und Kontraste beeinträchtigt sein. Für die Einfärbung kann neben der Legende keine zusätzliche Beschreibung zur Verfügung gestellt werden.
 
 [Übersicht](#übersicht)
 

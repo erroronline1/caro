@@ -121,8 +121,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * update readme pictures on tools menu, record menu, audit and regulatory
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
-* transfer schedule (apprentices)
-    * documentation, also config entry
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -705,6 +703,19 @@ graph TD;
     database2-.->summary;
     summary-......->select_day
 ```
+
+The calendar supports long term planning like used for assigning appretices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any porpose. Plans are accessible by anyone, editable by permitted users only. Longterm planning is informal only and not a persistent record.
+
+Planning is easy to use:
+* assign a name, define a timespan
+* define affected names or topics
+* define colors for units or actions
+* colourize the timespan for each name/topic with a selected color using a mouse or suitable pointer
+
+Given timespans are corrected to the first day of selected starting month and last day of ending month. Colourizing is possible for half months.
+
+![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning.png)
+
 [Content](#content)
 
 ## Files
@@ -1261,6 +1272,7 @@ documentapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve document
 documentcomposer = "ceo, qmo" ; compose documents
 documentexport = "ceo, qmo, supervisor" ; export documents as printable pdf
 incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+longtermplanning = "ceo, qmo, supervisor" ; set up transfer schedules or other long term planning
 measureedit = "ceo, qmo, prrc" ; edit, close and delete measures
 mdrsamplecheck = "ceo, qmo, prrc"; must have access to regulatory as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones
@@ -2032,7 +2044,7 @@ This application is partially compliant with the [Web Content Accessibility Guid
 The website was last tested on 08 February 2025.
 
 #### Preparation of this statement
-This statement was prepared on 08 February 2025.
+This statement was prepared on 30 March 2025.
 
 The statement is based on analysis feedback of the [axe DevTools Firefox plugin](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/), using automated testing.
 
@@ -2061,6 +2073,7 @@ Known limitations for the CARO App:
 * Color contrast ratios are not meeting desired thresholds by default. You are able to select a hopefully adequate theme within your user profile.
 * Some horizontal scrollable regions lack direct keyboard access. Desktop mode does provide buttons to navigate these regions. Navigation buttons are hidden for screen readers. Horizontal scrollable regions reduce visual information load for secondary, yet related information, and are therefore considered beneficial in general, even while possibly conflicting reflow criterion.
 * Connection timeout is not individually adjustable as this is a server setting. Please discuss this [general adjustable setting](#server-setup) with your operator.
+* Longterm planning happens with colourizing small areas on the screen. Accessibility my be reduced for this particular function due to dimensions and contrast. Beside the legend no additional description can be provided for colourisation.
 
 [Content](#content)
 
@@ -2559,6 +2572,48 @@ Parameters
 Sample response
 ```
 {"response":{"msg":"Event has been marked as completed.","type":"success"},"data":{"calendar_uncompletedevents":1}}
+```
+
+> POST ./api/api.php/calendar/longtermplanning
+
+Initiates a new planning form or updates or stores a new longterm plan.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | either new planning parameters or actual planning data to store |
+
+Sample response
+```
+{"response":{"msg":"Planning has been saved","type":"success"}}
+```
+
+> GET ./api/api.php/calendar/longtermplanning/{id}
+
+Returns a selection of available longterm plans, selected plan if requested id matches, initiation form if permission is available.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | defines the response, none if omitted |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select","onchange":"if (this.value !== '0') api.calendar('get', 'longtermplanning', this.value);"},"content":{"...":{"value":"0"},"Apprentices training schedule 24":{"value":11}}}],[{"type":"text","attributes":{"name":"Subject","required":true}},{"type":"date","attributes":{"name":"Start","required":true}},{"type":"date","attributes":{"name":"End","required":true},"hint":"The starting month will be set to the first, the ending month to the last day by default. Planning occurs for half months."},{"type":"text","attributes":{"name":"Name","multiple":true}},{"type":"select","attributes":{"name":"Import existing plan for selected timespan"},"content":{"...":{"value":"0"},"Apprentices training schedule 24":{"value":11}}}]],"form":{"data-usecase":"longtermplanning","action":"javascript:api.calendar('post', 'longtermplanning')"}}}
+```
+
+> DELETE ./api/api.php/calendar/longtermplanning/{id}
+
+Deletes longterm plan.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"response":{"msg":"Planning deleted","type":"success"}}
 ```
 
 > GET ./api/api.php/calendar/monthlyTimesheets/{date Y-m-d}
