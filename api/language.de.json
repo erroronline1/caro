@@ -688,7 +688,9 @@
 			"end": "Ende",
 			"hint": "Namen werden aus dem Ergebnis entfernt, sobald sie gelöscht werden. Farben können über die Kontextauswahl (Rechtsklick) entfernt werden.",
 			"name": "Name",
-			"new_hint":"Der Startmonat wird automatisch auf den ersten, der Endmonat auf den letzten Tag korrigiert. Die Planung erfolgt für halbe Monate.",
+			"new_hint": "Der Startmonat wird automatisch auf den ersten, der Endmonat auf den letzten Tag korrigiert. Die Planung erfolgt für halbe Monate.",
+			"save_error": "Die Planung konnte nicht gespeichert werden, bitte versuche es erneut.",
+			"save_success": "Die Planung wurde gespeichert",
 			"select": "Auswählen",
 			"start": "Start",
 			"subject": "Betreff"

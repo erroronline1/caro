@@ -689,6 +689,8 @@
 			"hint": "Names will be removed from result if left empty. Colors can be removed via context selection (right click).",
 			"name": "Name",
 			"new_hint":"The starting month will be set to the first, the ending month to the last day by default. Planning occurs for half months.",
+			"save_error": "Planning could not be saved, please try again.",
+			"save_success": "Planning has been saved",
 			"select": "Select",
 			"start": "Start",
 			"subject": "Subject"

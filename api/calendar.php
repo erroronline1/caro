@@ -1110,13 +1110,12 @@ class CALENDAR extends API {
 						'msg' => $this->_lang->GET('calendar.schedule.not_found'),
 						'type' => 'error'
 					]]);
-			
 				break;
 		}
 		$this->response($result);
 	}
 
-		/**
+	/**
 	 *   _   _               _           _           _       _
 	 *  | |_|_|_____ ___ ___| |_ ___ ___| |_ ___ ___| |_ ___|_|___ ___
 	 *  |  _| |     | -_|_ -|   | -_| -_|  _| -_|   |  _|  _| | -_|_ -|
@@ -1242,6 +1241,20 @@ class CALENDAR extends API {
 		return $events;
 	}
 
+	/**
+	 *   _             _                     _             _         
+	 *  | |___ ___ ___| |_ ___ ___ _____ ___| |___ ___ ___|_|___ ___ 
+	 *  | | . |   | . |  _| -_|  _|     | . | | .'|   |   | |   | . |
+	 *  |_|___|_|_|_  |_| |___|_| |_|_|_|  _|_|__,|_|_|_|_|_|_|_|_  |
+	 *            |___|                 |_|                     |___|
+	 * handle long term planning
+	 * post either displays half prepared planning form or adds entry to calendar-db
+	 * get displays init form if permitted, selection and selected plan otherwise
+	 * delete removes entry
+	 * 
+	 * responds with render data for assemble.js
+	 */
+
 	public function longtermplanning(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
@@ -1292,7 +1305,33 @@ class CALENDAR extends API {
 				} 
 				// store planning
 				else {
-var_dump($this->_payload);
+					// payload prepared by _client.calendar.longtermplanning()
+					$content = json_decode($this->_payload->content, true);
+					$preset = json_decode($this->_payload->preset, true);
+					$columns = [
+						':type' => 'longtermplanning',
+						':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
+						':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
+						':author_id' => $_SESSION['user']['id'],
+						':affected_user_id' => null,
+						':organizational_unit' => null,
+						':subject' => $this->_payload->name,
+						':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
+						':closed' => null,
+						':alert' => null
+					];
+					if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
+						'values' => $columns
+					])) $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
+							'type' => 'success'
+						]]);
+					else $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('calendar.longtermplanning.save_error'),
+							'type' => 'error'
+						]]);
 				}
 				break;
 			case 'GET':
