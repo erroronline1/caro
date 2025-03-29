@@ -93,6 +93,285 @@ class CALENDAR extends API {
 	}
 
 	/**
+	 *   _             _                     _             _         
+	 *  | |___ ___ ___| |_ ___ ___ _____ ___| |___ ___ ___|_|___ ___ 
+	 *  | | . |   | . |  _| -_|  _|     | . | | .'|   |   | |   | . |
+	 *  |_|___|_|_|_  |_| |___|_| |_|_|_|  _|_|__,|_|_|_|_|_|_|_|_  |
+	 *            |___|                 |_|                     |___|
+	 * handle long term planning
+	 * post either displays half prepared planning form or adds entry to calendar-db
+	 * get displays init form if permitted, selection and selected plan otherwise
+	 * delete removes entry
+	 * 
+	 * responds with render data for assemble.js
+	 */
+
+	 public function longtermplanning(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
+				$result = ['render' => [
+					'form' => [
+						'data-usecase' => 'longtermplanning',
+						'action' => "javascript:api.calendar('post', 'longtermplanning')"
+					],
+					'content' => []]
+				];
+
+				// new planning
+				if (isset($this->_payload->{$this->_lang->PROPERTY('calendar.longtermplanning.select')})){
+					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')), new DateTimeZone(CONFIG['application']['timezone']));
+					$start->modify('first day of this month');
+					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')), new DateTimeZone(CONFIG['application']['timezone']));
+					$end->modify('last day of this month');
+					$span = $start->diff($end)->format('%m') * 2; // half months
+					if ($span < 2) $this->response([], 406);
+
+					// import if requested
+					$schedule = null;
+					$import = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.import'));
+					if ($import && $import > 0) {
+						$schedule = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', ['replacements' => [':id' => $import]]);
+					}
+					$schedule = $schedule ? $schedule[0] : ['misc' => ''];
+					$schedule['misc'] = json_decode($schedule['misc'], true);
+					
+					// create default empty timeunits for selected timespan
+					$defaulttimeunits = [];
+					while ($start < $end){
+						$defaulttimeunits[$start->format('y-m-d')] = null;
+						$start->modify('+' . (floor($start->format('t') / 2)) . ' day'); // add approximately half a month
+						$defaulttimeunits[$start->format('y-m-d')] = null;
+						$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month 
+					}
+					
+					// create default content with requested names assigning default timeunits
+					$content = [];
+					foreach($this->_payload as $key => $value){
+						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
+							$content[$value] = $defaulttimeunits;
+						}
+					}
+					// import if available
+					if (isset($schedule['misc']['content'])){
+						foreach($schedule['misc']['content'] as $name => $importtimeunit){
+							$imports = [];
+							foreach($defaulttimeunits as $label => $color){
+								$imports[$label] = isset($importtimeunit[$label]) ? $importtimeunit[$label] : $color;
+							}
+							$content[$name] = $imports;
+						}
+					}
+					if (!$content) $this->response([], 406);
+
+					$result['render']['content'][] = [
+						[
+							'type' => 'longtermplanning',
+							'attributes' => [
+								'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.subject'))
+							],
+							'content' => $content,
+							'preset' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
+						]
+					];
+				} 
+				// store planning
+				else {
+					// payload prepared by _client.calendar.longtermplanning()
+					$content = json_decode($this->_payload->content, true);
+					$preset = json_decode($this->_payload->preset, true);
+					$id = $this->_payload->id;
+
+					if ($id > 0){
+						// update
+						$columns = [
+							':id' => $id,
+							':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
+							':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
+							':author_id' => $_SESSION['user']['id'],
+							':affected_user_id' => null,
+							':organizational_unit' => null,
+							':subject' => $this->_payload->name,
+							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
+							':closed' => null,
+							':alert' => null
+						];
+						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
+							'values' => $columns
+						])) $this->response([
+							'response' => [
+								'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
+								'type' => 'success'
+							]]);
+					} else {
+						// post
+						$columns = [
+							':type' => 'longtermplanning',
+							':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
+							':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
+							':author_id' => $_SESSION['user']['id'],
+							':affected_user_id' => null,
+							':organizational_unit' => null,
+							':subject' => $this->_payload->name,
+							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
+							':closed' => null,
+							':alert' => null
+						];
+						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
+							'values' => $columns
+						])) $this->response([
+							'response' => [
+								'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
+								'type' => 'success'
+							]]);
+					}
+
+					$this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('calendar.longtermplanning.save_error'),
+							'type' => 'error'
+						]
+					]);
+				}
+				break;
+			case 'GET':
+				$result = ['render' => [
+					'content' => []]
+				];
+				if (PERMISSION::permissionFor('longtermplanning')) $result['render']['form'] = [
+						'data-usecase' => 'longtermplanning',
+						'action' => "javascript:api.calendar('post', 'longtermplanning')"
+					];
+				$select = [
+					'edit' => [
+						'...' => ['value' => '0']
+					],
+					'import' =>  [
+						'...' => ['value' => '0']
+					]
+				];
+				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', ['values' => [':type' => 'longtermplanning']]);
+
+				foreach($schedules as $schedule){
+					$select['edit'][$schedule['subject']] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
+					if ($schedule['span_end'] > $this->_currentdate->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
+				}
+
+				$result['render']['content'][] = [
+					[
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.longtermplanning.select'),
+							'onchange' => "if (this.value !== '0') api.calendar('get', 'longtermplanning', this.value);"
+						],
+						'content' => $select['edit']
+					]
+				];
+				if ($this->_requestedId){
+					$planning = $schedules[array_search($this->_requestedId, array_column($schedules, 'id'))];
+					if (!$planning) $this->response([], 404);
+					$misc = json_decode($planning['misc'], true);
+					$result['render']['content'][] = [
+						[
+							'type' => 'longtermplanning',
+							'attributes' => [
+								'name' => $planning['subject']
+							],
+							'content' => $misc['content'],
+							'preset' => $misc['preset']
+						], [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('calendar.longtermplanning.author', [':author' => $planning['author']])
+							]
+						]
+					];
+					if (PERMISSION::permissionFor('longtermplanning')){
+						array_splice($result['render']['content'][count($result['render']['content']) - 1], -1, 0 , [
+							[
+								'type' => 'deletebutton',
+								'attributes' => [
+									'value' => $this->_lang->GET('calendar.longtermplanning.delete'),
+									'type' => 'button',
+									'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.longtermplanning.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('general.ok_button') . "': {'value': true, class: 'reducedCTA'}}})" .
+										".then(confirmation => {if (confirmation) api.calendar('delete', 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
+								]
+							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'name' => '_longtermid',
+									'value' => $planning['id']
+								]
+							]
+						]);
+					} else {
+						$result['render']['content'][count($result['render']['content']) - 1][0]['attributes']['readonly'] = true;
+					}
+				}
+				else {
+					if (PERMISSION::permissionFor('longtermplanning')){
+						$result['render']['content'][] = [
+							[
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.subject'),
+									'required' => true
+								]
+							], [
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.start'),
+									'required' => true
+								]
+							], [
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.end'),
+									'required' => true
+								],
+								'hint' => $this->_lang->GET('calendar.longtermplanning.new_hint')
+							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.name'),
+									'multiple' => true
+								]
+							]
+						];
+						if (count($select['import']) > 1){
+							$result['render']['content'][count($result['render']['content']) - 1][] = [
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.import')
+								],
+								'content' => $select['import']
+							];
+						}
+					}
+				}
+				break;
+			case 'DELETE':
+				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
+				if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+					'values' => [
+						':id' => $this->_requestedId
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_error'),
+						'type' => 'error'
+					]]);
+				break;
+		}
+		$this->response($result);
+	}
+
+	/**
 	 *                 _   _   _     _   _               _           _
 	 *   _____ ___ ___| |_| |_| |_ _| |_|_|_____ ___ ___| |_ ___ ___| |_
 	 *  |     | . |   |  _|   | | | |  _| |     | -_|_ -|   | -_| -_|  _|
@@ -1239,285 +1518,6 @@ class CALENDAR extends API {
 			}
 		}
 		return $events;
-	}
-
-	/**
-	 *   _             _                     _             _         
-	 *  | |___ ___ ___| |_ ___ ___ _____ ___| |___ ___ ___|_|___ ___ 
-	 *  | | . |   | . |  _| -_|  _|     | . | | .'|   |   | |   | . |
-	 *  |_|___|_|_|_  |_| |___|_| |_|_|_|  _|_|__,|_|_|_|_|_|_|_|_  |
-	 *            |___|                 |_|                     |___|
-	 * handle long term planning
-	 * post either displays half prepared planning form or adds entry to calendar-db
-	 * get displays init form if permitted, selection and selected plan otherwise
-	 * delete removes entry
-	 * 
-	 * responds with render data for assemble.js
-	 */
-
-	public function longtermplanning(){
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
-				$result = ['render' => [
-					'form' => [
-						'data-usecase' => 'longtermplanning',
-						'action' => "javascript:api.calendar('post', 'longtermplanning')"
-					],
-					'content' => []]
-				];
-
-				// new planning
-				if (isset($this->_payload->{$this->_lang->PROPERTY('calendar.longtermplanning.select')})){
-					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')), new DateTimeZone(CONFIG['application']['timezone']));
-					$start->modify('first day of this month');
-					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')), new DateTimeZone(CONFIG['application']['timezone']));
-					$end->modify('last day of this month');
-					$span = $start->diff($end)->format('%m') * 2; // half months
-					if ($span < 2) $this->response([], 406);
-
-					// import if requested
-					$schedule = null;
-					$import = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.import'));
-					if ($import && $import > 0) {
-						$schedule = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', ['replacements' => [':id' => $import]]);
-					}
-					$schedule = $schedule ? $schedule[0] : ['misc' => ''];
-					$schedule['misc'] = json_decode($schedule['misc'], true);
-					
-					// create default empty timeunits for selected timespan
-					$defaulttimeunits = [];
-					while ($start < $end){
-						$defaulttimeunits[$start->format('y-m-d')] = null;
-						$start->modify('+' . (floor($start->format('t') / 2)) . ' day'); // add approximately half a month
-						$defaulttimeunits[$start->format('y-m-d')] = null;
-						$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month 
-					}
-					
-					// create default content with requested names assigning default timeunits
-					$content = [];
-					foreach($this->_payload as $key => $value){
-						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
-							$content[$value] = $defaulttimeunits;
-						}
-					}
-					// import if available
-					if (isset($schedule['misc']['content'])){
-						foreach($schedule['misc']['content'] as $name => $importtimeunit){
-							$imports = [];
-							foreach($defaulttimeunits as $label => $color){
-								$imports[$label] = isset($importtimeunit[$label]) ? $importtimeunit[$label] : $color;
-							}
-							$content[$name] = $imports;
-						}
-					}
-					if (!$content) $this->response([], 406);
-
-					$result['render']['content'][] = [
-						[
-							'type' => 'longtermplanning',
-							'attributes' => [
-								'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.subject'))
-							],
-							'content' => $content,
-							'preset' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
-						]
-					];
-				} 
-				// store planning
-				else {
-					// payload prepared by _client.calendar.longtermplanning()
-					$content = json_decode($this->_payload->content, true);
-					$preset = json_decode($this->_payload->preset, true);
-					$id = $this->_payload->id;
-
-					if ($id > 0){
-						// update
-						$columns = [
-							':id' => $id,
-							':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
-							':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
-							':author_id' => $_SESSION['user']['id'],
-							':affected_user_id' => null,
-							':organizational_unit' => null,
-							':subject' => $this->_payload->name,
-							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
-							':closed' => null,
-							':alert' => null
-						];
-						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
-							'values' => $columns
-						])) $this->response([
-							'response' => [
-								'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
-								'type' => 'success'
-							]]);
-					} else {
-						// post
-						$columns = [
-							':type' => 'longtermplanning',
-							':span_start' => '20' . array_key_first($content[array_key_first($content)]) . ' 00:00:00', // first nesting is the affected name. add 20 to adhere to proper date format
-							':span_end' => '20' . array_key_last($content[array_key_first($content)]) . ' 23:59:59',
-							':author_id' => $_SESSION['user']['id'],
-							':affected_user_id' => null,
-							':organizational_unit' => null,
-							':subject' => $this->_payload->name,
-							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
-							':closed' => null,
-							':alert' => null
-						];
-						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
-							'values' => $columns
-						])) $this->response([
-							'response' => [
-								'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
-								'type' => 'success'
-							]]);
-					}
-
-					$this->response([
-						'response' => [
-							'msg' => $this->_lang->GET('calendar.longtermplanning.save_error'),
-							'type' => 'error'
-						]
-					]);
-				}
-				break;
-			case 'GET':
-				$result = ['render' => [
-					'content' => []]
-				];
-				if (PERMISSION::permissionFor('longtermplanning')) $result['render']['form'] = [
-						'data-usecase' => 'longtermplanning',
-						'action' => "javascript:api.calendar('post', 'longtermplanning')"
-					];
-				$select = [
-					'edit' => [
-						'...' => ['value' => '0']
-					],
-					'import' =>  [
-						'...' => ['value' => '0']
-					]
-				];
-				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', ['values' => [':type' => 'longtermplanning']]);
-
-				foreach($schedules as $schedule){
-					$select['edit'][$schedule['subject']] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
-					if ($schedule['span_end'] > $this->_currentdate->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
-				}
-
-				$result['render']['content'][] = [
-					[
-						'type' => 'select',
-						'attributes' => [
-							'name' => $this->_lang->GET('calendar.longtermplanning.select'),
-							'onchange' => "if (this.value !== '0') api.calendar('get', 'longtermplanning', this.value);"
-						],
-						'content' => $select['edit']
-					]
-				];
-				if ($this->_requestedId){
-					$planning = $schedules[array_search($this->_requestedId, array_column($schedules, 'id'))];
-					if (!$planning) $this->response([], 404);
-					$misc = json_decode($planning['misc'], true);
-					$result['render']['content'][] = [
-						[
-							'type' => 'longtermplanning',
-							'attributes' => [
-								'name' => $planning['subject']
-							],
-							'content' => $misc['content'],
-							'preset' => $misc['preset']
-						], [
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('calendar.longtermplanning.author', [':author' => $planning['author']])
-							]
-						]
-					];
-					if (PERMISSION::permissionFor('longtermplanning')){
-						array_splice($result['render']['content'][count($result['render']['content']) - 1], -1, 0 , [
-							[
-								'type' => 'deletebutton',
-								'attributes' => [
-									'value' => $this->_lang->GET('calendar.longtermplanning.delete'),
-									'type' => 'button',
-									'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.longtermplanning.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('general.ok_button') . "': {'value': true, class: 'reducedCTA'}}})" .
-										".then(confirmation => {if (confirmation) api.calendar('delete', 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
-								]
-							], [
-								'type' => 'hidden',
-								'attributes' => [
-									'name' => '_longtermid',
-									'value' => $planning['id']
-								]
-							]
-						]);
-					} else {
-						$result['render']['content'][count($result['render']['content']) - 1][0]['attributes']['readonly'] = true;
-					}
-				}
-				else {
-					if (PERMISSION::permissionFor('longtermplanning')){
-						$result['render']['content'][] = [
-							[
-								'type' => 'text',
-								'attributes' => [
-									'name' => $this->_lang->GET('calendar.longtermplanning.subject'),
-									'required' => true
-								]
-							], [
-								'type' => 'date',
-								'attributes' => [
-									'name' => $this->_lang->GET('calendar.longtermplanning.start'),
-									'required' => true
-								]
-							], [
-								'type' => 'date',
-								'attributes' => [
-									'name' => $this->_lang->GET('calendar.longtermplanning.end'),
-									'required' => true
-								],
-								'hint' => $this->_lang->GET('calendar.longtermplanning.new_hint')
-							], [
-								'type' => 'text',
-								'attributes' => [
-									'name' => $this->_lang->GET('calendar.longtermplanning.name'),
-									'multiple' => true
-								]
-							]
-						];
-						if (count($select['import']) > 1){
-							$result['render']['content'][count($result['render']['content']) - 1][] = [
-								'type' => 'select',
-								'attributes' => [
-									'name' => $this->_lang->GET('calendar.longtermplanning.import')
-								],
-								'content' => $select['import']
-							];
-						}
-					}
-				}
-				break;
-			case 'DELETE':
-				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
-				if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
-					'values' => [
-						':id' => $this->_requestedId
-					]
-				])) $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_success'),
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_error'),
-						'type' => 'error'
-					]]);
-				break;
-		}
-		$this->response($result);
 	}
 }
 ?>
