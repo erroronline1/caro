@@ -1276,22 +1276,42 @@ class CALENDAR extends API {
 					$span = $start->diff($end)->format('%m') * 2; // half months
 					if ($span < 2) $this->response([], 406);
 
-					$timeunits = [];
+					// import if requested
+					$schedule = null;
+					$import = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.import'));
+					if ($import && $import > 0) {
+						$schedule = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', ['replacements' => [':id' => $import]]);
+					}
+					$schedule = $schedule ? $schedule[0] : ['misc' => ''];
+					$schedule['misc'] = json_decode($schedule['misc'], true);
+					
+					// create default empty timeunits for selected timespan
+					$defaulttimeunits = [];
 					while ($start < $end){
-						$timeunits[$start->format('y-m-d')] = null;
+						$defaulttimeunits[$start->format('y-m-d')] = null;
 						$start->modify('+' . (floor($start->format('t') / 2)) . ' day'); // add approximately half a month
-						$timeunits[$start->format('y-m-d')] = null;
+						$defaulttimeunits[$start->format('y-m-d')] = null;
 						$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month 
 					}
-
+					
+					// create default content with requested names assigning default timeunits
 					$content = [];
 					foreach($this->_payload as $key => $value){
 						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
-							$content[$value] = $timeunits;
+							$content[$value] = $defaulttimeunits;
+						}
+					}
+					// import if available
+					if (isset($schedule['misc']['content'])){
+						foreach($schedule['misc']['content'] as $name => $importtimeunit){
+							$imports = [];
+							foreach($defaulttimeunits as $label => $color){
+								$imports[$label] = isset($importtimeunit[$label]) ? $importtimeunit[$label] : $color;
+							}
+							$content[$name] = $imports;
 						}
 					}
 					if (!$content) $this->response([], 406);
-
 
 					$result['render']['content'][] = [
 						[
@@ -1299,7 +1319,8 @@ class CALENDAR extends API {
 							'attributes' => [
 								'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.subject'))
 							],
-							'content' => $content
+							'content' => $content,
+							'preset' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
 						]
 					];
 				} 
@@ -1373,12 +1394,16 @@ class CALENDAR extends API {
 				$select = [
 					'edit' => [
 						'...' => ['value' => '0']
+					],
+					'import' =>  [
+						'...' => ['value' => '0']
 					]
 				];
 				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', ['values' => [':type' => 'longtermplanning']]);
 
 				foreach($schedules as $schedule){
 					$select['edit'][$schedule['subject']] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
+					if ($schedule['span_end'] > $this->_currentdate->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
 				}
 
 				$result['render']['content'][] = [
@@ -1460,6 +1485,15 @@ class CALENDAR extends API {
 								]
 							]
 						];
+						if (count($select['import']) > 1){
+							$result['render']['content'][count($result['render']['content']) - 1][] = [
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('calendar.longtermplanning.import')
+								],
+								'content' => $select['import']
+							];
+						}
 					}
 				}
 				break;
