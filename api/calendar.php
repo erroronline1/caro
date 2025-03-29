@@ -1385,12 +1385,12 @@ class CALENDAR extends API {
 				break;
 			case 'GET':
 				$result = ['render' => [
-					'form' => [
-						'data-usecase' => 'longtermplanning',
-						'action' => "javascript:api.calendar('post', 'longtermplanning')"
-					],
 					'content' => []]
 				];
+				if (PERMISSION::permissionFor('longtermplanning')) $result['render']['form'] = [
+						'data-usecase' => 'longtermplanning',
+						'action' => "javascript:api.calendar('post', 'longtermplanning')"
+					];
 				$select = [
 					'edit' => [
 						'...' => ['value' => '0']
@@ -1433,24 +1433,26 @@ class CALENDAR extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('calendar.longtermplanning.author', [':author' => $planning['author']])
 							]
-						], [
-							'type' => 'deletebutton',
-							'attributes' => [
-								'value' => $this->_lang->GET('calendar.longtermplanning.delete'),
-								'type' => 'button',
-								'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.longtermplanning.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('general.ok_button') . "': {'value': true, class: 'reducedCTA'}}})" .
-									".then(confirmation => {if (confirmation) api.calendar('delete', 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
-							]
 						]
 					];
 					if (PERMISSION::permissionFor('longtermplanning')){
-						$result['render']['content'][count($result['render']['content']) - 1][] = [
-							'type' => 'hidden',
-							'attributes' => [
-								'name' => '_longtermid',
-								'value' => $planning['id']
+						array_splice($result['render']['content'][count($result['render']['content']) - 1], -1, 0 , [
+							[
+								'type' => 'deletebutton',
+								'attributes' => [
+									'value' => $this->_lang->GET('calendar.longtermplanning.delete'),
+									'type' => 'button',
+									'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.longtermplanning.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('general.ok_button') . "': {'value': true, class: 'reducedCTA'}}})" .
+										".then(confirmation => {if (confirmation) api.calendar('delete', 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
+								]
+							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'name' => '_longtermid',
+									'value' => $planning['id']
+								]
 							]
-						];
+						]);
 					} else {
 						$result['render']['content'][count($result['render']['content']) - 1][0]['attributes']['readonly'] = true;
 					}
