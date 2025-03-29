@@ -2972,7 +2972,8 @@ export class Assemble {
 				label = document.createElement("label");
 				label.classList.add("schedule");
 				label.style.width = "calc(100% / " + Object.entries(timeunit).length + ")";
-				if (!(labelcount++ % every)) label.append(document.createTextNode(lbl));
+				label.append(document.createTextNode(lbl));
+				if (labelcount++ % every) label.style.visibility = "hidden";
 				labels.push(label);
 			}
 			current.append(...labels);
