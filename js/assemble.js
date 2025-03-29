@@ -2988,7 +2988,7 @@ export class Assemble {
 
 			current = document.createElement("button");
 			current.type = "button";
-			current.append(document.createTextNode(api._lang.GET("calendar.longtermplanning.delete")));
+			current.append(document.createTextNode(api._lang.GET("calendar.longtermplanning.delete_color")));
 			current.addEventListener("click", (e) => {
 				document.getElementById("_current").value = "inherit";
 			});
@@ -3017,7 +3017,7 @@ export class Assemble {
 						const options = {};
 						options[api._lang.GET("general.cancel_button")] = false;
 						options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-						new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.deletecolor"), options: options }).then((confirmation) => {
+						new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.delete_color_header"), options: options }).then((confirmation) => {
 							if (confirmation) e.target.parentNode.remove();
 						});
 					});
@@ -3075,7 +3075,7 @@ export class Assemble {
 							const options = {};
 							options[api._lang.GET("general.cancel_button")] = false;
 							options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-							new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.deletecolor"), options: options }).then((confirmation) => {
+							new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.delete_color_header"), options: options }).then((confirmation) => {
 								if (confirmation) e.target.parentNode.remove();
 							});
 						});
