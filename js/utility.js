@@ -467,6 +467,7 @@ export const _client = {
 				name = document.querySelector("[data-type=longtermplanning"),
 				schedules = document.querySelectorAll("div.schedule"),
 				colors = document.querySelectorAll("input[type=color]"),
+				id = document.getElementsByName("_longtermid"),
 				schedule,
 				headers,
 				result = { name: "", preset: {}, content: {} };
@@ -499,6 +500,7 @@ export const _client = {
 			response.append("name", result.name);
 			response.append("content", JSON.stringify(result.content));
 			response.append("preset", JSON.stringify(result.preset));
+			response.append("id", id ? id[0].value : 0);
 			return response;
 		},
 	},
