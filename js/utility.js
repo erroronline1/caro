@@ -500,7 +500,7 @@ export const _client = {
 			response.append("name", result.name);
 			response.append("content", JSON.stringify(result.content));
 			response.append("preset", JSON.stringify(result.preset));
-			response.append("id", id ? id[0].value : 0);
+			response.append("id", id && id[0] ? id[0].value : 0);
 			return response;
 		},
 	},
