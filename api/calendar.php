@@ -182,7 +182,7 @@ class CALENDAR extends API {
 					$preset = json_decode($this->_payload->preset, true);
 					$id = $this->_payload->id;
 
-					if ($id > 0){
+					if (intval($id) > 0){
 						// update
 						$columns = [
 							':id' => $id,
