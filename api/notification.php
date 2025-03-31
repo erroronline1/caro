@@ -82,7 +82,7 @@ class NOTIFICATION extends API {
 						':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
 					], true)
 				);
-				SQLQUERY::EXECUTE($this->_pdo, 'audit_notified',
+				SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_notified',
 					[
 					'values' => [
 						':notified' => $diff,
