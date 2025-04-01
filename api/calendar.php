@@ -172,6 +172,11 @@ class CALENDAR extends API {
 							],
 							'content' => $content,
 							'preset' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
+						], [
+							'type' => 'hidden',
+							'attributes' => [
+								'name' => '_longtermid'
+							]
 						]
 					];
 				} 
@@ -221,6 +226,7 @@ class CALENDAR extends API {
 							'values' => $columns
 						])) $this->response([
 							'response' => [
+								'id' => $this->_pdo->lastInsertId(),
 								'msg' => $this->_lang->GET('calendar.longtermplanning.save_success'),
 								'type' => 'success'
 							]]);

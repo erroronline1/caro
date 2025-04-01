@@ -609,6 +609,10 @@ export const api = {
 					if (request[3] !== undefined) location.hash = "#displayspecificdate";
 				}
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+				if (data.response !== undefined && data.response.id !== undefined) {
+					let id = document.getElementsByName("_longtermid");
+					if (id && id[0]) id[0].value = data.response.id;
+				}
 				if (data.data) _serviceWorker.notif.calendar(data.data);
 			},
 			title = {
@@ -636,8 +640,7 @@ export const api = {
 			case "post":
 				switch (request[1]) {
 					case "longtermplanning":
-						if (!(payload = _client.calendar.longtermplanning()))
-							payload = _.getInputs("[data-usecase=longtermplanning]", true);
+						if (!(payload = _client.calendar.longtermplanning())) payload = _.getInputs("[data-usecase=longtermplanning]", true);
 						break;
 					default:
 						payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()
