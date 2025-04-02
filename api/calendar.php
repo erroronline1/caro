@@ -173,6 +173,12 @@ class CALENDAR extends API {
 							'content' => $content,
 							'preset' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
 						], [
+							'type' => 'checkbox',
+							'content' => [
+								$this->_lang->GET('calendar.longtermplanning.closed') => ['id' => '_longtermclosed']
+							],
+							'hint' => $this->_lang->GET('calendar.longtermplanning.closed_hint')
+						], [
 							'type' => 'hidden',
 							'attributes' => [
 								'name' => '_longtermid'
@@ -186,6 +192,8 @@ class CALENDAR extends API {
 					$content = json_decode($this->_payload->content, true);
 					$preset = json_decode($this->_payload->preset, true);
 					$id = $this->_payload->id;
+					$closed = intval($this->_payload->closed) ? UTILITY::json_encode(['user' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d')]) : null;
+					if (!$content) $this->response([], 406);
 
 					if (intval($id) > 0){
 						// update
@@ -198,7 +206,7 @@ class CALENDAR extends API {
 							':organizational_unit' => null,
 							':subject' => $this->_payload->name,
 							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
-							':closed' => null,
+							':closed' => $closed,
 							':alert' => null
 						];
 						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
@@ -219,7 +227,7 @@ class CALENDAR extends API {
 							':organizational_unit' => null,
 							':subject' => $this->_payload->name,
 							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
-							':closed' => null,
+							':closed' => $closed,
 							':alert' => null
 						];
 						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
@@ -259,7 +267,9 @@ class CALENDAR extends API {
 				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', ['values' => [':type' => 'longtermplanning']]);
 
 				foreach($schedules as $schedule){
-					$select['edit'][$schedule['subject']] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
+					if (!PERMISSION::permissionFor('longtermplanning') && !$schedule['closed']) continue;
+					$schedule['closed'] = json_decode($schedule['closed'] ? : '', true);
+					$select['edit'][$schedule['subject'] . (isset($schedule['closed']['date']) ? (' - ' . $schedule['closed']['date']) :'')] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
 					if ($schedule['span_end'] > $this->_currentdate->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
 				}
 
@@ -281,7 +291,8 @@ class CALENDAR extends API {
 						[
 							'type' => 'longtermplanning',
 							'attributes' => [
-								'name' => $planning['subject']
+								'name' => $planning['subject'],
+								//'readonly' => $planning['closed'] this would result in an error for not creating a proper payload content object without inputs
 							],
 							'content' => $misc['content'],
 							'preset' => $misc['preset']
@@ -295,6 +306,12 @@ class CALENDAR extends API {
 					if (PERMISSION::permissionFor('longtermplanning')){
 						array_splice($result['render']['content'][count($result['render']['content']) - 1], -1, 0 , [
 							[
+								'type' => 'checkbox',
+								'content' => [
+									$this->_lang->GET('calendar.longtermplanning.closed') => $planning['closed'] ? ['id' => '_longtermclosed', 'checked' => true] : ['id' => '_longtermclosed']
+								],
+								'hint' => $this->_lang->GET('calendar.longtermplanning.closed_hint')
+							], [
 								'type' => 'deletebutton',
 								'attributes' => [
 									'value' => $this->_lang->GET('calendar.longtermplanning.delete'),

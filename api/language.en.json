@@ -685,6 +685,8 @@
 			"addcolor_name": "Name new color selection",
 			"addname": "Add new name",
 			"author": "created by :author",
+			"closed": "Planning completed",
+			"closed_hint": "Completed plannings are visible to all users",
 			"delete_color": "Unset color to erase",
 			"delete_color_header": "Delete color selection",
 			"delete": "Delete plan",

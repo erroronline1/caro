@@ -623,7 +623,7 @@ graph TD;
     summary-......->select_day
 ```
 
-Der Kalender unterstützt eine Langzeitplanung, wie sie etwa für die Einteilung von Auszubildenden über die Bereiche hinweg genutzt werden kann. Hier können innerhalb festgelegter Zeiträume farbliche Markierungen genutzt werden um z.B. Zuordnungen darzustellen. Der Editor erlaubt dabei auch den Import von vorausgehenden Planungen in den neuen Zeitraum, sowie das Hinzufügen und Entfernen von Namen und Farbvorlagen. Dabei sind Namen nicht zwingend Personen zuzuordnen und Farben nicht notwendigerweise Bereichen - die Planung kann für beliebige Zwecke verwendet werden. Planungen sind von jedem Nutzer einsehbar, editierbar jedoch nur von Nutzern mit entsprechender Berechtigung. Die Planungen haben nur einen informellen Character und sind keine dauerhaften Aufzeichnungen.
+Der Kalender unterstützt eine Langzeitplanung, wie sie etwa für die Einteilung von Auszubildenden über die Bereiche hinweg genutzt werden kann. Hier können innerhalb festgelegter Zeiträume farbliche Markierungen genutzt werden um z.B. Zuordnungen darzustellen. Der Editor erlaubt dabei auch den Import von vorausgehenden Planungen in den neuen Zeitraum, sowie das Hinzufügen und Entfernen von Namen und Farbvorlagen. Dabei sind Namen nicht zwingend Personen zuzuordnen und Farben nicht notwendigerweise Bereichen - die Planung kann für beliebige Zwecke verwendet werden. Planungen sind von jedem Nutzer einsehbar sobald die Planung als abgeschlossen markiert wurde, editierbar jedoch nur von Nutzern mit entsprechender Berechtigung. Die Planungen haben nur einen informellen Character und sind keine dauerhaften Aufzeichnungen.
 
 Die Planung ist einfach zu nutzen:
 * Bezeichnung und Zeitraum definieren

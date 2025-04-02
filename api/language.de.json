@@ -685,6 +685,8 @@
 			"addcolor_name": "Neue Farbauswahl bezeichnen",
 			"addname": "Neuen Namen hinzufügen",
 			"author": "erstellt von :author",
+			"closed": "Planung abgeschlossen",
+			"closed_hint": "abgeschlossene Planungen werden allen Nutzern angezeigt",
 			"delete_color": "Farbe löschen um zu radieren",
 			"delete_color_header": "Farbauswahl löschen",
 			"delete": "Planung löschen",

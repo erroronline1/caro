@@ -468,6 +468,7 @@ export const _client = {
 				schedules = document.querySelectorAll("div.schedule"),
 				colors = document.querySelectorAll("input[type=color]"),
 				id = document.getElementsByName("_longtermid"),
+				closed = document.getElementById("_longtermclosed"),
 				schedule,
 				headers,
 				result = { name: "", preset: {}, content: {} };
@@ -501,6 +502,7 @@ export const _client = {
 			response.append("content", JSON.stringify(result.content));
 			response.append("preset", JSON.stringify(result.preset));
 			response.append("id", id && id[0] ? id[0].value : 0);
+			response.append("closed", closed && closed.checked ? 1 : 0);
 			return response;
 		},
 	},
