@@ -121,6 +121,14 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * update readme pictures on tools menu, record menu, audit and regulatory
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
+    * new db, responsibilities.php module
+    * every responsibility as entry
+    * id, entry-user id int, unit, assigned_ids as dict (id, checked) varchar, proxies as dict (id, checked) varchar, start date end date smalldate, responsibility text, description text, references, text, hidden int
+    * timespan, with calendar entry on end to admin and assigned user and proxy
+    * display not hidden
+    * record characteristic, not deleteable
+    * notif on unchecked nominations
+    * ->communication
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -704,7 +712,7 @@ graph TD;
     summary-......->select_day
 ```
 
-The calendar supports long term planning like used for assigning appretices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any porpose. Plans are accessible by anyone, editable by permitted users only. Longterm planning is informal only and not a persistent record.
+The calendar supports long term planning like used for assigning appretices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any porpose. Plans are accessible by anyone once being marked as finished, editable by permitted users only. Longterm planning is informal only and not a persistent record.
 
 Planning is easy to use:
 * assign a name, define a timespan
@@ -2585,7 +2593,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Planning has been saved","type":"success"}}
+{"response":{"id":"11", "msg":"Planning has been saved","type":"success"}}
 ```
 
 > GET ./api/api.php/calendar/longtermplanning/{id}
