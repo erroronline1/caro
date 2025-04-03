@@ -920,7 +920,7 @@
 			"vendor": "Vendors"
 		},
 		"records": {
-			"audit": "Execute Audit",
+			"audit": "Internal audit",
 			"audit_templates": "Prepare audit",
 			"documents_manage_approval": "Approve document",
 			"documents_manage_bundles": "Manage document bundles",

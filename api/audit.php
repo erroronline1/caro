@@ -296,6 +296,13 @@ class AUDIT extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
+								'type' => 'button',
+								'value' => $this->_lang->GET('menu.records.audit_templates'),
+								'onclick' => "api.audit('get', 'audittemplate')"
+							]
+						],	[
+							'type' => 'button',
+							'attributes' => [
 								'value' => $this->_lang->GET('audit.audit.execute.new'),
 								'type' => 'button',
 								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('audit.audit.execute.new') . "', render: JSON.parse('" . 

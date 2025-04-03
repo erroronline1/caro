@@ -634,6 +634,20 @@ class DOCUMENT extends API {
 				'content' => $list
 			];
 		}
+
+		if (PERMISSION::permissionFor('documentcomposer')){
+			$return['render']['content'][] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('menu.records.documents_manage_bundles'),
+						'onclick' => "api.document('get', 'bundle')"
+					]
+				]
+			];
+		}
+
 		$this->response($return);
 	}
 
@@ -2016,6 +2030,29 @@ class DOCUMENT extends API {
 				'content' => $list
 			];
 		}
+		if (PERMISSION::permissionFor('documentcomposer')){
+			$return['render']['content'][] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('menu.records.documents_manage_components'),
+						'onclick' => "api.document('get', 'component_editor')"
+					]
+				]
+			];
+			$return['render']['content'][] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('menu.records.documents_manage_documents'),
+						'onclick' => "api.document('get', 'document_editor')"
+					]
+				]
+			];
+		}
+
 		$this->response($return);
 	}
 

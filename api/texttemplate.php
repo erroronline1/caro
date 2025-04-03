@@ -619,6 +619,7 @@ class TEXTTEMPLATE extends API {
 		]);
 		$template = $template ? $template[0] : null;
 		if (!$template) $template = [
+			'id' => null,
 			'name' => '',
 		];
 
@@ -801,6 +802,24 @@ class TEXTTEMPLATE extends API {
 			];
 			// append data for frontent processing
 			$return['data'] = ['blocks' => $usedtexts, 'replacements' => $usedreplacements];
+		}
+		if (!$this->_modal && PERMISSION::permissionFor('texttemplates')){
+			$return['render']['content'][] = [
+				'type' => 'button',
+				'attributes' => [
+					'type' => 'button',
+					'value' => $this->_lang->GET('menu.communication.texttemplate_chunks'),
+					'onclick' => "api.texttemplate('get', 'chunk')"
+				]
+			];
+			$return['render']['content'][] = [
+				'type' => 'button',
+				'attributes' => [
+					'type' => 'button',
+					'value' => $this->_lang->GET('menu.communication.texttemplate_templates'),
+					'onclick' => "api.texttemplate('get', 'template'" . ($template['id'] ? ", " . $template['id'] : "") . ")"
+				]
+			];
 		}
 		$this->response($return);
 	}

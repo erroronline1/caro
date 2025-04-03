@@ -278,6 +278,19 @@ class CSVFILTER extends API {
 					];
 				}
 
+				if (PERMISSION::permissionFor('csvrules')){
+					$return['render']['content'][] = [
+						[
+							'type' => 'button',
+							'attributes' => [
+								'type' => 'button',
+								'value' => $this->_lang->GET('menu.tools.csvfilter_filter_manager'),
+								'onclick' => "api.csvfilter('get', 'rule'" . ($filter['id'] ? ", " . $filter['id'] : "") . ")"
+							]
+						]
+					];
+				}
+				
 				$this->response($return);
 				break;
 		}

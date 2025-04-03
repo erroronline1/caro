@@ -541,25 +541,12 @@ class APPLICATION extends API {
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
 			$menu[$this->_lang->GET('menu.calendar.header')][$this->_lang->GET('menu.calendar.timesheet')] = ['onclick' => "api.calendar('get', 'timesheet')"];
 
-		if (PERMISSION::permissionFor('files')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.file_manager')] = ['onclick' => "api.file('get', 'filemanager')"];
-		if (PERMISSION::permissionFor('externaldocuments')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.external_file_manager')] = ['onclick' => "api.file('get', 'externalfilemanager')"];
-		if (PERMISSION::permissionFor('documentcomposer')){
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_components')] = ['onclick' => "api.document('get', 'component_editor')"];
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_documents')] = ['onclick' => "api.document('get', 'document_editor')"];
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_bundles')] = ['onclick' => "api.document('get', 'bundle')"];
-		}
 		if (PERMISSION::permissionFor('audit')){
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit')] = ['onclick' => "api.audit('get', 'audit')"];
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit_templates')] = ['onclick' => "api.audit('get', 'audittemplate')"];
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.management_review')] = ['onclick' => "api.audit('get', 'managementreview')"];
 		}
 
-		if (PERMISSION::permissionFor('filebundles')) $menu[$this->_lang->GET('menu.files.header')][$this->_lang->GET('menu.files.bundle_manager')] = ['onclick' => "api.file('get', 'bundlemanager')"];
 		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onclick' => "api.user('get', 'user')"];
-		if (PERMISSION::permissionFor('texttemplates')) {
-			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_chunks')] =['onclick' => "api.texttemplate('get', 'chunk')"];
-			$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.texttemplate_templates')] =['onclick' => "api.texttemplate('get', 'template')"];
-		}
 
 		// make sure measure management comes after texttemplate management so this is an exception
 		$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.measure')] = ['onclick' => "api.measure('get', 'measure')"];
@@ -568,7 +555,6 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onclick' => "api.document('get', 'approval')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onclick' => "api.application('get', 'manual')"];
-		if (PERMISSION::permissionFor('csvrules')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter_manager')] =['onclick' => "api.csvfilter('get', 'rule')"];
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
 		// make sure info comes last so this is an exception

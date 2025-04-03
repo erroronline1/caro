@@ -95,6 +95,20 @@ class FILE extends API {
 				]
 			];
 		}
+
+		if (PERMISSION::permissionFor('filebundles')){
+			$result['render']['content'][] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('menu.files.bundle_manager'),
+						'onclick' => "api.file('get', 'bundlemanager')"
+					]
+				]
+			];
+		}
+
 		$this->response($result);
 	}
 
@@ -850,6 +864,32 @@ class FILE extends API {
 			}
 		}
 		else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+
+		if (PERMISSION::permissionFor('files')){
+			$result['render']['content'][] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('menu.files.file_manager'),
+						'onclick' => "api.file('get', 'filemanager')"
+					]
+				]
+			];
+		}
+		if (PERMISSION::permissionFor('externaldocuments')){
+			$result['render']['content'][] = [
+				[
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('menu.files.external_file_manager'),
+						'onclick' => "api.file('get', 'externalfilemanager')"
+					]
+				]
+			];
+		}
+
 		$this->response($result);
 	}
 	

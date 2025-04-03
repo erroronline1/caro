@@ -920,7 +920,7 @@
 			"vendor": "Lieferanten"
 		},
 		"records": {
-			"audit": "Audit durchführen",
+			"audit": "Internes Audit",
 			"audit_templates": "Audit vorbereiten",
 			"documents_manage_approval": "Dokumente freigeben",
 			"documents_manage_bundles": "Dokumentenpakete verwalten",
