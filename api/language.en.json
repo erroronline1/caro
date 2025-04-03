@@ -1417,7 +1417,7 @@
 		"settings_hint": "Some settings require a reload.",
 		"settings_homeoffice": "Homeoffice",
 		"settings_initial_overtime": "Overtime hours on starting time tracking",
-		"settings_initial_overtime_hint": "YYYY-MM-DD",
+		"settings_initial_overtime_hint": "Number of hours",
 		"settings_language": "Language",
 		"settings_language_hint": "System standard is :lang",
 		"settings_primary_recordstate": "Preferred record state",
