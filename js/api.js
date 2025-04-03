@@ -1492,10 +1492,10 @@ export const api = {
 				};
 				break;
 			case "post":
+			case "put":
 				payload = _.getInputs("[data-usecase=responsibility]", true);
 				break;
 			default:
-				return;
 		}
 		api.send(method, request, successFn, null, payload);
 	},

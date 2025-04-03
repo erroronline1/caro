@@ -50,20 +50,20 @@ class RESPONSIBILITY extends API {
 			case 'GET':
 				$result = ['render' => ['content' => []]];
 				$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
-				$available_units = ['common'];
+				$available_units = [];
 				$selected = [];
 
 				// prepare existing responsibilities filtered by unit
 				foreach($responsibilities as $row){
 					if (!PERMISSION::permissionFor('responsibilities') && $row['hidden']) continue;
 					$row['units'] = explode(',', $row['units']);
-					array_push($available_units, $row['units']);
+					array_push($available_units, ...$row['units']);
 
 					// filter by unit
-					if ($this->_unit && !in_array($this->_unit, $row['unit'])) continue;
-					if (!$this->_unit && !array_intersect($row['unit'], ['common', ...$_SESSION['user']['units']])) continue;
+					if ($this->_unit && !in_array($this->_unit, $row['units'])) continue;
+					if (!$this->_unit && !array_intersect($row['units'], ['common', ...$_SESSION['user']['units']])) continue;
 					
-					if ($this->_requestedID && $this->_requestedID != $row['id']) continue;
+					if (intval($this->_requestedID) && intval($this->_requestedID) !== $row['id']) continue;
 
 					// add to result
 					$row['assigned_users'] = json_decode($row['assigned_users'], true);
@@ -75,13 +75,13 @@ class RESPONSIBILITY extends API {
 				$organizational_units = [];
 				$available_units = array_unique($available_units);
 				sort($available_units);
-				$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', document.getElementById('_documentfilter').value || 'null')"];
+				$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null')"];
 				if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 				foreach($available_units as $unit){
 					if (!$unit) {
 						continue;
 					}
-					$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', document.getElementById('_documentfilter').value || 'null', '" . $unit . "')"];
+					$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null', '" . $unit . "')"];
 					if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 				}
 
@@ -125,23 +125,31 @@ class RESPONSIBILITY extends API {
 						$content[] = [
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => "assigned"
+								'name' => $this->_lang->GET('responsibility.assigned')
 							],
 							'content' => $assigned
 						];
-						$content[] = [
+						if ($proxy)	$content[] = [
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => "proxy"
+								'name' => $this->_lang->GET('responsibility.proxy')
 							],
 							'content' => $proxy
 						];
 						$content[] = [
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => "duration"
+								'name' => $this->_lang->GET('responsibility.applicability')
 							],
-							'content' => $row['span_start'] . ' - ' . $row['span_end']
+							'content' => $this->_lang->GET('responsibility.apply', [':start' => substr($row['span_start'], 0, 10), ':end' => substr($row['span_end'], 0, 10)])
+						];
+						if (PERMISSION::permissionFor('responsibilities')) $content[] = [
+							'type' => 'button',
+							'attributes' => [
+								'type' => 'button',
+								'value' => $this->_lang->GET('responsibility.edit'),
+								'onclick' => "api.responsibility('get', 'responsibility', " . $row['id'] . ")"
+							]
 						];
 
 						$result['render']['content'][] = $content;
@@ -193,25 +201,28 @@ class RESPONSIBILITY extends API {
 				// process selected units
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
 					foreach( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
-						$responsibility['unit'][] = array_search($unit, $this->_lang->_USER['units']);
+						$responsibility[':units'][] = array_search($unit, $this->_lang->_USER['units']);
 					}
 				}
-				$responsibility['unit'] = implode(',', $responsibility['unit']);
+				$responsibility[':units'] = implode(',', $responsibility[':units']);
+
+				//user datalist
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				// process assigned users
 				foreach($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.assigned')) || !$value) continue;
-					$responsibility['assigned_users'][$value] = [];
+					$responsibility[':assigned_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
-				$responsibility['assigned_users'] = UTILITY::json_encode($responsibility['assigned_users']);
+				if (!$responsibility[':assigned_users'] || !$responsibility[':span_start'] || !$responsibility[':span_end']) $this->response([], 406);
+				$responsibility[':assigned_users'] = UTILITY::json_encode($responsibility[':assigned_users']);
 
 				// process proxy users
 				foreach($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.proxy')) || !$value) continue;
-					$responsibility['proxy_users'][$value] = [];
+					$responsibility[':proxy_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
-				$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
-
+				$responsibility[':proxy_users'] = UTILITY::json_encode($responsibility[':proxy_users']);
 				// insert responsibility into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_post', [
 					'values' => $responsibility
@@ -242,24 +253,28 @@ class RESPONSIBILITY extends API {
 				// process selected units
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
 					foreach( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
-						$responsibility['unit'][] = array_search($unit, $this->_lang->_USER['units']);
+						$responsibility[':units'][] = array_search($unit, $this->_lang->_USER['units']);
 					}
 				}
-				$responsibility['unit'] = implode(',', $responsibility['unit']);
+				$responsibility[':units'] = implode(',', $responsibility[':units']);
+
+				//user datalist
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				// process assigned users
 				foreach($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.assigned')) || !$value) continue;
-					$responsibility['assigned_users'][$value] = [];
+					$responsibility[':assigned_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
-				$responsibility['assigned_users'] = UTILITY::json_encode($responsibility['assigned_users']);
+				if (!$responsibility[':assigned_users'] || !$responsibility[':span_start'] || !$responsibility[':span_end']) $this->response([], 406);
+				$responsibility[':assigned_users'] = UTILITY::json_encode($responsibility[':assigned_users']);
 
 				// process proxy users
 				foreach($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.proxy')) || !$value) continue;
-					$responsibility['proxy_users'][$value] = [];
+					$responsibility[':proxy_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
-				$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
+				$responsibility[':proxy_users'] = UTILITY::json_encode($responsibility[':proxy_users']);
 
 				// insert responsibility into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_put', [
@@ -279,7 +294,7 @@ class RESPONSIBILITY extends API {
 			case 'GET':
 				$result = ['render' => ['form' => [
 					'data-usecase' => 'responsibility',
-					'action' => "javascript:api.responsibility('" . (intval($this->_requestedID) ? 'put': 'post') . "', 'responsibility', 'null', " . intval($this->_requestedID) . ")"
+					'action' => "javascript:api.responsibility('" . (intval($this->_requestedID) ? 'put': 'post') . "', 'responsibility', " . intval($this->_requestedID) . ")"
 					],
 					'content' => []]
 				];
@@ -308,6 +323,9 @@ class RESPONSIBILITY extends API {
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				// unset system user
 				unset($users[array_search(1, array_column($users, 'id'))]);
+				// reassing generic keys
+				$users = array_values($users);
+				// set datalist
 				$user_datalist = array_column($users, 'name');
 				
 				// unit selection
@@ -321,7 +339,8 @@ class RESPONSIBILITY extends API {
 						'type' => 'textarea',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.task'),
-							'value' => $responsibility['responsibility']
+							'value' => $responsibility['responsibility'],
+							'required' => true
 						]
 					], [
 						'type' => 'textarea',
@@ -339,13 +358,15 @@ class RESPONSIBILITY extends API {
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.applicability_start'),
-							'value' => $responsibility['span_start']
+							'value' => substr($responsibility['span_start'], 0, 10),
+							'required' => true
 						]
 					], [
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.applicability_end'),
-							'value' => $responsibility['span_end']
+							'value' => substr($responsibility['span_end'], 0, 10),
+							'required' => true
 						]
 					]
 				];
@@ -354,6 +375,17 @@ class RESPONSIBILITY extends API {
 						'type' => 'textsection',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.update_hint')
+						]
+					];
+					$result['render']['content'][count($result['render']['content']) - 1][] = [
+						'type' => 'deletebutton',
+						'attributes' => [
+							'type' => 'button',
+							'value' => $this->_lang->GET('responsibility.delete'),
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.delete_confirm') ."', options:{".
+								"'".$this->_lang->GET('general.cancel_button')."': false,".
+								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(confirmation => {if (confirmation) api.responsibility('delete', 'responsibility', ". $responsibility['id'] . ")})"
 						]
 					];
 				}
@@ -370,7 +402,7 @@ class RESPONSIBILITY extends API {
 				if ($responsibility['assigned_users']){
 					foreach($responsibility['assigned_users'] as $user_id => $property){
 						$user = array_search($user_id, array_column($users, 'id'));
-						if (!$user) continue;
+						if ($user === false) continue;
 						$user = $users[$user];
 
 						$result['render']['content'][count($result['render']['content']) - 1][] = [
@@ -405,7 +437,7 @@ class RESPONSIBILITY extends API {
 				if ($responsibility['proxy_users']){
 					foreach($responsibility['proxy_users'] as $user_id => $property){
 						$user = array_search($user_id, array_column($users, 'id'));
-						if (!$user) continue;
+						if ($user === false) continue;
 						$user = $users[$user];
 
 						$result['render']['content'][count($result['render']['content']) - 1][] = [
@@ -427,6 +459,22 @@ class RESPONSIBILITY extends API {
 					],
 					'datalist' => $user_datalist
 				];
+				break;
+			case 'DELETE':
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_delete', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.delete_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.delete_error'),
+						'type' => 'error'
+					]]);
 				break;
 		}
 		$this->response($result);
