@@ -46,6 +46,39 @@ class RESPONSIBILITY extends API {
 	public function responsibilities(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
+				if ($this->_userAcceptance != $_SESSION['user']['id']) $this->response([], 401);
+				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				]);
+				$responsibility = $responsibility ? $responsibility[0]: null;
+				if (!$responsibility) $this->response([], 404);
+				$responsibility['assigned_users'] = json_decode($responsibility['assigned_users'], true);
+				if (array_key_exists($this->_userAcceptance, $responsibility['assigned_users'])) $responsibility['assigned_users'][$this->_userAcceptance] = $this->_currentdate->format('Y-m-d');
+				else {
+					// only if not found for itsybity performance reasons
+					$responsibility['proxy_users'] = json_decode($responsibility['proxy_users'], true);
+					if (array_key_exists($this->_userAcceptance, $responsibility['proxy_users'])) $responsibility['proxy_users'][$this->_userAcceptance] = $this->_currentdate->format('Y-m-d');
+					$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
+				}
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_accept', [
+					'values' => [
+						':id' => intval($this->_requestedID),
+						':assigned_users' => UTILITY::json_encode(($responsibility['assigned_users'])),
+						':proxy_users' => $responsibility['proxy_users']
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.accepted_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.accepted_error'),
+						'type' => 'error'
+					]]);
+				
 				break;
 			case 'GET':
 				$result = ['render' => ['content' => []]];
@@ -107,12 +140,24 @@ class RESPONSIBILITY extends API {
 							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
 							else $user = $users[$user];
 							$assigned[$user['name']] = ['checked' => boolval($date)];
+							if (!boolval($date) && $_SESSION['user']['id'] == $user_id) $assigned[$user['name']] = ['onchange' =>
+								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
+								"'".$this->_lang->GET('general.cancel_button')."': false,".
+								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . ", " . $_SESSION['user']['id'] . "); this.disabled = true;} else this.checked = false;})"
+								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $assigned[$user['name']]['disabled'] = true;
 						}
 						foreach($row['proxy_users'] as $user_id => $date){
 							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
 							else $user = $users[$user];
 							$proxy[$user['name']] = ['checked' => boolval($date)];
+							if (!boolval($date) && $_SESSION['user']['id'] == $user_id) $assigned[$user['name']] = ['onchange' =>
+								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
+								"'".$this->_lang->GET('general.cancel_button')."': false,".
+								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . ", " . $_SESSION['user']['id'] . "); this.disabled = true;} else this.checked = false;})"
+								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $proxy[$user['name']]['disabled'] = true;
 						}
 						$content[] = [
@@ -226,12 +271,22 @@ class RESPONSIBILITY extends API {
 				// insert responsibility into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_post', [
 					'values' => $responsibility
-				])) $this->response([
+				])) {
+					$responsibility[':assigned_users'] = json_decode($responsibility[':assigned_users'], true);
+					$responsibility[':proxy_users'] = json_decode($responsibility[':proxy_users'], true);
+					$recipients = array_map(fn($id) => $users[array_search($id, array_column($users, 'id'))]['name'], [...array_keys($responsibility[':assigned_users']), ...array_keys($responsibility[':proxy_users'])]);
+					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
+						':user' => $_SESSION['user']['name'],
+						':task' => $responsibility[':responsibility'],
+						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\')">' . $this->_lang->GET('menu.communication.responsibility'). '</a>',
+					], true)));
+
+					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('responsibility.save_success'),
 						'type' => 'success'
 					]]);
-				else $this->response([
+				} else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('responsibility.save_error'),
 						'type' => 'error'
@@ -279,12 +334,22 @@ class RESPONSIBILITY extends API {
 				// insert responsibility into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_put', [
 					'values' => $responsibility
-				])) $this->response([
+				])) {
+					$responsibility[':assigned_users'] = json_decode($responsibility[':assigned_users'], true);
+					$responsibility[':proxy_users'] = json_decode($responsibility[':proxy_users'], true);
+					$recipients = array_map(fn($id) => $users[array_search($id, array_column($users, 'id'))]['name'], [...array_keys($responsibility[':assigned_users']), ...array_keys($responsibility[':proxy_users'])]);
+					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
+						':user' => $_SESSION['user']['name'],
+						':task' => $responsibility[':responsibility'],
+						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\')">' . $this->_lang->GET('menu.communication.responsibility', [], true). '</a>',
+					], true)));
+					
+					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('responsibility.save_success'),
 						'type' => 'success'
 					]]);
-				else $this->response([
+				} else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('responsibility.save_error'),
 						'type' => 'error'
