@@ -24,13 +24,14 @@ class RESPONSIBILITY extends API {
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 	private $_unit = null;
+	private $_userAcceptance = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_unit = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_unit = $this->_userAcceptance = isset(REQUEST[3]) ? REQUEST[3] : null;
 	}
 
 	/**
@@ -40,26 +41,35 @@ class RESPONSIBILITY extends API {
 	 *  |_| |___|___|  _|___|_|_|___|_|___|_|_|_|_| |_|___|___|
 	 *              |_|
 	 *
-	 * edit responsibilities
+	 * display responsibilities and accept assignment
 	 */
 	public function responsibilities(){
 		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if (!PERMISSION::permissionFor('responsibilities')) $this->response([], 401);
-				break;
 			case 'PUT':
 				break;
 			case 'GET':
 				$result = ['render' => ['content' => []]];
 				$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
 				$available_units = ['common'];
+				$selected = [];
 
+				// prepare existing responsibilities filtered by unit
 				foreach($responsibilities as $row){
 					if (!PERMISSION::permissionFor('responsibilities') && $row['hidden']) continue;
-					array_push($available_units, ...json_decode($row['units'], true));
-				}
+					$row['units'] = explode(',', $row['units']);
+					array_push($available_units, $row['units']);
 
-// see document.php ln 1980
+					// filter by unit
+					if ($this->_unit && !in_array($this->_unit, $row['unit'])) continue;
+					if (!$this->_unit && !array_intersect($row['unit'], ['common', ...$_SESSION['user']['units']])) continue;
+					
+					if ($this->_requestedID && $this->_requestedID != $row['id']) continue;
+
+					// add to result
+					$row['assigned_users'] = json_decode($row['assigned_users'], true);
+					$row['proxy_users'] = json_decode($row['proxy_users'], true);
+					$selected[] = $row;
+				}
 
 				// append selection of responsibilities per unit
 				$organizational_units = [];
@@ -84,14 +94,342 @@ class RESPONSIBILITY extends API {
 							'onchange' => "api.responsibility('get', 'responsibilities', this.value)"
 						]
 					]
-				];				
-				break;
-			case 'DELETE':
-				if (!PERMISSION::permissionFor('responsibilities')) $this->response([], 401);
+				];
+
+				$content = [];
+				if ($selected){
+					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+					foreach ($selected as $row){
+						$assigned = [];
+						$proxy = [];
+
+						foreach($row['assigned_users'] as $user_id => $date){
+							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
+							else $user = $users[$user];
+							$assigned[$user['name']] = ['checked' => boolval($date)];
+							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $assigned[$user['name']]['disabled'] = true;
+						}
+						foreach($row['proxy_users'] as $user_id => $date){
+							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
+							else $user = $users[$user];
+							$proxy[$user['name']] = ['checked' => boolval($date)];
+							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $proxy[$user['name']]['disabled'] = true;
+						}
+						$content[] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $row['responsibility']
+							],
+							'content' => $row['description']
+						];
+						$content[] = [
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => "assigned"
+							],
+							'content' => $assigned
+						];
+						$content[] = [
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => "proxy"
+							],
+							'content' => $proxy
+						];
+						$content[] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => "duration"
+							],
+							'content' => $row['span_start'] . ' - ' . $row['span_end']
+						];
+
+						$result['render']['content'][] = $content;
+					}
+				}
+				if (PERMISSION::permissionFor('responsibilities')) {
+					$result['render']['content'][] = [
+						[
+							'type' => 'button',
+							'attributes' => [
+								'type' => 'button',
+								'value' => $this->_lang->GET('responsibility.new'),
+								'onclick' => "api.responsibility('get', 'responsibility', 'null')"
+							]
+						]
+					];
+				}
 				break;
 		}
 		$this->response($result);
 	}
 
+
+	/**
+	 *                               _ _   _ _ _ _
+	 *   ___ ___ ___ ___ ___ ___ ___|_| |_|_| |_| |_ _ _
+	 *  |  _| -_|_ -| . | . |   |_ -| | . | | | |  _| | |
+	 *  |_| |___|___|  _|___|_|_|___|_|___|_|_|_|_| |_  |
+	 *              |_|                             |___|
+	 *
+	 * edit responsibilities
+	 */
+	public function responsibility(){
+		if (!PERMISSION::permissionFor('responsibilities'))  $this->response([], 401);
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$responsibility = [
+					':user_id' => $_SESSION['user']['id'],
+					':units' => [],
+					':assigned_users' => [],
+					':proxy_users' => [],
+					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_start')),
+					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end')),
+					':responsibility' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.task')),
+					':description' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.context')),
+					':hidden' => null,
+				];
+				// process selected units
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
+					foreach( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
+						$responsibility['unit'][] = array_search($unit, $this->_lang->_USER['units']);
+					}
+				}
+				$responsibility['unit'] = implode(',', $responsibility['unit']);
+
+				// process assigned users
+				foreach($this->_payload as $key => $value){
+					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.assigned')) || !$value) continue;
+					$responsibility['assigned_users'][$value] = [];
+				}
+				$responsibility['assigned_users'] = UTILITY::json_encode($responsibility['assigned_users']);
+
+				// process proxy users
+				foreach($this->_payload as $key => $value){
+					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.proxy')) || !$value) continue;
+					$responsibility['proxy_users'][$value] = [];
+				}
+				$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
+
+				// insert responsibility into database
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_post', [
+					'values' => $responsibility
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.save_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.save_error'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'PUT':
+				$responsibility = [
+					':id' => intval($this->_requestedID),
+					':user_id' => $_SESSION['user']['id'],
+					':units' => [],
+					':assigned_users' => [],
+					':proxy_users' => [],
+					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_start')),
+					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end')),
+					':responsibility' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.task')),
+					':description' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.context')),
+					':hidden' => null,
+				];
+				// process selected units
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
+					foreach( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
+						$responsibility['unit'][] = array_search($unit, $this->_lang->_USER['units']);
+					}
+				}
+				$responsibility['unit'] = implode(',', $responsibility['unit']);
+
+				// process assigned users
+				foreach($this->_payload as $key => $value){
+					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.assigned')) || !$value) continue;
+					$responsibility['assigned_users'][$value] = [];
+				}
+				$responsibility['assigned_users'] = UTILITY::json_encode($responsibility['assigned_users']);
+
+				// process proxy users
+				foreach($this->_payload as $key => $value){
+					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.proxy')) || !$value) continue;
+					$responsibility['proxy_users'][$value] = [];
+				}
+				$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
+
+				// insert responsibility into database
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_put', [
+					'values' => $responsibility
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.save_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('responsibility.save_error'),
+						'type' => 'error'
+					]]);
+
+				break;
+			case 'GET':
+				$result = ['render' => ['form' => [
+					'data-usecase' => 'responsibility',
+					'action' => "javascript:api.responsibility('" . (intval($this->_requestedID) ? 'put': 'post') . "', 'responsibility', 'null', " . intval($this->_requestedID) . ")"
+					],
+					'content' => []]
+				];
+				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
+					'values' => [
+						':id' => intval($this->_requestedID)
+					]
+				]);
+				$responsibility = $responsibility ? $responsibility[0] : [
+					'id' => null,
+					'user_id' => null,
+					'units' => '',
+					'assigned_users' => '',
+					'proxy_users' => '',
+					'span_start' => '',
+					'span_end' => '',
+					'responsibility' => '',
+					'description' => '',
+					'hidden' => null,
+				];
+				$responsibility['units'] = explode(',', $responsibility['units']);
+				$responsibility['assigned_users'] = json_decode($responsibility['assigned_users'], true);
+				$responsibility['proxy_users'] = json_decode($responsibility['proxy_users'], true);
+
+				//user datalist
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				// unset system user
+				unset($users[array_search(1, array_column($users, 'id'))]);
+				$user_datalist = array_column($users, 'name');
+				
+				// unit selection
+				$units = [];
+				foreach($this->_lang->_USER['units'] as $unit => $translation){
+					$units[$translation] = ['checked' => boolval(in_array($unit, $responsibility['units']))];
+				}
+				// default values
+				$result['render']['content'][] = [
+					[
+						'type' => 'textarea',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.task'),
+							'value' => $responsibility['responsibility']
+						]
+					], [
+						'type' => 'textarea',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.context'),
+							'value' => $responsibility['description']
+						]
+					], [
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.units')
+						],
+						'content' => $units
+					], [
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.applicability_start'),
+							'value' => $responsibility['span_start']
+						]
+					], [
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.applicability_end'),
+							'value' => $responsibility['span_end']
+						]
+					]
+				];
+				if (intval($this->_requestedID)){
+					$result['render']['content'][count($result['render']['content']) - 1][] = [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.update_hint')
+						]
+					];
+				}
+
+				// assigned users
+				$result['render']['content'][] = [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.assigned')
+						]
+					]
+				];
+				if ($responsibility['assigned_users']){
+					foreach($responsibility['assigned_users'] as $user_id => $property){
+						$user = array_search($user_id, array_column($users, 'id'));
+						if (!$user) continue;
+						$user = $users[$user];
+
+						$result['render']['content'][count($result['render']['content']) - 1][] = [
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('responsibility.assigned'),
+								'value' => $user['name'],
+							],
+							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => $property]) : null
+						];
+					}
+				}
+				// add empty field
+				$result['render']['content'][count($result['render']['content']) - 1][] = [
+					'type' => 'text',
+					'attributes' => [
+						'name' => $this->_lang->GET('responsibility.assigned'),
+						'multiple' => true
+					],
+					'datalist' => $user_datalist
+				];
+
+				// proxy users
+				$result['render']['content'][] = [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('responsibility.proxy')
+						]
+					]
+				];
+				if ($responsibility['proxy_users']){
+					foreach($responsibility['proxy_users'] as $user_id => $property){
+						$user = array_search($user_id, array_column($users, 'id'));
+						if (!$user) continue;
+						$user = $users[$user];
+
+						$result['render']['content'][count($result['render']['content']) - 1][] = [
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('responsibility.proxy'),
+								'value' => $user['name'],
+							],
+							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => $property]) : null
+						];
+					}
+				}
+				// add empty field
+				$result['render']['content'][count($result['render']['content']) - 1][] = [
+					'type' => 'text',
+					'attributes' => [
+						'name' => $this->_lang->GET('responsibility.proxy'),
+						'multiple' => true
+					],
+					'datalist' => $user_datalist
+				];
+				break;
+		}
+		$this->response($result);
+	}
 }
 ?>

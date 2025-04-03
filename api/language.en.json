@@ -1213,7 +1213,23 @@
 		"type_description": "Record type",
 		"unassigned": "Not assignable"
 	},
-	"responsibility": {},
+	"responsibility": {
+		"accepted": "accepted on :date",
+		"applicability": "Applicability",
+		"applicability_start": "From",
+		"applicability_end": "To",
+		"apply": "from :start to :end",
+		"assigned": "Assigned user",
+		"context": "Context, description",
+		"edit": "edit",
+		"new": "New responsibility",
+		"proxy": "Proxy",
+		"save_error" : "Responsibility could not be saved. Please try again.",
+		"save_success" : "Responsibility saved",
+		"task": "Task",
+		"units": "Units",
+		"update_hint" : "On updating all assigned users have to reaccept."
+	},
 	"risk": {
 		"acceptance_level_above": "Above the defined acceptance level",
 		"acceptance_level_below": "Below the defined acceptance level",

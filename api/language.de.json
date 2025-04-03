@@ -1213,7 +1213,23 @@
 		"type_description": "Dokumentationstyp",
 		"unassigned": "Nicht zugeordnet"
 	},
-	"responsibility": {},
+	"responsibility": {
+		"accepted": "Am :date bestätigt",
+		"applicability": "Gültigkeit",
+		"applicability_start": "Von",
+		"applicability_end": "Bis",
+		"apply": "vom :start bis :end",
+		"assigned": "Verantwortliche Mitarbeiter",
+		"context": "Zusammenhang, Erläuterung",
+		"edit": "bearbeiten",
+		"new": "Neue Verantwortlichkeit",
+		"proxy": "Vertretung",
+		"save_error" : "Verantwortlichkeit konnte nicht gespeichert werden, bitte versuche es erneut.",
+		"save_success" : "Verantwortlichkeit gespeichert",
+		"task": "Aufgabe",
+		"units": "Bereiche",
+		"update_hint" : "Im Falle einer Aktualisierung müssen alle benannten Mitarbeiter erneut bestätigen."
+	},
 	"risk": {
 		"acceptance_level_above": "Überschreitet das definierte Akzeptanzniveau",
 		"acceptance_level_below": "Innerhalb des definierten Akzeptanzniveaus",

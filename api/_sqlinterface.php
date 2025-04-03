@@ -837,9 +837,13 @@ class SQLQUERY {
 
 		'user_responsibility_post' => [
 			'mysql' => "INSERT INTO caro_user_responsibility (id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description, hidden) VALUES ( NULL, :user_id, :units, :assigned_users, :proxy_users, :span_start, :span_end, :responsibility, :description, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_user_responsibility (user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description, hidden) VALUES ( :user_id, :units, :assigned_users, :proxy_users,  CONVERT(DATE, :span_start, 23),  CONVERT(DATE, :span_end, 23), :responsibility, :description, :hidden)"
+			'sqlsrv' => "INSERT INTO caro_user_responsibility (user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description, hidden) VALUES ( :user_id, :units, :assigned_users, :proxy_users, CONVERT(DATE, :span_start, 23), CONVERT(DATE, :span_end, 23), :responsibility, :description, :hidden)"
 		],
 		'user_responsibility_put' => [
+			'mysql' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start = :span_start, span_end = :span_end, responsibility = :responsibility, description = :description, hidden = :hidden WHERE id = :id",
+			'sqlsrv' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start =  CONVERT(DATE, :span_start, 23),  span_end = CONVERT(DATE, :span_end, 23), responsibility = :responsibility, description = :description, hidden = :hidden WHERE id = :id"
+		],
+		'user_responsibility_accept' => [
 			'mysql' => "UPDATE caro_user_responsibility SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_user_training SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id"
 		],
