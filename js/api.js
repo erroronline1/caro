@@ -1459,6 +1459,48 @@ export const api = {
 	},
 
 	/**
+	 *                               _ _   _ _ _ _
+	 *   ___ ___ ___ ___ ___ ___ ___|_| |_|_| |_| |_ _ _
+	 *  |  _| -_|_ -| . | . |   |_ -| | . | | | |  _| | |
+	 *  |_| |___|___|  _|___|_|_|___|_|___|_|_|_|_| |_  |
+	 *              |_|                             |___|
+	 * 
+	 * @param {string} method 
+	 * @param  {array} request 
+	 * @returns request
+	 */
+	responsibility: (method, ...request) => {
+		request = [...request];
+		request.splice(0, 0, "responsibility");
+		let payload,
+			successFn = function (data) {
+				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+			},
+			title = {
+				responsibilities: api._lang.GET("menu.communication.responsibility"),
+			};
+		switch (method) {
+			case "get":
+				successFn = function (data) {
+					if (data.render) {
+						api.update_header(title[request[1]]);
+						const render = new Assemble(data.render);
+						document.getElementById("main").replaceChildren(render.initializeSection());
+						render.processAfterInsertion();
+					}
+					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+				};
+				break;
+			case "post":
+				payload = _.getInputs("[data-usecase=responsibility]", true);
+				break;
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
 	 *       _     _
 	 *   ___|_|___| |_
 	 *  |  _| |_ -| '_|

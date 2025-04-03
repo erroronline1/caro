@@ -407,6 +407,7 @@ if (in_array(REQUEST[0], [
 	'notification',
 	'order',
 	'record',
+	'responsibility',
 	'risk',
 	'texttemplate',
 	'tool',

@@ -897,6 +897,7 @@
 			"header": "Kommunikation",
 			"measure": "Verbesserungsvorschläge",
 			"register": "Mitarbeiterverzeichnis",
+			"responsibility": "Verantwortlichkeiten",
 			"texttemplate_chunks": "Textabschnitte verwalten",
 			"texttemplate_templates": "Textvorlagen verwalten",
 			"texttemplate_texts": "Textvorschläge"
@@ -1212,6 +1213,7 @@
 		"type_description": "Dokumentationstyp",
 		"unassigned": "Nicht zugeordnet"
 	},
+	"responsibility": {},
 	"risk": {
 		"acceptance_level_above": "Überschreitet das definierte Akzeptanzniveau",
 		"acceptance_level_below": "Innerhalb des definierten Akzeptanzniveaus",

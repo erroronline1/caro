@@ -493,6 +493,7 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.communication.conversations') => ['onclick' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
 				$this->_lang->GET('menu.communication.register') => ['onclick' => "api.message('get', 'register')"],
 				$this->_lang->GET('menu.communication.texttemplate_texts') => ['onclick' => "api.texttemplate('get', 'text')"],
+				$this->_lang->GET('menu.communication.responsibility') => ['onclick' => "api.responsibility('get', 'responsibilities')"],
 			],
 			$this->_lang->GET('menu.records.header') => [
 				$this->_lang->GET('menu.records.record_create_identifier') => ['onclick' => "api.record('get', 'identifier')"],
@@ -534,7 +535,6 @@ class APPLICATION extends API {
 
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onclick' => "api.document('get', 'bundles')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_record')] = ['onclick' => "api.document('get', 'documents')"];
-		
 		// make sure risk management comes after documents so this is an exception
 		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onclick' => "api.risk('get', 'risk')"];
 
