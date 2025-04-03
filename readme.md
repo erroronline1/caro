@@ -123,10 +123,9 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * public responsibilities and their acknowledgement via checkbox of logged in users
     * new db, responsibilities.php module
     * every responsibility as entry
-    * id, entry-user id int, unit, assigned_ids as dict (id, checked) varchar, proxies as dict (id, checked) varchar, start date end date smalldate, responsibility text, description text, references, text, hidden int
     * timespan, with calendar entry on end to admin and assigned user and proxy
     * display not hidden
-    * record characteristic, not deleteable
+    * filter my responsibilities
     * notif on unchecked nominations
     * ->communication
 
@@ -4828,6 +4827,7 @@ All libraries are embedded locally to avoid external, probably prohibited web re
 * [custom md pdf](https://marketplace.visualstudio.com/items?itemName=yzane.markdown-pdf)
 * [mermaid charts](https://mermaid.js.org/)
 * [recommendations on documenting software](https://github.com/openregulatory)
+* setting up one of the development environments regarding the local server with proper certificates to Joe <3
 
 [Content](#content)
 
