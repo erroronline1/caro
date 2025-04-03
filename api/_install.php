@@ -289,6 +289,20 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
+				"CREATE TABLE IF NOT EXISTS `caro_user_responsibility` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`user_id` int NOT NULL," .
+				"	`units` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`assigned_users` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`proxy_users` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`span_start` datetime NOT NULL," .
+				"	`span_end` datetime NOT NULL," .
+				"	`responsibility` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`description` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				.
 				"CREATE TABLE IF NOT EXISTS `caro_user_training` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
@@ -564,10 +578,24 @@ define('DEFAULTSQL', [
 				"	skills varchar(MAX) NOT NULL" .
 				");"
 				.
+				"IF OBJECT_ID(N'dbo.caro_user_responsibility', N'U') IS NULL " .
+				"CREATE TABLE caro_user_responsibility (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	user_id int NOT NULL," .
+				"	units varchar(MAX) NULL DEFAULT NULL," .
+				"	assigned_users varchar(MAX) NOT NULL," .
+				"	proxy_users varchar(MAX) NULL DEFAULT NULL," .
+				"	span_start date NOT NULL," .
+				"	span_end date NOT NULL," .
+				"	responsibility varchar(MAX) NULL DEFAULT NULL," .
+				"	description varchar(MAX) NULL DEFAULT NULL," .
+				"	hidden varchar(MAX) NULL DEFAULT NULL" .
+				");"
+				.
 				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NULL " .
 				"CREATE TABLE caro_user_training (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
-				"	user_id varchar(MAX) NOT NULL," .
+				"	user_id int NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	date date NOT NULL," .
 				"	expires date NULL," .

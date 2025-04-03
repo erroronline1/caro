@@ -835,6 +835,29 @@ class SQLQUERY {
 
 
 
+		'user_responsibility_post' => [
+			'mysql' => "INSERT INTO caro_user_responsibility (id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description, hidden) VALUES ( NULL, :user_id, :units, :assigned_users, :proxy_users, :span_start, :span_end, :responsibility, :description, :hidden)",
+			'sqlsrv' => "INSERT INTO caro_user_responsibility (user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description, hidden) VALUES ( :user_id, :units, :assigned_users, :proxy_users,  CONVERT(DATE, :span_start, 23),  CONVERT(DATE, :span_end, 23), :responsibility, :description, :hidden)"
+		],
+		'user_responsibility_put' => [
+			'mysql' => "UPDATE caro_user_responsibility SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_user_training SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id"
+		],
+		'user_responsibility_get' => [
+			'mysql' => "SELECT * FROM caro_user_responsibility WHERE id = :id",
+			'sqlsrv' => "SELECT * FROM caro_user_training WHERE id = :id"
+		],
+		'user_responsibility_get_all' => [
+			'mysql' => "SELECT * FROM caro_user_responsibility ORDER BY span_start DESC",
+			'sqlsrv' => "SELECT * FROM caro_user_responsibility ORDER BY span_start DESC"
+		],
+		'user_responsibility_delete' => [
+			'mysql' => "DELETE FROM caro_user_responsibility WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_user_responsibility WHERE id = :id"
+		],
+
+
+
 		'user_training_post' => [
 			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path, evaluation) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file_path, :evaluation)",
 			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file_path, evaluation) VALUES ( :user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path, :evaluation)"
