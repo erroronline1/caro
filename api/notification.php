@@ -50,7 +50,8 @@ class NOTIFICATION extends API {
 			'managementreview' => $this->managementreview(),
 			'measure_unclosed' => $this->measures(),
 			'message_unnotified' => $this->messageunnotified(),
-			'message_unseen' => $this->messageunseen()
+			'message_unseen' => $this->messageunseen(),
+			'responsibilities' => $this->responsibilities()
 		];
 		$this->response($result);
 	}
@@ -103,7 +104,6 @@ class NOTIFICATION extends API {
 	 *
 	 * checks system processable expiry dates, adds calendar reminders if applicable
 	 * alerts a user group if selected
-	 * used by service worker
 	 */
 	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo);
@@ -129,7 +129,7 @@ class NOTIFICATION extends API {
 					':span_start' => $today->format('Y-m-d H:i:s'),
 					':span_end' => $today->format('Y-m-d H:i:s'),
 					':author_id' => 1,
-					':affected_user_id' => 1,
+					':affected_user_id' => null,
 					':organizational_unit' => 'admin,office',
 					':subject' => $this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
 					':misc' => null,
@@ -519,6 +519,60 @@ class NOTIFICATION extends API {
 		// set alert flags
 		foreach ($alerts as $alert){
 			SQLQUERY::EXECUTE($this->_pdo, $alert);
+		}
+		return $number;
+	}
+
+	/**
+	 *                               _ _   _ _ _ _   _
+	 *   ___ ___ ___ ___ ___ ___ ___|_| |_|_| |_| |_|_|___ ___
+	 *  |  _| -_|_ -| . | . |   |_ -| | . | | | |  _| | -_|_ -|
+	 *  |_| |___|___|  _|___|_|_|___|_|___|_|_|_|_| |_|___|___|
+	 *              |_|
+	 *
+	 * responsibilities awaiting acceptance
+	 */
+	public function responsibilities(){
+		$number = 0;
+		$calendar = new CALENDARUTILITY($this->_pdo);
+		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+		$today->setTime(0, 0);
+
+		$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
+		foreach($responsibilities as $row){
+			if ($row['hidden']) continue;
+			if (substr($row['span_end'], 0, 10) < $this->_currentdate->format('Y-m-d')) {
+				// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
+				$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'])))], true));
+				$open = false;
+				foreach($reminders as $reminder){
+					if (!$reminder['closed']) $open = true;
+				}
+				if (!$open){
+					$calendar->post([
+						':type' => 'schedule',
+						':span_start' => $today->format('Y-m-d H:i:s'),
+						':span_end' => $today->format('Y-m-d H:i:s'),
+						':author_id' => 1,
+						':affected_user_id' => null,
+						':organizational_unit' => 'admin',
+						':subject' => $this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'])))], true),
+						':misc' => null,
+						':closed' => null,
+						':alert' => 1
+						]);		   
+				}
+			continue;
+			}
+			$row['assigned_users'] = json_decode($row['assigned_users'], true);
+			if (isset($row['assigned_users'][$_SESSION['user']['id']]) && !$row['assigned_users'][$_SESSION['user']['id']]) {
+				$number++;
+				continue;
+			}
+			$row['proxy_users'] = json_decode($row['proxy_users'], true);
+			if (isset($row['proxy_users'][$_SESSION['user']['id']]) && !$row['proxy_users'][$_SESSION['user']['id']]) {
+				$number++;
+			}
 		}
 		return $number;
 	}

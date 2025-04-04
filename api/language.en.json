@@ -597,6 +597,7 @@
 			"alert": "Message units on due event",
 			"alert_description": "Alert selected units",
 			"alert_message": ":content is scheduled for :date by :author and due on :due.",
+			"alert_responsibility_expired": "The responsibility for :task (:units) has expired and needs to be planned anew.",
 			"alert_vendor_certificate_expired": "The certificate / quality agreement with :vendor has expired. Look after an updated one!",
 			"author": "Editor",
 			"cancel": "Cancel",
