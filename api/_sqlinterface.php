@@ -845,11 +845,11 @@ class SQLQUERY {
 		],
 		'user_responsibility_accept' => [
 			'mysql' => "UPDATE caro_user_responsibility SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_user_training SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_user_responsibility SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id"
 		],
 		'user_responsibility_get' => [
 			'mysql' => "SELECT * FROM caro_user_responsibility WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_user_training WHERE id = :id"
+			'sqlsrv' => "SELECT * FROM caro_user_responsibility WHERE id = :id"
 		],
 		'user_responsibility_get_all' => [
 			'mysql' => "SELECT * FROM caro_user_responsibility ORDER BY span_start DESC",
