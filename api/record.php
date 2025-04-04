@@ -1354,7 +1354,7 @@ class RECORD extends API {
 				else $available_units[] = null;
 
 				// filter by unit
-				if (!$this->_unit && !array_intersect($record['units'], $_SESSION['user']['units'])) continue;
+				if (!$this->_unit && !array_intersect($record['units'], $_SESSION['user']['units']) && !$this->_requestedID) continue;
 
 				// add to result
 				$linkdisplay = $this->_lang->GET('record.list_touched', [

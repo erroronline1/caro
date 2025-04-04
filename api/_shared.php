@@ -184,7 +184,7 @@ class SHARED {
 			$row['units'] = $row['units'] ? explode(',', $row['units']) : [];
 			// continue if record does not match selected (or blank) unit
 			if ($row['units']){
-				if (((!isset($parameter['unit']) || !$parameter['unit']) && !array_intersect($row['units'], $_SESSION['user']['units'])) ||
+				if (((!isset($parameter['unit']) || !$parameter['unit']) && !$parameter['search'] && !array_intersect($row['units'], $_SESSION['user']['units'])) ||
 					(isset($parameter['unit']) && $parameter['unit'] && !in_array($parameter['unit'], $row['units']))
 				) continue;
 			}
