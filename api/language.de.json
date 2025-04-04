@@ -1454,6 +1454,7 @@
 		"settings_weekly_hours_hint": "YYYY-MM-DD; Stunden in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung empfohlen, frühere Kalendereinträge werden nicht mit berechnet.",
 		"take_photo": "Wähle ein Foto für das Profil",
 		"take_photo_hint": "Das Bild ist für alle Nutzer sichtbar, wie z.B. in den Unterhaltungen.",
+		"timesheet_format_error": "Speichern nicht möglich, eine der Angaben zur Zeiterfassung haben kein gültiges Format!",
 		"token": "Zugangstoken",
 		"token_renew": "Beim Speichern erneuern",
 		"units": "Bereich",

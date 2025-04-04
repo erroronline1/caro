@@ -228,9 +228,9 @@ class USER extends API {
 										($units ? $this->_lang->GET('user.units') . ': ' . implode(', ', $units) . "\n" : '') .
 										($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
 										(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
-										(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . str_replace(';', "\n", $user['app_settings']['weeklyhours']) : '') .
+										(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . $user['app_settings']['weeklyhours'] : '') .
 										(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
-										(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings_annual_vacation') . ': ' . str_replace(';', "\n", $user['app_settings']['annualvacation']) : '') .
+										(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings_annual_vacation') . ': ' . $user['app_settings']['annualvacation'] : '') .
 										(isset($timesheet_stats['_leftvacation']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
 										($skillmatrix ? " \n" . $skillmatrix : '')
 								]
@@ -482,9 +482,36 @@ class USER extends API {
 
 				// gather timesheet setup
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
-				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
+				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
+				// check formats
+				$settingentries = explode('\n', $user['app_settings']['annualvacation']);
+				natsort($settingentries);
+				foreach($settingentries as $line){
+					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
+					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+					// append datetime value and contract value
+					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('user.timesheet_format_error'),
+							'type' => 'error'
+						]]);
+				}
+
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
-				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
+				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
+				// check formats
+				$settingentries = explode('\n', $user['app_settings']['weeklyhours']);
+				natsort($settingentries);
+				foreach($settingentries as $line){
+					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
+					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+					// append datetime value and contract value
+					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('user.timesheet_format_error'),
+							'type' => 'error'
+						]]);
+				}
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
 
 				// gather user skills
@@ -665,10 +692,37 @@ class USER extends API {
 				// update timesheet settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
-				$user['app_settings']['annualvacation'] = $annualvacation ? str_replace("\n", ';', $annualvacation) : '';
+				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
+				// check formats
+				$settingentries = explode('\n', $user['app_settings']['annualvacation']);
+				natsort($settingentries);
+				foreach($settingentries as $line){
+					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
+					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+					// append datetime value and contract value
+					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('user.timesheet_format_error'),
+							'type' => 'error'
+						]]);
+				}
+
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
-				$user['app_settings']['weeklyhours'] = $weeklyhours ? str_replace("\n", ';', $weeklyhours) : '';
+				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
+				// check formats
+				$settingentries = explode('\n', $user['app_settings']['weeklyhours']);
+				natsort($settingentries);
+				foreach($settingentries as $line){
+					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
+					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+					// append datetime value and contract value
+					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('user.timesheet_format_error'),
+							'type' => 'error'
+						]]);
+				}
 
 				// update skills
 				$user['skills'] = [];
@@ -1023,7 +1077,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('user.settings_weekly_hours'),
-									'value' => isset($user['app_settings']['weeklyhours']) ? str_replace(';', "\n", $user['app_settings']['weeklyhours']) : ''
+									'value' => isset($user['app_settings']['weeklyhours']) ? $user['app_settings']['weeklyhours'] : ''
 								],
 								'hint' => $this->_lang->GET('user.settings_weekly_hours_hint')
 							]
@@ -1032,7 +1086,7 @@ class USER extends API {
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('user.settings_annual_vacation'),
-									'value' => isset($user['app_settings']['annualvacation']) ? str_replace(';', "\n", $user['app_settings']['annualvacation']) : ''
+									'value' => isset($user['app_settings']['annualvacation']) ? $user['app_settings']['annualvacation'] : ''
 								],
 								'hint' => $this->_lang->GET('user.settings_annual_vacation_hint')
 							]

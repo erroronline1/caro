@@ -742,13 +742,13 @@ class CALENDARUTILITY {
 			foreach(['weeklyhours', 'annualvacation'] as $setting){
 				$hours_vacation = [];
 				if (isset($user['app_settings'][$setting])){
-					$settingentries = explode(';', $user['app_settings'][$setting]);
+					$settingentries = explode('\n', $user['app_settings'][$setting]);
 					natsort($settingentries);
 					foreach($settingentries as $line){
 						// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
 						preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						// append datetime value and contract value
-						$hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
+						if (isset($lineentry[1]) && isset($lineentry[2])) $hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
 				} else $hours_vacation[] = ['date' => new DateTime('1970-01-01', $datetimezone), 'value' => 0];
 				array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
@@ -776,7 +776,7 @@ class CALENDARUTILITY {
 			if (!strlen($entry['subject'])) {
 				
 				// aka regular working day
-				if ($span_start < $user['timesheet']['_weeklyhours'][0]['date']){
+				if (isset($user['timesheet']['_weeklyhours'][0]) && $span_start < $user['timesheet']['_weeklyhours'][0]['date']){
 					// since entries are sorted by date, if dated earlier than the initial applied weeklyhours this can not be applicable
 					continue;
 				}
@@ -863,7 +863,7 @@ class CALENDARUTILITY {
 			$users[$row]['timesheet']['_overtime'] += $users[$row]['timesheet']['_performed'] - $users[$row]['timesheet']['_projected'];
 
 			// accumulate annual vacation days always from the beginning of tracking according to applicable contract settings at the respective time
-			$users[$row]['timesheet']['_leftvacation'] = $user['timesheet']['_annualvacation'][0]['value'];
+			$users[$row]['timesheet']['_leftvacation'] = isset($user['timesheet']['_annualvacation'][0]) ? $user['timesheet']['_annualvacation'][0]['value'] : 0;
 			for($i = 1; $i < count($user['timesheet']['_annualvacation']); $i++){
 				// reassure timespan within contract settings
 				$startdate = $user['timesheet']['_annualvacation'][$i]['date'];

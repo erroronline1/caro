@@ -1454,6 +1454,7 @@
 		"settings_weekly_hours_hint": "YYYY-MM-DD hours within every new line\nFirst entry recommended with start date of tracking, earlier entries will not be calculated",
 		"take_photo": "Take a photo for your profile",
 		"take_photo_hint": "This photo is public to all users, e.g. in messages",
+		"timesheet_format_error": "Saving aborted, one of the entries for time tracking have an invalid format!",
 		"token": "Access token",
 		"token_renew": "Renew on save",
 		"units": "Organizational units",
