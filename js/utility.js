@@ -81,11 +81,21 @@ export const _serviceWorker = {
 		 */
 		communication: function (data) {
 			let notif;
-			if ("message_unseen" in data) {
+			if ("message_unseen" in data || "responsibilities" in data) {
+				let message_unseen = 0,
+					responsibilities = 0;
+				if ("message_unseen" in data) {
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]"); // button
+					if (notif) notif.setAttribute("data-notification", data.message_unseen);
+					message_unseen = data.message_unseen;
+				}
+				if ("responsibilities" in data) {
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.responsibility").replace(" ", "_") + "]"); // button
+					if (notif) notif.setAttribute("data-notification", data.responsibilities);
+					responsibilities = data.responsibilities;
+				}
 				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]"); // labmain menu labelel
-				if (notif) notif.setAttribute("data-notification", data.message_unseen);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]"); // button
-				if (notif) notif.setAttribute("data-notification", data.message_unseen);
+				if (notif) notif.setAttribute("data-notification", parseInt(message_unseen, 10) + parseInt(responsibilities, 10));
 			}
 			if ("measure_unclosed" in data) {
 				// no appending number to userMenu to avoid distracting from unread messages
