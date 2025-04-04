@@ -397,6 +397,7 @@ nav {
 		margin: 0 0.75em;
 		background-color: var(--cta_darker);
 		cursor: pointer;
+		max-width: 10%;
 		width: 2.5em;
 		height: 2.5em;
 		padding: 0.2em;
@@ -1636,8 +1637,8 @@ button[data-type="submitbutton"]::before {
 
 [data-type="toleft"]::before {
 	background-color: var(--article);
-	-webkit-mask-image: url("./media/arrow-left.svg");
-	mask-image: url("./media/arrow-left.svg");
+	-webkit-mask-image: url("./media/angle-left.svg");
+	mask-image: url("./media/angle-left.svg");
 }
 
 [data-type="toright"]::before {
@@ -1654,8 +1655,8 @@ button[data-type="submitbutton"]::before {
 	background-size: cover;
 	margin: 0 0.5em 0.2em 0;
 	background-color: var(--article);
-	-webkit-mask-image: url("./media/arrow-right.svg");
-	mask-image: url("./media/arrow-right.svg");
+	-webkit-mask-image: url("./media/angle-right.svg");
+	mask-image: url("./media/angle-right.svg");
 }
 
 [data-type="textarea"]::before {
