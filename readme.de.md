@@ -17,6 +17,7 @@
         * [Unterhaltungen](#unterhaltungen)
         * [Mitarbeiterverzeichnis](#mitarbeiterverzeichnis)
         * [Textvorschläge](#textvorschläge)
+        * [Verantwortlichkeiten](#verantwortlichkeiten)
         * [Verbesserungsvorschläge](#verbesserungsvorschläge)
     * [Aufzeichnungen](#aufzeichnungen)
         * [Dokumente](#dokumente)
@@ -272,6 +273,13 @@ graph TD;
     chunks-...->edittemplate[Vorlage bearbeiten];
     edittemplate-.->|Vorlage hinzufügen|chunks;
 ```
+
+[Übersicht](#übersicht)
+
+### Verantwortlichkeiten
+Berechtigte Nutzer können Verantwortlichkeiten für Aufgaben erstellen und Nutzer und deren Stellvertreter zuordnen. Zugeordnete Nutzer erhalten eine Nachricht und Menü-Benachrichtigung um die Zuordnung zu prüfen und die Verantwortlichkeit zu akzeptieren. Verantwortlichkeiten haben eine verpflichtende Dauer, nach deren Ablauf ein Kalendereintrag die Leitung daran erinnert die Abgelaufenen Einträge zu erneuern. Verantwortlichkeiten können jederzeit geändert werden, aus Transparenzgründen müssen die Nutzer ihre Akzeptanz jedoch erneut bestätigen. Verantwortlichkeiten sind keine Aufzeichnungen, da sie primär der operativen Information dienen. Die Übersicht kann nach Bereichen gefiltert werden oder auch nur die eigenen Verantwortlichkeiten darstellen.
+
+![responsibilities screenshot](http://toh.erroronline.one/caro/responsibilities%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -920,7 +928,7 @@ Anwendungsunterstützung Legende:
 | ISO 13485 5.3 Qualitätspolitik | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 5.4.1 Qualitätsziele | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 5.4.2 Planung des Qualitäts-managementsystems | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
-| ISO 13485 5.5.1 Verantwortung und Befugnis | strukturell | &bull; Nutzern werden [Berechtigungen](#nutzer) erteilt, die spezielle Zugriffe ausdrücklich erlauben oder das Menü vereinfachen.<br/>&bull; Berechtigungen definieren den Zugriff auf Funktionen der Anwendung.<br/>&bull; Nutzer können eine PIN erhalten um Bestellungen freizugeben.<br/>&bull; Das Mitarbeiterverzeichnis listet alle Nutzer auch gruppiert nach organisatorischen Bereichen und Berechtigungen auf.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Nutzer](#nutzer), [Mitarbeiterverzeichnis](#mitarbeiterverzeichnis), [Laufzeitvariablen](#laufzeitvariablen) |
+| ISO 13485 5.5.1 Verantwortung und Befugnis | teilweise | &bull; Nutzern werden [Berechtigungen](#nutzer) erteilt, die spezielle Zugriffe ausdrücklich erlauben oder das Menü vereinfachen.<br/>&bull; Berechtigungen definieren den Zugriff auf Funktionen der Anwendung.<br/>&bull; Nutzer können eine PIN erhalten um Bestellungen freizugeben.<br/>&bull; Das Mitarbeiterverzeichnis listet alle Nutzer auch gruppiert nach organisatorischen Bereichen und Berechtigungen auf.<br/>&bull; Verantwortlichkeiten können festgelegt werden und sind öffentlich zugänglich | [Nutzer](#nutzer), [Mitarbeiterverzeichnis](#mitarbeiterverzeichnis), [Verantwortlichkeiten](#verantwortlichkeiten), [Laufzeitvariablen](#laufzeitvariablen) |
 | ISO 13485 5.5.2 Beauftragter der Leitung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 5.5.3 Interne Kommunikation | ja, strukturell | &bull; Die Anwendung hat einen internen [Nachrichtendienst](#unterhaltungen). Dieser Dienst wird von internen Modulen genutzt um eine zielführende Datenübermittlung sicherzustellen, z.B. für die Benachrichtigung von Nutzergruppen für die Freigabe von Dokumenten und deren Komponenten, die Benachrichtigung von Nutzergruppen über zurückgewiesene Bestellungen und geänderten Bestellstati, Benachrichtigungen zu zusätzlich erforderlichen Rechechen zu einer Bestellung an den Besteller, Benachrichtigung von Nutzergruppen zu geplanten Ereignissen, Benachrichtigungen über länger unbearbeitete Vorgänge<br/>&bull; Die Anwendung hat einen integrierten Kalender. Dieser soll die Aufgabenplanung und Bearbeitung zeitkritischer wiederkehrender Ereignisse wie Kalibrationsmaßnahmen und dergleichen unterstützen.<br/>&bull; Die Anwendung hat ein Bestellmodul. Bestellungen können vorbereitet und freigegeben werden. Der Einkauf hat alle erforderlichen Daten aus der Lieferantenpreisliste vorliegen um die Bestellung bearbeiten zu können; die Markierung des Bestellstatus erlaubt eine zeitnahe Rückmeldung an den Besteller.<br/>&bull; Die Anwendung hat einen Sharepoint für Dateien und einen STL-Betrachter für 3D-Modelle um einfach Informationen austauschen zu können, welche die Möglichkeiten des Nachrichtendienstes übersteigen.<br/>&bull; Die Oberfläche informiert über neue Nachrichten, freigegebene neue Bestellungen (Einkauf) und unerledigte Kalenderereignisse. Die Startseite zeigt zudem eine kurze Zusammenfassung offener Versorgungsfälle und geplanter Ereignisse der aktuellen Kalenderwoche sowie unerledigter Ereignisse.<br/>&bull; Dokumente können auf andere Dokumente verweisen. Dabei können diese nur angezeigt werden (z.B. Verfahrens- oder Arbeitsanweisungen) oder mit Übernahme des Identifikators für einen reibungslosen Transfer sorgen.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Unterhaltungen](#unterhaltungen), [Kalender](#kalender), [Bestellung](#bestellung), [Dateien](#dateien), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
 | ISO 13485 5.6.1 Allgemeine Anforderung an Management-bewertung | teilweise | &bull; Die Anwendung beinhaltete ein Formular für die Erstellung, Bearbeitung und den Abschluss eines Managementbericht, welches standardmäßig alle erforderlichen Themen beinhaltet. | [Managementbericht](#managementbericht), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |

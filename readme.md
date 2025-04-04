@@ -17,6 +17,7 @@
         * [Conversations](#conversations)
         * [Personnel register](#personnel-register)
         * [Text recommendations](#text-recommendations)
+        * [Responsibilities](#responsibilities)
         * [Improvement suggestions](#improvement-suggestions)
     * [Records](#records)
         * [Documents](#documents)
@@ -69,6 +70,7 @@
     * [Notification endpoints](#notification-endpoints)
     * [Order endpoints](#order-endpoints)
     * [Record endpoints](#record-endpoints)
+    * [Responsibility endpoints](#responsibility-endpoints)
     * [Risk endpoints](#risk-endpoints)
     * [Texttemplate endpoints](#texttemplate-endpoints)
     * [Tool endpoints](#tool-endpoints)
@@ -341,6 +343,13 @@ graph TD;
     chunks-...->edittemplate[edit template];
     edittemplate-.->|add template|chunks;
 ```
+
+[Content](#content)
+
+### Responsibilities
+Authorized users can define responsibilities for given tasks and assign users as well as their proxy. Assigned users will retrieve a message and a menu notification to review the assignments and accept the responsibilities. Responsibilities have a mandatory applicability timespan after which a calendar entry reminds admin to renew the expired item. Responsibilities can be edited at any time, only users have to reaccept their assignment for transparency reasons. Responsibilities are not a persistent record as they serve primarily operational information. The overwiew can be filtered by units as well as displaying only own responsibilities. 
+
+![responsibilities screenshot](http://toh.erroronline.one/caro/responsibilities.png)
 
 [Content](#content)
 
@@ -997,7 +1006,7 @@ Application support legend:
 | ISO 13485 5.3 Quality policy | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.4.1 Quality goals | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.1 Responsibility and authority | partial, structural | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A personnel register summarizes all users, also grouped by organizational unit and permission<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Personnel register](#personnel-register), [Runtime variables](#runtime-variables) |
+| ISO 13485 5.5.1 Responsibility and authority | partial | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A personnel register summarizes all users, also grouped by organizational unit and permission<br/>&bull; Responsibilities can be defined and are publicly accessible | [Users](#users), [Personnel register](#personnel-register), [Responsibilities](#responsibilities), [Runtime variables](#runtime-variables) |
 | ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.1 General management assessment | partial | &bull; The application has a form to add, edit or close management reviews, containing required issues by default. | [Management review](#management-review), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
@@ -3531,7 +3540,7 @@ Sample response
 
 > DELETE ./api/api.php/order/approved/{id}
 
-Returns approved orders by product.
+Deletes an approved order.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3928,6 +3937,96 @@ Parameters
 Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
+```
+
+[Content](#content)
+
+### Responsibility endpoints
+
+> PUT  ./api/api.php/responsibility/responsibilities/{id}
+
+Updates acceptance by submitting user for the given responsibility
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"response":{"msg":"Acceptance confirmed. Thank you for shouldering responsibility!","type":"success"}}
+```
+
+> GET ./api/api.php/responsibility/responsibilities/null/{unit}
+
+Displays responsibilites overview
+
+Parameters
+
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {unit} | path parameter | optional | filter, _my displays only own |
+
+Sample response
+```
+{"render":{"content":[[{"type":"radio","content":{"My responsibilities":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null', '_my')"},"My units":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null')","checked":true},"Prosthetics II":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null', 'prosthetics2')"}},....
+```
+
+> POST ./api/api.php/responsibility/responsibility
+
+Stores a new responsibility to the database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | details on the responsibility |
+
+Sample response
+```
+{"response":{"msg":"Responsibility saved","type":"success"}}
+```
+
+> PUT ./api/api.php/responsibility/responsibility/{id}
+
+Updates a responsibility
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+| payload | form data | required | details on the responsibility |
+
+Sample response
+```
+{"response":{"msg":"Responsibility saved","type":"success"}}
+```
+
+> GET ./api/api.php/responsibility/responsibility/{id}
+
+Display a form to add a new responsibility or prefilled with data from the requested database entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database id |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"responsibility","action":"javascript:api.responsibility('put', 'responsibility', 5)"},"content":[[{"type":"textarea","attributes":{"name":"Task","value":"test","required":true}},{"type":"textarea","attributes":{"name":"Context, description","value":""}},{"type":"checkbox","attributes":{"name":"Units"},"content":{"Common":{"checked":false},"Orthotics I":{"checked":false},"Orthotics II":{"checked":false},....
+```
+
+> DELETE ./api/api.php/responsibility/responsibility/{id|type}
+
+Deleted a responsibility.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database id |
+
+Sample response
+```
+{"response":{"msg":"Responsibility deleted","type":"success"}}
 ```
 
 [Content](#content)
