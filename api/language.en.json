@@ -1224,6 +1224,7 @@
 		"apply": "from :start to :end",
 		"assigned": "Assigned user",
 		"context": "Context, description",
+		"created": "created by :name",
 		"delete": "delete",
 		"delete_confirm": "Delete responsibility permanantly?",
 		"delete_error": "Responsibility could not be deleted. Please try again.",

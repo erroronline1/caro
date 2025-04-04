@@ -403,6 +403,13 @@ class RESPONSIBILITY extends API {
 				foreach($this->_lang->_USER['units'] as $unit => $translation){
 					$units[$translation] = ['checked' => boolval(in_array($unit, $responsibility['units']))];
 				}
+
+				$created = '';
+				$creator = array_search($responsibility['user_id'], array_column($users, 'id'));
+				if ($creator !== false){
+					$creator = $users[$creator];
+					$created = $this->_lang->GET('responsibility.created', [':name' => $creator['name']]);
+				}
 				// default values
 				$result['render']['content'][] = [
 					[
@@ -445,7 +452,8 @@ class RESPONSIBILITY extends API {
 						'type' => 'textsection',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.update_hint')
-						]
+						],
+						'content' => $created
 					];
 					$result['render']['content'][count($result['render']['content']) - 1][] = [
 						'type' => 'deletebutton',

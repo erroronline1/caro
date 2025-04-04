@@ -1224,6 +1224,7 @@
 		"apply": "vom :start bis :end",
 		"assigned": "Verantwortliche Mitarbeiter",
 		"context": "Zusammenhang, Erläuterung",
+		"created": "angelegt von :name",
 		"delete": "Löschen",
 		"delete_confirm": "Verantwortlichkeit unwiderruflich löschen?",
 		"delete_error": "Verantwortlichkeit konnte nicht gelöscht werden, bitte versuche es erneut.",
