@@ -166,7 +166,8 @@ class RESPONSIBILITY extends API {
 						$content[] = [
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $row['responsibility']
+								'name' => $row['responsibility'],
+								'class' => substr($row['span_end'], 0, 10) < $this->_currentdate->format('Y-m-d') ? 'red' : ''
 							],
 							'content' => $row['description']
 						];
@@ -187,7 +188,8 @@ class RESPONSIBILITY extends API {
 						$content[] = [
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $this->_lang->GET('responsibility.applicability')
+								'name' => $this->_lang->GET('responsibility.applicability'),
+								'class' => substr($row['span_end'], 0, 10) < $this->_currentdate->format('Y-m-d') ? 'red' : ''
 							],
 							'content' => $this->_lang->GET('responsibility.apply', [':start' => substr($row['span_start'], 0, 10), ':end' => substr($row['span_end'], 0, 10)])
 						];
