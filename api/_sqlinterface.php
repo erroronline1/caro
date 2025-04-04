@@ -195,7 +195,7 @@ class SQLQUERY {
 		],
 		'audit_and_management_get_by_id' => [
 			'mysql' => "SELECT * FROM caro_audit_and_management WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_aucaro_audit_and_managementdit WHERE id = :id"
+			'sqlsrv' => "SELECT * FROM caro_audit_and_management WHERE id = :id"
 		],
 		'audit_and_management_delete' => [
 			'mysql' => "DELETE FROM caro_audit_and_management WHERE id = :id AND closed IS NULL",
