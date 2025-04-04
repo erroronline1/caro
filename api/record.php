@@ -1334,7 +1334,7 @@ class RECORD extends API {
 	 * display records overview
 	 */
 	public function records(){
-		$return = ['render' => ['content' => []]];
+		$result = ['render' => ['content' => []]];
 
 		// get all records or these fitting the search
 		require_once('_shared.php');
@@ -1427,7 +1427,7 @@ class RECORD extends API {
 		if ($contexts){
 			foreach($contexts as $context => $links){
 				if ($links){
-					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"]))
+					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"], isset($_SESSION['user']['app_settings']['primaryRecordState']) ? $_SESSION['user']['app_settings']['primaryRecordState'] : null))
 						array_push($content, $casestate);
 					array_push($content, [
 						[
