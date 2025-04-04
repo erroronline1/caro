@@ -589,7 +589,7 @@
 		"userskills_warning_description": "Some defined skills are not matched!"
 	},
 	"calendar": {
-		"daily_title": ":day: :number enries",
+		"daily_title": ":day: :number entries",
 		"month_next": "next month",
 		"month_previous": "previous month",
 		"schedule": {
@@ -911,6 +911,10 @@
 			"files": "All files",
 			"header": "Files",
 			"sharepoint": "Open sharepoint"
+		},
+		"nav":{
+			"back": "back",
+			"forth": "forth"
 		},
 		"purchase": {
 			"approved_orders": "Approved orders",

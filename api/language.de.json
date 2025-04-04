@@ -912,6 +912,10 @@
 			"header": "Dateien",
 			"sharepoint": "Öffentlicher Sharepoint"
 		},
+		"nav":{
+			"back": "zurück",
+			"forth": "vorwärts"
+		},
 		"purchase": {
 			"approved_orders": "Freigegebene Bestellungen",
 			"header": "Einkauf",

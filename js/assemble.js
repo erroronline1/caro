@@ -57,6 +57,18 @@ export const assemble_helper = {
 		icons[api._lang.GET("menu.tools.header")] = "url('./media/tools.svg')";
 
 		let label, input, div, button, span;
+
+		// back nav
+		button = document.createElement("button");
+		button.type = "button";
+		button.title = api._lang.GET("menu.nav.back");
+		button.classList.add("inactive");
+		button.onclick = () => {
+			api.history.go("back");
+		};
+		button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-left.svg')";
+		elements.push(button);
+
 		// iterate over main categories
 		for (const [group, items] of Object.entries(content)) {
 			label = document.createElement("label");
@@ -115,6 +127,18 @@ export const assemble_helper = {
 			elements.push(input);
 			elements.push(div);
 		}
+
+		// forth nav
+		button = document.createElement("button");
+		button.type = "button";
+		button.title = api._lang.GET("menu.nav.forth");
+		button.classList.add("inactive");
+		button.onclick = () => {
+			api.history.go("forth");
+		};
+		button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-right.svg')";
+		elements.push(button);
+
 		menu.replaceChildren(...elements);
 		// trigger notifications
 		_serviceWorker.postMessage("getnotifications");

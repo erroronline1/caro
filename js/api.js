@@ -243,6 +243,76 @@ export const api = {
 	},
 
 	/**
+	 *   _   _     _
+	 *  | |_|_|___| |_ ___ ___ _ _
+	 *  |   | |_ -|  _| . |  _| | |
+	 *  |_|_|_|___|_| |___|_| |_  |
+	 *                        |___|
+	 * stores and recalls last get requests.
+	 */
+	history: {
+		currentStep: 1,
+		buttoncolor: function () {
+			if (!document.querySelector("nav>button:last-of-type")) return; // onload return because not yet rendered
+			// "disable" back
+			if (this.currentStep < 2) document.querySelector("nav>button:last-of-type").classList.add("inactive");
+			else document.querySelector("nav>button:last-of-type").classList.remove("inactive");
+			// "disable" forth
+			let history = JSON.parse(sessionStorage.getItem("history"));
+			if (this.currentStep === history.length) document.querySelector("nav>button:first-of-type").classList.add("inactive");
+			else document.querySelector("nav>button:first-of-type").classList.remove("inactive");
+		},
+		/**
+		 * navigates through the history
+		 * @param {string} dir 
+		 * @returns event of calling the request according to current history position
+		 */
+		go: function (dir) {
+			let history = JSON.parse(sessionStorage.getItem("history")),
+				request;
+			if (!history) return; // history is not written yet!!!
+			if (dir === "back") this.currentStep = ++this.currentStep <= history.length ? this.currentStep : history.length;
+			else this.currentStep = --this.currentStep > 0 ? this.currentStep : 1;
+			if (typeof history[history.length - this.currentStep] !== "undefined") {
+				request = history[history.length - this.currentStep];
+				api[request.shift()]("get", ...request);
+			}
+			this.buttoncolor();
+		},
+		/**
+		 * updates history to sessionStorage
+		 * @param {array} request 
+		 * @returns none
+		 */
+		write: function (request) {
+			let history = JSON.parse(sessionStorage.getItem("history"));
+			/**
+			 * compares two arrays for similarity
+			 * @param {array} a1 
+			 * @param {array} a2 
+			 * @returns boolean
+			 */
+			function areDifferent(a1, a2) {
+				if (typeof a1 === "undefined") return true;
+				if (JSON.stringify(a1) !== JSON.stringify(a2)) return true;
+				return false;
+			}
+			if (!history) {
+				// history is not written yet!!!
+				sessionStorage.setItem("history", JSON.stringify([request]));
+				return;
+			}
+			if (areDifferent(history[history.length - this.currentStep], request)) {
+				history.splice(history.length - (this.currentStep - 1));
+				history.push(request);
+				sessionStorage.setItem("history", JSON.stringify(history));
+				this.currentStep = 1;
+				this.buttoncolor();
+			}
+		},
+	},
+
+	/**
 	 *   ___ _ _ _
 	 *  |  _|_| | |_ ___ ___
 	 *  |  _| | |  _| -_|  _|
@@ -286,6 +356,8 @@ export const api = {
 	 */
 	application: async (method, ...request) => {
 		request = [...request];
+		if (method === "get" && !["language", "menu"].includes(request[0])) api.history.write(["application", ...request]);
+
 		request.splice(0, 0, "application");
 		let successFn, payload;
 		switch (request[1]) {
@@ -304,6 +376,8 @@ export const api = {
 				break;
 			case "login":
 				payload = _.getInputs("[data-usecase=login]", true);
+				// clear history
+				sessionStorage.clear();
 
 				successFn = async function (data) {
 					// import server side settings
@@ -464,6 +538,8 @@ export const api = {
 	 */
 	audit: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["audit", ...request]);
+
 		request.splice(0, 0, "audit");
 		let payload,
 			successFn = function (data) {
@@ -598,6 +674,8 @@ export const api = {
 	 */
 	calendar: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["calendar", ...request]);
+
 		request.splice(0, 0, "calendar");
 		let payload,
 			successFn = function (data) {
@@ -676,6 +754,8 @@ export const api = {
 	 */
 	csvfilter: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["csvfilter", ...request]);
+
 		request.splice(0, 0, "csvfilter");
 		let payload,
 			successFn = function (data) {
@@ -730,6 +810,8 @@ export const api = {
 	 */
 	file: async (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["file", ...request]);
+
 		request.splice(0, 0, "file");
 		let successFn = function (data) {
 				if (data.render) {
@@ -806,6 +888,8 @@ export const api = {
 	 */
 	document: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["document", ...request]);
+
 		request.splice(0, 0, "document");
 		let successFn = function (data) {
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -970,6 +1054,8 @@ export const api = {
 	 */
 	measure: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["measure", ...request]);
+
 		request.splice(0, 0, "measure");
 		let payload,
 			successFn = function (data) {
@@ -1021,6 +1107,8 @@ export const api = {
 	 */
 	message: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["message", ...request]);
+
 		request.splice(0, 0, "message");
 		let payload,
 			successFn = function (data) {
@@ -1080,6 +1168,8 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["purchase", ...request]);
+
 		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "exportpricelist", "productsearch"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
@@ -1279,6 +1369,8 @@ export const api = {
 	 */
 	record: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["record", ...request]);
+
 		request.splice(0, 0, "record");
 		let payload,
 			successFn = function (data) {
@@ -1464,13 +1556,15 @@ export const api = {
 	 *  |  _| -_|_ -| . | . |   |_ -| | . | | | |  _| | |
 	 *  |_| |___|___|  _|___|_|_|___|_|___|_|_|_|_| |_  |
 	 *              |_|                             |___|
-	 * 
-	 * @param {string} method 
-	 * @param  {array} request 
+	 *
+	 * @param {string} method
+	 * @param  {array} request
 	 * @returns request
 	 */
 	responsibility: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["responsibility", ...request]);
+
 		request.splice(0, 0, "responsibility");
 		let payload,
 			successFn = function (data) {
@@ -1515,6 +1609,8 @@ export const api = {
 	 */
 	risk: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["risk", ...request]);
+
 		request.splice(0, 0, "risk");
 		let payload,
 			successFn = function (data) {
@@ -1582,6 +1678,8 @@ export const api = {
 	 */
 	texttemplate: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["texttemplate", ...request]);
+
 		request.splice(0, 0, "texttemplate");
 		let payload,
 			successFn = function (data) {
@@ -1658,6 +1756,8 @@ export const api = {
 	 */
 	tool: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["tool", ...request]);
+
 		request.splice(0, 0, "tool");
 		let payload,
 			successFn = function (data) {
@@ -1726,6 +1826,8 @@ export const api = {
 	 */
 	user: (method, ...request) => {
 		request = [...request];
+		if (method === "get") api.history.write(["user", ...request]);
+
 		request.splice(0, 0, "user");
 		let payload,
 			successFn = function (data) {

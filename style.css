@@ -369,15 +369,56 @@ nav {
 	width: 100%;
 	height: 4rem;
 	padding: 0.75rem;
-	vertical-align: top;
-	text-align: center;
+
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: stretch;
+	gap: 0.75rem;
+
+	label[data-notification],
+	button[title] {
+		margin: 0;
+		padding: 0;
+		cursor: pointer;
+		max-width: 2.75rem;
+		height: 2.75rem;
+		width: 10%;
+	}
+	div[data-for] {
+		background-color: var(--cta_darker);
+		-webkit-mask-repeat: no-repeat;
+		mask-repeat: no-repeat;
+		width: 100%;
+		height: 100%;
+	}
+	button[title] {
+		background-color: var(--green);
+		-webkit-mask-repeat: no-repeat;
+		mask-repeat: no-repeat;
+	}
+	button.inactive {
+		visibility: hidden;
+	}
+
+	input {
+		appearance: none;
+		width: auto;
+	}
+
+	div[data-for="userMenuApplication"] {
+		border-radius: 50%;
+		background-size: cover;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
 
 	[data-notification]::after {
 		content: attr(data-notification);
 		color: var(--notif);
 		position: absolute;
-		margin-top: -0.25em;
-		margin-left: -1.75em;
+		margin-top: -2.5rem;
+		margin-left: 2rem;
 		font-size: 0.75em;
 		background-color: var(--red);
 		padding: 0 0.25em;
@@ -390,28 +431,6 @@ nav {
 
 	[data-notification="0"]::after {
 		display: none;
-	}
-
-	div[data-for] {
-		display: inline-block;
-		margin: 0 0.75em;
-		background-color: var(--cta_darker);
-		cursor: pointer;
-		max-width: 10%;
-		width: 2.5em;
-		height: 2.5em;
-		padding: 0.2em;
-	}
-
-	input {
-		appearance: none;
-		width: auto;
-	}
-
-	div[data-for="userMenuApplication"] > label {
-		border-radius: 50%;
-		background-size: cover;
-		background-repeat: no-repeat;
 	}
 
 	div.options {
@@ -430,6 +449,7 @@ nav {
 		overflow: hidden;
 		height: 0;
 		transition: 0.3s ease;
+		text-align: center;
 
 		span {
 			font-size: 1.15em;

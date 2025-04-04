@@ -121,13 +121,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * update readme pictures on tools menu, record menu, audit and regulatory
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
-    * timespan, with calendar entry on end to admin and assigned user and proxy
     * handle hidden attribute
-    * notif on unchecked nominations
     * documentation: chapter, api, config
-* history navigation
-    * navigation bar responsible, max-width per icon
-    * left arrow, right arrow for session wise get requests
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1974,7 +1969,7 @@ Stakeholder identification:
 | Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | **Rejected**; 2024-12-26 |
 | Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30 | Implemented; 2025-01-31 |
-| History navigation | User | 2025-04-03 |  |
+| History navigation | User | 2025-04-03 | Implemented; 2025-04-05 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
