@@ -288,7 +288,7 @@ class TOOL extends API {
 		$appointmentreminder .= ' ' . $this->_lang->GET('tool.code.qrcode_appointment_reminder_default');
 		$types = [
 			'qrcode_appointment' => ['name' => $this->_lang->GET('tool.code.qrcode_appointment'),
-				'content'=> [
+				'content' => [
 					[
 						'type' => 'date',
 						'attributes' => [
@@ -340,7 +340,7 @@ class TOOL extends API {
 					"END:VEVENT"
 			],
 			'qrcode_text' => ['name' => $this->_lang->GET('tool.code.qrcode_text'),
-				'content'=> [
+				'content' => [
 					[
 						'type' => 'textarea',
 						'attributes' => [
@@ -352,7 +352,7 @@ class TOOL extends API {
 				'code' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_text')) ? : ''
 			],
 			'barcode_code128' => ['name' => $this->_lang->GET('tool.code.barcode_code128'),
-				'content'=> [
+				'content' => [
 					[
 						'type' => 'text',
 						'hint' => $this->_lang->GET('tool.code.barcode_code128_hint'),
@@ -364,7 +364,7 @@ class TOOL extends API {
 				],
 				'code' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.barcode_description')) ? : ''],
 			'barcode_ean13' => ['name' => $this->_lang->GET('tool.code.barcode_ean13'),
-				'content'=> [
+				'content' => [
 					[
 						'type' => 'number',
 						'hint' => $this->_lang->GET('tool.code.barcode_ean13_hint'),
@@ -402,7 +402,7 @@ class TOOL extends API {
 		]];
 
 		if ($this->_requestedType){
-			if ($types[$this->_requestedType]['code']){
+			if ($types[$this->_requestedType]['code'] && count((array_keys((array) $this->_payload)))){
 				switch ($this->_requestedType){
 					case 'qrcode_appointment':
 						require_once('./_pdf.php');
@@ -421,7 +421,7 @@ class TOOL extends API {
 									':reminder' => $appointmentreminder
 								])
 							],
-							'filename' => $this->_lang->GET('tool.code.qrcode_appointment') . '.pdf'
+							'filename' => $this->_lang->GET('tool.code.qrcode_appointment')
 						];
 						$downloadfiles[$this->_lang->GET('tool.code.qrcode_appointment')] = [
 							'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
