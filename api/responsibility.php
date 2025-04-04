@@ -90,17 +90,19 @@ class RESPONSIBILITY extends API {
 				foreach($responsibilities as $row){
 					if (!PERMISSION::permissionFor('responsibilities') && $row['hidden']) continue;
 					$row['units'] = explode(',', $row['units']);
+					$row['assigned_users'] = json_decode($row['assigned_users'], true);
+					$row['proxy_users'] = json_decode($row['proxy_users'], true);
 					array_push($available_units, ...$row['units']);
 
 					// filter by unit
-					if ($this->_unit && !in_array($this->_unit, $row['units'])) continue;
 					if (!$this->_unit && !array_intersect($row['units'], ['common', ...$_SESSION['user']['units']])) continue;
-					
-					if (intval($this->_requestedID) && intval($this->_requestedID) !== $row['id']) continue;
+					if ($this->_unit && !in_array($this->_unit, $row['units'])) {
+						if ($this->_unit !== '_my')	continue;
+						// handle user assigned responsibilities
+						if (!array_key_exists($_SESSION['user']['id'], $row['assigned_users']) && !array_key_exists($_SESSION['user']['id'], $row['proxy_users'])) continue;
+					}
 
 					// add to result
-					$row['assigned_users'] = json_decode($row['assigned_users'], true);
-					$row['proxy_users'] = json_decode($row['proxy_users'], true);
 					$selected[] = $row;
 				}
 
@@ -108,6 +110,8 @@ class RESPONSIBILITY extends API {
 				$organizational_units = [];
 				$available_units = array_unique($available_units);
 				sort($available_units);
+				$organizational_units[$this->_lang->GET('responsibility.my')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null', '_my')"];
+				if ($this->_unit === '_my') $organizational_units[$this->_lang->GET('responsibility.my')]['checked'] = true;
 				$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null')"];
 				if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 				foreach($available_units as $unit){
@@ -133,6 +137,7 @@ class RESPONSIBILITY extends API {
 				if ($selected){
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($selected as $row){
+						$content = [];
 						$assigned = [];
 						$proxy = [];
 
@@ -278,7 +283,7 @@ class RESPONSIBILITY extends API {
 					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
 						':user' => $_SESSION['user']['name'],
 						':task' => $responsibility[':responsibility'],
-						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\')">' . $this->_lang->GET('menu.communication.responsibility'). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('menu.communication.responsibility'). '</a>',
 					], true)));
 
 					$this->response([
@@ -341,7 +346,7 @@ class RESPONSIBILITY extends API {
 					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
 						':user' => $_SESSION['user']['name'],
 						':task' => $responsibility[':responsibility'],
-						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\')">' . $this->_lang->GET('menu.communication.responsibility', [], true). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('menu.communication.responsibility', [], true). '</a>',
 					], true)));
 					
 					$this->response([
@@ -404,14 +409,14 @@ class RESPONSIBILITY extends API {
 						'type' => 'textarea',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.task'),
-							'value' => $responsibility['responsibility'],
+							'value' => $responsibility['responsibility'] ? : '',
 							'required' => true
 						]
 					], [
 						'type' => 'textarea',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.context'),
-							'value' => $responsibility['description']
+							'value' => $responsibility['description'] ? : ''
 						]
 					], [
 						'type' => 'checkbox',

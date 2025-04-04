@@ -1230,6 +1230,7 @@
 		"delete_success": "Responsibility deleted",
 		"edit": "edit",
 		"message": ":user puts you in charge of :task. Please confirm accepting this responsibility: :link",
+		"my": "My responsibilities",
 		"new": "New responsibility",
 		"proxy": "Proxy",
 		"save_error": "Responsibility could not be saved. Please try again.",

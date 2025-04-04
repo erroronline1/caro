@@ -1230,6 +1230,7 @@
 		"delete_success": "Verantwortlichkeit gelöscht",
 		"edit": "bearbeiten",
 		"message": ":user überträgt dir die Verantwortung für :task. Bitte bestätige, dass du diese Aufgabe übernimmst: :link",
+		"my": "Meine Verantwortlichkeiten",
 		"new": "Neue Verantwortlichkeit",
 		"proxy": "Vertretung",
 		"save_error": "Verantwortlichkeit konnte nicht gespeichert werden, bitte versuche es erneut.",
