@@ -1221,6 +1221,7 @@ recordsexport = "user"; Export von Aufzeichnungen, ggf. einschränken um ungewol
 recordsretyping = "ceo, supervisor, prrc" ; Reklamationen und Nacharbeiten als anderen Dokumentationstyp abändern
 regulatory = "ceo, qmo, prrc, supervisor" ; Zugriff auf regulatorische Auswertungen und Zusammenfassungen
 regulatoryoperation = "ceo, qmo, prrc" ; Erlaubnis zum Export, dem Widerruf von Stichprobenprüfungen, dem Löschen von Bestellstatistiken, etc.
+responsibilities = "ceo, qmo" ; Verantwortlichkeiten anlegen, bearbeiten und löschen
 riskmanagement = "ceo, qmo, prrc" ; Risiken anlegen, bearbeiten und löschen
 texttemplates = "ceo, qmo" ; Textvorschläge anlegen und bearbeiten
 trainingevaluation = "ceo, supervisor" ; Schulungsbewertungen

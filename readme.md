@@ -123,8 +123,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * update readme pictures on tools menu, record menu, audit and regulatory
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
-    * handle hidden attribute
-    * documentation: chapter, api, config
+    * handle hidden attribute?
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1298,6 +1297,7 @@ recordsexport = "user"; exporting records, limit if reasonable to reduce risk of
 recordsretyping = "ceo, supervisor, prrc" ; reset type of complaints and reworks
 regulatory = "ceo, qmo, prrc, supervisor" ; access regulatory evaluations and summaries
 regulatoryoperation = "ceo, qmo, prrc" ; export, revoke sample checks, drain order statistics, etc.
+responsibilities = "ceo, qmo" ; add, edit and delete responsibilities
 riskmanagement = "ceo, qmo, prrc" ; add, edit and delete risks
 texttemplates = "ceo, qmo" ; add and edit text templates
 trainingevaluation = "ceo, supervisor" ; evaluate trainings
