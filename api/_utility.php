@@ -394,7 +394,10 @@ class UTILITY {
 				break;
 		}
 		foreach($dir as $i => $file){
-			if (is_file($folder . '/' . $file)) $result[] = $folder . '/' . $file;
+			if (is_file($folder . '/' . $file) && !in_array($file, [
+				'.htaccess',
+				'web.config'
+			])) $result[] = $folder . '/' . $file;
 		}
 		return $result;
 	}
