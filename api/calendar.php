@@ -492,7 +492,7 @@ class CALENDAR extends API {
 					
 					// calculate hours for stored regular working days only
 					$misc = json_decode($entry['misc'], true);
-					if (!strlen($entry['subject'])) {
+					if (!$entry['subject'] || !strlen($entry['subject'])) {
 						$firstday = $days[0]; // copy object for down below method usage
 						$lastday = $days[count($days) - 1];  // copy object for down below method usage
 						$periods = new DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);

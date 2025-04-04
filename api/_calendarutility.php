@@ -748,9 +748,10 @@ class CALENDARUTILITY {
 						// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
 						preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						// append datetime value and contract value
-						if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
+						if ($line && isset($lineentry[1]) && isset($lineentry[2])) $hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
-				} else $hours_vacation[] = ['date' => new DateTime('1970-01-01', $datetimezone), 'value' => 0];
+				}
+				if (!$hours_vacation) $hours_vacation[] = ['date' => new DateTime('1970-01-01', $datetimezone), 'value' => 0];
 				array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
 				$users[$row]['timesheet']['_' . $setting] = $hours_vacation;
 			}
@@ -773,7 +774,7 @@ class CALENDARUTILITY {
 			// get breaks and homeoffice times
 			$misc = json_decode($entry['misc'], true);
 
-			if (!strlen($entry['subject'])) {
+			if (!$entry['subject'] || !strlen($entry['subject'])) {
 				
 				// aka regular working day
 				if (isset($user['timesheet']['_weeklyhours'][0]) && $span_start < $user['timesheet']['_weeklyhours'][0]['date']){
