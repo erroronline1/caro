@@ -24,14 +24,13 @@ class RESPONSIBILITY extends API {
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
 	private $_unit = null;
-	private $_userAcceptance = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_unit = $this->_userAcceptance = isset(REQUEST[3]) ? REQUEST[3] : null;
+		$this->_unit = isset(REQUEST[3]) ? REQUEST[3] : null;
 	}
 
 	/**
@@ -46,7 +45,6 @@ class RESPONSIBILITY extends API {
 	public function responsibilities(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				if ($this->_userAcceptance != $_SESSION['user']['id']) $this->response([], 401);
 				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
 					'values' => [
 						':id' => intval($this->_requestedID)
@@ -55,11 +53,11 @@ class RESPONSIBILITY extends API {
 				$responsibility = $responsibility ? $responsibility[0]: null;
 				if (!$responsibility) $this->response([], 404);
 				$responsibility['assigned_users'] = json_decode($responsibility['assigned_users'], true);
-				if (array_key_exists($this->_userAcceptance, $responsibility['assigned_users'])) $responsibility['assigned_users'][$this->_userAcceptance] = $this->_currentdate->format('Y-m-d');
+				if (array_key_exists($_SESSION['user']['id'], $responsibility['assigned_users'])) $responsibility['assigned_users'][$_SESSION['user']['id']] = $this->_currentdate->format('Y-m-d');
 				else {
 					// only if not found for itsybity performance reasons
 					$responsibility['proxy_users'] = json_decode($responsibility['proxy_users'], true);
-					if (array_key_exists($this->_userAcceptance, $responsibility['proxy_users'])) $responsibility['proxy_users'][$this->_userAcceptance] = $this->_currentdate->format('Y-m-d');
+					if (array_key_exists($_SESSION['user']['id'], $responsibility['proxy_users'])) $responsibility['proxy_users'][$_SESSION['user']['id']] = $this->_currentdate->format('Y-m-d');
 					$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
 				}
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_accept', [
@@ -149,7 +147,7 @@ class RESPONSIBILITY extends API {
 								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . ", " . $_SESSION['user']['id'] . "); this.disabled = true;} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
 								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $assigned[$user['name']]['disabled'] = true;
 						}
@@ -161,7 +159,7 @@ class RESPONSIBILITY extends API {
 								"new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.accept', [':task' => $row['responsibility']]) ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . ", " . $_SESSION['user']['id'] . "); this.disabled = true;} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {api.responsibility('put', 'responsibilities', ". $row['id'] . "); this.disabled = true;} else this.checked = false;})"
 								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $proxy[$user['name']]['disabled'] = true;
 						}
