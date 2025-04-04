@@ -231,12 +231,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token = :token"
 		],
 		'application_get_permission_group' => [
-			'mysql' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')",
-			'sqlsrv' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%', :group, '%')"
+			'mysql' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%,', :group, ',%')",
+			'sqlsrv' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%,', :group, ',%')"
 		],
 		'application_get_unit_group' => [
-			'mysql' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%', :group, '%')",
-			'sqlsrv' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%', :group, '%')"
+			'mysql' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%,', :group, ',%')",
+			'sqlsrv' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%,', :group, ',%')"
 		],
 		'application_post_manual' => [
 			'mysql' => "INSERT INTO caro_manual (id, title, content, permissions) VALUES (NULL, :title, :content, :permissions)",
