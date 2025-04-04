@@ -632,7 +632,7 @@
 			"approved_state": "freigegeben von :user am :date",
 			"break": "Pause",
 			"break_time": "Pause in Stunden und Minuten",
-			"bulk_approve": "Alle obigen :number einträge freigeben",
+			"bulk_approve": "Alle obigen :number Einträge freigeben",
 			"disapproved": "Die Freigabe wurde zurückgezogen.",
 			"end": "Ende",
 			"end_date": "Enddatum",

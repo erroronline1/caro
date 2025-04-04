@@ -642,7 +642,6 @@ class FILE extends API {
 					$result['render']['content'][] = [];
 					$folders = UTILITY::listDirectories(UTILITY::directory('files_documents'),'asc');
 					if ($folders){
-						$content=[];
 						foreach ($folders as $folder){
 							// prepare each folders properties
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
