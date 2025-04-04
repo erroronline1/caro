@@ -748,7 +748,7 @@ class CALENDARUTILITY {
 						// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
 						preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						// append datetime value and contract value
-						if (isset($lineentry[1]) && isset($lineentry[2])) $hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
+						if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
 				} else $hours_vacation[] = ['date' => new DateTime('1970-01-01', $datetimezone), 'value' => 0];
 				array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);

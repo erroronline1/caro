@@ -483,36 +483,26 @@ class USER extends API {
 				// gather timesheet setup
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
-				// check formats
-				$settingentries = explode('\n', $user['app_settings']['annualvacation']);
-				natsort($settingentries);
-				foreach($settingentries as $line){
-					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
-					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-					// append datetime value and contract value
-					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
-						'response' => [
-							'msg' => $this->_lang->GET('user.timesheet_format_error'),
-							'type' => 'error'
-						]]);
-				}
-
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
-				// check formats
-				$settingentries = explode('\n', $user['app_settings']['weeklyhours']);
-				natsort($settingentries);
-				foreach($settingentries as $line){
-					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
-					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-					// append datetime value and contract value
-					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
-						'response' => [
-							'msg' => $this->_lang->GET('user.timesheet_format_error'),
-							'type' => 'error'
-						]]);
-				}
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
+				// check formats according to _calendarutility.php
+				foreach(['weeklyhours', 'annualvacation'] as $setting){
+					if (isset($user['app_settings'][$setting])){
+						$settingentries = explode('\n', $user['app_settings'][$setting]);
+						natsort($settingentries);
+						foreach($settingentries as $line){
+							// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
+							preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+							// append datetime value and contract value
+							if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
+								'response' => [
+									'msg' => $this->_lang->GET('user.timesheet_format_error'),
+									'type' => 'error'
+								]]);
+						}
+					}
+				}
 
 				// gather user skills
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
@@ -693,35 +683,25 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
-				// check formats
-				$settingentries = explode('\n', $user['app_settings']['annualvacation']);
-				natsort($settingentries);
-				foreach($settingentries as $line){
-					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
-					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-					// append datetime value and contract value
-					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
-						'response' => [
-							'msg' => $this->_lang->GET('user.timesheet_format_error'),
-							'type' => 'error'
-						]]);
-				}
-
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
-				// check formats
-				$settingentries = explode('\n', $user['app_settings']['weeklyhours']);
-				natsort($settingentries);
-				foreach($settingentries as $line){
-					// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
-					preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-					// append datetime value and contract value
-					if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
-						'response' => [
-							'msg' => $this->_lang->GET('user.timesheet_format_error'),
-							'type' => 'error'
-						]]);
+				// check formats according to _calendarutility.php
+				foreach(['weeklyhours', 'annualvacation'] as $setting){
+					if (isset($user['app_settings'][$setting])){
+						$settingentries = explode('\n', $user['app_settings'][$setting]);
+						natsort($settingentries);
+						foreach($settingentries as $line){
+							// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
+							preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
+							// append datetime value and contract value
+							if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
+								'response' => [
+									'msg' => $this->_lang->GET('user.timesheet_format_error'),
+									'type' => 'error'
+								]]);
+						}
+					}
 				}
 
 				// update skills
