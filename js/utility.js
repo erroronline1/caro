@@ -369,6 +369,31 @@ export const _client = {
 			},
 		},
 
+		masonry: {
+			// kudos: https://medium.com/@andybarefoot/a-masonry-style-layout-using-css-grid-8c663d355ebb
+
+			init: function () {
+				this.resizeAllGridItems();
+				window.addEventListener("resize", _client.application.masonry.resizeAllGridItems);
+			},
+
+			resizeGridItem: function (item) {
+				let grid = document.querySelector("main");
+				let rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue("grid-auto-rows"));
+				let rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue("grid-row-gap"));
+				let rowSpan = Math.ceil((item.getBoundingClientRect().height + rowGap) / (rowHeight + rowGap));
+				item.style.gridRowEnd = "span " + rowSpan;
+				console.log(item);
+			},
+
+			resizeAllGridItems: function () {
+				let allItems = document.querySelector("main>div, main>form").childNodes;
+				for (let x = 0; x < allItems.length; x++) {
+					_client.application.masonry.resizeGridItem(allItems[x]);
+				}
+			},
+		},
+
 		/**
 		 * requests a pdf identifier label from backend
 		 * @requires api

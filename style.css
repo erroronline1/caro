@@ -179,6 +179,35 @@ main {
 	margin-bottom: 6rem;
 }
 
+/* desktop masonry _client.application.masonry
+@media only screen and (min-width: 90rem) {
+	main {
+		max-width: 100rem;
+		/*display: grid;
+		grid-gap: 10px;
+		grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+		grid-auto-rows: 20px;
+		* /
+
+		> div,
+		> form {
+			display: flex;
+			/*
+			flex-direction: column;
+			height:100vh;
+			overflow:scroll;
+			* /
+			flex-wrap: wrap;
+			align-items:flex-start;
+			> * {
+				width: calc(50% - 1em - 2px) !important;
+				margin: .5em !important;
+			}
+		}
+			
+	}
+}
+*/
 dialog {
 	position: fixed;
 	display: block;
@@ -752,7 +781,7 @@ input[type="range"],
 	text-align: center;
 }
 
-/* tablets */
+/* desktop */
 @media only screen and (min-width: 64rem) {
 	button {
 		font-size: 90%;
