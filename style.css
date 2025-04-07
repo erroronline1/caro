@@ -191,7 +191,8 @@ main {
 			flex-wrap: wrap;
 			align-items:flex-start;
 			gap: 1em;
-			> * {
+			> article,
+			> button {
 				flex-direction: column;
 				position: relative;
 				width: calc(50% - 1.5rem) !important;
