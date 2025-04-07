@@ -395,7 +395,8 @@ export const _client = {
 					 trackHeights[thisColumn] += item.getBoundingClientRect().height + parseFloat(getComputedStyle(item).marginBottom);
 					 // If the item has an item above it, then move it to fill the gap
 					 if(thisIndex - columnWidth >= 0) {
-						 let getItemAbove = document.querySelector(`${_client.application.masonry.itemIdentifier}:nth-of-type(${thisIndex - columnWidth + 1})`);
+						 let getItemAbove = document.querySelectorAll(_client.application.masonry.itemIdentifier)[thisIndex - columnWidth];
+						 console.log(item, getItemAbove, thisIndex, columnWidth);
 						 let previousBottom = getItemAbove.getBoundingClientRect().bottom;
 						 let currentTop = item.getBoundingClientRect().top - parseFloat(getComputedStyle(item).marginBottom);
 						 item.style.top = `-${currentTop - previousBottom}px`;
