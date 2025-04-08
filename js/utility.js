@@ -372,38 +372,38 @@ export const _client = {
 		masonry: {
 			// kudos: https://dev.to/smpnjn/css-only-masonry-grid-layouts-ndp
 
-			mainId : "main>div, main>form",
+			mainId: "main>div, main>form",
 			itemIdentifier: "main>div>article, main>form>article",
-			init:  ()=> {
-				 // Programmatically get the column width
-				 let item = document.querySelector(_client.application.masonry.itemIdentifier);
-				 let parentWidth = item.parentNode.getBoundingClientRect().width;
-				 let itemWidth = item.getBoundingClientRect().width + parseFloat(getComputedStyle(item).marginLeft) + parseFloat(getComputedStyle(item).marginRight);
-				 let columnWidth = Math.round((1 / (itemWidth / parentWidth)));
-			 
-				 // We need this line since JS nodes are dumb
-				 let arrayOfItems = Array.prototype.slice.call( document.querySelectorAll(_client.application.masonry.itemIdentifier) );
-				 let trackHeights = {};
-				 arrayOfItems.forEach(function(item) {
-					 // Get index of item
-					 let thisIndex = arrayOfItems.indexOf(item);
-					 // Get column this and set width
-					 let thisColumn = thisIndex % columnWidth;
-					 if(typeof trackHeights[thisColumn] == "undefined") {
-						 trackHeights[thisColumn] = 0;
-					 }
-					 trackHeights[thisColumn] += item.getBoundingClientRect().height + parseFloat(getComputedStyle(item).marginBottom);
-					 // If the item has an item above it, then move it to fill the gap
-					 if(thisIndex - columnWidth >= 0) {
-						 let getItemAbove = document.querySelectorAll(_client.application.masonry.itemIdentifier)[thisIndex - columnWidth];
-						 console.log(item, getItemAbove, thisIndex, columnWidth);
-						 let previousBottom = getItemAbove.getBoundingClientRect().bottom;
-						 let currentTop = item.getBoundingClientRect().top - parseFloat(getComputedStyle(item).marginBottom);
-						 item.style.top = `-${currentTop - previousBottom}px`;
-					 }
-				 });
-				 let max = Math.max(...Object.values(trackHeights));
-				 document.querySelector(_client.application.masonry.mainId).style.height = `${max}px`;
+			init: () => {
+				// Programmatically get the column width
+				let item = document.querySelector(_client.application.masonry.itemIdentifier);
+				let parentWidth = item.parentNode.getBoundingClientRect().width;
+				let itemWidth = item.getBoundingClientRect().width + parseFloat(getComputedStyle(item).marginLeft) + parseFloat(getComputedStyle(item).marginRight);
+				let columnWidth = Math.round(1 / (itemWidth / parentWidth));
+
+				// We need this line since JS nodes are dumb
+				let arrayOfItems = Array.prototype.slice.call(document.querySelectorAll(_client.application.masonry.itemIdentifier));
+				let trackHeights = {};
+				arrayOfItems.forEach(function (item) {
+					// Get index of item
+					let thisIndex = arrayOfItems.indexOf(item);
+					// Get column this and set width
+					let thisColumn = thisIndex % columnWidth;
+					if (typeof trackHeights[thisColumn] == "undefined") {
+						trackHeights[thisColumn] = 0;
+					}
+					trackHeights[thisColumn] += item.getBoundingClientRect().height + parseFloat(getComputedStyle(item).marginBottom);
+					// If the item has an item above it, then move it to fill the gap
+					if (thisIndex - columnWidth >= 0) {
+						let getItemAbove = document.querySelectorAll(_client.application.masonry.itemIdentifier)[thisIndex - columnWidth];
+						console.log(item, getItemAbove, thisIndex, columnWidth);
+						let previousBottom = getItemAbove.getBoundingClientRect().bottom;
+						let currentTop = item.getBoundingClientRect().top - parseFloat(getComputedStyle(item).marginBottom);
+						item.style.top = `-${currentTop - previousBottom}px`;
+					}
+				});
+				let max = Math.max(...Object.values(trackHeights));
+				document.querySelector(_client.application.masonry.mainId).style.height = `${max}px`;
 			},
 		},
 
@@ -707,6 +707,7 @@ export const _client = {
 					],
 				};
 			new Assemble(cart).initializeSection(nodes[nodes.length - 3]);
+			new Toast(api._lang.GET("order.added_confirmation", { ":name": data[3] }), "info");
 		},
 
 		/**
