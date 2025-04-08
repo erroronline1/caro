@@ -489,7 +489,7 @@ class RECORD extends API {
 					$content = [
 						'title' => $this->_lang->GET('record.create_identifier', [], true),
 						'content' => [$content, $content],
-						'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content) . '.pdf'
+						'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content)
 					];
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
 						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
