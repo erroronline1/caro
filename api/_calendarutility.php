@@ -96,9 +96,9 @@ class CALENDARUTILITY {
 		foreach ($entries as $entry){
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('calendar_complete'),
 				[
-					':id' => $this->_pdo->quote($entry['id']),
-					':closed' => $close ? $this->_pdo->quote(UTILITY::json_encode($close)) : null,
-					':alert' => $alert === null ? $entry['alert'] : (intval($alert) ? 1 : null)
+					':id' => $entry['id'],
+					':closed' => $close ? $this->_pdo->quote(UTILITY::json_encode($close)) : 'NULL',
+					':alert' => $alert === null ? $entry['alert'] : (intval($alert) ? 1 : 'NULL')
 				]
 			));
 		}
