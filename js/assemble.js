@@ -79,6 +79,7 @@ export const assemble_helper = {
 			div = document.createElement("div");
 			div.style.maskImage = div.style.webkitMaskImage = icons[group];
 			div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
+			div.title = group;
 			label.append(div);
 
 			// set up radio input for css checked condition
