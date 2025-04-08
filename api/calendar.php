@@ -475,12 +475,12 @@ class CALENDAR extends API {
 						'month' => $this->_lang->_DEFAULT['general']['month'][$day->format('n')] . ' ' . $day->format('Y'),
 						'days' => [],
 						'pto' => $pto,
-						'performed' => $stats_month_row['_performed'],
-						'projected' => $stats_month_row['_projected'],
+						'performed' => round(floatval($stats_month_row['_performed']), 2),
+						'projected' => round(floatval($stats_month_row['_projected']), 2),
 						'weeklyhours' => $stats_month_row['_span_end_weeklyhours'],
 						'leftvacation' => $stats_all_row['_leftvacation'],
-						'overtime' => $stats_all_row['_overtime'] - $stats_all_row['_initialovertime'],
-						'monthlyovertime' => $stats_month_row['_overtime']
+						'overtime' => round(floatval($stats_all_row['_overtime'] - $stats_all_row['_initialovertime']), 2),
+						'monthlyovertime' => round(floatval($stats_month_row['_overtime']), 2)
 					];
 				}
 				
@@ -506,7 +506,7 @@ class CALENDAR extends API {
 							'homeoffice' => isset($misc['homeoffice']) ? $misc['homeoffice'] : '',
 							'workinghourscorrection' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : '',
 							'note' => isset($misc['note']) ? $misc['note'] : '',
-							'hours' => $dailyhours,
+							'hours' => round($dailyhours, 2),
 						];
 					}
 
@@ -1002,7 +1002,7 @@ class CALENDAR extends API {
 			$date = new DateTime($row['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
 			$due = new DateTime($row['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
-			if (!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || $row['type'] !== 'schedule' ) continue; // skip not schedule and not user unit affecting
+			if ((!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !in_array($_SESSION['user']['id'], [$row['author_id'], $row['affected_user_id']])) || $row['type'] !== 'schedule' ) continue; // skip not schedule and not user unit affecting
 
 			// construct event information
 			$display = $this->_lang->GET('calendar.schedule.date') . ': ' . $date->format('Y-m-d') . "\n" .
