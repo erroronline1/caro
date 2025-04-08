@@ -1139,7 +1139,7 @@ dialect["escape"] = ""
 
 ;unzulässige Namen gemäß REGEX-Mustern
 [forbidden]
-names[characters] = "([^,\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, gilt auch für Export-Dateinamen
+names[characters] = "([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, gilt auch für Export-Dateinamen
 names[length] = "^.{0,3}$" ; weniger als 4 Zeichen
 
 ; unveränderliche fest einprogrammierte reservierte Begriffe
