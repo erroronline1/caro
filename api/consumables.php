@@ -1353,9 +1353,13 @@ class CONSUMABLES extends API {
 						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 
 						$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
+						$incorporationInfo .= " \n";
+						$pendingIncorporationCheck = "";
 						foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 							if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+							else $pendingIncorporationCheck .= "\n" . $this->_lang->GET('consumables.product.incorporation_pending', [':permission' =>$this->_lang->_USER['permissions'][$permission]]);
 						}
+						if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
 
 						array_push($result['render']['content'][3],
 							[
