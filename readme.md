@@ -124,6 +124,9 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
     * handle hidden attribute?
+* hr option for document composer
+* calendar refresh after add/edit
+* shorter timeout span? still there popup with small request?
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1216,7 +1219,7 @@ dialect["escape"] = ""
 
 ;forbidden names as regex-patterns
 [forbidden]
-names[characters] = "([^,\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, serves for export filenames as well
+names[characters] = "([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, serves for export filenames as well
 names[length] = "^.{0,3}$" ; less than 4 characters
 
 ; immutable hardcoded reserved keywords
@@ -1979,6 +1982,8 @@ Stakeholder identification:
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | **Rejected**; 2024-12-26 |
 | Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30 | Implemented; 2025-01-31 |
 | History navigation | User | 2025-04-03 | Implemented; 2025-04-05 |
+| HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | |
+| Shorter idle timespan for improved data security | CEO | 2025-04-07 | |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -1992,7 +1997,7 @@ Stakeholder identification:
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 | &bull; general bugfixes, see commit history<br/>&bull; History navigation |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons |
 
 [Content](#content)
 
