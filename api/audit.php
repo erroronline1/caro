@@ -223,8 +223,8 @@ class AUDIT extends API {
 							}
 						}
 						$summary .= "\n \n" . $this->_lang->GET('audit.audit.execute.summary', [], true) . ': ' . $audit['content']['summary'];
+						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit['unit']]], $summary);
 					}
-					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit['unit']]], $summary);
 					
 					$this->response([
 					'response' => [
