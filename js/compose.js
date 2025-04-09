@@ -103,7 +103,7 @@ export const compose_helper = {
 
 		// define which attribute is assigned the name value, and set default values
 		const buttonDefaultValues = {
-				calendarbutton: api._lang.GET("planning.event_new"),
+				calendarbutton: api._lang.GET("calendar.schedule.new"),
 			},
 			element = {
 				attributes: {},
@@ -116,11 +116,11 @@ export const compose_helper = {
 			if (!["label", "header", "input"].includes(sibling.localName)) {
 				continue;
 			}
-
 			if (sibling.localName === "header") {
-				// e.g. calendarbutton
+				// e.g. calendarbutton, hr
 				if (element.type === undefined) element["type"] = sibling.dataset.type;
-				if (!element.attributes) element["attributes"] = { value: buttonDefaultValues[sibling.dataset.type] };
+				if (buttonDefaultValues[sibling.dataset.type]) element["attributes"] = { value: buttonDefaultValues[sibling.dataset.type] };
+				else delete element.attributes;
 				continue;
 			} else if (sibling.localName === "input") {
 				// e.g. file
@@ -235,7 +235,7 @@ export const compose_helper = {
 			}
 
 			// check if new elements name is allowed
-			if (element.attributes.name) {
+			if (element.attributes && element.attributes.name) {
 				for (const pattern of Object.entries(api._settings.config.forbidden.names)) {
 					if (element.attributes.name.match(new RegExp(pattern, "gm"))) {
 						new Toast(api._lang.GET("assemble.compose.error_forbidden_name", { ":name": element.attributes.name }) + " " + pattern, "error");
@@ -244,9 +244,8 @@ export const compose_helper = {
 				}
 			}
 		}
-		console.log(element);
 		// append new widget to dom and update compose_helper.newDocumentComponents
-		if (Object.keys(element).length > 1) {
+		if (Object.keys(element).length > 0) {
 			const newElement = new Compose({
 				draggable: true,
 				content: [
@@ -1730,6 +1729,35 @@ export class Compose extends Assemble {
 	}
 
 	/**
+	 * creates editor to add a hr
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_hr"
+	 * 	}
+	 */
+	compose_hr() {
+		let result = [...this.br()];
+		this.currentElement = {
+			type: "textsection",
+			attributes: {
+				"data-type": "hr",
+				name: api._lang.GET("assemble.compose.component.hr"),
+			},
+		};
+		result = result.concat(...this.textsection());
+		this.currentElement = {
+			attributes: {
+				value: api._lang.GET("assemble.compose.component.hr"),
+				"data-type": "addblock",
+			},
+		};
+		result = result.concat(...this.button());
+		return result;
+	}
+
+	/**
 	 * creates editor to add an image to a conponent
 	 * @returns {domNodes}
 	 * @example this.currentElement
@@ -2278,7 +2306,7 @@ export class Compose extends Assemble {
 			type: "text",
 			description: api._lang.GET("assemble.compose.component.text"),
 			multiple: "optional",
-			autocomplete: "optional"
+			autocomplete: "optional",
 		});
 	}
 
@@ -2295,7 +2323,7 @@ export class Compose extends Assemble {
 		return this.compose_input({
 			type: "textarea",
 			description: api._lang.GET("assemble.compose.component.textarea"),
-			autocomplete: "optional"
+			autocomplete: "optional",
 		});
 	}
 
