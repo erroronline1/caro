@@ -1459,6 +1459,12 @@ button[data-type="file"]::before {
 	mask-image: url("./media/filter.svg");
 }
 
+[data-type="hr"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/horizontal-rule.svg");
+	mask-image: url("./media/horizontal-rule.svg");
+}
+
 [data-type="identify"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/database.svg");
