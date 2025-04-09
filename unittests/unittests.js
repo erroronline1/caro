@@ -182,6 +182,7 @@ export function rendertest(element) {
 						},
 						hint: "This will be prepared by the backend, even if nothing happens now.",
 					},
+					{ type: "hr" },
 					{
 						type: "documentbutton",
 						attributes: {
@@ -355,6 +356,7 @@ export function rendertest(element) {
 						},
 						hint: "Das wird vom Hintergrundsystem vorbereitet, auch wenn hier gerade nichts passiert.",
 					},
+					{ type: "hr" },
 					{
 						type: "documentbutton",
 						attributes: {
@@ -565,7 +567,8 @@ export function rendertest(element) {
 							content: "All options above are valid. As seen in user manager",
 						},
 					],
-				],				[
+				],
+				[
 					{
 						type: "longtermplanning",
 						attributes: {
@@ -644,7 +647,7 @@ export function rendertest(element) {
 								"27-06-01": "rgb(152, 106, 68)",
 								"27-06-16": "rgb(97, 53, 131)",
 								"27-07-01": "rgb(97, 53, 131)",
-								"27-07-16": "rgb(97, 53, 131)"
+								"27-07-16": "rgb(97, 53, 131)",
 							},
 							"Apprentice 2": {
 								"24-08-01": "rgb(255, 255, 255)",
@@ -718,7 +721,7 @@ export function rendertest(element) {
 								"27-06-01": "rgb(152, 106, 68)",
 								"27-06-16": "rgb(97, 53, 131)",
 								"27-07-01": "rgb(97, 53, 131)",
-								"27-07-16": "rgb(97, 53, 131)"
+								"27-07-16": "rgb(97, 53, 131)",
 							},
 							"Apprentice 3": {
 								"24-08-01": "rgb(255, 0, 0)",
@@ -792,7 +795,7 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
+								"27-07-16": null,
 							},
 							"Apprentice 4": {
 								"24-08-01": "rgb(255, 120, 0)",
@@ -866,7 +869,7 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
+								"27-07-16": null,
 							},
 							"Apprentice 5": {
 								"24-08-01": "rgb(220, 138, 221)",
@@ -940,7 +943,7 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
+								"27-07-16": null,
 							},
 							"Apprentice 6": {
 								"24-08-01": "rgb(0, 255, 0)",
@@ -1014,8 +1017,8 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
-							}
+								"27-07-16": null,
+							},
 						},
 						preset: {
 							"Introducion with mentor": "#ffffff",
@@ -1026,10 +1029,10 @@ export function rendertest(element) {
 							"Orthotics 2": "#62a0ea",
 							"Prosthetics 1": "#ff0000",
 							"Prosthetics 2": "#00ff00",
-							"Rehabilitation": "#ff7800",
+							Rehabilitation: "#ff7800",
 							"Exam preparation": "#613583",
-							"Specialisation": "#986a44"
-						}
+							Specialisation: "#986a44",
+						},
 					},
 				],
 				[
@@ -1240,7 +1243,8 @@ export function rendertest(element) {
 							content: "Alle Optionen sind möglich. Verwendet in der Nutzerverwaltung.",
 						},
 					],
-				],				[
+				],
+				[
 					{
 						type: "longtermplanning",
 						attributes: {
@@ -1319,7 +1323,7 @@ export function rendertest(element) {
 								"27-06-01": "rgb(152, 106, 68)",
 								"27-06-16": "rgb(97, 53, 131)",
 								"27-07-01": "rgb(97, 53, 131)",
-								"27-07-16": "rgb(97, 53, 131)"
+								"27-07-16": "rgb(97, 53, 131)",
 							},
 							"Azubi 2": {
 								"24-08-01": "rgb(255, 255, 255)",
@@ -1393,7 +1397,7 @@ export function rendertest(element) {
 								"27-06-01": "rgb(152, 106, 68)",
 								"27-06-16": "rgb(97, 53, 131)",
 								"27-07-01": "rgb(97, 53, 131)",
-								"27-07-16": "rgb(97, 53, 131)"
+								"27-07-16": "rgb(97, 53, 131)",
 							},
 							"Azubi 3": {
 								"24-08-01": "rgb(255, 0, 0)",
@@ -1467,7 +1471,7 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
+								"27-07-16": null,
 							},
 							"Azubi 4": {
 								"24-08-01": "rgb(255, 120, 0)",
@@ -1541,7 +1545,7 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
+								"27-07-16": null,
 							},
 							"Azubi 5": {
 								"24-08-01": "rgb(220, 138, 221)",
@@ -1615,7 +1619,7 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
+								"27-07-16": null,
 							},
 							"Azubi 6": {
 								"24-08-01": "rgb(0, 255, 0)",
@@ -1689,22 +1693,22 @@ export function rendertest(element) {
 								"27-06-01": null,
 								"27-06-16": null,
 								"27-07-01": null,
-								"27-07-16": null
-							}
+								"27-07-16": null,
+							},
 						},
 						preset: {
 							"Einführung mit Paten": "#ffffff",
-							"Metallgrunsausbildung": "#77767b",
-							"Kunststoffgrundausbildung": "#509bb0",
-							"Silikongrundausbildung": "#dc8add",
+							Metallgrunsausbildung: "#77767b",
+							Kunststoffgrundausbildung: "#509bb0",
+							Silikongrundausbildung: "#dc8add",
 							"Orthetik 1": "#ffff00",
 							"Orthetik 2": "#62a0ea",
 							"Prothetik 1": "#ff0000",
 							"Prothetik 2": "#00ff00",
-							"Reha": "#ff7800",
-							"Prüfungsvorbereitung": "#613583",
-							"Spezialisierung": "#986a44"
-						}
+							Reha: "#ff7800",
+							Prüfungsvorbereitung: "#613583",
+							Spezialisierung: "#986a44",
+						},
 					},
 				],
 				[
