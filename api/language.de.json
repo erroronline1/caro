@@ -264,6 +264,7 @@
 				"field_hint": "Optionale Hinweise",
 				"field_name": "Gibt einen Feldnamen an",
 				"file": "Füge einen Datei-Upload hinzu",
+				"hr":"Füge eine horizontale Linie für eine besser verständliche Struktur hinzu",
 				"image": "Füge ein Bild hinzu",
 				"image_description": "Gib eine Bildbezeichnung an",
 				"link": "Füge ein Verknüpfungsfeld hinzu",

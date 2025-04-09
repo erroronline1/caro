@@ -264,6 +264,7 @@
 				"field_hint": "Optional hints",
 				"field_name": "Enter field name",
 				"file": "Add a file upload",
+				"hr":"Add a horizontal line to enhance structure comprehension",
 				"image": "Add an image",
 				"image_description": "Add image description",
 				"link": "Add a link input",

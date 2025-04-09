@@ -1127,6 +1127,9 @@ class DOCUMENT extends API {
 						'form' => true,
 						'type' => 'compose_documentbutton',
 						'content' => $approveddocuments
+					]], [[
+						'form' => true,
+						'type' => 'compose_hr',
 					]]
 				],
 				[[

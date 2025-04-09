@@ -124,7 +124,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * public responsibilities and their acknowledgement via checkbox of logged in users
     * handle hidden attribute?
-* hr option for document composer
 * calendar refresh after add/edit
 * shorter timeout span? still there popup with small request?
 
@@ -1945,7 +1944,7 @@ Stakeholder identification:
 * Purchase
 * Operator of infrastructure
 
-#### Discussed stakeholder requirements:
+#### Discussed major stakeholder requirements:
 | Requirement / issue | Stakeholder | Time | Implementation |
 | ------------------- | ----------- | ---- | -------------- |
 | It can't go on like this | CEO | 2019 | Development of a digital application to reduce paperbased operations |
@@ -1982,7 +1981,7 @@ Stakeholder identification:
 | Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | **Rejected**; 2024-12-26 |
 | Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30 | Implemented; 2025-01-31 |
 | History navigation | User | 2025-04-03 | Implemented; 2025-04-05 |
-| HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | |
+| HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | Implemented; 2025-04-08 |
 | Shorter idle timespan for improved data security | CEO | 2025-04-07 | |
 
 #### Rejected requirements
