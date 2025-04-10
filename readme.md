@@ -127,9 +127,16 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * shorter timeout span? still there popup with small request?
 	* api.session_timeout
     * application->login
-    * config.lifespan.idle and ini_get('session.gc_maxlifetime')
+    * config.lifespan.idle as per user setting, dump animation
+    * ini_get('session.gc_maxlifetime') pass to _settings.server.timeout
+        * request _serviceWorker.postMessage passing user fingerprint as param to refresh api->__construct $_SESSION['lastrequest']
     * https://stackoverflow.com/questions/667555/how-to-detect-idle-time-in-javascript
-    * https://www.w3.org/WAI/WCAG21/Understanding/timeouts.html
+    * https://stackoverflow.com/questions/15115768/settimeout-not-working-when-window-loses-focus
+    * https://stackoverflow.com/questions/5927284/how-can-i-make-setinterval-also-work-when-a-tab-is-inactive-in-chrome
+    * https://www.w3.org/WAI/WCAG21/Understanding/timeouts.html allow specific timeout within user management
+    * reset idle timeout on events
+    * ask if user is still there (embed into toast?) does tapping reset timeout as well?
+    * 
 * live runtime permission elevation to display certain contents? how are timesheets more important than patient data?
 
 # Aims
