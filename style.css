@@ -194,13 +194,14 @@ main {
 			> article,
 			> button {
 				flex-direction: column;
+				display:initial;
 				position: relative;
 				width: calc(50% - 1.5rem) !important;
 			}
 		}
 	}
 }
-*/
+/**/
 
 dialog {
 	position: fixed;
