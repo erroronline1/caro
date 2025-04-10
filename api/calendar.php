@@ -145,14 +145,7 @@ class CALENDAR extends API {
 						$start->modify('+' . ($start->format('t') - $start->format('d') + 1) . ' day'); // add rest to the next first day of next month 
 					}
 					
-					// create default content with requested names assigning default timeunits
-					$content = [];
-					foreach($this->_payload as $key => $value){
-						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
-							$content[$value] = $defaulttimeunits;
-						}
-					}
-					// import if available
+					// import if available, do first to append new given names
 					if (isset($schedule['misc']['content'])){
 						foreach($schedule['misc']['content'] as $name => $importtimeunit){
 							$imports = [];
@@ -160,6 +153,13 @@ class CALENDAR extends API {
 								$imports[$label] = isset($importtimeunit[$label]) ? $importtimeunit[$label] : $color;
 							}
 							$content[$name] = $imports;
+						}
+					}
+					// create default content with requested names assigning default timeunits
+					$content = [];
+					foreach($this->_payload as $key => $value){
+						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
+							$content[$value] = $defaulttimeunits;
 						}
 					}
 					if (!$content) $this->response([], 406);
@@ -344,12 +344,14 @@ class CALENDAR extends API {
 								'type' => 'date',
 								'attributes' => [
 									'name' => $this->_lang->GET('calendar.longtermplanning.start'),
-									'required' => true
+									'required' => true,
+									'onchange' => "let start = new Date(this.value), minend; if (!start) return; minend = new Date(start.setDate(start.getDate() + 7 * 4)); document.getElementById('_spanend').min = minend.toISOString().substring(0, 10);"
 								]
 							], [
 								'type' => 'date',
 								'attributes' => [
 									'name' => $this->_lang->GET('calendar.longtermplanning.end'),
+									'id' => '_spanend',
 									'required' => true
 								],
 								'hint' => $this->_lang->GET('calendar.longtermplanning.new_hint')
