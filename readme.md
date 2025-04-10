@@ -124,7 +124,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-* calendar refresh after add/edit
 * shorter timeout span? still there popup with small request?
 	* api.session_timeout
     * application->login

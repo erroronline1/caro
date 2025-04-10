@@ -264,7 +264,7 @@ export const api = {
 		},
 		/**
 		 * navigates through the history
-		 * @param {string} dir 
+		 * @param {string} dir
 		 * @returns event of calling the request according to current history position
 		 */
 		go: function (dir) {
@@ -281,15 +281,15 @@ export const api = {
 		},
 		/**
 		 * updates history to sessionStorage
-		 * @param {array} request 
+		 * @param {array} request
 		 * @returns none
 		 */
 		write: function (request) {
 			let history = JSON.parse(sessionStorage.getItem("history"));
 			/**
 			 * compares two arrays for similarity
-			 * @param {array} a1 
-			 * @param {array} a2 
+			 * @param {array} a1
+			 * @param {array} a2
 			 * @returns boolean
 			 */
 			function areDifferent(a1, a2) {
@@ -692,6 +692,7 @@ export const api = {
 					if (id && id[0]) id[0].value = data.response.id;
 				}
 				if (data.data) _serviceWorker.notif.calendar(data.data);
+				if (["post", "put", "delete"].includes(method) && ["schedule", "timesheet"].includes[request[1]]) api.history.go("forth");
 			},
 			title = {
 				schedule: api._lang.GET("menu.calendar.scheduling"),
