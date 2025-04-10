@@ -1362,6 +1362,7 @@ class CALENDAR extends API {
 					if ($timesheetentries) $events[] = [
 						'type' => 'button',
 						'attributes' => [
+							'data-type' => 'download',
 							'value' => $this->_lang->GET('calendar.timesheet.monthly_summary'),
 							'onclick' => "api.calendar('get', 'monthlyTimesheets', '" . $this->_requestedDate . "')"
 						]
