@@ -37,6 +37,32 @@ class APPLICATION extends API {
 	}
 
 	/**
+	 *           _   _           _         
+	 *   ___ _ _| |_| |_ ___ ___|_|___ ___ 
+	 *  | .'| | |  _|   | . |  _| |- _| -_|
+	 *  |__,|___|_| |_|_|___|_| |_|___|___|
+	 *
+	 * (re)log in user or destroy session
+	 */
+	public function authorize(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'DELETE':
+				$params = session_get_cookie_params();
+				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+				session_destroy();
+				session_write_close();
+				
+				var_dump(preg_split('/[\\/]/m', $_SERVER['PHP_SELF']));
+				header('Location:' . preg_split('/[\\/]/m', $_SERVER['PHP_SELF'])[1] . '/index.html');
+				die();
+				break;
+			default:
+				$auth = $this->auth(isset($_SESSION['user']));
+				$this->response($auth);
+		}
+	}
+
+	/**
 	 *   _     ___     
 	 *  |_|___|  _|___ 
 	 *  | |   |  _| . |
@@ -511,6 +537,7 @@ class APPLICATION extends API {
 			],
 			$this->_lang->GET('menu.application.header') => [
 				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('post', 'login', 'logout')"],
+//				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authorize', 'null', 'null', 'null')"],
 				$this->_lang->GET('menu.application.start') => ['onclick' => "api.application('get', 'start')"],			
 				$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
 			],
@@ -580,6 +607,8 @@ class APPLICATION extends API {
 	public function start(){
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 		$result = ['user' => $_SESSION['user']['name'], 'render' => ['content' => []]];
+//		array_merge($result, $this->_auth);
+
 		$tiles = [];
 
 		// set up dashboard notifications

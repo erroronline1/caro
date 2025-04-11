@@ -72,6 +72,11 @@ class API {
 	public $_requestedMethod = null;
 
 	/**
+	 * public preset of successful authorized user data in case of (re)authorization in session timeout
+	 */
+	public $_auth = [];
+
+	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
 	 */
@@ -91,14 +96,19 @@ class API {
 
 		$this->_lang = new LANG();
 
+
+/*		
+		// (re)authorize if session user is not set or session has timed out
+		if(isset($_SESSION['user'])) var_dump($_SESSION);
+		if ((!isset($_SESSION['user']) || (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])))
+		&& !in_array(REQUEST[1], ['language', 'info', 'menu', 'authorize'])){ // these requests do not need authentification
+			$this->_auth = $this->auth(isset($_SESSION['user']));
+		}
+*/
+
+
 		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])
 		&& !in_array(REQUEST[1], ['language', 'login', 'info', 'menu'])){ // these requests do not need authentification
-
-/*			$auth = $this->auth(REQUEST[1] !== 'auth'); // 
-			$this->response($auth, 511);
-
-			PREVENT LOOP
-*/
 			$params = session_get_cookie_params();
 			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 			session_destroy();
@@ -251,40 +261,11 @@ class API {
 	 * 
 	 * @return array either application- and user-settings or render structure for login form
 	 */
-	public function auth($reauth = false){
-		$_requestedLogout = isset(REQUEST[2]) ? REQUEST[2] : null;
+	public function auth($reauthenticate = false){
+		if (!$reauthenticate){
+			// get current user and application settings for frontend setup
 
-		if (!$reauth){
-			if (!$_requestedLogout){
-				// on reload this method is requested by default
-				// get current user and application settings for frontend setup
-				if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login')) && isset($_SESSION['user'])){
-					return [
-							'user' => [
-							'image' => $_SESSION['user']['image'],
-							'app_settings' => $_SESSION['user']['app_settings'],
-							'fingerprint' => $this->session_get_fingerprint(),
-							'permissions' => [
-								'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
-							]
-						],
-						'config' => [
-							'application' => [
-								'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
-								'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
-							],
-							'lifespan' => [
-								'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
-							],
-							'limits' => [
-								'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-							],
-							'label' => CONFIG['label'],
-							'forbidden' => CONFIG['forbidden']
-						]
-					];
-				}
-
+			if (!isset($_SESSION['user'])){
 				// select single user based on login token
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
 					'values' => [
@@ -301,42 +282,41 @@ class API {
 					$_SESSION['user']['image'] = './' . $result['image'];
 
 					$this->session_set();
-
-					return [
-							'user' => [
-							'image' => $_SESSION['user']['image'],
-							'app_settings' => $_SESSION['user']['app_settings'],
-							'fingerprint' => $this->session_get_fingerprint(),
-							'permissions' => [
-								'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
-							]
-						],
-						'config' => [
-							'application' => [
-								'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
-								'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
-							],
-							'lifespan' => [
-								'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
-							],
-							'limits' => [
-								'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-							],
-							'label' => CONFIG['label'],
-							'forbidden' => CONFIG['forbidden']
-						]
-					];
 				}
 			}
+			if (isset($_SESSION['user'])) return [
+					'user' => [
+						'image' => $_SESSION['user']['image'],
+						'app_settings' => $_SESSION['user']['app_settings'],
+						'fingerprint' => $this->session_get_fingerprint(),
+						'permissions' => [
+							'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
+						]
+					],
+					'config' => [
+						'application' => [
+							'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
+							'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
+						],
+						'lifespan' => [
+							'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+						],
+						'limits' => [
+							'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
+						],
+						'label' => CONFIG['label'],
+						'forbidden' => CONFIG['forbidden']
+					]
+				];
 			// user not found is handled by api as well, destroy if logout requested, condition important to avoid errors on session timeout
-			if ($_SESSION){
+			/*if (false && $_SESSION){
 				$params = session_get_cookie_params();
 				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 				session_destroy();
 				session_write_close();
 				header('Location:' . preg_split('/[\\/]/m', $_SERVER['PHP_SELF'])[1] . '/../index.html');
 				die();
-			}
+			}*/
 		}
 		// append login screen
 		$response = ['render' =>
@@ -365,7 +345,7 @@ class API {
 			]
 		];
 
-		if (!$reauth){
+		if (!$reauthenticate){
 			// prepare term of service with providable permission settings
 			$tos = [];
 			$replacements = [
@@ -396,11 +376,11 @@ class API {
 				]
 			];
 		}
-		return $response;
+		$this->response($response, 511);
 	}
 
 	/**
-	 * @return str readable http status message based on $this->_httpResponse
+	 * @return string readable http status message based on $this->_httpResponse
 	 */
 	private function get_status_message(){
 		$status = array(

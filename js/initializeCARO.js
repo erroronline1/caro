@@ -56,5 +56,5 @@ if (navigator.userAgent.toLowerCase().includes("safari")) document.documentEleme
 if (navigator.userAgent.toLowerCase().includes("chrome")) document.documentElement.removeAttribute("data-useragent");
 
 // initial api requests
-api.application("get", "language");
-api.application("post", "login");
+await api.application("get", "language");
+api.application("post", "login"); //"start");
