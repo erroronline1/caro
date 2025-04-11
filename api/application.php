@@ -37,6 +37,35 @@ class APPLICATION extends API {
 	}
 
 	/**
+	 *           _   _
+	 *   ___ _ _| |_| |_
+	 *  | .'| | |  _|   |
+	 *  |__,|___|_| |_|_|
+	 *
+	 * user authentification handling on timeout after having been prompted to reprovide token through api parent class
+	 */
+	public function auth(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				// select single user based on login token
+				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+					'values' => [
+						':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login'))
+					]
+				]);
+				if ($query && isset($_SESSION['user'])) $this->response(true);
+				else {
+					$params = session_get_cookie_params();
+					setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+					session_destroy();
+					session_write_close();
+					$this->response('REAUTHENTIFICATION FAILED, PLEASE LOG IN THE REGULAR WAY');
+				}
+				break;
+		}
+	}
+
+	/**
 	 *   _     ___     
 	 *  |_|___|  _|___ 
 	 *  | |   |  _| . |

@@ -120,11 +120,26 @@ export const api = {
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, ["post", "put"].includes(method.toLowerCase()))
 			.then(async (data) => {
-				document.querySelector("header>div:nth-of-type(2)").style.display = data.status === 200 ? "none" : "block";
+				document.querySelector("header>div:nth-of-type(2)").style.display = [200, 511].includes(data.status) ? "none" : "block";
 				if (data.status === 203) new Toast(api._lang.GET("general.service_worker_get_cache_fallback"), "info");
 				if (data.status === 207) {
 					new Toast(api._lang.GET("general.service_worker_post_cache_fallback"), "info");
 					_serviceWorker.onPostCache();
+					return;
+				}
+				if (data.status === 511) {
+					// session timeout
+					const options = {};
+					options[api._lang.GET("general.ok_button")] = false;
+					await new Dialog({
+						type: "input",
+						render: data.render,
+						options: options,
+					}).then((response) => {
+						let submission = _client.application.dialogToFormdata(response);
+						if (submission) api.application("post", "auth", submission);
+						//else new Toast(api._lang.GET("order.incorporation.failure"), "error");
+					});
 					return;
 				}
 				api.session_timeout.init();

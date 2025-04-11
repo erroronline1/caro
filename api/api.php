@@ -70,6 +70,7 @@ class API {
 	 * public preset of descendant classes property to ececute requested method as per REQUEST[1]
 	 */
 	 public $_requestedMethod = null;
+
 	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
@@ -91,6 +92,12 @@ class API {
 		$this->_lang = new LANG();
 
 		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])){
+			/*$this->reauth();
+
+			
+
+			PREVENT LOOP
+*/
 			$params = session_get_cookie_params();
 			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 			session_destroy();
@@ -108,14 +115,6 @@ class API {
 				// valid user IS logged in
 				// renew session timeout except for defined requests
 				if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
-
-				//update user setting for each request
-				$result = $user[0];
-				$_SESSION['user'] = $result;
-				$_SESSION['user']['permissions'] = explode(',', $result['permissions'] ? : '');
-				$_SESSION['user']['units'] = explode(',', $result['units'] ? : '');
-				$_SESSION['user']['app_settings'] = json_decode($result['app_settings'] ? : '', true);
-				$_SESSION['user']['image'] = './' . $result['image'];
 
 				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
 				if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])
@@ -147,6 +146,14 @@ class API {
 						//else $this->response([strlen($payload), $payload], 401);
 						else $this->response([], 401);
 					} else $this->response([], 401);
+				} else {
+					// update user setting for get and delete request without fingerprint
+					$result = $user[0];
+					$_SESSION['user'] = $result;
+					$_SESSION['user']['permissions'] = explode(',', $result['permissions'] ? : '');
+					$_SESSION['user']['units'] = explode(',', $result['units'] ? : '');
+					$_SESSION['user']['app_settings'] = json_decode($result['app_settings'] ? : '', true);
+					$_SESSION['user']['image'] = './' . $result['image'];
 				}
 			}
 			else {
@@ -283,6 +290,7 @@ class API {
 			504 => 'Gateway Timeout',
 			505 => 'HTTP Version Not Supported',
 			507 => 'Insufficient Storage',
+			511 => 'Network Authentication Required'
 		);
 		return ($status[$this->_httpResponse])?$status[$this->_httpResponse]:$status[500];
 	}
@@ -309,7 +317,31 @@ class API {
 		if(method_exists($this, $func))
 			$this->$func();
 		else
-			$this->response([], 404); // If the method not exist within this class, response would be "Page not found".
+			$this->response([], 404); // if the method doesn't exist within this class, response would be "Page not found".
+	}
+
+	/**
+	 * user authentification on timeout, returns inputs to reaffirm authentification, processed by frontent api dialog
+	 * user input is handled by application->auth() for parent class having no own endpoint
+	 */
+	private function reauth(){
+		$result = ['render' => ['content' => [
+			[
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => 'RELOGIN AFTER TIMEOUT'
+					]
+				], [
+					'type' => 'scanner',
+					'attributes' => [
+						'name' => $this->_lang->GET('application.login', [], true),
+						'type' => 'password'
+					]
+				]
+			]
+		]]];
+		$this->response($result, 511);
 	}
 
 	/**

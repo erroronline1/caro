@@ -73,6 +73,7 @@ var httpResponse = {
 	504: "Gateway Timeout",
 	505: "HTTP Version Not Supported",
 	507: "Insufficient Storage",
+	511: 'Network Authentication Required'
 };
 
 const _ = {
@@ -107,7 +108,7 @@ const _ = {
 			cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
 			body: method == "GET" ? null : form_data ? payload : JSON.stringify(payload), // body data type must match "Content-Type" header
 		}).then(async (response) => {
-			if (response.statusText === "OK")
+			if (response.statusText === "OK" || response.status === 511)
 				return {
 					status: response.status,
 					body: await response.json(),
