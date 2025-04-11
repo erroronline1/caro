@@ -69,7 +69,7 @@ class API {
 	/**
 	 * public preset of descendant classes property to ececute requested method as per REQUEST[1]
 	 */
-	 public $_requestedMethod = null;
+	public $_requestedMethod = null;
 
 	/**
 	 * constructor prepares payload and database connection
@@ -91,10 +91,11 @@ class API {
 
 		$this->_lang = new LANG();
 
-		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])){
-			/*$this->reauth();
+		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])
+		&& !in_array(REQUEST[1], ['language', 'login', 'info', 'menu'])){ // these requests do not need authentification
 
-			
+/*			$auth = $this->auth(REQUEST[1] !== 'auth'); // 
+			$this->response($auth, 511);
 
 			PREVENT LOOP
 */
@@ -243,6 +244,162 @@ class API {
 	}
 
 	/**
+	 * user authentification on timeout, returns inputs to (re)affirm authentification, processed by frontent api dialog
+	 * user input is handled by application->auth() for parent class having no own endpoint
+	 * 
+	 * @param bool $reauth true returns just a login input without terms of use
+	 * 
+	 * @return array either application- and user-settings or render structure for login form
+	 */
+	public function auth($reauth = false){
+		$_requestedLogout = isset(REQUEST[2]) ? REQUEST[2] : null;
+
+		if (!$reauth){
+			if (!$_requestedLogout){
+				// on reload this method is requested by default
+				// get current user and application settings for frontend setup
+				if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login')) && isset($_SESSION['user'])){
+					return [
+							'user' => [
+							'image' => $_SESSION['user']['image'],
+							'app_settings' => $_SESSION['user']['app_settings'],
+							'fingerprint' => $this->session_get_fingerprint(),
+							'permissions' => [
+								'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
+							]
+						],
+						'config' => [
+							'application' => [
+								'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
+								'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
+							],
+							'lifespan' => [
+								'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+							],
+							'limits' => [
+								'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
+							],
+							'label' => CONFIG['label'],
+							'forbidden' => CONFIG['forbidden']
+						]
+					];
+				}
+
+				// select single user based on login token
+				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+					'values' => [
+						':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login'))
+					]
+				]);
+				if ($query){ // && (!$reauth && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.terms_of_service_accepted')))){
+					// get current user and application settings for frontend setup
+					$result = $query[0];
+					$_SESSION['user'] = $result;
+					$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
+					$_SESSION['user']['units'] = explode(',', $result['units']);
+					$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
+					$_SESSION['user']['image'] = './' . $result['image'];
+
+					$this->session_set();
+
+					return [
+							'user' => [
+							'image' => $_SESSION['user']['image'],
+							'app_settings' => $_SESSION['user']['app_settings'],
+							'fingerprint' => $this->session_get_fingerprint(),
+							'permissions' => [
+								'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
+							]
+						],
+						'config' => [
+							'application' => [
+								'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
+								'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
+							],
+							'lifespan' => [
+								'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+							],
+							'limits' => [
+								'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
+							],
+							'label' => CONFIG['label'],
+							'forbidden' => CONFIG['forbidden']
+						]
+					];
+				}
+			}
+			// user not found is handled by api as well, destroy if logout requested, condition important to avoid errors on session timeout
+			if ($_SESSION){
+				$params = session_get_cookie_params();
+				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+				session_destroy();
+				session_write_close();
+				header('Location:' . preg_split('/[\\/]/m', $_SERVER['PHP_SELF'])[1] . '/../index.html');
+				die();
+			}
+		}
+		// append login screen
+		$response = ['render' =>
+			[
+				'form' => [
+					'action' => "javascript:api.application('post','login')",
+					'data-usecase'=> 'login',
+				],
+				'content' => [
+					[
+						[
+							'type' => 'scanner',
+							'attributes' => [
+								'name' => $this->_lang->GET('application.login', [], true),
+								'type' => 'password'
+							]
+						]
+					]
+				]
+			],
+			'user' => [],
+			'config' => [
+				'application' => [
+					'defaultlanguage' => CONFIG['application']['defaultlanguage'],
+				]
+			]
+		];
+
+		if (!$reauth){
+			// prepare term of service with providable permission settings
+			$tos = [];
+			$replacements = [
+				':issue_mail' => CONFIG['application']['issue_mail'],
+				// no use of PERMISSIONS::permissionFor, because this method required a logged in user
+				':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])]))
+			];
+
+			// append terms-of-service slider panels
+			foreach ($this->_lang->_USER['application']['terms_of_service'] as $description => $content){
+				$tos[] = [[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $description,
+					],
+					'content' => strtr($content, $replacements)
+				]];
+			}
+			$response['render']['content'][] = $tos;
+
+			// append tos-acceptance input
+			$response['render']['content'][] = [
+				[
+					'type' => 'checkbox',
+					'content' => [
+						$this->_lang->GET('application.terms_of_service_accepted', [], true) => ['required' => true]
+					]
+				]
+			];
+		}
+		return $response;
+	}
+
+	/**
 	 * @return str readable http status message based on $this->_httpResponse
 	 */
 	private function get_status_message(){
@@ -318,30 +475,6 @@ class API {
 			$this->$func();
 		else
 			$this->response([], 404); // if the method doesn't exist within this class, response would be "Page not found".
-	}
-
-	/**
-	 * user authentification on timeout, returns inputs to reaffirm authentification, processed by frontent api dialog
-	 * user input is handled by application->auth() for parent class having no own endpoint
-	 */
-	private function reauth(){
-		$result = ['render' => ['content' => [
-			[
-				[
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => 'RELOGIN AFTER TIMEOUT'
-					]
-				], [
-					'type' => 'scanner',
-					'attributes' => [
-						'name' => $this->_lang->GET('application.login', [], true),
-						'type' => 'password'
-					]
-				]
-			]
-		]]];
-		$this->response($result, 511);
 	}
 
 	/**

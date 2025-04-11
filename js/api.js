@@ -130,15 +130,14 @@ export const api = {
 				if (data.status === 511) {
 					// session timeout
 					const options = {};
-					options[api._lang.GET("general.ok_button")] = false;
+					options[api._lang.GET("general.ok_button")] = true;
 					await new Dialog({
 						type: "input",
-						render: data.render,
+						render: data.body.render,
 						options: options,
 					}).then((response) => {
 						let submission = _client.application.dialogToFormdata(response);
-						if (submission) api.application("post", "auth", submission);
-						//else new Toast(api._lang.GET("order.incorporation.failure"), "error");
+						api.application("post", "auth", submission);
 					});
 					return;
 				}
@@ -376,6 +375,9 @@ export const api = {
 		request.splice(0, 0, "application");
 		let successFn, payload;
 		switch (request[1]) {
+			case "auth":
+				payload = request.pop();
+				break;
 			case "info":
 				successFn = function (data) {
 					api.update_header(api._lang.GET("menu.application.info"));
