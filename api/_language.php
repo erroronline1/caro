@@ -111,8 +111,8 @@ class LANG {
 	 * @param array $replace replacement key=>value pairs to replace :placeholders
 	 * @return string textchunk with replacements and whitespaces replaced with underscore as in request parameters
 	 */
-	public function PROPERTY($request, $replace = []){
-		return preg_replace('/[\s\.]/', '_', $this->GET($request, $replace));
+	public function PROPERTY($request, $replace = [], $forceDefault = false){
+		return preg_replace('/[\s\.]/', '_', $this->GET($request, $replace, $forceDefault));
 	}
 
 	/**
