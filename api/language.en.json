@@ -162,7 +162,7 @@
 			"source": "https://github.com/erroronline1/caro",
 			"source_header": "Source"
 		},
-		"login": "Login",
+		"login": "User authentification",
 		"manual": {
 			"content": "Content",
 			"delete": "Delete this topic",
