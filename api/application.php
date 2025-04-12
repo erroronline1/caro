@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// login handler, menu and landing page methods
+// authentify endpoint handling, menu and landing page methods
 require_once('_calendarutility.php');
 require_once('notification.php');
 
@@ -36,14 +36,14 @@ class APPLICATION extends API {
 	}
 
 	/**
-	 *           _   _           _         
-	 *   ___ _ _| |_| |_ ___ ___|_|___ ___ 
-	 *  | .'| | |  _|   | . |  _| |- _| -_|
-	 *  |__,|___|_| |_|_|___|_| |_|___|___|
-	 *
+	 *           _   _           _   _ ___     
+	 *   ___ _ _| |_| |_ ___ ___| |_|_|  _|_ _ 
+	 *  | .'| | |  _|   | -_|   |  _| |  _| | |
+	 *  |__,|___|_| |_|_|___|_|_|_| |_|_| |_  |
+	 *                                    |___|
 	 * (re)log in user or destroy session
 	 */
-	public function authorize(){
+	public function authentify(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'DELETE':
 				$params = session_get_cookie_params();
@@ -60,8 +60,7 @@ class APPLICATION extends API {
 				]);
 				break;
 			default:
-				$auth = $this->auth(isset($_SESSION['user']));
-				$this->response($auth);
+				$this->response($this->_auth);
 		}
 	}
 
@@ -124,8 +123,8 @@ class APPLICATION extends API {
 			],
 		]]];
 		$this->response($response);
-
 	}
+
 	/**
 	 *   _
 	 *  | |___ ___ ___ _ _ ___ ___ ___
@@ -138,153 +137,6 @@ class APPLICATION extends API {
 		$this->response(['data' => $this->_lang->GETALL()]);
 	}
 
-	/**
-	 *   _         _
-	 *  | |___ ___|_|___
-	 *  | | . | . | |   |
-	 *  |_|___|_  |_|_|_|
-	 *        |___|
-	 * log in user or destroy session
-	 * without current user respond with login form
-	 */
-/*	public function login(){
-			// on reload this method is requested by default
-			// get current user and application settings for frontend setup
-			if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login')) && isset($_SESSION['user'])){
-				$this->response([
-					'user' => [
-					'image' => $_SESSION['user']['image'],
-					'app_settings' => $_SESSION['user']['app_settings'],
-					'fingerprint' => $this->session_get_fingerprint(),
-					'permissions' => [
-						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
-					]
-				],
-				'config' => [
-					'application' => [
-						'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
-						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
-					],
-					'lifespan' => [
-						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
-					],
-					'limits' => [
-						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-					],
-					'label' => CONFIG['label'],
-					'forbidden' => CONFIG['forbidden']
-				]]);
-			}
-
-			// select single user based on login token
-			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
-				'values' => [
-					':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login'))
-				]
-			]);
-			if ($query && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.terms_of_service_accepted'))){
-				// get current user and application settings for frontend setup
-				$result = $query[0];
-				$_SESSION['user'] = $result;
-				$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
-				$_SESSION['user']['units'] = explode(',', $result['units']);
-				$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
-				$_SESSION['user']['image'] = './' . $result['image'];
-
-				$this->session_set();
-
-				$this->response([
-					'user' => [
-					'image' => $_SESSION['user']['image'],
-					'app_settings' => $_SESSION['user']['app_settings'],
-					'fingerprint' => $this->session_get_fingerprint(),
-					'permissions' => [
-						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
-					]
-				],
-				'config' => [
-					'application' => [
-						'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
-						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
-					],
-					'lifespan' => [
-						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
-					],
-					'limits' => [
-						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-					],
-					'label' => CONFIG['label'],
-					'forbidden' => CONFIG['forbidden']
-				]]);
-			}
-		// user not found is handled by api as well, destroy if logout requested, condition important to avoid errors on session timeout
-		if ($_SESSION){
-			$params = session_get_cookie_params();
-			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-			session_destroy();
-			session_write_close();
-			header('Location:' . preg_split('/[\\/]/m', $_SERVER['PHP_SELF'])[1] . '/../index.html');
-			die();
-		}
-		// append login screen
-		$response = ['render' =>
-			[
-				'form' => [
-					'action' => "javascript:api.application('post','login')",
-					'data-usecase'=> 'login',
-				],
-				'content' => [
-					[
-						[
-							'type' => 'scanner',
-							'attributes' => [
-								'name' => $this->_lang->GET('application.login', [], true),
-								'type' => 'password'
-							]
-						]
-					]
-				]
-			],
-			'user' => [],
-			'config' => [
-				'application' => [
-					'defaultlanguage' => CONFIG['application']['defaultlanguage'],
-				]
-			]
-		];
-
-		// prepare term of service with providable permission settings
-		$tos = [];
-		$replacements = [
-			':issue_mail' => CONFIG['application']['issue_mail'],
-			// no use of PERMISSIONS::permissionFor, because this method required a logged in user
-			':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], ['admin', ...preg_split('/\W+/', CONFIG['permissions']['users'])]))
-		];
-
-		// append terms-of-service slider panels
-		foreach ($this->_lang->_USER['application']['terms_of_service'] as $description => $content){
-			$tos[] = [[
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $description,
-				],
-				'content' => strtr($content, $replacements)
-			]];
-		}
-		$response['render']['content'][] = $tos;
-
-		// append tos-acceptance input
-		$response['render']['content'][] = [
-			[
-				'type' => 'checkbox',
-				'content' => [
-					$this->_lang->GET('application.terms_of_service_accepted', [], true) => ['required' => true]
-				]
-			]
-		];
-		$this->response($response);
-	}
-*/
 	/**
 	 *                         _
 	 *   _____ ___ ___ _ _ ___| |
@@ -507,7 +359,7 @@ class APPLICATION extends API {
 	public function menu(){
 		// get permission based menu items
 		if (!isset($_SESSION['user'])) $this->response(['render' => [$this->_lang->GET('menu.application.header') => [
-			$this->_lang->GET('menu.application.signin') => ['onclick' => "api.application('get', 'login')"],
+			$this->_lang->GET('menu.application.signin') => ['onclick' => "api.application('get', 'start')"],
 			$this->_lang->GET('menu.application.info') => ['onclick' => "api.application('get', 'info')"]
 			]]]);	// early exit
 
@@ -531,7 +383,7 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.calendar.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
 			],
 			$this->_lang->GET('menu.application.header') => [
-				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authorize')"],
+				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authentify')"],
 				$this->_lang->GET('menu.application.start') => ['onclick' => "api.application('get', 'start')"],			
 				$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
 			],
@@ -600,9 +452,8 @@ class APPLICATION extends API {
 	 */
 	public function start(){
 		if (!isset($_SESSION['user'])) $this->response([], 401);
-		$result = array_merge(['render' => ['content' => []]], $this->auth());
+		$result = array_merge(['render' => ['content' => []]], $this->_auth);
 		$tiles = [];
-
 		// set up dashboard notifications
 		$notifications = new NOTIFICATION;
 

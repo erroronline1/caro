@@ -21,12 +21,17 @@ import { Compose, compose_helper } from "./compose.js";
 import { Lang } from "../js/language.js";
 
 export const api = {
+	// passed from backend
 	_settings: {
 		user: {},
 		config: {},
 	},
 
+	// instatiate a broadly usable language class
 	_lang: new Lang(),
+
+	// to store requests that need to be re-requested on (re)authentication
+	_unauthorizedRequest: {},
 
 	/**
 	 *                           _     _     _       _
@@ -127,18 +132,25 @@ export const api = {
 					_serviceWorker.onPostCache();
 					return;
 				}
-				if (data.status === 511 && request[1] !== "authorize") {
+				if (data.status === 511) {
 					// session timeout
 					api.loadindicator(false);
+					if (JSON.stringify(request) !== JSON.stringify(["application", "authentify"])) api._unauthorizedRequest = { method: method, request: request };
 					const options = {};
 					options[api._lang.GET("general.ok_button")] = true;
+					options[api._lang.GET("menu.application.signout_user", { ":name": api._settings.user.name || "" })] = {
+						onclick: "api.application('delete', 'authentify'); api.application('get', 'start')",
+						class: "reducedCTA",
+						value: false,
+						type: "button",
+					};
 					await new Dialog({
 						type: "input",
 						render: data.body.render,
 						options: options,
 					}).then((response) => {
 						let token = _client.application.dialogToFormdata(response);
-						api.application("post", "authorize", token, method, request);
+						api.application("post", "authentify", token);
 					});
 					return;
 				}
@@ -371,30 +383,27 @@ export const api = {
 	 */
 	application: async (method, ...request) => {
 		request = [...request];
-		if (method === "get" && !["language", "menu", "authorize"].includes(request[0])) api.history.write(["application", ...request]);
+		if (method === "get" && !["language", "menu", "authentify"].includes(request[0])) api.history.write(["application", ...request]);
 
 		request.splice(0, 0, "application");
 		let successFn, payload;
 		switch (request[1]) {
-			case "authorize":
+			case "authentify":
 				switch (method) {
 					case "delete":
 						successFn = function (data) {
 							api._settings.user = data.user || {};
 							api._settings.config = data.config || {};
+							document.querySelector("body>header>h1").innerHTML = document.getElementById("main").innerHTML = document.querySelector("body>nav").innerHTML = "";
 							api.application("get", "start");
 						};
 						break;
 					default:
-						let resend = {
-							request: request.pop(),
-							method: request.pop(),
-						};
 						successFn = function (data) {
 							if (data.user) api._settings.user = data.user;
 							if (data.config) api._settings.config = data.config;
 
-							if (data.user) api[resend.request.shift()](resend.method, ...resend.request);
+							if (data.user) api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
 						};
 						payload = request.pop();
 				}
@@ -412,103 +421,7 @@ export const api = {
 					api._lang._USER = data.data;
 				};
 				break;
-/*			case "login":
-				payload = _.getInputs("[data-usecase=login]", true);
-				// clear history
-				sessionStorage.clear();
-
-				successFn = async function (data) {
-					// import server side settings
-					await api.application("get", "language");
-					await api.application("get", "menu");
-					api._settings.user = data.user || {};
-					api._settings.config = data.config || {};
-
-					if (data.user) _serviceWorker.register();
-					else {
-						clearInterval(_serviceWorker.notif.interval);
-						_serviceWorker.notif.interval = null;
-					}
-					if (data.render && data.render.form) {
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
-
-						// replace "please sign in" with user name for landing page
-						let signin = api._lang.GET("menu.application.signin"),
-							greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
-						api.update_header(
-							api._lang.GET("general.welcome_header", {
-								":user": greeting,
-							})
-						);
-						return;
-					}
-
-					// update default language
-					if (api._settings.config.application && api._settings.config.application.defaultlanguage) {
-						document.querySelector("html").lang = api._settings.config.application.defaultlanguage;
-					}
-
-					// update application menu icon with user image
-					if (api._settings.user.image) {
-						let applicationLabel;
-						while (!applicationLabel) {
-							await _.sleep(50);
-							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.application.header") + "]");
-						}
-						applicationLabel.style.maskImage = applicationLabel.style.webkitMaskImage = "none";
-						applicationLabel.style.backgroundImage = "url('" + api._settings.user.image + "')";
-						applicationLabel.style.backgroundSize = "cover";
-						applicationLabel.style.borderRadius = "50%";
-					}
-
-					// override css properties with user settings
-					if (api._settings.user.app_settings) {
-						for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
-							switch (key) {
-								case "forceDesktop":
-									if (value) {
-										let stylesheet;
-										for (const [i, sname] of Object.entries(document.styleSheets)) {
-											if (!sname.href.includes("style.css")) continue;
-											stylesheet = document.styleSheets[i].cssRules;
-											break;
-										}
-										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64rem)") {
-												stylesheet[i].media.mediaText = "only screen and (min-width: 0)";
-											}
-											if (stylesheet[i].conditionText === "only screen and (max-width: 64rem)") {
-												stylesheet[i].media.mediaText = "only screen and (max-width: 0)";
-											}
-										}
-									}
-									break;
-								case "theme":
-									if (value) {
-										document.getElementsByTagName("head")[0].removeChild(document.getElementById("csstheme"));
-										const link = document.createElement("link");
-										link.href = "./" + value + ".css";
-										link.type = "text/css";
-										link.rel = "stylesheet";
-										link.media = "screen";
-										link.id = "csstheme";
-										document.getElementsByTagName("head")[0].appendChild(link);
-									}
-							}
-						}
-					}
-
-					// set general titles to common elements
-					document.querySelector("dialog#inputmodal").ariaLabel = document.querySelector("dialog#inputmodal2").ariaLabel = document.querySelector("dialog#modal").ariaLabel = api._lang.GET("assemble.render.aria.dialog");
-					document.querySelector("dialog#toast").ariaLabel = document.querySelector("dialog#sessionwarning").ariaLabel = api._lang.GET("assemble.render.aria.dialog_toast");
-
-					// retrieve landing page
-					api.application("get", "start");
-				};
-				break;
-*/			case "menu":
+			case "menu":
 				successFn = function (data) {
 					// construct backend provided application menu
 					assemble_helper.userMenu(data.render);
@@ -516,18 +429,6 @@ export const api = {
 				break;
 			case "start":
 				successFn = async function (data) {
-/*					// replace "please sign in" with user name for landing page
-					// duplicate of login for selection of landing page from menu
-					let signin = api._lang.GET("menu.application.signin"),
-						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
-					if (data.user) greeting = " " + data.user;
-					api.update_header(
-						api._lang.GET("general.welcome_header", {
-							":user": greeting,
-						})
-					);
-*/					
-
 					// import server side settings
 					await api.application("get", "language");
 					await api.application("get", "menu");
