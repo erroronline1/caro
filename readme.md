@@ -135,8 +135,10 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * https://stackoverflow.com/questions/5927284/how-can-i-make-setinterval-also-work-when-a-tab-is-inactive-in-chrome
     * https://www.w3.org/WAI/WCAG21/Understanding/timeouts.html allow specific timeout within user management
     * reset idle timeout on events
-    * ask if user is still there (embed into toast?) does tapping reset timeout as well?
-    * 
+    * update or reject different user
+    * authorize 511 state not intended
+    * rm application.login
+    * update api endpoints & statements on technical guidelines
 * live runtime permission elevation to display certain contents? how are timesheets more important than patient data?
 
 # Aims
