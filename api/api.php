@@ -72,11 +72,6 @@ class API {
 	public $_requestedMethod = null;
 
 	/**
-	 * public preset of successful authorized user data in case of (re)authorization in session timeout
-	 */
-	public $_auth = [];
-
-	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
 	 */
@@ -97,17 +92,13 @@ class API {
 		$this->_lang = new LANG();
 
 
-/*		
 		// (re)authorize if session user is not set or session has timed out
-		if(isset($_SESSION['user'])) var_dump($_SESSION);
 		if ((!isset($_SESSION['user']) || (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])))
 		&& !in_array(REQUEST[1], ['language', 'info', 'menu', 'authorize'])){ // these requests do not need authentification
-			$this->_auth = $this->auth(isset($_SESSION['user']));
+			$this->auth(isset($_SESSION['user']));
 		}
-*/
 
-
-		if (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])
+		if (false && isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])
 		&& !in_array(REQUEST[1], ['language', 'login', 'info', 'menu'])){ // these requests do not need authentification
 			$params = session_get_cookie_params();
 			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
@@ -129,7 +120,7 @@ class API {
 
 				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
 				if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])
-					&& isset(REQUEST[1]) && REQUEST[1] !== 'login'
+					&& isset(REQUEST[1]) && REQUEST[1] !== 'authorize'
 				){
 					// post and put MUST have _user_post_validation payload
 					if (($_user_post_validation = UTILITY::propertySet($this->_payload, '_user_post_validation')) !== false) {
@@ -286,6 +277,7 @@ class API {
 			}
 			if (isset($_SESSION['user'])) return [
 					'user' => [
+						'name' => $_SESSION['user']['name'],
 						'image' => $_SESSION['user']['image'],
 						'app_settings' => $_SESSION['user']['app_settings'],
 						'fingerprint' => $this->session_get_fingerprint(),
@@ -321,10 +313,6 @@ class API {
 		// append login screen
 		$response = ['render' =>
 			[
-				'form' => [
-					'action' => "javascript:api.application('post','login')",
-					'data-usecase'=> 'login',
-				],
 				'content' => [
 					[
 						[
@@ -337,12 +325,12 @@ class API {
 					]
 				]
 			],
-			'user' => [],
+/*			'user' => [],
 			'config' => [
 				'application' => [
 					'defaultlanguage' => CONFIG['application']['defaultlanguage'],
 				]
-			]
+			]*/
 		];
 
 		if (!$reauthenticate){

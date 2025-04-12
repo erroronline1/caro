@@ -57,4 +57,4 @@ if (navigator.userAgent.toLowerCase().includes("chrome")) document.documentEleme
 
 // initial api requests
 await api.application("get", "language");
-api.application("post", "login"); //"start");
+api.application("get", "start");

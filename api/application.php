@@ -50,7 +50,14 @@ class APPLICATION extends API {
 				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 				session_destroy();
 				session_write_close();
-				$this->response(['bye' => 'bye']);
+				$this->response([
+					'user' => [],
+					'config' => [
+						'application' => [
+							'defaultlanguage' => CONFIG['application']['defaultlanguage'],
+						]
+					]
+				]);
 				break;
 			default:
 				$auth = $this->auth(isset($_SESSION['user']));
@@ -140,13 +147,7 @@ class APPLICATION extends API {
 	 * log in user or destroy session
 	 * without current user respond with login form
 	 */
-	public function login(){
-		/*		
-		$auth = $this->auth();
-		$this->response($auth);
-		return;
-
-		*/
+/*	public function login(){
 			// on reload this method is requested by default
 			// get current user and application settings for frontend setup
 			if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login')) && isset($_SESSION['user'])){
@@ -283,7 +284,7 @@ class APPLICATION extends API {
 		];
 		$this->response($response);
 	}
-
+*/
 	/**
 	 *                         _
 	 *   _____ ___ ___ _ _ ___| |
@@ -599,9 +600,7 @@ class APPLICATION extends API {
 	 */
 	public function start(){
 		if (!isset($_SESSION['user'])) $this->response([], 401);
-		$result = ['user' => $_SESSION['user']['name'], 'render' => ['content' => []]];
-//		array_merge($result, $this->_auth);
-
+		$result = array_merge(['render' => ['content' => []]], $this->auth());
 		$tiles = [];
 
 		// set up dashboard notifications

@@ -380,9 +380,9 @@ export const api = {
 				switch (method) {
 					case "delete":
 						successFn = function (data) {
-							api._settings.user = {};
-							api._settings.config = {};
-							api.application("get", "login");
+							api._settings.user = data.user || {};
+							api._settings.config = data.config || {};
+							api.application("get", "start");
 						};
 						break;
 					default:
@@ -391,8 +391,8 @@ export const api = {
 							method: request.pop(),
 						};
 						successFn = function (data) {
-							api._settings.user = data.user || {};
-							api._settings.config = data.config || {};
+							if (data.user) api._settings.user = data.user;
+							if (data.config) api._settings.config = data.config;
 
 							if (data.user) api[resend.request.shift()](resend.method, ...resend.request);
 						};
@@ -412,7 +412,7 @@ export const api = {
 					api._lang._USER = data.data;
 				};
 				break;
-			case "login":
+/*			case "login":
 				payload = _.getInputs("[data-usecase=login]", true);
 				// clear history
 				sessionStorage.clear();
@@ -508,7 +508,7 @@ export const api = {
 					api.application("get", "start");
 				};
 				break;
-			case "menu":
+*/			case "menu":
 				successFn = function (data) {
 					// construct backend provided application menu
 					assemble_helper.userMenu(data.render);
@@ -516,7 +516,7 @@ export const api = {
 				break;
 			case "start":
 				successFn = async function (data) {
-					// replace "please sign in" with user name for landing page
+/*					// replace "please sign in" with user name for landing page
 					// duplicate of login for selection of landing page from menu
 					let signin = api._lang.GET("menu.application.signin"),
 						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
@@ -526,32 +526,28 @@ export const api = {
 							":user": greeting,
 						})
 					);
-					
-/*
+*/					
+
 					// import server side settings
 					await api.application("get", "language");
 					await api.application("get", "menu");
+					if (data.user) api._settings.user = data.user;
+					if (data.config) api._settings.config = data.config;
 
 					if (api._settings.user) _serviceWorker.register();
 					else {
 						clearInterval(_serviceWorker.notif.interval);
 						_serviceWorker.notif.interval = null;
 					}
-					if (data.render && data.render.form) {
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
 
-						// replace "please sign in" with user name for landing page
-						let signin = api._lang.GET("menu.application.signin"),
-							greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
-						api.update_header(
-							api._lang.GET("general.welcome_header", {
-								":user": api._settings.user.name || greeting,
-							})
-						);
-						return;
-					}
+					// replace "please sign in" with user name for landing page
+					let signin = api._lang.GET("menu.application.signin"),
+						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
+					api.update_header(
+						api._lang.GET("general.welcome_header", {
+							":user": api._settings.user.name ? " " + api._settings.user.name : greeting,
+						})
+					);
 
 					// update default language
 					if (api._settings.config.application && api._settings.config.application.defaultlanguage) {
@@ -611,7 +607,7 @@ export const api = {
 					// set general titles to common elements
 					document.querySelector("dialog#inputmodal").ariaLabel = document.querySelector("dialog#inputmodal2").ariaLabel = document.querySelector("dialog#modal").ariaLabel = api._lang.GET("assemble.render.aria.dialog");
 					document.querySelector("dialog#toast").ariaLabel = document.querySelector("dialog#sessionwarning").ariaLabel = api._lang.GET("assemble.render.aria.dialog_toast");
-*/
+
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
