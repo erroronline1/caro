@@ -379,6 +379,11 @@ export const api = {
 			case "authorize":
 				switch (method) {
 					case "delete":
+						successFn = function (data) {
+							api._settings.user = {};
+							api._settings.config = {};
+							api.application("get", "login");
+						};
 						break;
 					default:
 						let resend = {

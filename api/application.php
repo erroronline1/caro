@@ -24,7 +24,6 @@ require_once('notification.php');
 class APPLICATION extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
-    private $_requestedLogout = null;
     private $_requestedManual = null;
     private $_search = null;
 
@@ -33,7 +32,7 @@ class APPLICATION extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		$this->_requestedLogout = $this->_requestedManual = $this->_search = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_requestedManual = $this->_search = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -51,10 +50,7 @@ class APPLICATION extends API {
 				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 				session_destroy();
 				session_write_close();
-				
-				var_dump(preg_split('/[\\/]/m', $_SERVER['PHP_SELF']));
-				header('Location:' . preg_split('/[\\/]/m', $_SERVER['PHP_SELF'])[1] . '/index.html');
-				die();
+				$this->response(['bye' => 'bye']);
 				break;
 			default:
 				$auth = $this->auth(isset($_SESSION['user']));
@@ -151,7 +147,6 @@ class APPLICATION extends API {
 		return;
 
 		*/
-		if (!$this->_requestedLogout){
 			// on reload this method is requested by default
 			// get current user and application settings for frontend setup
 			if (!UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login')) && isset($_SESSION['user'])){
@@ -221,7 +216,6 @@ class APPLICATION extends API {
 					'forbidden' => CONFIG['forbidden']
 				]]);
 			}
-		}
 		// user not found is handled by api as well, destroy if logout requested, condition important to avoid errors on session timeout
 		if ($_SESSION){
 			$params = session_get_cookie_params();
@@ -536,8 +530,7 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.calendar.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
 			],
 			$this->_lang->GET('menu.application.header') => [
-				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('post', 'login', 'logout')"],
-//				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authorize', 'null', 'null', 'null')"],
+				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authorize')"],
 				$this->_lang->GET('menu.application.start') => ['onclick' => "api.application('get', 'start')"],			
 				$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
 			],
