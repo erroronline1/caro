@@ -238,8 +238,9 @@ class API {
 	 */
 	public function auth(){
 		$reAuthUser = (
-			(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
-			|| (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])) // session timeout
+			//(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
+			//||
+			(isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')))) // session timeout
 		);
 		$returnUser = (
 			(!$reAuthUser && isset($_SESSION['user'])) // if there are no reasons for reauthentification on valid user session return if applicable
