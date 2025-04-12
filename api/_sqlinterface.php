@@ -259,7 +259,7 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_manual WHERE id = :id"
 		],
 		'application_post_session' => [
-			'mysql' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP ON DUPLICATE KEY UPDATE date = CURRENT_TIMESTAMP",
+			'mysql' => "INSERT IGNORE INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)",
 			//'sqlsrv' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
 			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING (SELECT :id AS id, :user_id AS user_id, CURRENT_TIMESTAMP AS date) AS source (id, user_id, date) ON (target.id = source.id ) WHEN MATCHED THEN UPDATE SET date = CURRENT_TIMESTAMP WHEN NOT MATCHED THEN INSERT (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
 		],
