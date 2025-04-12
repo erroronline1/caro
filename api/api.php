@@ -72,6 +72,11 @@ class API {
 	public $_requestedMethod = null;
 
 	/**
+	 * public preset of authentified user data
+	 */
+	public $_auth = [];
+
+	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
 	 */
@@ -91,79 +96,60 @@ class API {
 
 		$this->_lang = new LANG();
 
-
-		// (re)authorize if session user is not set or session has timed out
-		if ((!isset($_SESSION['user']) || (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])))
-		&& !in_array(REQUEST[1], ['language', 'info', 'menu', 'authorize'])){ // these requests do not need authentification
-			$this->auth(isset($_SESSION['user']));
+		// (re)authentify session user
+		if (REQUEST[0] === 'application' && (
+			in_array(REQUEST[1], ['language', 'info', 'menu'])
+			|| (REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'DELETE')
+		)){ // these requests do not need authentification or handle it on their own
+			$this->_auth = true;
+		}
+		else {
+			$this->_auth = $this->auth();
 		}
 
-		if (false && isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])
-		&& !in_array(REQUEST[1], ['language', 'login', 'info', 'menu'])){ // these requests do not need authentification
+		// check if a registered user with valid token is logged in
+		if ($this->_auth){
+			// valid user IS logged in
+
+			// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
+			if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])
+				&& isset(REQUEST[1]) && REQUEST[1] !== 'authentify'
+			){
+				// post and put MUST have _user_post_validation payload
+				if (($_user_post_validation = UTILITY::propertySet($this->_payload, '_user_post_validation')) !== false) {
+					unset ($this->_payload->_user_post_validation);
+					// sanitize arrays from payload as checksum can't handle these from client side
+					$payload = json_decode(json_encode($this->_payload), true);
+					foreach ($payload as $key => $value){
+						if ($value && gettype($value) === 'array') unset($payload[$key]);
+					}
+					//var_dump(json_encode($payload));
+					$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
+						return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
+						}, json_encode($payload) );
+					$payload = preg_replace(['/\\\\r|\\\\n|\\\\t/', '/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is somehow not resolved properly on the backend
+					//var_dump(strlen($payload), $payload);
+
+					if ($user = $this->session_get_user_from_fingerprint_checksum($_user_post_validation, strlen($payload))){
+						//update user setting for each request
+						$_SESSION['user'] = $user;
+						$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
+						$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
+						$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
+						$_SESSION['user']['image'] = './' . $user['image'];
+					}
+					//else $this->response([strlen($payload), $payload], 401);
+					else $this->response([], 401);
+				} else $this->response([], 401);
+			}
+		}
+		else {
+			// user validity failed, destroy session
 			$params = session_get_cookie_params();
 			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 			session_destroy();
 			session_write_close();
 			session_unset();
-		}
-		// check if a registered user with valid token is logged in
-		if (isset($_SESSION['user']['token'])){
-			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
-				'values' => [
-					':token' => $_SESSION['user']['token']
-				]
-			]);
-			if ($user){
-				// valid user IS logged in
-				// renew session timeout except for defined requests
-				if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
-
-				// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
-				if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])
-					&& isset(REQUEST[1]) && REQUEST[1] !== 'authorize'
-				){
-					// post and put MUST have _user_post_validation payload
-					if (($_user_post_validation = UTILITY::propertySet($this->_payload, '_user_post_validation')) !== false) {
-						unset ($this->_payload->_user_post_validation);
-						// sanitize arrays from payload as checksum can't handle these from client side
-						$payload = json_decode(json_encode($this->_payload), true);
-						foreach ($payload as $key => $value){
-							if ($value && gettype($value) === 'array') unset($payload[$key]);
-						}
-						//var_dump(json_encode($payload));
-						$payload = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($match) {
-							return mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE');
-							}, json_encode($payload) );
-						$payload = preg_replace(['/\\\\r|\\\\n|\\\\t/', '/[\W_]/', '/0D0A/i'], '', $payload);  // harmonized cross browser, 0d0a is carriage return that is somehow not resolved properly on the backend
-						//var_dump(strlen($payload), $payload);
-
-						if ($user = $this->session_get_user_from_fingerprint_checksum($_user_post_validation, strlen($payload))){
-							//update user setting for each request
-							$_SESSION['user'] = $user;
-							$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
-							$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
-							$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-							$_SESSION['user']['image'] = './' . $user['image'];
-						}
-						//else $this->response([strlen($payload), $payload], 401);
-						else $this->response([], 401);
-					} else $this->response([], 401);
-				} else {
-					// update user setting for get and delete request without fingerprint
-					$result = $user[0];
-					$_SESSION['user'] = $result;
-					$_SESSION['user']['permissions'] = explode(',', $result['permissions'] ? : '');
-					$_SESSION['user']['units'] = explode(',', $result['units'] ? : '');
-					$_SESSION['user']['app_settings'] = json_decode($result['app_settings'] ? : '', true);
-					$_SESSION['user']['image'] = './' . $result['image'];
-				}
-			}
-			else {
-				$params = session_get_cookie_params();
-				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-				session_destroy();
-				session_write_close();
-			}
 		}
 	}
 	
@@ -245,70 +231,74 @@ class API {
 	}
 
 	/**
-	 * user authentification on timeout, returns inputs to (re)affirm authentification, processed by frontent api dialog
-	 * user input is handled by application->auth() for parent class having no own endpoint
-	 * 
-	 * @param bool $reauth true returns just a login input without terms of use
+	 * user authentification, returns updated user data or inputs to (re)affirm authentification, processed by frontent api dialog
+	 * actively requesting auth or terminating sessions is handled by application->authentify() for parent class having no own endpoint
 	 * 
 	 * @return array either application- and user-settings or render structure for login form
 	 */
-	public function auth($reauthenticate = false){
-		if (!$reauthenticate){
-			// get current user and application settings for frontend setup
+	public function auth(){
+		$reAuthUser = (
+			(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
+			|| (isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > CONFIG['lifespan']['idle'])) // session timeout
+		);
+		$returnUser = (
+			(!$reAuthUser && isset($_SESSION['user'])) // if there are no reasons for reauthentification on valid user session return if applicable
+			|| UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login', [], true)) // on submitting a token return confirmed
+		);
 
-			if (!isset($_SESSION['user'])){
-				// select single user based on login token
-				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
-					'values' => [
-						':token' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login'))
-					]
-				]);
-				if ($query){ // && (!$reauth && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.terms_of_service_accepted')))){
-					// get current user and application settings for frontend setup
-					$result = $query[0];
-					$_SESSION['user'] = $result;
-					$_SESSION['user']['permissions'] = explode(',', $result['permissions']);
-					$_SESSION['user']['units'] = explode(',', $result['units']);
-					$_SESSION['user']['app_settings'] = $result['app_settings'] ? json_decode($result['app_settings'], true) : [];
-					$_SESSION['user']['image'] = './' . $result['image'];
+		if (!($token = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login', [], true))) && isset($_SESSION['user'])) $token = $_SESSION['user']['token'];
+
+		$valid = false;
+		if ($returnUser){
+			// login or reauth by token
+			// get user by token and their application settings for frontend setup
+			$user = SQLQUERY::EXECUTE($this->_pdo, 'application_login', [
+				'values' => [
+					':token' => strval($token)
+				]
+			]);
+			$user = $user ? $user[0]: null;
+			if ($user){
+				// confirm new login or reauth from previous user
+				if (!isset($_SESSION['user']['token']) || $_SESSION['user']['token'] === $user['token']) {
+					$_SESSION['user'] = $user;
+					$_SESSION['user']['permissions'] = explode(',', $user['permissions']);
+					$_SESSION['user']['units'] = explode(',', $user['units']);
+					$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
+					$_SESSION['user']['image'] = './' . $user['image'];
+
+					// renew session timeout except for defined requests
+					if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
 
 					$this->session_set();
+					$valid = true;
 				}
 			}
-			if (isset($_SESSION['user'])) return [
-					'user' => [
-						'name' => $_SESSION['user']['name'],
-						'image' => $_SESSION['user']['image'],
-						'app_settings' => $_SESSION['user']['app_settings'],
-						'fingerprint' => $this->session_get_fingerprint(),
-						'permissions' => [
-							'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
-						]
-					],
-					'config' => [
-						'application' => [
-							'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
-							'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
-						],
-						'lifespan' => [
-							'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
-						],
-						'limits' => [
-							'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-						],
-						'label' => CONFIG['label'],
-						'forbidden' => CONFIG['forbidden']
+			if ($valid) return [
+				'user' => [
+					'name' => $_SESSION['user']['name'],
+					'image' => $_SESSION['user']['image'],
+					'app_settings' => $_SESSION['user']['app_settings'],
+					'fingerprint' => $this->session_get_fingerprint(),
+					'permissions' => [
+						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
 					]
-				];
-			// user not found is handled by api as well, destroy if logout requested, condition important to avoid errors on session timeout
-			/*if (false && $_SESSION){
-				$params = session_get_cookie_params();
-				setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-				session_destroy();
-				session_write_close();
-				header('Location:' . preg_split('/[\\/]/m', $_SERVER['PHP_SELF'])[1] . '/../index.html');
-				die();
-			}*/
+				],
+				'config' => [
+					'application' => [
+						'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
+						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
+					],
+					'lifespan' => [
+						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+					],
+					'limits' => [
+						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
+					],
+					'label' => CONFIG['label'],
+					'forbidden' => CONFIG['forbidden']
+				]
+			];
 		}
 		// append login screen
 		$response = ['render' =>
@@ -325,15 +315,9 @@ class API {
 					]
 				]
 			],
-/*			'user' => [],
-			'config' => [
-				'application' => [
-					'defaultlanguage' => CONFIG['application']['defaultlanguage'],
-				]
-			]*/
 		];
 
-		if (!$reauthenticate){
+		if (!$reAuthUser){
 			// prepare term of service with providable permission settings
 			$tos = [];
 			$replacements = [
