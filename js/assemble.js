@@ -372,16 +372,18 @@ export class Dialog {
 	confirm() {
 		const buttons = [];
 		let button;
-		for (const [option, value] of Object.entries(this.options)) {
+		for (const [option, properties] of Object.entries(this.options)) {
 			button = document.createElement("button");
 			button.append(document.createTextNode(option));
 			button.classList.add("confirmButton");
-			if (typeof value === "string" || typeof value === "boolean") button.value = value;
+			if (typeof properties === "string" || typeof properties === "boolean") button.value = properties;
 			else {
-				button.value = value.value;
-				if (value.class) button.classList.add(value.class);
+				for (const [property, value] of Object.entries(properties)){
+					if (property === "class") button.classList.add(value);
+					else button.setAttribute(property, value);
+				}
 			}
-			if (!value) button.formNoValidate = true;
+			if (!properties) button.formNoValidate = true;
 			buttons.push(button);
 		}
 		return buttons;
