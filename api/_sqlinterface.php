@@ -168,7 +168,7 @@ class SQLQUERY {
 	 */
 	public const QUERIES = [
 		'DYNAMICDBSETUP' => [
-			'mysql' => "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));",  // intuitive group by
+			'mysql' => "SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))",  // intuitive group by
 			'sqlsrv' => ""
 		],
 
@@ -259,8 +259,9 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_manual WHERE id = :id"
 		],
 		'application_post_session' => [
-			'mysql' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)",
-			'sqlsrv' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
+			'mysql' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP ON DUPLICATE KEY UPDATE date = CURRENT_TIMESTAMP",
+			//'sqlsrv' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
+			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING (SELECT :id AS id, :user_id AS user_id, CURRENT_TIMESTAMP AS date) AS source (id, user_id, date) ON (target.id = source.id ) WHEN MATCHED THEN UPDATE SET date = CURRENT_TIMESTAMP WHEN NOT MATCHED THEN INSERT (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
 		],
 		'application_get_session_fingerprint' => [
 			'mysql' => "SELECT user_id, SHA2(CONCAT(id, user_id), 256) AS fingerprint FROM caro_sessions WHERE id = :id AND user_id = :user_id",
@@ -317,8 +318,8 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
 		],
 		'calendar_alert' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP;",
+			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP",
 		],
 
 
@@ -703,7 +704,7 @@ class SQLQUERY {
 		// kudos https://stackoverflow.com/a/30660857/6087758
 		'order_post_order_statistics' => [
 			'mysql' => "INSERT INTO caro_consumables_order_statistics (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, :ordered, :partially_received, :received, :ordertype) ON DUPLICATE KEY UPDATE order_data = :order_data, partially_received = :partially_received, received = :received, ordertype = :ordertype",
-			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING (SELECT :order_id AS order_id, :order_data AS order_data, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :partially_received, 120) AS partially_received, CONVERT(SMALLDATETIME, :received, 120) AS received, :ordertype AS ordertyle) AS source (order_id, order_data, ordered, partially_received, received, ordertype) ON (target.order_id = source.order_id ) WHEN MATCHED THEN UPDATE SET order_data = :order_data, partially_received = CONVERT(SMALLDATETIME, :partially_received, 120), received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :partially_received, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype);"
+			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING (SELECT :order_id AS order_id, :order_data AS order_data, CONVERT(SMALLDATETIME, :ordered, 120) AS ordered, CONVERT(SMALLDATETIME, :partially_received, 120) AS partially_received, CONVERT(SMALLDATETIME, :received, 120) AS received, :ordertype AS ordertype) AS source (order_id, order_data, ordered, partially_received, received, ordertype) ON (target.order_id = source.order_id ) WHEN MATCHED THEN UPDATE SET order_data = :order_data, partially_received = CONVERT(SMALLDATETIME, :partially_received, 120), received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :partially_received, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype)"
 		],
 		'order_get_order_statistics' => [
 			'mysql' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id",
