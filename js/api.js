@@ -232,26 +232,12 @@ export const api = {
 	 */
 	session_timeout: {
 		circle: null,
+		events: null,
 		init: function () {
 			new Toast(null, null, null, "sessionwarning");
-			if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
-			this.stop = new Date().getTime() + api._settings.config.lifespan.idle * 1000;
-			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
-			api.session_timeout.interval = setInterval(function () {
-				if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
-				const remaining = api.session_timeout.stop - new Date().getTime();
-				if (api._settings.config.lifespan.idle > 0 && remaining > 0) {
-					document.querySelector("header>div:nth-of-type(3)").style.display = "none";
-					api.session_timeout.render((100 * remaining) / (api._settings.config.lifespan.idle * 1000), remaining);
-					return;
-				}
-				api.session_timeout.render(0);
-				if (Object.keys(api._settings.user).length) new Toast(api._lang.GET("assemble.render.aria.timeout"), "error", 1800000, "sessionwarning");
-				clearInterval(api.session_timeout.interval);
-				clearInterval(_serviceWorker.notif.interval);
-				_serviceWorker.notif.interval = null;
-				document.querySelector("header>div:nth-of-type(3)").style.display = "block";
-			}, 5000);
+			this.stop = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.idle || 0 : 0) * 1000;
+			this.events = null;
+			this.reset();
 		},
 		render: function (percent, remaining = 0) {
 			if (!this.circle) this.circle = document.querySelector(".session-timeout__circle");
@@ -266,7 +252,36 @@ export const api = {
 			this.circle.style.strokeDasharray = `${circumference} ${circumference}`;
 			this.circle.style.strokeDashoffset = offset;
 		},
+		reset: function () {
+			if (api.session_timeout.stop - new Date().getTime() < 0) return; // timeout has happended anyway, don't bother
+			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
+			this.stop_visual = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.idle || 0 : 0) * 1000; // on event resets (see initializeCARO.js) the indicator will be reset
+			api.session_timeout.interval = setInterval(function () {
+				if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
+				const remaining = api.session_timeout.stop - new Date().getTime(),
+					remaining_visual = api.session_timeout.stop_visual - new Date().getTime();
+				if (api._settings.config.lifespan.idle > 0 && remaining < 10000 && api.session_timeout.events > 2) {
+					 // if some events have been counted a small backend request prolongs the session approximately ten seconds before real timeout
+					api.session_timeout.events = null;
+					api.application("get", "authentify");
+				}
+				if (api._settings.config.lifespan.idle > 0 && remaining_visual > 0) {
+					// render the indicator as long as there is time left
+					document.querySelector("header>div:nth-of-type(3)").style.display = "none";
+					api.session_timeout.render((100 * remaining_visual) / (api._settings.config.lifespan.idle * 1000), remaining_visual);
+					return;
+				}
+				// session has been timed out, display message and clear intervals
+				api.session_timeout.render(0);
+				if (Object.keys(api._settings.user).length) new Toast(api._lang.GET("assemble.render.aria.timeout"), "error", 1800000, "sessionwarning");
+				clearInterval(api.session_timeout.interval);
+				clearInterval(_serviceWorker.notif.interval);
+				_serviceWorker.notif.interval = null;
+				document.querySelector("header>div:nth-of-type(3)").style.display = "block";
+			}, 5000);
+		},
 		stop: null,
+		stop_visual: null,
 	},
 
 	/**
@@ -398,12 +413,12 @@ export const api = {
 							api.application("get", "start");
 						};
 						break;
-					default:
+					case "post":
 						successFn = function (data) {
 							if (data.user) api._settings.user = data.user;
 							if (data.config) api._settings.config = data.config;
 
-							if (data.user) api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+							if (data.user && api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
 						};
 						payload = request.pop();
 				}

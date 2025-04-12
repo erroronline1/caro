@@ -59,8 +59,29 @@ class APPLICATION extends API {
 					]
 				]);
 				break;
-			default:
+			case 'POST':
 				$this->response($this->_auth);
+			default:
+			$response = [
+				'I don\'t make threats. But I do keep promises. And I promise you I shall cause you more trouble than you bargained for... If you don\'t return my property!',
+				'An unintelligent enemy is far less dangerous than an intelligent one, Jamie. Just act stupid. Do you think you can manage that?',
+				'Courage isn\'t just a matter of not being frightened, you know. It\'s being afraid and doing what you have to do, anyway.',
+				'You may be a doctor. But I am the Doctor. The definite article, you might say!',
+				'You know how it is - you put things off for a day, and next thing you know, it\'s a hundred years later.',
+				'This is a situation that requires tact and finesse. Fortunately, I am blessed with both!',
+				'Think about me when you\'re living your life one day after another, all in a neat pattern. Think about the homeless traveler and his old police box, with his days like crazy paving.',
+				'I love humans. Always seeing patterns in things that aren\'t there.',
+				'Great men are forged in fire. It is the privilege of lesser men to light the flame. Whatever the cost.',
+				'Just This Once, Everybody Lives!',
+				'Time is more like a big ball of wibbly-wobbly, timey-wimey stuff.',
+				'Hello, I\'m the Doctor. Basically... run!',
+				'Hardly anything is evil, but most things are hungry. Hunger looks very like evil from the wrong end of the cutlery. Or do you think that your bacon sandwich loves you back?',
+				'If I was still a bloke, I could get on with the job and not have to waste time defending myself.',
+				'I fought all those battles for all those years, and now I know what for. This. I\'ve never been so happy in my life.',
+				'We\'re all dead eventually. There\'s hardly any time that we\'re not dead. Which is a good thing, too! We\'ve got to keep the pace up, otherwise nothing would get done. Dying defines us.',
+				'No time to be tired. Still work to do out there. Lives at stake. Armies being born. People need the Doctor'
+			];
+			$this->response([$response[array_rand($response)]]);
 		}
 	}
 

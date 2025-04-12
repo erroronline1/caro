@@ -124,16 +124,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-* shorter timeout span? still there popup with small request?
-	* api.session_timeout
-    * config.lifespan.idle as per user setting, dump animation
-    * ini_get('session.gc_maxlifetime') pass to _settings.server.timeout
-        * request _serviceWorker.postMessage passing user fingerprint as param to refresh api->__construct $_SESSION['lastrequest']
-    * https://stackoverflow.com/questions/667555/how-to-detect-idle-time-in-javascript
-    * https://stackoverflow.com/questions/15115768/settimeout-not-working-when-window-loses-focus
-    * https://stackoverflow.com/questions/5927284/how-can-i-make-setinterval-also-work-when-a-tab-is-inactive-in-chrome
-    * https://www.w3.org/WAI/WCAG21/Understanding/timeouts.html allow specific timeout within user management?
-    * reset idle timeout on events
 * live runtime permission elevation to display certain contents? how are timesheets more important than patient data?
 
 # Aims
@@ -182,6 +172,8 @@ Orders can be deleted by administrative users and requesting unit members at any
 
 ## Data integrity
 As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
+
+Usage time of the application can be [restricted](#runtime-variables) within the boundaries of the [server setting](#installation) for session duration. Whichever comes first enforces a new authentification of the last user or logout to proceed. While interacting with the application there will be a tiny request shortly before timeout to avoid friction. The defined timeout will happen after the last request without intermittent interaction.
 
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
@@ -1991,7 +1983,7 @@ Stakeholder identification:
 | Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30 | Implemented; 2025-01-31 |
 | History navigation | User | 2025-04-03 | Implemented; 2025-04-05 |
 | HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | Implemented; 2025-04-08 |
-| Shorter idle timespan for improved data security | CEO | 2025-04-07 | |
+| Shorter idle timespan for improved data security | CEO | 2025-04-07 | Implemented; 2025-04-13 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -2265,6 +2257,20 @@ Sample response
 {"user":{"image":".\/fileserver\/users\/profilepic_error on line 1_dev.png","app_settings":{"forceDesktop":"on","annualvacation":"2023-01-01 30\r;2024-01-01 30","weeklyhours":"2024-05-01 5","initialovertime":"10","homeoffice":"on","primaryUnit":"prosthetics2","language":"en","theme":"light"},"cached_identity":"d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"},"application":{"session_timeout_seconds":"1440"}}
 ```
 
+> GET ./api/api.php/application/authentify
+
+Returns a random string if the session is valid.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+["Hardly anything is evil, but most things are hungry. Hunger looks very like evil from the wrong end of the cutlery. Or do you think that your bacon sandwich loves you back?"]
+```
+
 > DELETE ./api/api.php/application/authentify
 
 Destroys session and returns empty user- and application settings.
@@ -2272,7 +2278,7 @@ Destroys session and returns empty user- and application settings.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| payload | form data | optional | contains password for authentification |
+| none |  |  |  |
 
 Sample response
 ```
