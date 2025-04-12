@@ -474,6 +474,7 @@ export class Toast {
 	constructor(message = "", type = "", duration = 4000, destination = "toast") {
 		this.message = message || undefined;
 		this.duration = duration;
+		this.stop = new Date().getTime() + duration;
 		this.destination = destination;
 		this.toast = document.getElementById(destination);
 		this.toast.removeAttribute("class");
@@ -499,13 +500,12 @@ export class Toast {
 	}
 	/**
 	 * updates reversed progress bar and closes toast on timeout
-	 * @param {int} percent
 	 */
-	countdown(percent = 100) {
+	countdown() {
 		const countdowndiv = document.querySelector("#" + this.destination + " > div");
-		countdowndiv.style.width = percent + "%";
-		window.toasttimeout[this.destination] = window.setTimeout(this.countdown.bind(this), this.duration / 1000, Math.round((percent - 1000 / this.duration) * 1000) / 1000);
-		if (percent < 0) {
+		countdowndiv.style.width = Math.round(100 * (this.stop - new Date().getTime()) / this.duration) + "%";
+		window.toasttimeout[this.destination] = window.setTimeout(this.countdown.bind(this), this.duration / 1000);
+		if (this.stop - new Date().getTime() < 0) {
 			window.clearTimeout(window.toasttimeout[this.destination]);
 			this.toast.close();
 		}
