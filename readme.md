@@ -126,19 +126,14 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * handle hidden attribute?
 * shorter timeout span? still there popup with small request?
 	* api.session_timeout
-    * application->login
     * config.lifespan.idle as per user setting, dump animation
     * ini_get('session.gc_maxlifetime') pass to _settings.server.timeout
         * request _serviceWorker.postMessage passing user fingerprint as param to refresh api->__construct $_SESSION['lastrequest']
     * https://stackoverflow.com/questions/667555/how-to-detect-idle-time-in-javascript
     * https://stackoverflow.com/questions/15115768/settimeout-not-working-when-window-loses-focus
     * https://stackoverflow.com/questions/5927284/how-can-i-make-setinterval-also-work-when-a-tab-is-inactive-in-chrome
-    * https://www.w3.org/WAI/WCAG21/Understanding/timeouts.html allow specific timeout within user management
+    * https://www.w3.org/WAI/WCAG21/Understanding/timeouts.html allow specific timeout within user management?
     * reset idle timeout on events
-    * update or reject different user
-    * authorize 511 state not intended
-    * rm application.login
-    * update api endpoints & statements on technical guidelines
 * live runtime permission elevation to display certain contents? how are timesheets more important than patient data?
 
 # Aims
@@ -1151,7 +1146,7 @@ Technically the application is being usable on any webserver but the use on a pu
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime according to [CONFIG[limits][idle_logout]](#runtime-variables)
+* optional php.ini session.gc_maxlifetime in relation to [CONFIG[limits][idle_logout]](#runtime-variables)
 * php.ini enable extensions:
     * fileinfo
     * gd
@@ -1242,7 +1237,7 @@ names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
 
 [lifespan]
-idle = 2700 ; SECONDS after which a session expires without intermittend request
+idle = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
 mdr14_sample_interval = 365 ; DAYS until a new sample check is required as default value
 mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
 open_record_reminder = 30 ; DAYS after unclosed records are reminded of via messenger
@@ -2133,7 +2128,7 @@ There is a PERMISSION class handling
 * full approval check
 * pending approval check
 
-Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin*, scenarios lacking a logged in user (login page) or limiting access for
+Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin*, scenarios lacking a logged in user or limiting access for
 * *supervisors* having access to assigned organizational unit content only
 * *groups* not having access to recording
 
@@ -2155,7 +2150,7 @@ All requests have to be executed through the api ensuring
 * responses for logged in users only
 * reaching only intended endpoints
 
-Application endpoint (landing page) differs for availability of login page for obvious reasons. (./api/api.php and registered files)
+Application endpoint differs for availability of language settings being able to be returned as default. (./api/api.php and registered files)
 
 Notifications are processed within the NOTIFICATION-class extending the API-class (./api/notification.php) and are supposed to return integers rather than strings (possible sensitive data).
 
@@ -2246,9 +2241,43 @@ graph TD;
     compose==>assemble;
 ```
 
+All endpoints may return
+```
+{"render":{"content":[[{"type":"scanner","attributes":{"name":"User authentification","type":"password"}}]]}}
+```
+with a HTTP status code 511 in case of a reauthetification prompt due to timeout.
+
 [Content](#content)
 
 ## Application endpoints
+
+> POST ./api/api.php/application/authentify
+
+Returns user- and application settings on valid authentification, submission form otherwise.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | optional | contains password for authentification |
+
+Sample response
+```
+{"user":{"image":".\/fileserver\/users\/profilepic_error on line 1_dev.png","app_settings":{"forceDesktop":"on","annualvacation":"2023-01-01 30\r;2024-01-01 30","weeklyhours":"2024-05-01 5","initialovertime":"10","homeoffice":"on","primaryUnit":"prosthetics2","language":"en","theme":"light"},"cached_identity":"d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"},"application":{"session_timeout_seconds":"1440"}}
+```
+
+> DELETE ./api/api.php/application/authentify
+
+Destroys session and returns empty user- and application settings.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | optional | contains password for authentification |
+
+Sample response
+```
+{"user":[],"config":{"application":{"defaultlanguage":"en"}}}
+```
 
 > GET ./api/api.php/application/info
 
@@ -2272,21 +2301,6 @@ Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
 | none | | | |
-
-> POST ./api/api.php/application/login/{logout}
-
-Returns user image and app settings on valid session, login form otherwise.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {logout} | path parameter | optional | triggers active logout if added literally |
-| payload | form data | optional | contains password for login |
-
-Sample response
-```
-{"user":{"image":".\/fileserver\/users\/profilepic_error on line 1_dev.png","app_settings":{"forceDesktop":"on","annualvacation":"2023-01-01 30\r;2024-01-01 30","weeklyhours":"2024-05-01 5","initialovertime":"10","homeoffice":"on","primaryUnit":"prosthetics2","language":"en","theme":"light"},"cached_identity":"d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"},"application":{"session_timeout_seconds":"1440"}}
-```
 
 > GET ./api/api.php/application/menu
 
@@ -4551,15 +4565,15 @@ I welcome any constructive input on this topic.
 * O.Auth_5 Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen (z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit einbezogen werden.
     > This is not reasonable for the application used within a closed environment.
 * O.Auth_6 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche Anmeldevorgänge informieren zu lassen.
-    > This is not reasonable for the application used within a closed environment.
+    > This is not reasonable for the application used within a closed environment. Users can see their logins for the past (customizable) days though.
 * O.Auth_7 Die Anwendung MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren.
     > This is not reasonable for the application used within a closed environment and on shared devices.
 * O.Auth_8 Wurde die Anwendung unterbrochen (in den Hintergrundbetrieb versetzt), MUSS nach Ablauf einer angemessenen Frist (Grace Period) eine erneute Authentisierung durchgeführt werden.
-    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
+    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
 * O.Auth_9 Die Anwendung MUSS nach einer angemessenen Zeit in der sie nicht aktiv verwendet wurde (idle time) eine erneute Authentisierung fordern. 
-    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
+    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
 * O.Auth_10 Die Anwendung MUSS nach einer angemessenen Zeit in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung zur Reaktivierung der Serversitzung fordern. 
-    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
+    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
 * O.Auth_11 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
     > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
 * O.Auth_12 Die Anwendung MUSS für die Anbindung eines Hintergrundsystems eine dem Stand der Technik entsprechende Authentifizierung verwenden.
@@ -4808,9 +4822,9 @@ I welcome any constructive input on this topic.
 * O.Auth_9 Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren.
     > This is not reasonable for the application used within a closed environment and on shared devices.
 * O.Auth_10 Das Hintergrundsystem MUSS die Anwendungssitzung nach einer angemessenen Zeit, in der sie nicht aktiv verwendet wurde (idle time) beenden und eine erneute Authentisierung fordern.
-    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
+    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
 * O.Auth_11 Das Hintergrundsystem MUSS für die Anwendungssitzung nach einer angemessenen Zeit, in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung fordern. 
-    > The backend handles idle time based on last request by an authorized user and destroys the session locking the user out.
+    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
 * O.Auth_12 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
     > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
 * O.Auth_13 Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.

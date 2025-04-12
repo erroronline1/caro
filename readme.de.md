@@ -1058,7 +1058,7 @@ Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funkt
     * Preislistenimport @ 220k Zeilen benötigt etwa 1 Minute mit Uniform Server, 1 Minute mit SQL Server
     * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* php.ini session.gc_maxlifetime gemäß [CONFIG[limits][idle_logout]](#laufzeitvariablen)
+* optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[limits][idle_logout]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
     * fileinfo
     * gd
@@ -1149,7 +1149,7 @@ names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getre
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 [lifespan]
-idle = 2700 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine Abmeldung erzwingt
+idle = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt
 mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
 mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
 open_record_reminder = 30 ; Tage nach denen per Nachricht and nicht abgeschlossene Aufzeichnungen erinnert wird
