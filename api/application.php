@@ -460,7 +460,7 @@ class APPLICATION extends API {
 		// make sure info comes last so this is an exception
 		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onclick' => "api.application('get', 'info')"];
 
-		$this->response(['render' => $menu, 'user' => $_SESSION['user']['name']]);
+		$this->response(['render' => $menu]);
 	}
 
 	/**
