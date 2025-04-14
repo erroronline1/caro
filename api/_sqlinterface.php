@@ -261,7 +261,7 @@ class SQLQUERY {
 		'application_post_session' => [
 			'mysql' => "INSERT IGNORE INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)",
 			//'sqlsrv' => "INSERT INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
-			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING (SELECT :id AS id, :user_id AS user_id, CURRENT_TIMESTAMP AS date) AS source (id, user_id, date) ON (target.id = source.id ) WHEN MATCHED THEN UPDATE SET date = CURRENT_TIMESTAMP WHEN NOT MATCHED THEN INSERT (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)"
+			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING (SELECT :id AS id, :user_id AS user_id, CURRENT_TIMESTAMP AS date) AS source (id, user_id, date) ON (target.id = source.id ) WHEN MATCHED THEN UPDATE SET date = CURRENT_TIMESTAMP WHEN NOT MATCHED THEN INSERT (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP);"
 		],
 		'application_get_session_fingerprint' => [
 			'mysql' => "SELECT user_id, SHA2(CONCAT(id, user_id), 256) AS fingerprint FROM caro_sessions WHERE id = :id AND user_id = :user_id",
