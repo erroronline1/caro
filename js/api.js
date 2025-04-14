@@ -444,11 +444,13 @@ export const api = {
 				break;
 			case "start":
 				successFn = async function (data) {
+					// set application and user settings
+					if (data.user) api._settings.user = data.user;
+					if (data.config) api._settings.config = data.config;
+
 					// import server side settings
 					await api.application("get", "language");
 					await api.application("get", "menu");
-					if (data.user) api._settings.user = data.user;
-					if (data.config) api._settings.config = data.config;
 
 					if (api._settings.user) _serviceWorker.register();
 					else {
