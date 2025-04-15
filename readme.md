@@ -120,11 +120,10 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * document templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* update readme pictures on tools menu, record menu, audit and regulatory
+* update readme pictures, add responsibilities
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-* live runtime permission elevation to display certain contents? how are timesheets more important than patient data?
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1997,7 +1996,7 @@ Stakeholder identification:
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons |
 
 [Content](#content)
 
