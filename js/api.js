@@ -261,7 +261,7 @@ export const api = {
 				const remaining = api.session_timeout.stop - new Date().getTime(),
 					remaining_visual = api.session_timeout.stop_visual - new Date().getTime();
 				if (api._settings.config.lifespan.idle > 0 && remaining < 10000 && api.session_timeout.events > 2) {
-					 // if some events have been counted a small backend request prolongs the session approximately ten seconds before real timeout
+					// if some events have been counted a small backend request prolongs the session approximately ten seconds before real timeout
 					api.session_timeout.events = null;
 					api.application("get", "authentify");
 				}
@@ -294,6 +294,10 @@ export const api = {
 	 */
 	history: {
 		currentStep: 1,
+		/**
+		 *
+		 * @returns event of altering availability (color or visibility) of navigation buttons depending on reaching either end of history
+		 */
 		buttoncolor: function () {
 			if (!document.querySelector("nav>button:last-of-type")) return; // onload return because not yet rendered
 			// "disable" back
@@ -320,6 +324,13 @@ export const api = {
 				api[request.shift()]("get", ...request);
 			}
 			this.buttoncolor();
+		},
+		/**
+		 * reset history
+		 */
+		reset: function () {
+			this.currentStep = 1;
+			sessionStorage.removeItem("history");
 		},
 		/**
 		 * updates history to sessionStorage
@@ -410,6 +421,7 @@ export const api = {
 							api._settings.user = data.user || {};
 							api._settings.config = data.config || {};
 							document.querySelector("body>header>h1").innerHTML = document.getElementById("main").innerHTML = document.querySelector("body>nav").innerHTML = "";
+							api.history.reset();
 							api.application("get", "start");
 						};
 						break;
@@ -418,7 +430,8 @@ export const api = {
 							if (data.user) api._settings.user = data.user;
 							if (data.config) api._settings.config = data.config;
 
-							if (data.user && api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+							if (data.user && api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"]))
+								api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
 						};
 						payload = request.pop();
 				}
@@ -451,6 +464,7 @@ export const api = {
 					// import server side settings
 					await api.application("get", "language");
 					await api.application("get", "menu");
+					api.history.buttoncolor();
 
 					if (api._settings.user) _serviceWorker.register();
 					else {
@@ -730,7 +744,7 @@ export const api = {
 					if (id && id[0]) id[0].value = data.response.id;
 				}
 				if (data.data) _serviceWorker.notif.calendar(data.data);
-				if (["post", "put", "delete"].includes(method) && ["schedule", "timesheet"].includes[request[1]]) api.history.go("forth");
+				if (["post", "put", "delete"].includes(method) && ["schedule", "timesheet"].includes(request[1])) api.history.go("forth");
 			},
 			title = {
 				schedule: api._lang.GET("menu.calendar.scheduling"),
