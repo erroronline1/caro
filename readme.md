@@ -58,6 +58,7 @@
     * [Deployment process](#deployment-process)
 * [API documentation](#api-documentation)
     * [Request flow](#request-flow)
+    * [Authentification flow](#authentification-flow)
     * [Application endpoints](#application-endpoints)
     * [Audit endpoints](#audit-endpoints)
     * [Calendar endpoints](#calendar-endpoints)
@@ -124,6 +125,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
+* responsive masonry as application setting option, alter code by inserting empty articles to limit asymmetric height (aria hidden to ensure accessibility and order of elements)
+    * split longterm-planning widget
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -171,8 +174,6 @@ Orders can be deleted by administrative users and requesting unit members at any
 
 ## Data integrity
 As records intend to save the submitting users name, group accounts are unrecommended albeit being possible but with limited access. Instead every user is supposed to have their own account. Defined authorized users can create, edit and delete users. To make things as easy as possible a unique 64 byte token has to be created. This token will be converted into an QR code that is scannable on login. This avoids remembering passwords and user names, as well as the need of typing in several pieces of information. The process is quite quick and enables session switching on limited access to terminal devices.
-
-Usage time of the application can be [restricted](#runtime-variables) within the boundaries of the [server setting](#installation) for session duration. Whichever comes first enforces a new authentification of the last user or logout to proceed. While interacting with the application there will be a tiny request shortly before timeout to avoid friction. The defined timeout will happen after the last request without intermittent interaction.
 
 Form data and requests occasionally contain ids to access distinct contents. Technically it is possible to compromise requests from the client side but still considered reasonable giving any verification on the server side can hardly guess the original intent. It appears not less secure than intentionally providing false data on any paper based documentation.
 
@@ -227,6 +228,8 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
 Users can have multiple assigned organizational units and permissions.
 
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
+
+> On rare occasions the QR-token may not be readable by the inbuilt reader. It is advised to check the compatibility with the scanner from [tools](#tools) before passing, generating a new one if required.
 
 ![user screenshot](http://toh.erroronline.one/caro/user.png)
 
@@ -2237,6 +2240,35 @@ All endpoints may return
 {"render":{"content":[[{"type":"scanner","attributes":{"name":"User authentification","type":"password"}}]]}}
 ```
 with a HTTP status code 511 in case of a reauthetification prompt due to timeout.
+
+[Content](#content)
+
+## Authentification flow
+User authentification is handled by the backend. Usage time of the application can be [restricted](#runtime-variables) within the boundaries of the [server setting](#installation) for session duration. Whichever comes first enforces a new authentification of the last user or logout to proceed. While interacting with the application there will be a tiny request shortly before timeout to avoid friction. The defined timeout will happen after the last request without intermittent interaction.
+
+```mermaid
+graph TD;
+    ui((interface use))-->count("frontend timeout tracking,
+    illustration,
+    count interactions");
+    count-->ui_timeout(timeout approaching);
+    ui_timeout-->autoprolong{interactions counted?};
+    autoprolong-->|yes|prolong["background request
+    to frictionless
+    prolong session"];
+    autoprolong-->|no|terminate["runout to terminate
+    authorization"]
+
+    request((api request))-->auth("backend user
+    authentification");
+    auth-->active_session{active session?};
+    active_session--->|no|loginauth["serve token submit form
+    http status 511"];
+    active_session-->|yes|timeout{timeout?};
+    timeout-->|yes|reauth["serve token resubmit form
+    http status 511"];
+    timeout-->|no|serve_content[serve content];
+```
 
 [Content](#content)
 
