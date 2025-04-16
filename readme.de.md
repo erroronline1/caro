@@ -99,8 +99,6 @@ Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Be
 ## Datenintegrität
 Aufzeichnungen speichern stets den Namen des übermittelnden Nutzers ab. Gruppen-Nutzer sind daher nicht empfohlen, jedoch mit eingeschränkten Berechtigungen möglich. Individuelle Nutzer sind indes vorgesehen. Berechtigte Nutzer können andere Nutzer anlegen, bearbeiten und löschen. Zur Vereinfachung wird ein 64 Byte Token erstellt. Dieser Token wird in einen QR-Code umgewandelt, welcher bei der Anmeldung gescannt werden kann. Dadurch muss sich kein Nutzername und Kennwort gemerkt werden und es kann auf die Eingabe mehrerer Felder bei der Anmeldung verzichtet werden. Dieser Vorgang ist daher schnell umsetzbar und erlaubt einen raschen Wechsel zwischen unterschiedlichen Anmeldungen bei eingeschränkter Verfügbarkeit von Endgeräten.
 
-Die Nutzungszeit der Anwendung kann innerhalb der Grenzen der [Servereinstellungen](#installation) für die Session-Dauer [eingeschränkt](#laufzeitvariablen) werden. Was immer vorher eintritt erzwingt eine erneute Authentifizierung des letzten Nutzers oder eine Abmeldung um fortfahren zu können. Während mit der Anwendung interagiert wird, erfolgt eine kleine Server-Anfrage kurz vor Ablauf der Zeit um den Arbeitsablauf nicht zu beeinträchtigen. Der definierte Zeitablauf erfolgt nach der letzten Serveranfrage ohne zwischenzeitliche Interaktion.
-
 Formulardaten und Serveranfragen beinhalten teilweise IDs um spezifische Inhalte zu erreichen. Technisch gesehen ist es möglich diese Daten und Anfragen zu manipulieren. Dennoch wird dieses Vorgehen als angemessen bewertet, da Serververarbeitungen nicht in der Lage sind auf die ursprüngliche Intention zu schließen. Dies erscheint nicht weniger sicher als eine beabsichtige Falschangabe in einer beliebigen papierbasierten Dokumentation.
 
 Die Übermittlung von Formulardaten fügt dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu, der Server verifiziert die Identität und Datenintegrität durch eine Prüfsumme.
@@ -154,6 +152,8 @@ Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutze
 Nutzer können mehrere unterschiedliche Berechtigungen erhalten und mehreren Bereichen zugeordnet werden.
 
 Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt. Individuelle Profilbilder können mit diesem Bild wieder ersetzt werden. Eine automatisch generierte PIN kann als Berechtigung für die Freigabe von Bestellungen verwendet werden. Das Hinzufügen von Schulungen ist nur für berechtigte Nutzer möglich um sicherzustellen, dass Schulungen bekannt und nicht übersehen werden. Fähigkeiten können gemäß der [geplanten Liste](#anpassung) angepasst werden. Der erstellte Anmeldung-Token kann exportiert und beispielsweise als laminierte Karte verwendet werden.
+
+> In seltenen Fällen kann der QR-Code nicht vom eingebauten Scanner gelesen werden. Es wird empfohlen die Kompatibilität mit dem eingebauten Scanner der [Werkzeuge](#werkzeuge) zu prüfen, bevor der Code weitergegeben wird und bei Bedarf einen neuen Zugangstoken generieren zu lassen.
 
 ![user screenshot](http://toh.erroronline.one/caro/user%20de.png)
 
