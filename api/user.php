@@ -479,6 +479,8 @@ class USER extends API {
 					}
 				}
 				$user['units'] = implode(',', $units);
+				// set default primary unit if only one has been selected
+				if (count($units) && count($units) < 2)$user['app_settings']['primaryUnit'] = $units[0];
 
 				// gather timesheet setup
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
@@ -678,6 +680,8 @@ class USER extends API {
 					}
 				}
 				$user['units'] = implode(',', $units);
+				// set default primary unit if only one has been selected
+				if (count($units) && count($units) < 2)$user['app_settings']['primaryUnit'] = $units[0];
 
 				// update timesheet settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];

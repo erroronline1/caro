@@ -1284,7 +1284,10 @@ class INSTALL {
 				
 				// ensure proper formatting
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
-				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units'] ? : ''));
+				$entry['units'] = preg_split('/[^\w\d]+/m', $entry['units'] ? : '');
+				// set default primary unit if only one has been selected
+				if (count($entry['units']) && count($entry['units']) < 2)$user['app_settings']['primaryUnit'] = $entry['units'][0];
+				$entry['units'] = implode(',', $entry['units']);
 
 				$names[] = $entry['name'];
 				$insertions[] = [
