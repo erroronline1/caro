@@ -613,7 +613,7 @@
 			"edit": "bearbeiten",
 			"error": "Es trat eine Fehler beim Speichern des Ereignisses auf! Bitte versuche es erneut.",
 			"error_missing": "Ereignisse können nur mit einem Datum, einer Beschreibung und ausgeqählten Bereichen erstellt werden! Bitte versuche es erneut.",
-			"events_assigned_units": "Heutige Ereignisse für deine zugewiesenen Bereiche",
+			"events_assigned_units": "Heutige Ereignisse für deine zugewiesenen Bereiche oder von dir erstellt",
 			"events_assigned_units_previous_uncompleted": "Frühere unerledigte Ereignisse",
 			"events_assigned_units_uncompleted": "Unerledigte Ereignisse",
 			"events_none": "Keine Ereignisse gefunden",

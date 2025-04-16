@@ -613,7 +613,7 @@
 			"edit": "Edit",
 			"error": "Error saving event! Please try again.",
 			"error_missing": "Events only can be created with a date, description and selected units! Please try again.",
-			"events_assigned_units": "This days events for your assigned units",
+			"events_assigned_units": "This days events for your assigned units or created by you",
 			"events_assigned_units_previous_uncompleted": "Previous yet uncompleted events",
 			"events_assigned_units_uncompleted": "Yet uncompleted events",
 			"events_none": "No events found.",
