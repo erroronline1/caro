@@ -1184,7 +1184,7 @@ within the template directory too for a swift availability upon launch. Structur
 ### Installation procedure
 * Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
-* Install as progressive web app (PWA) from the initial browser request and give requested permissions on any elegible workplace.
+* [Install as progressive web app (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_from_the_web) from the initial browser request and give requested permissions on any elegible workplace.
 
 ## Runtime variables
 Some variables can be edited during runtime. This applies for all *values* of language.XX.env/.json files and some settings in config.ini. These options are mostly considered critical for the applications stability and regulatory compliance, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
