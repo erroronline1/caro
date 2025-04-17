@@ -2139,11 +2139,13 @@ class AUDIT extends API {
 		$content = [];
 
 		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+		$from = $orders ? substr($orders[0]['ordered'], 0, 10) : '-';
+		$until = $orders ? substr($orders[count($orders) - 1]['ordered'], 0, 10) : '-';
 		$content[] = [
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.orderstatistics_number', [':number' => count($orders)])
+					'name' => $this->_lang->GET('audit.orderstatistics_number', [':number' => count($orders), ':from' => $from, ':until' => $until])
 				],
 				'content' => count($orders) ? $this->_lang->GET('audit.orderstatistics_info') : ''
 			]
@@ -2205,7 +2207,6 @@ class AUDIT extends API {
 			$deliverytime = '';
 			if ($order['received']){
 				$datetimezone = new DateTimeZone(CONFIG['application']['timezone']);
-				$now = new DateTime('now', $datetimezone);
 				$ordered = new DateTime($order['ordered'], $datetimezone);
 				$received = new DateTime($order['received'], $datetimezone);
 				$deliverytime = intval($ordered->diff($received)->format('%a'));
@@ -2223,6 +2224,7 @@ class AUDIT extends API {
 				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
 				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
 				$order['ordered'],
+				$order['partially_received'],
 				$order['received'],
 				$deliverytime
 			];
