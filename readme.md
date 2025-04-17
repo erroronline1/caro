@@ -127,6 +127,14 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * handle hidden attribute?
 * responsive masonry as application setting option, alter code by inserting empty articles to limit asymmetric height (aria hidden to ensure accessibility and order of elements)
     * split longterm-planning widget
+* review window.scrollTo(0, document.body.scrollHeight) for eligible api methods
+* vendor text recommendation, import values gone after error?
+    * selection abort error "could not find modal"
+    * hide edit buttons on modal!
+* configurable time format output UTILITY::dateFormat(input ISO format) processing config.something.dateformat according to https://www.php.net/manual/en/datetime.format.php
+* keyboard input jumping to select modal options
+* inform users on timeout span regarding WCAG (e.g. on landing page)
+* highlighting required inputs on modals (see assemble.prepareform()) e.g. login
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -228,6 +236,8 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
 Users can have multiple assigned organizational units and permissions.
 
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
+
+Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user. The profile picture will always be overwritten with the default image following a name change.
 
 > On rare occasions the QR-token may not be readable by the inbuilt reader. It is advised to check the compatibility with the scanner from [tools](#tools) before passing, generating a new one if required.
 
@@ -521,6 +531,8 @@ If records contain data from restricted documents, summaries will only contain t
 * on the other hand you have to take more care of role management and who is to export actual complete data in case of requests.
 
 All alterings on records (reidentification, retyping, case state) are recorded as well.
+
+Records outside of manually created documents, that are being supported by the application (e.g. case state, see above), are being stored in the [system language](#runtime-variables).
 
 ![screen record summary](http://toh.erroronline.one/caro/record%20screen.png)
 
@@ -1986,6 +1998,9 @@ Stakeholder identification:
 | History navigation | User | 2025-04-03 | Implemented; 2025-04-05 |
 | HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | Implemented; 2025-04-08 |
 | Shorter idle timespan for improved data security | CEO | 2025-04-07 | Implemented; 2025-04-13 |
+| Configurable time format output | User | 2025-04-16 | |
+| Keyboard input jumping to select modal options | User | 2025-04-16 |
+| Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16|
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -1999,7 +2014,7 @@ Stakeholder identification:
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice |
 
 [Content](#content)
 
@@ -3591,7 +3606,7 @@ Sample response
 
 > GET ./api/api.php/notification/notifs
 
-Returns notifications on number of 	*calendar_uncompletedevents*, *consumables_pendingincorporation*, *document_approval*, *order_unprocessed*, *message_unnotified*, *message_unseen* to display on menu, checks for systems expiry dates, contributes to calendar and alerts eligible users.
+Returns notifications on number of *audit_closing*, *calendar_uncompletedevents*, *consumables_pendingincorporation*, *document_approval*, *order_unprocessed*, *order_prepared*, *managementreview*, *measure_unclosed*, *message_unnotified*, *message_unseen*, *responsibilities* to display on menu, checks for systems expiry dates, contributes to calendar and alerts eligible users.
 
 Parameters
 | Name | Data Type | Required | Description |
