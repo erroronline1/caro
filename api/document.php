@@ -1181,9 +1181,8 @@ class DOCUMENT extends API {
 	 * export a document as pdf, if earlier than requested maxDocumentTimestmp, with data if provided
 	 */
 	public function export(){
-		$document_id = $identifier = $context = null;
+		$document_id = $identifier = null;
 		if ($document_id = UTILITY::propertySet($this->_payload, '_document_id')) unset($this->_payload->_document_id);
-		if ($context = UTILITY::propertySet($this->_payload, '_context')) unset($this->_payload->_context);
 		if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
 		if ($entry_date = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.date'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.date')});
 		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
@@ -1264,7 +1263,7 @@ class DOCUMENT extends API {
 					$content['fillable'] = $subcontent['fillable'];
 				}
 				else {
-					if (in_array($subs['type'], ['identify'])) continue;
+					if (in_array($subs['type'], ['identify', 'hr'])) continue;
 					if (in_array($subs['type'], ['image', 'links'])) {
 						$name = $subs['description'];
 					}

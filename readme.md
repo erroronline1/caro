@@ -480,6 +480,7 @@ Available elements for documents are:
 * signature field
 * calendar button
 * document link, just for display or to continue transferring identifier
+* horizontal line for document structure
 
 Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
 Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.

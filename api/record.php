@@ -1817,7 +1817,7 @@ class RECORD extends API {
 						$content['content'] = array_merge($content['content'], $subcontent['content']);
 					}
 					else {
-						if (in_array($subs['type'], ['identify', 'documentbutton', 'calendarbutton'])) continue;
+						if (in_array($subs['type'], ['identify', 'documentbutton', 'calendarbutton', 'hr'])) continue;
 						if (in_array($subs['type'], ['image', 'links'])) {
 							$name = $subs['description'];
 						}
