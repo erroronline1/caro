@@ -378,7 +378,7 @@ export class Dialog {
 			button.classList.add("confirmButton");
 			if (typeof properties === "string" || typeof properties === "boolean") button.value = properties;
 			else {
-				for (const [property, value] of Object.entries(properties)){
+				for (const [property, value] of Object.entries(properties)) {
 					if (property === "class") button.classList.add(value);
 					else button.setAttribute(property, value);
 				}
@@ -503,7 +503,7 @@ export class Toast {
 	 */
 	countdown() {
 		const countdowndiv = document.querySelector("#" + this.destination + " > div");
-		countdowndiv.style.width = Math.round(100 * (this.stop - new Date().getTime()) / this.duration) + "%";
+		countdowndiv.style.width = Math.round((100 * (this.stop - new Date().getTime())) / this.duration) + "%";
 		window.toasttimeout[this.destination] = window.setTimeout(this.countdown.bind(this), this.duration / 1000);
 		if (this.stop - new Date().getTime() < 0) {
 			window.clearTimeout(window.toasttimeout[this.destination]);
@@ -755,14 +755,17 @@ export class Assemble {
 		// indicator circles of length with pointerenter event
 		for (let i = 0; i < length; i++) {
 			let indicator = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
-				circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+				circle = document.createElementNS("http://www.w3.org/2000/svg", "circle"),
+				title = document.createElementNS("http://www.w3.org/2000/svg", "title");
 			indicator.classList = "articleindicator";
-			indicator.setAttributeNS(null, "viewbox", "0 0 10 10");
-			circle.setAttributeNS(null, "cx", "5");
-			circle.setAttributeNS(null, "cy", "5");
-			circle.setAttributeNS(null, "r", "4");
+			indicator.setAttributeNS(null, "viewbox", "0 0 20 20");
+			circle.setAttributeNS(null, "cx", "10");
+			circle.setAttributeNS(null, "cy", "10");
+			circle.setAttributeNS(null, "r", "9");
 			indicator.appendChild(circle);
-			indicator.addEventListener("pointerenter", function (e) {
+			title.appendChild(document.createTextNode(i + 1));
+			indicator.appendChild(title);
+			indicator.addEventListener("click", function (e) {
 				document.getElementById(sectionID).scrollTo({
 					top: 0,
 					left: (document.getElementById(sectionID).scrollWidth / length) * i - 1,
@@ -1924,7 +1927,7 @@ export class Assemble {
 			message = this.apply_attributes(this.currentElement.attributes, message);
 			if ("onclick" in this.currentElement.attributes) {
 				message.role = "link";
-				message.title = api._lang.GET("message.no_messages");
+				message.title = api._lang.GET("message.open", { ":user": this.currentElement.content.user });
 			}
 		}
 		message.classList.add("message");
