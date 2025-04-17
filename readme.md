@@ -1137,6 +1137,8 @@ Firefox, Edge and most probably any chromium browser, as well as Safari have pre
 
 Technically the application is being usable on any webserver but the use on a public accessible server is **not recommended** as this does not adhere to [data safety requirements](#statement-on-technical-guidelines-on-data-security).
 
+It is strongly recommended to create an additional development environment to test changes and CSV-filters to ensure the application in production environment remaining stable!
+
 [Content](#content)
 
 ## Installation
@@ -2058,6 +2060,7 @@ Stakeholder identification:
 | Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
 | Insufficient configuration | Medium | High (application unstable) | Documentation of config.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
 | Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
+| Memory overflow due to looping by erroneous RegEx filter for CSV | High (server unresponsive) | Since most users are unlikely to be experienced with RegEx and an development environment is recommended anyway the responsible person should test filters there in advance | The versatility to process complex data must not suffer |
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 | Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 

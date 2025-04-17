@@ -1050,6 +1050,8 @@ Firefox, Edge und vermutlich jeder andere Chromium-Browser sowie Safari haben f�
 
 Während die Anwendung technisch betrachtet auf einem beliebigen Webserver funktioniert, können nicht alle Aspekte [erforderlicher Datenschutzanforderungen](#stellungnahme-zu-technischen-richtlinien-zur-datensicherheit) abgebildet werden, daher ist die Verwendung auf einem öffentlich zugänglichen Server ausdrücklich **nicht empfohlen**.
 
+Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um Änderungen und CSV-Filter testen zu können und sicherzustellen, dass die Anwendung in der Produktivumgebung stabil bleibt!
+
 [Übersicht](#übersicht)
 
 ## Installation
