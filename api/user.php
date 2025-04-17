@@ -478,9 +478,9 @@ class USER extends API {
 						$units[] = array_search($setunit, $this->_lang->_USER['units']);
 					}
 				}
-				$user['units'] = implode(',', $units);
 				// set default primary unit if only one has been selected
 				if (count($units) && count($units) < 2)$user['app_settings']['primaryUnit'] = $units[0];
+				$user['units'] = implode(',', $units);
 
 				// gather timesheet setup
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
@@ -652,6 +652,7 @@ class USER extends API {
 				$user = $user ? $user[0] : null;
 				// prepare user-array to update, return error if not found
 				if (!$user) $this->response(null, 406);
+				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				
 				// check forbidden names
 				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, $this->_lang->GET('user.name')));
@@ -679,12 +680,11 @@ class USER extends API {
 						$units[] = $unit;
 					}
 				}
-				$user['units'] = implode(',', $units);
 				// set default primary unit if only one has been selected
-				if (count($units) && count($units) < 2)$user['app_settings']['primaryUnit'] = $units[0];
+				if (count($units) && count($units) < 2) $user['app_settings']['primaryUnit'] = $units[0];
+				$user['units'] = implode(',', $units);
 
 				// update timesheet settings
-				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
@@ -739,7 +739,7 @@ class USER extends API {
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
-				// save and convert image or create default
+				// save and convert image or create default - default image overides custom in case of name update!
 				if ((!(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					$tempPhoto = tmpfile();
 					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
@@ -869,6 +869,7 @@ class USER extends API {
 				// gather available units
 				$units = [];
 				foreach($this->_lang->_USER['units'] as $unit => $description){
+					if ($unit === 'common') continue;
 					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
 
