@@ -185,14 +185,15 @@ export class Dialog {
 		this.options = options.options || {};
 		this.scannerElements = {};
 		this.assemble = null;
-		let modal = "modal";
+		this.modal = "modal";
+		this.form = null;
 
 		let dialog = document.getElementById("modal");
 		if (this.type) {
 			// define output dialog
-			if (this.type === "input") modal = "inputmodal";
+			if (this.type === "input") this.modal = "inputmodal";
 			if (this.type === "input2") {
-				modal = "inputmodal2";
+				this.modal = "inputmodal2";
 				this.type = "input";
 			}
 
@@ -203,15 +204,15 @@ export class Dialog {
 			}
 
 			// refer to output dialog
-			dialog = document.getElementById(modal);
+			dialog = document.getElementById(this.modal);
 
 			// create form
-			const form = document.createElement("form");
+			this.form = document.createElement("form");
 			if (this.type === "message") {
-				form.dataset.usecase = "message";
+				this.form.dataset.usecase = "message";
 				this.type = "input";
 			}
-			form.method = "dialog";
+			this.form.method = "dialog";
 
 			// append close button
 			const img = document.createElement("img");
@@ -221,9 +222,9 @@ export class Dialog {
 			img.onclick = () => {
 				const scanner = document.querySelector("video");
 				if (scanner) scanner.srcObject.getTracks()[0].stop();
-				document.getElementById(modal).close();
+				document.getElementById(this.modal).close();
 			};
-			form.append(img);
+			this.form.append(img);
 
 			// append provided icon, header and content-string if applicable
 			if (this.header || this.render || this.icon) {
@@ -244,15 +245,15 @@ export class Dialog {
 						header.append(document.createElement("br"));
 					}
 				}
-				form.append(header);
+				this.form.append(header);
 			}
 
 			// append select buttons if applicable
-			if (this.type === "select") form.style.display = "flex";
+			if (this.type === "select") this.form.style.display = "flex";
 			for (const element of this[this.type]()) {
-				if (element) form.append(element);
+				if (element) this.form.append(element);
 			}
-			dialog.replaceChildren(form);
+			dialog.replaceChildren(this.form);
 
 			// append scanner if applicable
 			if (this.type === "scanner") {
@@ -382,6 +383,30 @@ export class Dialog {
 					if (property === "class") button.classList.add(value);
 					else button.setAttribute(property, value);
 				}
+			}
+			if (properties === true && this.form) {
+				button.onclick = (event) => {
+					event.preventDefault();
+					const required = document.querySelectorAll("#" + this.modal + " [required]");
+					let missing_required = false;
+
+					// check regular inputs
+					for (const element of required) {
+						if (element.validity.valueMissing) {
+							if (["file", "checkbox", "radio"].includes(element.type)) element.nextElementSibling.classList.add("input_required_alert");
+							else element.classList.add("input_required_alert");
+							if (!missing_required) {
+								element.scrollIntoView({
+									behavior: "smooth",
+									block: "center",
+									inline: "nearest",
+								});
+							}
+							missing_required = true;
+						} else if (element.nextElementSibling) element.nextElementSibling.classList.remove("input_required_alert");
+					}
+					if (!missing_required) this.form.requestSubmit();
+				};
 			}
 			if (!properties) button.formNoValidate = true;
 			buttons.push(button);
