@@ -215,10 +215,10 @@ export const api = {
 	update_header: function (string = "") {
 		if (string) document.querySelector("header>h1").innerHTML = string;
 		location.hash = "";
-		//window.scrollTo({
-		//	top: 0,
-		//	behavior: "smooth",
-		//});
+		window.scrollTo({
+			top: 0,
+			behavior: "smooth",
+		});
 	},
 
 	/**
