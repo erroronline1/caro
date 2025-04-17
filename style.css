@@ -1237,8 +1237,10 @@ section > div > hr {
 	stroke: var(--foreground);
 	stroke-width: 1px;
 	fill: none;
-	width: 10px;
-	height: 10px;
+	width: 20px;
+	height: 20px;
+	margin: 0 1px;
+	cursor: pointer;
 }
 
 .articleactive {
