@@ -264,7 +264,7 @@
 				"field_hint": "Optionale Hinweise",
 				"field_name": "Gibt einen Feldnamen an",
 				"file": "Füge einen Datei-Upload hinzu",
-				"hr":"Füge eine horizontale Linie für eine besser verständliche Struktur hinzu",
+				"hr": "Füge eine horizontale Linie für eine besser verständliche Struktur hinzu",
 				"image": "Füge ein Bild hinzu",
 				"image_description": "Gib eine Bildbezeichnung an",
 				"link": "Füge ein Verknüpfungsfeld hinzu",
@@ -550,7 +550,7 @@
 		"order_statistics_delivery_time_column": "Lieferzeit in Tagen",
 		"order_statistics_undefined_vendor": "Sonstiges",
 		"orderstatistics_info": "Der Export erfolgt in einer XLSX-Datei, bei der die Bestellungen nach Lieferant in Tabellenblätter sortiert sind.",
-		"orderstatistics_number": "Aktuell gibt es :number bearbeitete Bestellungen die evaluiert werden können.",
+		"orderstatistics_number": "Aktuell gibt es :number bearbeitete Bestellungen vom :from bis :until die evaluiert werden können.",
 		"orderstatistics_truncate": "Statistiken löschen",
 		"orderstatistics_truncate_confirm": "Ja, unwiderruflich löschen",
 		"orderstatistics_truncate_success": "Bestellstatistiken wurden gelöscht.",
@@ -598,7 +598,7 @@
 			"alert": "Bereiche benachrichtigen wenn Ereignis fällig ist",
 			"alert_description": "Ausgewählte Bereiche benachrichtigen",
 			"alert_message": ":content ist von :author für den :date geplant und am :due fällig.",
-			"alert_responsibility_expired" : "Die Verantwortlichkeit der Aufgabe :task (:units) ist ausgelaufen und muss neu geplant werden.",
+			"alert_responsibility_expired": "Die Verantwortlichkeit der Aufgabe :task (:units) ist ausgelaufen und muss neu geplant werden.",
 			"alert_vendor_certificate_expired": "Das Zertifikat / die Qualitätsvereinbarung mit :vendor ist abgelaufen. Bitte kümmere dich um eine Aktualisierung!",
 			"author": "Ersteller",
 			"cancel": "Abbrechen",
@@ -914,7 +914,7 @@
 			"header": "Dateien",
 			"sharepoint": "Öffentlicher Sharepoint"
 		},
-		"nav":{
+		"nav": {
 			"back": "zurück",
 			"forth": "vorwärts"
 		},
@@ -997,6 +997,7 @@
 		"new_message": "Du hast eine neue Nachricht!",
 		"new_messages": "Du hast :amount neue Nachrichten!",
 		"no_messages": "Mitteilungen",
+		"open": "Unterhaltung mit :user öffnen",
 		"register_message_all": "Nachricht an alle",
 		"register_orderauth": "Nutzer mit Bestellberechtigung",
 		"register_users": "Alle Nutzer nach Name",
@@ -1652,11 +1653,11 @@
 	},
 	"html5_qrcode": {
 		"error": {
-			"navigator": "Das Gerät unterstützt keine navigator.mediaDevices, in diesem Fall wird nur der deviceID-Parameter asl String für cameraIdOrConfig unterstützt.",
-			"no_camera_found": "Keine Kmera gefunden",
+			"navigator": "Das Gerät unterstützt keine navigator.mediaDevices, in diesem Fall wird nur der deviceID-Parameter als String für cameraIdOrConfig unterstützt.",
+			"no_camera_found": "Keine Kamera gefunden",
 			"no_code": "Es wurde kein Bar- oder QR-Code erkannt.",
 			"no_file": "Keine Bilddatei gewählt",
-			"not_running": "Scan läuft nicht oder wurde pausiert.",
+			"not_running": "Scan abgeschlossen oder pausiert.",
 			"parse": "QR Code Auswertungsfehler, Fehler = ",
 			"scanner": "Fehler",
 			"ssl": "Kamerazugriff wird nur für sichere Umgebungen mit https oder localhost unterstützt.",
