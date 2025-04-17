@@ -432,9 +432,16 @@ export const api = {
 
 							// sometimes an error occures, try to show what's happening
 							try {
-								if (data.user && api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
-									_serviceWorker.register();
-									api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+								if (data.user) {
+									// reset notif interval
+									_serviceWorker.notif.interval = setInterval(() => {
+										_serviceWorker.postMessage("getnotifications");
+									}, _serviceWorker.notif.interval_duration);
+
+									if (api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
+										// resend last request
+										api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+									}
 								}
 							} catch (error) {
 								console.trace(error, api._unauthorizedRequest);

@@ -72,6 +72,7 @@ export const _serviceWorker = {
 		},
 
 		interval: null,
+		interval_duration: 300000,
 
 		/**
 		 * updates styleable data-for=userMenu for communication menu
@@ -199,7 +200,7 @@ export const _serviceWorker = {
 				if (registration && !_serviceWorker.notif.interval) {
 					_serviceWorker.notif.interval = setInterval(() => {
 						_serviceWorker.postMessage("getnotifications");
-					}, 300000);
+					}, _serviceWorker.notif.interval_duration);
 				}
 				navigator.serviceWorker.addEventListener("message", (message) => {
 					this.onMessage(message);
