@@ -660,7 +660,7 @@ class TEXTTEMPLATE extends API {
 					'type' => 'select',
 					'attributes' => [
 						'name' => $this->_lang->GET('texttemplate.use.text_select', [':unit' => $this->_lang->_USER['units'][$unit]]),
-						'onchange' => "api.texttemplate('get', 'text', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
+						'onchange' => "if (this.value) api.texttemplate('get', 'text', this.value" . ($this->_modal ? ", 'modal'" : "") . ($this->_modal && $this->_clientimport ? ", '" . $this->_clientimport . "'" : "") . ")"
 					],
 					'content' => $templates
 				]
