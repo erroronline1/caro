@@ -430,8 +430,15 @@ export const api = {
 							if (data.user) api._settings.user = data.user;
 							if (data.config) api._settings.config = data.config;
 
-							if (data.user && api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"]))
-								api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+							// sometimes an error occures, try to show what's happening
+							try {
+								if (data.user && api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
+									_serviceWorker.register();
+									api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+								}
+							} catch (error) {
+								console.trace(error, api._unauthorizedRequest);
+							}
 						};
 						payload = request.pop();
 				}
