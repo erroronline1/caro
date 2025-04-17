@@ -543,7 +543,7 @@ class CALENDAR extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('menu.calendar.timesheet', [], true),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->_currentdate->format('Y-m-d H:i')
 		];
 
 		$downloadfiles = [];
@@ -634,7 +634,7 @@ class CALENDAR extends API {
 					if (isset($day['note']) && $day['note']) $dayinfo[] = $day['note'];
 					
 					$rows[] = [
-						[$day['weekday'] . ' ' . $date, $day['holiday']],
+						[$day['weekday'] . ' ' . UTILITY::dateFormat($date), $day['holiday']],
 						implode(', ', $dayinfo)
 					];
 				}
@@ -914,7 +914,7 @@ class CALENDAR extends API {
 				$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 				foreach ($thisDaysEvents as $id => $row){
 					if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user'); // fallback message
-					if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+					if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". UTILITY::dateFormat(substr($row['span_start'], 0, 10)) . " - ". UTILITY::dateFormat(substr($row['span_end'], 0, 10)) . "\n";
 				}
 
 				// add absent mates
@@ -924,7 +924,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'id' => 'displayspecificdate',
 						'data-type' => 'calendar',
-						'name' => $this->_requestedDate
+						'name' => UTILITY::dateFormat($this->_requestedDate)
 					]
 				];
 
@@ -1007,8 +1007,8 @@ class CALENDAR extends API {
 			if ((!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !in_array($_SESSION['user']['id'], [$row['author_id'], $row['affected_user_id']])) || $row['type'] !== 'schedule' ) continue; // skip not schedule and not user unit affecting
 
 			// construct event information
-			$display = $this->_lang->GET('calendar.schedule.date') . ': ' . $date->format('Y-m-d') . "\n" .
-				$this->_lang->GET('calendar.schedule.due') . ': ' . $due->format('Y-m-d') . "\n";
+			$display = $this->_lang->GET('calendar.schedule.date') . ': ' . UTILITY::dateFormat($date->format('Y-m-d')) . "\n" .
+				$this->_lang->GET('calendar.schedule.due') . ': ' . UTILITY::dateFormat($due->format('Y-m-d')) . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => $this->_lang->_USER['units'][$unit], explode(',', $row['organizational_unit'])));
 			if ($row['affected_user_id'] && $userrow = array_search($row['affected_user_id'], array_column($users, 'id'))){
 				$display .= "\n" . $users[$userrow]['name'];
@@ -1024,7 +1024,7 @@ class CALENDAR extends API {
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.schedule.complete')]['checked'] = true;
 				$row['closed'] = json_decode($row['closed'], true);
-				$completed_hint = $this->_lang->GET('calendar.schedule.completed_state', [':user' => $row['closed']['user'], ':date' => $row['closed']['date']]);
+				$completed_hint = $this->_lang->GET('calendar.schedule.completed_state', [':user' => $row['closed']['user'], ':date' => UTILITY::dateFormat($row['closed']['date'])]);
 			}
 
 			// add event tile
@@ -1304,7 +1304,7 @@ class CALENDAR extends API {
 					// display absent workmates for own units
 					if ($row['type'] === 'timesheet'
 						&& !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons'])
-						&& array_intersect($row['affected_user_units'], ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+						&& array_intersect($row['affected_user_units'], ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". UTILITY::dateFormat(substr($row['span_start'], 0, 10)) . " - ". UTILITY::dateFormat(substr($row['span_end'], 0, 10)) . "\n";
 					
 					// allow approval for fullaccess and supervisors of affected user units
 					if ($row['type'] === 'timesheet'
@@ -1321,7 +1321,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'id' => 'displayspecificdate',
 						'data-type' => 'calendar',
-						'name' => $this->_requestedDate
+						'name' => UTILITY::dateFormat($this->_requestedDate)
 					]
 				];
 
@@ -1454,8 +1454,8 @@ class CALENDAR extends API {
 			$hint = '';
 			$display = '';
 			if ($row['subject']) $display .= $this->_lang->GET('calendar.timesheet.irregular') . ': ' . $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . "\n";
-			$display .=	$this->_lang->GET('calendar.timesheet.start') . ': ' . $date->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n" .
-				$this->_lang->GET('calendar.timesheet.end') . ': ' . $due->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i') . "\n";
+			$display .=	$this->_lang->GET('calendar.timesheet.start') . ': ' . UTILITY::dateFormat($date->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i')) . "\n" .
+				$this->_lang->GET('calendar.timesheet.end') . ': ' . UTILITY::dateFormat($due->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i')) . "\n";
 			if ($row['misc']){
 				$misc = json_decode($row['misc'], true);
 				if (!$row['subject'] && isset($misc['break'])) $display .= $this->_lang->GET('calendar.timesheet.break') . ': ' . $misc['break'] . "\n";
@@ -1495,7 +1495,7 @@ class CALENDAR extends API {
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.timesheet.approve')]['checked'] = true;
 				$row['closed'] = json_decode($row['closed'], true);
-				$completed_hint = $this->_lang->GET('calendar.timesheet.approved_state', [':user' => $row['closed']['user'], ':date' => $row['closed']['date']]);
+				$completed_hint = $this->_lang->GET('calendar.timesheet.approved_state', [':user' => $row['closed']['user'], ':date' => UTILITY::dateFormat($row['closed']['date'])]);
 			}
 			$events[count($events)-1]['content'][] = [
 				'type' => 'checkbox',

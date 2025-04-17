@@ -194,6 +194,7 @@ class UTILITY {
 	 *                                                        |___|
 	 * creates a directory and inserts a .htaccess-file preventing any access
 	 * @param string $dir path
+	 * 
 	 * @return bool on success
 	 */
 	private static function createDirectory($dir){
@@ -207,6 +208,30 @@ class UTILITY {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 *     _     _       ___                   _   
+	 *   _| |___| |_ ___|  _|___ ___ _____ ___| |_ 
+	 *  | . | .'|  _| -_|  _| . |  _|     | .'|  _|
+	 *  |___|__,|_| |___|_| |___|_| |_|_|_|__,|_|  
+	 *
+	 * formats ISO 8601 date to custom as per config 
+	 * 
+	 * @param string $input YYYY-MM-DD (time optional)
+	 * 
+	 * @return string
+	 */
+	public static function dateFormat($input){
+		if (!$input) return '';
+		if (!isset(CONFIG['calendar']['dateformat']) || !CONFIG['calendar']['dateformat']) return $input;
+		try {
+			$date = new DateTime(substr($input, 0, 10), new DateTimeZone(CONFIG['application']['timezone']));
+		}
+		catch (Exception $e) {
+			return $input;
+		}
+		return $date->format(CONFIG['calendar']['dateformat']) . (strlen($input) > 10 ? substr($input, 10) : '');
 	}
 
 	/**

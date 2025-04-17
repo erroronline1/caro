@@ -131,9 +131,10 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * vendor text recommendation, import values gone after error?
     * selection abort error "could not find modal"
     * hide edit buttons on modal!
-* configurable time format output UTILITY::dateFormat(input ISO format) processing config.something.dateformat according to https://www.php.net/manual/en/datetime.format.php
 * keyboard input jumping to select modal options
 * highlighting required inputs on modals (see assemble.prepareform()) e.g. login
+* review single simple record export
+* review 'deliver by' order data not showing up
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1209,7 +1210,8 @@ timezone = "Europe/Berlin" ; timezone for calendar handling
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
 
 [calendar]
-holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"
+dateformat = ""; according to https://www.php.net/manual/en/datetime.format.php, e.g. "d.m.Y"; empty for ISO 8601 Y-m-d
+holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"; month-day
 ; comment out if any of these holidays don't apply
 ; second key is just for comprehension, value is offset to easter sunday
 ; easter_holidays[maundy_thursday] = -3
@@ -1365,6 +1367,8 @@ appointment[codesizeoffset] = 40
 bundle_files_per_slide = 12
 products_per_slide = 6
 ```
+
+Calendar dateformat takes effect where reasonable. Since the ISO 8601 YYYY-MM-DD is the superior format and way better at being sorted, selections stick with it independent of any setting. 
 
 PDF-labels can be extended to desired formats. For labels and pdf setting following options are available, albeit not necessarily being used on all requests:
 | Key | Options | Default if not provided |
@@ -2000,9 +2004,9 @@ Stakeholder identification:
 | History navigation | User | 2025-04-03 | Implemented; 2025-04-05 |
 | HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | Implemented; 2025-04-08 |
 | Shorter idle timespan for improved data security | CEO | 2025-04-07 | Implemented; 2025-04-13 |
-| Configurable time format output | User | 2025-04-16 | |
+| Configurable time format output | User | 2025-04-16 | Implemented; 2025-04-17 |
 | Keyboard input jumping to select modal options | User | 2025-04-16 |
-| Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16|
+| Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data

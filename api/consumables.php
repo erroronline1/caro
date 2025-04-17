@@ -1015,7 +1015,7 @@ class CONSUMABLES extends API {
 				$hidden = null;
 				if ($product['hidden']) {
 					$hiddenproperties = json_decode($product['hidden'], true);
-					$hidden = $this->_lang->GET('consumables.product.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+					$hidden = $this->_lang->GET('consumables.product.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
 
 				// switch between display- and edit mode 
@@ -1087,7 +1087,7 @@ class CONSUMABLES extends API {
 							$result['render']['content'][2][] = [
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $this->_lang->GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)])
+									'name' => $this->_lang->GET('order.order_last_ordered', [':date' => UTILITY::dateFormat(substr($product['last_order'], 0, -9))])
 								],
 							];
 						}
@@ -1316,7 +1316,7 @@ class CONSUMABLES extends API {
 						$result['render']['content'][2][] = [
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $this->_lang->GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)])
+								'name' => $this->_lang->GET('order.order_last_ordered', [':date' => UTILITY::dateFormat(substr($product['last_order'], 0, -9))])
 							]
 						];
 					}
@@ -1962,7 +1962,7 @@ class CONSUMABLES extends API {
 				$hidden = null;
 				if ($vendor['hidden']) {
 					$hiddenproperties = json_decode($vendor['hidden'], true);
-					$hidden = $this->_lang->GET('consumables.vendor.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+					$hidden = $this->_lang->GET('consumables.vendor.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
 
 				// switch between display- and edit mode 
@@ -2057,7 +2057,7 @@ class CONSUMABLES extends API {
 					if (isset($latest_vendor_evaluation['_author'])) $evaluationdocument[0][] = [
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $latest_vendor_evaluation['_author'], ':date' => $latest_vendor_evaluation['_date']])
+							'name' => $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $latest_vendor_evaluation['_author'], ':date' => UTILITY::dateFormat($latest_vendor_evaluation['_date'])])
 						]
 					];
 

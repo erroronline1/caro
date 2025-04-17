@@ -1280,7 +1280,7 @@ class RECORD extends API {
 						array_splice($return['render']['content'][$last_element], 1, 0, [[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $this->_lang->GET('record.closed', [':role' => $this->_lang->GET('permissions.' . $role), ':name' => $property['name'], ':date' => $property['date']])
+								'name' => $this->_lang->GET('record.closed', [':role' => $this->_lang->GET('permissions.' . $role), ':name' => $property['name'], ':date' => UTILITY::dateFormat($property['date'])])
 							]
 						]]);
 					}
@@ -1359,7 +1359,7 @@ class RECORD extends API {
 				// add to result
 				$linkdisplay = $this->_lang->GET('record.list_touched', [
 					':identifier' => $record['identifier'],
-					':date' => $record['last_touch'],
+					':date' => UTILITY::dateFormat($record['last_touch']),
 					':document' => $record['last_document']
 					]);
 				$contexts[$contextkey][$linkdisplay] = [
@@ -1750,8 +1750,8 @@ class RECORD extends API {
 					$value = '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
 				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
-				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => substr($record['date'], 0, -3)], true)];
-				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
+				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => UTILITY::dateFormat(substr($record['date'], 0, -3))], true)];
+				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = UTILITY::dateFormat($record['date']);
 			}
 		}
 
@@ -1851,6 +1851,7 @@ class RECORD extends API {
 
 			$printablecontent = $enumerate = [];
 			foreach($summary['content'] as $document => $content){
+//				var_dump($document);
 				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $document
@@ -1858,6 +1859,7 @@ class RECORD extends API {
 					else $printablecontent[$document] = $content; // pseudodocument
 			}
 			$summary['content'] = $printablecontent;
+//			var_dump($printablecontent, $useddocument);
 			if ($type === 'simplifieddocument'){
 				// convert summary contents to a simpler view. this allows document formatting suitable to hand over to patients/customers, e.g. a manual with the latest record entries
 				$summary['content'] = [' ' => $printablecontent[$useddocument['name'] . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')], true)]];

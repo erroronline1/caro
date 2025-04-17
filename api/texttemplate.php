@@ -316,7 +316,7 @@ class TEXTTEMPLATE extends API {
 					if ($chunk['hidden']) {
 						$hidden['content'][$this->_lang->GET('texttemplate.chunk.hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($chunk['hidden'], true);
-						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . $this->_lang->GET('texttemplate.chunk.dependencies', [':templates' => implode(', ', $dependedtemplates)]);
 					array_push($return['render']['content'][1], $hidden);
@@ -590,7 +590,7 @@ class TEXTTEMPLATE extends API {
 					if ($template['hidden']) {
 						$hidden['content'][$this->_lang->GET('texttemplate.template.hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($template['hidden'], true);
-						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					array_push($return['render']['content'][1], $hidden);
 				}
@@ -752,7 +752,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $this->_lang->GET('texttemplate.use.import', [':placeholders' => implode(', ', array_keys($clientimport))]),
 						'onclick' => "_client.texttemplate.import('" . $this->_clientimport . "');"
 					],
-					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])
+					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => UTILITY::dateFormat($row['date'])])
 				];	
 			}
 
@@ -780,7 +780,7 @@ class TEXTTEMPLATE extends API {
 					'onclick' => '_client.texttemplate.update();',
 					'data-type' => 'generateupdate'
 				],
-				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']])
+				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => UTILITY::dateFormat($row['date'])])
 			];
 
 			// append inputs

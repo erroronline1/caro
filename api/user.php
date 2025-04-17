@@ -247,7 +247,7 @@ class USER extends API {
 				]);
 				$usertrainings = [];
 				foreach ($alltrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . UTILITY::dateFormat($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
@@ -258,7 +258,7 @@ class USER extends API {
 					}
 					$usertrainings[] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $row['expires'],
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . UTILITY::dateFormat($row['expires']),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $usertrainings[] = [
@@ -286,7 +286,7 @@ class USER extends API {
 				]);
 				$sessions = [];
 				foreach($usersessions as $session){
-					$sessions[] = $session['date'];
+					$sessions[] = UTILITY::dateFormat($session['date']);
 				}
 				if ($sessions) $user_data[] = [
 					[
@@ -926,7 +926,7 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $row['date']];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . UTILITY::dateFormat($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
 						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
@@ -937,7 +937,7 @@ class USER extends API {
 					}
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $row['expires'],
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . UTILITY::dateFormat($row['expires']),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $skillmatrix[0][] = [

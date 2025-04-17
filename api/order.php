@@ -435,7 +435,7 @@ class ORDER extends API {
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
-						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => substr($product['last_order'], 0, -9)]) : null,
+						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => UTILITY::dateFormat(substr($product['last_order'], 0, -9))]) : null,
 						'orderer' => UTILITY::propertySet($decoded_order_data, 'orderer') ? : null,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
@@ -459,7 +459,7 @@ class ORDER extends API {
 					}
 
 					// add approval
-					$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.approved') . ': ' . $row['approved'] . ' ';
+					$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.approved') . ': ' . UTILITY::dateFormat($row['approved']) . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) {
 						$data['ordertext'] .= "\n". $row['approval'];
 					} else {
@@ -476,7 +476,7 @@ class ORDER extends API {
 						if (!isset($data['state'][$s])) $data['state'][$s] = [];
 						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
-							$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.' . $s) . ': ' . $row[$s];
+							$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.' . $s) . ': ' . UTILITY::dateFormat($row[$s]);
 						}
 						switch ($s){
 							case 'ordered':

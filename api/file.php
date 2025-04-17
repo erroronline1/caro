@@ -335,7 +335,7 @@ class FILE extends API {
 				$hidden = null;
 				if ($bundle['hidden']) {
 					$hiddenproperties = json_decode($bundle['hidden'], true);
-					$hidden = $this->_lang->GET('file.manager.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+					$hidden = $this->_lang->GET('file.manager.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
 				$return['render']['content'][] = [
 					[
@@ -344,7 +344,7 @@ class FILE extends API {
 							'name'=> $this->_lang->GET('file.bundle.save_bundle'),
 							'value' => $bundle['name']
 						],
-						'hint' => $bundle['name'] ? $this->_lang->GET('file.last_edit', [':user' => $bundle['author'], ':date' => $bundle['date']]): ''
+						'hint' => $bundle['name'] ? $this->_lang->GET('file.last_edit', [':user' => $bundle['author'], ':date' => UTILITY::dateFormat($bundle['date'])]): ''
 					],
 					[
 						'type' => 'radio',
@@ -514,7 +514,7 @@ class FILE extends API {
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
-									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => $file['retired']]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
+									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => UTILITY::dateFormat($file['retired'])]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
 									'content' => [
 										$file['name'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
 									],
@@ -650,7 +650,7 @@ class FILE extends API {
 							array_push($result['render']['content'][0],
 								[
 									'type' => 'links',
-									'description' => $this->_lang->GET('file.manager.folder_header', [':date' => $filedate->format('Y-m-d H:i')]),
+									'description' => $this->_lang->GET('file.manager.folder_header', [':date' => UTILITY::dateFormat($filedate->format('Y-m-d H:i'))]),
 									'content' => [
 										$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]
 									]
@@ -725,7 +725,7 @@ class FILE extends API {
 								array_push($result['render']['content'][1],
 									[
 										'type' => 'links',
-										'description' => $filedate->format('Y-m-d H:i'),
+										'description' => UTILITY::dateFormat($filedate->format('Y-m-d H:i')),
 										'content' => [
 											$file['path'] => ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => $file['path']]
 										],

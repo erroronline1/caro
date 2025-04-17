@@ -1122,6 +1122,7 @@ timezone = "Europe/Berlin" ; Zeitzone für den Kalender
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
 
 [calendar]
+dateformat = ""; gemäß https://www.php.net/manual/en/datetime.format.php, z.B. "d.m.Y"; leer für ISO 8601 Y-m-d
 holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31" ; Monat-Tag
 ; nicht anwendbare Feiertage können auskommentiert werden
 ; der zweite Schlüssel dient dem Verständnis, der Wert ist der Abstand an Tagen zu Ostersonntag
@@ -1279,6 +1280,8 @@ appointment[codesizeoffset] = 40
 bundle_files_per_slide = 12
 products_per_slide = 6
 ```
+
+Calendar dateformat wird angewendet wo es angemessen ist. Da das ISO 8601 Format mit YYYY-MM-DD überlegen und zudem besser zu sortieren ist, wird es insbesondere bei Auswahllisten unabhängig von der Konfiguration beibehalten. 
 
 PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label und PDF-Einstellungen sind folgende Optionen verfügbar, wenngleich nicht zwingend für alle Anfragen verwendet:
 | Schlüssel | Optionen | Standard sofern nicht gesetzt |

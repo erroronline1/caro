@@ -702,7 +702,7 @@ class APPLICATION extends API {
 					foreach($context as $record){
 						$display = $this->_lang->GET('record.list_touched', [
 							':identifier' => $record['identifier'],
-							':date' => $record['last_touch'],
+							':date' => UTILITY::dateFormat($record['last_touch']),
 							':document' => $record['last_document']
 						]);
 						$matches[$display] = [
@@ -778,9 +778,9 @@ class APPLICATION extends API {
 		// sort events
 		foreach ($thisDaysEvents as $row){
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
-			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) || 
+			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || 
 				array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
-			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". substr($row['span_start'], 0, 10) . " - ". substr($row['span_end'], 0, 10) . "\n";
+			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". UTILITY::dateFormat(substr($row['span_start'], 0, 10)) . " - ". UTILITY::dateFormat(substr($row['span_end'], 0, 10)) . "\n";
 		}
 		// display todays events
 		if ($displayevents) $overview[] = [
@@ -804,7 +804,7 @@ class APPLICATION extends API {
 		$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 		$uncompleted = [];
 		foreach ($pastEvents as $row){
-			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && !$row['closed']) $uncompleted[$row['subject'] . " (" . substr($row['span_start'], 0, 10) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
+			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !$row['closed']) $uncompleted[$row['subject'] . " (" . UTILITY::dateFormat(substr($row['span_start'], 0, 10)) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
 		}
 		if ($uncompleted) $overview[] = [
 			'type' => 'links',

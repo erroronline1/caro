@@ -184,7 +184,7 @@ class MEASURE extends API {
 					$measurecontent[] = [
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => ($measure['user_name'] ? : $this->_lang->GET('measure.anonymous_user')) . ' ' . $measure['timestamp']
+							'name' => ($measure['user_name'] ? : $this->_lang->GET('measure.anonymous_user')) . ' ' . UTILITY::dateFormat($measure['timestamp'])
 						],
 						'content' => $measure['content']
 					];
@@ -227,7 +227,7 @@ class MEASURE extends API {
 								'name' => $this->_lang->GET('measure.measure')
 							],
 							'content' => $measure['measures'],
-							'hint' => $this->_lang->GET('measure.last_touch', [':user' => $measure['last_user'], ':date' => $measure['last_touch']])
+							'hint' => $this->_lang->GET('measure.last_touch', [':user' => $measure['last_user'], ':date' => UTILITY::dateFormat($measure['last_touch'])])
 						];
 					if (PERMISSION::permissionFor('measureedit')) {
 						$measurecontent[] = [

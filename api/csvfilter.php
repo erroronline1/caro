@@ -401,7 +401,7 @@ class CSVFILTER extends API {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 						$filterdatalist[] = $row['name'];
-						$options[$row['name'] ] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$options[$row['name']] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					
 					$display = $row['name']. ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
@@ -485,7 +485,7 @@ class CSVFILTER extends API {
 					if ($filter['hidden']) {
 						$hidden['content'][$this->_lang->GET('csvfilter.edit.filter_hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($filter['hidden'], true);
-						$hidden['hint'] .= ' ' . $this->_lang->GET('csvfilter.edit.edit_hidden_set', [':date' => $hiddenproperties['date'], ':name' => $hiddenproperties['name']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('csvfilter.edit.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					array_push($return['render']['content'][1], $hidden);
 				}

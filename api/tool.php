@@ -285,7 +285,7 @@ class TOOL extends API {
 	public function code(){
 		$appointmentreminder = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_reminder')) ? : '';
 		if ($appointmentreminder && !str_ends_with($appointmentreminder, '.')) $appointmentreminder .= '.';
-		$appointmentreminder .= ' ' . $this->_lang->GET('tool.code.qrcode_appointment_reminder_default');
+		$appointmentreminder .= ' ' . $this->_lang->GET('tool.code.qrcode_appointment_reminder_default', [], true);
 		$types = [
 			'qrcode_appointment' => ['name' => $this->_lang->GET('tool.code.qrcode_appointment'),
 				'content' => [
@@ -416,10 +416,10 @@ class TOOL extends API {
 								$this->_lang->GET('tool.code.qrcode_appointment_readable', [
 									':company' => $this->_lang->GET('company.address'),
 									':occasion' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')),
-									':start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time')),
-									':end' => date("Y-m-d H:i", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration'))) * 3600),
+									':start' => UTILITY::dateFormat(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date'))) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time')),
+									':end' => UTILITY::dateFormat(date("Y-m-d H:i", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration'))) * 3600)),
 									':reminder' => $appointmentreminder
-								])
+								], true)
 							],
 							'filename' => $this->_lang->GET('tool.code.qrcode_appointment')
 						];
