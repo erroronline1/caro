@@ -1335,11 +1335,11 @@ class RECORD extends API {
 	 */
 	public function records(){
 		$result = ['render' => ['content' => []]];
-
+		$this->_requestedID = $this->_requestedID === 'null' ? null : $this->_requestedID;
 		// get all records or these fitting the search
 		require_once('_shared.php');
 		$search = new SHARED($this->_pdo);
-		$data = $search->recordsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
+		$data = $search->recordsearch(['search' => $this->_requestedID]);
 
 		// prepare datalists, display values, available units to select and styling
 		$recorddatalist = $contexts = $available_units = [];
