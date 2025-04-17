@@ -186,7 +186,8 @@
 			"Device permissions": "This application requests permission to use a camera and send notifications. Camera access may be neccessary to append photos to documentation and scan 2D-codes. Latter can be achieved by a dedicated terminal device. You may not be able to log in without this permission and limit your documentation abilities. Notifications inform about new in-app messages and support a better work condition. You may revoke the permissions through the browser settings.",
 			"Feedback": "If you experience any issues with data security or application usage contact :issue_mail immidiately providing details and a response address."
 		},
-		"terms_of_service_accepted": "I agree to the terms of service"
+		"terms_of_service_accepted": "I agree to the terms of service",
+		"timeout_aria":"Without active use of the application you will have to reauthenticate after about :minutes minutes."
 	},
 	"assemble": {
 		"approve": {

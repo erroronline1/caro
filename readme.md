@@ -133,7 +133,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * hide edit buttons on modal!
 * configurable time format output UTILITY::dateFormat(input ISO format) processing config.something.dateformat according to https://www.php.net/manual/en/datetime.format.php
 * keyboard input jumping to select modal options
-* inform users on timeout span regarding WCAG (e.g. on landing page)
 * highlighting required inputs on modals (see assemble.prepareform()) e.g. login
 
 # Aims

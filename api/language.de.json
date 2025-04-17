@@ -186,7 +186,8 @@
 			"Berechtigungen": "Die Anwendung erbittet die Berechtigung für den Kamerazugriff und Benachrichtigungen. Kamerazugriff kann für die Erfassung von Fotos für die Dokumentation und dem Scannen von Strich- und QR-Codes erforderlich sein. Letztere Anwendung kann auch durch zusätzliche Geräte erfolgen. Andernfalls kannst du dich nicht anmelden und die Dokumentation nicht im erforderlichen Maße sicherstellen. Benachrichtigungen informieren über neue Nachrichten innerhalb der Anwendung und verbessern dadurch die Arbeitsbedingungen. Die Berechtigungen können durch die Browsereinstellungen jederzeit entzogen werden.",
 			"Rückmeldungen": "Solltest du Probleme mit der Datensicherheit oder der Anwendung feststellen, wenden dich umgehend an :issue_mail, erläutere die Details und ergänze eine Kontaktmöglichkeit."
 		},
-		"terms_of_service_accepted": "Ich stimme den Bedingungen zu"
+		"terms_of_service_accepted": "Ich stimme den Bedingungen zu",
+		"timeout_aria":"Ohne aktive Nutzung der Anwendung musst du dich nach etwa :minutes Minuten erneut authentifizieren."
 	},
 	"assemble": {
 		"approve": {

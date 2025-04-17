@@ -476,8 +476,32 @@ class APPLICATION extends API {
 	public function start(){
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 		$result = array_merge(['render' => ['content' => []]], $this->_auth);
-		$tiles = [];
+
+		// aria timeout information
+		$result['render']['content'][] = [
+			[
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('application.timeout_aria', [':minutes' => round(min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')) / 60)])
+				]
+			]
+		];
+
+		// storage warning
+		$storage = round(disk_free_space("/") / pow(1024, 3), 3);
+		if ($storage < CONFIG['limits']['storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
+			$result['render']['content'][count($result['render']['content']) - 1][] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
+					'class' => 'red'
+				]
+			];
+		}
+
+		
 		// set up dashboard notifications
+		$tiles = [];
 		$notifications = new NOTIFICATION;
 
 		// messages
@@ -654,18 +678,6 @@ class APPLICATION extends API {
 			];
 		}
 		if (count($tiles)) $result['render']['content'][] = $tiles;
-
-		// storage warning
-		$storage = round(disk_free_space("/") / pow(1024, 3), 3);
-		if ($storage < CONFIG['limits']['storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
-			$result['render']['content'][] = [
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
-					'class' => 'red'
-				]
-			];
-		}
 
 		// append search function to landing page
 		$searchelements = [
