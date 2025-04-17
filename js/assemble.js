@@ -464,6 +464,7 @@ export class Dialog {
 				optgroup = document.createElement("h3");
 				optgroup.classList.add("modaloptgroup");
 				optgroup.append(document.createTextNode(firststring));
+				optgroup.id = "opt" + firststring;
 				buttons.append(optgroup);
 			}
 			button = document.createElement("button");
@@ -480,6 +481,12 @@ export class Dialog {
 			button.value = value;
 			buttons.append(button);
 		}
+		// jump to optgoup while dialog has focus right after creation, at least on desktop with physical keyboard
+		if (optgroup) buttons.addEventListener("keydown", (event) => {
+			event.preventDefault(); // prevent starting site search 
+			const opt = document.getElementById("opt" + event.key.toUpperCase()) || document.getElementById("opt" + event.key);
+			if (opt) opt.scrollIntoView();
+		});
 		return [buttons];
 	}
 }
