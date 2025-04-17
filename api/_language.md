@@ -24,7 +24,7 @@ Append if new modules require specific permissions. `permissions` order is passe
 ### units
 Organizational units.
 
-First item (common) is used as default for texttemplates assignments and possibly other select options, admin and office are hardcoded.
+First item (common) is hardcoded and used as default for texttemplates assignments and possibly other select options, admin and office are hardcoded as well.
 Once defined keys remain in the database, so it should be appended at best! `units` order is passed to application.
 
 ### skills
