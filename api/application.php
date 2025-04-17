@@ -391,9 +391,10 @@ class APPLICATION extends API {
 			// order here defines frontend order
 			$this->_lang->GET('menu.communication.header') => [
 				$this->_lang->GET('menu.communication.conversations') => ['onclick' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
-				$this->_lang->GET('menu.communication.register') => ['onclick' => "api.message('get', 'register')"],
 				$this->_lang->GET('menu.communication.texttemplate_texts') => ['onclick' => "api.texttemplate('get', 'text')"],
+				$this->_lang->GET('menu.communication.register') => ['onclick' => "api.message('get', 'register')"],
 				$this->_lang->GET('menu.communication.responsibility') => ['onclick' => "api.responsibility('get', 'responsibilities')"],
+				$this->_lang->GET('menu.communication.measure') => ['onclick' => "api.measure('get', 'measure')"],
 			],
 			$this->_lang->GET('menu.records.header') => [
 				$this->_lang->GET('menu.records.record_create_identifier') => ['onclick' => "api.record('get', 'identifier')"],
@@ -409,9 +410,9 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
 			],
 			$this->_lang->GET('menu.files.header') => [
+				$this->_lang->GET('menu.files.sharepoint') => ['onclick' => "api.file('get', 'sharepoint')"],
 				$this->_lang->GET('menu.files.files') => ['onclick' => "api.file('get', 'files')"],
 				$this->_lang->GET('menu.files.bundles') => ['onclick' => "api.file('get', 'bundle')"],
-				$this->_lang->GET('menu.files.sharepoint') => ['onclick' => "api.file('get', 'sharepoint')"],
 			],
 			$this->_lang->GET('menu.purchase.header') => [
 				$this->_lang->GET('menu.purchase.order') => ['onclick' => "api.purchase('get', 'order')"],
@@ -433,32 +434,33 @@ class APPLICATION extends API {
 		// permission based functions
 		//////////////////////////////////
 
+		// records
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onclick' => "api.document('get', 'bundles')"];
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_record')] = ['onclick' => "api.document('get', 'documents')"];
-		// make sure risk management comes after documents so this is an exception
+		// make sure risk management comes after documents so this is an order exception without special permission
 		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onclick' => "api.risk('get', 'risk')"];
-
-		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
-			$menu[$this->_lang->GET('menu.calendar.header')][$this->_lang->GET('menu.calendar.timesheet')] = ['onclick' => "api.calendar('get', 'timesheet')"];
-
 		if (PERMISSION::permissionFor('audit')){
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit')] = ['onclick' => "api.audit('get', 'audit')"];
 			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.management_review')] = ['onclick' => "api.audit('get', 'managementreview')"];
 		}
-
-		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onclick' => "api.user('get', 'user')"];
-
-		// make sure measure management comes after texttemplate management so this is an exception
-		$menu[$this->_lang->GET('menu.communication.header')][$this->_lang->GET('menu.communication.measure')] = ['onclick' => "api.measure('get', 'measure')"];
-
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
-		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onclick' => "api.document('get', 'approval')"];
+
+		// calendar
+		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
+			$menu[$this->_lang->GET('menu.calendar.header')][$this->_lang->GET('menu.calendar.timesheet')] = ['onclick' => "api.calendar('get', 'timesheet')"];
+
+		// application
+		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onclick' => "api.user('get', 'user')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onclick' => "api.application('get', 'manual')"];
+		// make sure info comes last so this is an an order exception without special permission
+		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onclick' => "api.application('get', 'info')"];
+
+		// purchase
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
-		// make sure info comes last so this is an exception
-		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onclick' => "api.application('get', 'info')"];
+		// tools
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
 
 		$this->response(['render' => $menu]);
 	}
