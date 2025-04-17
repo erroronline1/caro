@@ -1551,7 +1551,7 @@ class RECORD extends API {
 		$merge['content'] = json_decode($merge['content'], true);
 		$merge['content'][] = [
 			'author' => $_SESSION['user']['name'],
-			'date' => $this->_currentdate->format('y-m-d H:i:s'),
+			'date' => $this->_currentdate->format('Y-m-d H:i:s'),
 			'document' => 0,
 			'content' => [
 				$this->_lang->GET('record.reidentify_pseudodocument_name', [], true) => ($original ? $this->_lang->GET('record.reidentify_merge_content', [':identifier' => $entry_id], true) : $this->_lang->GET('record.reidentify_identify_content', [':identifier' => $entry_id], true))
@@ -1633,7 +1633,7 @@ class RECORD extends API {
 			$original['content'] = json_decode($original['content'], true);
 			$original['content'][] = [
 				'author' => $_SESSION['user']['name'],
-				'date' => $this->_currentdate->format('y-m-d H:i'),
+				'date' => $this->_currentdate->format('Y-m-d H:i'),
 				'document' => 0,
 				'content' => [
 					$this->_lang->GET('record.retype_pseudodocument_name', [], true) => $this->_lang->GET('record.retype_content', [
@@ -1715,7 +1715,7 @@ class RECORD extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('menu.records.record_summary', [], true),
-			'date' => $this->_currentdate->format('y-m-d H:i'),
+			'date' => $this->_currentdate->format('Y-m-d H:i'),
 			'closed' => $data['closed'],
 			'record_type' => $data['record_type'],
 			'units' => $data['units'] ? explode(',', $data['units']) : [],
@@ -1751,7 +1751,7 @@ class RECORD extends API {
 				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
 				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => UTILITY::dateFormat(substr($record['date'], 0, -3))], true)];
-				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = UTILITY::dateFormat($record['date']);
+				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
 			}
 		}
 
@@ -1851,19 +1851,17 @@ class RECORD extends API {
 
 			$printablecontent = $enumerate = [];
 			foreach($summary['content'] as $document => $content){
-//				var_dump($document);
 				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $document
-					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')], true)] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
+					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('Y-m-d H:i')], true)] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
 					else $printablecontent[$document] = $content; // pseudodocument
 			}
 			$summary['content'] = $printablecontent;
-//			var_dump($printablecontent, $useddocument);
 			if ($type === 'simplifieddocument'){
 				// convert summary contents to a simpler view. this allows document formatting suitable to hand over to patients/customers, e.g. a manual with the latest record entries
-				$summary['content'] = [' ' => $printablecontent[$useddocument['name'] . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')], true)]];
-				$summary['date'] = $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')], true);
+				$summary['content'] = [' ' => $printablecontent[$useddocument['name'] . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('Y-m-d H:i')], true)]];
+				$summary['date'] = $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('Y-m-d H:i')], true);
 				$summary['title'] = $useddocument['name'];
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}
