@@ -91,7 +91,7 @@ class CALENDAR extends API {
 
 					$content = [
 						'title' => $this->_lang->GET('calendar.appointment.title', [], true),
-						'date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.date')),
+						'date' => UTILITY::dateFormat($this->_currentdate->format('Y-m-d')),
 						'content' => [
 							$ics,
 							$this->_lang->GET('calendar.appointment.readable', [
