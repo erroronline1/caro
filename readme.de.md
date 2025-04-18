@@ -26,6 +26,10 @@
         * [Audit](#audit)
         * [Managementbericht](#managementbericht)
     * [Kalender](#kalender)
+        * [Terminvereinbarung](#terminvereinbarung)
+        * [Kalender](#kalender-1)
+        * [Langzeitplanung](#langzeitplanung)
+        * [Zeiterfassung](#zeiterfassung)
     * [Dateien](#dateien)
     * [Einkauf](#einkauf)
         * [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung)
@@ -541,6 +545,14 @@ Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Unterbrech
 ## Kalender
 ![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu%20de.png)
 
+### Terminvereinbarung
+Es kann eine Terminerinnerung für Kunden erstellt werden. Nach der Eingabe der relevanten Daten kann entweder eine ausgedruckte Version mit den Daten sowie einem QR-Code für den Import in einen Kalender auf einem Mobilgerät, oder direkt eine ICS-Datei für den Versand per eMail oder Nachrichtendienst verwendet werden.
+
+![appointment screenshot](http://toh.erroronline.one/caro/appointment.png)
+
+[Übersicht](#übersicht)
+
+### Kalender
 Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
 
 Ereignisse können eine [Benachrichtigung](#unterhaltungen) an Nutzergruppen auslösen, wenn diese Einstellung vorgenommen wurde.
@@ -550,26 +562,6 @@ Da die Terminplanung primär die Arbeitsplanung (beispielweise die Festlegung vo
 Angezeigte Kalender stellen auch Wochenenden und sonstige arbeitsfreie Tage dar, um sicherzustellen, dass versehentlich an einem solchen Tag geplante Ereignisse nicht übersehen werden.
 
 Die Planung von Terminen ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht.
-
-Neben der Terminplanung kann der Kalender für die Erfassung der Arbeitszeiten der Mitarbeiter genutzt werden. Dies steht nur mittelbar in Zusammenhang mit der Arbeitsplanung, soweit Urlaube und andere dienstfreie Zeiten erfasst und angezeigt werden können und die Planungen beeinflussen können. Wo wir aber schon einmal dabei sind können ebensogut die Arbeitszeiten erfasst und berechnet werden. Die Anzeige und der Export ist nur für den betroffenen Nutzer, Bereichsleiter und berechtigte Nutzer möglich. Letztere sind dazu berechtigt für jeden Nutzer eine Eingabe zu machen um beipielsweise Bereiche über Krankenausfälle zu informieren. Nicht abgeschlossene Einträge können nur durch den Nutzer selbst bearbeitet werden. Der Status als abgeschlossen kann von einem Bereichsleiter des dem Nutzer zugewiesenen Bereichs oder für Vollzugriff berechtigten Nutzern gesetzt werden. Die Nutzereinstellungen erlauben die Eingabe von Wochenstunden zugunsten einer zielführenden Berechnung. Die Zeiterfassung findet auf Vertrauensbasis statt, wobei jeder Mitabeiter seine Dienstzeiten manuell einträgt.
-
-Dies soll eine transparente Kommunikation, einen vertraulichen Umgang mit den Daten und eine gemeinsame Übereinkunft über die Zeiterfassung sicherstellen. Ziel ist es allen bekannten Anliegen deutschen Rechts und denen der Personalräte und Gewerkschaften zu entsprechen. Dabei handelt es sich nicht um eine dauerhafte Erfassung, da die Datenbank um Nutzereinträge bei deren Löschung bereinigt wird. Arbeitszeitzusammenfassungen können exportiert werden, was nach aktuellem Stand ein bevorzugter Weg ist und im Sinne einer langfristigeren Datenspeicherung im Sinne von Arbeitszeitgesetzen empfohlen wird. Die Aufzeichnungen entsprechen etablierten Verfahren in Art und Umfang, verbessern die Zugriffssicherheit sensibler Daten auf einen eingeschränkten Personenkreis und vereinfachen die Berechnung ehrlich erfasster Daten. 
-
-Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten Ereignissen angezeigt als auch andersherum, um für das Arbeitsaufkommen der verbleibenden Belegschaft zu sensibilisieren.
-
-*Warnung: die aktuelle Implementierung hat eine recht starre Definition von Feiertagen und berücksichtigt weder unterschiedliche Regionen, noch mögliche Änderungen gesetzlicher Feiertage. Derzeit würden Änderungen auch vergangene Zeiterfassungen berücksichtigen und unterschiedliche Berechnungen ergeben. Bei kleineren Änderungen wird empfohlen die neuesten Zeiterfassungen zu exportieren und innerhalb der Anwendung neu zu beginnen.*
-
-Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
-
-Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahresurlaub/Wochenarbeitszeit* im ISO 8601 Format `yyyy-mm-dd XX` anzugeben, wobei `XX`für die Anzahl an Urlaubstagen oder Wochenarbeitszeitstunden steht. Falls unterjährig in die Berechnung eingestiegen werden soll muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
-```
-2023-07-01; 15
-2024-01-01; 30
-2026-01-01; 15
-```
-Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte sind erlaubt, als Trennzeichen gelten Komma oder Punkt. Die Trennung zwischen Datum und Wert ist mit Ausnahme von Zahlen frei wählbar.
-
-Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar%20de.png)
 
@@ -638,6 +630,9 @@ graph TD;
     summary-......->select_day
 ```
 
+[Übersicht](#übersicht)
+
+### Langzeitplanung
 Der Kalender unterstützt eine Langzeitplanung, wie sie etwa für die Einteilung von Auszubildenden über die Bereiche hinweg genutzt werden kann. Hier können innerhalb festgelegter Zeiträume farbliche Markierungen genutzt werden um z.B. Zuordnungen darzustellen. Der Editor erlaubt dabei auch den Import von vorausgehenden Planungen in den neuen Zeitraum, sowie das Hinzufügen und Entfernen von Namen und Farbvorlagen. Dabei sind Namen nicht zwingend Personen zuzuordnen und Farben nicht notwendigerweise Bereichen - die Planung kann für beliebige Zwecke verwendet werden. Planungen sind von jedem Nutzer einsehbar sobald die Planung als abgeschlossen markiert wurde, editierbar jedoch nur von Nutzern mit entsprechender Berechtigung. Die Planungen haben nur einen informellen Character und sind keine dauerhaften Aufzeichnungen.
 
 Die Planung ist einfach zu nutzen:
@@ -649,6 +644,29 @@ Die Planung ist einfach zu nutzen:
 Gewählte Zeiträume werden auf den ersten Tag des Startmonats und den letzten Tag des Endmonats korrigiert. Die Einfärbung erfolgt für halbe Monate.
 
 ![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning%20de.png)
+
+[Übersicht](#übersicht)
+
+### Zeiterfassung
+Neben der Terminplanung kann der Kalender für die Erfassung der Arbeitszeiten der Mitarbeiter genutzt werden. Dies steht nur mittelbar in Zusammenhang mit der Arbeitsplanung, soweit Urlaube und andere dienstfreie Zeiten erfasst und angezeigt werden können und die Planungen beeinflussen können. Wo wir aber schon einmal dabei sind können ebensogut die Arbeitszeiten erfasst und berechnet werden. Die Anzeige und der Export ist nur für den betroffenen Nutzer, Bereichsleiter und berechtigte Nutzer möglich. Letztere sind dazu berechtigt für jeden Nutzer eine Eingabe zu machen um beipielsweise Bereiche über Krankenausfälle zu informieren. Nicht abgeschlossene Einträge können nur durch den Nutzer selbst bearbeitet werden. Der Status als abgeschlossen kann von einem Bereichsleiter des dem Nutzer zugewiesenen Bereichs oder für Vollzugriff berechtigten Nutzern gesetzt werden. Die Nutzereinstellungen erlauben die Eingabe von Wochenstunden zugunsten einer zielführenden Berechnung. Die Zeiterfassung findet auf Vertrauensbasis statt, wobei jeder Mitabeiter seine Dienstzeiten manuell einträgt.
+
+Dies soll eine transparente Kommunikation, einen vertraulichen Umgang mit den Daten und eine gemeinsame Übereinkunft über die Zeiterfassung sicherstellen. Ziel ist es allen bekannten Anliegen deutschen Rechts und denen der Personalräte und Gewerkschaften zu entsprechen. Dabei handelt es sich nicht um eine dauerhafte Erfassung, da die Datenbank um Nutzereinträge bei deren Löschung bereinigt wird. Arbeitszeitzusammenfassungen können exportiert werden, was nach aktuellem Stand ein bevorzugter Weg ist und im Sinne einer langfristigeren Datenspeicherung im Sinne von Arbeitszeitgesetzen empfohlen wird. Die Aufzeichnungen entsprechen etablierten Verfahren in Art und Umfang, verbessern die Zugriffssicherheit sensibler Daten auf einen eingeschränkten Personenkreis und vereinfachen die Berechnung ehrlich erfasster Daten. 
+
+Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten Ereignissen angezeigt als auch andersherum, um für das Arbeitsaufkommen der verbleibenden Belegschaft zu sensibilisieren.
+
+*Warnung: die aktuelle Implementierung hat eine recht starre Definition von Feiertagen und berücksichtigt weder unterschiedliche Regionen, noch mögliche Änderungen gesetzlicher Feiertage. Derzeit würden Änderungen auch vergangene Zeiterfassungen berücksichtigen und unterschiedliche Berechnungen ergeben. Bei kleineren Änderungen wird empfohlen die neuesten Zeiterfassungen zu exportieren und innerhalb der Anwendung neu zu beginnen.*
+
+Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
+
+Für eine korrete Berechnung ist es erforderlich Werte als *Startdatum und Jahresurlaub/Wochenarbeitszeit* im ISO 8601 Format `yyyy-mm-dd XX` anzugeben, wobei `XX`für die Anzahl an Urlaubstagen oder Wochenarbeitszeitstunden steht. Falls unterjährig in die Berechnung eingestiegen werden soll muss der erste Eintrag den Resturlaub beinhalten. Danach sollte der volle Jahresurlaub mit Start zum 1. Januar des Folgejahres eingetragen werden. Bei Beendigung der Berechnungen sollte ein weiterer Wert mit den Resttagen zum Ende hin erfolgen. Ein Beispiel für eine dreijährige Periode mit Start und Ende im Sommer und jeweils 30 Tagen Jahresurlaub sähe ertwa folgendermaßen aus:
+```
+2023-07-01; 15
+2024-01-01; 30
+2026-01-01; 15
+```
+Die Wochenarbeitszeit sieht mit `2023-07-01; 39,5` ähnlich aus, Dezimalwerte sind erlaubt, als Trennzeichen gelten Komma oder Punkt. Die Trennung zwischen Datum und Wert ist mit Ausnahme von Zahlen frei wählbar.
+
+Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exportierenden Nutzer jedoch der Bequemlichkeit halber stets als erstes.
 
 [Übersicht](#übersicht)
 

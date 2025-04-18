@@ -26,6 +26,10 @@
         * [Audit](#audit)
         * [Management review](#management-review)
     * [Calendar](#calendar)
+        * [Appointment notice](#appointment-notice)
+        * [Scheduling](#scheduling)
+        * [Long term planning](#long-term-planning)
+        * [Timesheet](#timesheet)
     * [Files](#files)
     * [Purchase](#purchase)
         * [Vendor and product management](#vendor-and-product-management)
@@ -121,7 +125,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * document templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* update readme pictures, add responsibilities
+* update readme pictures, add responsibilities, appointment
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
@@ -626,10 +630,17 @@ Similar to audits you can enter management reviews, save and edit later, make th
 
 [Content](#content)
 
-
 ## Calendar
 ![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu.png)
 
+### Appointment notice
+Create an appointment notice for customers. Setting relevant data you can decide to either hand out a printed version containing the appointment data as well as a QR-code for import into a mobile device calendar or directly an ICS-file to send by mail or messenger.
+
+![appointment screenshot](http://toh.erroronline.one/caro/appointment.png)
+
+[Content](#content)
+
+### Scheduling
 Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
@@ -640,25 +651,6 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records).
 
-Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined authorized users only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined authorized users for full access only. User settings allow for entering weekly hours to calculate properly. Timetracking happens based on trust, while employees record their working hours manually.
-
-This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. Records correspond to established methods type- and scopewise, improve security on sensible data accessible only by a restricted user group and simplify calculations for honest tracked data.
-
-Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
-
-*Warning: current impementation has quite a fixed definition of holidays and does not take different regions as well as changes in public holidays into account. Currently changes will affect past timesheet entries and calculate different results. Changes as soon as i can think of a solution! On minor changes it is recommended to export the most recent timesheets and start tracking anew.*
-
-Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
-
-For a correct calculation it is neccessary to provide values as *start-date and annual vacation/weekly hours* in the ISO 8601 format `yyyy-mm-dd XX`, where `XX` stands for number of vacation days or weekly hours. If entering the calculation during a calendar year, actual remaining annual vacation days have to be the initial value. Then the full annual vacation days can be applied by adding a setting for the next year starting on January 1st. On exiting the calculation another setting sould be applied with the annual vacation days up to the exit date. An example for a three years period starting and ending in summer with 30 days of annual vacation per contract would look like:
-```
-2023-07-01; 15
-2024-01-01; 30
-2026-01-01; 15
-```
-Weekly hours look similar like `2023-07-01; 39.5` with allowed decimal values and comma or period as delimiter. The separator between date and value is freely choosable except numbers.
-
-Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
 
@@ -726,6 +718,9 @@ graph TD;
     summary-......->select_day
 ```
 
+[Content](#content)
+
+### Long term planning
 The calendar supports long term planning like used for assigning appretices to units over the course of their training. Within defined timespans color markings can be used e.g. to display allocation. The editor allows for import of previous plans into the new timespan as well as adding and removing names and color selections. You don't necessarily have to assign persons and units - planning can be used for any porpose. Plans are accessible by anyone once being marked as finished, editable by permitted users only. Longterm planning is informal only and not a persistent record.
 
 Planning is easy to use:
@@ -737,6 +732,29 @@ Planning is easy to use:
 Given timespans are corrected to the first day of selected starting month and last day of ending month. Colourizing is possible for half months.
 
 ![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning.png)
+
+[Content](#content)
+
+### Timesheet
+Beside scheduling, the calendar can be used to document working hours of the staff. This is originally loosely connected with planning as far as vacations and other leaves can be entered, displayed and may affect scheduling events. While we're at it we can as well write the working hours up and summarize them. Displaying and exporting is permitted to the owning user, supervisor and defined authorized users only. Latter are allowed to contribute an entry for every user to inform units about sick leave. Editing is only permitted to the owning user for unclosed entries. Entries approval state can be set by supervisors of the respective unit and defined authorized users for full access only. User settings allow for entering weekly hours to calculate properly. Timetracking happens based on trust, while employees record their working hours manually.
+
+This is supposed to ensure a transparent communication, data safety and collective agreements on timetracking. It aims to address all known concerns of german law and staff council/union. It's not a persistent tracking though, for the database will be cleaned from all entries where the affected user is deleted. Timesheets can be exported, which is preferred anyway by current experience and is highly recommended if used for documentation regarding labour laws. Records correspond to established methods type- and scopewise, improve security on sensible data accessible only by a restricted user group and simplify calculations for honest tracked data.
+
+Off duty events are displayed with the scheduled events, but scheduled events are also displayed within the timesheet calendar to raise awareness about possible workload of the remaining staff.
+
+*Warning: current impementation has quite a fixed definition of holidays and does not take different regions as well as changes in public holidays into account. Currently changes will affect past timesheet entries and calculate different results. Changes as soon as i can think of a solution! On minor changes it is recommended to export the most recent timesheets and start tracking anew.*
+
+Timesheets support changes in weekly hours and annual vacation though. Respective start dates and values are part of the user settings.
+
+For a correct calculation it is neccessary to provide values as *start-date and annual vacation/weekly hours* in the ISO 8601 format `yyyy-mm-dd XX`, where `XX` stands for number of vacation days or weekly hours. If entering the calculation during a calendar year, actual remaining annual vacation days have to be the initial value. Then the full annual vacation days can be applied by adding a setting for the next year starting on January 1st. On exiting the calculation another setting sould be applied with the annual vacation days up to the exit date. An example for a three years period starting and ending in summer with 30 days of annual vacation per contract would look like:
+```
+2023-07-01; 15
+2024-01-01; 30
+2026-01-01; 15
+```
+Weekly hours look similar like `2023-07-01; 39.5` with allowed decimal values and comma or period as delimiter. The separator between date and value is freely choosable except numbers.
+
+Exports are ordered by user name with exporting user coming first regardless, for convenience.
 
 [Content](#content)
 
@@ -2652,7 +2670,36 @@ Sample response
 ```
 {"response":{"msg":"Management review has been deleted.","type":"success"}}
 ```
+
 ### Calendar endpoints
+
+> POST ./api/api.php/calendar/appointment
+
+Initiates a new planning form or updates or stores a new longterm plan.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | either new planning parameters or actual planning data to store |
+
+Sample response
+```
+{"render":[{"type":"links","description":"Print out the PDF or send the ICS-file by mail or messenger","content":{"PDF handout with QR appointment":{"href":"./api/api.php/file/stream/./fileserver/tmp/PDF handout with QR appointment fitting 2025-04-25 10:00.pdf"},"ICS calendar file":{"href":"./api/api.php/file/stream/./fileserver/tmp/ICS calendar file fitting 2025-04-25 10:00.ics","download":"ICS calendar file fitting 2025-04-25 10:00.ics"}}}]}
+```
+
+> GET ./api/api.php/calendar/appointment
+
+Returns a form to create an appointment note and ICS-file.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"appointment","action":"javascript:api.calendar('post', 'appointment')"},"content":[[{"type":"date","attributes":{"name":"Date","value":""}},{"type":"time","attributes":{"name":"Time","value":""}},{"type":"text","hint":"e.g. cast for orthosis, fitting for prosthesis, etc.","attributes":{"name":"Occasion","value":""}},{"type":"text","hint":"e.g. remember bringing shoes","attributes":{"name":"Reminder","value":""}},{"type":"number","attributes":{"name":"Approximate duration (hours)","min":1,"max":200,"step":1,"value":1}}]]}}
+```
 
 > PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
 
@@ -4275,11 +4322,11 @@ Returns a form with selection of code creators.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {type} | path parameter | optional | supported code type (qrcode_text, qrcode_appointment, barcode_code128, barcode_ean13) |
+| {type} | path parameter | optional | supported code type (qrcode_text, barcode_code128, barcode_ean13) |
 
 Sample response
 ```
-{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
+{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": ""}}]]]}}
 ```
 
 > POST ./api/api.php/tool/code/{type}
@@ -4289,12 +4336,12 @@ Returns a form with selection of code creators, prefilled with passed data from 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {type} | path parameter | required | supported code type (qrcode_text, qrcode_appointment, barcode_code128, barcode_ean13) |
+| {type} | path parameter | required | supported code type (qrcode_text, barcode_code128, barcode_ean13) |
 | payload | form data | required | defined fields from previous GET fetch |
 
 Sample response
 ```
-{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"QR appointment": {"value": "qrcode_appointment"},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
+{"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
 ```
 
 > GET ./api/api.php/tool/image
