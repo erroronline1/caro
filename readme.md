@@ -127,14 +127,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * handle hidden attribute?
 * responsive masonry as application setting option, alter code by inserting empty articles to limit asymmetric height (aria hidden to ensure accessibility and order of elements)
     * split longterm-planning widget
-* review window.scrollTo(0, document.body.scrollHeight) for eligible api methods
 * vendor text recommendation, import values gone after error?
-    * selection abort error "could not find modal"
-    * hide edit buttons on modal!
-* keyboard input jumping to select modal options
-* highlighting required inputs on modals (see assemble.prepareform()) e.g. login
-* review single simple record export
-* review 'deliver by' order data not showing up
+    * hide edit buttons on modal! reproduce on iis
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -164,7 +158,7 @@ Main goal is a distribution of mobile devices to the whole staff or at least key
 For technical details see [prerequisites](#prerequisites). 
 
 ## What it is not
-Beside a few architectural decisions the app is not a preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
+Beside some architectural decisions to fit regulatory requirements the app is not a fully preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
 
 The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
 
@@ -1368,7 +1362,7 @@ bundle_files_per_slide = 12
 products_per_slide = 6
 ```
 
-Calendar dateformat takes effect where reasonable. Since the ISO 8601 YYYY-MM-DD is the superior format and way better at being sorted, selections stick with it independent of any setting. 
+Calendar dateformat takes effect where reasonable. Since the ISO 8601 YYYY-MM-DD is the superior format and way better at being sorted, selections stick with it independent of any setting. Document inputs of type date adhere to this format as well, due to the browsers date processing.
 
 PDF-labels can be extended to desired formats. For labels and pdf setting following options are available, albeit not necessarily being used on all requests:
 | Key | Options | Default if not provided |
@@ -2005,7 +1999,7 @@ Stakeholder identification:
 | HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | Implemented; 2025-04-08 |
 | Shorter idle timespan for improved data security | CEO | 2025-04-07 | Implemented; 2025-04-13 |
 | Configurable time format output | User | 2025-04-16 | Implemented; 2025-04-17 |
-| Keyboard input jumping to select modal options | User | 2025-04-16 |
+| Keyboard input jumping to select modal options | User | 2025-04-16 | Implemented; 2025-04-18 |
 | Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16 |
 
 #### Rejected requirements

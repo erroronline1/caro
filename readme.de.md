@@ -80,7 +80,7 @@ Das oberste Ziel ist die Ausstattung der gesamten Belegschaft oder zumindest von
 Für technische Details siehe [Voraussetzungen](#voraussetzungen).
 
 ## Was es nicht ist
-Abgesehen von einigen architektonischen Entscheidungen ist die Anwendung kein voreingestelltes Qualitätsmanagementsystem. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
+Abgesehen von einigen architektonischen Entscheidungen zur Erfüllung regulatorischer Anforderungen ist die Anwendung kein vollständig voreingestelltes Qualitätsmanagementsystem. Prozesse, Dokumente und Verantwortlichkeiten sind selbst zu bestimmen. Die Anwendung soll lediglich dabei unterstützen strukturierte Abläufe und eine halbautomatisierte Erfüllung regulatorischer Anforderungen sicherzustellen. *Berechtigungen in den Flussdiagrammen stellen unverbindliche Standardeinstellungen dar.*
 
 Die Anwendung ersetzt kein ERP-System. Daten für den Einkauf sind nur innerhalb der Oberfläche auf Basis der eigenen Datenbank möglich. Diese bewusste Entscheidung richtet sich gegen aufgeblähte Artikelstammdaten von ERP-Systemen derer kaum Herr zu werden möglich ist und die stets eine geschlossene Benutzeroberfläche erfordern. Die Produktdatenbank kann durch Preislisten der Lieferanten bestückt und dabei von vorneherein regelmäßig um unwichtige Daten bereinigt werden.
 
@@ -1281,7 +1281,7 @@ bundle_files_per_slide = 12
 products_per_slide = 6
 ```
 
-Calendar dateformat wird angewendet wo es angemessen ist. Da das ISO 8601 Format mit YYYY-MM-DD überlegen und zudem besser zu sortieren ist, wird es insbesondere bei Auswahllisten unabhängig von der Konfiguration beibehalten. 
+Calendar dateformat wird angewendet wo es angemessen ist. Da das ISO 8601 Format mit YYYY-MM-DD überlegen und zudem besser zu sortieren ist, wird es insbesondere bei Auswahllisten unabhängig von der Konfiguration beibehalten. Eingabefelder in Dokumenten vom Datum-Typ halten sich aufgrund der Datumverarbeitung des Browsers ebenfalls an dieses Format.
 
 PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label und PDF-Einstellungen sind folgende Optionen verfügbar, wenngleich nicht zwingend für alle Anfragen verwendet:
 | Schlüssel | Optionen | Standard sofern nicht gesetzt |
