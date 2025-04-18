@@ -108,6 +108,7 @@ class USER extends API {
 				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_homeoffice'));
 				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_language')) ? : 'en';
 				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_theme'));
+				$user['app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_masonry'));
 				$user['app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_forth'));
 				$user['app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_back'));
 
@@ -369,7 +370,8 @@ class USER extends API {
 						'content' => [
 							$this->_lang->GET('user.settings_force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
 							$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
-						]
+							//$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
+							]
 					], [
 						'type' => 'select',
 						'attributes' => [

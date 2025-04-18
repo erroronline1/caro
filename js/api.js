@@ -263,6 +263,7 @@ export const api = {
 				if (api._settings.config.lifespan.idle > 0 && remaining < 10000 && api.session_timeout.events > 2) {
 					// if some events have been counted a small backend request prolongs the session approximately ten seconds before real timeout
 					api.session_timeout.events = null;
+					new Toast(null, null, null, "sessionwarning");
 					api.application("get", "authentify");
 				}
 				if (api._settings.config.lifespan.idle > 0 && remaining_visual > 0) {
@@ -529,8 +530,21 @@ export const api = {
 											if (stylesheet[i].conditionText === "only screen and (min-width: 64rem)") {
 												stylesheet[i].media.mediaText = "only screen and (min-width: 0)";
 											}
-											if (stylesheet[i].conditionText === "only screen and (max-width: 64rem)") {
-												stylesheet[i].media.mediaText = "only screen and (max-width: 0)";
+										}
+									}
+									break;
+								case "masonry":
+									break;
+									if (value) {
+										let stylesheet;
+										for (const [i, sname] of Object.entries(document.styleSheets)) {
+											if (!sname.href.includes("style.css")) continue;
+											stylesheet = document.styleSheets[i].cssRules;
+											break;
+										}
+										for (let i = 0; i < stylesheet.length; i++) {
+											if (stylesheet[i].conditionText === "only screen and (min-width: 1000rem)") {
+												stylesheet[i].media.mediaText = "only screen and (min-width: 105rem)";
 											}
 										}
 									}

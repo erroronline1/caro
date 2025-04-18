@@ -179,30 +179,6 @@ main {
 	margin-bottom: 6rem;
 }
 
-/* desktop masonry _client.application.masonry * /
-@media only screen and (min-width: 90rem) {
-	main {
-		max-width: 100rem;
-
-		> div,
-		> form {
-			display: flex;
-			flex-direction: row;
-			flex-wrap: wrap;
-			align-items:flex-start;
-			gap: 1em;
-			> article,
-			> button {
-				flex-direction: column;
-				display:initial;
-				position: relative;
-				width: calc(50% - 1.5rem) !important;
-			}
-		}
-	}
-}
-/**/
-
 dialog {
 	position: fixed;
 	display: block;
@@ -1245,6 +1221,35 @@ section > div > hr {
 
 .articleactive {
 	fill: var(--foreground);
+}
+
+
+/*************************** bigger screen masonry ******************************/
+/* quite at the bottom to override previous values.
+hope default value is ridiculously high enough in the medium future.
+min width will be reduced to a reasonable size by api.js in case user settings activate masonry style */
+
+@media only screen and (min-width: 1000rem) {
+	main {
+		max-width: 100rem;
+
+		> div,
+		> form {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items:flex-start;
+			gap: 2em;
+			> article,
+			> button {
+				flex-direction: column;
+				display:initial;
+				position: relative;
+				width: calc(50% - 1.5rem) !important;
+				margin-bottom: 2em;
+			}
+		}
+	}
 }
 
 /*************************** icons and cursors ******************************/

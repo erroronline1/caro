@@ -482,11 +482,12 @@ export class Dialog {
 			buttons.append(button);
 		}
 		// jump to optgoup while dialog has focus right after creation, at least on desktop with physical keyboard
-		if (optgroup) buttons.addEventListener("keydown", (event) => {
-			event.preventDefault(); // prevent starting site search 
-			const opt = document.getElementById("opt" + event.key.toUpperCase()) || document.getElementById("opt" + event.key);
-			if (opt) opt.scrollIntoView();
-		});
+		if (optgroup)
+			buttons.addEventListener("keydown", (event) => {
+				event.preventDefault(); // prevent starting site search
+				const opt = document.getElementById("opt" + event.key.toUpperCase()) || document.getElementById("opt" + event.key);
+				if (opt) opt.scrollIntoView();
+			});
 		return [buttons];
 	}
 }
@@ -655,7 +656,51 @@ export class Assemble {
 			eventListenerTarget.removeEventListener("scroll", _client.application.lazyload.load);
 		}
 
+		if (api._settings.user.app_settings && api._settings.user.app_settings.masonry) this.masonry();
+
 		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
+	}
+
+	/**
+	 * rearranges the content alternating masonry style
+	 * kudos: https://dev.to/smpnjn/css-only-masonry-grid-layouts-ndp
+	 */
+	masonry() {
+		return;
+		const mainId = "main",
+			itemIdentifier = "main>div>article, main>div>button, main>form>article, main>form>button";
+
+		// Programmatically get the column width
+		let item = document.querySelector(itemIdentifier);
+		let parentWidth = item.parentNode.getBoundingClientRect().width;
+		let itemWidth = item.getBoundingClientRect().width + parseFloat(getComputedStyle(item).marginLeft) + parseFloat(getComputedStyle(item).marginRight);
+		let columnWidth = Math.round(1 / (itemWidth / parentWidth));
+
+		// We need this line since JS nodes are dumb
+		let arrayOfItems = Array.prototype.slice.call(document.querySelectorAll(itemIdentifier));
+		let trackHeights = {};
+		arrayOfItems.forEach(function (item) {
+			// Get index of item
+			let thisIndex = arrayOfItems.indexOf(item);
+			// Get column this and set width
+			let thisColumn = thisIndex % columnWidth;
+			if (typeof trackHeights[thisColumn] == "undefined") {
+				trackHeights[thisColumn] = 0;
+			}
+			trackHeights[thisColumn] += item.getBoundingClientRect().height + parseFloat(getComputedStyle(item).marginBottom);
+			// If the item has an item above it, then move it to fill the gap
+			if (thisIndex - columnWidth >= 0) {
+				let getItemAbove = document.querySelectorAll(itemIdentifier)[thisIndex - columnWidth];
+				let previousBottom = getItemAbove.getBoundingClientRect().bottom;
+				let currentTop = item.getBoundingClientRect().top - parseFloat(getComputedStyle(item).marginBottom);
+				item.style.top = `-${currentTop - previousBottom}px`;
+			}
+		});
+		let max = Math.max(...Object.values(trackHeights));
+		
+		document.querySelector("html").style.height = document.querySelector("main").style.height= `${max}px`;
+		//document.querySelector(mainId).style.backgroundColor = `green`;
+		//document.querySelector("body").style.backgroundColor = `red`;
 	}
 
 	/**
