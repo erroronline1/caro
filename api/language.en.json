@@ -2,7 +2,9 @@
 	"_LICENSE": "CARO - Cloud Assisted Records and Operations Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one) This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.",
 	"_IMPORTANT": "see _language.md",
 	"company": {
-		"address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland"
+		"address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland",
+		"mail": "spam@spam.spam",
+		"phone": "01234 567890"
 	},
 	"permissions": {
 		"user": "User",
@@ -1388,12 +1390,13 @@
 			"barcode_ean13_hint": "12 to 13 numbers only, check number will be verified or appended",
 			"code_created": "Download created code",
 			"code_select_type": "Create a",
+			"ics_appointment":"ICS calendar file",
 			"qrcode_appointment": "QR appointment",
 			"qrcode_appointment_date": "Date / Time",
 			"qrcode_appointment_duration": "Approximate duration (hours)",
 			"qrcode_appointment_occasion": "Occasion",
 			"qrcode_appointment_occasion_hint": "e.g. cast for orthosis, fitting for prosthesis, etc.",
-			"qrcode_appointment_readable": "Your appointment at :company\n\nfor :occasion\non :start\nuntil around :end\n\nPlease remember: :reminder",
+			"qrcode_appointment_readable": "Your appointment at :company\n\nfor :occasion\non :start\nuntil around :end\n\nPlease remember: :reminder\n\nPhone: :phone\neMail: :mail",
 			"qrcode_appointment_reminder": "Reminder",
 			"qrcode_appointment_reminder_default": "Please let us know if you cannot make the appointment.",
 			"qrcode_appointment_reminder_hint": "e.g. remember bringing shoes",

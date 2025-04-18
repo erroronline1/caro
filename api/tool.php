@@ -331,13 +331,21 @@ class TOOL extends API {
 					],
 				],
 				'code' =>
+					"BEGIN:VCALENDAR\n".
+					"PRODID:-//" . $this->_lang->GET('company.address') . "//CALENDAR//EN\n" .
+					"VERSION:2.0\n" .
 					"BEGIN:VEVENT\n" .
+					"UID:20250423T100000spam@spam.spam\n" .
 					"SUMMARY:" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')) . "\n" .
 					"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
 					"DESCRIPTION:" . $appointmentreminder . "\n" .
-					"DTSTART:" . str_replace('-', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date'))) . 'T' . str_replace(':', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) . "00\n" .
-					"DTEND:" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration'))) * 3600) . "\n" .
-					"END:VEVENT"
+					"DTSTAMP;TZID=/" . CONFIG['application']['timezone'] . ":" . date("Ymd\THis"). "\n" .
+					"DTSTART;TZID=/" . CONFIG['application']['timezone'] . ":" . str_replace('-', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date'))) . 'T' . str_replace(':', '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) . "00\n" .
+					"DTEND;TZID=/" . CONFIG['application']['timezone'] . ":" . date("Ymd\THis", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration'))) * 3600) . "\n" .
+					"CONTACT:" . $this->_lang->GET('company.phone') . "\n" .
+					"ORGANIZER:" . $this->_lang->GET('company.mail') . "\n" .
+					"END:VEVENT\n" .
+					"END:VCALENDAR"
 			],
 			'qrcode_text' => ['name' => $this->_lang->GET('tool.code.qrcode_text'),
 				'content' => [
@@ -418,7 +426,9 @@ class TOOL extends API {
 									':occasion' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')),
 									':start' => UTILITY::dateFormat(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date'))) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time')),
 									':end' => UTILITY::dateFormat(date("Y-m-d H:i", strtotime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time'))) + intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_duration'))) * 3600)),
-									':reminder' => $appointmentreminder
+									':reminder' => $appointmentreminder,
+									':phone' => $this->_lang->GET('company.phone'),
+									':mail' => $this->_lang->GET('company.mail')
 								], true)
 							],
 							'filename' => $this->_lang->GET('tool.code.qrcode_appointment')
@@ -426,6 +436,18 @@ class TOOL extends API {
 						$downloadfiles[$this->_lang->GET('tool.code.qrcode_appointment')] = [
 							'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
 						];
+
+						// add ics file to send by mail
+						$tempFile = UTILITY::directory('tmp') . '/' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_occasion')) . UTILITY::dateFormat(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_date'))) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.code.qrcode_appointment_time')). '.ics';
+						$file = fopen($tempFile, 'w');
+						fwrite($file, $types[$this->_requestedType]['code']);
+						fclose($file);
+						// provide downloadfile
+						$downloadfiles[$this->_lang->GET('tool.code.ics_appointment')] = [
+							'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+							'download' => $tempFile
+						];
+
 						$body = [
 							[
 								'type' => 'links',
