@@ -593,7 +593,45 @@
 		"userskills_warning_description": "Some defined skills are not matched!"
 	},
 	"calendar": {
+		"appointment": {
+			"date": "Date",
+			"download":"Print out the PDF or send the ICS-file by mail or messenger",
+			"duration": "Approximate duration (hours)",
+			"ics":"ICS calendar file",
+			"occasion": "Occasion",
+			"occasion_hint": "e.g. cast for orthosis, fitting for prosthesis, etc.",
+			"pdf": "PDF handout with QR appointment",
+			"readable": "Your appointment at :company\n\nfor :occasion\non :start\nuntil around :end\n\nPlease remember: :reminder\n\nPhone: :phone\neMail: :mail",
+			"reminder": "Reminder",
+			"reminder_default": "Please let us know if you cannot make the appointment.",
+			"reminder_hint": "e.g. remember bringing shoes",
+			"time": "Time",
+			"title": "Your appointment"
+		},
 		"daily_title": ":day: :number entries",
+		"longtermplanning": {
+			"addcolor": "Add another color selection",
+			"addcolor_name": "Name new color selection",
+			"addname": "Add new name",
+			"author": "created by :author",
+			"closed": "Planning completed",
+			"closed_hint": "Completed plannings are visible to all users",
+			"delete_color": "Unset color to erase",
+			"delete_color_header": "Delete color selection",
+			"delete": "Delete plan",
+			"delete_error": "Planning could not be deleted, please try again.",
+			"delete_success": "Planning deleted",
+			"end": "End",
+			"hint": "Names will be removed from result if left empty. Colors can be removed via context selection (right click).",
+			"import": "Import existing plan for selected timespan",
+			"name": "Name",
+			"new_hint": "The starting month will be set to the first, the ending month to the last day by default. Planning occurs for half months.",
+			"save_error": "Planning could not be saved, please try again.",
+			"save_success": "Planning has been saved",
+			"select": "Select",
+			"start": "Start",
+			"subject": "Subject"
+		},
 		"month_next": "next month",
 		"month_previous": "previous month",
 		"schedule": {
@@ -684,29 +722,6 @@
 			"start": "Start",
 			"start_date": "Start date",
 			"start_time": "Start time"
-		},
-		"longtermplanning": {
-			"addcolor": "Add another color selection",
-			"addcolor_name": "Name new color selection",
-			"addname": "Add new name",
-			"author": "created by :author",
-			"closed": "Planning completed",
-			"closed_hint": "Completed plannings are visible to all users",
-			"delete_color": "Unset color to erase",
-			"delete_color_header": "Delete color selection",
-			"delete": "Delete plan",
-			"delete_error": "Planning could not be deleted, please try again.",
-			"delete_success": "Planning deleted",
-			"end": "End",
-			"hint": "Names will be removed from result if left empty. Colors can be removed via context selection (right click).",
-			"import": "Import existing plan for selected timespan",
-			"name": "Name",
-			"new_hint": "The starting month will be set to the first, the ending month to the last day by default. Planning occurs for half months.",
-			"save_error": "Planning could not be saved, please try again.",
-			"save_success": "Planning has been saved",
-			"select": "Select",
-			"start": "Start",
-			"subject": "Subject"
 		}
 	},
 	"consumables": {
@@ -893,6 +908,7 @@
 			"user_profile": "My profile"
 		},
 		"calendar": {
+			"appointment": "Appointment notice",
 			"header": "Calendar",
 			"longtermplanning": "Long term planning",
 			"scheduling": "Scheduling",
@@ -1390,18 +1406,6 @@
 			"barcode_ean13_hint": "12 to 13 numbers only, check number will be verified or appended",
 			"code_created": "Download created code",
 			"code_select_type": "Create a",
-			"ics_appointment":"ICS calendar file",
-			"qrcode_appointment": "QR appointment",
-			"qrcode_appointment_date": "Date / Time",
-			"qrcode_appointment_duration": "Approximate duration (hours)",
-			"qrcode_appointment_occasion": "Occasion",
-			"qrcode_appointment_occasion_hint": "e.g. cast for orthosis, fitting for prosthesis, etc.",
-			"qrcode_appointment_readable": "Your appointment at :company\n\nfor :occasion\non :start\nuntil around :end\n\nPlease remember: :reminder\n\nPhone: :phone\neMail: :mail",
-			"qrcode_appointment_reminder": "Reminder",
-			"qrcode_appointment_reminder_default": "Please let us know if you cannot make the appointment.",
-			"qrcode_appointment_reminder_hint": "e.g. remember bringing shoes",
-			"qrcode_appointment_time": "Time",
-			"qrcode_appointment_title": "Your appointment",
 			"qrcode_text": "QR text / URL"
 		},
 		"image": {

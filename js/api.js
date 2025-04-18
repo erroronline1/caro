@@ -758,9 +758,10 @@ export const api = {
 					if (id && id[0]) id[0].value = data.response.id;
 				}
 				if (data.data) _serviceWorker.notif.calendar(data.data);
-				if (["post", "put", "delete"].includes(method) && ["schedule", "timesheet"].includes(request[1])) api.history.go("forth");
+				if (["post", "put", "delete"].includes(method) && ["schedule", "timesheet"].includes(request[1])) api.history.go("forth"); // updates the view after any change
 			},
 			title = {
+				appointment: api._lang.GET("menu.calendar.appointment"),
 				schedule: api._lang.GET("menu.calendar.scheduling"),
 				timesheet: api._lang.GET("menu.calendar.timesheet"),
 				longtermplanning: api._lang.GET("menu.calendar.longtermplanning"),
@@ -784,6 +785,21 @@ export const api = {
 				break;
 			case "post":
 				switch (request[1]) {
+					case "appointment":
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.render !== undefined) {
+								const options = {};
+								options[api._lang.GET("general.ok_button")] = false;
+								new Dialog({
+									type: "input",
+									render: data.render,
+									options: options,
+								});
+							}
+						};
+						payload = _.getInputs("[data-usecase=appointment]", true);
+						break;
 					case "longtermplanning":
 						if (!(payload = _client.calendar.longtermplanning())) payload = _.getInputs("[data-usecase=longtermplanning]", true);
 						break;

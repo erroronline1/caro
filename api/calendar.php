@@ -41,6 +41,156 @@ class CALENDAR extends API {
 	}
 
 	/**
+	 *                   _     _                 _   
+	 *   ___ ___ ___ ___|_|___| |_ _____ ___ ___| |_ 
+	 *  | .'| . | . | . | |   |  _|     | -_|   |  _|
+	 *  |__,|  _|  _|___|_|_|_|_| |_|_|_|___|_|_|_|  
+	 *      |_| |_|
+	 * display a form to create an appointment handout and ics file
+	 */
+	public function appointment(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (count((array_keys((array) $this->_payload)))){
+					require_once('./_pdf.php');
+					$downloadfiles = [];
+					$PDF = new PDF(CONFIG['pdf']['appointment']);
+
+					$appointment = [];
+					foreach([
+						'date',
+						'time',
+						'occasion',
+						'reminder',
+						'duration'
+					] as $key){
+						$appointment[$key] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.' . $key)) ? : '';
+					}
+
+					if (!$appointment['date'] || !$appointment['time'])	$this->response([], 406);
+
+					if ($appointment['reminder'] && !str_ends_with($appointment['reminder'], '.')) $appointment['reminder'].= '.';
+					$appointment['reminder'] .= ' ' . $this->_lang->GET('calendar.appointment.reminder_default', [], true);
+
+					$ics = "BEGIN:VCALENDAR\n".
+					"PRODID:-//" . CONFIG['system']['caroapp'] . "//CALENDAR//EN\n" .
+					"VERSION:2.0\n" .
+					"BEGIN:VEVENT\n" .
+					"UID:" . implode('-', str_split(md5(CONFIG['system']['caroapp'] . time()), 5)) . "\n" .
+					"CREATED:" . date('Ymd\THis') . "\n" .
+					"DTSTAMP:" . date('Ymd\THis') . "\n" .
+					"DTSTART:" . str_replace('-', '', $appointment['date']) . 'T' . str_replace(':', '', $appointment['time']) . "00\n" .
+					"DTEND:" . date("Ymd\THis", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600) . "\n" .
+					wordwrap("DESCRIPTION:" . $appointment['reminder'], 75, "\n ") . "\n" .
+					wordwrap("SUMMARY:" . $appointment['occasion'], 75, "\n ")  . "\n" .
+					"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
+					"CONTACT:" . $this->_lang->GET('company.phone') . "\n" .
+					"ORGANIZER:" . $this->_lang->GET('company.mail') . "\n" .
+					"END:VEVENT\n" .
+					"END:VCALENDAR";
+
+					$content = [
+						'title' => $this->_lang->GET('calendar.appointment.title', [], true),
+						'date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.date')),
+						'content' => [
+							$ics,
+							$this->_lang->GET('calendar.appointment.readable', [
+								':company' => $this->_lang->GET('company.address'),
+								':occasion' => $appointment['occasion'],
+								':start' => UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']),
+								':end' => UTILITY::dateFormat(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600)),
+								':reminder' => $appointment['reminder'],
+								':phone' => $this->_lang->GET('company.phone'),
+								':mail' => $this->_lang->GET('company.mail')
+							], true)
+						],
+						'filename' => $this->_lang->GET('calendar.appointment.pdf') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time'])
+					];
+					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
+						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
+					];
+
+					// add ics file to send by mail
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics';
+					$file = fopen($tempFile, 'w');
+					fwrite($file, $ics);
+					fclose($file);
+					// provide downloadfile
+					$downloadfiles[$this->_lang->GET('calendar.appointment.ics')] = [
+						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'download' => $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics'
+					];
+
+					$body = [
+						[
+							'type' => 'links',
+							'description' => $this->_lang->GET('calendar.appointment.download'),
+							'content' => $downloadfiles
+						]
+					];
+					$this->response([
+						'render' => $body
+					]);
+				}
+				$this->response([], 406);
+				break;
+			case "GET":
+				// i'll leave payload options here, maybe there is a future use to call this with get parameters as preparation.
+				$response = [
+					'render' => [
+						'form' => [
+							'data-usecase' => 'appointment',
+							'action' => "javascript:api.calendar('post', 'appointment')"	
+						],
+						'content' => [
+							[
+								[
+									'type' => 'date',
+									'attributes' => [
+										'name' => $this->_lang->GET('calendar.appointment.date'),
+										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.date')) ? : ''
+									]
+								], [
+									'type' => 'time',
+									'attributes' => [
+										'name' => $this->_lang->GET('calendar.appointment.time'),
+										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.time')) ? : ''
+									]
+								], [
+									'type' => 'text',
+									'hint' => $this->_lang->GET('calendar.appointment.occasion_hint'),
+									'attributes' => [
+										'name' => $this->_lang->GET('calendar.appointment.occasion'),
+										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.occasion')) ? : ''
+									]
+								], [
+									'type' => 'text',
+									'hint' => $this->_lang->GET('calendar.appointment.reminder_hint'),
+									'attributes' => [
+										'name' => $this->_lang->GET('calendar.appointment.reminder'),
+										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.reminder')) ? : ''
+									]
+								], [
+									'type' => 'number',
+									'attributes' => [
+										'name' => $this->_lang->GET('calendar.appointment.duration'),
+										'min' => 1,
+										'max' => 200,
+										'step' => 1,
+										'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.appointment.duration')) ? : 1
+									]
+								]
+							]
+						]
+					]
+				];
+				$this->response($response);
+				break;
+		}
+		$this->response([], 400);
+	}
+
+	/**
 	 *                     _     _
 	 *   ___ ___ _____ ___| |___| |_ ___
 	 *  |  _| . |     | . | | -_|  _| -_|

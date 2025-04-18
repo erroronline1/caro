@@ -401,6 +401,7 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.records.record_summary') => ['onclick' => "api.record('get', 'records')"]
 			],
 			$this->_lang->GET('menu.calendar.header') => [
+				$this->_lang->GET('menu.calendar.appointment') => ['onclick' => "api.calendar('get', 'appointment')"],
 				$this->_lang->GET('menu.calendar.scheduling') => ['onclick' => "api.calendar('get', 'schedule')"],
 				$this->_lang->GET('menu.calendar.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
 			],
