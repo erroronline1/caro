@@ -1268,7 +1268,6 @@ sheet[marginright] = 0 ; in mm
 sheet[marginbottom] = 10 ; in mm
 sheet[marginleft] = 0 ; in mm
 sheet[fontsize] = 10
-sheet[codesizeoffset] = 10
 sheet[header] = no
 sheet[footer] = no
 
@@ -1292,7 +1291,8 @@ appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape
 appointment[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
 appointment[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
-appointment[codesizeoffset] = 40
+appointment[codesizelimit] = 50
+appointment[codepadding] = 10
 
 [splitresults]
 bundle_files_per_slide = 12
@@ -1317,7 +1317,8 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 | rows | wiederholende Zeilen desselben Inhalts | 1 |
 | columns | wiederholende Spalten desselben Inhalts | 1 |
 | fontsize | einfache Zahl der Schriftgröße in *unit* | 12 |
-| codesizeoffset | einfache Zahl in *unit* als zusätzlicher Abstand eines QR-Codes vom Rand | 0 |
+| codesizelimit | einfache Zahl in *unit* limitiert die Größe, welche sich sonst am kleineren Wert von Spaltenbreite oder Zeilenhöhe orientiert | none |
+| codepadding | plain number in *unit*, zusätzlicher Abstand zwischen Code und Text | none |
 | header | yes oder no | yes |
 | footer | yes oder no | yes |
 

@@ -38,7 +38,8 @@ class PDF{
 			'rows'=> isset($setup['rows']) ? intval($setup['rows']) : 1,
 			'columns'=> isset($setup['columns']) ? intval($setup['columns']) : 1,
 			'fontsize'=> isset($setup['fontsize']) ? intval($setup['fontsize']) : 12,
-			'codesizeoffset' => isset($setup['codesizeoffset']) ? intval($setup['codesizeoffset']) : 0,
+			'codesizelimit' => isset($setup['codesizelimit']) ? intval($setup['codesizelimit']) : null,
+			'codepadding' => isset($setup['codepadding']) ? intval($setup['codepadding']) : 0,
 			'header' => isset($setup['header']) ? $setup['header'] : true,
 			'footer' => isset($setup['footer']) ? $setup['footer'] : true,
 		];
@@ -247,8 +248,7 @@ class PDF{
 		$columnwidth = ($format[0] - ($this->_setup['marginleft'] + $this->_setup['marginright'])) / $this->_setup['columns'];
 		$rowheight = ($format[1] - ($this->_setup['margintop'] + $this->_setup['marginbottom'])) / $this->_setup['rows'];
 
-		//var_dump($columnwidth, $rowheight);
-		$codesize = min($columnwidth, $rowheight) - $this->_setup['codesizeoffset'];
+		$codesize = min($columnwidth, $rowheight, $this->_setup['codesizelimit'] ? : $rowheight);
 		$style = array(
 			'border' => 0,
 			'vpadding' => 'auto',
@@ -260,8 +260,8 @@ class PDF{
 		);
 		for ($row = 0; $row < $this->_setup['rows']; $row++){
 			for ($column = 0; $column < $this->_setup['columns']; $column++){
-				$this->_pdf->write2DBarcode($content['content'][0], 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $this->_setup['marginleft'], $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
-				$this->_pdf->MultiCell($columnwidth - $codesize, $rowheight, $content['content'][1], 0, '', 0, intval($column === $this->_setup['columns'] - 1), $column * $columnwidth + $codesize + $this->_setup['marginleft'], $row * $rowheight + $this->_setup['margintop'], true, 0, false, true, 24, 'T', true);
+				$this->_pdf->write2DBarcode($content['content'][0], 'QRCODE,' . CONFIG['limits']['qr_errorlevel'], $column * $columnwidth + $this->_setup['marginleft'] , $row * $rowheight + $this->_setup['margintop'], $codesize, $codesize, $style, 'N');
+				$this->_pdf->MultiCell($columnwidth - $codesize - $this->_setup['codepadding'], $rowheight, $content['content'][1], 0, '', 0, intval($column === $this->_setup['columns'] - 1), $column * $columnwidth + $codesize + $this->_setup['marginleft'] + $this->_setup['codepadding'], $row * $rowheight + $this->_setup['margintop'], true, 0, false, true, 24, 'T', true);
 			}
 		}
 

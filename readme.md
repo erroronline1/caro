@@ -1349,7 +1349,6 @@ sheet[marginright] = 0 ; in mm
 sheet[marginbottom] = 10 ; in mm
 sheet[marginleft] = 0 ; in mm
 sheet[fontsize] = 10
-sheet[codesizeoffset] = 10
 sheet[header] = no
 sheet[footer] = no
 
@@ -1373,7 +1372,8 @@ appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape
 appointment[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
 appointment[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
-appointment[codesizeoffset] = 40
+appointment[codesizelimit] = 50
+appointment[codepadding] = 10
 
 [splitresults]
 bundle_files_per_slide = 12
@@ -1398,7 +1398,8 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 | rows | repetitive rows of content | 1 |
 | columns | repetitive columns of content | 1 |
 | fontsize | plain number of font size in points | 12 |
-| codesizeoffset | plain number of *unit* of offset of a qr code from borders | 0 |
+| codesizelimit | plain number of *unit* limits the size that is the minimum value of colum width or row height otherwise | none |
+| codepadding | plain number in *unit*, additional space between code and text | none |
 | header | yes or no | yes |
 | footer | yes or no | yes |
 
