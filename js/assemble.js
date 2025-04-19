@@ -41,9 +41,11 @@ export const assemble_helper = {
 	 * kudos: https://github.com/markmead/js-masonry
 	 *
 	 * this method has to be on global scope and called upon all dimension changes:
-	 * * assemble.processAfterInsertion()
+	 * * Assemble.processAfterInsertion()
 	 * * window resizing
 	 * * collapsible execution
+	 * * longtermplanning adding users and colours
+	 * * multiple inputs after Assemble.initializeSection()
 	 */
 	async masonry() {
 		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // fory anyone calling, e.g. collapsible
@@ -1777,6 +1779,7 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
+					assemble_helper.masonry();
 				}
 			};
 		}
@@ -2195,6 +2198,7 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
+					assemble_helper.masonry();
 				}
 			};
 		}
@@ -2392,6 +2396,7 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
+						assemble_helper.masonry();
 					}
 				};
 			}
@@ -2431,6 +2436,7 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
+						assemble_helper.masonry();
 					}
 				}
 			});
@@ -2584,6 +2590,7 @@ export class Assemble {
 								composer: "elementClone",
 								names: this.names,
 							}).initializeSection(null, hint ? hint[0] : label);
+							assemble_helper.masonry();
 						}
 					}
 				});
@@ -3143,6 +3150,7 @@ export class Assemble {
 						});
 						div.append(...schedules(labels, false, every));
 						e.target.parentNode.insertBefore(div, e.target);
+						assemble_helper.masonry();
 					}
 				});
 			});
@@ -3274,6 +3282,7 @@ export class Assemble {
 					if (response && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
 						let label = colorselection(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]);
 						e.target.parentNode.insertBefore(label, e.target);
+						assemble_helper.masonry();
 					}
 				});
 			});
