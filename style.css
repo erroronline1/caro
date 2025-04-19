@@ -1244,24 +1244,36 @@ main {
 			transition: ease 0.2s;
 		}
 	}
+	> div[draggable] {
+		display: block;
+		max-width: 48.5rem;
+		margin: auto;
+		transform: translateX(-0.75em);
+	}
 }
 
-@media only screen and (min-width: 2000rem) { /* two colum breakpoint, adjusting see above */
+@media only screen and (min-width: 2000rem) {
+	/* two colum breakpoint, adjusting see above */
 	main {
 		max-width: 105rem;
-		> div,
+		> div:not([draggable]),
 		> form {
 			grid-template-columns: repeat(2, calc(50% - 1.5rem));
 		}
 	}
 }
 
-@media only screen and (min-width: 3000rem) { /* three colum breakpoint, adjusting see above */
+@media only screen and (min-width: 3000rem) {
+	/* three colum breakpoint, adjusting see above */
 	main {
 		max-width: 155rem;
-		> div,
+		> div:not([draggable]),
 		> form {
 			grid-template-columns: repeat(3, calc(33% - 1.5rem));
+		}
+		> div[draggable] {
+			max-width: 49.5rem;
+			transform: translateX(-1em);
 		}
 	}
 }
