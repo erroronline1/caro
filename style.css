@@ -1384,7 +1384,8 @@ button[data-type="additem"]::before {
 
 [data-type="calendar"]::before,
 [data-type="calendarbutton"]::before,
-[data-type="date"]::before {
+[data-type="date"]::before,
+[data-type="longtermplanning_timeline"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/calendar-alt.svg");
 	mask-image: url("./media/calendar-alt.svg");
