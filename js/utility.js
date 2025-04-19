@@ -475,7 +475,7 @@ export const _client = {
 		 */
 		longtermplanning: () => {
 			let names = document.getElementsByName("_schedule[]"),
-				name = document.querySelector("[data-type=longtermplanning"),
+				name = document.querySelector("[data-type=longtermplanning_timeline"),
 				schedules = document.querySelectorAll("div.schedule"),
 				colors = document.querySelectorAll("input[type=color]"),
 				id = document.getElementsByName("_longtermid"),

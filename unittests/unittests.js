@@ -570,7 +570,7 @@ export function rendertest(element) {
 				],
 				[
 					{
-						type: "longtermplanning",
+						type: "longtermplanning_timeline",
 						attributes: {
 							name: "Apprentices training schedule",
 						},
@@ -1020,7 +1020,10 @@ export function rendertest(element) {
 								"27-07-16": null,
 							},
 						},
-						preset: {
+					},
+					{
+						type: "longtermplanning_topics",
+						content: {
 							"Introducion with mentor": "#ffffff",
 							"Metal basics": "#77767b",
 							"Plastics basiscs": "#509bb0",
@@ -1246,7 +1249,7 @@ export function rendertest(element) {
 				],
 				[
 					{
-						type: "longtermplanning",
+						type: "longtermplanning_timeline",
 						attributes: {
 							name: "Ausbildungsplan",
 						},
@@ -1696,7 +1699,10 @@ export function rendertest(element) {
 								"27-07-16": null,
 							},
 						},
-						preset: {
+					},
+					{
+						type: "longtermplanning_topics",
+						content: {
 							"Einführung mit Paten": "#ffffff",
 							Metallgrunsausbildung: "#77767b",
 							Kunststoffgrundausbildung: "#509bb0",

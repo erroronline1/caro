@@ -2995,12 +2995,16 @@ export class Assemble {
 	}
 
 	/**
-	 * creates a transfer schedule input or display
+	 * creates a part of transfer schedule input or display
+	 *
+	 * must be used in combination with longtermplanning_topics
+	 * separated for structural reasons
+	 *
 	 * @returns {domNodes}
 	 * @example this.currentElement
 	 * ```json
 	 * 	{
-	 * 		type: "transfer",
+	 * 		type: "longtermplanning_timeline",
 	 * 		attributes: {
 	 * 			name: "Transfer schedule",
 	 * 			readonly: true
@@ -3009,17 +3013,12 @@ export class Assemble {
 	 * 			"Name 1": [],
 	 * 			"Name 2": [],
 	 * 		},
-	 * 		preset: {
-	 * 			"#ff0000": "Unit 1",
-	 * 			"#00ff00": "Unit 2",
-	 * 			"#0000ff": "Unit 3",
-	 * 		}
+	 * 		hint: "lorem ipsum"
 	 * 	}
 	 * ```
 	 */
-	longtermplanning() {
+	longtermplanning_timeline() {
 		let cal = [],
-			preset = [],
 			current,
 			labels,
 			label,
@@ -3092,48 +3091,6 @@ export class Assemble {
 			return result;
 		}
 
-		/**
-		 * create a color input to draw with
-		 * @param {string} name for input and label
-		 * @param {string} color hex-notation
-		 * @param {*} readonly whatever compares to boolean
-		 * @returns {domNode} label containing span and input
-		 */
-		function colorselection(name, color = "#000000", readonly = false) {
-			let label = document.createElement("label"),
-				span = document.createElement("span"),
-				input = document.createElement("input");
-			label.dataset.type = "color";
-			span.appendChild(document.createTextNode(name));
-
-			input.type = "color";
-			input.name = name;
-			input.value = color;
-			if (!readonly) {
-				input.addEventListener("click", (e) => {
-					document.getElementById("_current").value = e.target.value;
-				});
-				input.addEventListener("change", (e) => {
-					document.getElementById("_current").value = e.target.value;
-				});
-				input.addEventListener("contextmenu", (e) => {
-					e.preventDefault();
-					const options = {};
-					options[api._lang.GET("general.cancel_button")] = false;
-					options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-					new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.delete_color_header"), options: options }).then((confirmation) => {
-						if (confirmation) e.target.parentNode.remove();
-					});
-				});
-			} else {
-				input.addEventListener("click", (e) => {
-					e.preventDefault();
-				});
-			}
-			label.append(span, input);
-			return label;
-		}
-
 		// add paintable divs and labels like provided
 		for (const [name, timeunit] of Object.entries(this.currentElement.content)) {
 			current = document.createElement("div");
@@ -3189,8 +3146,85 @@ export class Assemble {
 					}
 				});
 			});
-			preset.push(current);
+			cal.push(current);
+		}
+		// add hint
+		if (!this.currentElement.attributes.readonly) {
+			this.currentElement.hint = api._lang.GET("calendar.longtermplanning.hint");
+		}
+		return [...this.header(), ...cal, ...this.hint()];
+	}
 
+	/**
+	 * creates a part of transfer schedule input or display
+	 *
+	 * must be used in combination with longtermplanning_timeline
+	 * separated for structural reasons
+	 *
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		type: "longtermplanning_topics",
+	 * 		attributes: {
+	 * 			readonly: true
+	 * 		},
+	 * 		content: {
+	 * 			"#ff0000": "Unit 1",
+	 * 			"#00ff00": "Unit 2",
+	 * 			"#0000ff": "Unit 3",
+	 * 		},
+	 * 		hint: "lorem ipsum"
+	 * 	}
+	 * ```
+	 */
+	longtermplanning_topics() {
+		let preset = [],
+			current;
+
+		/**
+		 * create a color input to draw with
+		 * @param {string} name for input and label
+		 * @param {string} color hex-notation
+		 * @param {*} readonly whatever compares to boolean
+		 * @returns {domNode} label containing span and input
+		 */
+		function colorselection(name, color = "#000000", readonly = false) {
+			let label = document.createElement("label"),
+				span = document.createElement("span"),
+				input = document.createElement("input");
+			label.dataset.type = "color";
+			span.appendChild(document.createTextNode(name));
+
+			input.type = "color";
+			input.name = name;
+			input.value = color;
+			if (!readonly) {
+				input.addEventListener("click", (e) => {
+					document.getElementById("_current").value = e.target.value;
+				});
+				input.addEventListener("change", (e) => {
+					document.getElementById("_current").value = e.target.value;
+				});
+				input.addEventListener("contextmenu", (e) => {
+					e.preventDefault();
+					const options = {};
+					options[api._lang.GET("general.cancel_button")] = false;
+					options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+					new Dialog({ type: "confirm", header: api._lang.GET("calendar.longtermplanning.delete_color_header"), options: options }).then((confirmation) => {
+						if (confirmation) e.target.parentNode.remove();
+					});
+				});
+			} else {
+				input.addEventListener("click", (e) => {
+					e.preventDefault();
+				});
+			}
+			label.append(span, input);
+			return label;
+		}
+
+		if (!this.currentElement.attributes || !this.currentElement.attributes.readonly) {
 			// add color selection and erase button
 			current = document.createElement("input");
 			current.type = "hidden";
@@ -3206,15 +3240,15 @@ export class Assemble {
 			preset.push(current);
 		}
 		// add colors
-		if (this.currentElement.preset) {
-			for (const [name, color] of Object.entries(this.currentElement.preset)) {
-				current = colorselection(name, color, this.currentElement.attributes.readonly);
+		if (this.currentElement.content) {
+			for (const [name, color] of Object.entries(this.currentElement.content)) {
+				current = colorselection(name, color, this.currentElement.attributes && this.currentElement.attributes.readonly);
 				preset.push(current);
 			}
 		}
 		// add button to append another color selection
 		// and hint
-		if (!this.currentElement.attributes.readonly) {
+		if (!this.currentElement.attributes || !this.currentElement.attributes.readonly) {
 			current = document.createElement("button");
 			current.type = "button";
 			current.append(document.createTextNode(api._lang.GET("calendar.longtermplanning.addcolor")));
@@ -3246,7 +3280,7 @@ export class Assemble {
 			preset.push(current);
 			this.currentElement.hint = api._lang.GET("calendar.longtermplanning.hint");
 		}
-		return [...this.header(), ...cal, ...preset, ...this.hint()];
+		return [...this.header(), ...preset, ...this.hint()];
 	}
 
 	/**

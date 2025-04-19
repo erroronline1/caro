@@ -316,12 +316,11 @@ class CALENDAR extends API {
 
 					$result['render']['content'][] = [
 						[
-							'type' => 'longtermplanning',
+							'type' => 'longtermplanning_timeline',
 							'attributes' => [
 								'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.subject'))
 							],
 							'content' => $content,
-							'preset' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
 						], [
 							'type' => 'checkbox',
 							'content' => [
@@ -333,6 +332,12 @@ class CALENDAR extends API {
 							'attributes' => [
 								'name' => '_longtermid'
 							]
+						]
+					];
+					$result['render']['content'][] = [
+						[
+							'type' => 'longtermplanning_topics',
+							'content' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
 						]
 					];
 				} 
@@ -439,13 +444,12 @@ class CALENDAR extends API {
 					$misc = json_decode($planning['misc'], true);
 					$result['render']['content'][] = [
 						[
-							'type' => 'longtermplanning',
+							'type' => 'longtermplanning_timeline',
 							'attributes' => [
 								'name' => $planning['subject'],
 								//'readonly' => $planning['closed'] this would result in an error for not creating a proper payload content object without inputs
 							],
 							'content' => $misc['content'],
-							'preset' => $misc['preset']
 						], [
 							'type' => 'textsection',
 							'attributes' => [
@@ -453,8 +457,17 @@ class CALENDAR extends API {
 							]
 						]
 					];
+					$result['render']['content'][] = [
+						[
+							'type' => 'longtermplanning_topics',
+							'attributes' => [
+								//'readonly' => $planning['closed'] this would result in an error for not creating a proper payload content object without inputs
+							],
+							'content' => $misc['preset']
+						]
+					];
 					if (PERMISSION::permissionFor('longtermplanning')){
-						array_splice($result['render']['content'][count($result['render']['content']) - 1], -1, 0 , [
+						array_splice($result['render']['content'][count($result['render']['content']) - 2], -1, 0 , [
 							[
 								'type' => 'checkbox',
 								'content' => [
@@ -478,7 +491,7 @@ class CALENDAR extends API {
 							]
 						]);
 					} else {
-						$result['render']['content'][count($result['render']['content']) - 1][0]['attributes']['readonly'] = true;
+						$result['render']['content'][count($result['render']['content']) - 2][0]['attributes']['readonly'] = $result['render']['content'][count($result['render']['content']) - 1][0]['attributes']['readonly'] = true;
 					}
 				}
 				else {
@@ -1072,7 +1085,6 @@ class CALENDAR extends API {
 					'type' => 'textsection',
 					'content' => $displayabsentmates,
 					'attributes' => [
-						'id' => 'displayspecificdate',
 						'data-type' => 'calendar',
 						'name' => UTILITY::dateFormat($this->_requestedDate)
 					]
@@ -1469,7 +1481,6 @@ class CALENDAR extends API {
 					'type' => 'textsection',
 					'content' => $displayabsentmates,
 					'attributes' => [
-						'id' => 'displayspecificdate',
 						'data-type' => 'calendar',
 						'name' => UTILITY::dateFormat($this->_requestedDate)
 					]
