@@ -370,7 +370,7 @@ class USER extends API {
 						'content' => [
 							$this->_lang->GET('user.settings_force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
 							$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
-							//$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
+							$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
 							]
 					], [
 						'type' => 'select',

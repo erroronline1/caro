@@ -918,26 +918,19 @@ canvas {
 	margin-bottom: 2em;
 }
 
-article,
-main > form > article,
 .contextmenu {
 	margin: 1em 0;
 	padding: 1em;
-	width: 100%;
-	display: inline-block;
-	border: 1px solid var(--3d-border);
-	border-radius: 0.2em;
-	background-color: var(--article);
-	box-shadow: var(--shadow);
-	transition: ease 0.2s;
-}
-.contextmenu {
 	width: fit-content;
 	display: block;
 	z-index: 10;
 	position: absolute;
 	padding-top: 2.5em;
-
+	border: 1px solid var(--3d-border);
+	border-radius: 0.2em;
+	background-color: var(--article);
+	box-shadow: var(--shadow);
+	transition: ease 0.2s;
 	img.close {
 		width: 1.5em;
 		height: 1.5em;
@@ -978,9 +971,8 @@ section > form,
 section > article,
 section > div[draggable] {
 	width: 100%;
-	padding-top: 1em;
+	padding: 1em;
 	margin-top: 0;
-	padding-bottom: 1em;
 	scroll-snap-align: center;
 	flex: none;
 	overflow: auto;
@@ -991,6 +983,7 @@ section > div[draggable] {
 
 form > article,
 section > div > article {
+	padding: 1em;
 	box-shadow: none;
 	border: none;
 	background: none;
@@ -1007,8 +1000,15 @@ article:has(> article) {
 		width: calc(33% - 1em);
 		min-width: 13em;
 		margin: 0.5em;
+		padding: 1em;
 		vertical-align: top;
 		overflow: hidden;
+		display: inline-block;
+		border: 1px solid var(--3d-border);
+		border-radius: 0.2em;
+		background-color: var(--article);
+		box-shadow: var(--shadow);
+		transition: ease 0.2s;
 	}
 	*:not(article) {
 		width: 90%;
@@ -1223,31 +1223,45 @@ section > div > hr {
 	fill: var(--foreground);
 }
 
-
 /*************************** bigger screen masonry ******************************/
 /* quite at the bottom to override previous values.
 hope default value is ridiculously high enough in the medium future.
 min width will be reduced to a reasonable size by api.js in case user settings activate masonry style */
 
-@media only screen and (min-width: 1000rem) {
-	main {
-		max-width: 100rem;
+main {
+	> div,
+	> form {
+		display: grid;
+		align-items: flex-start;
+		gap: 2em;
+		grid-template-columns: repeat(1, calc(100% - 1.5rem));
+		> article {
+			padding: 1em;
+			border: 1px solid var(--3d-border);
+			border-radius: 0.2em;
+			background-color: var(--article);
+			box-shadow: var(--shadow);
+			transition: ease 0.2s;
+		}
+	}
+}
 
+@media only screen and (min-width: 2000rem) { /* two colum breakpoint, adjusting see above */
+	main {
+		max-width: 105rem;
 		> div,
 		> form {
-			display: flex;
-			flex-direction: row;
-			flex-wrap: wrap;
-			align-items:flex-start;
-			gap: 2em;
-			> article,
-			> button {
-				flex-direction: column;
-				display:initial;
-				position: relative;
-				width: calc(50% - 1.5rem) !important;
-				margin-bottom: 2em;
-			}
+			grid-template-columns: repeat(2, calc(50% - 1.5rem));
+		}
+	}
+}
+
+@media only screen and (min-width: 3000rem) { /* three colum breakpoint, adjusting see above */
+	main {
+		max-width: 155rem;
+		> div,
+		> form {
+			grid-template-columns: repeat(3, calc(33% - 1.5rem));
 		}
 	}
 }

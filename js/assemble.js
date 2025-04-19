@@ -36,6 +36,48 @@ export const assemble_helper = {
 	getNextElementID: getNextElementID,
 
 	/**
+	 * rearranges the content alternating masonry style
+	 *
+	 * kudos: https://github.com/markmead/js-masonry
+	 *
+	 * this method has to be on global scope and called upon all dimension changes:
+	 * * assemble.processAfterInsertion()
+	 * * window resizing
+	 * * collapsible execution
+	 */
+	async masonry() {
+		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // fory anyone calling, e.g. collapsible
+
+		const el = document.querySelector("main>div, main>form");
+		const gridGap = parseFloat(getComputedStyle(el).gap);
+		const gridItems = [...el.childNodes].filter((gridItem) => gridItem.nodeType === 1 && gridItem.tagName !== "TEMPLATE");
+
+		const perChunk = getComputedStyle(el).gridTemplateColumns.split(" ").length;
+
+		gridItems.forEach((gridItem) => gridItem.style.removeProperty("margin-top"));
+
+		if (perChunk === 1) {
+			return;
+		}
+
+		gridItems.forEach(async function (gridItem, itemIndex) {
+			const previousItem = gridItems[itemIndex - perChunk];
+
+			if (!previousItem) {
+				return;
+			}
+			gridItem.style.transition = "none"; // otherwise browser canvas rendering takes longer than the loop and messes up positions!
+			const currentItemTop = gridItem.getBoundingClientRect().top;
+			const previousItemBottom = previousItem.getBoundingClientRect().bottom;
+			const spaceBetween = currentItemTop - previousItemBottom;
+
+			if (spaceBetween !== gridGap) {
+				gridItem.style.marginTop = `-${spaceBetween - gridGap}px`;
+			}
+		});
+	},
+
+	/**
 	 * creates the application menu
 	 * @requires api
 	 * @param {object} content render data return from api
@@ -656,51 +698,12 @@ export class Assemble {
 			eventListenerTarget.removeEventListener("scroll", _client.application.lazyload.load);
 		}
 
-		if (api._settings.user.app_settings && api._settings.user.app_settings.masonry) this.masonry();
+		if (api._settings.user.app_settings && api._settings.user.app_settings.masonry) {
+			assemble_helper.masonry();
+			window.addEventListener("resize", assemble_helper.masonry);
+		}
 
 		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
-	}
-
-	/**
-	 * rearranges the content alternating masonry style
-	 * kudos: https://dev.to/smpnjn/css-only-masonry-grid-layouts-ndp
-	 */
-	masonry() {
-		return;
-		const mainId = "main",
-			itemIdentifier = "main>div>article, main>div>button, main>form>article, main>form>button";
-
-		// Programmatically get the column width
-		let item = document.querySelector(itemIdentifier);
-		let parentWidth = item.parentNode.getBoundingClientRect().width;
-		let itemWidth = item.getBoundingClientRect().width + parseFloat(getComputedStyle(item).marginLeft) + parseFloat(getComputedStyle(item).marginRight);
-		let columnWidth = Math.round(1 / (itemWidth / parentWidth));
-
-		// We need this line since JS nodes are dumb
-		let arrayOfItems = Array.prototype.slice.call(document.querySelectorAll(itemIdentifier));
-		let trackHeights = {};
-		arrayOfItems.forEach(function (item) {
-			// Get index of item
-			let thisIndex = arrayOfItems.indexOf(item);
-			// Get column this and set width
-			let thisColumn = thisIndex % columnWidth;
-			if (typeof trackHeights[thisColumn] == "undefined") {
-				trackHeights[thisColumn] = 0;
-			}
-			trackHeights[thisColumn] += item.getBoundingClientRect().height + parseFloat(getComputedStyle(item).marginBottom);
-			// If the item has an item above it, then move it to fill the gap
-			if (thisIndex - columnWidth >= 0) {
-				let getItemAbove = document.querySelectorAll(itemIdentifier)[thisIndex - columnWidth];
-				let previousBottom = getItemAbove.getBoundingClientRect().bottom;
-				let currentTop = item.getBoundingClientRect().top - parseFloat(getComputedStyle(item).marginBottom);
-				item.style.top = `-${currentTop - previousBottom}px`;
-			}
-		});
-		let max = Math.max(...Object.values(trackHeights));
-		
-		document.querySelector("html").style.height = document.querySelector("main").style.height= `${max}px`;
-		//document.querySelector(mainId).style.backgroundColor = `green`;
-		//document.querySelector("body").style.backgroundColor = `red`;
 	}
 
 	/**
@@ -1395,8 +1398,10 @@ export class Assemble {
 		img.classList.add("close");
 		img.src = "./media/plus.svg";
 		img.alt = api._lang.GET("assemble.render.aria.extend");
-		img.onclick = () => {
+		img.onclick = async () => {
 			div.classList.toggle("extended");
+			await _.sleep(500); // wait for transition
+			assemble_helper.masonry();
 		};
 		// accessibility setting
 		img.setAttribute("aria-hidden", true);

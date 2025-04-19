@@ -534,7 +534,6 @@ export const api = {
 									}
 									break;
 								case "masonry":
-									break;
 									if (value) {
 										let stylesheet;
 										for (const [i, sname] of Object.entries(document.styleSheets)) {
@@ -543,8 +542,11 @@ export const api = {
 											break;
 										}
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 1000rem)") {
-												stylesheet[i].media.mediaText = "only screen and (min-width: 105rem)";
+											if (stylesheet[i].conditionText === "only screen and (min-width: 2000rem)") {
+												stylesheet[i].media.mediaText = "only screen and (min-width: 110rem)";
+											}
+											if (stylesheet[i].conditionText === "only screen and (min-width: 3000rem)") {
+												stylesheet[i].media.mediaText = "only screen and (min-width: 155rem)";
 											}
 										}
 									}
@@ -764,7 +766,6 @@ export const api = {
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
-					if (request[3] !== undefined) location.hash = "#displayspecificdate";
 				}
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 				if (data.response !== undefined && data.response.id !== undefined) {
