@@ -50,67 +50,76 @@ export const assemble_helper = {
 	async masonry() {
 		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // for anyone calling, e.g. collapsible
 
-		const el = document.querySelector("main>div, main>form");
-		const gridGap = parseFloat(getComputedStyle(el).gap);
-		const gridItems = [...el.childNodes].filter((gridItem) => gridItem.nodeType === 1 && gridItem.tagName !== "TEMPLATE");
+		const container = document.querySelector("main>div, main>form");
+		const gridGap = parseFloat(getComputedStyle(container).gap);
+		let gridItems = [...container.childNodes].filter((gridItem) => gridItem.nodeType === 1 && gridItem.tagName !== "TEMPLATE");
 
-		const perChunk = getComputedStyle(el).gridTemplateColumns.split(" ").length;
-
-		gridItems.forEach((gridItem) => gridItem.style.removeProperty("margin-top"));
-
-		// initiate column height observer
-		const columnHeight = {};
-
-		gridItems.forEach(async function (gridItem, itemIndex) {
-			const previousItem = gridItems[itemIndex - perChunk];
-
-			// detect which column the current item is placed in and initialize height observer property if undefined yet
-			const column = itemIndex % perChunk;
-			if (columnHeight[column] === undefined) columnHeight[column] = 0;
-			columnHeight[column] += gridItem.getBoundingClientRect().bottom ;
-
-			if (!previousItem) {
-				// top most items (key error) do not need recomputation
-				return;
-			}
-
-			// remove empty pseudo articles
+		// remove empty pseudo articles, reset top margin and
+		// turn off transition animations otherwise browser canvas rendering takes longer than the loop and messes up positions!
+		// the latter have been some messy hours to figure out.
+		gridItems.forEach((gridItem) => {
 			if (!gridItem.hasChildNodes()) {
 				gridItem.remove();
 				return;
 			}
-
-			if (perChunk === 1) {
-				// one column does not need further recomputation
-				// but on changes possible pseudo articles have to be removed
-				return;
-			}
-
-			// turn off transition animations otherwise browser canvas rendering takes longer than the loop and messes up positions! this have been some messy hours to figure out.
+			gridItem.style.removeProperty("margin-top");
 			gridItem.style.transition = "none";
-
-
-			// get dimensions
-			const currentItemTop = gridItem.getBoundingClientRect().top;
-			const previousItemBottom = previousItem.getBoundingClientRect().bottom;
-
-			// if the previous items bottom is lower than the next colums height plus the current items height shift item to next column by inserting an invisible pseudo article
-			if (false && previousItemBottom > (columnHeight[column + 1]!==undefined ? columnHeight[column + 1] : columnHeight[0]) + gridItem.getBoundingClientRect().height+gridGap) {
-				//console.log(columnHeight);
-				const pseudo = document.createElement("article");
-				pseudo.style.height = pseudo.style.padding = pseudo.style.border = pseudo.style.margin = "1px";
-				pseudo.ariaHidden = true;
-				gridItem.parentNode.insertBefore(pseudo, gridItem);
-				return;
-			}
-			// calculate and apply positions
-			const spaceBetween = currentItemTop - previousItemBottom;
-			if (spaceBetween !== gridGap) {
-				gridItem.style.marginTop = `-${spaceBetween - gridGap}px`;
-			}
-			// append most recent bottom value to column height observer
 		});
-		//console.log(gridItems);
+
+		// get number of overall columns
+		const columns = getComputedStyle(container).gridTemplateColumns.split(" ").length;
+
+		// one column does not need further recomputation
+		if (columns === 1) {
+			return;
+		}
+
+		// initiate column height observer and preset 0 values to make undefined key meaningful
+		const columnHeight = {};
+		for (let init = 0; init < columns; init++) columnHeight[init] = 0;
+
+		// other to it by forEach but there might be elements being appended for column shift during the loop
+		let currentItem, currentItemTop, currentItemHeight, spaceBetween, currentColumn, columnIteration, shiftInjection;
+		for (let itemIndex = 0; itemIndex < gridItems.length; itemIndex++) {
+			currentItem = gridItems[itemIndex];
+			currentItemHeight = currentItem.getBoundingClientRect().height + gridGap;
+
+			// detect which column the current item is placed in
+			currentColumn = itemIndex % columns;
+
+			// top most items (key error) do not need recomputation, but add to the columns height
+			if (!gridItems[itemIndex - columns]) {
+				columnHeight[currentColumn] += currentItem.getBoundingClientRect().bottom + gridGap;
+				continue;
+			}
+
+			// if the next columns bottom including the current items height is higher (less) than the current columns height including the current items height
+			// then shift item to next column by inserting an invisible pseudo article
+			if (false && currentItem.hasChildNodes() && columnHeight[currentColumn] + currentItemHeight > (columnHeight[currentColumn + 1] !== undefined ? columnHeight[currentColumn + 1] : columnHeight[0]) + currentItemHeight) {
+				for (columnIteration = 1; columnIteration < columns; columnIteration++) {
+					if (!currentItem.hasChildNodes() || columnHeight[currentColumn] + currentItemHeight <= (columnHeight[currentColumn + 1] !== undefined ? columnHeight[currentColumn + 1] : columnHeight[0]) + currentItemHeight) break;
+
+					// create an empty article to inject, influencing the stylesheet
+					shiftInjection = document.createElement("article");
+					shiftInjection.style.height = shiftInjection.style.padding = shiftInjection.style.border = "1px";
+					shiftInjection.style.margin = "1px";
+					shiftInjection.ariaHidden = true;
+					// insert before the current item to shift column
+					gridItems[itemIndex - 1].after(shiftInjection);
+					// add to gridItems for next iteration
+					gridItems.splice(itemIndex, 0, shiftInjection);
+					//if (columnHeight[++currentColumn] === undefined) currentColumn = 0;
+				}
+			}
+			// get dimensions, calculate and apply positions
+			currentItemTop = currentItem.getBoundingClientRect().top;
+			spaceBetween = currentItemTop - columnHeight[currentColumn];
+			if (spaceBetween !== gridGap) {
+				currentItem.style.marginTop = `-${spaceBetween}px`;
+			}
+			// append currentItemHeight to column height observer
+			columnHeight[currentColumn] += currentItemHeight;
+		}
 	},
 
 	/**
