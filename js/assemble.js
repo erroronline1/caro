@@ -36,6 +36,30 @@ export const assemble_helper = {
 	getNextElementID: getNextElementID,
 
 	/**
+	 * promise resolving to true after an element has been added to the dom
+	 *
+	 * kudos: https://stackoverflow.com/a/61511955/6087758
+	 *
+	 * @param {domNode} node
+	 * @param {domNode} after
+	 * @returns true
+	 */
+	insertNodeAfter: async (node, after) => {
+		return new Promise((resolve) => {
+			const observer = new MutationObserver((mutations) => {
+				console.log(node.parentNode, mutations);
+				observer.disconnect();
+				resolve(true);
+			});
+			observer.observe(after.parentNode, {
+				childList: true,
+				subtree: true,
+			});
+			after.after(node);
+		});
+	},
+
+	/**
 	 * rearranges the content alternating masonry style
 	 *
 	 * kudos: https://github.com/markmead/js-masonry
@@ -47,7 +71,7 @@ export const assemble_helper = {
 	 * * longtermplanning adding users and colours
 	 * * multiple inputs after Assemble.initializeSection()
 	 */
-	async masonry() {
+	masonry: async () => {
 		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // for anyone calling, e.g. collapsible
 
 		const container = document.querySelector("main>div, main>form");
@@ -73,16 +97,16 @@ export const assemble_helper = {
 		if (columns === 1) {
 			return;
 		}
-
+		console.log("recalc");
 		// initiate column height observer and preset 0 values to make undefined key meaningful
 		const columnHeight = {};
 		for (let init = 0; init < columns; init++) columnHeight[init] = 0;
 
-		// other to it by forEach but there might be elements being appended for column shift during the loop
-		let currentItem, currentItemTop, currentItemHeight, spaceBetween, currentColumn, nextColumn, injectedNode;
+		// others do it by forEach but there might be elements being appended for column shift during the loop
+		let currentItem, currentItemTop, currentItemHeight, spaceBetween, currentColumn, suitableColumn, injectedNode;
 		for (let itemIndex = 0; itemIndex < gridItems.length; itemIndex++) {
 			currentItem = gridItems[itemIndex];
-			currentItemHeight = currentItem.getBoundingClientRect().height + gridGap;
+			currentItemHeight = currentItem.hasChildNodes() ? currentItem.getBoundingClientRect().height + gridGap : 0;
 
 			// detect which column the current item is placed in
 			currentColumn = itemIndex % columns;
@@ -95,29 +119,35 @@ export const assemble_helper = {
 
 			// if the next columns bottom including the current items height is higher (less) than the current columns height including the current items height
 			// then shift item to next column by inserting an invisible pseudo article
-			if (currentItem.hasChildNodes() && columnHeight[currentColumn] + currentItemHeight > (columnHeight[currentColumn + 1] !== undefined ? columnHeight[currentColumn + 1] : columnHeight[0]) + currentItemHeight) {
-				injectedNode = null;
+			injectedNode = null;
+			if (currentItem.hasChildNodes()) {
+				// check for max columns count - 1
 				for (let columnIteration = 0; columnIteration < columns - 1; columnIteration++) {
-					nextColumn = currentColumn + columnIteration;
-					if (!currentItem.hasChildNodes() || columnHeight[nextColumn] + currentItemHeight <= (columnHeight[nextColumn + 1] !== undefined ? columnHeight[nextColumn + 1] : columnHeight[0]) + currentItemHeight) break;
+					suitableColumn = (columnHeight[currentColumn + columnIteration] !== undefined ? currentColumn : -1) + columnIteration;
+					// break if the current column would shorter than the next after appending
+					if (columnHeight[suitableColumn] + currentItemHeight <= (columnHeight[suitableColumn + 1] !== undefined ? columnHeight[suitableColumn + 1] : columnHeight[0]) + currentItemHeight) break;
 
-					// create an empty element to inject, affected by grid properties thus influencing the colums
+					// create an empty element to inject, affected by grid properties thus influencing the columns
 					injectedNode = document.createElement("article");
-					injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = "1px";
-					injectedNode.style.margin = "-16px";
+					injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = 0;
+					injectedNode.style.margin = `-${gridGap / 2}px`;
 					injectedNode.ariaHidden = true;
-					// insert after previous / before current item to shift column
-					gridItems[itemIndex - 1].after(injectedNode);
-					// add to gridItems for next parent iteration
-					gridItems.splice(itemIndex, 0, injectedNode);
+
+					// insert before current item to shift column
+					// and add to gridItems for next parent iteration
+					if (await assemble_helper.insertNodeAfter(injectedNode, gridItems[itemIndex - 1 + columnIteration])) gridItems.splice(itemIndex, 0, injectedNode);
 				}
-				if (injectedNode) continue;
+				// update current item for being a possible injected element
+				currentItem = gridItems[itemIndex];
+				currentItemHeight = currentItem.hasChildNodes() ? currentItem.getBoundingClientRect().height + gridGap : 0;
 			}
+			console.log(itemIndex, currentItem, currentColumn, gridItems.length);
+
 			// get dimensions, calculate and apply positions
 			currentItemTop = currentItem.getBoundingClientRect().top;
 			spaceBetween = currentItemTop - columnHeight[currentColumn];
 			if (spaceBetween !== gridGap) {
-				currentItem.style.marginTop = `-${spaceBetween}px`;
+				currentItem.style.marginTop = `-${spaceBetween + gridGap * +!gridItems[itemIndex].hasChildNodes()}px`;
 			}
 			// append currentItemHeight to column height observer
 			columnHeight[currentColumn] += currentItemHeight;
