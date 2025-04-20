@@ -79,7 +79,7 @@ export const assemble_helper = {
 		for (let init = 0; init < columns; init++) columnHeight[init] = 0;
 
 		// other to it by forEach but there might be elements being appended for column shift during the loop
-		let currentItem, currentItemTop, currentItemHeight, spaceBetween, currentColumn, columnIteration, shiftInjection;
+		let currentItem, currentItemTop, currentItemHeight, spaceBetween, currentColumn, nextColumn, injectedNode;
 		for (let itemIndex = 0; itemIndex < gridItems.length; itemIndex++) {
 			currentItem = gridItems[itemIndex];
 			currentItemHeight = currentItem.getBoundingClientRect().height + gridGap;
@@ -95,21 +95,23 @@ export const assemble_helper = {
 
 			// if the next columns bottom including the current items height is higher (less) than the current columns height including the current items height
 			// then shift item to next column by inserting an invisible pseudo article
-			if (false && currentItem.hasChildNodes() && columnHeight[currentColumn] + currentItemHeight > (columnHeight[currentColumn + 1] !== undefined ? columnHeight[currentColumn + 1] : columnHeight[0]) + currentItemHeight) {
-				for (columnIteration = 1; columnIteration < columns; columnIteration++) {
-					if (!currentItem.hasChildNodes() || columnHeight[currentColumn] + currentItemHeight <= (columnHeight[currentColumn + 1] !== undefined ? columnHeight[currentColumn + 1] : columnHeight[0]) + currentItemHeight) break;
+			if (currentItem.hasChildNodes() && columnHeight[currentColumn] + currentItemHeight > (columnHeight[currentColumn + 1] !== undefined ? columnHeight[currentColumn + 1] : columnHeight[0]) + currentItemHeight) {
+				injectedNode = null;
+				for (let columnIteration = 0; columnIteration < columns - 1; columnIteration++) {
+					nextColumn = currentColumn + columnIteration;
+					if (!currentItem.hasChildNodes() || columnHeight[nextColumn] + currentItemHeight <= (columnHeight[nextColumn + 1] !== undefined ? columnHeight[nextColumn + 1] : columnHeight[0]) + currentItemHeight) break;
 
-					// create an empty article to inject, influencing the stylesheet
-					shiftInjection = document.createElement("article");
-					shiftInjection.style.height = shiftInjection.style.padding = shiftInjection.style.border = "1px";
-					shiftInjection.style.margin = "1px";
-					shiftInjection.ariaHidden = true;
-					// insert before the current item to shift column
-					gridItems[itemIndex - 1].after(shiftInjection);
-					// add to gridItems for next iteration
-					gridItems.splice(itemIndex, 0, shiftInjection);
-					//if (columnHeight[++currentColumn] === undefined) currentColumn = 0;
+					// create an empty element to inject, affected by grid properties thus influencing the colums
+					injectedNode = document.createElement("article");
+					injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = "1px";
+					injectedNode.style.margin = "-16px";
+					injectedNode.ariaHidden = true;
+					// insert after previous / before current item to shift column
+					gridItems[itemIndex - 1].after(injectedNode);
+					// add to gridItems for next parent iteration
+					gridItems.splice(itemIndex, 0, injectedNode);
 				}
+				if (injectedNode) continue;
 			}
 			// get dimensions, calculate and apply positions
 			currentItemTop = currentItem.getBoundingClientRect().top;
