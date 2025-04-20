@@ -48,7 +48,7 @@ export const assemble_helper = {
 	 * * multiple inputs after Assemble.initializeSection()
 	 */
 	async masonry() {
-		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // fory anyone calling, e.g. collapsible
+		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // for anyone calling, e.g. collapsible
 
 		const el = document.querySelector("main>div, main>form");
 		const gridGap = parseFloat(getComputedStyle(el).gap);
@@ -58,25 +58,59 @@ export const assemble_helper = {
 
 		gridItems.forEach((gridItem) => gridItem.style.removeProperty("margin-top"));
 
-		if (perChunk === 1) {
-			return;
-		}
+		// initiate column height observer
+		const columnHeight = {};
 
 		gridItems.forEach(async function (gridItem, itemIndex) {
 			const previousItem = gridItems[itemIndex - perChunk];
 
+			// detect which column the current item is placed in and initialize height observer property if undefined yet
+			const column = itemIndex % perChunk;
+			if (columnHeight[column] === undefined) columnHeight[column] = 0;
+			columnHeight[column] += gridItem.getBoundingClientRect().bottom ;
+
 			if (!previousItem) {
+				// top most items (key error) do not need recomputation
 				return;
 			}
-			gridItem.style.transition = "none"; // otherwise browser canvas rendering takes longer than the loop and messes up positions!
+
+			// remove empty pseudo articles
+			if (!gridItem.hasChildNodes()) {
+				gridItem.remove();
+				return;
+			}
+
+			if (perChunk === 1) {
+				// one column does not need further recomputation
+				// but on changes possible pseudo articles have to be removed
+				return;
+			}
+
+			// turn off transition animations otherwise browser canvas rendering takes longer than the loop and messes up positions! this have been some messy hours to figure out.
+			gridItem.style.transition = "none";
+
+
+			// get dimensions
 			const currentItemTop = gridItem.getBoundingClientRect().top;
 			const previousItemBottom = previousItem.getBoundingClientRect().bottom;
-			const spaceBetween = currentItemTop - previousItemBottom;
 
+			// if the previous items bottom is lower than the next colums height plus the current items height shift item to next column by inserting an invisible pseudo article
+			if (false && previousItemBottom > (columnHeight[column + 1]!==undefined ? columnHeight[column + 1] : columnHeight[0]) + gridItem.getBoundingClientRect().height+gridGap) {
+				//console.log(columnHeight);
+				const pseudo = document.createElement("article");
+				pseudo.style.height = pseudo.style.padding = pseudo.style.border = pseudo.style.margin = "1px";
+				pseudo.ariaHidden = true;
+				gridItem.parentNode.insertBefore(pseudo, gridItem);
+				return;
+			}
+			// calculate and apply positions
+			const spaceBetween = currentItemTop - previousItemBottom;
 			if (spaceBetween !== gridGap) {
 				gridItem.style.marginTop = `-${spaceBetween - gridGap}px`;
 			}
+			// append most recent bottom value to column height observer
 		});
+		//console.log(gridItems);
 	},
 
 	/**
