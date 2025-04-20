@@ -273,3 +273,5 @@
 11.04.25,9,api
 12.04.25,8,"api, ui-assembler"
 17.04.25,7,"api, ui, bug-fixes, tool-api"
+18.04.25,9,"tool-api, calendar-api, ui"
+19.04.25,8,"ui, calendar-api, unittests"
