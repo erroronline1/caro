@@ -70,6 +70,10 @@ export const assemble_helper = {
 	 * * collapsible execution
 	 * * longtermplanning adding users and colours
 	 * * multiple inputs after Assemble.initializeSection()
+	 * 
+	 * issue: on resizing the window a shifting node injection sometimes does not happen, no matter what
+	 * 
+	 * this glitch is resolvable by the next assembly (reload, request, history navigation)
 	 */
 	masonry: async () => {
 		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // for anyone calling, e.g. collapsible
@@ -90,14 +94,14 @@ export const assemble_helper = {
 			gridItem.style.transition = "none";
 		});
 
-		// get number of overall columns
+		// get number of overall columns as per stylesheet breakpoints
 		const columns = getComputedStyle(container).gridTemplateColumns.split(" ").length;
 
 		// one column does not need further recomputation
 		if (columns === 1) {
 			return;
 		}
-		console.log("recalc");
+
 		// initiate column height observer and preset 0 values to make undefined key meaningful
 		const columnHeight = {};
 		for (let init = 0; init < columns; init++) columnHeight[init] = 0;
@@ -134,19 +138,19 @@ export const assemble_helper = {
 					injectedNode.ariaHidden = true;
 
 					// insert before current item to shift column
-					// and add to gridItems for next parent iteration
+					// and add to gridItems in the current position for next parent iteration
 					if (await assemble_helper.insertNodeAfter(injectedNode, gridItems[itemIndex - 1 + columnIteration])) gridItems.splice(itemIndex, 0, injectedNode);
 				}
 				// update current item for being a possible injected element
 				currentItem = gridItems[itemIndex];
 				currentItemHeight = currentItem.hasChildNodes() ? currentItem.getBoundingClientRect().height + gridGap : 0;
 			}
-			console.log(itemIndex, currentItem, currentColumn, gridItems.length);
 
 			// get dimensions, calculate and apply positions
 			currentItemTop = currentItem.getBoundingClientRect().top;
 			spaceBetween = currentItemTop - columnHeight[currentColumn];
 			if (spaceBetween !== gridGap) {
+				// add gridGap only if element has child nodes aka regular element, no injection
 				currentItem.style.marginTop = `-${spaceBetween + gridGap * +!gridItems[itemIndex].hasChildNodes()}px`;
 			}
 			// append currentItemHeight to column height observer
