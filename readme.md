@@ -131,7 +131,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * responsibilities
     * handle hidden attribute?
 * responsive masonry
-    * adjust application widgets and structure to meet masonry design
+    * adjust application widgets and structure to meet masonry design (especially regulatory summaries)
+    * new orders and products raises error due to hr?
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
 
