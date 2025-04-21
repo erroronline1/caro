@@ -41,6 +41,7 @@
     * [Installation](#installation)
     * [Runtime variables](#runtime-variables)
     * [Useage notes and caveats](#useage-notes-and-caveats)
+    * [Known deficencies](#known-deficencies)
     * [Customisation](#customisation)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
 * [CSV processor](#csv-processor)
@@ -130,7 +131,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * responsibilities
     * handle hidden attribute?
 * responsive masonry
-    * review altering code by inserting empty articles to limit asymmetric height (aria hidden to ensure accessibility and order of elements)
     * adjust application widgets and structure to meet masonry design
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
@@ -1203,6 +1203,8 @@ within the template directory too for a swift availability upon launch. Structur
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * [Install as progressive web app (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_from_the_web) from the initial browser request and give requested permissions on any elegible workplace.
 
+[Content](#content)
+
 ## Runtime variables
 Some variables can be edited during runtime. This applies for all *values* of language.XX.env/.json files and some settings in config.ini. These options are mostly considered critical for the applications stability and regulatory compliance, therefore they are not intended to be simply edited from the interface but with a bit of consideration and moderate effort instead.
 
@@ -1404,6 +1406,8 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 | header | yes or no | yes |
 | footer | yes or no | yes |
 
+[Content](#content)
+
 ## Useage notes and caveats
 
 ### General
@@ -1418,11 +1422,8 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
 * Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services.
-* Dragging document elements for reordering within the document-editors doesn't work on handhelds because touch-events do not include this function. Constructing document components and documents will need devices with mice or a supported pointer to avoid bloating scripts. Reordered images will disappear but don't worry.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
-* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
-* Only one timezone is supported.
 * Images are always exported as PNG which may be occasionally bigger in size than JPG but lossless. A behavioural change can be done within the image()-method of the Assemble-class.
 
 ### Safaris special needs
@@ -1445,6 +1446,17 @@ Notes:
 * Disclaimer: it is possible that some restrictions happen because of a self signed certificate for the developer environment SSL-connection. Trust settings were unsuccessful on macOS as well. Also there may be limits due to a virtual test environment.
 
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
+
+[Content](#content)
+
+## Known deficencies
+* Dragging document elements for reordering within the document-editors doesn't work on handhelds because touch-events do not include this function. Constructing document components and documents will need devices with mice or a supported pointer to avoid bloating scripts.
+* Reordered images will disappear - but not being lost in the currently edited data-structure.
+* The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
+* Only one timezone is supported.
+* Masonry layout for wide screens may glitch on application-window resizing. A reload, history navigation, the next request or drawing the application-window to another size resolves this temporal inconvenience.
+
+[Content](#content)
 
 ## Customisation
 There are a few JSON-files, for language (language.XX.json) and as templates for swift installation. Every JSON-file can be extended with an ENV-file to override default settings or append entries. It is highly recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one. The JSON-files serve as a default fallback, are necessary to detect available languages and serve required values in case of future updates of the original repository.
