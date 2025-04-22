@@ -50,10 +50,16 @@ export const assemble_helper = {
 				observer.disconnect();
 				resolve(true);
 			});
-			observer.observe(after.parentNode, {
-				childList: true,
-				subtree: true,
-			});
+			try {
+				observer.observe(after.parentNode, {
+					childList: true,
+					subtree: true,
+				});
+			} catch (e) {
+				// sometimes after.parentNode is null even if checked in advance of calling this method.
+				// so i can as well handle this solely here.
+				//console.log(e, after.parentNode);
+			}
 			after.after(node);
 		});
 	},
@@ -63,20 +69,25 @@ export const assemble_helper = {
 	 *
 	 * kudos: https://github.com/markmead/js-masonry
 	 *
-	 * this method has to be on global scope and called upon all dimension changes:
-	 * * Assemble.processAfterInsertion()
+	 * this method has to be on global scope and called upon all dimension and content changes:
+	 * * window.masonry = MutationObserver on application init
 	 * * window resizing
 	 * * collapsible execution
 	 * * longtermplanning adding users and colours
 	 * * multiple inputs after Assemble.initializeSection()
-	 * 
+	 *
 	 * issue: on resizing the window a shifting node injection sometimes does not happen, no matter what
-	 * 
+	 *
 	 * this glitch is resolvable by the next assembly (reload, request, history navigation)
+	 *
+	 * performance is not that great at 1000 orders though:
+	 * * about 3 seconds for top margin offset
+	 * * about 10 seconds with conditional column shifting
 	 */
 	masonry: async () => {
 		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // for anyone calling, e.g. collapsible
 
+		window.masonry.disconnect();
 		const container = document.querySelector("main>div, main>form");
 		const gridGap = parseFloat(getComputedStyle(container).gap);
 		let gridItems = [...container.childNodes].filter((gridItem) => gridItem.nodeType === 1 && gridItem.tagName !== "TEMPLATE");
@@ -85,7 +96,7 @@ export const assemble_helper = {
 		// turn off transition animations otherwise browser canvas rendering takes longer than the loop and messes up positions!
 		// the latter have been some messy hours to figure out.
 		gridItems.forEach((gridItem) => {
-			if (!gridItem.hasChildNodes()) {
+			if (!(gridItem.hasChildNodes() || gridItem.constructor === HTMLHRElement)) {
 				gridItem.remove();
 				return;
 			}
@@ -98,6 +109,10 @@ export const assemble_helper = {
 
 		// one column does not need further recomputation
 		if (columns === 1) {
+			window.masonry.observe(document.querySelector("main"), {
+				childList: true,
+				subtree: true,
+			});
 			return;
 		}
 
@@ -109,7 +124,7 @@ export const assemble_helper = {
 		let currentItem, currentItemTop, currentItemHeight, spaceBetween, currentColumn, suitableColumn, injectedNode;
 		for (let itemIndex = 0; itemIndex < gridItems.length; itemIndex++) {
 			currentItem = gridItems[itemIndex];
-			currentItemHeight = currentItem.hasChildNodes() ? currentItem.getBoundingClientRect().height + gridGap : 0;
+			currentItemHeight = currentItem.hasChildNodes() || currentItem.constructor === HTMLHRElement ? currentItem.getBoundingClientRect().height + gridGap : 0;
 
 			// detect which column the current item is placed in
 			currentColumn = itemIndex % columns;
@@ -123,7 +138,7 @@ export const assemble_helper = {
 			// if the next columns bottom including the current items height is higher (less) than the current columns height including the current items height
 			// then shift item to next column by inserting an invisible pseudo article
 			injectedNode = null;
-			if (currentItem.hasChildNodes()) {
+			if (currentItem.hasChildNodes() || currentItem.constructor === HTMLHRElement) {
 				// check for max columns count - 1
 				for (let columnIteration = 0; columnIteration < columns - 1; columnIteration++) {
 					suitableColumn = (columnHeight[currentColumn + columnIteration] !== undefined ? currentColumn : -1) + columnIteration;
@@ -155,6 +170,10 @@ export const assemble_helper = {
 			// append currentItemHeight to column height observer
 			columnHeight[currentColumn] += currentItemHeight;
 		}
+		window.masonry.observe(document.querySelector("main"), {
+			childList: true,
+			subtree: true,
+		});
 	},
 
 	/**
@@ -776,11 +795,6 @@ export class Assemble {
 			eventListenerTarget.addEventListener("scroll", _client.application.lazyload.load, false);
 		} else {
 			eventListenerTarget.removeEventListener("scroll", _client.application.lazyload.load);
-		}
-
-		if (api._settings.user.app_settings && api._settings.user.app_settings.masonry) {
-			assemble_helper.masonry();
-			window.addEventListener("resize", assemble_helper.masonry);
 		}
 
 		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
