@@ -785,79 +785,17 @@ class ORDER extends API {
 					]
 				];
 
+				// render search and selection
+				require_once('_shared.php');
+				$search = new SHARED($this->_pdo);
 				$result['render'] = ['form' => [
 					'data-usecase'=> 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
 				],
 				'content' => [
+					...$search->productsearch('order')
+					,
 					[
-						[
-							'type' => 'scanner',
-							'destination' => 'productsearch'
-						], [
-							'type' => 'select',
-							'content' => $vendors,
-							'attributes' => [
-								'id' => 'productsearchvendor',
-								'name' => $this->_lang->GET('consumables.product.vendor_select')
-							]
-						], [
-							'type' => 'search',
-							'attributes' => [
-								'name' => $this->_lang->GET('consumables.product.search'),
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
-								'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value); return false;}",
-								'id' => 'productsearch'
-							]
-						], [
-							'type' => 'button',
-							'attributes' => [
-								'value' => $this->_lang->GET('order.add_manually'),
-								'type' => 'button',
-								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
-								UTILITY::json_encode([
-									[
-										[
-											'type' => 'number',
-											'attributes' => [
-												'name' => $this->_lang->GET('order.quantity_label'),
-											]
-										], [
-											'type' => 'text',
-											'attributes' => [
-												'name' => $this->_lang->GET('order.unit_label'),
-											],
-											'datalist' => array_values(array_unique($datalist_unit))
-										], [
-											'type' => 'text',
-											'attributes' => [
-												'name' => $this->_lang->GET('order.ordernumber_label')
-											]
-										], [
-											'type' => 'text',
-											'attributes' => [
-												'name' => $this->_lang->GET('order.productname_label')
-											]
-										], [
-											'type' => 'text',
-											'attributes' => [
-												'name' => $this->_lang->GET('order.vendor_label'),
-											],
-											'datalist' => array_values(array_unique($datalist))
-										]
-									]
-								])
-								."'), options:{".
-									"'".$this->_lang->GET('order.add_manually_confirm')."': true,".
-									"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
-								"}}).then(response => {if (Object.keys(response).length) {".
-									"_client.order.addProduct(response[api._lang.GET('order.quantity_label')] || '', response[api._lang.GET('order.unit_label')] || '', response[api._lang.GET('order.ordernumber_label')] || '', response[api._lang.GET('order.productname_label')] || '', response[api._lang.GET('order.barcode_label')] || '', response[api._lang.GET('order.vendor_label')] || '');".
-									"api.preventDataloss.monitor = true;}".
-									"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
-						]]
-					],[
-						['type' => 'hr']
-					],[
 						[
 							'type' => 'radio',
 							'attributes' => [
