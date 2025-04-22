@@ -68,6 +68,17 @@ events.forEach(function (name) {
 if (navigator.userAgent.toLowerCase().includes("safari")) document.documentElement.setAttribute("data-useragent", "safari");
 if (navigator.userAgent.toLowerCase().includes("chrome")) document.documentElement.removeAttribute("data-useragent");
 
+// observe changes to the canvas, updating masonry
+import { assemble_helper } from "./assemble.js";
+window.addEventListener("resize", assemble_helper.masonry);
+window.masonry = new MutationObserver((mutations) => {
+	assemble_helper.masonry();
+});
+window.masonry.observe(document.querySelector("main"), {
+	childList: true,
+	subtree: true,
+});
+
 // initial api requests
 await api.application("get", "language");
 api.application("get", "start");
