@@ -97,7 +97,7 @@ class MESSAGE extends API {
 								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
 									"'".$this->_lang->GET('message.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', " . $conversation['conversation_user'] . ", 'inbox')})"
+									"}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', " . $conversation['conversation_user'] . ")})"
 							]
 						]
 					];
@@ -193,7 +193,7 @@ class MESSAGE extends API {
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.delete_success'),
-						'redirect' => false,
+						'redirect' => 'conversation',
 						'type' => 'success'
 					]]);
 				else $this->response([
@@ -261,7 +261,7 @@ class MESSAGE extends API {
 				if ($success === count($recipients)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.send_success'),
-						'redirect' => 'conversation',
+						'redirect' => ['conversation', count($recipients) < 2 ? $recipients[0]['id'] : 0],
 						'type' => 'success'
 					]]);
 				else $this->response([

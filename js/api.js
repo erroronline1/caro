@@ -1200,7 +1200,7 @@ export const api = {
 	 * handles internal messenger
 	 *
 	 * @param {string} method get|post|delete
-	 * @param  {array} request api method, filter term / message id / message form data, occasionally query selector
+	 * @param  {array} request api method, conversation partner id / message form data
 	 * @returns request
 	 */
 	message: (method, ...request) => {
@@ -1211,7 +1211,7 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				new Toast(data.response.msg, data.response.type);
-				if (data.response !== undefined && data.response.redirect) api.message("get", data.response.redirect);
+				if (data.response !== undefined && data.response.redirect) api.message("get", ...data.response.redirect);
 			},
 			title = {
 				conversation: api._lang.GET("menu.communication.conversations"),
@@ -1230,10 +1230,6 @@ export const api = {
 					}
 					if (data.data) _serviceWorker.notif.communication(data.data);
 					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					if (request[1] === "inbox" && _serviceWorker.worker)
-						_serviceWorker.onMessage({
-							unseen: 0,
-						});
 				};
 				break;
 			case "post":
