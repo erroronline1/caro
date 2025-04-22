@@ -1041,7 +1041,7 @@
 		"added_confirmation": ":name wurde zur Bestellung hinzugefügt.",
 		"added_product": ":unit :number :name von :vendor",
 		"additional_info": "Zusätzliche Informationen",
-		"alert_achived_limit": "Aktuell sind mehr als :max Bestellungen archiviert. Bitte prüft ob davon welche gelöscht werden können.",
+		"alert_archived_limit": "Aktuell sind mehr als :max Bestellungen archiviert. Bitte prüft ob davon welche gelöscht werden können.",
 		"alert_disapprove_order": "Die Bestellung \n\n:order \n\nfür :unit wurde von :user zurückgewiesen und als vorbereitete Bestellung zurückgesetzt, da weitere Recherchen erforderlich sind. Bitte tretet in Kontakt.",
 		"alert_orderstate_change": "Der Bestellstatus \n\n:order \n\nfür :unit wurde von :user aktualisiert.",
 		"alert_purchase": "Neue Bestellungen freuen sich auf Bearbeitung :)",

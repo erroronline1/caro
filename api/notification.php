@@ -190,7 +190,7 @@ class NOTIFICATION extends API {
 		}
 		foreach ($units as $unit => $num){
 			if ($num > CONFIG['limits']['order_approved_archived']) {
-				$subject = $this->_lang->GET('order.alert_achived_limit', [
+				$subject = $this->_lang->GET('order.alert_archived_limit', [
 					':max' => CONFIG['limits']['order_approved_archived']
 				], true);
 				$reminders = $calendar->search($subject);
