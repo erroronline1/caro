@@ -47,7 +47,6 @@ export const assemble_helper = {
 	insertNodeAfter: async (node, after) => {
 		return new Promise((resolve) => {
 			const observer = new MutationObserver((mutations) => {
-				console.log(node.parentNode, mutations);
 				observer.disconnect();
 				resolve(true);
 			});
@@ -634,7 +633,7 @@ export class Toast {
 		this.destination = destination;
 		this.toast = document.getElementById(destination);
 		this.toast.removeAttribute("class");
-		if (typeof this.message !== "undefined") {
+		if (this.message) {
 			const closeimg = document.createElement("img"),
 				pauseimg = document.createElement("img"),
 				msg = document.createElement("span"),
