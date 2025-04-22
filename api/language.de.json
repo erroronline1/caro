@@ -1290,6 +1290,7 @@
 		"measure_probability": "Wahrscheinlichkeit nach Maßnahme",
 		"measure_remainder": "Verbleibende Maßnahmen sofern zutreffend",
 		"new": "neu",
+		"not_found": "Die Suche nach \":search\" ergab keine Treffer.",
 		"probabilities": ["unwahrscheinlich", "möglich", "wahrscheinlich", "sehr wahrscheinlich"],
 		"probability": "Wahrscheinlichkeit",
 		"process": "Prozess",

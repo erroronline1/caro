@@ -1705,16 +1705,11 @@ export const api = {
 			case "get":
 				switch (request[1]) {
 					case "search":
-						if (!request[2]) {
-							api.risk("get", "risk");
-							return;
-						}
 						successFn = function (data) {
-							let list = document.querySelector("hr").previousElementSibling;
-							if (list.previousElementSibling) list.remove();
-							if (data.render.content) {
+							let search = document.querySelector("main form").firstElementChild;
+							if (data.render && data.render.content) {
 								const render = new Assemble(data.render);
-								render.initializeSection("hr");
+								search.replaceWith(...Array.from(render.initializeSection(null,null, "iCanHasNodes")));
 								render.processAfterInsertion();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);

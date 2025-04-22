@@ -255,22 +255,10 @@ class RISK extends API {
 					if (isset($this->_lang->_USER['risks'][$selectedrisk]) && isset($risks[$this->_lang->_USER['risks'][$selectedrisk]])) $risks[$this->_lang->_USER['risks'][$selectedrisk]]['checked'] = true;
 				}
 
-				$result['render'] = ['content' => [
-					[
-						[
-							'type' => 'search',
-							'attributes' => [
-								'name' => $this->_lang->GET('risk.search'),
-								'onkeypress' => "if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}",
-								]
-						]
-					],[
-						[
-							'type' => 'hr'
-						]
-					]
-				]];
-
+				require_once('_shared.php');
+				$search = new SHARED($this->_pdo);
+				$result = ['render' => ['content' => $search->risksearch()]];		
+				
 				// render selection of types and their content, one selection per process
 				$selection = [];
 				foreach ($this->_lang->_USER['risk']['type'] as $type => $translation){
@@ -735,8 +723,15 @@ class RISK extends API {
 	public function search(){
 		require_once('_shared.php');
 		$search = new SHARED($this->_pdo);
-		$result = ['render' => ['content' => $search->risksearch(['search' => $this->_search])]];
-		$this->response($result);
+		if ($result = $search->risksearch(['search' => $this->_search])) {
+			$this->response(['render' => ['content' => $result]]);
+		}
+		$this->response([
+			'response' => [
+			'msg' => $this->_lang->GET('risk.not_found', [':search' => $this->_search]),
+			'type' => 'error'
+		]]);
+
 	}
 }
 ?>

@@ -224,15 +224,25 @@ class SHARED {
 	public function risksearch($parameter = []){
 		$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 		$productsPerSlide = 0;
-		$matches = [[]];
+		$slides = [
+			[
+				[
+					'type' => 'search',
+					'attributes' => [
+						'name' => $this->_lang->GET('risk.search'),
+						'onkeypress' => "if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}",
+						'value' => isset($parameter['search']) ? $parameter['search'] : ''
+					]
+				]
+			]
+		];
 		foreach($risk_datalist as $row){
 			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 			$row['risk'] = implode(' ', array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
-			if (stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search'])){
+			if (isset($parameter['search']) && trim($parameter['search']) && stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search'])){
 
-				$article = intval(count($matches) - 1);
 				if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
-					$matches[$article][] = [
+					$slides[] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
@@ -241,7 +251,8 @@ class SHARED {
 						]
 					];
 				}
-				$slide = intval(count($matches[$article]) - 1);	
+				$slide = count($slides) - 1;
+				$tile = max(1, count($slides[$slide]) - 1);	
 				switch ($row['type']){
 					case 'characteristic': // implement further cases if suitable, according to languagefile
 						$content = $row['process'] . ': ' . $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
@@ -250,8 +261,8 @@ class SHARED {
 						$content = $row['process'] . ': ' . ($row['cause'] ? : '') . ($row['cause'] && $row['effect'] ? ': ': '') . ($row['effect'] ? : '');
 						break;
 				}
-				if ($row['hidden']) $content .= ' [X]';
-				$matches[$article][$slide][] = [
+				if ($row['hidden']) $content = UTILITY::hiddenOption($content);
+				$slides[$slide][$tile][] = [
 					'type' => 'tile',
 					'attributes' => [
 						'onclick' => "api.risk('get', 'risk', " . $row['id'] . ")",
@@ -269,16 +280,8 @@ class SHARED {
 				];
 			}
 		}
-		if (!$matches[0]) $matches[0][] = [
-			[
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $this->_lang->GET('risk.search_result', [':search' => $parameter['search']])
-				],
-			]
-		];
-		$content = $matches;
-		return $content;
+		if (isset($parameter['search']) && $parameter['search'] && !isset($slides[1])) return false;
+		return [array_values($slides)];
 	}
 
     /**

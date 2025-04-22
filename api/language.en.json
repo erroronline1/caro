@@ -189,7 +189,7 @@
 			"Feedback": "If you experience any issues with data security or application usage contact :issue_mail immidiately providing details and a response address."
 		},
 		"terms_of_service_accepted": "I agree to the terms of service",
-		"timeout_aria":"Without active use of the application you will have to reauthenticate after about :minutes minutes."
+		"timeout_aria": "Without active use of the application you will have to reauthenticate after about :minutes minutes."
 	},
 	"assemble": {
 		"approve": {
@@ -595,9 +595,9 @@
 	"calendar": {
 		"appointment": {
 			"date": "Date",
-			"download":"Print out the PDF or send the ICS-file by mail or messenger",
+			"download": "Print out the PDF or send the ICS-file by mail or messenger",
 			"duration": "Approximate duration (hours)",
-			"ics":"ICS calendar file",
+			"ics": "ICS calendar file",
 			"occasion": "Occasion",
 			"occasion_hint": "e.g. cast for orthosis, fitting for prosthesis, etc.",
 			"pdf": "PDF handout with QR appointment",
@@ -1290,6 +1290,7 @@
 		"measure_probability": "Post measure probability",
 		"measure_remainder": "Remaining measures if reasonable",
 		"new": "New",
+		"not_found": "The search for \":search\" did not return any results.",
 		"probabilities": ["unlikely", "possible", "likely", "most likely"],
 		"probability": "Probability",
 		"process": "Process",
@@ -1465,7 +1466,7 @@
 		"settings_initial_overtime_hint": "Number of hours",
 		"settings_language": "Language",
 		"settings_language_hint": "System standard is :lang",
-		"settings_masonry":"Masonry view on wide screens",
+		"settings_masonry": "Masonry view on wide screens",
 		"settings_primary_recordstate": "Preferred record state",
 		"settings_primary_unit": "Primary unit",
 		"settings_theme": "Colour scheme",
