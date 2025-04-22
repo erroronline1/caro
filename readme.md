@@ -133,8 +133,10 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * responsive masonry
     * adjust application widgets and structure to meet masonry design (especially regulatory summaries)
     * new orders and products raises error due to hr?
+    * check performance (especially orders on stresstest)
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
+* review filtering by submitting ids and provide proper filtered results instead. especially approved orders may need too much rendering time possible to crash the browser. best limit to selected state. same goes for other tasks like document bundles, file bundles (probably not files)
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -3699,18 +3701,20 @@ Sample response
 {"response": {"id": false,"msg": "This order has been permanently deleted","type": "success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> GET ./api/api.php/order/approved/
+> GET ./api/api.php/order/approved/{search}/{null}/{state}
 
 Returns approved orders as data.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| none |  |  |  |
+| {search} | path parameter | optional | true, false |
+| {null} | path parameter | optional but necessary by use of {state} |  |
+| {state} | path parameter | optional | ordered, received, delivered, archived |
 
 Sample response
 ```
-{"data":{"order":[{"id":22321,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2024-10-25 21:34:23 \n12345\nOrder processed: 2024-10-25 22:48:26","quantity":7,"unit":"ST","barcode":"4032767176687","name":"Anschlusskappe f\u00fcr Fu\u00dfh\u00fclle 2C4=*(C-Walk 1C40), dunkelbraun","vendor":"Otto Bock","ordernumber":"2C11=L29-30\/15","commission":"wolfgangUVIKmdEZsiuOdAYlQbhnm6UfPhD7URBY955","approval":null,"information":"daksjhof wgo 4islfdsdfg","addinformation":true,"lastorder":null,"orderer":"error on line 1","organizationalunit":"prosthetics2","orderstatechange":{"select changed order state":[],"not deliverable":[],"delivery date announced":[],"delivery date changed":[]},"state":{"ordered":{"data-ordered":"true"},"received":{"data-received":"false"},"delivered":{"data-delivered":"false"},"archived":{"data-archived":"false"}},"disapprove":false,"cancel":true,"return":false....
+{"data":{"filter":"","state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2025-01-25 01:45:48 ","quantity":"1","unit":"PAK","barcode":"4032767124961","name":"Schlauch-Strumpf","vendor":"Otto Bock HealthCare Deutschland GmbH","ordernumber":"99B25","commission":"1234","approval":0,"addinformation":true,"orderer":"error on line 1","organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"partially_received":{"data-partially_received":"false"},"received":{"data-received":"false"},"partially_delivered":{"data-partially_delivered":"false"},....
 ```
 
 > PUT ./api/api.php/order/approved/{id}/{update}/{state}
@@ -3733,20 +3737,6 @@ Parameters
 Sample response
 ```
 {"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
-```
-
-> GET ./api/api.php/order/filter/{search}
-
-Returns order ids whose contents match {search}.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | required | search string  |
-
-Sample response
-```
-{"data": ["89","90"]}
 ```
 
 > DELETE ./api/api.php/order/order/{id}

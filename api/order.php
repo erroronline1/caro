@@ -316,7 +316,13 @@ class ORDER extends API {
 					$this->delete_approved_order($row);
 				}
 
-				$result = ['data' => ['order' => [], 'approval' => []]];
+				// sanitize search
+				$this->_requestedID = in_array($this->_requestedID, ['null']) ? '' : trim($this->_requestedID ? : '');
+
+				$result = ['data' => [
+					'filter' => $this->_requestedID ? : '', // preset search term
+					'state' => $this->_subMethodState ? : 'unprocessed', // preset the appropriate language key
+					'order' => [], 'approval' => []]];
 				// set available units
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
@@ -392,8 +398,12 @@ class ORDER extends API {
 				}
 				ksort($statechange);
 
-				// get all approved orders by applicable units
-				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_unit', [
+				// get all approved orders filtered by
+				// applicable units, state and search
+				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+					'values' => [
+						':orderfilter' => $this->_requestedID ? : ''
+					],
 					'replacements' => [
 						':organizational_unit' => implode(",", $units)
 					]
@@ -411,6 +421,9 @@ class ORDER extends API {
 					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $result['data']['approval'])) $result['data']['approval'][] = $row['approval'];
 				}
 				foreach($order as $row) {
+					// filter selected state or default to unprocessed
+					if ((!$this->_subMethodState && $row['ordered']) || ($this->_subMethodState && !$row[$this->_subMethodState])) continue;
+					
 					$decoded_order_data = json_decode($row['order_data'], true);
 					
 					$product = null;
@@ -611,36 +624,6 @@ class ORDER extends API {
 			'values' => [
 				':id' => $row['id']
 			]
-		]);
-	}
-	
-	/**
-	 *   ___ _ _ _
-	 *  |  _|_| | |_ ___ ___
-	 *  |  _| | |  _| -_|  _|
-	 *  |_| |_|_|_| |___|_|
-	 *
-	 * filter orders by search
-	 */
-	public function filter(){
-		if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
-		else $units = $_SESSION['user']['units']; // display only orders for own units
-
-		$filtered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_filter', [
-			'values' => [
-				':orderfilter' => $this->_requestedID
-			],
-			'replacements' => [
-				':organizational_unit' => implode(",", $units),
-			]
-		]);
-		$matches = [];
-		foreach ($filtered as $row){
-			$matches[] = strval($row['id']);
-		}
-		// return order ids
-		$this->response( [
-			'data' => $matches
 		]);
 	}
 	

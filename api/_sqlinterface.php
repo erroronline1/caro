@@ -659,39 +659,35 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
 
-		'order_get_approved_order_by_unit' => [
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) ORDER BY id DESC"
-		],
 		'order_get_approved_order_by_id' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id"
 		],
-		'order_get_approved_order_by_substr' => [ // CASE SENSITIVE JUST TO BE SURE
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')"
-		],
-		'order_get_approved_order_by_delivered' => [
+		'order_get_approved_order_by_delivered' => [ // preselection for safe deletion
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE delivered < :date_time AND archived IS NULL",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE delivered < CONVERT(SMALLDATETIME, :date_time, 120) AND archived IS NULL"
 		],		
+		'order_get_approved_order_by_substr' => [ // CASE SENSITIVE JUST TO BE SURE, compares order data to detect reused attachments in case of deletion
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE order_data LIKE CONCAT('%', :substr, '%')"
+		],
 		'order_delete_approved_order' => [
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
-		'order_get_filter' => [
-			'mysql' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))",
-			'sqlsrv' => "SELECT id FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))"
+		'order_get_approved_filtered' => [
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))"
 		],
-		'order_get_approved_unprocessed' => [
+		'order_get_approved_unprocessed' => [ // for notifications
 			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 			'sqlsrv' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
 		],
-		'order_get_approved_unreceived_undelivered' => [
+		'order_get_approved_unreceived_undelivered' => [ // for system message reminders
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (received IS NULL OR delivered IS NULL)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE ordered IS NOT NULL AND (received IS NULL OR delivered IS NULL)",
 		],
-		'order_get_approved_archived' => [
+		'order_get_approved_archived' => [ // for system message reminders
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE archived IS NOT NULL",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE archived IS NOT NULL",
 		],

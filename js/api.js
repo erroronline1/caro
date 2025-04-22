@@ -1326,17 +1326,6 @@ export const api = {
 								};
 						}
 						break;
-					case "filter":
-						successFn = function (data) {
-							if (data.data) {
-								const all = document.querySelectorAll("[data-filtered]");
-								for (const order of all) {
-									order.parentNode.parentNode.style.display = data.data.includes(order.dataset.filtered) ? api.filter(order.parentNode.parentNode.localName) : "none";
-								}
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
 					case "incorporation":
 						successFn = function (data) {
 							if (data.render) {
@@ -1390,7 +1379,6 @@ export const api = {
 							if (request[1] === "approved" && data.data) {
 								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								_client.order.approved(data.data);
-								_client.order.filter();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.links !== undefined) {

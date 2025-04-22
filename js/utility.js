@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Assemble, Dialog, Toast } from "./assemble.js";
+import { Assemble, assemble_helper, Dialog, Toast } from "./assemble.js";
 import QrCreator from "../libraries/qr-creator.js";
 
 export const _serviceWorker = {
@@ -690,13 +690,15 @@ export const _client = {
 				labels = [];
 
 			// construct filter checkboxes with events
-			filter[api._lang.GET("order.order.unprocessed")] = { checked: true, onchange: "_client.order.filter()" };
-			filter[api._lang.GET("order.order.ordered")] = { onchange: '_client.order.filter("ordered")' };
-			filter[api._lang.GET("order.order.partially_received")] = { onchange: '_client.order.filter("partially_received")' };
-			filter[api._lang.GET("order.order.received")] = { onchange: '_client.order.filter("received")' };
-			filter[api._lang.GET("order.order.partially_delivered")] = { onchange: '_client.order.filter("partially_delivered")' };
-			filter[api._lang.GET("order.order.delivered")] = { onchange: '_client.order.filter("delivered")' };
-			filter[api._lang.GET("order.order.archived")] = { onchange: '_client.order.filter("archived")' };
+			filter[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value)' };
+			filter[api._lang.GET("order.order.ordered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "ordered")' };
+			filter[api._lang.GET("order.order.partially_received")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "partially_received")' };
+			filter[api._lang.GET("order.order.received")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "received")' };
+			filter[api._lang.GET("order.order.partially_delivered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "partially_delivered")' };
+			filter[api._lang.GET("order.order.delivered")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "delivered")' };
+			filter[api._lang.GET("order.order.archived")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value || "null", "null", "archived")' };
+			filter[api._lang.GET("order.order." + data.state)].checked = true;
+
 			content.push([
 				{
 					type: "radio",
@@ -709,17 +711,19 @@ export const _client = {
 					type: "filtered",
 					attributes: {
 						name: api._lang.GET("order.order_filter_label"),
-						onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'filter', this.value); return false;}",
-						onblur: "api.purchase('get', 'filter', this.value); return false;",
+						onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'approved', this.value); return false;}",
+						onblur: "api.purchase('get', 'approved', this.value); return false;",
 						id: "productsearch",
+						value: data.filter ? data.filter : "",
 					},
 				},
 			]);
 
 			// iterate over orders and construct Assemble syntax
 			for (const element of data.order) {
-				// reinstatiate with order id for filtering
-				collapsible = [{ type: "hidden", description: "filter", attributes: { "data-filtered": element.id } }];
+				// reinstatiate
+				collapsible = [];
+				// sanitize null data for proper output
 				["unit", "ordernumber", "name", "vendor"].forEach((e) => {
 					if (!element[e]) element[e] = "";
 				});
@@ -1353,46 +1357,6 @@ export const _client = {
 			const render = new Assemble({ content: content });
 			document.getElementById("main").replaceChildren(render.initializeSection());
 			render.processAfterInsertion();
-		},
-
-		/**
-		 * filter orders by order processing state
-		 * @param {string} type to display, hide all others
-		 * @event hiding or displaying approved orders
-		 */
-		filter: (type = undefined) => {
-			document.querySelectorAll("[data-ordered]").forEach((article) => {
-				article.parentNode.parentNode.style.display = "none";
-			});
-			const filters = {
-				ordered: document.querySelectorAll("[data-ordered=true]"),
-				partially_received: document.querySelectorAll("[data-partially_received=true]"),
-				received: document.querySelectorAll("[data-received=true]"),
-				partially_delivered: document.querySelectorAll("[data-partially_delivered=true]"),
-				delivered: document.querySelectorAll("[data-delivered=true]"),
-				archived: document.querySelectorAll("[data-archived=true]"),
-			};
-			let display = [...document.querySelectorAll("[data-ordered=false]")].map(function (node) {
-				return node.parentNode.parentNode;
-			});
-			if (type) {
-				let hide = [],
-					ignore = true;
-				for (const [key, nodes] of Object.entries(filters)) {
-					if (type === key) {
-						ignore = false;
-						continue;
-					}
-					if (ignore) continue;
-					hide = hide.concat(...nodes);
-				}
-				display = [...filters[type]].map(function (node) {
-					return [...hide].map((n) => n.parentNode.parentNode).includes(node.parentNode.parentNode) ? undefined : node.parentNode.parentNode;
-				});
-			}
-			display.forEach((article) => {
-				if (article) article.style.display = "block";
-			});
 		},
 	},
 	record: {
