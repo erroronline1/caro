@@ -2330,8 +2330,7 @@ export class Assemble {
 								name: "_selectedproduct",
 								id: "_selectedproduct",
 							},
-						},
-						{ type: "hr" },
+						}
 					],
 				],
 				options: options,

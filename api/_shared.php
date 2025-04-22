@@ -497,7 +497,7 @@ class SHARED {
 								],
 								'content' => []
 							];
-							$slides[$slide][$tiles][1]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
+							$slides[$slide][$tiles][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
 									'onchange' => "if (this.checked) document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
 								];
 							break;
@@ -526,7 +526,7 @@ class SHARED {
 								];
 					}
 				}
-				if (isset($parameter['search']) && !isset($slides[1])) return false;
+				if (isset($parameter['search']) && !isset($slides[$usecase === 'productselection' ? 0 : 1])) return false;
 				break;
 			}
 		return [array_values($slides)]; // return a proper nested article

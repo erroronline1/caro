@@ -1289,8 +1289,8 @@ export const api = {
 						switch (request[4]) {
 							case "productselection": // coming from assemble.js widget
 								successFn = function (data) {
-									let hr = document.querySelector("#inputmodal form article hr");
-									let sibling = hr.nextSibling,
+									let article = document.querySelector("#inputmodal form article");
+									let sibling = article.children[3], // as per assemble after button, label and hidden input
 										deletesibling;
 									if (sibling) {
 										do {
@@ -1299,9 +1299,9 @@ export const api = {
 											deletesibling.remove();
 										} while (sibling);
 									}
-									if (data.render.content) {
+									if (data.render && data.render.content) {
 										const render = new Assemble(data.render);
-										render.initializeSection(null, hr);
+										render.initializeSection(null, article.children[2]);
 										render.processAfterInsertion();
 									}
 									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -1372,7 +1372,7 @@ export const api = {
 								api.preventDataloss.start();
 							}
 							if (request[1] === "approved" && data.data) {
-								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
+								api.update_header(title[request[1]]);
 								_client.order.approved(data.data);
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
