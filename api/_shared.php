@@ -294,22 +294,20 @@ class SHARED {
 	 * @return array render content
 	 */
 	public function productsearch($usecase = '', $parameter = []){
+		$slides = [];
 		// order of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
-				if (!isset($parameter['search'])) {
-					$content = [];
-					break;
-				}
+				$vendors = SQLQUERY::EXECUTE($this->_pdo, SQLQUERY::PREPARE('consumables_get_vendor_datalist'));
 
-				if ($usecase === 'productselection'){
-					// prepared by assemble.js vendor ids are passed as 'null'-string
-					$vendors = SQLQUERY::EXECUTE($this->_pdo, SQLQUERY::PREPARE('consumables_get_vendor_datalist'));
+				if (!isset($parameter['vendors']) || $parameter['vendors'] === 'null'){
 					$parameter['vendors'] = implode('_', array_values(array_column($vendors, 'id')));
 				}
-				$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['editconsumables', 'productinformation']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
+
+				$search = [];
+				if (isset($parameter['search'])) $search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 					'values' => [
-						':search' => $parameter['search']
+						':search' => trim($parameter['search'])
 					],
 					'replacements' => [
 						':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
@@ -317,15 +315,156 @@ class SHARED {
 				]);
 
 				$productsPerSlide = 0;
-				$matches = [[]];
+
+				// insert request specific search to first tile
+				switch($usecase){
+					case 'productselection':
+						// no prefacing inputs
+						break;
+					case 'product':
+						// prepare existing vendor lists
+						$vendorselection = [];
+
+						$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
+
+						foreach($vendors as $key => $row) {
+							$datalist[] = $row['name'];
+							$display = $row['name'];
+							if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+							$vendorselection[$display] = ['value' => $row['id']];
+						}
+						ksort($vendorselection);
+
+						$slides[] = [
+							[
+								'type' => 'scanner',
+								'destination' => 'productsearch'
+							], [
+								'type' => 'select',
+								'content' => $vendorselection,
+								'attributes' => [
+									'id' => 'productsearchvendor',
+									'name' => $this->_lang->GET('consumables.product.filter_vendors')
+									]
+							], [
+								'type' => 'search',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.search'),
+									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, '" . $usecase . "'); return false;}",
+									'id' => 'productsearch',
+									'value' => isset($parameter['search']) ? trim($parameter['search']) : ''
+								]
+							]
+						];
+						if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited')){
+							array_splice($slides[0], 0, 0, [
+								[
+								'type' => 'button',
+								'attributes' => [
+									'value' => $this->_lang->GET('consumables.product.add_new'),
+									'type' => 'button',
+									'onclick' => "api.purchase('get', 'product')",
+								]
+							]
+							]);
+						}
+						break;
+					default:
+						$datalist = [];
+						$datalist_unit = [];
+		
+						// prepare existing vendor lists
+						$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendors))];
+						foreach($vendors as $key => $row) {
+							if ($row['hidden']) continue;
+							$datalist[] = $row['name'];
+							$vendorselection[$row['name']] = ['value' => $row['id']];
+						}
+						ksort($vendorselection);
+		
+						// prepare existing sales unit lists
+						$product_units = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
+						foreach($product_units as $key => $row) {
+							$datalist_unit[] = $row['article_unit'];
+						}
+
+						$slides[] = [
+							[
+								[
+									'type' => 'scanner',
+									'destination' => 'productsearch'
+								], [
+									'type' => 'select',
+									'content' => $vendorselection,
+									'attributes' => [
+										'id' => 'productsearchvendor',
+										'name' => $this->_lang->GET('consumables.product.vendor_select')
+									]
+								], [
+									'type' => 'search',
+									'attributes' => [
+										'name' => $this->_lang->GET('consumables.product.search'),
+											'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'order'); return false;}",
+										'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'order'); return false;}",
+										'id' => 'productsearch',
+										'value' => isset($parameter['search']) ? trim($parameter['search']) : ''
+									]
+								], [
+									'type' => 'button',
+									'attributes' => [
+										'value' => $this->_lang->GET('order.add_manually'),
+										'type' => 'button',
+										'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
+										UTILITY::json_encode([
+											[
+												[
+													'type' => 'number',
+													'attributes' => [
+														'name' => $this->_lang->GET('order.quantity_label'),
+													]
+												], [
+													'type' => 'text',
+													'attributes' => [
+														'name' => $this->_lang->GET('order.unit_label'),
+													],
+													'datalist' => array_values(array_unique($datalist_unit))
+												], [
+													'type' => 'text',
+													'attributes' => [
+														'name' => $this->_lang->GET('order.ordernumber_label')
+													]
+												], [
+													'type' => 'text',
+													'attributes' => [
+														'name' => $this->_lang->GET('order.productname_label')
+													]
+												], [
+													'type' => 'text',
+													'attributes' => [
+														'name' => $this->_lang->GET('order.vendor_label'),
+													],
+													'datalist' => array_values(array_unique($datalist))
+												]
+											]
+										])
+										."'), options:{".
+											"'".$this->_lang->GET('order.add_manually_confirm')."': true,".
+											"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
+										"}}).then(response => {if (Object.keys(response).length) {".
+											"_client.order.addProduct(response[api._lang.GET('order.quantity_label')] || '', response[api._lang.GET('order.unit_label')] || '', response[api._lang.GET('order.ordernumber_label')] || '', response[api._lang.GET('order.productname_label')] || '', response[api._lang.GET('order.barcode_label')] || '', response[api._lang.GET('order.vendor_label')] || '');".
+											"api.preventDataloss.monitor = true;}".
+											"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
+								]]
+							]
+						];
+				}
 
 				foreach($search as $key => $row) {
 					foreach($row as $key => $value){
 						$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
 					}
-					$article = intval(count($matches) - 1);
 					if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
-						$matches[$article][] = [
+						$slides[] = [
 							[
 								'type' => 'textsection',
 								'attributes' => [
@@ -334,11 +473,11 @@ class SHARED {
 							]
 						];
 					}
-					$slide = intval(count($matches[$article]) - 1);
+					$slide = count($slides) - 1;
+					$tiles = max(1, count($slides[$slide]) - 1);
 					switch ($usecase){
-						case 'editconsumables': // consumables.php can make good use of this method!
-						case 'productinformation': // consumables.php can make good use of this method!
-								$matches[$article][$slide][] = [
+						case 'product': // consumables.php can make good use of this method!
+								$slides[$slide][$tiles][] = [
 								'type' => 'tile',
 								'attributes' => [
 									'onclick' => "api.purchase('get', 'product', " . $row['id'] . ")",
@@ -352,14 +491,14 @@ class SHARED {
 							];
 							break;
 						case 'productselection': // document.php, record.php, assemble.js can make good use of this method!
-							if (!isset($matches[$article][$slide][1])) $matches[$article][$slide][] = [
+							if (!isset($slides[$slide][$tiles][1])) $slides[$slide][$tiles][] = [
 								'type' => 'radio',
 								'attributes' => [
 									'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
 								],
 								'content' => []
 							];
-							$matches[$article][$slide][1]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
+							$slides[$slide][$tiles][1]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
 									'onchange' => "if (this.checked) document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
 								];
 							break;
@@ -371,7 +510,7 @@ class SHARED {
 								if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 							}
-							$matches[$article][$slide][] = [
+							$slides[$slide][$tiles][] = [
 								'type' => 'tile',
 								'attributes' => [
 									'onclick' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
@@ -388,18 +527,10 @@ class SHARED {
 								];
 					}
 				}
-				if (!$matches[0]) $matches[0][] = [
-					[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
-						],
-					]
-				];
-				$content = $matches;
+				if (isset($parameter['search']) && !isset($slides[1])) return false;
 				break;
 			}
-		return $content;
+		return [array_values($slides)]; // return a proper nested article
 	}
 
 	/**

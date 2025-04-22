@@ -1287,7 +1287,7 @@ export const api = {
 				switch (request[1]) {
 					case "productsearch":
 						switch (request[4]) {
-							case "productselection": //coming from assemble.js
+							case "productselection": // coming from assemble.js widget
 								successFn = function (data) {
 									let hr = document.querySelector("#inputmodal form article hr");
 									let sibling = hr.nextSibling,
@@ -1307,14 +1307,13 @@ export const api = {
 									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 								};
 								break;
-							default:
+							default: // product management or order
 								api.preventDataloss.monitor = false;
 								successFn = function (data) {
-									let list = document.querySelector("hr").previousElementSibling;
-									if (list.previousElementSibling) list.remove();
-									if (data.render.content) {
+									let search = document.querySelector("main form").firstElementChild;
+									if (data.render && data.render.content) {
 										const render = new Assemble(data.render);
-										render.initializeSection("hr");
+										search.replaceWith(...Array.from(render.initializeSection(null,null, "iCanHasNodes")));
 										render.processAfterInsertion();
 									}
 									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -1358,7 +1357,7 @@ export const api = {
 						break;
 					case "product":
 						if (request[2] && typeof request[2] !== "number") {
-							//pass article info as query paramaters for adding unknown articles to database from orders
+							// pass article info as query parameters for adding unknown articles to database from orders
 							payload = JSON.parse(request[2]);
 							delete request[2];
 						}

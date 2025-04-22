@@ -946,7 +946,6 @@ class CONSUMABLES extends API {
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				$certificates = [];
 				$documents = [];
 
 				// gather files
@@ -995,16 +994,12 @@ class CONSUMABLES extends API {
 				$vendors[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 
 				foreach($vendor as $key => $row) {
-					$datalist[] = $row['name'];
 					$display = $row['name'];
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$options[$display] = [];
 					if ($row['name'] === $product['vendor_name']) $options[$display]['selected'] = true;
-					$vendors[$display] = ['value' => $row['id']];
-					if ($row['name'] === $product['vendor_name']) $product['vendor_id'] = $row['id']; 
 				}
 				ksort($options);
-				ksort($vendors);
 
 				// prepare existing delivery unit lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
@@ -1018,35 +1013,14 @@ class CONSUMABLES extends API {
 					$hidden = $this->_lang->GET('consumables.product.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
 
+				// render search and selection
+				require_once('_shared.php');
+				$search = new SHARED($this->_pdo);
+				$result = ['render' => ['content' => $search->productsearch($this->_usecase ? : 'product')]];
+		
 				// switch between display- and edit mode 
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')) {
 					// standard user view
-					// render search and selection
-					$result['render'] = ['content' => [
-						[
-							[
-								'type' => 'scanner',
-								'destination' => 'productsearch'
-							], [
-								'type' => 'select',
-								'content' => $vendors,
-								'attributes' => [
-									'id' => 'productsearchvendor',
-									'name' => $this->_lang->GET('consumables.product.filter_vendors')
-									]
-							], [
-								'type' => 'search',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.search'),
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'productinformation'); return false;}",
-									'id' => 'productsearch'
-								]
-							]
-						], [
-							['type' => 'hr']
-						]
-					]];
-					
 					if ($product['id']){
 						// deactivate inputs for regular users
 						$isactive['disabled'] = $isinactive['disabled'] = true;
@@ -1084,7 +1058,7 @@ class CONSUMABLES extends API {
 
 						// inform about last order
 						if ($product['id'] && $product['last_order']){
-							$result['render']['content'][2][] = [
+							$result['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $this->_lang->GET('order.order_last_ordered', [':date' => UTILITY::dateFormat(substr($product['last_order'], 0, -9))])
@@ -1104,7 +1078,7 @@ class CONSUMABLES extends API {
 							foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 								if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
 							}
-							$result['render']['content'][2][] = [
+							$result['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $incorporationState
@@ -1113,7 +1087,7 @@ class CONSUMABLES extends API {
 							];
 						}
 						else {
-							$result['render']['content'][2][] = [
+							$result['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.incorporated_not')
@@ -1121,7 +1095,7 @@ class CONSUMABLES extends API {
 							];
 						}
 						if ($documents) {
-							$result['render']['content'][2][] = [
+							$result['render']['content'][1][] = [
 								'type' => 'links',
 								'description' => $this->_lang->GET('consumables.product.documents_download'),
 								'content' => $documents
@@ -1131,36 +1105,7 @@ class CONSUMABLES extends API {
 				}
 				else {
 					// display form for adding or editing a product
-					$result['render'] = ['content' => [
-						[
-							[
-								'type' => 'button',
-								'attributes' => [
-									'value' => $this->_lang->GET('consumables.product.add_new'),
-									'type' => 'button',
-									'onclick' => "api.purchase('get', 'product')",
-								]
-							], [
-								'type' => 'scanner',
-								'destination' => 'productsearch'
-							], [
-								'type' => 'select',
-								'content' => $vendors,
-								'attributes' => [
-									'id' => 'productsearchvendor',
-									'name' => $this->_lang->GET('consumables.product.filter_vendors')
-									]
-							], [
-								'type' => 'search',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.search'),
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'editconsumables'); return false;}",
-									'id' => 'productsearch'
-								]
-							]
-						], [
-							['type' => 'hr']
-						], [
+					$result['render']['content'][] = [
 							[
 								'type' => 'select',
 								'numeration' => 'prevent',
@@ -1216,8 +1161,7 @@ class CONSUMABLES extends API {
 									'value' => $product['article_info'] ? : '',
 								]
 							]
-						]
-					]];
+					];
 					// append form for authorized users
 					if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited')){
 						$result['render']['form'] = [
@@ -1230,19 +1174,19 @@ class CONSUMABLES extends API {
 					// deactivate inputs for restricted users
 					if (!PERMISSION::permissionFor('products')){
 						$result['render']['content'][0][2]['attributes']['disabled'] = // add new product
-						$result['render']['content'][2][0]['attributes']['disabled'] = // select vendor
-						$result['render']['content'][2][1]['attributes']['readonly'] = // type vendor
-						$result['render']['content'][2][2]['attributes']['readonly'] = // article number
-						$result['render']['content'][2][3]['attributes']['readonly'] = // article name
-						$result['render']['content'][2][4]['attributes']['readonly'] = // article alias
-						$result['render']['content'][2][5]['attributes']['readonly'] = // order unit
-						$result['render']['content'][2][6]['attributes']['readonly'] = // article ean
-						$result['render']['content'][2][7]['attributes']['readonly'] = // article info
+						$result['render']['content'][1][0]['attributes']['disabled'] = // select vendor
+						$result['render']['content'][1][1]['attributes']['readonly'] = // type vendor
+						$result['render']['content'][1][2]['attributes']['readonly'] = // article number
+						$result['render']['content'][1][3]['attributes']['readonly'] = // article name
+						$result['render']['content'][1][4]['attributes']['readonly'] = // article alias
+						$result['render']['content'][1][5]['attributes']['readonly'] = // order unit
+						$result['render']['content'][1][6]['attributes']['readonly'] = // article ean
+						$result['render']['content'][1][7]['attributes']['readonly'] = // article info
 						true; 
 					}
 					if (PERMISSION::permissionFor('productslimited')){
-						unset($result['render']['content'][2][4]['attributes']['readonly']); // article alias
-						unset($result['render']['content'][2][7]['attributes']['readonly']); // article info
+						unset($result['render']['content'][1][4]['attributes']['readonly']); // article alias
+						unset($result['render']['content'][1][7]['attributes']['readonly']); // article info
 					}
 
 					// append toggles
@@ -1313,7 +1257,7 @@ class CONSUMABLES extends API {
 
 					// add last order info
 					if ($product['id'] && $product['last_order']){
-						$result['render']['content'][2][] = [
+						$result['render']['content'][1][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('order.order_last_ordered', [':date' => UTILITY::dateFormat(substr($product['last_order'], 0, -9))])
@@ -1323,8 +1267,8 @@ class CONSUMABLES extends API {
 
 					// add download options for documents
 					if ($documents) {
-						if (isset($result['render']['content'][4]))
-							$result['render']['content'][4] = [
+						if (isset($result['render']['content'][3]))
+							$result['render']['content'][3] = [
 								[
 									[
 										'type' => 'links',
@@ -1332,7 +1276,7 @@ class CONSUMABLES extends API {
 										'content' => $documents
 									]
 								],
-								$result['render']['content'][4]
+								$result['render']['content'][3]
 							];
 						else $result['render']['content'][] = [
 							[
@@ -1361,7 +1305,7 @@ class CONSUMABLES extends API {
 						}
 						if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
 
-						array_push($result['render']['content'][3],
+						array_push($result['render']['content'][2],
 							[
 								'type' => 'textsection',
 								'attributes' => [
@@ -1377,7 +1321,7 @@ class CONSUMABLES extends API {
 							}
 							$incorporation[$this->_lang->GET('consumables.product.incorporated_revoke')] = [];
 							if ($similarproducts) $incorporation[$this->_lang->GET('consumables.product.incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
-							array_push($result['render']['content'][3], [
+							array_push($result['render']['content'][2], [
 									'type' => 'checkbox',
 									'attributes' => [
 										'name' => $this->_lang->GET('order.incorporation.state_approve')
@@ -1389,7 +1333,7 @@ class CONSUMABLES extends API {
 						}
 					}
 					else {
-						$result['render']['content'][3][] = [
+						$result['render']['content'][2][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('consumables.product.incorporated_not')
@@ -1458,9 +1402,14 @@ class CONSUMABLES extends API {
 	public function productsearch(){
 		require_once('_shared.php');
 		$search = new SHARED($this->_pdo);
-		$result = ['render' => ['content' => $search->productsearch($this->_usecase, ['search' => $this->_search, 'vendors' => $this->_requestedID])]];
-
-		$this->response($result);
+		if ($result = $search->productsearch($this->_usecase ? : 'product', ['search' => $this->_search, 'vendors' => $this->_requestedID])){
+			$this->response(['render' => ['content' => $result]]);
+		}	
+		$this->response([
+			'response' => [
+			'msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_search]),
+			'type' => 'error'
+		]]);
 	}
 
 	/**
