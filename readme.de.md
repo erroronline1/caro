@@ -1100,21 +1100,26 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
 
 ### Anwendungseinrichtung
+Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronline1/caro/tree/master/templates) im entsprechenden *template*-Ordner bereit um eine schnelle Verfügbarkeit von Inhalten bei der Inbetriebnahme der Anwendung zu unterstützen. Dateinamen folgen dem Muster `{frei wählbar}.{Typ}.{Standardsprache}.{Dateinamenerweiterung} wobei
+* der frei wählbare Teil alles sein kann, was die Struktur bei der Vorbereitung vereinfacht
+* der Typ einer der folgenden ist
+	* audits
+	* csvfilter
+	* documents
+	* manuals
+	* risks
+	* texts
+	* users
+    * vendors
+* die Standardsprache der Anwendung, wie sie in der  [Laufzeitvariablen](#laufzeitvariablen) festgelegt ist
+* die Dateinamenerweiterung `.json` optional von `.env`-Dateien erweitert wird (siehe auch [Anpassung](#anpassung))
+
+Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können mehrere Dateien eines Typs mit einem frei wählbaren Namensteil angelegt werden um die Übersicht zu behalten (vor dieser Designentscheidung hatten die Risiken 30.000 Zeilen, die noch unüberisichtlicher waren). Das ist jedoch nur eine Option, sofern keine Berührungsängste bestehen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch in jedem Fall nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
+
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
-* Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in templates/manual.XX.env/.json-Dateien.
-* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und templates/manual.XX.env/.json)
+* Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in Manual-Vorlagen.
+* [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und Manual-Vorlagen)
 * Auswahl eines Installationskennworts für die Systemnutzerin.
-
-*Optional*
-
-Sofern keine Berührungsängste bestehen JSON-Dateien wie die Sprachdateien oder die Standardanleitung mit einem Text-Editor zu bearbeiten können auch 
-* documents.XX.env/.json
-* vendors.XX.env/.json
-* risks.XX.env/.json
-* texttemplates.XX.env/.json
-* users.env/.json
-
-innerhalb des template-Verzeichnisses für eine schnellere Verfügbarkeit nach dem Start vorbereitet werden. Die Struktur muss den [original Templates](https://github.com/erroronline1/caro/tree/master/templates) (für den Fall dass diese nicht zur Verfügung gestellt wurden) entsprechen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
 
 ### Installation
 * Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*, Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind.

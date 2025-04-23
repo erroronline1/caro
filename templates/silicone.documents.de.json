@@ -1,0 +1,187 @@
+[
+	{
+		"comment": "following are silicone components #################################################################################################"
+	},
+
+	{
+		"name": "silikonfertigungsauftrag",
+		"alias": "",
+		"context": "component",
+		"unit": "silicone",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition obere Extremität",
+							"multiple": true
+						},
+						"content": {
+							"...": [],
+							"Liner / Silikonschaft UA OA 75S10": [],
+							"Außenschaft / Schutzüberzug UA OA 75S40": [],
+							"Silikoninlet Schulterschaft 75S50": [],
+							"Silikonschulterkappe 75S60": [],
+							"Silikonbandage 75S70": [],
+							"Handgelenkorthese 75O10": [],
+							"Silikonkompressionshandschuh 75O40": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition untere Extremität",
+							"multiple": true
+						},
+						"content": {
+							"...": [],
+							"Liner US 75S20": [],
+							"Silikoninnenschaft US 75S25": [],
+							"Liner OS 75S30": [],
+							"Silikoninnenschaft OS 75S35": [],
+							"Silikonhose / Beckenschaft 75S90": [],
+							"Außenschaft / Schutzüberzug US OS 75S45": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Polster, Narben, Traktion, Sonstiges",
+							"multiple": true
+						},
+						"content": {
+							"...": [],
+							"HTV-RTV-Polster 75S80": [],
+							"RTV-Polster 75S81": [],
+							"Platte für Traktionsmanschetten 75O70": [],
+							"Steckhülse für Lagerungsschale 75O80": [],
+							"RTV-Grundierung für konfektionierte Dichtlippe 75A90": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstige Grundposition"
+						}
+					}
+				],
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Zusätze zur Grundposition",
+							"multiple": true
+						},
+						"content": {
+							"...": [],
+							"Gurtband 75A10": [],
+							"Carbonverbund 75A40": [],
+							"Verschraubung 75A50": [],
+							"Dichtmanschette 75A70": [],
+							"Kaschierung 75E10": [],
+							"RTV-Schicht zur Adhäsionssteigerung 75E20": [],
+							"Integrierter kleiner Narbenausgleich 75E30": [],
+							"Matrix 75E40": [],
+							"Integriertes distales Polster zur Druckentlastung 75E70": [],
+							"HeiSens Leitspot pro Elektrode 75E80": [],
+							"Silikon Composite 75E90": [],
+							"Silikonbeschichtung zur Haftungsreduktion 75E100": [],
+							"Individuelle Farbgestaltung 75I10": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Reparaturauftrag"
+						},
+						"content": {
+							"Reparatur": []
+						},
+						"hint": "Modell erforderlich"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Reparaturausführung, sonstige Zusätze, ggf. Anzahl"
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Stärke"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Shore"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Farbe"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Weitere Ausführungen"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Skizze"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Fertigung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Verwendete Materialien im Hautkontakt"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Silikonfertigung erledigt"
+						},
+						"content": {
+							"Abgeschlossen": []
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"comment": "following are silicone documents #################################################################################################"
+	},
+
+	{
+		"name": "Silikonfertigungsauftrag",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "silicone",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "identifikator,silikonfertigungsauftrag"
+	}
+]

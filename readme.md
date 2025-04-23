@@ -122,8 +122,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 
 ## development
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-* text recommendation templates
-* document templates
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * update readme pictures, add responsibilities, appointment
@@ -1181,21 +1179,26 @@ It is strongly recommended to create an additional development environment to te
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
 
 ### Application setup
+The default provides [template files](#https://github.com/erroronline1/caro/tree/master/templates) in the respective template folder for a swift availability of contents upon launch. Filenames follow a pattern of `{choosable name part}.{type}.{default language}.{extension}` where
+* the choosable name part can be anything to help you structure any preparations
+* the type is one of
+	* audits
+	* csvfilter
+	* documents
+	* manuals
+	* risks
+	* texts
+	* users
+    * vendors
+* the default language of the application as specified within the [runtime variables](#runtime-variables)
+* the extension being `.json` by default with the option to extended by `.env` files (also see [customisation](#customisation))
+
+If you are going to prepare the deployment you are free to create multiple files of one type with a choosable name part for enhanced comprehensibility (before this design choice default risks had about 30k lines which was an even worse of a mess to track). This is optional and if you feel comfortable enough only. Also approvals, evaluations and pricelist imports have to be done the regular way after installation though. The templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
+
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
-* Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to templates/manual.XX.env/.json-files.
-* [Customize](#customisation) your appropriate language-files (language.XX.env/.json and templates/manual.XX.env/.json)
+* Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to manual templates.
+* [Customize](#customisation) your appropriate language-files (language.XX.env/.json and manual templates)
 * Select an installation password for the system user.
-
-*Optional*
-
-If you are comfortable enough with text editing JSON-files to modify the language files and template-manual you further can prepare
-* documents.XX.env/.json
-* vendors.XX.env/.json
-* risks.XX.env/.json
-* texttemplates.XX.env/.json
-* users.env/.json
-
-within the template directory too for a swift availability upon launch. Structure must adhere to the [original templates](https://github.com/erroronline1/caro/tree/master/templates) - in case you have not been provided with. Approvals, evaluations and pricelist imports have to be done the regular way after installation though. Also the templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
 
 ### Installation procedure
 * Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.

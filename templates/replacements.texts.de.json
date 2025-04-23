@@ -1,0 +1,216 @@
+[
+	{
+		"comment": "following are common replacements #################################################################################################"
+	},
+	{
+		"type": "replacement",
+		"name": "DIE_PATIENTIN_NOMINATIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "die Patientin\nder Patient\nder Patient\ndie Patientinder Patient\n\nder Patient\nDu\nSie"
+	},
+	{
+		"type": "replacement",
+		"name": "DER_PATIENTIN_AKKUSATIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "der Patientin\nden Patienten\nden Patienten\nder Patientinden Patienten\n\nden Patienten\nDich\nSie"
+	},
+	{
+		"type": "replacement",
+		"name": "DER_PATIENTIN_DATIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "der Patientin\ndem Patienten\ndem Patienten\nder Patientin\ndem Patienten\ndem Patienten\nDir\nIhnen"
+	},
+	{
+		"type": "replacement",
+		"name": "DER_PATIENTIN_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "der Patientin\ndes Patienten\ndes Patienten\nder Patientin\ndes Patienten\ndes Patienten\nDein\nIhr"
+	},
+	{
+		"type": "replacement",
+		"name": "OG_PATIENT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "die oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\ndie oben genannte Patientin\nder oben genannte Patient\nder oben genannte Patient\nDu\nSie"
+	},
+	{
+		"type": "replacement",
+		"name": "IHRE_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ihre\nseine\nseine\nihre\nseine\nseine\nDeine\nIhre"
+	},
+
+	{
+		"type": "replacement",
+		"name": "IHR_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ihr\nsein\nsein\nihr\nsein\nsein\nDein\nIhr"
+	},
+	{
+		"type": "replacement",
+		"name": "IHRER_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ihrer\nseiner\nseiner\nihrer\nseiner\nseiner\nDeiner\nIhrer"
+	},
+	{
+		"type": "replacement",
+		"name": "IHREN_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ihren\nseinen\nseinen\nihren\nseinen\nseinen\nDeinen\nIhren"
+	},
+	{
+		"type": "replacement",
+		"name": "IHREM_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ihrem\nseinem\nseinem\nihrem\nseinem\nseinem\nDeinem\nIhrem"
+	},
+	{
+		"type": "replacement",
+		"name": "IHRES_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ihres\nseines\nseines\nihres\nseines\nseines\nDeines\nIhres"
+	},
+	{
+		"type": "replacement",
+		"name": "IHRE_VERSICHERTE_NOMINATIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Ihre Versicherte\nIhr Versicherter\nIhr Versicherter\nIhre Versicherte\nIhr Versicherter\nIhr Versicherter\nDu\nSie"
+	},
+	{
+		"type": "replacement",
+		"name": "IHRER_VERSICHERTEN_DATIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Ihrer Versicherten\nIhren Versicherten\nIhren Versicherten\nIhrer Versicherten\nIhren Versicherten\nIhren Versicherten\nDich\nSie"
+	},
+	{
+		"type": "replacement",
+		"name": "IHRER_VERSICHERTEN_GENITIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Ihrer Versicherten\nIhres Versicherten\nIhres Versicherten\nIhrer Versicherten\nIhres Versicherten\nIhres Versicherten\nvon Dir\nvon Ihnen"
+	},
+	{
+		"type": "replacement",
+		"name": "SEHR_GEEHRTE",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Liebe\nLieber\n\nSehr geehrte Frau\nSehr geehrter Herr\nSehr geehrte\nLiebe\nSehr geehrte"
+	},
+	{
+		"type": "replacement",
+		"name": "FRAU_NOMINATIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "\n\n\nFrau\nHerr\n\n\n"
+	},
+	{
+		"type": "replacement",
+		"name": "FRAU_AKKUSATIV",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "\n\n\nFrau\nHerrn\n\n\n"
+	},
+	{
+		"type": "replacement",
+		"name": "ERHÄLT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "erhält\nerhält\nerhält\nerhält\nerhält\nerhält\nerhältst\nerhalten"
+	},
+	{
+		"type": "replacement",
+		"name": "BESTÄTIGT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "bestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigt\nbestätigst\nbestätigen"
+	},
+	{
+		"type": "replacement",
+		"name": "WURDE",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "wurde\nwurde\nwurde\nwurde\nwurde\nwurde\nwurdest\nwurden"
+	},
+	{
+		"type": "replacement",
+		"name": "IST_",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "ist\nist\nist\nist\nist\nist\nbist\nsind"
+	},
+	{
+		"type": "replacement",
+		"name": "KANN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "kann\nkann\nkann\nkann\nkann\nkann\nkannst\nkönnen"
+	},
+	{
+		"type": "replacement",
+		"name": "SCHICKEN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "\n\n\n\n\n\nschicke\nschicken Sie"
+	},
+	{
+		"type": "replacement",
+		"name": "MACHT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "macht\nmacht\nmacht\nmacht\nmacht\nmacht\nmachst\nmachen"
+	},
+	{
+		"type": "replacement",
+		"name": "HAT_",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "hat\nhat\nhat\nhat\nhat\nhat\nhast\nhaben"
+	},
+	{
+		"type": "replacement",
+		"name": "LEBT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "lebt\nlebt\nlebt\nlebt\nlebt\nlebt\nlebst\nleben"
+	},
+	{
+		"type": "replacement",
+		"name": "NIMMT",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "nimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmt\nnimmst\nnehmen"
+	},
+	{
+		"type": "replacement",
+		"name": "WILL",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "will\nwill\nwill\nwill\nwill\nwill\nwillst\nwollen"
+	},
+	{
+		"type": "replacement",
+		"name": "REIST",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "reist\nreist\nreist\nreist\nreist\nreist\nreist\nreisen"
+	},
+	{
+		"type": "replacement",
+		"name": "NUTZERIN",
+		"unit": "common",
+		"author": "Caro App",
+		"content": "Nutzerin\nNutzer\nNutzer\nNutzerin\nNutzer\nNutzer\nNutzer\nNutzer"
+	}
+]

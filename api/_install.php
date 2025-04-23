@@ -755,36 +755,52 @@ class INSTALL {
 	}
 
 	/**
-	 * imports a json file, returns array or message if not found or defective
-	 * @param string $file filepath to template file
+	 * imports a json file, overrun with env if applicable, returns array or message if not found or defective
+	 * @param string $path filepath with trailing \ for template files
+	 * @param string $type template type of
+	 * * audits
+	 * * csvfilter
+	 * * documents
+	 * * manuals
+	 * * risks
+	 * * texts
+	 * * users
+	 * * vendors
+	 * @param bool $defaultLanguage true by default, false to ignore language templates
 	 * @return array parsed json
 	 */
-	public function importJSON($filename){
-		$jsonpath = realpath($filename . '.json');
-		$envpath = realpath($filename . '.env');
-		if (!($jsonpath || $envpath)) {
-			$this->printError($filename . '.* not found');
-			die();
+	public function importJSON($path, $type, $defaultLanguage = true){
+		$lookup = $path . '*' . $type . ($defaultLanguage ? '.' . $this->_defaultLanguage : '') . '.*';
+		$files = [];
+		foreach(glob($lookup) as $file){
+			$pinfo = pathinfo($file);
+			$files[] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $pinfo['dirname'] . '/' . $pinfo['filename']);
 		}
-		$json = $env = [];
-		if ($jsonpath){
-			$json = file_get_contents($jsonpath);
-			$json = json_decode($json, true);
-			if (!$json)	{
-				$this->printError($filename . '.json is defective and could not be properly parsed.');
-				$json = [];
+		$files = array_unique($files);
+		$data = [];
+		foreach ($files as $filename){
+			$jsonpath = realpath($filename . '.json');
+			$envpath = realpath($filename . '.env');
+			$json = $env = [];
+			if ($jsonpath){
+				$json = file_get_contents($jsonpath);
+				$json = json_decode($json, true);
+				if (!$json)	{
+					$this->printError($filename . '.json is defective and could not be properly parsed.');
+					$json = [];
+				}
 			}
-		}
-		if ($envpath){
-			$env = file_get_contents($envpath);
-			$env = json_decode($env, true);
-			if (!$env) {
-				$this->printError($filename . '.env is defective and could not be properly parsed.');
-				$env = [];
+			if ($envpath){
+				$env = file_get_contents($envpath);
+				$env = json_decode($env, true);
+				if (!$env) {
+					$this->printError($filename . '.env is defective and could not be properly parsed.');
+					$env = [];
+				}
 			}
+			if (!$json && !$env) continue;
+			$data = array_unique([...$data, ...$json, ...$env], SORT_REGULAR);
 		}
-		if (!$json && !$env) die();
-		$data = array_unique([...$json, ...$env], SORT_REGULAR);
 		return $data;
 	}
 
@@ -830,8 +846,7 @@ class INSTALL {
 	 * installs audit templates
 	 */
 	public function installAudittemplates(){
-		$file = '../templates/audittemplates.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'audits');
 		// gather possibly existing entries
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates'),
@@ -875,22 +890,21 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('audit_post_template'), $insertions)))
-			$this->printSuccess('novel entries by unit and objectives from ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by unit and objectives from audits have been installed.');
+		else $this->printWarning('there were no novelties to install from audits ressources.');
 	}
 	
 	/**
 	 * installs csv filter
 	 */
 	public function installCSVFilter(){
-		$file = '../templates/csvfilter';
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'csvfilter');
 		// gather possibly existing entries
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist'),
 		];
 
-		$insertions = $names = [];
+		$insertions = [];
 		foreach ($json as $entry){
 			// filters are only transferred if the name is not already taken
 			if (!(
@@ -914,16 +928,15 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('csvfilter_post'), $insertions)))
-			$this->printSuccess('novel entries by name and content from ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by name and content from csv-filter have been installed.');
+		else $this->printWarning('there were no novelties to install from csv-filter ressources.');
 	}
 	
 	/**
 	 * installs documents by novel name
 	 */
 	public function installDocuments(){
-		$file = '../templates/documents.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'documents');
 		// gather possibly existing entries
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist'),
@@ -1004,16 +1017,15 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('document_post'), $insertions)))
-			$this->printSuccess('novel entries by name from ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by name from documents have been installed.');
+		else $this->printWarning('there were no novelties to install from documents ressources.');
 	}
 
 	/**
 	 * installs manual entries by novel title
 	 */
 	public function installManual(){
-		$file = '../templates/manual.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'manuals');
 		// gather possibly existing entries
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual'),
@@ -1053,16 +1065,15 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('application_post_manual'), $insertions)))
-			$this->printSuccess('novel entries by name from ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by name from manuas have been installed.');
+		else $this->printWarning('there were no novelties to install from manuals ressources.');
 	}
 
 	/**
 	 * installs risks by novel process+risk+cause+measure
 	 */
 	public function installRisks(){
-		$file = '../templates/risks.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'risks');
 		// gather possibly existing entries
 		$DBall = [];
 		foreach(SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist') as $row){
@@ -1153,15 +1164,14 @@ class INSTALL {
 			$this->printError('The following dataset is invalid and will be skipped:', $entry);
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('risk_post'), $insertions)))
-			$this->printSuccess('novel entries by process+risk+cause+measure ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by process+risk+cause+measure from risks have been installed.');
+		else $this->printWarning('there were no novelties to install from risks ressources.');
 	}
 	/**
 	 * installs texttemplates by novel name
 	 */
 	public function installTexttemplates(){
-		$file = '../templates/texttemplates.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'texts');
 		// gather possibly existing entries
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist'),
@@ -1219,16 +1229,15 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
-			$this->printSuccess('novel entries by name ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by name from textx have been installed.');
+		else $this->printWarning('there were no novelties to install from texts ressources.');
 	}
 
 	/**
 	 * installs vendors by novel name
 	 */
 	public function installUsers(){
-		$file = '../templates/users';
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'users');
 		// gather possibly existing entries
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
@@ -1303,16 +1312,15 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('user_post'), $insertions)))
-			$this->printSuccess('novel entries by name ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by name from users have been installed.');
+		else $this->printWarning('there were no novelties to install from user ressources.');
 	}
 
 	/**
 	 * installs vendors by novel name
 	 */
 	public function installVendors(){
-		$file = '../templates/vendors.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'vendors');
 		// gather possibly existing entries
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
@@ -1350,8 +1358,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_vendor'), $insertions)))
-			$this->printSuccess('novel entries by name ' . $file . ' have been installed.');
-		else $this->printWarning('there were no novelties to install from '. $file . '.');
+			$this->printSuccess('novel entries by name for vendors have been installed.');
+		else $this->printWarning('there were no novelties to install from vendor ressources.');
 	}
 }
 

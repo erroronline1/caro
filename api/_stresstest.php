@@ -52,7 +52,8 @@ class STRESSTEST extends INSTALL{
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
-			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION, USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.';
+			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION';
+			echo '<br />[~] USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.';
 			echo '<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
@@ -85,8 +86,7 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function csvFilterTest(){
 		require_once('./_csvprocessor.php');
-		$file = '../unittests/csvfilter';
-		$content = $this->importJSON($file);
+		$content = $this->importJSON('../unittests/', 'csvfilter', false);
 		$content['filesetting']['source'] = $this->_csvInput;
 		if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 		$content['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
@@ -305,8 +305,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all audit templates according to template file
 	 */
 	public function removeAudittemplates(){
-		$file = '../templates/audittemplates.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'audits');
 
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates')
@@ -337,8 +336,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all csv filters according to template file
 	 */
 	public function removeCSVFilter(){
-		$file = '../templates/csvfilter';
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'csvfilter');
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 
@@ -367,8 +365,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all documents, components and bundles according to template file
 	 */
 	public function removeDocuments(){
-		$file = '../templates/documents.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'documents');
 
 		$DBall = [
 			...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
@@ -410,8 +407,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all manual entries according to template file
 	 */
 	public function removeManual(){
-		$file = '../templates/manual.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'manuals');
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 
@@ -439,8 +435,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all risk entries according to template file
 	 */
 	public function removeRisks(){
-		$file = '../templates/risks.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'risks');
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 
@@ -474,8 +469,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all text templates according to template file
 	 */
 	public function removeTexttemplates(){
-		$file = '../templates/texttemplates.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'texts');
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 
@@ -506,8 +500,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all vendors according to template file
 	 */
 	public function removeUsers(){
-		$file = '../templates/users';
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'users');
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
@@ -552,8 +545,7 @@ class STRESSTEST extends INSTALL{
 	 * deletes all vendors according to template file
 	 */
 	public function removeVendors(){
-		$file = '../templates/vendors.' . $this->_defaultLanguage;
-		$json = $this->importJSON($file);
+		$json = $this->importJSON('../templates/', 'vendors');
 
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
