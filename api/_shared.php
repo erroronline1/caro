@@ -54,12 +54,12 @@ class SHARED {
 		if (!isset($parameter['folder']) || !$parameter['folder']) $files = array_merge($files, array_column(SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active'), 'path')); // all
 		if (isset($parameter['folder']) && in_array($parameter['folder'], ['external_documents'])) $files = UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'); // external_document specified
 		
-		if (!$parameter['search']) return $files;
-		// return based on similarity if search is provided 
+		// return based on similarity if search is provided
+		// also converting the path
 		$matches = [];
 		foreach ($files as $file){
 			similar_text($parameter['search'], pathinfo($file)['filename'], $percent);
-			if ($percent >= CONFIG['likeliness']['file_search_similarity']) $matches[] = $file;
+			if (!$parameter['search'] || $percent >= CONFIG['likeliness']['file_search_similarity']) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
 		}
 		return $matches;
 	}
