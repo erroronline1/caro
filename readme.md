@@ -132,11 +132,8 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * handle hidden attribute?
 * responsive masonry
     * adjust application widgets and structure to meet masonry design (especially regulatory summaries)
-    * new orders and products raises error due to hr?
-    * check performance (especially orders on stresstest)
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
-* review filtering by submitting ids and provide proper filtered results instead. especially approved orders may need too much rendering time possible to crash the browser. best limit to selected state. same goes for other tasks like document bundles, file bundles (probably not files)
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -3024,20 +3021,20 @@ Sample response
 {"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
-> GET ./api/api.php/consumables/productsearch/{vendor_id}/{search}/{_usecase}
+> GET ./api/api.php/consumables/productsearch/{vendor_id}/{search}/{usecase}
 
-Returns products matching {search} to be inserted into orders. If {_usecase} is set to *editconsumables* the returned elements events lead to consumables editing, *productinformation* to consumables product information.
+Returns a search form based on usecase and products matching {search}. If {_usecase} is set to *product* the returned elements events lead to consumables editing or product information depending on permissions. *productselection* returns only results for the respective widget. *order* results lead to adding the selected product to a new order.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {vendor_id} | path parameter | required | vendor id in database, _-separated list for all |
+| {vendor_id} | path parameter | required | vendor id in database or null |
 | {search} | path parameter | required | search term for article_no, article_name, article_alias, article_ean |
-| {_usecase} | path parameter | optional | altered events for product management |
+| {usecase} | path parameter | optional | altered events for product management |
 
 Sample response
 ```
-{"render": {"content": [[[{"type": "textsection","attributes":{"name": "Add article from 1 matches"}},{"type": "tile","attributes": {"onpointerup": "_client.order.addProduct('PAK', '99B25', 'Schlauch-Strumpf', '4032767124961', 'Otto Bock'); return false;"},"content": [{"type": "textsection","attributes":{"name": "Incorporation pending"},"content": "Otto Bock 99B25 Schlauch-Strumpf PAK 4032767124961"}]}]]]}}
+{"render":{"content":[[[{"type":"button","attributes":{"value":"Add new product","type":"button","onclick":"api.purchase('get', 'product')"}},{"type":"scanner","destination":"productsearch"},{"type":"select","content":{"... all vendors":{"value":"null"},....},"attributes":{"id":"productsearchvendor","name":"Filter vendors"}},{"type":"search","attributes":{"name":"Search product by article number or name","onkeypress":"if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'product'); return false;}","id":"productsearch","value":"99b25"}}],[{"type":"textsection","attributes":{"name":"Add article from 1 matches"}},[{"type":"tile","attributes":{"onclick":"api.purchase('get', 'product', 1752)"},"content":[{"type":"textsection","content":"Otto Bock HealthCare Deutschland GmbH 99B25 Schlauch-Strumpf PAK"}]}]]]]}}
 ```
 
 > GET ./api/api.php/consumables/vendor/{name|id}
@@ -4215,7 +4212,7 @@ Sample response
 
 > GET ./api/api.php/risk/search/{search}
 
-Returns risks matching {search}
+Returns a search form and risks matching {search}.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -4224,7 +4221,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[[{"type":"textsection","attributes":{"name":"Ergebnisse f\u00fcr die Suche druck"}},{"type":"tile","attributes":{"onpointerup":"api.risk('get', 'risk', 2)"},"content":[{"type":"textsection","attributes":{"name":"Risiko","class":"green"},"content":"CAD: unzureichende Passgenauigkeit nach digitaler\/additiver Modellerstellung: Druckstellen"}]},{"type":"tile","attributes":{"onpointerup":"api.risk('get', 'risk', 455)"},"content":[{"type":"textsection","attributes":{"name":"Risiko","class":"green"},"content":"Einlagen: Einlagen f\u00fcr die verwendeten Schuhe zu gro\u00df \/ zu klein: Druckstellen an Phalangen"}]},....
+{"render":{"content":[[[{"type":"search","attributes":{"name":"Search","onkeypress":"if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}","value":"unzureichend"}}],[{"type":"textsection","attributes":{"name":"Matches for this search for \"unzureichend\""}},[{"type":"tile","attributes":{"onclick":"api.risk('get', 'risk', 528)"},"content":[{"type":"textsection","attributes":{"name":"Risk","class":"green"},"content":"CAD: unzureichende Layerhaftung additiv gefertigter Verschlusssysteme: mangelhafte Stabilität und Funktionsverlust des Verschlussystems"}]},{"type":"tile","attributes":{"onclick":"api.risk('get', 'risk', 527)"},"content":[{"type":"textsection","attributes":{"name":"Risk","class":"green"},"content":"CAD: unzureichende Passgenauigkeit nach digitaler/additiver Modellerstellung: Druckstellen"}]},....
 ```
 
 [Content](#content)
