@@ -129,6 +129,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * responsibilities
     * handle hidden attribute?
 * observe performance of responsive masonry
+    * alternative method by display:flex, flex-direction:column and reorganizing articles. may be more responsive but will it solve height specific ordering? needs an explanation in accessibility restrictions!
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
 
