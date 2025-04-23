@@ -1,25 +1,25 @@
 # Important notices on customizing language files
 
-## templates/manual.XX.env/.json
-templates/manual.XX.env/.json stores default database entries that are made during installation, so these can as well be prepared in the set up default language. Crop, extend and change to your needs in advance to installation. This file is only used once at this procedure.
+## templates/default.manual.XX.env/.json
+templates/default.manual.XX.env/.json stores default database entries that are made during installation, so these can as well be prepared in the set up default language. Crop, extend and change to your needs in advance to installation. This file is only used once at this procedure.
 
 ## language.XX.env/.json
 
 language.XX.env/.json store language chunks, tokens like :token are replaced by the language handlers (language.php and language.js).
-The structure MUST be the same across all language files! 
+The structure MUST be the same across all provided or extended language files! 
 Any key is used and therefore can affect function of the whole application. Try to avoid equal values within one context if possible.
 Values occasionally may be stored within databases.
 
 Some subsets are displayed in the given order, hence can be customized to your comprehensible needs. Respective keys are mentioned below.
 
-As stated in the readme it is recommended to keep the original JSON-file and customize copies named language.XX.**env**, where you can alter or append selected entries, without deleting a probably needed one.
+As stated in the [readme](../readme.md) it is recommended to keep the original JSON-file and customize copies named language.XX.**env**, where you can alter or append selected entries, without deleting a probably needed one.
 
 ### company
 Holds general company info, used on pdf exports.
 
 ### permissions
 Autorization levels with language specific values. Default keys are hardcoded!
-Append if new modules require specific permissions. `permissions` order is passed to application.
+Append if additional custom modules require specific permissions. `permissions` order is passed to application.
 
 ### units
 Organizational units.
@@ -37,7 +37,7 @@ Duties CAN resemble units but this is optional. Second level key (_DESCRIPTION) 
 Document contexts - defined here for language reasons.
 Avoid reusing any key regardless of top level key and translation to reduce confusion.
 Do not use any forbidden word as defined in config.ini.
-Keys are hardcoded
+Keys are hardcoded.
 
 * identify.casedocumentation: patients treatment process, related to a case of a medical device treatment
 * identify.incident: occasionally reportable incidents, related to medical device treatment, better overview of cases
@@ -47,7 +47,7 @@ Keys are hardcoded
 *All* orders are passed to application.
 
 ### casestate
-Administrative case state, generates a pseudodocument to check states by given permission levels and makes unclosed records filterable by given states within overview. Checkbox options with a low level key according to documentcontext high level keys record_pseudodocument_{low level key} translation must be set in [record]. `casestate` order is passed to application.
+Administrative case state, generates a pseudodocument to check states by given permission levels and makes unclosed records filterable by given states within overview. Checkbox options with a low level key according to documentcontext high level keys record_pseudodocument_{low level key} translation must be set in [record](#record). `casestate` order is passed to application.
 
 ### general
 All keys are hardcoded, `weekday` and `month` order is passed to application.
@@ -56,10 +56,10 @@ All keys are hardcoded, `weekday` and `month` order is passed to application.
 Most keys are hardcoded. Terms_of_service keys however are handled as headers and therefore require translation. `term_of_service` order is passed to application.
 
 ### assemble
-All keys are hardcoded
+All keys are hardcoded.
 
 ### audit
-All keys are hardcoded
+All keys are hardcoded.
 
 `risk_issues`-keys must contain `risk.type` as well. `audit.execute.rating_steps` order is passed to application.
 
@@ -67,25 +67,31 @@ All keys are hardcoded
 All keys are hardcoded. `timesheet.pto`, `timesheet.signature` and `timesheet.export.sheet_daily` orders are passed to application.
 
 ### consumables
-All keys are hardcoded
+All keys are hardcoded.
 
 ### csvfilter
-All keys are hardcoded
+All keys are hardcoded.
 
 ### file
-All keys are hardcoded
+All keys are hardcoded.
 
 ### menu
-All keys are hardcoded
+All keys are hardcoded.
+
+### measure
+All keys are hardcoded.
 
 ### message
-All keys are hardcoded
+All keys are hardcoded.
 
-### orders
+### order
 Most keys are hardcoded, orderstate can be cropped or extended. `order.ordertype`, `order.orderstate` orders are passed to application.
 
 ### record
 All keys are hardcoded. `type` order is passed to application.
+
+### responsibility
+All keys are hardcoded.
 
 ### risk
 Most keys are hardcoded.
@@ -101,10 +107,10 @@ preset_process and preset_risk can be cropped or extended as well.
 All keys are hardcoded. `use.genus` can be extended or cropped, order is passed to application.
 
 ### tool
-All keys are hardcoded
+All keys are hardcoded.
 
 ### user
-All keys are hardcoded
+All keys are hardcoded.
 
 ### regulatory
 These are the chapters of the ISO 13485 and other regulatory issues. They serve as a checklist for fulfillment regarding document assignment and can be adjusted during runtime and extended by necessary regulatory aspects.

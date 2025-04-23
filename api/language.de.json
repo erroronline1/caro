@@ -34,7 +34,25 @@
 	},
 	"skills": {
 		"_LEVEL": ["Kein", "Backup", "Sekundäraufgabe", "Primäraufgabe", "Stellvertretende Verantwortung", "Primäre Verantwortung"],
-		"prosthetics_I": {
+		"orthotics1": {
+			"_DESCRIPTION": "Orthetik I",
+			"technical_responsibility": "Technische Verantwortung",
+			"technical_correspondence": "Technische Korrespondenz",
+			"estimates": "Kostenvoranschläge",
+			"training_schedules": "Schulungspläne",
+			"outpatient_support": "Ambulanzbetreuung",
+			"quality_control": "Qualitätskontrolle"
+		},
+		"orthotics2": {
+			"_DESCRIPTION": "Orthetik II",
+			"technical_responsibility": "Technische Verantwortung",
+			"technical_correspondence": "Technische Korrespondenz",
+			"estimates": "Kostenvoranschläge",
+			"training_schedules": "Schulungspläne",
+			"outpatient_support": "Ambulanzbetreuung",
+			"quality_control": "Qualitätskontrolle"
+		},
+		"prosthetics1": {
 			"_DESCRIPTION": "Prothetik I",
 			"technical_responsibility": "Technische Verantwortung",
 			"technical_correspondence": "Technische Korrespondenz",
@@ -43,13 +61,44 @@
 			"outpatient_support": "Ambulanzbetreuung",
 			"quality_control": "Qualitätskontrolle"
 		},
-		"prosthetics_II": {
+		"prosthetics2": {
 			"_DESCRIPTION": "Prothetik II",
 			"technical_responsibility": "Technische Verantwortung",
 			"technical_correspondence": "Technische Korrespondenz",
 			"estimates": "Kostenvoranschläge",
 			"training_schedules": "Schulungspläne",
 			"outpatient_support": "Ambulanzbetreuung",
+			"quality_control": "Qualitätskontrolle"
+		},
+		"cad": {
+			"_DESCRIPTION": "CAD",
+			"technical_responsibility": "Technische Verantwortung",
+			"technical_correspondence": "Technische Korrespondenz",
+			"estimates": "Kostenvoranschläge",
+			"training_schedules": "Schulungspläne",
+			"quality_control": "Qualitätskontrolle"
+		},
+		"polymertech": {
+			"_DESCRIPTION": "Kunststoffverarbeitung",
+			"technical_responsibility": "Technische Verantwortung",
+			"technical_correspondence": "Technische Korrespondenz",
+			"training_schedules": "Schulungspläne",
+			"quality_control": "Qualitätskontrolle"
+		},
+		"silicone": {
+			"_DESCRIPTION": "Silikon",
+			"technical_responsibility": "Technische Verantwortung",
+			"technical_correspondence": "Technische Korrespondenz",
+			"estimates": "Kostenvoranschläge",
+			"training_schedules": "Schulungspläne",
+			"quality_control": "Qualitätskontrolle"
+		},
+		"office": {
+			"_DESCRIPTION": "Verwaltung",
+			"technical_responsibility": "Verantwortung",
+			"technical_correspondence": "Korrespondenz",
+			"estimates": "Kostenvoranschläge",
+			"training_schedules": "Schulungspläne",
 			"quality_control": "Qualitätskontrolle"
 		}
 	},

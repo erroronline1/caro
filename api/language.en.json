@@ -34,7 +34,25 @@
 	},
 	"skills": {
 		"_LEVEL": ["None", "Backup", "Secondary task", "Primary task", "Substitutional responsibility", "Primary responsibility"],
-		"prosthetics_I": {
+		"orthotics1": {
+			"_DESCRIPTION": "Orthotics I",
+			"technical_responsibility": "Technical responsibility",
+			"technical_correspondence": "Technical correspondence",
+			"estimates": "Estimates",
+			"training_schedules": "Training schedules",
+			"outpatient_support": "Outpatient support",
+			"quality_control": "Quality control"
+		},
+		"orthotics2": {
+			"_DESCRIPTION": "Orthotics II",
+			"technical_responsibility": "Technical responsibility",
+			"technical_correspondence": "Technical correspondence",
+			"estimates": "Estimates",
+			"training_schedules": "Training schedules",
+			"outpatient_support": "Outpatient support",
+			"quality_control": "Quality control"
+		},
+		"prosthetics1": {
 			"_DESCRIPTION": "Prothetics I",
 			"technical_responsibility": "Technical responsibility",
 			"technical_correspondence": "Technical correspondence",
@@ -43,13 +61,44 @@
 			"outpatient_support": "Outpatient support",
 			"quality_control": "Quality control"
 		},
-		"prosthetics_II": {
+		"prosthetics2": {
 			"_DESCRIPTION": "Prothetics II",
 			"technical_responsibility": "Technical responsibility",
 			"technical_correspondence": "Technical correspondence",
 			"estimates": "Estimates",
 			"training_schedules": "Training schedules",
 			"outpatient_support": "Outpatient support",
+			"quality_control": "Quality control"
+		},
+		"cad": {
+			"_DESCRIPTION": "CAD",
+			"technical_responsibility": "Technical responsibility",
+			"technical_correspondence": "Technical correspondence",
+			"estimates": "Estimates",
+			"training_schedules": "Training schedules",
+			"quality_control": "Quality control"
+		},
+		"polymertech": {
+			"_DESCRIPTION": "Polymer Tech",
+			"technical_responsibility": "Technical responsibility",
+			"technical_correspondence": "Technical correspondence",
+			"training_schedules": "Training schedules",
+			"quality_control": "Quality control"
+		},
+		"silicone": {
+			"_DESCRIPTION": "Silicone",
+			"technical_responsibility": "Technical responsibility",
+			"technical_correspondence": "Technical correspondence",
+			"estimates": "Estimates",
+			"training_schedules": "Training schedules",
+			"quality_control": "Quality control"
+		},
+		"office": {
+			"_DESCRIPTION": "Office",
+			"technical_responsibility": "Responsibility",
+			"technical_correspondence": "Correspondence",
+			"estimates": "Estimates",
+			"training_schedules": "Training schedules",
 			"quality_control": "Quality control"
 		}
 	},
