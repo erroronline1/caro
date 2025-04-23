@@ -6,7 +6,7 @@
 * [ofa](#ofa)
 
 ### prepared filters
-prepared filters can be found within vendors.XX.json. these are by no means perfect and need tweaking according to your customs. They can be tested with _stresstest.php
+prepared filters can be found within default.vendors.XX.json. these are by no means perfect and need tweaking according to your customs. They can be tested with _stresstest.php
 
 ### plan b: no usable list or no vendor response
 generate csv-lists from your erp-export with the following csv-filter. data is groomed as accurate or shitty as within your erp! it is highly recommended to edit
