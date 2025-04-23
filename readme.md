@@ -130,8 +130,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-* responsive masonry
-    * adjust application widgets and structure to meet masonry design (especially regulatory summaries)
+* observe performance of responsive masonry
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
 

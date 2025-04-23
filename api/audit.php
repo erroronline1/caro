@@ -1150,7 +1150,19 @@ class AUDIT extends API {
 			if (!in_array($bundle['name'], array_column($currentbundles, 'name')) && !in_array($bundle['name'], $hidden)) $currentbundles[] = $bundle;
 		}
 
-		$documentscontent = [
+		// add export button
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('audit.record_export'),
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
+					'data-type' => 'download'
+				]
+			]
+		];
+		
+		$content[] = [
 			[
 				'type' => 'date',
 				'attributes' => [
@@ -1184,6 +1196,7 @@ class AUDIT extends API {
 		// iterate over documents an their respective components
 		foreach($currentdocuments as $document){
 			$entry = '';
+			$documentscontent = [];
 			// display document approval
 			foreach(json_decode($document['approval'], true) as $position => $data){
 				$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
@@ -1257,6 +1270,7 @@ class AUDIT extends API {
 					"}}).then(response => {if (response) api.document('post', 'export', null, _client.application.dialogToFormdata(response))})"
 				]
 			];
+			$content[] = $documentscontent;
 		}
 
 		$externalcontent = [
@@ -1276,6 +1290,7 @@ class AUDIT extends API {
 			}
 			$externalcontent[0]['content'] = $links;
 		}
+		$content[] = $externalcontent;
 
 		$bundlescontent = [
 			[
@@ -1297,21 +1312,6 @@ class AUDIT extends API {
 				'content' => implode("\n", $documentslist)
 			];
 		}
-
-		// add export button
-		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
-			[
-				'type' => 'button',
-				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
-					'data-type' => 'download'
-				]
-			]
-		];
-		
-		$content[] = $documentscontent;
-		$content[] = $externalcontent;
 		$content[] = $bundlescontent;
 		return $content;
 	}
@@ -1486,7 +1486,7 @@ class AUDIT extends API {
 			}
 			if ($fullyapproved < $this->_requestedDate . ' ' . $this->_requestedTime) continue;
 			$incorporated[] = $row;
-			unset($products[$id]);
+			unset($products[$id]); // to avoid duplicate warnings on orderedunincorporated below
 		}
 
 		$approvedorders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
@@ -1554,6 +1554,7 @@ class AUDIT extends API {
 			return $a['incorporated'][$permission]['date'] < $b['incorporated'][$permission]['date'] ? -1: 1;
 		});
 
+		$incorporations = [];
 		$entries[] = [
 			'type' => 'textsection',
 			'attributes' => [
@@ -1562,19 +1563,33 @@ class AUDIT extends API {
 			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
 		];
 		foreach($incorporated as $product){
+			if (!isset($incorporations[$product['vendor_name']])) $incorporations[$product['vendor_name']] = [];
+
 			$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 			foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 				if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . UTILITY::dateFormat($product['incorporated'][$permission]['date']);
 			}
-			$entries[] = [
+			$incorporations[$product['vendor_name']][] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']
+					'name' => $product['article_no'] . ' ' . $product['article_name']
 				],
 				'linkedcontent' => $incorporationInfo . "\n" . '<a href="javascript:api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . $this->_lang->GET('audit.incorporation_link') . '</a>'
 			];
 		}
-		if ($entries) $content[] = $entries;
+		ksort($incorporations);
+		foreach($incorporations as $vendor => $vendorchecks){
+			$content[] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.incorporation_export_vendor', [':vendor' => $vendor])
+					],
+					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
+				],
+				...$vendorchecks
+			];
+		}
 		return $content;
 	}
 	/**
@@ -1594,13 +1609,14 @@ class AUDIT extends API {
 
 		$documents = $this->incorporation();
 
-		for($i = 1; $i<count($documents); $i++){
+		for($i = 3; $i<count($documents); $i++){
 			foreach($documents[$i] as $item){
 				if (isset($item['content']) || isset($item['linkedcontent'])){
 					if (isset($item['content']) && isset($item['attributes']['name']))
 						$summary['content'][$item['attributes']['name']] = $item['content'];
 					elseif (isset($item['linkedcontent']) && isset($item['attributes']['name']))
-						$summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation_link') . '$/m','', strip_tags($item['linkedcontent']));
+						// remove link to product to be only displayed onscreen
+						$summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation_link') . '$/m', '', strip_tags($item['linkedcontent']));
 				}
 			}
 		}
@@ -2042,32 +2058,27 @@ class AUDIT extends API {
 			return $a['checked'] < $b['checked'] ? -1: 1;
 		});
 
-		$entries[] = [
-			'type' => 'textsection',
-			'attributes' => [
-				'name' => $this->_lang->GET('audit.checks_type.mdrsamplecheck')
-			],
-			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
-		];
-
+		$checks = [];
 		foreach($products as $product){
 			if (!$product['sample_checks']) continue;
 			if ($product['checked'] < $this->_requestedDate . ' ' . $this->_requestedTime . ':00') continue;
 
+			if (!isset($checks[$product['vendor_name']])) $checks[$product['vendor_name']] = [];
+
 			$product['sample_checks'] = json_decode($product['sample_checks'], true);
-			$checks = [];
+			$productchecks = [];
 			foreach($product['sample_checks'] as $check){
-				$checks[] = $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => UTILITY::dateFormat($check['date'])], true) . "\n" . $check['content'];
+				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => UTILITY::dateFormat($check['date'])], true) . "\n" . $check['content'];
 			}
-			$entries[] = [
+			$checks[$product['vendor_name']][] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => implode(' ', [$product['vendor_name'], $product['article_no'], $product['article_name']])
+					'name' => implode(' ', [$product['article_no'], $product['article_name']])
 				],
-				'content' => implode("\n\n", $checks)
+				'content' => implode("\n\n", $productchecks)
 			];
 
-			if(PERMISSION::permissionFor('regulatoryoperation')) $entries[] = [
+			if(PERMISSION::permissionFor('regulatoryoperation')) $checks[$product['vendor_name']][] = [
 				'type' => 'button',
 				'attributes' => [
 					'type' => 'button',
@@ -2080,7 +2091,19 @@ class AUDIT extends API {
 				]
 			];
 		}
-		if ($entries) $content[] = $entries;
+		ksort($checks);
+		foreach($checks as $vendor => $vendorchecks){
+			$content[] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('audit.mdrsamplecheck_export_vendor', [':vendor' => $vendor])
+					],
+					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
+				],
+				...$vendorchecks
+			];
+		}
 		return $content;
 	}
 	/**
@@ -2098,14 +2121,12 @@ class AUDIT extends API {
 			'date' => $this->_currentdate->format('y-m-d H:i')
 		];
 
-		$documents = $this->mdrsamplecheck();
+		$checks = $this->mdrsamplecheck();
 
-		for($i = 1; $i<count($documents); $i++){
-			foreach($documents[$i] as $item){
-				if (isset($item['content'])){
-					if (isset($item['content']) && isset($item['attributes']['name']))
+		for($i = 3; $i < count($checks); $i++){
+			foreach($checks[$i] as $item){
+				if (isset($item['content']) && isset($item['attributes']['name']))
 						$summary['content'][$item['attributes']['name']] = $item['content'];
-				}
 			}
 		}
 		$downloadfiles = [];
@@ -2207,9 +2228,9 @@ class AUDIT extends API {
 			$deliverytime = '';
 			if ($order['received']){
 				$datetimezone = new DateTimeZone(CONFIG['application']['timezone']);
-				$ordered = new DateTime($order['ordered'], $datetimezone);
-				$received = new DateTime($order['received'], $datetimezone);
-				$deliverytime = intval($ordered->diff($received)->format('%a'));
+				$ordered = $order['ordered'] ? new DateTime($order['ordered'], $datetimezone) : '-';
+				$received = $order['received'] ? new DateTime($order['received'], $datetimezone) : '-';
+				$deliverytime = ($order['ordered'] && $order['received']) ? intval($ordered->diff($received)->format('%a')) : '-';
 			}
 
 			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = $this->_lang->GET('audit.order_statistics_undefined_vendor');
@@ -2236,7 +2257,7 @@ class AUDIT extends API {
 		foreach($vendor_orders as $vendor => $orders){
 			$writer->writeSheetRow($vendor, array_values($columns));
 			foreach ($orders as $line)
-				$writer->writeSheetRow($vendor, $line, $row_options = array('height' => 30,'wrap_text' => true));
+				$writer->writeSheetRow($vendor, $line, array('height' => 30, 'wrap_text' => true));
 		}
 
 		$writer->writeToFile($tempFile);
@@ -2445,7 +2466,7 @@ class AUDIT extends API {
 	 * returns regulatory items according to language.xx.ini and matches current assigned documents
 	 */
 	private function regulatory(){
-		$content = $issues = [];
+		$content = [];
 		// prepare existing document lists
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $regulatory = [];
@@ -2488,12 +2509,12 @@ class AUDIT extends API {
 			]
 		];
 		foreach($this->_lang->_USER['regulatory'] as $key => $issue){
-			if (isset($regulatory[$key])) $issues[] = [
+			if (isset($regulatory[$key])) $content[] = [
 				'type' => 'links',
 				'description' => $issue,
 				'content' => $regulatory[$key]
 			];
-			else $issues[] = [
+			else $content[] = [
 				'type' => 'textsection',
 				'attributes' => [
 					'class' => 'red',
@@ -2502,7 +2523,6 @@ class AUDIT extends API {
 				'content' => $this->_lang->GET('audit.regulatory_warning_content')
 			];
 		}
-		$content[] = $issues;
 		return $content;
 	}
 
@@ -2522,7 +2542,8 @@ class AUDIT extends API {
 		];
 
 		$issues = $this->regulatory();
-		foreach($issues[1] as $item){
+		foreach($issues as $item){
+			if (!isset($item['type'])) continue;
 			switch ($item['type']){
 				case 'links':
 					$summary['content'][$item['description']] = $item['content'];	
@@ -3365,7 +3386,6 @@ class AUDIT extends API {
 	 * returns all current active vendors with stored info, most recent pricelist import, MDR sample check and certificate details in alphabetical order
 	 */
 	private function vendors(){
-		$vendorlist = $hidden = [];
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$lastchecks = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_last_checked');
 		$vendor_info = [
@@ -3391,48 +3411,48 @@ class AUDIT extends API {
 		];
 		foreach($vendors as $vendor){
 			$info = '';
-			if (!$vendor['hidden']) {
-				if ($vendor['info']) {
-					$vendor['info'] = json_decode($vendor['info'] ? : '', true);
-					$vendor['info'] = array_filter($vendor['info'], function($value){return $value;});
-					$info .= implode(" \n", array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) . "\n";
+			if ($vendor['hidden']) continue;
+			if ($vendor['info']) {
+				$vendor['info'] = json_decode($vendor['info'] ? : '', true);
+				$vendor['info'] = array_filter($vendor['info'], function($value){return $value;});
+				$info .= implode(" \n", array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) . "\n";
+			}
+			$vendor['pricelist'] = isset($vendor['pricelist']) ? $vendor['pricelist'] : [];
+			$pricelist = json_decode($vendor['pricelist'] ? : '', true);
+			if (isset($pricelist['validity']) && $pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
+			if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
+			$certificate = json_decode($vendor['certificate'] ? : '', true);
+			if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
+			if ($vendor['evaluation']){
+				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
+				foreach($vendor['evaluation'] as $evaluation){
+					$info .= " \n". $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $evaluation['_author'], ':date' => UTILITY::dateFormat($evaluation['_date'])]) . "\n";
+					unset($evaluation['_author'], $evaluation['_date']);
+					foreach($evaluation as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";	
 				}
-				$vendor['pricelist'] = isset($vendor['pricelist']) ? $vendor['pricelist'] : [];
-				$pricelist = json_decode($vendor['pricelist'] ? : '', true);
-				if (isset($pricelist['validity']) && $pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $pricelist['validity'] . "\n";
-				if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $lastchecks[$samplecheck]['checked'] . "\n";
-				$certificate = json_decode($vendor['certificate'] ? : '', true);
-				if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
-				if ($vendor['evaluation']){
-					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
-					foreach($vendor['evaluation'] as $evaluation){
-						$info .= " \n". $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $evaluation['_author'], ':date' => UTILITY::dateFormat($evaluation['_date'])]) . "\n";
-						unset($evaluation['_author'], $evaluation['_date']);
-						foreach($evaluation as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";	
-					}
-				}
+			}
 
-				$vendorlist[] = [
+			$content[] = [
+				[
 					'type' => 'textsection',
 					'attributes' => [
 						'name' => $vendor['name']
 					],
 					'content' => $info
-				];
-				
-				$certificates = [];
-				$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
-				foreach($certfiles as $path){
-					$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
-				}
-				if ($certificates) $vendorlist[] = [
-					'type' => 'links',
-					'description' => $this->_lang->GET('consumables.vendor.documents_download'),
-					'content' => $certificates
-				];
+				]
+			];
+			
+			$certificates = [];
+			$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
+			foreach($certfiles as $path){
+				$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
 			}
+			if ($certificates) $content[count($content) - 1][] = [
+				'type' => 'links',
+				'description' => $this->_lang->GET('consumables.vendor.documents_download'),
+				'content' => $certificates
+			];
 		}
-		$content[] = $vendorlist;
 		return $content;
 	}
 
@@ -3451,14 +3471,16 @@ class AUDIT extends API {
 			'date' => $this->_currentdate->format('y-m-d H:i')
 		];
 
-		$vendors = $this->vendors();
+		$incorporations = $this->vendors();
 		$previous = ''; // given there's a text followed by links
-		foreach($vendors[1] as $item){
-			if ($item['type'] === 'textsection') {
-				$summary['content'][$item['attributes']['name']] = $item['content'];
-				$previous = $item['attributes']['name'];
+		for($i = 1; $i < count($incorporations); $i++){
+			foreach($incorporations[$i] as $item){
+				if ($item['type'] === 'textsection') {
+					$summary['content'][$item['attributes']['name']] = $item['content'];
+					$previous = $item['attributes']['name'];
+				}
+				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
 			}
-			if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
 		}
 
 		$downloadfiles = [];

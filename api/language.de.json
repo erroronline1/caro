@@ -189,7 +189,7 @@
 			"Rückmeldungen": "Solltest du Probleme mit der Datensicherheit oder der Anwendung feststellen, wenden dich umgehend an :issue_mail, erläutere die Details und ergänze eine Kontaktmöglichkeit."
 		},
 		"terms_of_service_accepted": "Ich stimme den Bedingungen zu",
-		"timeout_aria":"Ohne aktive Nutzung der Anwendung musst du dich nach etwa :minutes Minuten erneut authentifizieren."
+		"timeout_aria": "Ohne aktive Nutzung der Anwendung musst du dich nach etwa :minutes Minuten erneut authentifizieren."
 	},
 	"assemble": {
 		"approve": {
@@ -509,6 +509,7 @@
 		"documentusage_warning": "Die Bewertung der Angemessenheit kann nicht alleine anhand der Anzahl der Nutzungen bewertet werden, es ist aber eine zusätzliche Information. Im Folgenden stehen die Dokumente welche für Aufzeichnungen geeignet sind.",
 		"experience_points": ":number Erfahrungspunkte für das Jahr :year",
 		"incorporation_export_timestamp": "seit :timestamp",
+		"incorporation_export_vendor": "Produkteinführungen für :vendor",
 		"incorporation_link": "zum Artikel",
 		"incorporation_warning_content": "Beobachte Bestellungen und sensibilisiere für die Beachtung: :amount Produkte",
 		"incorporation_warning_description": "Manche bestellten Produkte benötigen noch eine Produkteinführung!",
@@ -546,6 +547,7 @@
 			"saved": "Managementbericht gespeichert"
 		},
 		"mdrsamplecheck_edit": "Bewertet von :author am :date",
+		"mdrsamplecheck_export_vendor": "MDR Stichproben für :vendor",
 		"mdrsamplecheck_revoke": "letzte Stichprobe widerrufen",
 		"mdrsamplecheck_revoke_confirm": "Ja, Stichprobenprüfung widerrufen",
 		"mdrsamplecheck_warning_content": "Beobachte Bestellungen von folgenden Lieferanten und sensibilisiere für die Beachtung: :vendors",
@@ -595,9 +597,9 @@
 	"calendar": {
 		"appointment": {
 			"date": "Datum",
-			"download":"Drucke die PDF-Datei aus oder versende die ICS-Datei per Mail oder Nachrichtendienst",
+			"download": "Drucke die PDF-Datei aus oder versende die ICS-Datei per Mail oder Nachrichtendienst",
 			"duration": "Ungefähre Dauer in Stunden",
-			"ics":"ICS Kalender Datei",
+			"ics": "ICS Kalender Datei",
 			"occasion": "Anlass",
 			"occasion_hint": "z.B. Gipsabdruck für Orthese, Prothesenanprobe, etc.",
 			"pdf": "PDF Aufdruck mit QR-Code für Termin",
@@ -1466,7 +1468,7 @@
 		"settings_initial_overtime_hint": "Anzahl in Stunden",
 		"settings_language": "Sprache",
 		"settings_language_hint": "Systemstandard ist :lang",
-		"settings_masonry":"Mauerwerkdarstellung auf breiten Bildschirmen",
+		"settings_masonry": "Mauerwerkdarstellung auf breiten Bildschirmen",
 		"settings_primary_recordstate": "Bevorzugter Vorgangsstatus",
 		"settings_primary_unit": "Primärer Bereich",
 		"settings_theme": "Farbschema",
