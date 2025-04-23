@@ -1148,7 +1148,7 @@
 		"return_message_cancel": "No, thank you",
 		"return_message_ok": "Yes, return",
 		"sample_check": {
-			"alert": "A new MDR §14 Sample check has been submitted. Review within :audit\n\n",
+			"alert": "A new MDR §14 Sample check has been submitted by :name. Review within :audit\n\n",
 			"by_user": "This article qualifies for a MDR §14 sample check by a personified user account!",
 			"cancel": "No, thank you",
 			"checked": "examined",

@@ -249,7 +249,8 @@ class CONSUMABLES extends API {
 								])) {
 									$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 										$this->_lang->GET('order.sample_check.alert', [
-											':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
+											':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>',
+											':name' => $_SESSION['user']['name']
 										], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 								}
 							}
@@ -547,6 +548,7 @@ class CONSUMABLES extends API {
 					]]);
 
 				$checkcontent = implode("\n", array_map(fn($k, $v) => $k . ': ' . $v, array_keys($check), array_values($check)));
+				// append to products sample checks
 				$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
 				$product['sample_checks'][] = ['date' => $this->_currentdate->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
 
@@ -561,8 +563,9 @@ class CONSUMABLES extends API {
 				])) {
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 						$this->_lang->GET('order.sample_check.alert', [
-							':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>'
-						], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
+							':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>',
+							':name' => $_SESSION['user']['name']
+						], true) . " \n" . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('order.sample_check.success'),

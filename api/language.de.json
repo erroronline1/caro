@@ -1148,7 +1148,7 @@
 		"return_message_cancel": "Nein danke",
 		"return_message_ok": "Ja, zurücksenden",
 		"sample_check": {
-			"alert": "Eine neue Stichprobenprüfung wurde übermittelt. Bitte überprüfe sie bei :audit\n\n",
+			"alert": "Eine neue Stichprobenprüfung wurde von :name übermittelt. Bitte überprüfe sie bei :audit\n\n",
 			"by_user": "Dieser Artikel kommt für eine Stichprobenprüfung durch eine persönliche Nutzeranmeldung in Frage!",
 			"cancel": "Nein danke",
 			"checked": "geprüft",
