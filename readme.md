@@ -1254,7 +1254,7 @@ dialect["escape"] = ""
 
 ;forbidden names as regex-patterns
 [forbidden]
-names[characters] = "([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, serves for export filenames as well
+names[characters] = "([^\w\s\d,\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, serves for export filenames as well
 names[length] = "^.{0,3}$" ; less than 4 characters
 
 ; immutable hardcoded reserved keywords
@@ -1262,6 +1262,8 @@ names[numeric] = "^\d+$" ; names must not be numeric only as this is reserved fo
 names[underscorestart] = "^_" ; names must not start with _
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
+
+filename[characters] = "[,]" ; replace matched characters to avoid link errors, as experienced on iis (NOT apache)
 
 [lifespan]
 idle = 600 ; SECONDS after which a reauthorization is necessary without intermittend use

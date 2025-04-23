@@ -104,7 +104,7 @@ class CALENDAR extends API {
 								':mail' => $this->_lang->GET('company.mail')
 							], true)
 						],
-						'filename' => $this->_lang->GET('calendar.appointment.pdf') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time'])
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']))
 					];
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
 						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
@@ -700,7 +700,7 @@ class CALENDAR extends API {
 		array_splice($timesheets, 0, 0, $self);
 
 		$summary = [
-			'filename' => preg_replace('/[^\w\d]/', '', $this->_lang->GET('menu.calendar.timesheet', [], true) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('menu.calendar.timesheet', [], true) . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => $this->prepareTimesheetOutput($timesheets),
 			'files' => [],

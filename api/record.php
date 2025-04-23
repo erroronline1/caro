@@ -489,7 +489,7 @@ class RECORD extends API {
 					$content = [
 						'title' => $this->_lang->GET('record.create_identifier', [], true),
 						'content' => [$content, $content],
-						'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $content)
+						'filename' =>preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $content)
 					];
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
 						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
@@ -1709,7 +1709,7 @@ class RECORD extends API {
 		if (!$data) return false;
 		//set up summary
 		$summary = [
-			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,
 			'content' => [],
 			'files' => [],

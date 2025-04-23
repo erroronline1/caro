@@ -1175,7 +1175,7 @@ dialect["escape"] = ""
 
 ;unzulässige Namen gemäß REGEX-Mustern
 [forbidden]
-names[characters] = "([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, gilt auch für Export-Dateinamen
+names[characters] = "([^\w\s\d,\.\[\]\(\)\-ÄÖÜäöüß])" ; alles was keine Buchstaben, Leerzeichen, Zahlen oder freigegebene Zeichen sind, gilt auch für Export-Dateinamen
 names[length] = "^.{0,3}$" ; weniger als 4 Zeichen
 
 ; unveränderliche fest einprogrammierte reservierte Begriffe
@@ -1183,6 +1183,8 @@ names[numeric] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, d
 names[underscorestart] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
+
+filename[characters] = "[,]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden, wie mit IIS erlebt (NICHT apache)
 
 [lifespan]
 idle = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt

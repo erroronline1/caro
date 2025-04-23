@@ -1229,7 +1229,7 @@ class DOCUMENT extends API {
 		}
 		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier', [] , true): null;
 		$summary = [
-			'filename' => preg_replace('/' . CONFIG['forbidden']['names']['characters'] . '/', '', $document['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $document['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
 			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
