@@ -32,8 +32,40 @@ export function getNextElementID() {
 const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown"];
 const VOIDVALUES = ["", "..."];
 
-export const assemble_helper = {
-	getNextElementID: getNextElementID,
+export class Masonry {
+	/**
+	 * rearranges the content alternating masonry style by utilizing flex
+	 *
+	 * kudos: https://tobiasahlin.com/blog/masonry-with-css/
+	 *
+	 * this class has to be on global scope and its masonry method called upon all dimension and content changes:
+	 * * window.Masonry = initiate MutationObserver on instatiation
+	 * * collapsible execution => window.Masonry.masonry()
+	 * 
+	 * Mutation observer does not fire for unknown reasons for 
+	 * * longtermplanning adding users and colours => window.Masonry.masonry()
+	 * * multiple inputs after Assemble.initializeSection() => window.Masonry.masonry()
+	 *
+	 * performance is not that great at 1000 orders though:
+	 * * about 3 seconds for top margin offset
+	 * * about 10 seconds with conditional column shifting wich does not work properly as of 2025-04-25
+	 */
+
+	constructor() {
+		this.observer_halted = false;
+		this.observer = new MutationObserver(async (mutations) => {
+			console.log("MASONRY INIT", mutations, "halted:", this.observer_halted);
+			this.masonry(true);
+		});
+		window.addEventListener("resize", async () => {
+			console.log("MASONRY RESIZE", "halted:", this.observer_halted);
+			this.masonry(true);
+		});
+		this.observer.observe(document.querySelector("main"), {
+			childList: true,
+			subtree: true,
+		});
+	}
 
 	/**
 	 * promise resolving to true after an element has been added to the dom
@@ -44,7 +76,7 @@ export const assemble_helper = {
 	 * @param {domNode} after
 	 * @returns true
 	 */
-	insertNodeAfter: async (node, after) => {
+	async insertNodeAfter(node, after) {
 		return new Promise((resolve) => {
 			const observer = new MutationObserver((mutations) => {
 				observer.disconnect();
@@ -56,236 +88,121 @@ export const assemble_helper = {
 					subtree: true,
 				});
 			} catch (e) {
+				console.log(e, after, after.parentNode);
+				resolve(false);
 				// sometimes after.parentNode is null even if checked in advance of calling this method.
 				// so i can as well handle this solely here.
-				//console.log(e, after.parentNode);
 			}
 			after.after(node);
 		});
-	},
+	}
 
 	/**
-	 * rearranges the content alternating masonry style
 	 *
-	 * kudos: https://github.com/markmead/js-masonry
-	 *
-	 * this method has to be on global scope and called upon all dimension and content changes:
-	 * * window.masonry = MutationObserver on application init
-	 * * window resizing
-	 * * collapsible execution
-	 * * longtermplanning adding users and colours
-	 * * multiple inputs after Assemble.initializeSection()
-	 *
-	 * issue: on resizing the window a shifting node injection sometimes does not happen, no matter what
-	 *
-	 * this glitch is resolvable by the next assembly (reload, request, history navigation)
-	 *
-	 * performance is not that great at 1000 orders though:
-	 * * about 3 seconds for top margin offset
-	 * * about 10 seconds with conditional column shifting
+	 * @param {boolean} init  whether to inject nodes for column shifting or not (just recalculating container height)
+	 * @returns none
 	 */
-	masonry: async () => {
-		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return; // for anyone calling, e.g. collapsible
-
-		window.masonry.disconnect();
+	async masonry(init = false) {
+		// stop MutationObserver for possible insertions
+		this.observer.disconnect();
+		// reevaluate masonry setting for anyone calling by default, e.g. collapsible
+		if (this.observer_halted || !(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return;
+		// retrieve nodes
+		this.observer_halted = true;
 		const container = document.querySelector("main>div, main>form");
-		const gridGap = parseFloat(getComputedStyle(container).gap);
-		let gridItems = [...container.childNodes].filter((gridItem) => gridItem.nodeType === 1 && gridItem.tagName !== "TEMPLATE");
+		let children = [...container.childNodes];
 
-		// remove empty pseudo articles, reset top margin and
-		// turn off transition animations otherwise browser canvas rendering takes longer than the loop and messes up positions!
-		// the latter have been some messy hours to figure out.
-		gridItems.forEach((gridItem) => {
-			if (!(gridItem.hasChildNodes() || gridItem.constructor === HTMLHRElement)) {
-				gridItem.remove();
-				return;
-			}
-			gridItem.style.removeProperty("margin-top");
-			gridItem.style.transition = "none";
-		});
-
+		if (init) {
+			// remove empty pseudo articles, disable transitions for otherwise messing up dimensions
+			children.forEach((child) => {
+				if (!(child.hasChildNodes() || child.constructor === HTMLHRElement)) {
+					child.remove();
+					return;
+				}
+				child.style.transition = "none";
+			});
+		}
 		// get number of overall columns as per stylesheet breakpoints
-		const columns = getComputedStyle(container).gridTemplateColumns.split(" ").length;
-
-		// one column does not need further recomputation
+		const columns = Math.round(container.getBoundingClientRect().width / children[0].getBoundingClientRect().width);
+		// one column does not need further recomputation, reset height to initial and restart MutationObserver
 		if (columns === 1) {
-			window.masonry.observe(document.querySelector("main"), {
+			container.style.height = null;
+			this.observer.observe(document.querySelector("main"), {
 				childList: true,
 				subtree: true,
 			});
+			this.observer_halted = false;
 			return;
 		}
 
-		// initiate column height observer and preset 0 values to make undefined key meaningful
-		const columnHeight = {};
-		for (let init = 0; init < columns; init++) columnHeight[init] = 0;
+		// get gap size
+		const gap = parseFloat(getComputedStyle(container).gap);
 
-		// others do it by forEach but there might be elements being appended for column shift during the loop
-		let currentItem, currentItemTop, currentItemHeight, spaceBetween, currentColumn, suitableColumn, injectedNode;
-		for (let itemIndex = 0; itemIndex < gridItems.length; itemIndex++) {
-			currentItem = gridItems[itemIndex];
-			currentItemHeight = currentItem.hasChildNodes() || currentItem.constructor === HTMLHRElement ? currentItem.getBoundingClientRect().height + gridGap : 0;
+		// initiate column height observer and preset with offset values
+		const columnHeight = [];
+		for (let initCols = 0; initCols < columns; initCols++) columnHeight[initCols] = parseInt(getComputedStyle(container.parentNode).marginBottom);
 
-			// detect which column the current item is placed in
-			currentColumn = itemIndex % columns;
+		// others iterate by forEach but there might be elements being appended for column shift during the loop
+		let child, index, childHeight, currentColumn, nextColumn, injectedNode;
+		for (let rowSet = 0; rowSet < children.length; rowSet += columns) {
+			// iterate over each item of column
+			for (let column = 0; column < columns; column++) {
+				// get the real index
+				index = rowSet + column;
+				// if child is defined
+				if ((child = children[index])) {
+					// get current height
+					childHeight = child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
+					// insert spacer if and where applicable
+					if (false && init) {
+						// if the next columns bottom including the current childs height is higher (less) than the current columns height including the current childs height
+						// then shift child to next column by inserting an invisible pseudo article
+						if (
+							child.hasChildNodes() ||
+							child.constructor === HTMLHRElement
+						) {
+							// check for the following max columns - 1
+							for (let addColumn = 0; addColumn < columns - 1; addColumn++) {
+								currentColumn = (columnHeight[column + addColumn] !== undefined ? column : -1) + addColumn;
+								nextColumn = columnHeight[currentColumn + 1] !== undefined ? currentColumn + 1 : 0;
+								// break if the current column would be shorter or equal than the next after appending
+								if (columnHeight[currentColumn] + childHeight <= columnHeight[nextColumn] + childHeight) break;
 
-			// top most items (key error) do not need recomputation, but add to the columns height
-			if (!gridItems[itemIndex - columns]) {
-				columnHeight[currentColumn] += currentItem.getBoundingClientRect().bottom + gridGap;
-				continue;
-			}
+								console.log("about to inject before:", child, "with index:", index);
+								console.log("current column:", currentColumn, "height:", columnHeight[currentColumn]);
+								console.log("child height:", childHeight);
+								console.log("suitable column:", nextColumn, "height:", columnHeight[nextColumn]);
+								// create an empty element to inject, affected by grid properties thus influencing the columns
+								injectedNode = document.createElement("article");
+								injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = 0;
+								injectedNode.style.margin = -gap / 2 + "px";
+								injectedNode.ariaHidden = true;
 
-			// if the next columns bottom including the current items height is higher (less) than the current columns height including the current items height
-			// then shift item to next column by inserting an invisible pseudo article
-			injectedNode = null;
-			if (currentItem.hasChildNodes() || currentItem.constructor === HTMLHRElement) {
-				// check for max columns count - 1
-				for (let columnIteration = 0; columnIteration < columns - 1; columnIteration++) {
-					suitableColumn = (columnHeight[currentColumn + columnIteration] !== undefined ? currentColumn : -1) + columnIteration;
-					// break if the current column would shorter than the next after appending
-					if (columnHeight[suitableColumn] + currentItemHeight <= (columnHeight[suitableColumn + 1] !== undefined ? columnHeight[suitableColumn + 1] : columnHeight[0]) + currentItemHeight) break;
-
-					// create an empty element to inject, affected by grid properties thus influencing the columns
-					injectedNode = document.createElement("article");
-					injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = 0;
-					injectedNode.style.margin = `-${gridGap / 2}px`;
-					injectedNode.ariaHidden = true;
-
-					// insert before current item to shift column
-					// and add to gridItems in the current position for next parent iteration
-					if (await assemble_helper.insertNodeAfter(injectedNode, gridItems[itemIndex - 1 + columnIteration])) gridItems.splice(itemIndex, 0, injectedNode);
+								// insert before current child to shift column
+								// and add to children in the current position for next parent iteration
+								if (await this.insertNodeAfter(injectedNode, children[index - 1])) children.splice(index, 0, injectedNode);
+								console.log("inserted:", injectedNode);
+							}
+							// update current child for being a possible injected element
+							child = children[index];
+							childHeight = child.getBoundingClientRect().height + gap // child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
+						}
+					}
+					// add current child to column height observer
+					columnHeight[column] += childHeight;
 				}
-				// update current item for being a possible injected element
-				currentItem = gridItems[itemIndex];
-				currentItemHeight = currentItem.hasChildNodes() ? currentItem.getBoundingClientRect().height + gridGap : 0;
 			}
-
-			// get dimensions, calculate and apply positions
-			currentItemTop = currentItem.getBoundingClientRect().top;
-			spaceBetween = currentItemTop - columnHeight[currentColumn];
-			if (spaceBetween !== gridGap) {
-				// add gridGap only if element has child nodes aka regular element, no injection
-				currentItem.style.marginTop = `-${spaceBetween + gridGap * +!gridItems[itemIndex].hasChildNodes()}px`;
-			}
-			// append currentItemHeight to column height observer
-			columnHeight[currentColumn] += currentItemHeight;
 		}
-		window.masonry.observe(document.querySelector("main"), {
+		// set container height to the max columnHeight and restart MutationObserver
+		container.style.height = `${Math.max(...columnHeight)}px`;
+
+		this.observer.observe(document.querySelector("main"), {
 			childList: true,
 			subtree: true,
 		});
-	},
-
-	/**
-	 * creates the application menu
-	 * @requires api
-	 * @param {object} content render data return from api
-	 * @event insertion of menu nodes to menu container
-	 */
-	userMenu: function (content) {
-		if (!content) return;
-		const menu = document.querySelector("nav"),
-			elements = [],
-			icons = {};
-
-		// set up icons css property
-		icons[api._lang.GET("menu.application.header")] = "url('./media/bars.svg')";
-		icons[api._lang.GET("menu.communication.header")] = "url('./media/comment.svg')";
-		icons[api._lang.GET("menu.records.header")] = "url('./media/file-signature.svg')";
-		icons[api._lang.GET("menu.calendar.header")] = "url('./media/calendar-alt.svg')";
-		icons[api._lang.GET("menu.purchase.header")] = "url('./media/shopping-bag.svg')";
-		icons[api._lang.GET("menu.files.header")] = "url('./media/folders.svg')";
-		icons[api._lang.GET("menu.tools.header")] = "url('./media/tools.svg')";
-
-		let label, input, div, button, span;
-
-		// back nav
-		button = document.createElement("button");
-		button.type = "button";
-		button.title = api._lang.GET("menu.nav.back");
-		button.classList.add("inactive");
-		button.onclick = () => {
-			api.history.go("back");
-		};
-		button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-left.svg')";
-		elements.push(button);
-
-		// iterate over main categories
-		for (const [group, items] of Object.entries(content)) {
-			label = document.createElement("label");
-
-			// set up label and notification element
-			label.htmlFor = "userMenu" + group;
-			label.setAttribute("data-notification", 0);
-			div = document.createElement("div");
-			div.style.maskImage = div.style.webkitMaskImage = icons[group];
-			div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
-			div.title = group;
-			label.append(div);
-
-			// set up radio input for css checked condition
-			input = document.createElement("input");
-			input.type = "radio";
-			input.name = "userMenu";
-			input.id = "userMenu" + group;
-			// accessibility settings
-			input.tabIndex = -1;
-			input.setAttribute("aria-hidden", true);
-			input.title = group;
-
-			// set up div containing subsets of category
-			div = document.createElement("div");
-			div.classList.add("options");
-			div.role = "menu";
-			span = document.createElement("span");
-			span.append(document.createTextNode(group));
-			div.append(span);
-			div.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
-
-			// iterate over subset
-			for (const [description, attributes] of Object.entries(items)) {
-				// create button to access subsets action
-				if ("onclick" in attributes) {
-					button = document.createElement("button");
-					for (const [attribute, value] of Object.entries(attributes)) {
-						button.setAttribute(attribute, value);
-					}
-					button.type = "button";
-					button.classList.add("discreetButton");
-					button.setAttribute("data-for", "userMenuItem" + description.replace(" ", "_"));
-					button.setAttribute("data-notification", 0);
-					button.appendChild(document.createTextNode(description));
-					button.role = "menuitem";
-					div.append(button);
-				}
-				// create description element
-				else {
-					span = document.createElement("span");
-					span.append(document.createTextNode(description));
-					div.append(span);
-				}
-			}
-			elements.push(label);
-			elements.push(input);
-			elements.push(div);
-		}
-
-		// forth nav
-		button = document.createElement("button");
-		button.type = "button";
-		button.title = api._lang.GET("menu.nav.forth");
-		button.classList.add("inactive");
-		button.onclick = () => {
-			api.history.go("forth");
-		};
-		button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-right.svg')";
-		elements.push(button);
-
-		menu.replaceChildren(...elements);
-		// trigger notifications
-		_serviceWorker.postMessage("getnotifications");
-	},
-};
+		this.observer_halted = false;
+	}
+}
 
 export class Dialog {
 	/**
@@ -1495,7 +1412,7 @@ export class Assemble {
 		img.onclick = async () => {
 			div.classList.toggle("extended");
 			await _.sleep(500); // wait for transition
-			assemble_helper.masonry();
+			window.Masonry.masonry();
 		};
 		// accessibility setting
 		img.setAttribute("aria-hidden", true);
@@ -1871,7 +1788,7 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					assemble_helper.masonry();
+					window.Masonry.masonry();
 				}
 			};
 		}
@@ -2290,7 +2207,7 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					assemble_helper.masonry();
+					window.Masonry.masonry();
 				}
 			};
 		}
@@ -2330,7 +2247,7 @@ export class Assemble {
 								name: "_selectedproduct",
 								id: "_selectedproduct",
 							},
-						}
+						},
 					],
 				],
 				options: options,
@@ -2487,7 +2404,7 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
-						assemble_helper.masonry();
+						window.Masonry.masonry();
 					}
 				};
 			}
@@ -2527,7 +2444,7 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
-						assemble_helper.masonry();
+						window.Masonry.masonry();
 					}
 				}
 			});
@@ -2681,7 +2598,7 @@ export class Assemble {
 								composer: "elementClone",
 								names: this.names,
 							}).initializeSection(null, hint ? hint[0] : label);
-							assemble_helper.masonry();
+							window.Masonry.masonry();
 						}
 					}
 				});
@@ -3241,7 +3158,7 @@ export class Assemble {
 						});
 						div.append(...schedules(labels, false, every));
 						e.target.parentNode.insertBefore(div, e.target);
-						assemble_helper.masonry();
+						window.Masonry.masonry();
 					}
 				});
 			});
@@ -3373,7 +3290,7 @@ export class Assemble {
 					if (response && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
 						let label = colorselection(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]);
 						e.target.parentNode.insertBefore(label, e.target);
-						assemble_helper.masonry();
+						window.Masonry.masonry();
 					}
 				});
 			});

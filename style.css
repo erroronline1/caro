@@ -172,13 +172,6 @@ body > header {
 	}
 }
 
-main {
-	margin: 2rem auto 0;
-	width: 100%;
-	max-width: 50rem;
-	margin-bottom: 6rem;
-}
-
 dialog {
 	position: fixed;
 	display: block;
@@ -997,7 +990,7 @@ article:has(> article) {
 
 	article {
 		/*tile*/
-		width: calc(33% - 1em);
+		width: calc(50% - 1em);
 		min-width: 13em;
 		margin: 0.5em;
 		padding: 1em;
@@ -1228,7 +1221,7 @@ section > div > hr {
 hope default value is ridiculously high enough in the medium future.
 min width will be reduced to a reasonable size by api.js in case user settings activate masonry style */
 
-main {
+/*main {
 	> div,
 	> form {
 		display: grid;
@@ -1253,7 +1246,7 @@ main {
 }
 
 @media only screen and (min-width: 2000rem) {
-	/* two colum breakpoint, adjusting see above */
+	/* two colum breakpoint, adjusting see above * /
 	main {
 		max-width: 105rem;
 		> div:not([draggable]),
@@ -1264,7 +1257,7 @@ main {
 }
 
 @media only screen and (min-width: 3000rem) {
-	/* three colum breakpoint, adjusting see above */
+	/* three colum breakpoint, adjusting see above * /
 	main {
 		max-width: 155rem;
 		> div:not([draggable]),
@@ -1274,6 +1267,99 @@ main {
 		> div[draggable] {
 			max-width: 49.5rem;
 			transform: translateX(-1em);
+		}
+	}
+}*/
+
+main {
+	margin: 2rem auto 0;
+	width: 100%;
+	max-width: 50rem;
+	margin-bottom: 6rem;
+	> div,
+	> form {
+		--gap:1em;
+		display: flex;
+		flex-flow: column wrap;
+		gap: var(--gap);
+		>article{
+			width:100%;
+			padding: 1em;
+			border: 1px solid var(--3d-border);
+			border-radius: 0.2em;
+			background-color: var(--article);
+			box-shadow: var(--shadow);
+			transition: ease 0.2s;
+		}>button {
+			width:100%;
+			padding: 1em;
+			box-shadow: var(--shadow);
+			transition: ease 0.2s;
+		}
+	}
+	> div[draggable] {
+		display: block;
+		max-width: 48.5rem;
+		margin: auto;
+		transform: translateX(-0.75em);
+	}
+}
+
+@media only screen and (min-width: 2000rem) {
+	/* two colum breakpoint, adjusting see above */
+	main {
+		max-width: 105rem;
+		> div:not([draggable]),
+		> form {
+			>article,>button{
+				width:calc(50% - var(--gap))
+			}
+			:nth-child(2n + 1) {
+				order: 1;
+			}
+			:nth-child(2n) {
+				order: 2;
+			}
+		}
+		> div:not([draggable])::before,
+		> div:not([draggable])::after,
+		> form::before,
+		> form::after {
+			content: "";
+			flex-basis: 100%;
+			width: 0;
+			order: 2;
+		}
+	}
+}
+
+@media only screen and (min-width: 3000rem) {
+	/* three colum breakpoint, adjusting see above */
+	main {
+		max-width: 155rem;
+		> div:not([draggable]),
+		> form {
+			>article,>button{
+				width:calc(100% / 3 - var(--gap))
+			}
+			:nth-child(3n + 1) {
+				order: 1;
+			}
+			:nth-child(3n + 2) {
+				order: 2;
+			}
+			:nth-child(3n) {
+				order: 3;
+			}
+		}
+		> div:not([draggable])::before,
+		> div:not([draggable])::after,
+		> form::before,
+		> form::after {
+			content: "";
+			flex-basis: 100%;
+			width: 0;
+			order: 2;
 		}
 	}
 }
