@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Assemble, assemble_helper, Dialog, Toast } from "./assemble.js";
+import { Assemble, Dialog, Toast } from "./assemble.js";
 import { Compose, compose_helper } from "./compose.js";
 import { Lang } from "../js/language.js";
 
@@ -466,7 +466,107 @@ export const api = {
 			case "menu":
 				successFn = function (data) {
 					// construct backend provided application menu
-					assemble_helper.userMenu(data.render);
+					if (!data.render) return;
+					const menu = document.querySelector("nav"),
+						elements = [],
+						icons = {};
+
+					// set up icons css property
+					icons[api._lang.GET("menu.application.header")] = "url('./media/bars.svg')";
+					icons[api._lang.GET("menu.communication.header")] = "url('./media/comment.svg')";
+					icons[api._lang.GET("menu.records.header")] = "url('./media/file-signature.svg')";
+					icons[api._lang.GET("menu.calendar.header")] = "url('./media/calendar-alt.svg')";
+					icons[api._lang.GET("menu.purchase.header")] = "url('./media/shopping-bag.svg')";
+					icons[api._lang.GET("menu.files.header")] = "url('./media/folders.svg')";
+					icons[api._lang.GET("menu.tools.header")] = "url('./media/tools.svg')";
+
+					let label, input, div, button, span;
+
+					// back nav
+					button = document.createElement("button");
+					button.type = "button";
+					button.title = api._lang.GET("menu.nav.back");
+					button.classList.add("inactive");
+					button.onclick = () => {
+						api.history.go("back");
+					};
+					button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-left.svg')";
+					elements.push(button);
+
+					// iterate over main categories
+					for (const [group, items] of Object.entries(data.render)) {
+						label = document.createElement("label");
+
+						// set up label and notification element
+						label.htmlFor = "userMenu" + group;
+						label.setAttribute("data-notification", 0);
+						div = document.createElement("div");
+						div.style.maskImage = div.style.webkitMaskImage = icons[group];
+						div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
+						div.title = group;
+						label.append(div);
+
+						// set up radio input for css checked condition
+						input = document.createElement("input");
+						input.type = "radio";
+						input.name = "userMenu";
+						input.id = "userMenu" + group;
+						// accessibility settings
+						input.tabIndex = -1;
+						input.setAttribute("aria-hidden", true);
+						input.title = group;
+
+						// set up div containing subsets of category
+						div = document.createElement("div");
+						div.classList.add("options");
+						div.role = "menu";
+						span = document.createElement("span");
+						span.append(document.createTextNode(group));
+						div.append(span);
+						div.style.maxHeight = (Object.entries(items).length + 1) * 4 + "em";
+
+						// iterate over subset
+						for (const [description, attributes] of Object.entries(items)) {
+							// create button to access subsets action
+							if ("onclick" in attributes) {
+								button = document.createElement("button");
+								for (const [attribute, value] of Object.entries(attributes)) {
+									button.setAttribute(attribute, value);
+								}
+								button.type = "button";
+								button.classList.add("discreetButton");
+								button.setAttribute("data-for", "userMenuItem" + description.replace(" ", "_"));
+								button.setAttribute("data-notification", 0);
+								button.appendChild(document.createTextNode(description));
+								button.role = "menuitem";
+								div.append(button);
+							}
+							// create description element
+							else {
+								span = document.createElement("span");
+								span.append(document.createTextNode(description));
+								div.append(span);
+							}
+						}
+						elements.push(label);
+						elements.push(input);
+						elements.push(div);
+					}
+
+					// forth nav
+					button = document.createElement("button");
+					button.type = "button";
+					button.title = api._lang.GET("menu.nav.forth");
+					button.classList.add("inactive");
+					button.onclick = () => {
+						api.history.go("forth");
+					};
+					button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-right.svg')";
+					elements.push(button);
+
+					menu.replaceChildren(...elements);
+					// trigger notifications
+					_serviceWorker.postMessage("getnotifications");
 				};
 				break;
 			case "start":
@@ -545,7 +645,7 @@ export const api = {
 												stylesheet[i].media.mediaText = "only screen and (min-width: 110rem)";
 											}
 											if (stylesheet[i].conditionText === "only screen and (min-width: 3000rem)") {
-												stylesheet[i].media.mediaText = "only screen and (min-width: 155rem)";
+												stylesheet[i].media.mediaText = "only screen and (min-width: 165rem)";
 											}
 										}
 									}
@@ -1312,7 +1412,7 @@ export const api = {
 									let search = document.querySelector("main form").firstElementChild;
 									if (data.render && data.render.content) {
 										const render = new Assemble(data.render);
-										search.replaceWith(...Array.from(render.initializeSection(null,null, "iCanHasNodes")));
+										search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
 										render.processAfterInsertion();
 									}
 									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -1708,7 +1808,7 @@ export const api = {
 							let search = document.querySelector("main form").firstElementChild;
 							if (data.render && data.render.content) {
 								const render = new Assemble(data.render);
-								search.replaceWith(...Array.from(render.initializeSection(null,null, "iCanHasNodes")));
+								search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
 								render.processAfterInsertion();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);

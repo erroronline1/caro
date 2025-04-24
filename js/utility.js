@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Assemble, assemble_helper, Dialog, Toast } from "./assemble.js";
+import { Assemble, Dialog, Toast } from "./assemble.js";
 import QrCreator from "../libraries/qr-creator.js";
 
 export const _serviceWorker = {
