@@ -45,7 +45,7 @@ export const compose_helper = {
 			for (let i = 0; i < clone.childNodes.length; i++) {
 				if ("value" in clone.childNodes[i]) clone.childNodes[i].value = "";
 				if ("id" in clone.childNodes[i] && clone.childNodes[i].id) {
-					clonedIds[clone.childNodes[i].id] = compose_helper.getNextElementID();
+					clonedIds[clone.childNodes[i].id] = getNextElementID();
 					clone.childNodes[i].id = clonedIds[clone.childNodes[i].id];
 				}
 				if ("required" in clone.childNodes[i]) clone.childNodes[i].removeAttribute("required");
@@ -61,7 +61,6 @@ export const compose_helper = {
 	newTextElements: {},
 	componentIdentify: 0,
 	componentSignature: 0,
-	getNextElementID: getNextElementID,
 
 	/**
 	 * append new audit question to view and newAuditQuestions. used by audit.php composer
