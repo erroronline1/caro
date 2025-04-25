@@ -49,6 +49,9 @@ export class Masonry {
 	 * performance is not that great at 1000 orders though:
 	 * * about 3 seconds for top margin offset
 	 * * about 10 seconds with conditional column shifting wich does not work properly as of 2025-04-25
+	 * 
+	 * TODO: nodes sometimes are inserted and deleted immidiately most probably due to a racing condition from updating the dom tree from intended and simultaneously by an event trigger such as resize.
+	 * this.observer_halted does not seem to prevent this behaviour.
 	 */
 
 	constructor() {
@@ -105,7 +108,7 @@ export class Masonry {
 	async masonry(init = false) {
 		// stop MutationObserver for possible insertions
 		this.observer.disconnect();
-		// reevaluate masonry setting for anyone calling by default, e.g. collapsible
+		// reevaluate masonry setting for anyone calling by default inline integration, e.g. collapsible
 		if (this.observer_halted || !(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return;
 		// retrieve nodes
 		this.observer_halted = true;
