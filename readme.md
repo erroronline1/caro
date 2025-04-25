@@ -132,6 +132,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * alternative method by display:flex, flex-direction:column and reorganizing articles. may be more responsive but will it solve height specific ordering? needs an explanation in accessibility restrictions!
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
+* audit preparation review importing of checkbox2text
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -2254,7 +2255,7 @@ Response properties are
 * *log* (csv-filter log)
 * *links* (csv-filter result file)
 
-All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS compose_helper-methods (./js/compose.js). Processing is regularily dependent on specific names.
+All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS Composer-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
 ## Request flow
 ```mermaid

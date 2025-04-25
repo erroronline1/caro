@@ -887,7 +887,7 @@ class AUDIT extends API {
 						'attributes' => [
 							'type' => 'button',
 							'value' => $this->_lang->GET('audit.audit.add'),
-							'onclick' => "compose_helper.composeNewAuditQuestionCallback(document.getElementById('_question').value, document.getElementById('_regulatory').value, document.getElementById('_hint').value);"
+							'onclick' => "Composer.composeNewAuditQuestionCallback(document.getElementById('_question').value, document.getElementById('_regulatory').value, document.getElementById('_hint').value);"
 						]
 					]
 				];

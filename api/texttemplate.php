@@ -489,7 +489,7 @@ class TEXTTEMPLATE extends API {
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('texttemplate.template.insert_name', [':unit' => $this->_lang->_USER['units'][$unit]]),
-							'onchange' => "if (this.value.length > 1) compose_helper.composeNewTextTemplateCallback(this.value);"
+							'onchange' => "if (this.value.length > 1) Composer.composeNewTextTemplateCallback(this.value);"
 						],
 						'content' => $templates
 					];

@@ -28,10 +28,9 @@ window._client = _client;
 // observe changes to the canvas, updating masonry
 import { Masonry } from "./assemble.js";
 window.Masonry = new Masonry();
-
-// necessary import due to calling from inline events prerendered by backend api
-import { compose_helper } from "./compose.js";
-window.compose_helper = compose_helper;
+// necessary global import due to calling from inline events prerendered by backend api
+import { Composer } from "./compose.js";
+window.Composer = new Composer();
 
 // during development, can be deleted during production, doesn't mess up the application though
 import { rendertest, screenshot } from "../unittests/unittests.js";

@@ -21,7 +21,17 @@ this module helps to compose and edit documents according to the passed simplifi
 */
 import { getNextElementID, Assemble, Toast } from "./assemble.js";
 
-export const compose_helper = {
+export class Composer {
+	constructor() {
+		this.newAuditQuestions = {};
+		this.newDocumentComponents = {};
+		this.newDocumentElements = new Set();
+		this.newTextElements = {};
+		this.componentIdentify = 0;
+		this.componentSignature = 0;
+		this.stopParentDropEvent = false;
+	}
+
 	/**
 	 * e.g. adding new input fields for link collections
 	 * @param {object} startNode
@@ -29,7 +39,7 @@ export const compose_helper = {
 	 * @param {int} numberOfElements
 	 * @returns {domNodes}]
 	 */
-	cloneMultipleItems: function (startNode, offset = -1, numberOfElements = 1) {
+	cloneMultipleItems(startNode, offset = -1, numberOfElements = 1) {
 		// positive offset for nodes after fromNode, negative for previous nodes, zero to take exactly the passed node
 
 		//set pointer
@@ -54,22 +64,16 @@ export const compose_helper = {
 			startNode = startNode.nextElementSibling;
 		}
 		return elements;
-	},
-	newAuditQuestions: {},
-	newDocumentComponents: {},
-	newDocumentElements: new Set(),
-	newTextElements: {},
-	componentIdentify: 0,
-	componentSignature: 0,
+	}
 
 	/**
-	 * append new audit question to view and newAuditQuestions. used by audit.php composer
+	 * append new audit question to view and this.newAuditQuestions. used by audit.php composer
 	 * @requires _client, Compose
 	 * @param {string} key referring _client.texttemplate.data
 	 * @event append question to view
-	 * @event add question structure to compose_helper.newAuditQuestions
+	 * @event add question structure to this..newAuditQuestions
 	 */
-	composeNewAuditQuestionCallback: function (question, regulatory, hint) {
+	composeNewAuditQuestionCallback(question, regulatory, hint) {
 		const chunk = new Compose({
 			draggable: true,
 			allowSections: false,
@@ -87,17 +91,17 @@ export const compose_helper = {
 		});
 		document.getElementById("main").append(...chunk.initializeSection());
 		chunk.processAfterInsertion();
-		compose_helper.newAuditQuestions[chunk.generatedElementIDs[0]] = { question: question, regulatory: regulatory, hint: hint };
-	},
+		this.newAuditQuestions[chunk.generatedElementIDs[0]] = { question: question, regulatory: regulatory, hint: hint };
+	}
 
 	/**
 	 * create widget from composer and append to view and newDocumentComponents
 	 * @requires Compose, api
 	 * @param {domNode} parent composer form for widget
 	 * @event append widget to view
-	 * @event add widget structure to compose_helper.newDocumentComponents
+	 * @event add widget structure to this.newDocumentComponents
 	 */
-	composeNewElementCallback: function (parent) {
+	composeNewElementCallback(parent) {
 		let sibling, siblingName, siblingValue;
 
 		// define which attribute is assigned the name value, and set default values
@@ -165,7 +169,7 @@ export const compose_helper = {
 					for (const node of signatureform) {
 						if (node.dataset.type === "addblock") {
 							node.disabled = true;
-							compose_helper.componentSignature++;
+							this.componentSignature++;
 						}
 					}
 				}
@@ -243,7 +247,7 @@ export const compose_helper = {
 				}
 			}
 		}
-		// append new widget to dom and update compose_helper.newDocumentComponents
+		// append new widget to dom and update this.newDocumentComponents
 		if (Object.keys(element).length > 0) {
 			const newElement = new Compose({
 				draggable: true,
@@ -253,18 +257,18 @@ export const compose_helper = {
 			});
 			document.getElementById("main").append(...newElement.initializeSection());
 			newElement.processAfterInsertion();
-			compose_helper.newDocumentComponents[newElement.generatedElementIDs[0]] = element;
+			this.newDocumentComponents[newElement.generatedElementIDs[0]] = element;
 		}
-	},
+	}
 
 	/**
 	 * append new text chunk to view and newTextElements. used by texttemplate.php composer
 	 * @requires _client, Compose
 	 * @param {string} key referring _client.texttemplate.data
 	 * @event append texttemplate to view
-	 * @event add texttemplate structure to compose_helper.newTextElements
+	 * @event add texttemplate structure to this.newTextElements
 	 */
-	composeNewTextTemplateCallback: function (key) {
+	composeNewTextTemplateCallback(key) {
 		const chunk = new Compose({
 			draggable: true,
 			allowSections: false,
@@ -282,28 +286,28 @@ export const compose_helper = {
 		});
 		document.getElementById("main").append(...chunk.initializeSection());
 		chunk.processAfterInsertion();
-		compose_helper.newTextElements[chunk.generatedElementIDs[0]] = key;
-	},
+		this.newTextElements[chunk.generatedElementIDs[0]] = key;
+	}
 
 	/**
 	 * add multipart form for component editor for file uploads. used by api.js
 	 * @event adds form domNode
 	 */
-	addComponentMultipartFormToMain: function () {
+	addComponentMultipartFormToMain() {
 		const form = document.createElement("form");
 		form.style.display = "hidden";
 		form.dataset.usecase = "component_editor_form";
 		form.enctype = "multipart/form-data";
 		form.method = "post";
 		document.getElementById("main").insertAdjacentElement("afterbegin", form);
-	},
+	}
 
 	/**
 	 * appends or updates a hidden input for fields with the components json structure to the editor form. used by api.js
 	 * @param {object} composedComponent Assemble syntax
 	 * @event adds domNodes
 	 */
-	addComponentStructureToComponentForm: function (composedComponent) {
+	addComponentStructureToComponentForm(composedComponent) {
 		const cc = document.querySelector("[name=composedComponent]");
 		if (cc) {
 			cc.value = JSON.stringify(composedComponent);
@@ -314,16 +318,16 @@ export const compose_helper = {
 		input.name = "composedComponent";
 		input.value = JSON.stringify(composedComponent);
 		document.querySelector("[data-usecase=component_editor_form]").append(input);
-	},
+	}
 
 	/**
 	 * creates an audit template by comparing the contents of newAuditQuestions and the actual order from view (after reordering/dragging)
-	 * textcomponents not present in view will be skipped on compose_helper.newAuditQuestions
+	 * textcomponents not present in view will be skipped on this.newAuditQuestions
 	 * @requires api, Toast
 	 * @returns object|null
 	 * @event Toast on errors
 	 */
-	composeNewAuditTemplate: function () {
+	composeNewAuditTemplate() {
 		// set dragged/dropped order of elements
 		const unit = document.getElementById("TemplateUnit").value,
 			objectives = document.getElementById("TemplateObjectives").value,
@@ -333,7 +337,7 @@ export const compose_helper = {
 		/**
 		 * recursively get dragged/dropped order of elements and add to array
 		 * @param {domNode} parent passed node to analyze contents
-		 * @return {array} array of ordered compose_helper.newAuditQuestions
+		 * @return {array} array of ordered this.newAuditQuestions
 		 */
 		function nodechildren(parent) {
 			let content = [];
@@ -341,18 +345,18 @@ export const compose_helper = {
 				if (node.draggable && node.children.item(1) && node.children.item(1).localName === "article") {
 					[...node.childNodes].forEach((element) => {
 						if (element.localName === "article") {
-							content.push(nodechildren(element));
+							content.push(nodechildren.call(this, element));
 						}
 					});
 				} else {
-					if (node.id in compose_helper.newAuditQuestions) {
-						content.push(compose_helper.newAuditQuestions[node.id]);
+					if (node.id in this.newAuditQuestions) {
+						content.push(this.newAuditQuestions[node.id]);
 					}
 				}
 			});
 			return content;
 		}
-		const templateContent = nodechildren(document.querySelector("main"));
+		const templateContent = nodechildren.call(this, document.querySelector("main"));
 		if (unit && objectives && templateContent.length) {
 			data.append("unit", unit);
 			data.append("content", JSON.stringify(templateContent));
@@ -362,17 +366,17 @@ export const compose_helper = {
 		}
 		new Toast(api._lang.GET("audit.audit.template.not_saved_missing"), "error");
 		return null;
-	},
+	}
 
 	/**
 	 * creates a full component by comparing the contents of newDocumentComponents and the actual order from view (after reordering/dragging)
-	 * widgets not present in view will be skipped on compose_helper.newDocumentComponents
+	 * widgets not present in view will be skipped on this.newDocumentComponents
 	 * @requires api, Toast
 	 * @param {bool} raw_import
 	 * @returns object|null
 	 * @event Toast on errors
 	 */
-	composeNewComponent: function (raw_import = false) {
+	composeNewComponent(raw_import = false) {
 		let isForm = false,
 			componentContent = [],
 			name = document.getElementById("ComponentName").value,
@@ -382,7 +386,7 @@ export const compose_helper = {
 		/**
 		 * recursively get dragged/dropped order of elements and add to array
 		 * @param {domNode} parent passed node to analyze contents
-		 * @return {array} array of ordered compose_helper.newDocumentComponents
+		 * @return {array} array of ordered this.newDocumentComponents
 		 */
 		function nodechildren(parent) {
 			let content = [],
@@ -391,20 +395,20 @@ export const compose_helper = {
 				if (node.draggable) {
 					container = node.children[1];
 					if (container && container.localName === "article") {
-						if (container.firstChild.localName === "section") content.push(nodechildren(container.firstChild));
-						else content.push(nodechildren(container));
+						if (container.firstChild.localName === "section") content.push(nodechildren.call(this, container.firstChild));
+						else content.push(nodechildren.call(this, container));
 					} else {
-						if (node.id in compose_helper.newDocumentComponents) {
-							if (compose_helper.newDocumentComponents[node.id].attributes != undefined) delete compose_helper.newDocumentComponents[node.id].attributes["placeholder"];
-							content.push(compose_helper.newDocumentComponents[node.id]);
-							if (!["text", "links", "image"].includes(compose_helper.newDocumentComponents[node.id].type)) isForm = true;
+						if (node.id in this.newDocumentComponents) {
+							if (this.newDocumentComponents[node.id].attributes != undefined) delete this.newDocumentComponents[node.id].attributes["placeholder"];
+							content.push(this.newDocumentComponents[node.id]);
+							if (!["text", "links", "image"].includes(this.newDocumentComponents[node.id].type)) isForm = true;
 						}
 					}
 				}
 			});
 			return content;
 		}
-		componentContent = nodechildren(document.querySelector("main"));
+		componentContent = nodechildren.call(this, document.querySelector("main"));
 		const answer = {
 			name: name,
 			content: componentContent,
@@ -416,7 +420,7 @@ export const compose_helper = {
 		if (raw_import || (name && componentContent)) return answer;
 		new Toast(api._lang.GET("assemble.compose.component.component_not_saved_missing"), "error");
 		return null;
-	},
+	}
 
 	/**
 	 * creates a document fetching the actual order of components (names) from view
@@ -425,7 +429,7 @@ export const compose_helper = {
 	 * @returns object|null
 	 * @event Toast on errors
 	 */
-	composeNewDocument: function () {
+	composeNewDocument() {
 		// get document order and values
 		const nodes = document.getElementById("main").children,
 			name = document.getElementById("ComponentName").value,
@@ -456,16 +460,16 @@ export const compose_helper = {
 		}
 		new Toast(api._lang.GET("assemble.compose.document.document_not_saved_missing"), "error");
 		return null;
-	},
+	}
 
 	/**
 	 * creates a text template by comparing the contents of newTextElements and the actual order from view (after reordering/dragging)
-	 * textcomponents not present in view will be skipped on compose_helper.newTextElements
+	 * textcomponents not present in view will be skipped on this.newTextElements
 	 * @requires api, Toast
 	 * @returns object|null
 	 * @event Toast on errors
 	 */
-	composeNewTextTemplate: function () {
+	composeNewTextTemplate() {
 		// set dragged/dropped order of elements
 		const name = document.getElementById("TemplateName").value,
 			unit = document.getElementById("TemplateUnit").value,
@@ -475,7 +479,7 @@ export const compose_helper = {
 		/**
 		 * recursively get dragged/dropped order of elements and add to array
 		 * @param {domNode} parent passed node to analyze contents
-		 * @return {array} array of ordered compose_helper.newTextElements
+		 * @return {array} array of ordered this.newTextElements
 		 */
 		function nodechildren(parent) {
 			let content = [];
@@ -483,18 +487,18 @@ export const compose_helper = {
 				if (node.draggable && node.children.item(1) && node.children.item(1).localName === "article") {
 					[...node.childNodes].forEach((element) => {
 						if (element.localName === "article") {
-							content.push(nodechildren(element));
+							content.push(nodechildren.call(this, element));
 						}
 					});
 				} else {
-					if (node.id in compose_helper.newTextElements) {
-						content.push(compose_helper.newTextElements[node.id]);
+					if (node.id in this.newTextElements) {
+						content.push(this.newTextElements[node.id]);
 					}
 				}
 			});
 			return content;
 		}
-		const templateContent = nodechildren(document.querySelector("main"));
+		const templateContent = nodechildren.call(this, document.querySelector("main"));
 		if (name && unit && templateContent.length) {
 			data.append("name", name);
 			data.append("unit", unit);
@@ -504,17 +508,17 @@ export const compose_helper = {
 		}
 		new Toast(api._lang.GET("texttemplate.template.not_saved_missing"), "error");
 		return null;
-	},
+	}
 
 	/**
 	 * appends audit questions to view and newAuditQuestions after being fetched by api.js
 	 * @requires Compose
 	 * @param {object} chunks Assemble syntax
 	 * @event append chunks
-	 * @event update compose_helper.newAuditQuestions
+	 * @event update this.newAuditQuestions
 	 */
-	importAuditTemplate: function (chunks) {
-		compose_helper.newAuditQuestions = {};
+	importAuditTemplate(chunks) {
+		this.newAuditQuestions = {};
 		let question = [];
 		for (const questions of chunks) {
 			question.push({
@@ -533,18 +537,18 @@ export const compose_helper = {
 		document.getElementById("main").append(...chunk.initializeSection());
 		chunk.processAfterInsertion();
 		for (let i = 0; i < chunks.length; i++) {
-			compose_helper.newAuditQuestions[chunk.generatedElementIDs[i]] = chunks[i];
+			this.newAuditQuestions[chunk.generatedElementIDs[i]] = chunks[i];
 		}
-	},
+	}
 
 	/**
 	 * appends a component to view and newDocumentComponents after being fetched by api.js
 	 * @requires Compose
 	 * @param {object} content Assemble syntax
 	 * @event append component
-	 * @event update compose_helper.newDocumentComponents
+	 * @event update this.newDocumentComponents
 	 */
-	importComponent: function (content) {
+	importComponent(content) {
 		/**
 		 * recursively verify input names for not being forbidden
 		 * @param {object} elements object
@@ -577,7 +581,7 @@ export const compose_helper = {
 			return;
 		}
 
-		compose_helper.newDocumentComponents = {};
+		this.newDocumentComponents = {};
 		const newElements = new Compose({
 			draggable: true,
 			content: structuredClone(content.content),
@@ -591,36 +595,36 @@ export const compose_helper = {
 		function assignIDs(element) {
 			for (const container of element) {
 				if (container.constructor.name === "Array") {
-					assignIDs(container);
+					assignIDs.call(this, container);
 				} else {
-					compose_helper.newDocumentComponents[elementIDs[i]] = container;
+					this.newDocumentComponents[elementIDs[i]] = container;
 					i++;
 				}
 			}
 		}
-		assignIDs(content.content);
-	},
+		assignIDs.call(this, content.content);
+	}
 
 	/**
 	 * appends document components to view and newDocumentElements after being fetched by api.js
 	 * @requires MetaCompose, api, Toast
 	 * @param {object} content Assemble syntax
 	 * @event append components
-	 * @event update compose_helper.newDocumentComponents
+	 * @event update this.newDocumentComponents
 	 */
-	importDocument: function (content) {
+	importDocument(content) {
 		/**
 		 * recursively count identify and signaturepad widgets within components
 		 * @param {domNode} element domNode
-		 * @event update compose_helper.componentIdentify, compose_helper.componentSignature
+		 * @event update this.componentIdentify, this.componentSignature
 		 */
 		function lookupIdentify(element) {
 			for (const container of element) {
 				if (container.constructor.name === "Array") {
-					lookupIdentify(container);
+					lookupIdentify.call(this, container);
 				} else {
-					if (container.type === "identify") compose_helper.componentIdentify++;
-					if (container.type === "signature") compose_helper.componentSignature++;
+					if (container.type === "identify") this.componentIdentify++;
+					if (container.type === "signature") this.componentSignature++;
 				}
 			}
 		}
@@ -631,24 +635,24 @@ export const compose_helper = {
 			let current = new MetaCompose(component);
 			document.getElementById("main").append(current.initializeSection());
 			current.processAfterInsertion2();
-			compose_helper.newDocumentElements.add(component.name);
-			lookupIdentify(current.content);
+			this.newDocumentElements.add(component.name);
+			lookupIdentify.call(this, current.content);
 		}
 
 		// alert on forbidden widget count per document
-		if (compose_helper.componentIdentify > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_identify"), "error");
-		if (compose_helper.componentSignature > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_signature"), "error");
-	},
+		if (this.componentIdentify > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_identify"), "error");
+		if (this.componentSignature > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_signature"), "error");
+	}
 
 	/**
 	 * appends text chunks to view and newTextElements after being fetched by api.js
 	 * @requires Compose
 	 * @param {object} chunks Assemble syntax
 	 * @event append chunks
-	 * @event update compose_helper.newTextElements
+	 * @event update this.newTextElements
 	 */
-	importTextTemplate: function (chunks) {
-		compose_helper.newTextElements = {};
+	importTextTemplate(chunks) {
+		this.newTextElements = {};
 		for (const paragraph of chunks) {
 			let texts = { content: [], keys: [] };
 			for (const key of paragraph) {
@@ -669,18 +673,18 @@ export const compose_helper = {
 			document.getElementById("main").append(...chunk.initializeSection());
 			chunk.processAfterInsertion();
 			for (let i = 0; i < texts.keys.length; i++) {
-				compose_helper.newTextElements[chunk.generatedElementIDs[i]] = texts.keys[i];
+				this.newTextElements[chunk.generatedElementIDs[i]] = texts.keys[i];
 			}
 		}
-	},
+	}
 
 	/**
 	 * populates the respective components or audit templates editor forms with widgets settings
 	 * @param {domNode} widgetcontainer event
 	 * @event populate components or audit templates editor form with values
-	 * @see compose helper.composeNewAuditQuestionCallback and compose_helper.composeNewElementCallback()
+	 * @see compose helper.composeNewAuditQuestionCallback and this.composeNewElementCallback()
 	 */
-	importWidget: function (widgetcontainer) {
+	importWidget(widgetcontainer) {
 		// this may not make sense for some types but idc. actually impossible for image type, so this is a exit case
 
 		let type,
@@ -696,14 +700,14 @@ export const compose_helper = {
 		}
 
 		if (type === "auditsection") {
-			newElements = compose_helper.newAuditQuestions;
+			newElements = this.newAuditQuestions;
 			Object.keys(newElements).forEach((key) => {
 				newElements[key].type = "auditsection";
 			});
 			targetform = forms[0].childNodes[2]; // article containing questions inputs
 		} else {
 			// document components
-			newElements = compose_helper.newDocumentComponents;
+			newElements = this.newDocumentComponents;
 			// detect appropriate form
 			for (let f = 0; f < forms.length; f++) {
 				if (forms[f].childNodes[0] && type === forms[f].childNodes[0].dataset.type) {
@@ -725,7 +729,7 @@ export const compose_helper = {
 		if (["image"].includes(element.type)) return;
 
 		if (element.type === type || (element.type === "identify" && type === "scanner")) {
-			// actual inverse compose_helper.composeNewElementCallback
+			// actual inverse this.composeNewElementCallback
 			let sibling,
 				siblingName,
 				multilistupdated = false;
@@ -763,7 +767,7 @@ export const compose_helper = {
 						let next = [],
 							all = [];
 						for (let i = 1; i < options.length; i++) {
-							next = compose_helper.cloneMultipleItems(sibling.parentNode, 0);
+							next = this.cloneMultipleItems(sibling.parentNode, 0);
 							for (const e of next) {
 								if ("value" in e.childNodes[e.childNodes.length - 1]) e.childNodes[e.childNodes.length - 1].value = options[i];
 							}
@@ -796,305 +800,305 @@ export const compose_helper = {
 				}
 			}
 		}
-	},
+	}
 
-	dragNdrop: {
-		stopParentDropEvent: false,
-		allowDrop: function (evnt) {
-			evnt.preventDefault();
-		},
-		/**
-		 * displays a context menu (right click) on draggable containers to allow for reordering or deleting event target
-		 * @requires api, _client
-		 * @param {event} evnt
-		 * @event append context menu to body
-		 */
-		contextMenu: function (evnt) {
-			evnt.preventDefault();
+	allowDrop(evnt) {
+		evnt.preventDefault();
+	}
 
-			evnt.dataTransfer = new DataTransfer();
-			evnt.dataTransfer.setData("text", evnt.target.id);
-			for (const element of document.querySelectorAll(".contextmenu")) element.remove();
-			let div = document.createElement("div"),
-				button,
-				target,
-				targetClone;
+	/**
+	 * displays a context menu (right click) on draggable containers to allow for reordering or deleting event target
+	 * @requires api, _client
+	 * @param {event} evnt
+	 * @event append context menu to body
+	 */
+	contextMenu(evnt) {
+		evnt.preventDefault();
 
-			// determine target:
-			// target is element
-			if (evnt.target.classList.contains("draggableDocumentElement")) target = evnt.target; // draggable element container
-			else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) target = evnt.target.parentNode; // draggable element container content
-			// target is container
-			else if (["main", "section"].includes(evnt.target.parentNode.localName)) target = evnt.target; // draggable div container
-			else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) target = evnt.target.parentNode; // draggable div container content
+		evnt.dataTransfer = new DataTransfer();
+		evnt.dataTransfer.setData("text", evnt.target.id);
+		for (const element of document.querySelectorAll(".contextmenu")) element.remove();
+		let div = document.createElement("div"),
+			button,
+			target,
+			targetClone;
 
-			// style context menu and position relative to pointer
-			div.classList.add("contextmenu");
-			div.style.left = evnt.clientX + "px";
-			div.style.top = window.scrollY + evnt.clientY - 10 + "px";
+		// determine target:
+		// target is element
+		if (evnt.target.classList.contains("draggableDocumentElement")) target = evnt.target; // draggable element container
+		else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) target = evnt.target.parentNode; // draggable element container content
+		// target is container
+		else if (["main", "section"].includes(evnt.target.parentNode.localName)) target = evnt.target; // draggable div container
+		else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) target = evnt.target.parentNode; // draggable div container content
 
-			// add close "button"
-			const img = document.createElement("img");
-			img.classList.add("close");
-			img.src = "./media/times.svg";
-			img.onclick = () => {
-				div.remove();
-			};
-			div.append(img);
+		// style context menu and position relative to pointer
+		div.classList.add("contextmenu");
+		div.style.left = evnt.clientX + "px";
+		div.style.top = window.scrollY + evnt.clientY - 10 + "px";
 
-			// edit option
-			button = document.createElement("button");
-			button.type = "button";
-			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_edit")));
-			button.onclick = () => {
-				if (!target) return;
-				compose_helper.importWidget(target);
-				div.remove();
-			};
-			div.append(button);
+		// add close "button"
+		const img = document.createElement("img");
+		img.classList.add("close");
+		img.src = "./media/times.svg";
+		img.onclick = () => {
+			div.remove();
+		};
+		div.append(img);
 
-			// to top option
-			button = document.createElement("button");
-			button.type = "button";
-			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2top")));
-			button.onclick = () => {
-				if (!target) return;
-				if (target.previousElementSibling && target.previousElementSibling.draggable) {
-					targetClone = target.cloneNode(true);
-					let c;
-					for (c = 0; c < target.parentNode.childNodes.length; c++) {
-						if (target.parentNode.childNodes[c].draggable) break;
-					}
-					target.parentNode.insertBefore(targetClone, target.parentNode.childNodes[c]); // hidden form for submission and undraggable div with general selection, properties and delete area come before
-					target.remove();
-				}
-				div.remove();
-			};
-			div.append(button);
+		// edit option
+		button = document.createElement("button");
+		button.type = "button";
+		button.classList.add("discreetButton");
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_edit")));
+		button.onclick = () => {
+			if (!target) return;
+			this.importWidget(target);
+			div.remove();
+		};
+		div.append(button);
 
-			// one up option
-			button = document.createElement("button");
-			button.type = "button";
-			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1up")));
-			button.onclick = () => {
-				if (!target) return;
-				if (target.previousElementSibling && target.previousElementSibling.draggable) {
-					targetClone = target.cloneNode(true);
-					target.parentNode.insertBefore(targetClone, target.previousElementSibling);
-					target.remove();
-				}
-				div.remove();
-			};
-			div.append(button);
-
-			// one down option
-			button = document.createElement("button");
-			button.type = "button";
-			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1down")));
-			button.onclick = () => {
-				if (!target) return;
-				if (target.nextElementSibling) {
-					targetClone = target.cloneNode(true);
-					target.nextElementSibling.after(targetClone);
-					target.remove();
-				}
-				div.remove();
-			};
-			div.append(button);
-
-			// to bottom option
-			button = document.createElement("button");
-			button.type = "button";
-			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2bottom")));
-			button.onclick = () => {
-				if (!target) return;
+		// to top option
+		button = document.createElement("button");
+		button.type = "button";
+		button.classList.add("discreetButton");
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2top")));
+		button.onclick = () => {
+			if (!target) return;
+			if (target.previousElementSibling && target.previousElementSibling.draggable) {
 				targetClone = target.cloneNode(true);
-				target.parentNode.append(targetClone);
+				let c;
+				for (c = 0; c < target.parentNode.childNodes.length; c++) {
+					if (target.parentNode.childNodes[c].draggable) break;
+				}
+				target.parentNode.insertBefore(targetClone, target.parentNode.childNodes[c]); // hidden form for submission and undraggable div with general selection, properties and delete area come before
 				target.remove();
-				div.remove();
-			};
-			div.append(button);
+			}
+			div.remove();
+		};
+		div.append(button);
 
-			// delete target
-			button = document.createElement("button");
-			button.type = "button";
-			button.classList.add("discreetButton");
-			button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_delete")));
-			let options = {};
-			(options[api._lang.GET("general.cancel_button")] = false),
-				(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
-				(button.onclick = () => {
-					new _client.Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.context_delete"), options: options }).then((confirmation) => {
-						if (confirmation) {
-							compose_helper.dragNdrop.drop_delete(evnt);
-						}
-						div.remove();
-					});
+		// one up option
+		button = document.createElement("button");
+		button.type = "button";
+		button.classList.add("discreetButton");
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1up")));
+		button.onclick = () => {
+			if (!target) return;
+			if (target.previousElementSibling && target.previousElementSibling.draggable) {
+				targetClone = target.cloneNode(true);
+				target.parentNode.insertBefore(targetClone, target.previousElementSibling);
+				target.remove();
+			}
+			div.remove();
+		};
+		div.append(button);
+
+		// one down option
+		button = document.createElement("button");
+		button.type = "button";
+		button.classList.add("discreetButton");
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1down")));
+		button.onclick = () => {
+			if (!target) return;
+			if (target.nextElementSibling) {
+				targetClone = target.cloneNode(true);
+				target.nextElementSibling.after(targetClone);
+				target.remove();
+			}
+			div.remove();
+		};
+		div.append(button);
+
+		// to bottom option
+		button = document.createElement("button");
+		button.type = "button";
+		button.classList.add("discreetButton");
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2bottom")));
+		button.onclick = () => {
+			if (!target) return;
+			targetClone = target.cloneNode(true);
+			target.parentNode.append(targetClone);
+			target.remove();
+			div.remove();
+		};
+		div.append(button);
+
+		// delete target
+		button = document.createElement("button");
+		button.type = "button";
+		button.classList.add("discreetButton");
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_delete")));
+		let options = {};
+		(options[api._lang.GET("general.cancel_button")] = false),
+			(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
+			(button.onclick = () => {
+				new _client.Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.context_delete"), options: options }).then((confirmation) => {
+					if (confirmation) {
+						this.drop_delete(evnt);
+					}
+					div.remove();
 				});
-			div.append(button);
+			});
+		div.append(button);
 
-			// append context menu
-			document.querySelector("body").append(div);
-			return false;
-		},
+		// append context menu
+		document.querySelector("body").append(div);
+		return false;
+	}
 
-		drag: function (evnt) {
-			evnt.dataTransfer.setData("text", evnt.target.id);
-			this.stopParentDropEvent = false;
-		},
-		/**
-		 * inserts widgets or section before dropped upon widget or section
-		 * @param {event} evnt
-		 * @param {domNode} droppedUpon node
-		 * @param {bool} allowSections if a dropped element is allowed to create a slider. only allowed for component editor, not documents or textrecommendations
-		 * @event insert dragged element clone, reorder and propapbly nest nodes and delete original
-		 */
-		drop_insert: function (evnt, droppedUpon, allowSections) {
-			evnt.preventDefault();
-			if (!evnt.dataTransfer.getData("text")) return;
+	drag(evnt) {
+		evnt.dataTransfer.setData("text", evnt.target.id);
+		this.stopParentDropEvent = false;
+	}
 
-			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text")),
-				draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
-				originParent = draggedElement.parentNode;
-			//console.log('dragged', draggedElement.id, 'dropped on', droppedUpon.id, 'target', evnt.target);
-			if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
+	/**
+	 * inserts widgets or section before dropped upon widget or section
+	 * @param {event} evnt
+	 * @param {domNode} droppedUpon node
+	 * @param {bool} allowSections if a dropped element is allowed to create a slider. only allowed for component editor, not documents or textrecommendations
+	 * @event insert dragged element clone, reorder and propapbly nest nodes and delete original
+	 */
+	drop_insert(evnt, droppedUpon, allowSections) {
+		evnt.preventDefault();
+		if (!evnt.dataTransfer.getData("text")) return;
 
-			// dragging single widget
-			if (draggedElement.classList.contains("draggableDocumentElement")) {
-				// dropping on single widget
-				if (droppedUpon.classList.contains("draggableDocumentElement")) {
-					droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
-				}
-				// dropping on hr creating a new article
-				else if (evnt.target.localName === "hr") {
-					let container = document.createElement("div"),
-						article = document.createElement("article"),
-						insertionArea = document.createElement("hr");
-					container = compose_helper.create_draggable(container, false);
-					article.append(draggedElementClone);
-					insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
-					insertionArea.setAttribute("ondragleave", "this.classList.remove('insertionAreaHover')");
-					insertionArea.classList.add("insertionArea");
-					container.append(insertionArea, article);
-					droppedUpon.parentNode.insertBefore(container, droppedUpon);
-					droppedUpon.firstChild.classList.remove("insertionAreaHover");
-				}
-				// avoid dropping elsewhere (main, article borders, etc.)
-				else return;
-				// dropping on self or own container
-				this.stopParentDropEvent = true;
-				// sanitize article on lack of elements if dragged out of article or section
-				if (originParent.children.length < 2) {
-					originParent.parentNode.remove(); // adapt to changes in section creation!
-				}
-				draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
-				return;
-			}
+		const draggedElement = document.getElementById(evnt.dataTransfer.getData("text")),
+			draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
+			originParent = draggedElement.parentNode;
+		//console.log('dragged', draggedElement.id, 'dropped on', droppedUpon.id, 'target', evnt.target);
+		if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
 
-			// dragging articles
-			// dropping on hr for reordering
-			if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
-				// no section insertion
-				// handle only if dropped within the reorder area
+		// dragging single widget
+		if (draggedElement.classList.contains("draggableDocumentElement")) {
+			// dropping on single widget
+			if (droppedUpon.classList.contains("draggableDocumentElement")) {
 				droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
-				droppedUpon.firstChild.classList.remove("insertionAreaHover");
-				this.stopParentDropEvent = true;
-				draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
-				// sanitize section on lack of articles
-				if (originParent.children.length < 2) {
-					if (originParent.children.length > 0)
-						//    section  article    draggable div                                                                  section    article    container
-						originParent.parentNode.parentNode.parentNode.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
-					originParent.parentNode.parentNode.remove();
-				}
-				return;
 			}
-			// dropping on article to create a slider
-			if (
-				allowSections &&
-				!(draggedElement.children.item(1).firstChild && draggedElement.children.item(1).firstChild.localName === "section") &&
-				!(droppedUpon.children.item(1).firstChild && droppedUpon.children.item(1).firstChild.localName === "section") &&
-				!(droppedUpon.parentNode.localName === "section") &&
-				!draggedElement.classList.contains("draggableDocumentElement") &&
-				!droppedUpon.classList.contains("draggableDocumentElement")
-			) {
-				// avoid recursive multiples
-				// create a multiple article tile if dropped on a tile (slider)
+			// dropping on hr creating a new article
+			else if (evnt.target.localName === "hr") {
 				let container = document.createElement("div"),
 					article = document.createElement("article"),
-					section = document.createElement("section"),
-					insertionArea = document.createElement("hr"),
-					insertbefore = droppedUpon.nextElementSibling;
-				container = compose_helper.create_draggable(container, false, false);
-
-				section.append(draggedElementClone, droppedUpon);
-				article.append(section);
-				container.append(article);
+					insertionArea = document.createElement("hr");
+				container = this.create_draggable(container, false);
+				article.append(draggedElementClone);
 				insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
 				insertionArea.setAttribute("ondragleave", "this.classList.remove('insertionAreaHover')");
 				insertionArea.classList.add("insertionArea");
-				container.insertBefore(insertionArea, container.firstChild);
-
-				if (insertbefore) insertbefore.parentNode.insertBefore(container, insertbefore);
-				else draggedElement.parentNode.insertAdjacentElement("beforeend", container);
-				draggedElement.remove(); // do not remove earlier! inserBefore might reference to this object by chance
-				return;
+				container.append(insertionArea, article);
+				droppedUpon.parentNode.insertBefore(container, droppedUpon);
+				droppedUpon.firstChild.classList.remove("insertionAreaHover");
 			}
-		},
-		/**
-		 * deletes widget or section if dropped on deletion area or confirmed context menu deletion
-		 * @param {event} evnt
-		 * @event removes event target
-		 * @event updates compose_helper.componentIdentify and compose_helper.componentSignature count
-		 */
-		drop_delete: function (evnt) {
-			const draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
-			if (!draggedElement) {
-				new _client.Toast(api._lang.GET("assemble.compose.context_delete_error"), "error");
-				return;
-			}
-			const originParent = draggedElement.parentNode;
-
-			// sanitize article on lack of elements
-			if (originParent.parentNode != document.getElementById("main") && originParent.children.length < 2) {
+			// avoid dropping elsewhere (main, article borders, etc.)
+			else return;
+			// dropping on self or own container
+			this.stopParentDropEvent = true;
+			// sanitize article on lack of elements if dragged out of article or section
+			if (originParent.children.length < 2) {
 				originParent.parentNode.remove(); // adapt to changes in section creation!
 			}
+			draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
+			return;
+		}
 
-			/**
-			 * recursively count deleted identifiers or signaturepads within component/document to eventually reenable adding
-			 * @param {domNode} parent domNode
-			 * @event updates compose_helper.componentIdentify and compose_helper.componentSignature count
-			 */
-			function nodechildren(parent) {
-				[...parent.childNodes].forEach((node) => {
-					if (["article", "div"].includes(node.localName)) {
-						if (node.firstChild.localName === "section") nodechildren(node.firstChild);
-						else nodechildren(node);
-					} else {
-						if (node.name && node.name.match(/IDENTIFY_BY_/g)) {
-							if (document.getElementById("setIdentify")) document.getElementById("setIdentify").disabled = false;
-							compose_helper.componentIdentify--;
-						}
-						if (node.id && node.id === "signaturecanvas") {
-							const signatureformsibling = document.querySelector("form>label[data-type=signature");
-							if (signatureformsibling)
-								for (const node of signatureformsibling.parentNode) {
-									if (node.dataset.type === "addblock") node.disabled = false;
-								}
-							compose_helper.componentSignature--;
-						}
-					}
-				});
+		// dragging articles
+		// dropping on hr for reordering
+		if (evnt.target.localName === "hr" && !(evnt.target.parentNode.parentNode.localName === "section" && draggedElement.children.item(1) && draggedElement.children.item(1).firstChild.localName === "section")) {
+			// no section insertion
+			// handle only if dropped within the reorder area
+			droppedUpon.parentNode.insertBefore(draggedElementClone, droppedUpon);
+			droppedUpon.firstChild.classList.remove("insertionAreaHover");
+			this.stopParentDropEvent = true;
+			draggedElement.remove(); // do not remove earlier! insertBefore might reference to this object by chance
+			// sanitize section on lack of articles
+			if (originParent.children.length < 2) {
+				if (originParent.children.length > 0)
+					//    section  article    draggable div                                                                  section    article    container
+					originParent.parentNode.parentNode.parentNode.insertBefore(originParent.children[0].cloneNode(true), originParent.parentNode.parentNode); // adapt to changes in section creation!
+				originParent.parentNode.parentNode.remove();
 			}
-			nodechildren(draggedElement);
-			draggedElement.remove();
-		},
-	},
+			return;
+		}
+		// dropping on article to create a slider
+		if (
+			allowSections &&
+			!(draggedElement.children.item(1).firstChild && draggedElement.children.item(1).firstChild.localName === "section") &&
+			!(droppedUpon.children.item(1).firstChild && droppedUpon.children.item(1).firstChild.localName === "section") &&
+			!(droppedUpon.parentNode.localName === "section") &&
+			!draggedElement.classList.contains("draggableDocumentElement") &&
+			!droppedUpon.classList.contains("draggableDocumentElement")
+		) {
+			// avoid recursive multiples
+			// create a multiple article tile if dropped on a tile (slider)
+			let container = document.createElement("div"),
+				article = document.createElement("article"),
+				section = document.createElement("section"),
+				insertionArea = document.createElement("hr"),
+				insertbefore = droppedUpon.nextElementSibling;
+			container = this.create_draggable(container, false, false);
+
+			section.append(draggedElementClone, droppedUpon);
+			article.append(section);
+			container.append(article);
+			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
+			insertionArea.setAttribute("ondragleave", "this.classList.remove('insertionAreaHover')");
+			insertionArea.classList.add("insertionArea");
+			container.insertBefore(insertionArea, container.firstChild);
+
+			if (insertbefore) insertbefore.parentNode.insertBefore(container, insertbefore);
+			else draggedElement.parentNode.insertAdjacentElement("beforeend", container);
+			draggedElement.remove(); // do not remove earlier! inserBefore might reference to this object by chance
+			return;
+		}
+	}
+
+	/**
+	 * deletes widget or section if dropped on deletion area or confirmed context menu deletion
+	 * @param {event} evnt
+	 * @event removes event target
+	 * @event updates this.componentIdentify and this.componentSignature count
+	 */
+	drop_delete(evnt) {
+		const draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
+		if (!draggedElement) {
+			new _client.Toast(api._lang.GET("assemble.compose.context_delete_error"), "error");
+			return;
+		}
+		const originParent = draggedElement.parentNode;
+
+		// sanitize article on lack of elements
+		if (originParent.parentNode != document.getElementById("main") && originParent.children.length < 2) {
+			originParent.parentNode.remove(); // adapt to changes in section creation!
+		}
+
+		/**
+		 * recursively count deleted identifiers or signaturepads within component/document to eventually reenable adding
+		 * @param {domNode} parent domNode
+		 * @event updates this.componentIdentify and this.componentSignature count
+		 */
+		function nodechildren(parent) {
+			[...parent.childNodes].forEach((node) => {
+				if (["article", "div"].includes(node.localName)) {
+					if (node.firstChild.localName === "section") nodechildren.call(this, node.firstChild);
+					else nodechildren.call(this, node);
+				} else {
+					if (node.name && node.name.match(/IDENTIFY_BY_/g)) {
+						if (document.getElementById("setIdentify")) document.getElementById("setIdentify").disabled = false;
+						this.componentIdentify--;
+					}
+					if (node.id && node.id === "signaturecanvas") {
+						const signatureformsibling = document.querySelector("form>label[data-type=signature");
+						if (signatureformsibling)
+							for (const node of signatureformsibling.parentNode) {
+								if (node.dataset.type === "addblock") node.disabled = false;
+							}
+						this.componentSignature--;
+					}
+				}
+			});
+		}
+		nodechildren.call(this, draggedElement);
+		draggedElement.remove();
+	}
 
 	/**
 	 * make an element draggable (widget, component, textchunk)
@@ -1103,14 +1107,14 @@ export const compose_helper = {
 	 * @param {bool} allowSections if a dropped element is allowed to create a slider. only allowed for component editor, not documents or textrecommendations
 	 * @returns {domNode} altered element
 	 */
-	create_draggable: function (element, insertionArea = true, allowSections = true) {
+	create_draggable(element, insertionArea = true, allowSections = true) {
 		element.id = getNextElementID();
 		element.setAttribute("draggable", "true");
-		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event); this.classList.add('draggableDocumentElementHover')");
+		element.setAttribute("ondragstart", "Composer.drag(event)");
+		element.setAttribute("ondragover", "Composer.allowDrop(event); this.classList.add('draggableDocumentElementHover')");
 		element.setAttribute("ondragleave", "this.classList.remove('draggableDocumentElementHover')");
-		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableDocumentElementHover')");
-		element.setAttribute("oncontextmenu", "compose_helper.dragNdrop.contextMenu(event)");
+		element.setAttribute("ondrop", "Composer.drop_insert(event, this, " + allowSections + "), this.classList.remove('draggableDocumentElementHover')");
+		element.setAttribute("oncontextmenu", "Composer.contextMenu(event)");
 		if (insertionArea) {
 			const insertionArea = document.createElement("hr");
 			insertionArea.setAttribute("ondragover", "this.classList.add('insertionAreaHover')");
@@ -1119,30 +1123,30 @@ export const compose_helper = {
 			element.insertBefore(insertionArea, element.firstChild);
 		}
 		return element;
-	},
+	}
 
 	/**
 	 * adds drop event to delete dragged upon nodes
 	 * @param {domNode} element to make a trash area for deletion
 	 * @event add events
 	 */
-	composer_add_trash: function (element) {
-		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
-		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_delete(event)");
-	},
+	composer_add_trash(element) {
+		element.setAttribute("ondragstart", "Composer.drag(event)");
+		element.setAttribute("ondragover", "Composer.allowDrop(event)");
+		element.setAttribute("ondrop", "Composer.drop_delete(event)");
+	}
 
 	/**
 	 * adds drop event for reimport to widget creation forms
 	 * @param {domNode} element to allow reimport event
 	 * @event add events
 	 */
-	composer_component_document_reimportable: function (element) {
-		element.setAttribute("ondragstart", "compose_helper.dragNdrop.drag(event)");
-		element.setAttribute("ondragover", "compose_helper.dragNdrop.allowDrop(event)");
-		element.setAttribute("ondrop", "compose_helper.dragNdrop.drop_reimport(event)");
-	},
-};
+	composer_component_document_reimportable(element) {
+		element.setAttribute("ondragstart", "Composer.drag(event)");
+		element.setAttribute("ondragover", "Composer.allowDrop(event)");
+		element.setAttribute("ondrop", "Composer.drop_reimport(event)");
+	}
+}
 
 export class Compose extends Assemble {
 	/**
@@ -1199,9 +1203,9 @@ export class Compose extends Assemble {
 					// composer creation form for adding elements
 					if (element[0].form) {
 						const form = document.createElement("form");
-						compose_helper.composer_component_document_reimportable(form);
+						window.Composer.composer_component_document_reimportable(form);
 						form.onsubmit = () => {
-							compose_helper.composeNewElementCallback(form);
+							window.Composer.composeNewElementCallback(form);
 						};
 						form.action = "javascript:void(0);";
 						for (const e of widget) {
@@ -1222,7 +1226,7 @@ export class Compose extends Assemble {
 					// imported component element
 					else {
 						let div = document.createElement("div");
-						div = compose_helper.create_draggable(div, undefined, this.allowSections);
+						div = window.Composer.create_draggable(div, undefined, this.allowSections);
 						div.append(article);
 						section.append(div);
 					}
@@ -1245,7 +1249,7 @@ export class Compose extends Assemble {
 				let frame = document.createElement("div");
 				frame.classList.add("draggableDocumentElement");
 				frame.append(...this[this.currentElement.type]());
-				frame = compose_helper.create_draggable(frame, false, this.allowSections);
+				frame = window.Composer.create_draggable(frame, false, this.allowSections);
 				this.generatedElementIDs.push(frame.id);
 				content.push(frame);
 			}
@@ -1280,7 +1284,7 @@ export class Compose extends Assemble {
 				article.append(...nodes);
 				if (this.createDraggable) {
 					let container = document.createElement("div");
-					container = compose_helper.create_draggable(container, undefined, this.allowSections);
+					container = window.Composer.create_draggable(container, undefined, this.allowSections);
 					container.append(article);
 					assembledPanels.add(container);
 				} else assembledPanels.add(article);
@@ -1930,7 +1934,7 @@ export class Compose extends Assemble {
 				"data-type": "additem",
 				type: "button",
 				onclick: function () {
-					for (const e of compose_helper.cloneMultipleItems(this, -1, 1)) this.parentNode.insertBefore(e, this);
+					for (const e of window.Composer.cloneMultipleItems(this, -1, 1)) this.parentNode.insertBefore(e, this);
 				}.toString(),
 			},
 		};
@@ -2130,7 +2134,7 @@ export class Compose extends Assemble {
 				onclick: function () {
 					if (document.getElementById("_compose_raw").value)
 						try {
-							compose_helper.importComponent({ content: JSON.parse(document.getElementById("_compose_raw").value) });
+							window.Composer.importComponent({ content: JSON.parse(document.getElementById("_compose_raw").value) });
 						} catch (e) {
 							new _client.Dialog({ type: "alert", header: api._lang.GET("assemble.compose.component.raw"), render: api._lang.GET("assemble.compose.component.raw_json_error") });
 						}
@@ -2143,7 +2147,7 @@ export class Compose extends Assemble {
 				value: api._lang.GET("assemble.compose.component.raw_import"),
 				"data-type": "import",
 				onclick: function () {
-					let component = compose_helper.composeNewComponent(true);
+					let component = window.Composer.composeNewComponent(true);
 					document.getElementById("_compose_raw").value = component ? JSON.stringify(component.content, null, 4) : "";
 					document.getElementById("_compose_raw").dispatchEvent(new Event("keyup"));
 				}.toString(),
@@ -2385,7 +2389,7 @@ export class MetaCompose extends Assemble {
 	 */
 	processAfterInsertion2() {
 		this.processAfterInsertion();
-		if (this.setup.draggable) compose_helper.create_draggable(this.section, true, false);
+		if (this.setup.draggable) window.Composer.create_draggable(this.section, true, false);
 		this.section.setAttribute("data-name", this.setup.name);
 		if (this.setup.hidden) this.section.classList.add("hiddencomponent");
 	}

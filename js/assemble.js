@@ -698,7 +698,7 @@ export class Assemble {
 
 		// inititalize drag events
 		const trash = document.querySelector("[data-type=trash");
-		if (trash) compose_helper.composer_add_trash(trash.parentNode);
+		if (trash) Composer.composer_add_trash(trash.parentNode);
 
 		if (this.signaturePad) {
 			this.initialize_SignaturePad();
