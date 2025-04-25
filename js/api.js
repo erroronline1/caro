@@ -17,7 +17,7 @@
  */
 
 import { Assemble, Dialog, Toast } from "./assemble.js";
-import { Compose, compose_helper } from "./compose.js";
+import { Compose } from "./compose.js";
 import { Lang } from "../js/language.js";
 
 export const api = {
@@ -765,7 +765,7 @@ export const api = {
 								render.processAfterInsertion();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.selected && data.selected.length) compose_helper.importAuditTemplate(data.selected);
+							if (data.selected && data.selected.length) Composer.importAuditTemplate(data.selected);
 							api.preventDataloss.start();
 						};
 						break;
@@ -809,7 +809,7 @@ export const api = {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
 				} else if (request[1] === "audittemplate") {
-					if (!(payload = compose_helper.composeNewAuditTemplate())) return;
+					if (!(payload = Composer.composeNewAuditTemplate())) return;
 					successFn = function (data) {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						if (data.id) api.audit("get", "audittemplate", null, data.id);
@@ -831,7 +831,7 @@ export const api = {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
 				} else if (request[1] === "audittemplate") {
-					if (!(payload = compose_helper.composeNewAuditTemplate())) return;
+					if (!(payload = Composer.composeNewAuditTemplate())) return;
 					successFn = function (data) {
 						if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 					};
@@ -1117,38 +1117,38 @@ export const api = {
 						successFn = function (data) {
 							if (data.render) {
 								data.render.content.name = data.render.name;
-								if (data.render.content) compose_helper.importDocument([data.render.content]);
+								if (data.render.content) Composer.importDocument([data.render.content]);
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
 						break;
 					case "component_editor":
-						compose_helper.componentIdentify = 0;
-						compose_helper.componentSignature = 0;
+						Composer.componentIdentify = 0;
+						Composer.componentSignature = 0;
 						successFn = function (data) {
 							if (data.render) {
 								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								const render = new Compose(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
-								if (data.render.component) compose_helper.importComponent(data.render.component);
+								if (data.render.component) Composer.importComponent(data.render.component);
 								// create multipart form for file uploads
-								compose_helper.addComponentMultipartFormToMain();
+								Composer.addComponentMultipartFormToMain();
 								api.preventDataloss.start();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
 						break;
 					case "document_editor":
-						compose_helper.componentIdentify = 0;
-						compose_helper.componentSignature = 0;
+						Composer.componentIdentify = 0;
+						Composer.componentSignature = 0;
 						successFn = function (data) {
 							if (data.render) {
 								api.update_header(title[request[1]] + String(data.header ? " - " + data.header : ""));
 								const render = new Compose(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
-								if (data.render.components) compose_helper.importDocument(data.render.components);
+								if (data.render.components) Composer.importDocument(data.render.components);
 								api.preventDataloss.start();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -1200,9 +1200,9 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
 						};
-						composedComponent = compose_helper.composeNewComponent();
+						composedComponent = Composer.composeNewComponent();
 						if (!composedComponent) return;
-						compose_helper.addComponentStructureToComponentForm(composedComponent);
+						Composer.addComponentStructureToComponentForm(composedComponent);
 						payload = _.getInputs("[data-usecase=component_editor_form]", true);
 						break;
 					case "document":
@@ -1210,7 +1210,7 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
 						};
-						if (!(payload = compose_helper.composeNewDocument())) return;
+						if (!(payload = Composer.composeNewDocument())) return;
 						break;
 					case "bundle":
 						successFn = function (data) {
@@ -1876,7 +1876,7 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.data !== undefined) _client.texttemplate.data = data.data;
 							if (data.selected !== undefined && data.selected.length) {
-								compose_helper.importTextTemplate(data.selected);
+								Composer.importTextTemplate(data.selected);
 							}
 						};
 						break;
@@ -1891,7 +1891,7 @@ export const api = {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.data !== undefined) _client.texttemplate.data = data.data;
 							if (data.selected !== undefined && data.selected.length) {
-								compose_helper.importTextTemplate(data.selected);
+								Composer.importTextTemplate(data.selected);
 							}
 							api.preventDataloss.start();
 						};
@@ -1903,7 +1903,7 @@ export const api = {
 						successFn = function (data) {
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
-						if (!(payload = compose_helper.composeNewTextTemplate())) return;
+						if (!(payload = Composer.composeNewTextTemplate())) return;
 						break;
 					default:
 						payload = _.getInputs("[data-usecase=texttemplate]", true);
