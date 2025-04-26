@@ -516,7 +516,7 @@ export function rendertest(element) {
 								attributes: {
 									name: "textsection on a tile",
 								},
-								content: "This is a third width. As seen on landing page.",
+								content: "This is half the parents elements width. As seen on landing page.",
 							},
 						],
 					},
@@ -1020,6 +1020,7 @@ export function rendertest(element) {
 								"27-07-16": null,
 							},
 						},
+						hint: "As seen in longterm planning.",
 					},
 					{
 						type: "longtermplanning_topics",
@@ -1036,6 +1037,7 @@ export function rendertest(element) {
 							"Exam preparation": "#613583",
 							Specialisation: "#986a44",
 						},
+						hint: "As seen in longterm planning.",
 					},
 				],
 				[
@@ -1195,7 +1197,7 @@ export function rendertest(element) {
 								attributes: {
 									name: "textsection auf einer Kachel",
 								},
-								content: "Dies ist ein Drittel der Breite, Verwendet auf der Startseite",
+								content: "Dies ist die hälte der Parent-Element-Breite, Verwendet auf der Startseite",
 							},
 						],
 					},
@@ -1699,6 +1701,7 @@ export function rendertest(element) {
 								"27-07-16": null,
 							},
 						},
+						hint: "Verwendet in der Langzeitplanung.",
 					},
 					{
 						type: "longtermplanning_topics",
@@ -1715,6 +1718,7 @@ export function rendertest(element) {
 							Prüfungsvorbereitung: "#613583",
 							Spezialisierung: "#986a44",
 						},
+						hint: "Verwendet in der Langzeitplanung.",
 					},
 				],
 				[
