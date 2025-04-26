@@ -81,7 +81,7 @@ class MESSAGE extends API {
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
 								//inline system links won't work otherwise, therefore this property exists for conversation threads
-								'ICON_onclick' => "_client.message.newMessage('". $this->_lang->GET('message.forward') ."', '', '" . 
+								'ICON_onclick' => "_client.message.newMessage('". $this->_lang->GET('message.forward', [':user' => $conversation['conversation_user_name']]) ."', '', '" . 
 									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')"
 							]

@@ -133,6 +133,7 @@
 		"calendar_week": "Week :number",
 		"cancel_button": "No, I am not done yet",
 		"copied_to_clipboard": "Copied to clipboard",
+		"copied_to_clipboard_error": "Copying to clipboard is not allowed on your device",
 		"import_scan_result_button_from_modal": "Transfer result",
 		"missing_form_data": "Some required data is missing!",
 		"month": {
@@ -1056,7 +1057,7 @@
 		"deleted_user": "Deleted User",
 		"error_not_found": "Message not found!",
 		"forbidden": "This user does not accept messages.",
-		"forward": "Forward",
+		"forward": "Forward this message by :user",
 		"forward_hint": "Click or tap on the user image of a message above to forward it to another user.",
 		"forward_message": ":user on :date:\n:message",
 		"from": "From",

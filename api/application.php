@@ -512,6 +512,9 @@ class APPLICATION extends API {
 				'type' => 'tile',
 				'attributes' => [
 					'onclick' => "api.message('get', 'conversation')",
+					'onkeydown' => "if (event.key==='Enter') api.message('get', 'conversation')",
+					'role' => 'link',
+					'tabindex' => '0'
 				],
 				'content' => [
 					[
@@ -534,7 +537,10 @@ class APPLICATION extends API {
 					'type' => 'tile',
 					'attributes' => [
 						'onclick' => "api.purchase('get', 'approved')",
-					],
+						'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'approved')",
+						'role' => 'link',
+						'tabindex' => '0'
+						],
 					'content' => [
 						[
 							'type' => 'textsection',
@@ -557,7 +563,10 @@ class APPLICATION extends API {
 					'type' => 'tile',
 					'attributes' => [
 						'onclick' => "api.purchase('get', 'prepared')",
-					],
+						'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'prepared')",
+						'role' => 'link',
+						'tabindex' => '0'
+						],
 					'content' => [
 						[
 							'type' => 'textsection',
@@ -579,6 +588,9 @@ class APPLICATION extends API {
 				'type' => 'tile',
 				'attributes' => [
 					'onclick' => "api.record('get', 'records')",
+					'onkeydown' => "if (event.key==='Enter') api.record('get', 'records')",
+					'role' => 'link',
+					'tabindex' => '0'
 				],
 				'content' => [
 					[
@@ -601,7 +613,10 @@ class APPLICATION extends API {
 					'type' => 'tile',
 					'attributes' => [
 						'onclick' => "api.audit('get', 'audit')",
-					],
+						'onkeydown' => "if (event.key==='Enter') api.audit('get', 'audit')",
+						'role' => 'link',
+						'tabindex' => '0'
+						],
 					'content' => [
 						[
 							'type' => 'textsection',
@@ -623,6 +638,9 @@ class APPLICATION extends API {
 				'type' => 'tile',
 				'attributes' => [
 					'onclick' => "api.document('get', 'approval')",
+					'onkeydown' => "if (event.key==='Enter') api.document('get', 'approval')",
+					'role' => 'link',
+					'tabindex' => '0'
 				],
 				'content' => [
 					[
@@ -644,6 +662,9 @@ class APPLICATION extends API {
 				'type' => 'tile',
 				'attributes' => [
 					'onclick' => "api.purchase('get', 'pendingincorporations')",
+					'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'pendingincorporations')",
+					'role' => 'link',
+					'tabindex' => '0'
 				],
 				'content' => [
 					[
@@ -665,6 +686,9 @@ class APPLICATION extends API {
 				'type' => 'tile',
 				'attributes' => [
 					'onclick' => "api.audit('get', 'checks', 'complaints')",
+					'onkeydown' => "if (event.key==='Enter') api.audit('get', 'checks', 'complaints')",
+					'role' => 'link',
+					'tabindex' => '0'
 				],
 				'content' => [
 					[
@@ -687,7 +711,7 @@ class APPLICATION extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('application.search'),
 					'value' => $this->_search,
-					'onkeypress' => "if (event.key === 'Enter') {api.application('get', 'start', this.value); return false;}",
+					'onkeydown' => "if (event.key === 'Enter') {api.application('get', 'start', this.value); return false;}",
 				]
 			]
 		];

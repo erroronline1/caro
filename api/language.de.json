@@ -133,6 +133,7 @@
 		"calendar_week": "Kalenderwoche :number",
 		"cancel_button": "Nein, ich bin noch nicht fertig",
 		"copied_to_clipboard": "in Zwischenablage eingefügt",
+		"copied_to_clipboard_error": "Das Einfügen in die Zwischenablauge ist auf deinem Gerät nicht erlaubt",
 		"import_scan_result_button_from_modal": "Ergebnis übertragen",
 		"missing_form_data": "Es fehlen erforderliche Angaben!",
 		"month": {
@@ -1056,7 +1057,7 @@
 		"deleted_user": "Gelöschter Benutzer",
 		"error_not_found": "Nachricht wurde nicht gefunden!",
 		"forbidden": "Dieser Benutzer akzeptiert keine Mitteilungen.",
-		"forward": "Weiterleiten",
+		"forward": "Weiterleiten dieser Nachricht von :user",
 		"forward_hint": "Klicke oder drücke auf das Profilbild einer der Nachrichten um sie an einen anderen Mitarbeiter weiterzuleiten.",
 		"forward_message": ":user am :date:\n:message",
 		"from": "Von",

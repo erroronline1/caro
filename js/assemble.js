@@ -29,7 +29,7 @@ export function getNextElementID() {
 	return "elementID" + ++ELEMENT_ID;
 }
 
-const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown"];
+const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown", "onfocus"];
 const VOIDVALUES = ["", "..."];
 
 export class Masonry {
@@ -1260,11 +1260,15 @@ export class Assemble {
 				daytile.onclick = function () {
 					api.calendar("get", apicall, day.date, day.date);
 				};
+				daytile.onkeydown = function (event) {
+					if (event.key === "Enter") api.calendar("get", apicall, day.date, day.date);
+				};
 				if (day.today) daytile.classList.add("today");
 				if (day.selected) daytile.classList.add("selected");
 				if (day.holiday) daytile.classList.add("holiday");
 				daytile.title = day.title;
 				daytile.role = "link";
+				daytile.tabIndex = 0;
 			}
 			cal.push(daytile);
 		}
@@ -1980,8 +1984,10 @@ export class Assemble {
 			icon.alt = api._lang.GET("assemble.render.aria.image", { ":image": this.currentElement.content.user });
 			if (onclick_forward) {
 				icon.onclick = new Function(onclick_forward);
-				icon.title = api._lang.GET("message.forward");
+				icon.onkeydown = new Function("if (event.key==='Enter') " + onclick_forward);
+				icon.title = api._lang.GET("message.forward", { ":user": this.currentElement.content.user });
 				icon.role = "link";
+				icon.tabIndex = 0;
 			}
 			message.append(icon);
 		}
@@ -2041,6 +2047,8 @@ export class Assemble {
 			if ("onclick" in this.currentElement.attributes) {
 				message.role = "link";
 				message.title = api._lang.GET("message.open", { ":user": this.currentElement.content.user });
+				message.onkeydown = new Function("if (event.key==='Enter') " + this.currentElement.attributes.onclick);
+				message.tabIndex = 0;
 			}
 		}
 		message.classList.add("message");
@@ -2757,7 +2765,7 @@ export class Assemble {
 	 * 		"type": "text_copy",
 	 * 		"attributes": {
 	 * 			"name": "variable name",
-	 * 			"onclick": "_client.application.toClipboard(this)"
+	 * 			"onfocus": "_client.application.toClipboard(this)"
 	 * 		}
 	 * 	}
 	 * ```
@@ -3185,7 +3193,7 @@ export class Assemble {
 		}
 		// add hint
 		if (!this.currentElement.attributes.readonly) {
-			this.currentElement.hint = (this.currentElement.hint || '') + " " + api._lang.GET("calendar.longtermplanning.hint");
+			this.currentElement.hint = (this.currentElement.hint || "") + " " + api._lang.GET("calendar.longtermplanning.hint");
 		}
 		return [...this.header(), ...cal, ...this.hint()];
 	}
@@ -3314,7 +3322,7 @@ export class Assemble {
 				});
 			});
 			preset.push(current);
-			this.currentElement.hint = (this.currentElement.hint || '') + " " + api._lang.GET("calendar.longtermplanning.hint");
+			this.currentElement.hint = (this.currentElement.hint || "") + " " + api._lang.GET("calendar.longtermplanning.hint");
 		}
 		return [...this.header(), ...preset, ...this.hint()];
 	}

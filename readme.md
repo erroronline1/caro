@@ -125,6 +125,7 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * update readme pictures, add responsibilities, appointment
+* improve screenreader accessibility
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
@@ -2111,12 +2112,12 @@ This application is designed to comply with the technical standard for websites 
 #### Compliance status
 This application is partially compliant with the [Web Content Accessibility Guidelines (WCAG) 2.1 Level AA](https://www.w3.org/TR/WCAG21/). See [Non-accessible content](#non-accessible-content) for more details.
 
-The website was last tested on 08 February 2025.
+The website was last tested on 24 April 2025.
 
 #### Preparation of this statement
-This statement was prepared on 30 March 2025.
+This statement was prepared on 24 April 2025.
 
-The statement is based on analysis feedback of the [axe DevTools Firefox plugin](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/), using automated testing.
+The statement is based on analysis feedback of the [axe DevTools Firefox plugin](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/), using automated testing and [Orca Screenreader](https://orca.gnome.org/) for Linux, using manual testing.
 
 #### Feedback
 I welcome your feedback on the accessibility of the CARO App. Please let me know if you encounter accessibility barriers:

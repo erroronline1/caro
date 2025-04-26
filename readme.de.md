@@ -1809,12 +1809,12 @@ Diese Anwendung ist gemäß der technischen Norm für Websites und mobile Apps g
 #### Stand der Vereinbarkeit mit den Anforderungen
 Diese Anwendung entspricht teilweise den Richtlinien für [barrierefreie Webinhalte (WCAG) Version 2.1 Stufe AA](https://www.w3.org/TR/WCAG21/). Siehe [Nicht barrierefreie Inhalte](#nicht-barrierefreie-inhalte) für nähere Informationen.
 
-Die Anwendung wurde zuletzt am 08. Februar 2025 getestet.
+Die Anwendung wurde zuletzt am 24. April 2025 getestet.
 
 #### Erstellung der Erklärung
-Diese Erklärung wurde am 30. März 2025 erstellt.
+Diese Erklärung wurde am 24. April 2025 erstellt.
 
-Die Erklärung basiert auf den automatisierten Analyseergebnissen des [axe DevTools Firefox Plugins](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/).
+Die Erklärung basiert auf den automatisierten Analyseergebnissen des [axe DevTools Firefox Plugins](https://addons.mozilla.org/en-US/firefox/addon/axe-devtools/) und manuellen Tests mit dem [Orca Screenreader](https://orca.gnome.org/) für Linux.
 
 #### Feedback
 Ich begrüße Ihr Feedback bezüglich der Barrierefreiheit der CARO App. Bitte teilen Sie mir mit, wenn Sie Probleme mit der Barrierefreiheit haben:
