@@ -783,7 +783,7 @@ class AUDIT extends API {
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
 					foreach($template['content'] as &$question){
 						$question['regulatory'] = explode(',', $question['regulatory']);
-						$question['regulatory'] = implode(', ', array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, $question['regulatory']));
+						$question['regulatory'] = implode(', ', array_map(fn($r) => isset($this->_lang->_USER['regulatory'][$r]) ? $this->_lang->_USER['regulatory'][$r] : $r, $question['regulatory']));
 					}
 					$result['selected'] = $template['content'];
 				}
