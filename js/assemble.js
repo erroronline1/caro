@@ -41,28 +41,27 @@ export class Masonry {
 	 * this class has to be on global scope and its masonry method called upon all dimension and content changes:
 	 * * window.Masonry = initiate MutationObserver on instatiation
 	 * * collapsible execution => window.Masonry.masonry()
-	 * 
-	 * Mutation observer does not fire for unknown reasons for 
+	 *
+	 * Mutation observer does not fire for unknown reasons for
 	 * * longtermplanning adding users and colours => window.Masonry.masonry()
 	 * * multiple inputs after Assemble.initializeSection() => window.Masonry.masonry()
 	 *
 	 * performance is not that great at 1000 orders though:
 	 * * about 3 seconds for top margin offset
 	 * * about 10 seconds with conditional column shifting wich does not work properly as of 2025-04-25
-	 * 
-	 * TODO: nodes sometimes are inserted and deleted immidiately most probably due to a racing condition from updating the dom tree from intended and simultaneously by an event trigger such as resize.
-	 * this.observer_halted does not seem to prevent this behaviour.
+	 *
+	 * TODO: OK, some progress. reinitialization only occurs on column change.
+	 * still sometimes a weird reference error occurs.
+	 * also review sorting as this is not accurate (e.g. vendors)
 	 */
 
 	constructor() {
-		this.observer_halted = false;
+		this.columns = null;
 		this.observer = new MutationObserver(async (mutations) => {
-			console.log("MASONRY INIT", mutations, "halted:", this.observer_halted);
-			this.masonry(true);
+			this.masonry();
 		});
 		window.addEventListener("resize", async () => {
-			console.log("MASONRY RESIZE", "halted:", this.observer_halted);
-			this.masonry(true);
+			this.masonry();
 		});
 		this.observer.observe(document.querySelector("main"), {
 			childList: true,
@@ -80,10 +79,10 @@ export class Masonry {
 	 * @returns true
 	 */
 	async insertNodeAfter(node, after) {
-		return new Promise((resolve) => {
+		return new Promise((resolve, reject) => {
 			const observer = new MutationObserver((mutations) => {
 				observer.disconnect();
-				resolve(true);
+				resolve();
 			});
 			try {
 				observer.observe(after.parentNode, {
@@ -91,8 +90,7 @@ export class Masonry {
 					subtree: true,
 				});
 			} catch (e) {
-				console.log(e, after, after.parentNode);
-				resolve(false);
+				reject(e);
 				// sometimes after.parentNode is null even if checked in advance of calling this method.
 				// so i can as well handle this solely here.
 			}
@@ -105,17 +103,21 @@ export class Masonry {
 	 * @param {boolean} init  whether to inject nodes for column shifting or not (just recalculating container height)
 	 * @returns none
 	 */
-	async masonry(init = false) {
+	async masonry() {
 		// stop MutationObserver for possible insertions
 		this.observer.disconnect();
 		// reevaluate masonry setting for anyone calling by default inline integration, e.g. collapsible
-		if (this.observer_halted || !(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return;
+		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return;
 		// retrieve nodes
-		this.observer_halted = true;
 		const container = document.querySelector("main>div, main>form");
 		let children = [...container.childNodes];
 
+		// get number of overall columns as per stylesheet breakpoints
+		const columns = Math.round(container.getBoundingClientRect().width / children[0].getBoundingClientRect().width);
+		init = this.columns !== columns;
+
 		if (init) {
+			this.columns = columns;
 			// remove empty pseudo articles, disable transitions for otherwise messing up dimensions
 			children.forEach((child) => {
 				if (!(child.hasChildNodes() || child.constructor === HTMLHRElement)) {
@@ -125,8 +127,6 @@ export class Masonry {
 				child.style.transition = "none";
 			});
 		}
-		// get number of overall columns as per stylesheet breakpoints
-		const columns = Math.round(container.getBoundingClientRect().width / children[0].getBoundingClientRect().width);
 		// one column does not need further recomputation, reset height to initial and restart MutationObserver
 		if (columns === 1) {
 			container.style.height = null;
@@ -134,7 +134,6 @@ export class Masonry {
 				childList: true,
 				subtree: true,
 			});
-			this.observer_halted = false;
 			return;
 		}
 
@@ -157,13 +156,10 @@ export class Masonry {
 					// get current height
 					childHeight = child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
 					// insert spacer if and where applicable
-					if (false && init) {
+					if (init) {
 						// if the next columns bottom including the current childs height is higher (less) than the current columns height including the current childs height
 						// then shift child to next column by inserting an invisible pseudo article
-						if (
-							child.hasChildNodes() ||
-							child.constructor === HTMLHRElement
-						) {
+						if (child.hasChildNodes() || child.constructor === HTMLHRElement) {
 							// check for the following max columns - 1
 							for (let addColumn = 0; addColumn < columns - 1; addColumn++) {
 								currentColumn = (columnHeight[column + addColumn] !== undefined ? column : -1) + addColumn;
@@ -171,10 +167,6 @@ export class Masonry {
 								// break if the current column would be shorter or equal than the next after appending
 								if (columnHeight[currentColumn] + childHeight <= columnHeight[nextColumn] + childHeight) break;
 
-								console.log("about to inject before:", child, "with index:", index);
-								console.log("current column:", currentColumn, "height:", columnHeight[currentColumn]);
-								console.log("child height:", childHeight);
-								console.log("suitable column:", nextColumn, "height:", columnHeight[nextColumn]);
 								// create an empty element to inject, affected by grid properties thus influencing the columns
 								injectedNode = document.createElement("article");
 								injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = 0;
@@ -183,12 +175,18 @@ export class Masonry {
 
 								// insert before current child to shift column
 								// and add to children in the current position for next parent iteration
-								if (await this.insertNodeAfter(injectedNode, children[index - 1])) children.splice(index, 0, injectedNode);
-								console.log("inserted:", injectedNode);
+								await this.insertNodeAfter(injectedNode, children[index - 1])
+									.then(() => {
+										children.splice(index, 0, injectedNode);
+									})
+									.catch((error) => {
+										console.log(error);
+									});
+								console.log("tried to insert:", injectedNode);
 							}
 							// update current child for being a possible injected element
 							child = children[index];
-							childHeight = child.getBoundingClientRect().height + gap // child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
+							childHeight = child.getBoundingClientRect().height + gap; // child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
 						}
 					}
 					// add current child to column height observer
@@ -203,7 +201,6 @@ export class Masonry {
 			childList: true,
 			subtree: true,
 		});
-		this.observer_halted = false;
 	}
 }
 
