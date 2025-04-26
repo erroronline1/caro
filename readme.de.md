@@ -1380,7 +1380,6 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 * Es wird nur eine Zeitzone unterstützt.
-* Die Mauerwerkdarstellung für breite Bildschirme kann bei der Größenänderung des Anwendungsfensters fehlerhaft sein. Ein Neuladen, die Nutzung der Historie, der nächste Funktionsaufruf oder eine Nachjustierung des Anwendungsfenstergröße beheben diese kurzfristige Unannehmlichkeit.
 
 [Übersicht](#übersicht)
 

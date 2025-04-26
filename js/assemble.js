@@ -44,24 +44,43 @@ export class Masonry {
 	 *
 	 * Mutation observer does not fire for unknown reasons for
 	 * * longtermplanning adding users and colours => window.Masonry.masonry()
-	 * * multiple inputs after Assemble.initializeSection() => window.Masonry.masonry()
+	 * * multiple inputs appending after respective Assemble.initializeSection() => window.Masonry.masonry()
 	 *
-	 * performance is not that great at 1000 orders though:
-	 * * about 3 seconds for top margin offset
-	 * * about 10 seconds with conditional column shifting wich does not work properly as of 2025-04-25
-	 *
-	 * TODO: OK, some progress. reinitialization only occurs on column change.
-	 * still sometimes a weird reference error occurs.
-	 * also review sorting as this is not accurate (e.g. vendors)
+	 * performance is not that great at above 300 children of different heights:
+	 * * at 300 orders stresstest render time is above 10 seconds
+	 * -> limit masonry reordering to this.timeout as maximum added time to interface rendering since as of today only orders may be affected by this and shifting is not that crucial here
 	 */
 
 	constructor() {
+		this.timeout = 5000; // milliseconds
 		this.columns = null;
 		this.observer = new MutationObserver(async (mutations) => {
-			this.masonry();
+			this.observer.disconnect();
+
+			this.masonry(true)
+				.then(() => {
+					this.observer.observe(document.querySelector("main"), {
+						childList: true,
+						subtree: true,
+					});
+				})
+				.catch(() => {
+					// user settings do not have masonry enabled, no need to restart observing
+				});
 		});
 		window.addEventListener("resize", async () => {
-			this.masonry();
+			this.observer.disconnect();
+
+			this.masonry()
+				.then(() => {
+					this.observer.observe(document.querySelector("main"), {
+						childList: true,
+						subtree: true,
+					});
+				})
+				.catch(() => {
+					// user settings do not have masonry enabled, no need to restart observing
+				});
 		});
 		this.observer.observe(document.querySelector("main"), {
 			childList: true,
@@ -91,115 +110,107 @@ export class Masonry {
 				});
 			} catch (e) {
 				reject(e);
-				// sometimes after.parentNode is null even if checked in advance of calling this method.
-				// so i can as well handle this solely here.
 			}
 			after.after(node);
 		});
 	}
 
 	/**
+	 * iterates over children of container, with optional injections of column shifting invisible nodes
+	 * sums up the heights of elements to limit the container height for proper stylesheet column style
+	 * note, that this does not affect the order of elements for screen readers handling the sourcecode
 	 *
 	 * @param {boolean} init  whether to inject nodes for column shifting or not (just recalculating container height)
-	 * @returns none
+	 * @returns Promise resolving when finished, rejecting if user settings are not configured to masonry
 	 */
-	async masonry() {
-		// stop MutationObserver for possible insertions
-		this.observer.disconnect();
-		// reevaluate masonry setting for anyone calling by default inline integration, e.g. collapsible
-		if (!(api._settings.user.app_settings && api._settings.user.app_settings.masonry)) return;
-		// retrieve nodes
-		const container = document.querySelector("main>div, main>form");
-		let children = [...container.childNodes];
+	async masonry(init = false) {
+		return new Promise(async (resolve, reject) => {
+			// reevaluate masonry setting for anyone calling by default inline integration, e.g. collapsible
+			if (!(api._settings && api._settings.user && api._settings.user.app_settings && api._settings.user.app_settings.masonry)) reject();
+			const startTime = Date.now();
+			// retrieve nodes
+			let container = document.querySelector("main>form");
+			if (!container || !container.firstChild)container = document.querySelector("main>div"); // e.g. in document composer, where an empty form is preplaced before visible content
+			let children = [...container.childNodes];
 
-		// get number of overall columns as per stylesheet breakpoints
-		const columns = Math.round(container.getBoundingClientRect().width / children[0].getBoundingClientRect().width);
-		init = this.columns !== columns;
+			// get number of overall columns as per stylesheet breakpoints
+			const columns = Math.round(container.getBoundingClientRect().width / container.firstChild.getBoundingClientRect().width);
+			// determine need to recalculate insertions, whether by forced parameter or if column layout has changed since last time
+			init = init || this.columns !== columns;
 
-		if (init) {
-			this.columns = columns;
-			// remove empty pseudo articles, disable transitions for otherwise messing up dimensions
-			children.forEach((child) => {
-				if (!(child.hasChildNodes() || child.constructor === HTMLHRElement)) {
-					child.remove();
-					return;
-				}
-				child.style.transition = "none";
-			});
-		}
-		// one column does not need further recomputation, reset height to initial and restart MutationObserver
-		if (columns === 1) {
-			container.style.height = null;
-			this.observer.observe(document.querySelector("main"), {
-				childList: true,
-				subtree: true,
-			});
-			return;
-		}
-
-		// get gap size
-		const gap = parseFloat(getComputedStyle(container).gap);
-
-		// initiate column height observer and preset with offset values
-		const columnHeight = [];
-		for (let initCols = 0; initCols < columns; initCols++) columnHeight[initCols] = parseInt(getComputedStyle(container.parentNode).marginBottom);
-
-		// others iterate by forEach but there might be elements being appended for column shift during the loop
-		let child, index, childHeight, currentColumn, nextColumn, injectedNode;
-		for (let rowSet = 0; rowSet < children.length; rowSet += columns) {
-			// iterate over each item of column
-			for (let column = 0; column < columns; column++) {
-				// get the real index
-				index = rowSet + column;
-				// if child is defined
-				if ((child = children[index])) {
-					// get current height
-					childHeight = child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
-					// insert spacer if and where applicable
-					if (init) {
-						// if the next columns bottom including the current childs height is higher (less) than the current columns height including the current childs height
-						// then shift child to next column by inserting an invisible pseudo article
-						if (child.hasChildNodes() || child.constructor === HTMLHRElement) {
-							// check for the following max columns - 1
-							for (let addColumn = 0; addColumn < columns - 1; addColumn++) {
-								currentColumn = (columnHeight[column + addColumn] !== undefined ? column : -1) + addColumn;
-								nextColumn = columnHeight[currentColumn + 1] !== undefined ? currentColumn + 1 : 0;
-								// break if the current column would be shorter or equal than the next after appending
-								if (columnHeight[currentColumn] + childHeight <= columnHeight[nextColumn] + childHeight) break;
-
-								// create an empty element to inject, affected by grid properties thus influencing the columns
-								injectedNode = document.createElement("article");
-								injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = 0;
-								injectedNode.style.margin = -gap / 2 + "px";
-								injectedNode.ariaHidden = true;
-
-								// insert before current child to shift column
-								// and add to children in the current position for next parent iteration
-								await this.insertNodeAfter(injectedNode, children[index - 1])
-									.then(() => {
-										children.splice(index, 0, injectedNode);
-									})
-									.catch((error) => {
-										console.log(error);
-									});
-								console.log("tried to insert:", injectedNode);
-							}
-							// update current child for being a possible injected element
-							child = children[index];
-							childHeight = child.getBoundingClientRect().height + gap; // child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
-						}
+			// remove previous injections
+			if (init) {
+				this.columns = columns;
+				// remove empty pseudo articles, disable transitions for otherwise messing up dimensions
+				for (let c = 0; c < children.length; c++) {
+					if (!(children[c].hasChildNodes() || children[c].constructor === HTMLHRElement)) {
+						children[c].remove(); // remove node
+						children.splice(c, 1); // remove from array
+						continue;
 					}
-					// add current child to column height observer
-					columnHeight[column] += childHeight;
+					children[c].style.transition = "none";
 				}
 			}
-		}
-		// set container height to the max columnHeight and restart MutationObserver
-		container.style.height = `${Math.max(...columnHeight)}px`;
+			// one column does not need further recomputation, reset height to initial
+			if (columns === 1) {
+				container.style.height = null;
+				resolve();
+			}
 
-		this.observer.observe(document.querySelector("main"), {
-			childList: true,
-			subtree: true,
+			// get gap size
+			const gap = parseFloat(getComputedStyle(container).gap);
+
+			// initiate column height observer and preset with offset values
+			const columnHeight = [];
+			for (let initCols = 0; initCols < columns; initCols++) columnHeight[initCols] = parseInt(getComputedStyle(container.parentNode).marginBottom);
+
+			// others iterate by forEach but there might be elements being appended for column shift during the loop
+			let child, childHeight, column, currentColumn, nextColumn, injectedNode;
+			for (let index = 0; index < children.length; index++) {
+				if (!children[index]) break;
+				child = children[index];
+				column = index % columns;
+				// get current height
+				childHeight = child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
+				// insert spacer if and where applicable
+				if (init && Date.now() - startTime < this.timeout) {
+					// if the next columns bottom including the current childs height is higher (less) than the current columns height including the current childs height
+					// then shift child to next column by inserting an invisible pseudo article
+					if (child.hasChildNodes() || child.constructor === HTMLHRElement) {
+						// check for the following max columns - 1
+						for (let addColumn = 0; addColumn < columns - 1; addColumn++) {
+							currentColumn = (columnHeight[column + addColumn] !== undefined ? column : -1) + addColumn;
+							nextColumn = columnHeight[currentColumn + 1] !== undefined ? currentColumn + 1 : 0;
+							// break if the current column would be shorter or equal than the next after appending
+							if (columnHeight[currentColumn] + childHeight <= columnHeight[nextColumn] + childHeight ) break;
+
+							// create an empty element to inject, affected by grid properties thus influencing the columns
+							injectedNode = document.createElement("article");
+							injectedNode.style.height = injectedNode.style.padding = injectedNode.style.border = 0;
+							injectedNode.style.margin = -gap / 2 + "px";
+							injectedNode.ariaHidden = true;
+
+							// insert before current child to shift column
+							// and add to children in the current position for next parent iteration
+							await this.insertNodeAfter(injectedNode, children[index - 1])
+								.then(() => {
+									children.splice(index, 0, injectedNode);
+								})
+								.catch((error) => {
+									//console.log(error);
+								});
+						}
+						// update current child for being a possible injected element
+						child = children[index];
+						childHeight = child.getBoundingClientRect().height + gap; // child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
+					}
+				}
+				// add current child to column height observer
+				columnHeight[column] += Math.round(childHeight);
+			}
+			// set container height to the max columnHeight and restart MutationObserver
+			container.style.height = `${Math.max(...columnHeight)}px`;
+			resolve();
 		});
 	}
 }

@@ -128,8 +128,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-* observe performance of responsive masonry
-    * alternative method by display:flex, flex-direction:column and reorganizing articles. may be more responsive but will it solve height specific ordering? needs an explanation in accessibility restrictions!
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
 * audit preparation review importing of checkbox2text
@@ -1460,7 +1458,6 @@ Albeit Safari being capable of displaying most of the content and contributing r
 * Reordered images will disappear - but not being lost in the currently edited data-structure.
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * Only one timezone is supported.
-* Masonry layout for wide screens may glitch on application-window resizing. A reload, history navigation, the next request or drawing the application-window to another size resolves this temporal inconvenience.
 
 [Content](#content)
 
