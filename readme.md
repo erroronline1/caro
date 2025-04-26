@@ -130,7 +130,6 @@ The most recent documentation is available at [https://github.com/erroronline1/c
     * handle hidden attribute?
 * vendor text recommendation, import values gone after error?
     * hide edit buttons on modal! reproduce on iis
-* audit preparation review importing of checkbox2text
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
@@ -1500,6 +1499,7 @@ If you ever fiddle around with the sourcecode:
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning. During development altering tables [can be enabled if disabled by default](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
 * Settings to access a local server on the development machine: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
+* The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results.
 
 [Content](#content)
 

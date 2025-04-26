@@ -130,7 +130,7 @@ export class Masonry {
 			const startTime = Date.now();
 			// retrieve nodes
 			let container = document.querySelector("main>form");
-			if (!container || !container.firstChild)container = document.querySelector("main>div"); // e.g. in document composer, where an empty form is preplaced before visible content
+			if (!container || !container.firstChild) container = document.querySelector("main>div"); // e.g. in document composer, where an empty form is preplaced before visible content
 			let children = [...container.childNodes];
 
 			// get number of overall columns as per stylesheet breakpoints
@@ -182,7 +182,7 @@ export class Masonry {
 							currentColumn = (columnHeight[column + addColumn] !== undefined ? column : -1) + addColumn;
 							nextColumn = columnHeight[currentColumn + 1] !== undefined ? currentColumn + 1 : 0;
 							// break if the current column would be shorter or equal than the next after appending
-							if (columnHeight[currentColumn] + childHeight <= columnHeight[nextColumn] + childHeight ) break;
+							if (columnHeight[currentColumn] + childHeight <= columnHeight[nextColumn] + childHeight) break;
 
 							// create an empty element to inject, affected by grid properties thus influencing the columns
 							injectedNode = document.createElement("article");
@@ -1821,7 +1821,15 @@ export class Assemble {
 			input.value = inputvalue.join(", ");
 			let currentElement = this.currentElement;
 			input.onclick = function () {
-				const options = {};
+				const options = {},
+					content = currentElement.content,
+					value = this.value.split(", ");
+				if (value) {
+					Object.keys(content).forEach((key) => {
+						if (value.includes(key)) content[key].checked = true;
+						else delete content[key].checked;
+					});
+				}
 				options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
 				options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
 				new Dialog({
@@ -3177,7 +3185,7 @@ export class Assemble {
 		}
 		// add hint
 		if (!this.currentElement.attributes.readonly) {
-			this.currentElement.hint = api._lang.GET("calendar.longtermplanning.hint");
+			this.currentElement.hint = (this.currentElement.hint || '') + " " + api._lang.GET("calendar.longtermplanning.hint");
 		}
 		return [...this.header(), ...cal, ...this.hint()];
 	}
@@ -3306,7 +3314,7 @@ export class Assemble {
 				});
 			});
 			preset.push(current);
-			this.currentElement.hint = api._lang.GET("calendar.longtermplanning.hint");
+			this.currentElement.hint = (this.currentElement.hint || '') + " " + api._lang.GET("calendar.longtermplanning.hint");
 		}
 		return [...this.header(), ...preset, ...this.hint()];
 	}
