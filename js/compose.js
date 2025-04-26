@@ -758,7 +758,6 @@ export class Composer {
 					}
 					if (siblingName === api._lang.GET("assemble.compose.component.multilist_add_item") && !multilistupdated) {
 						let deletesibling = sibling.parentNode; // label container
-						console.log(deletesibling.nextElementSibling);
 						while (deletesibling.nextElementSibling && deletesibling.nextElementSibling.localName !== "button") {
 							deletesibling.nextElementSibling.remove();
 						}
