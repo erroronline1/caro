@@ -393,14 +393,22 @@ export const _client = {
 		 * @param {domNode} node
 		 * @event navigator.clipboard.writeText()
 		 */
-		toClipboard: (node) => {
+		toClipboard: async (node) => {
+			let value = node; // passed string by default
 			if (["HTMLInputElement", "HTMLTextAreaElement"].includes(node.constructor.name)) {
 				node.select();
 				node.setSelectionRange(0, 99999); // For mobile devices
-				navigator.clipboard.writeText(node.value);
+				value = node.value;
 				node.selectionStart = node.selectionEnd;
-			} else navigator.clipboard.writeText(node); // passed string
-			new Toast(api._lang.GET("general.copied_to_clipboard"), "info");
+			}
+			navigator.clipboard
+				.writeText(value)
+				.then(() => {
+					new Toast(api._lang.GET("general.copied_to_clipboard"), "info");
+				})
+				.catch(() => {
+					new Toast(api._lang.GET("general.copied_to_clipboard_error"), "error");
+				});
 		},
 
 		/**
