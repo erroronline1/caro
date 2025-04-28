@@ -863,9 +863,15 @@ class INSTALL {
 				continue;
 			}
 
-			if ((isset($entry['unit']) && $entry['unit'] && !in_array($entry['unit'], array_column($DBall, 'unit'))) &&
-				isset($entry['objectives']) && $entry['objectives'] && !in_array($entry['objectives'], array_column($DBall, 'objectives'))
-			) {
+			$entry['hint'] = isset($entry['hint']) ? $entry['hint'] : null;
+			// keep only by current unit
+			$similar = array_filter($DBall, fn($audit) => $audit['unit'] === $entry['unit']);
+			// keep only by current objectives
+			$similar = array_filter($similar, fn($audit) => $audit['objectives'] === $entry['objectives']);
+			// keep only by current hints, compare boolval for empty and null values
+			$similar = array_filter($similar, fn($audit) => ($audit['hint'] === $entry['hint'] || boolval($audit['hint']) === boolval($entry['hint'])));
+			// proceed only if NO similar items remain
+			if (!$similar) {
 				foreach($entry['content'] as $key => &$question){
 					// filter empty sets
 					if (!$question['question']){
