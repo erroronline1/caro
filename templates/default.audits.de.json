@@ -137,5 +137,66 @@
 				"hint": ""
 			}
 		]
-	}
-]
+	},
+	{
+		"unit": "office",
+		"hint": "Verwaltung",
+		"objectives": "Das interne Audit des Bereichs Verwaltung soll prüfen, ob der Bereich alle relevanten regulatorischen Anforderungen und Prozessabläufe gemäß ISO 13485 erfüllt.\n \nAuditziele:\n- Feststellung des Grades der Konformität des Managementsystems\n- Beurteilung der Fähigkeit des Managementsystems die Erfüllung regulatorischer Anforderungen sicherzustellen\n- Beurteilung der Wirksamkeit des Managementsystems die festgelegten Ziele zu erreichen\n- Beurteilung der Fähigkeit des Managementsystems konforme Produkte bereitzustellen\n- Nennung möglicher Verbesserungen\n \nGrundlagen:\n- EN ISO 13485\n- QM-Handbuch und anhängige Dokumente",
+		"content": [
+			{
+				"question": "Wie läuft eine Kostenvoranschlagserstellung ab?",
+				"regulatory": "iso13485_7_5_1",
+				"hint": ""
+			},
+			{
+				"question": "Gibt es offene Kostenvoranschläge und werden diese erinnert?",
+				"regulatory": "iso13485_7_5_1",
+				"hint": "ggf. Nachweise"
+			},
+			{
+				"question": "Was geschieht im Falle von Rückfragen durch den Kostenträger?",
+				"regulatory": "iso13485_4_2_5",
+				"hint": "z.B. fachliche Fragen: weiterleitung an Bereich"
+			},
+			{
+				"question": "Was gibt es zu beachten, wenn ein Kostenträger weitere Informationen zu einer Patientenversorgung anfordert?",
+				"regulatory": "iso13485_4_2_5",
+				"hint": "Schweigepflichtentbindung, Datenschutz beachten"
+			},
+			{
+				"question": "Was geschieht im Falle von Rückfragen durch den Kunden?",
+				"regulatory": "iso13485_4_2_5,mpbetreibv",
+				"hint": "fachliche Fragstellungen durch Medizinprodukteberater"
+			},
+			{
+				"question": "Welche Dokumente werden den Produktivbereichen zur Verfügung gestellt und woher stammen diese?",
+				"regulatory": "iso13485_4_2_5",
+				"hint": "z.B. Anwendung, Dokumentenpakete"
+			},
+			{
+				"question": "Wie werden Reklamationen on der Verwaltung bearbeitet?",
+				"regulatory": "iso13485_8_2_2",
+				"hint": ""
+			},
+			{
+				"question": "Wie lange werden Aufzeichnungen aufbewahrt?",
+				"regulatory": "iso13485_4_2_5",
+				"hint": "Aubewahrungsfristen"
+			},
+			{
+				"question": "Wie wird die Überwachung nach dem Inverkehrbringen sichergestellt? Werden Patienten an Kontrolltermine erinnert?",
+				"regulatory": "mdr83",
+				"hint": ""
+			},
+			{
+				"question": "Was gibt es bei der Terminierung zu beachten?",
+				"regulatory": "iso13485_7_5_1",
+				"hint": "ggf. Arbeitsanweisung"
+			},
+			{
+				"question": "Gibt es Besonderheiten nach einem Softwareupdate?",
+				"regulatory": "iso13485_4_1_6",
+				"hint": ""
+			}
+		]
+	}]
