@@ -300,25 +300,15 @@ class AUDIT extends API {
 								'value' => $this->_lang->GET('menu.records.audit_templates'),
 								'onclick' => "api.audit('get', 'audittemplate')"
 							]
-						],	[
-							'type' => 'button',
-							'attributes' => [
-								'value' => $this->_lang->GET('audit.audit.execute.new'),
-								'type' => 'button',
-								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('audit.audit.execute.new') . "', render: JSON.parse('" . 
-									UTILITY::json_encode([[
-										'type' => 'select',
-										'attributes' => [
-											'name' => $this->_lang->GET('audit.audit.template.select')
-										],
-										'content' => $select['templates']
-									]]) .
-									"'), options:{".
-									"'".$this->_lang->GET('general.cancel_button')."': {value: true, class: 'reducedCTA'},".
-									"'".$this->_lang->GET('general.ok_button')."': true".
-									"}}).then(response => {if (response && response !== '...') api.audit('get', 'audit', response['" . $this->_lang->GET('audit.audit.template.select') . "'])});"
-							]
 						]
+					];
+					if (count(array_keys($select['templates'])) > 1) $result['render']['content'][count($result['render']['content']) - 1][] = [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.template.select'),
+							'onchange' => "if (this.value !== '0') api.audit('get', 'audit', this.value);"
+						],
+						'content' => $select['templates']
 					];
 					if (count(array_keys($select['edit'])) > 1) $result['render']['content'][count($result['render']['content']) - 1][] = [
 						'type' => 'select',
@@ -364,14 +354,15 @@ class AUDIT extends API {
 						$proof = [];
 						if (isset($preset['proof'])){
 							foreach($preset['proof'] as $value){
-								$proof[] = ['type' => 'scanner',
-									'attributes' => [
-										'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
-										'multiple' => true,
-										'data-loss' => 'prevent',
-										'value' => $value
-									]
-								];
+								if ($value) // empty values are stored by default, to have everything an the audits data, clear empty proofs that otherwise would pile up to an array of emptyness
+									$proof[] = ['type' => 'scanner',
+										'attributes' => [
+											'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
+											'multiple' => true,
+											'data-loss' => 'prevent',
+											'value' => $value
+										]
+									];
 							}
 						}
 						$proof[] = ['type' => 'scanner',

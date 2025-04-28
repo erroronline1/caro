@@ -473,7 +473,7 @@
 			"add": "Frage hinzufügen",
 			"delete": "löschen",
 			"delete_confirm_cancel": "Nein danke!",
-			"edit": "Bearbeiten",
+			"edit": "Laufendes Audit fortsetzen",
 			"execute": {
 				"close": "abgeschlossen",
 				"close_confirm": "Nach dem Abschluss ist eine weitere Bearbeitung nicht mehr möglich. Fortfahren?",
@@ -516,7 +516,7 @@
 				"not_saved": "Vorlage konnte nicht gespeichert werden.",
 				"not_saved_missing": "Die Vorlage konnte nicht gespeichert werden, bitte gib einen Bereich und einen Inhalt an!",
 				"schedule": "Audit in den Kalender eintragen",
-				"select": "Vorlage wählen",
+				"select": "Neues Audit mit Vorlage starten",
 				"saved": "Vorlage gespeichert",
 				"used": "Diese Vorlage kann nicht gelöscht werden, da sie derzeit noch von einem nicht abgeschlossenen Audit verwendet wird."
 			},
