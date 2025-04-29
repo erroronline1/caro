@@ -54,7 +54,7 @@ window.addEventListener("scroll", function () {
 window.addEventListener("pointerup", _client.application.clearMenu);
 
 // session timeout event counter
-const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart", "pointerdown"];
+const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "pointerdown"];
 events.forEach(function (name) {
 	document.addEventListener(
 		name,
