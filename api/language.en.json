@@ -960,6 +960,7 @@
 			"user_manager": "Manage users",
 			"user_profile": "My profile"
 		},
+		"ariaSkipMenu": "skip menu",
 		"calendar": {
 			"appointment": "Appointment notice",
 			"header": "Calendar",

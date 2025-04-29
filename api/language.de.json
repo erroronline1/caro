@@ -960,6 +960,7 @@
 			"user_manager": "Nutzer verwalten",
 			"user_profile": "Mein Profil"
 		},
+		"ariaSkipMenu": "Menü überspringen",
 		"calendar": {
 			"appointment": "Terminvereinbarung",
 			"header": "Kalender",

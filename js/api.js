@@ -485,7 +485,12 @@ export const api = {
 					if (!data.render) return;
 					const menu = document.querySelector("nav"),
 						elements = [],
-						icons = {};
+						icons = {},
+						ariaSkipMenu = document.createElement("a");
+					ariaSkipMenu.append(document.createTextNode(api._lang.GET("menu.ariaSkipMenu")));
+					ariaSkipMenu.href = "#main";
+					ariaSkipMenu.classList.add("ariaonly");
+					elements.push(ariaSkipMenu);
 
 					// set up icons css property
 					icons[api._lang.GET("menu.application.header")] = "url('./media/bars.svg')";
