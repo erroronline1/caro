@@ -821,6 +821,7 @@
 			"similar_count": "Es gibt :number Artikel mit einer ähnlichen Artikelnummer von diesem Lieferanten",
 			"similar_hint": "Diese Einstellung wird auch auf die gewählten Produkte angewandt.",
 			"special_attention": "erfordert eine Chargennummer",
+			"tile_title": ":product von :vendor anzeigen",
 			"vendor": "oder gib den Namen ein",
 			"vendor_select": "Wähle einen Lieferanten",
 			"vendor_select_default": "..."
@@ -1212,6 +1213,7 @@
 		},
 		"saved": "Die freigegebene Bestellung kann nun vom Einkauf bearbeitet werden.",
 		"saved_to_prepared": "Die Bestellung wurde zu den vorbereiteten Bestellungen hinzugefügt, muss aber noch freigegeben werden.",
+		"tile_title": ":product von :vendor zur Bestellung hinzufügen",
 		"token_verified": " mit Token freigegeben",
 		"trace_label": "Rückverfolgung",
 		"trace_label_hint": "z.B. Lieferscheinnummer oder fortlaufende Chargennummer, Lieferant wird selbstständig beigefügt",
@@ -1357,6 +1359,7 @@
 		"risk_saved": "Der Eintrag im Risikomanagement wurde gespeichert",
 		"search": "Suche",
 		"search_result": "Ergebnisse für die Suche nach \":search\"",
+		"tile_title": ":type anzeigen",
 		"type": {
 			"risk": "Risiko",
 			"characteristic": "Eigenschaft mit Auswirkungen auf die Sicherheit"

@@ -821,6 +821,7 @@
 			"similar_count": "There are :number products with a likely similar article number by this vendor",
 			"similar_hint": "These settings will be applied to all selected similar products as well.",
 			"special_attention": "Requires a batch number",
+			"tile_title": "display :product by :vendor",
 			"vendor": "or type their name",
 			"vendor_select": "Select vendor",
 			"vendor_select_default": "..."
@@ -1212,6 +1213,7 @@
 		},
 		"saved": "Approved order can now be processed by the purchase department.",
 		"saved_to_prepared": "Order has been saved to prepared orders but has still to be approved.",
+		"tile_title": "add :product by :vendor to order",
 		"token_verified": " verified by token",
 		"trace_label": "Batch identifier",
 		"trace_label_hint": "e.g. delivery note number or consecuting number, vendor is added by default",
@@ -1357,6 +1359,7 @@
 		"risk_saved": "The risk management entry has been saved",
 		"search": "Search",
 		"search_result": "Matches for this search for \":search\"",
+		"tile_title": "display :type",
 		"type": {
 			"risk": "Risk",
 			"characteristic": "Characteristic related to safety"

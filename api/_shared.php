@@ -266,6 +266,10 @@ class SHARED {
 					'type' => 'tile',
 					'attributes' => [
 						'onclick' => "api.risk('get', 'risk', " . $row['id'] . ")",
+						'onkeydown' => "if (event.key==='Enter') api.risk('get', 'risk', " . $row['id'] . ")",
+						'role' => 'link',
+						'tabindex' => '0',
+						'title' => $this->_lang->GET('risk.tile_title', [':type' => $this->_lang->_USER['risk']['type'][$row['type']]])
 					],
 					'content' => [
 						[
@@ -290,7 +294,7 @@ class SHARED {
 	 *  | . |  _| . | . | | |  _|  _|_ -| -_| .'|  _|  _|   |
 	 *  |  _|_| |___|___|___|___|_| |___|___|__,|_| |___|_|_|
 	 *  |_|
-	 * returns product tiles based on search
+	 * returns sliders with search form (where applicable) and product tiles based on search
 	 * @param string $usecase
 	 * @param array $parameter named array, currently with search string and _-separated vendor ids
 	 * 
@@ -319,12 +323,11 @@ class SHARED {
 
 				$productsPerSlide = 0;
 
-				// insert request specific search to first tile
+				// insert request specific search to first slide
 				switch($usecase){
-					case 'productselection':
-						// no prefacing inputs
+					case 'productselection': // document.php, record.php, assemble.js don't need prefacing inputs for productselection widget
 						break;
-					case 'product':
+					case 'product': // consumables.php can make good use of this method!
 						// prepare existing vendor lists
 						$vendorselection = [];
 
@@ -372,7 +375,7 @@ class SHARED {
 							]);
 						}
 						break;
-					default:
+					default: // order.php can make good use of this method!
 						$datalist = [];
 						$datalist_unit = [];
 		
@@ -483,6 +486,10 @@ class SHARED {
 								'type' => 'tile',
 								'attributes' => [
 									'onclick' => "api.purchase('get', 'product', " . $row['id'] . ")",
+									'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'product', " . $row['id'] . ")",
+									'role' => 'link',
+									'tabindex' => '0',
+									'title' => $this->_lang->GET('consumables.product.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
 								],
 								'content' => [
 									[
@@ -516,6 +523,10 @@ class SHARED {
 								'type' => 'tile',
 								'attributes' => [
 									'onclick' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+									'onkeydown' => "if (event.key==='Enter') _client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+									'role' => 'link',
+									'tabindex' => '0',
+									'title' => $this->_lang->GET('order.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
 								],
 								'content' => [
 									[
