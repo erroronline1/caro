@@ -53,19 +53,6 @@ window.addEventListener("scroll", function () {
 // menu clearing event listener
 window.addEventListener("pointerup", _client.application.clearMenu);
 
-// session timeout event counter
-const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "pointerdown"];
-events.forEach(function (name) {
-	document.addEventListener(
-		name,
-		function () {
-			api.session_timeout.events++;
-			if (!(api.session_timeout.events % 5)) api.session_timeout.reset();
-		},
-		true
-	);
-});
-
 // add useragent to html tag to apply specific css attributes
 if (navigator.userAgent.toLowerCase().includes("safari")) document.documentElement.setAttribute("data-useragent", "safari");
 if (navigator.userAgent.toLowerCase().includes("chrome")) document.documentElement.removeAttribute("data-useragent");

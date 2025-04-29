@@ -232,10 +232,19 @@ export const api = {
 	session_timeout: {
 		circle: null,
 		events: null,
+		event_reset: function () {
+			api.session_timeout.events++;
+			if (!(api.session_timeout.events % 5)) api.session_timeout.reset();
+		},
 		init: function () {
 			new Toast(null, null, null, "sessionwarning");
 			this.stop = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.idle || 0 : 0) * 1000;
 			this.events = null;
+			// session timeout event counter and resetter, with binded callback only attached once
+			const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "pointerdown"];
+			events.forEach(function (name) {
+				document.addEventListener(name, api.session_timeout.event_reset, true);
+			});
 			this.reset();
 		},
 		render: function (percent, remaining = 0) {
@@ -252,7 +261,14 @@ export const api = {
 			this.circle.style.strokeDashoffset = offset;
 		},
 		reset: function () {
-			if (api.session_timeout.stop - new Date().getTime() < 0) return; // timeout has happended anyway, don't bother
+			if (api.session_timeout.stop - new Date().getTime() < 0) {
+				// remove session timeout event counter and resetter to avoid errors during fuzzy transformation to backend timeout
+				const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "pointerdown"];
+				events.forEach(function (name) {
+					document.removeEventListener(name, api.session_timeout.event_reset, true);
+				});
+				return; // timeout has happended anyway, don't bother
+			}
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
 			this.stop_visual = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.idle || 0 : 0) * 1000; // on event resets (see initializeCARO.js) the indicator will be reset
 			api.session_timeout.interval = setInterval(function () {
