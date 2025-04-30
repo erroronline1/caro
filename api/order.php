@@ -239,7 +239,7 @@ class ORDER extends API {
 							}
 							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
 							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
-							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
+							$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 							
 							// rewrite order as cancelled type
 							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
@@ -261,7 +261,7 @@ class ORDER extends API {
 							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
 							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
 							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
-							$decoded_order_data['orderer'] = $_SESSION['user']['name'];
+							$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 
 							// create a new order as return
 							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
@@ -416,6 +416,9 @@ class ORDER extends API {
 					'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
 				];
 
+				// userlist to decode orderer
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
 				// create array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
 				foreach($order as $row){
 					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $result['data']['approval'])) $result['data']['approval'][] = $row['approval'];
@@ -433,6 +436,9 @@ class ORDER extends API {
 						}
 					}
 					// data chunks to be assembled by js _client.order.approved()
+					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
+					if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
+					else $orderer = $this->_lang->GET('message.deleted_user');
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
@@ -449,7 +455,7 @@ class ORDER extends API {
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
 						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => UTILITY::dateFormat(substr($product['last_order'], 0, -9))]) : null,
-						'orderer' => UTILITY::propertySet($decoded_order_data, 'orderer') ? : null,
+						'orderer' => $orderer,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
 						'state' => [],
@@ -859,7 +865,7 @@ class ORDER extends API {
 
 				// append identification for group members
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
-					array_splice($result['render']['content'][2], 1, 0, [[
+					array_splice($result['render']['content'][1], 1, 0, [[
 							'type' => 'text',
 							'hint' => $this->_lang->GET('order.orderer_group_hint'),
 							'attributes' => [
@@ -877,7 +883,7 @@ class ORDER extends API {
 					foreach(explode(',', $order['attachments']) as $file){
 						$files[pathinfo($file)['basename']] = ['href' => './api/api.php/file/stream/' . $file, 'target' => '_blank'];
 					}
-					array_splice($result['render']['content'], 4, 0, [
+					array_splice($result['render']['content'], 3, 0, [
 						[
 							[
 								'type' => 'links',
@@ -976,7 +982,7 @@ class ORDER extends API {
 							]
 						]);
 					}
-					array_splice($result['render']['content'], 2, 0, $items);
+					array_splice($result['render']['content'], 1, 0, $items);
 				}
 
 				// append delete button
@@ -1243,7 +1249,7 @@ class ORDER extends API {
 				elseif (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // see only orders for own units
 
-				// filter by organizationla unit
+				// filter by organizational unit
 				$organizational_orders = [];
 				foreach($orders as $key => $row) {
 					$order_data = json_decode($row['order_data'], true);
@@ -1271,6 +1277,9 @@ class ORDER extends API {
 					];
 				}
 
+				// userlist to decode orderer
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
 				// display selected prepared orders 
 				if (count($organizational_orders)){
 					foreach($organizational_orders as $order){ // order
@@ -1292,6 +1301,10 @@ class ORDER extends API {
 							} else {
 								if ($key === 'attachments') continue;
 								if ($key === 'organizational_unit') $value = $this->_lang->GET('units.' . $value);
+								if ($key === 'orderer'){
+									if ($orderer = array_search($value, array_column($users, 'id'))) $value = $users[$orderer]['name'];
+									else $value = $this->_lang->GET('message.deleted_user');
+								}
 								if ($key === 'order_type') {
 									$order_attributes = [
 										'name' => $this->_lang->GET('order.ordertype.' . $value),
@@ -1354,26 +1367,24 @@ class ORDER extends API {
 					// append authorization methods
 					if (count($organizational_orders)){
 						$authorize = [];
-						if ($_SESSION['user']['orderauth']) {
-							$authorize[] = [
-								[
-									'type' => 'number',
-									'attributes' => [
-										'name' => $this->_lang->GET('user.order_authorization'),
-										'type' => 'password'
-									]
+						$authorize[] = [
+							[
+								'type' => 'number',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.order_authorization'),
+									'type' => 'password'
 								]
-							];
-							if (preg_match('/token/i', CONFIG['application']['order_auth'])) $authorize[] = [
-								[
-									'type' => 'scanner',
-									'attributes' => [
-										'name' => $this->_lang->GET('user.token'),
-										'type' => 'password'
-									]
+							]
+						];
+						if (preg_match('/token/i', CONFIG['application']['order_auth'])) $authorize[] = [
+							[
+								'type' => 'scanner',
+								'attributes' => [
+									'name' => $this->_lang->GET('user.token'),
+									'type' => 'password'
 								]
-							];
-						}
+							]
+						];
 						if (preg_match('/signature/i', CONFIG['application']['order_auth'])) $authorize[] = [
 							[
 								'type' => 'signature',
@@ -1488,7 +1499,7 @@ class ORDER extends API {
 				if (boolval($value) && $value !== 'undefined') $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $value));
 			}
 		}
-		$order_data['orderer'] = $_SESSION['user']['name'];
+		$order_data['orderer'] = $_SESSION['user']['id'];
 		if(!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
 	}
