@@ -1032,6 +1032,7 @@ export const _client = {
 										":vendor": "element.vendor",
 										":info": "element.information" || "",
 										":commission": "element.commission",
+										":aut_idem": "element.aut_idem"
 									})
 									.replace("\\n", "\n"),
 								buttons
@@ -1039,7 +1040,7 @@ export const _client = {
 						}
 							.toString()
 							._replaceArray(
-								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "buttons"],
+								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "buttons"],
 								[
 									element.orderer,
 									element.quantity,
@@ -1049,6 +1050,7 @@ export const _client = {
 									element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
 									element.information ? element.information.replaceAll('"', '\\"') : "",
 									element.commission ? element.commission.replaceAll('"', '\\"') : "",
+									element.aut_idem ? element.aut_idem.replaceAll('"', '\\"') : "",
 									JSON.stringify(buttons),
 								]
 							),
