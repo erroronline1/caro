@@ -1407,8 +1407,7 @@ class RECORD extends API {
 					'attributes' => [
 						'id' => '_recordfilter',
 						'name' => $this->_lang->GET('record.filter'),
-						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'records', this.value); return false;}",
-						'onblur' => "api.record('get', 'records', this.value); return false;",
+						'onkeypress' => "if (event.key === 'Enter') {api.record('get', 'records', this.value);}",
 						'value' => ($this->_requestedID && $this->_requestedID !== 'null') ? $this->_requestedID : ''
 					],
 					'datalist' => array_values(array_unique($recorddatalist))

@@ -208,7 +208,7 @@ class MEASURE extends API {
 								'data-type' => 'upvote',
 								'class' => 'inlinebutton' . ($uservote > 0 ? ' voted': ''),
 								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
-								'title' => $this->_lang->GET('measure.thumbs_up') . ($uservote > 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $approval - $uservote])
+								'title' => $this->_lang->GET('measure.thumbs_up') . ($uservote > 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $approval - ($uservote > 0 ? $uservote : 0)])
 							],
 						];
 						$measurecontent[] = [
@@ -218,7 +218,7 @@ class MEASURE extends API {
 								'data-type' => 'downvote',
 								'class' => 'inlinebutton' . ($uservote < 0 ? ' voted': ''),
 								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
-								'title' => $this->_lang->GET('measure.thumbs_down') . ($uservote < 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $rejection + $uservote])
+								'title' => $this->_lang->GET('measure.thumbs_down') . ($uservote < 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $rejection + ($uservote < 0 ? $uservote : 0)])
 							],
 						];
 						$measurecontent[] = [
@@ -296,7 +296,7 @@ class MEASURE extends API {
 				
 				// sanitize input or exit error
 				if (intval($this->_requestedVote) > 0) $this->_requestedVote = 1; 
-				if (intval($this->_requestedVote) < 0) $this->_requestedVote = -1;
+				elseif (intval($this->_requestedVote) < 0) $this->_requestedVote = -1;
 				else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.vote_error'),

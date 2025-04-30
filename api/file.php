@@ -66,8 +66,7 @@ class FILE extends API {
 						'type' => 'filtered',
 						'attributes' => [
 							'name' => $this->_lang->GET('file.bundle_filter_label'),
-							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value); return false;}",
-							'onblur' => "api.file('get', 'bundlefilter', this.value); return false;",
+							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value)}",
 							'id' => 'filesearch'
 						]
 					]
@@ -487,8 +486,7 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => $this->_lang->GET('file.file_filter_label'),
-								'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external_documents', this.value); return false;}",
-								'onblur' => "api.file('get', 'filter', 'external_documents', this.value); return false;",
+								'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external_documents', this.value)}",
 								'id' => 'filefilter'
 							]
 						]
@@ -705,8 +703,7 @@ class FILE extends API {
 								'type' => 'filtered',
 								'attributes' => [
 									'name' => $this->_lang->GET('file.file_filter_label'),
-									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
-									'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
+									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value)}",
 									'id' => 'filefilter'
 								]
 							]
@@ -818,8 +815,7 @@ class FILE extends API {
 						'type' => 'filtered',
 						'attributes' => [
 							'name' => $this->_lang->GET('file.file_filter_label'),
-							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;}",
-							'onblur' => "api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value); return false;",
+							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value);}",
 							'id' => 'filesearch'
 						]
 					]
@@ -981,8 +977,7 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => $this->_lang->GET('file.file_filter_label'),
-								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value); return false;}",
-								'onblur' => "api.file('get', 'filter', 'sharepoint', this.value); return false;",
+								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value)}",
 								'id' => 'filefilter'
 							]
 						]

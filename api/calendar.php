@@ -862,8 +862,7 @@ class CALENDAR extends API {
 						'value' => $this->_requestedId,
 						'id' => 'recordfilter',
 						'name' => $this->_lang->GET('calendar.schedule.search'),
-						'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
-						'onblur' => "api.calendar('get', 'search', this.value); return false;",
+						'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value)}",
 					],
 					'hint' => $this->_lang->GET('calendar.schedule.search_hint'),
 				]
@@ -1024,8 +1023,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'id' => 'recordfilter',
 							'name' => $this->_lang->GET('calendar.schedule.search'),
-							'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}",
-							'onblur' => "api.calendar('get', 'search', this.value); return false;",
+							'onkeypress' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value);}",
 						],
 						'hint' => $this->_lang->GET('calendar.schedule.search_hint'),
 					]

@@ -361,6 +361,7 @@ export class Dialog {
 			if (this.assemble) this.assemble.processAfterInsertion(dialog);
 
 			return new Promise((resolve, reject) => {
+				dialog.removeAttribute("aria-hidden");
 				dialog.showModal();
 				dialog.onclose = resolve;
 			}).then((response) => {
@@ -407,6 +408,7 @@ export class Dialog {
 			});
 		}
 		dialog.close();
+		dialog.setAttribute("aria-hidden", true);
 	}
 
 	/**
@@ -574,7 +576,7 @@ export class Toast {
 	 * duration is a bit fuzzy, idk why
 	 *
 	 */
-	constructor(message = "", type = "", duration = 4000, destination = "toast") {
+	constructor(message = "", type = "", duration = 8000, destination = "toast") {
 		this.message = message || undefined;
 		this.duration = duration;
 		this.stop = new Date().getTime() + duration;
@@ -597,9 +599,12 @@ export class Toast {
 			pauseimg.onclick = new Function("window.clearTimeout(window.toasttimeout['" + destination + "']);");
 			msg.innerHTML = message;
 			this.toast.replaceChildren(closeimg, pauseimg, msg, div);
+			this.toast.removeAttribute("aria-hidden");
 			this.toast.show();
+			this.toast.focus();
 			this.countdown();
 		} else this.toast.close();
+		this.toast.setAttribute("aria-hidden", true);
 	}
 	/**
 	 * updates reversed progress bar and closes toast on timeout
@@ -611,6 +616,7 @@ export class Toast {
 		if (this.stop - new Date().getTime() < 0) {
 			window.clearTimeout(window.toasttimeout[this.destination]);
 			this.toast.close();
+			this.toast.setAttribute("aria-hidden", true);
 		}
 	}
 }
@@ -725,7 +731,7 @@ export class Assemble {
 		} else {
 			eventListenerTarget.removeEventListener("scroll", _client.application.lazyload.load);
 		}
-
+		document.querySelector("main").focus();
 		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
 	}
 
@@ -2264,8 +2270,7 @@ export class Assemble {
 							type: "search",
 							attributes: {
 								name: api._lang.GET("consumables.product.search"),
-								onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;}",
-								onblur: "api.purchase('get', 'productsearch', 'null', this.value, 'productselection'); return false;",
+								onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'productsearch', 'null', this.value, 'productselection');}",
 								id: "productsearch",
 							},
 						},

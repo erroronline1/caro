@@ -467,13 +467,13 @@ html[data-useragent*="safari"] body {
 
 /*************************** input elements and call to action *******************************/
 
-.ariaonly {
-	/* visually hide screenreader components*/
+.visually-hidden {
+	/* visually hide screenreader-only components*/
 	width:0;
 	height:0;
 	padding:0;
 	margin:0;
-	visibility: hidden;
+	overflow: hidden;
 }
 
 a,

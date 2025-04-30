@@ -610,8 +610,7 @@ class DOCUMENT extends API {
 					'attributes' => [
 						'id' => '_bundlefilter',
 						'name' => $this->_lang->GET('assemble.compose.document_filter'),
-						'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value); return false;}",
-						'onblur' => "api.document('get', 'bundles', this.value); return false;",
+						'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value);}",
 						'value' => $this->_requestedID ? : ''
 					],
 					'datalist' => array_keys($bundles)
@@ -1999,8 +1998,7 @@ class DOCUMENT extends API {
 							'id' => '_documentfilter',
 							'value' => $this->_requestedID && $this->_requestedID !== 'null' ? $this->_requestedID : '',
 							'name' => $this->_lang->GET('assemble.compose.document_filter'),
-							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documents', this.value); return false;}",
-							'onblur' => "api.document('get', 'documents', this.value); return false;"
+							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documents', this.value)}",
 						],
 						'datalist' => array_values(array_unique($documentdatalist)),
 						'hint' => $this->_lang->GET('assemble.compose.document_filter_hint')
