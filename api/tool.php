@@ -510,7 +510,10 @@ class TOOL extends API {
 		foreach ($folders as $folder) {
 			$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
 		}
-		$files = array_merge($files, UTILITY::listFiles(UTILITY::directory('external_documents') ,'asc'));
+
+		$external = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
+		if ($external) $files = array_merge($files, array_column($files, 'path'));
+		
 		$options = ['...' => ['value' => 'null']];
 		foreach ($files as $path){
 			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => '../api/api.php/file/stream/' . substr($path, 3)];
