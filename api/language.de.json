@@ -918,6 +918,7 @@
 		"external_file": {
 			"available": "verfügbar",
 			"available_success": "Diese Datei ist wieder verfügbar",
+			"folder": "externer Dokumente",
 			"hint": "Bitte stelle Dateien mit nachvollziehbaren Namen zur Verfügung. Füge gegebenenfalls eine Versionsnummer an, sofern sinnvoll.",
 			"introduced": "Eingeführt am :introduced von :user",
 			"link": "Verknüpfe eine Datei von einer Netzwerkressource",

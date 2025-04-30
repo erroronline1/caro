@@ -487,7 +487,7 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => $this->_lang->GET('file.file_filter_label'),
-								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external_documents', this.value); return false;}",
+								'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', 'external_documents', this.value); return false;}",
 								'onblur' => "api.file('get', 'filter', 'external_documents', this.value); return false;",
 								'id' => 'filefilter'
 							]
@@ -547,6 +547,7 @@ class FILE extends API {
 										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
 										'data-filtered' => $file['path']
 									],
+									'numeration' => 'none'
 								]
 							);
 						}
@@ -851,12 +852,14 @@ class FILE extends API {
 					$matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 				}
 
+				// reassign displayed folder name
+				$folder = $folder === UTILITY::directory('external_documents') ? $this->_lang->GET('file.external_file.folder') : pathinfo($folder)['filename'];
 				// append folder
 				$result['render']['content'][]=
 				[
 					[
 						'type' => 'links',
-						'description' => $this->_lang->GET('file.file_list', [':folder' => pathinfo($folder)['filename']]),
+						'description' => $this->_lang->GET('file.file_list', [':folder' => $folder]),
 						'content' => $matches
 					]
 				];
