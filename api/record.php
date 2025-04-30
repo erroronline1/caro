@@ -456,7 +456,7 @@ class RECORD extends API {
 	 */
 	private function export($summarize = "full"){
 		if (!PERMISSION::permissionFor('recordsexport')) $this->response([], 401);
-		$content = $this->summarizeRecord($summarize, false, true);
+		$content = $this->summarizeRecord($summarize, true);
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
@@ -970,7 +970,7 @@ class RECORD extends API {
 				$return = ['render' => []];
 				$body = [];
 				// summarize content
-				$content = $this->summarizeRecord('full', PERMISSION::permissionFor('recordsretyping'));
+				$content = $this->summarizeRecord('full');
 				if (!$content) $this->response([], 404);
 				// display identifier
 				$body[] = [
@@ -1749,7 +1749,7 @@ class RECORD extends API {
 	 * @return array $summary
 	 */
 
-	private function summarizeRecord($type = 'full', $retype = false, $export = false){
+	private function summarizeRecord($type = 'full', $export = false){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
 			'values' => [
 				':identifier' => $this->_requestedID
@@ -1765,7 +1765,7 @@ class RECORD extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('menu.records.record_summary', [], true),
-			'date' => $this->_currentdate->format('Y-m-d H:i'),
+			'date' => UTILITY::dateFormat($this->_currentdate->format('Y-m-d H:i')),
 			'closed' => $data['closed'],
 			'record_type' => $data['record_type'],
 			'units' => $data['units'] ? explode(',', $data['units']) : [],
@@ -1889,7 +1889,7 @@ class RECORD extends API {
 
 						$content['content'][$name] = $value;
 						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys($payload));
-						foreach($dynamicMultiples as $matchkey => $submitted){
+						foreach($dynamicMultiples as $submitted){
 							$value = $payload[$submitted];
 							$content['content'][$submitted] = $value;
 						}
@@ -1904,14 +1904,14 @@ class RECORD extends API {
 				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $document
-					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('Y-m-d H:i')], true)] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
+					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
 					else $printablecontent[$document] = $content; // pseudodocument
 			}
 			$summary['content'] = $printablecontent;
 			if ($type === 'simplifieddocument'){
 				// convert summary contents to a simpler view. this allows document formatting suitable to hand over to patients/customers, e.g. a manual with the latest record entries
-				$summary['content'] = [' ' => $printablecontent[$useddocument['name'] . ' ' . $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('Y-m-d H:i')], true)]];
-				$summary['date'] = $this->_lang->GET('assemble.render.export_exported', [':version' => substr($useddocument['date'], 0, -3), ':date' => $this->_currentdate->format('Y-m-d H:i')], true);
+				$summary['content'] = [' ' => $printablecontent[$useddocument['name']]];
+				$summary['date'] = UTILITY::dateFormat($this->_currentdate->format('Y-m-d H:i'));
 				$summary['title'] = $useddocument['name'];
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}
