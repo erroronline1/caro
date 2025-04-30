@@ -1390,7 +1390,7 @@ export const api = {
 		let payload,
 			successFn = function (data) {
 				new Toast(data.response.msg, data.response.type);
-				if (data.response.type !== "error") api.purchase("get", request[1], data.response.id);
+				if (data.response.type !== "error" && data.response.id) api.purchase("get", request[1], data.response.id);
 				if (data.data) _serviceWorker.notif.consumables(data.data);
 			},
 			title = {
