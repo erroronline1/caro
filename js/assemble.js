@@ -245,6 +245,7 @@ export class Dialog {
 	 *  	if (Object.keys(response)) console.log('these are the results of the form:', response);
 	 * 	});
 	 * ```
+	 * true options must be assigned {value: true}. false can be assigned without other properties.
 	 */
 	constructor(options = {}) {
 		this.type = options.type || null;
