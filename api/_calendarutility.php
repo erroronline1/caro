@@ -637,12 +637,12 @@ class CALENDARUTILITY {
 					$row['affected_user_units'] = $row['affected_user_units'] ? : $row['organizational_unit'];
 					switch ($type){
 						case 'schedule':
-							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))
+							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]))
 								if (!$row['closed'])
 								$numbers++;
 							break;
 						case 'timesheet':
-							if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units']))
+							if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']]))
 							$numbers++;
 					}	
 				}
