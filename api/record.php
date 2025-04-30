@@ -382,14 +382,8 @@ class RECORD extends API {
 
 		// add export options or notifictaion
 		if (PERMISSION::permissionFor('documentexport') || $document['permitted_export']){
-			$return['render']['content'][] = [
-				[
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => $this->_lang->GET('assemble.render.required_asterisk')
-					]
-				],
-				[
+			if (isset($return['render']['form'])) {
+				$export = [
 					'type' => 'button',
 					'hint' => $this->_lang->GET('assemble.render.export_hint'),
 					'attributes' => [
@@ -398,7 +392,29 @@ class RECORD extends API {
 						'value' => $this->_lang->GET('assemble.render.export'),
 						'formaction' => "javascript:api.document('post', 'export')"
 					]
-				]
+				];
+			}
+			else {
+				$export = [
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('assemble.render.export'),
+						'onclick' => "const formdata = new FormData(); "
+							. "formdata.append('_document_id', " . $document['id'] . "); "
+							. "api.document('post', 'export', null, formdata);"
+						]
+				];
+			} 
+
+			$return['render']['content'][] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('assemble.render.required_asterisk')
+					]
+				],
+				$export
 			];
 		}
 		else {
