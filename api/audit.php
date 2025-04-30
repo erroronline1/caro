@@ -1275,9 +1275,13 @@ class AUDIT extends API {
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
 				if (preg_match('/^\.\.\//', $file['path'])){
-					$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
+					$file['url'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 				}
-				$links[$file['path'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])] = ['href' => $file['path'], 'target' => 'blank'];
+				$display = pathinfo($file['path'])['basename'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']]);
+				foreach(explode(',', $file['regulatory_context'] ? : '') as $context){
+					$display .= " | " . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
+				}
+				$links[$display] = ['href' => $file['url'], 'target' => 'blank'];
 			}
 			$externalcontent[0]['content'] = $links;
 		}
