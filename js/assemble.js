@@ -576,7 +576,7 @@ export class Toast {
 	 * duration is a bit fuzzy, idk why
 	 *
 	 */
-	constructor(message = "", type = "", duration = 8000, destination = "toast") {
+	constructor(message = "", type = "", duration = 5000, destination = "toast") {
 		this.message = message || undefined;
 		this.duration = duration;
 		this.stop = new Date().getTime() + duration;
@@ -1788,7 +1788,7 @@ export class Assemble {
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
-		if (type === "search") this.currentElement.hint = (this.currentElement.hint || "") + " ↵" + api._lang.GET('assemble.render.search_hint');
+		if (type === "search") this.currentElement.hint = (this.currentElement.hint || "") + " \u21B5" + api._lang.GET('assemble.render.search_hint');
 		hint = this.hint();
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
