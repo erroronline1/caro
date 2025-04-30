@@ -718,8 +718,8 @@ button {
 	color: var(--article);
 	font-weight: bold;
 	font-size: 1.15em;
-	word-break: break-all;
-
+	overflow-wrap: break-word;
+	
 	&.floatright {
 		float: right;
 		width: fit-content;
@@ -811,6 +811,7 @@ input:read-only {
 
 .inlinebutton {
 	width: fit-content;
+	max-width: 98%;
 	display: inline-block;
 	margin-bottom: 0;
 	margin: 0.25em 1em;
