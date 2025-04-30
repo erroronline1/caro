@@ -1264,6 +1264,8 @@
 		"import_error": "No data available to import for this identifier.",
 		"import_ok": "OK",
 		"import_success": "Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!",
+		"inquiry": "Case inquiry",
+		"inquiry_message_content": ":user has an inquiry for the case :identifier: :inquiry",
 		"list_touched": ":identifier, last edit on :date with :document",
 		"mark_as_closed": "Mark as closed in your role as",
 		"mark_as_closed_info": "The record will not show up in the overview, however it will still be found using the filter.",

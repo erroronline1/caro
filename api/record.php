@@ -143,18 +143,28 @@ class RECORD extends API {
 		if ($casestate = UTILITY::propertySet($this->_payload, 'casestate')) unset ($this->_payload->casestate);
 		if ($casestatestate = UTILITY::propertySet($this->_payload, 'casestatestate')) unset ($this->_payload->casestatestate);
 		if ($recipient = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.casestate_change_recipient'))) unset ($this->_payload->{$this->_lang->PROPERTY('record.casestate_change_recipient')});
-		$recipient = preg_split('/[,;]\s{0,}/', $recipient ? : '');
+		if ($inquiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.inquiry'))) unset ($this->_payload->{$this->_lang->PROPERTY('record.inquiry')});
+		$recipient = $recipient ? preg_split('/[,;]\s{0,}/', $recipient) : [];
 		// remainder of payload are checked units and maybe supervisor_only flag
 		$permission = [];
 		if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->PROPERTY('permissions.supervisor')]))) {
 			$permission = ['supervisor'];
 			unset($this->_payload->{$this->_lang->PROPERTY('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->PROPERTY('permissions.supervisor')])});
 		}
-		$message = $this->_lang->GET('record.casestate_change_message_content', [
-			':user' => $_SESSION['user']['name'],
-			':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
-			':casestate' => $this->_lang->GET($casestatestate === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $context . '.' . $casestate, [], true)], true)
-		], true);
+		if ($casestate)	{
+				$message = $this->_lang->GET('record.casestate_change_message_content', [
+				':user' => $_SESSION['user']['name'],
+				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
+				':casestate' => $this->_lang->GET($casestatestate === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $context . '.' . $casestate, [], true)], true)
+			], true);
+		}
+		elseif ($inquiry) {
+				$message = $this->_lang->GET('record.inquiry_message_content', [
+				':user' => $_SESSION['user']['name'],
+				':identifier' => '<a href="javascript:void(0);" onclick="api.record(\'get\', \'record\', \'' . $identifier . '\')"> ' . $identifier . '</a>',
+				':inquiry' => $inquiry
+			], true);
+		}
 
 		if ((array_values((array)$this->_payload) || $recipient) && $this->alertUserGroup(['permission' => $permission, 'unit' => array_values((array)$this->_payload), 'user' => $recipient], $message)) $this->response([
 			'response' => [
@@ -978,39 +988,40 @@ class RECORD extends API {
 				foreach($user as $key => $row) {
 					if ($row['id'] > 1 && $row['id'] !== $_SESSION['user']['id']) $datalist[] = $row['name'];
 				}
+				$notification_recipients = [
+					[
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET('record.casestate_change_recipient_unit')
+						],
+						'content' => $messagedialog
+					],
+					[
+						'type' => 'hidden',
+						'attributes' => [
+							'name' => 'identifier',
+							'value' => $this->_requestedID
+						]
+					],
+					[
+						'type' => 'hidden',
+						'attributes' => [
+							'name' => 'context',
+							'value' => $content['context']
+						]
+					],
+					[
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('record.casestate_change_recipient'),
+						],
+						'datalist' => $datalist
+					]
+				];
 				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', this.dataset.casestate, this.checked);"
 					. " new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.casestate_change_message') . "', render: JSON.parse('"
-					. UTILITY::json_encode([
-						[
-							'type' => 'checkbox',
-							'attributes' => [
-								'name' => $this->_lang->GET('record.casestate_change_recipient_unit')
-							],
-							'content' => $messagedialog
-						],
-						[
-							'type' => 'hidden',
-							'attributes' => [
-								'name' => 'identifier',
-								'value' => $this->_requestedID
-							]
-						],
-						[
-							'type' => 'hidden',
-							'attributes' => [
-								'name' => 'context',
-								'value' => $content['context']
-							]
-						],
-						[
-							'type' => 'text',
-							'attributes' => [
-								'name' => $this->_lang->GET('record.casestate_change_recipient'),
-							],
-							'datalist' => $datalist
-						]
-					])
-					. "'.replace()), options: JSON.parse('"
+ 					. UTILITY::json_encode($notification_recipients)
+					. "'), options: JSON.parse('"
 					. UTILITY::json_encode([
 						$this->_lang->GET('general.cancel_button') => false,
 						$this->_lang->GET('general.submit_button') => ['value' => true, 'class'=> 'reducedCTA']
@@ -1019,6 +1030,30 @@ class RECORD extends API {
 					], $content['case_state'])){
 					$body[] = [$casestate];
 				}
+				// append general request button
+				$body[count($body) - 1][] = [
+					'type' => 'button',
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('record.inquiry'),
+						'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.inquiry') . "', render: JSON.parse('"
+							. UTILITY::json_encode([
+								[
+									'type' => 'textarea',
+									'attributes' => [
+										'name' => $this->_lang->GET('record.inquiry')
+									]
+								],...$notification_recipients
+							])
+							. "'), options: JSON.parse('"
+							. UTILITY::json_encode([
+								$this->_lang->GET('general.cancel_button') => false,
+								$this->_lang->GET('general.submit_button') => ['value' => true, 'class'=> 'reducedCTA']
+							])
+							."')}).then((response) => { if (response) { api.record('post', 'casestatealert', null, _client.application.dialogToFormdata(response)); }});"
+					]
+				];
+
 				// define all considered document names
 				$includedDocuments = array_keys($content['content']);
 
