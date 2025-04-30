@@ -97,7 +97,7 @@ class DOCUMENT extends API {
 							$hidden = [];
 							foreach($fd as $row) {
 								if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-								if (isset($component['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
+								if (isset($approve['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($approve['name'], explode(',', $row['content']))) {
 									$dependeddocuments[] = $row['name'];
 									$documents[] = '<a href="javascript:void(0);" onclick="api.record(\'get\', \'document\', \'' . $row['name'] . '\')">' . $row['name'] . '</a>';
 								}
@@ -1234,7 +1234,7 @@ class DOCUMENT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $document['name'],
-			'date' => $this->_lang->GET('assemble.render.export_exported', [':version' => substr($document['date'], 0, -3), ':date' => $this->_currentdate->format('y-m-d H:i')], true)
+			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => UTILITY::dateFormat($this->_currentdate->format('y-m-d H:i'))], true)
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){
@@ -1364,8 +1364,18 @@ class DOCUMENT extends API {
 		foreach(explode(',', $document['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent, $maxDocumentTimestamp);
 			if (!$component) continue;
+			// add component version
+			$summary['content'] = array_merge($summary['content'], [
+				$component['name'] . $component['date'] => [
+					'type' => 'version',
+					'value' => $this->_lang->GET('assemble.render.export_component', [
+						':component' => $component['name'],
+						':version' => $component['date']
+					], true)
+				]
+			]);
+			// add component content prefilled by payload
 			$component['content'] = json_decode($component['content'], true);
-
 			$printablecontent = printable($component['content']['content'], $this->_payload, $this->_lang, $enumerate);
 			$summary['content'] = array_merge($summary['content'], $printablecontent['content']);
 			$summary['images'] = array_merge($summary['images'], $printablecontent['images']);

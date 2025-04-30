@@ -139,7 +139,6 @@ class PDF{
 		foreach($content['content'] as $document => $entries){
 			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] + 2);
 			$this->_pdf->MultiCell(145, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-			$keyY = $this->_pdf->GetY();
 			foreach($entries as $key => $value){
 				// make sure to write on next page if multiline textfield would reach into footer
 				if ($value['type'] === "multiline" && !$value['value']
@@ -147,6 +146,14 @@ class PDF{
 						$this->_pdf->AddPage();
 						$this->_pdf->SetY($this->_setup['margintop']);
 				}
+
+				// version of components to be displayed smallish and ignoring the name column (component name for unique key)
+				if ($value['type'] === 'version'){
+					$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] - 4);
+					$this->_pdf->MultiCell(140, 4, $value['value'], 0, 'R', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
+					continue;
+				}
+
 				// name column
 				$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 100, 'T', false);

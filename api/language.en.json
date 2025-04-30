@@ -441,13 +441,14 @@
 			"error_no_approved_components": "It seems all contents of this document have been deactivated. Please inform any of :permission to clean things up!",
 			"export": "Export document as PDF",
 			"export_by": "Assessed / filled in by, on",
+			"export_component": "Component :component V:version",
+			"export_document": "V:version, exported on :date",
 			"export_element": {
 				"calendarbutton": "Do not forget to schedule further activities",
 				"documentbutton": "Relevant document",
 				"file": "Providing files is recommended",
 				"photo": "Providing photos is recommended"
 			},
-			"export_exported": "V:version, exported on :date",
 			"export_hint": "File and photo inputs are replaced by a hint.",
 			"export_identifier": "Place label here",
 			"export_permission": "If you need a document printed out ask someone with one of the following permissions: :permissions",

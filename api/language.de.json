@@ -441,13 +441,14 @@
 			"error_no_approved_components": "Es scheint als wären alle Inhalte für dieses Dokument deaktiviert worden. Bitte informiere einen von :permission hier aufzuräumen!",
 			"export": "Exportiere das Dokument als PDF",
 			"export_by": "Beurteilt / ausgefüllt von, am",
+			"export_component": "Komponente :component V:version",
+			"export_document": "V:version, exportiert am :date",
 			"export_element": {
 				"calendarbutton": "Vergiss nicht weitere Aktivitäten zu planen",
 				"documentbutton": "Relevantes Dokument",
 				"file": "Es wird empfohlen Dateien bereitzustellen",
 				"photo": "Es wird empfohlen Fotos beizufügen"
 			},
-			"export_exported": "V:version, exportiert am :date",
 			"export_hint": "Datei- und Fotouploads werden durch Hinweise ersetzt.",
 			"export_identifier": "Aufkleber hier platzieren",
 			"export_permission": "Falls du ein gedrucktes Dokument benötigst, frage jemanden mit einer der folgenden Berechtigungen: :permissions",
