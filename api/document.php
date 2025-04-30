@@ -2090,7 +2090,10 @@ class DOCUMENT extends API {
 		foreach ($elements as $element){
 			if (PERMISSION::fullyapproved('documentapproval', $element['approval'])
 				&& (!$maxtimestamp || $element['date']<= $maxtimestamp)
-			) return $element;
+			) {
+				if ($element['hidden']) return false;
+				return $element;
+			}
 		}
 		return false;
 	}
