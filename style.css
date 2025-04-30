@@ -718,6 +718,7 @@ button {
 	color: var(--article);
 	font-weight: bold;
 	font-size: 1.15em;
+	word-break: break-all;
 
 	&.floatright {
 		float: right;
