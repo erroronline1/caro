@@ -198,22 +198,27 @@ class MEASURE extends API {
 					}
 					else { // vote buttons
 						$measure['votes'] = json_decode($measure['votes'] ? : '', true);
+						$approval = strval($measure['votes'] ? array_sum(array_filter(array_values($measure['votes']), fn($v) => $v > 0)) : 0);
+						$rejection = strval($measure['votes'] ? abs(array_sum(array_filter(array_values($measure['votes']), fn($v) => $v < 0))) : 0);
+						$uservote = isset($measure['votes'][$_SESSION['user']['id']]) ? $measure['votes'][$_SESSION['user']['id']] : 0;
 						$measurecontent[] = [
 							'type' => 'button',
 							'attributes' => [
-								'value' => strval($measure['votes'] ? array_sum(array_filter(array_values($measure['votes']), fn($v) => $v > 0)) : 0),
+								'value' => $approval,
 								'data-type' => 'upvote',
-								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) > 0 ? ' voted': ''),
-								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));"
+								'class' => 'inlinebutton' . ($uservote > 0 ? ' voted': ''),
+								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", 1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
+								'title' => $this->_lang->GET('measure.thumbs_up') . ($uservote > 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $approval - $uservote])
 							],
 						];
 						$measurecontent[] = [
 							'type' => 'button',
 							'attributes' => [
-								'value' => strval($measure['votes'] ? abs(array_sum(array_filter(array_values($measure['votes']), fn($v) => $v < 0))) : 0),
+								'value' => $rejection,
 								'data-type' => 'downvote',
-								'class' => 'inlinebutton' . (isset($measure['votes'][$_SESSION['user']['id']]) && intval($measure['votes'][$_SESSION['user']['id']]) < 0 ? ' voted': ''),
-								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));"
+								'class' => 'inlinebutton' . ($uservote < 0 ? ' voted': ''),
+								'onclick' => "api.measure('put', 'vote', " . $measure['id'] . ", -1); this.classList.toggle('voted'); this.firstChild.nodeValue = String(parseInt(this.firstChild.nodeValue) + (this.classList.contains('voted') ? 1 : -1));",
+								'title' => $this->_lang->GET('measure.thumbs_down') . ($uservote < 0 ? ' ' . $this->_lang->GET('measure.thumbs_you') : '') . ' ' . $this->_lang->GET('measure.thumbs_others', [':num' => $rejection + $uservote])
 							],
 						];
 						$measurecontent[] = [
@@ -288,6 +293,16 @@ class MEASURE extends API {
 				$measure = $measure ? $measure[0] : null;
 				if (!$measure) $this->response([], 404);
 				$measure['votes'] = json_decode($measure['votes'] ? : '', true);
+				
+				// sanitize input or exit error
+				if (intval($this->_requestedVote) > 0) $this->_requestedVote = 1; 
+				if (intval($this->_requestedVote) < 0) $this->_requestedVote = -1;
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('measure.vote_error'),
+						'type' => 'error'
+					]]);
+
 				if (isset($measure['votes'][$_SESSION['user']['id']]) && $measure['votes'][$_SESSION['user']['id']] === $this->_requestedVote) unset($measure['votes'][$_SESSION['user']['id']]); // revoke vote
 				else $measure['votes'][$_SESSION['user']['id']] = $this->_requestedVote; // insert or update vote
 

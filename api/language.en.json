@@ -1047,6 +1047,10 @@
 		"suggestion_saved": "Suggestion saved",
 		"select": "Select",
 		"suggestion": "Suggestion",
+		"thumbs_down": "Rejection by",
+		"thumbs_others": ":num other users",
+		"thumbs_up": "Approval by",
+		"thumbs_you": "you and",
 		"vote_confirm": "Thank you for your opinion!",
 		"vote_error": "Opinion could not be saved, please try again"
 	},
