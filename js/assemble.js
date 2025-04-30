@@ -130,7 +130,7 @@ export class Masonry {
 			const startTime = Date.now();
 			// retrieve nodes
 			let container = document.querySelector("main>form");
-			if (!container || !container.firstChild) container = document.querySelector("main>div"); // e.g. in document composer, where an empty form is preplaced before visible content
+			if (!container || !container.firstChild) container = document.querySelector("main>div:first-child"); // e.g. in document composer, where an empty form is preplaced before visible content
 			let children = [...container.childNodes];
 
 			// get number of overall columns as per stylesheet breakpoints
