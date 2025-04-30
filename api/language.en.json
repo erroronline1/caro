@@ -948,7 +948,8 @@
 		},
 		"no_files": "files",
 		"sharepoint_file_lifespan": "available for another :hours hours",
-		"sharepoint_upload_header": "Sharing is caring"
+		"sharepoint_lifespan_hint": "Files are available for :hours hours and will be deleted afterwards.",
+		"sharepoint_upload_header": "Share files"
 	},
 	"menu": {
 		"application": {

@@ -1004,7 +1004,8 @@ class FILE extends API {
 							'name' => $this->_lang->GET('file.sharepoint_upload_header'),
 							'multiple' => true,
 							'required' => true
-						]
+						],
+						'hint' => $this->_lang->GET('file.sharepoint_lifespan_hint', [':hours' => CONFIG['lifespan']['sharepoint']])
 					]
 				];
 				$this->response($result);

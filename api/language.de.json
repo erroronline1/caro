@@ -948,6 +948,7 @@
 		},
 		"no_files": "Dateien",
 		"sharepoint_file_lifespan": "noch für :hours Stunden verfügbar",
+		"sharepoint_lifespan_hint": "Dateien sind für :hours Stunden verfügbar und werden dann automatisch gelöscht.",
 		"sharepoint_upload_header": "Teile Dateien"
 	},
 	"menu": {
