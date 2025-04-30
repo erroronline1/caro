@@ -1782,12 +1782,14 @@ export class Assemble {
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
 			span = document.createElement("span"),
-			hint = this.hint(),
+			hint,
 			imagealigned = false,
 			datalist;
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
+		if (type === "search") this.currentElement.hint = (this.currentElement.hint || "") + " ↵" + api._lang.GET('assemble.render.search_hint');
+		hint = this.hint();
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
 

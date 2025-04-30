@@ -462,6 +462,7 @@
 			"photo_rechoose": "oder noch einmal ein neues Foto wählen...",
 			"required_asterisk": "Felder mit * sind erforderlich",
 			"reset": "Zurücksetzen",
+			"search_hint": "-Taste um abzusenden",
 			"scan_button": "Einen Code für :field scannen",
 			"scan_multiple": "Nach dem Scan oder einer Eingabe erscheint ein weiteres Feld.",
 			"select_multiple": "Nach der Auswahl erscheint eine weitere Liste.",
