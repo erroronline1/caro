@@ -1430,7 +1430,7 @@ export const api = {
 							default: // product management or order
 								api.preventDataloss.monitor = false;
 								successFn = function (data) {
-									let search = document.querySelector("main form").firstElementChild;
+									let search = document.querySelector("main form, main div").firstElementChild;
 									if (data.render && data.render.content) {
 										const render = new Assemble(data.render);
 										search.replaceWith(...Array.from(render.initializeSection(null, null, "iCanHasNodes")));
