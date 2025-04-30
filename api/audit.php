@@ -1279,7 +1279,7 @@ class AUDIT extends API {
 				}
 				$display = pathinfo($file['path'])['basename'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']]);
 				foreach(explode(',', $file['regulatory_context'] ? : '') as $context){
-					$display .= " | " . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
+					if ($context) $display .= " | " . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
 				}
 				$links[$display] = ['href' => $file['url'], 'target' => 'blank'];
 			}
