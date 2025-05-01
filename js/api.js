@@ -766,6 +766,7 @@ export const api = {
 			case "get":
 				switch (request[1]) {
 					case "audit":
+					case "managementreview":
 						successFn = function (data) {
 							if (data.render) {
 								api.update_header(title[request[1]]);
@@ -1001,6 +1002,7 @@ export const api = {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
 						render.processAfterInsertion();
+						api.preventDataloss.start();
 					}
 					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 				};
@@ -1782,6 +1784,7 @@ export const api = {
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
 						render.processAfterInsertion();
+						api.preventDataloss.start();
 					}
 					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 				};

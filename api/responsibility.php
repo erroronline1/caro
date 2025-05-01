@@ -417,14 +417,16 @@ class RESPONSIBILITY extends API {
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.task'),
 							'value' => $responsibility['responsibility'] ? : '',
-							'required' => true
-						]
+							'required' => true,
+							'data-loss' => 'prevent'
+							]
 					], [
 						'type' => 'textarea',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.context'),
-							'value' => $responsibility['description'] ? : ''
-						]
+							'value' => $responsibility['description'] ? : '',
+							'data-loss' => 'prevent'
+							]
 					], [
 						'type' => 'checkbox',
 						'attributes' => [
@@ -488,6 +490,7 @@ class RESPONSIBILITY extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('responsibility.assigned'),
 								'value' => $user['name'],
+								'data-loss' => 'prevent'
 							],
 							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => UTILITY::dateFormat($property)]) : null
 						];
@@ -498,7 +501,8 @@ class RESPONSIBILITY extends API {
 					'type' => 'text',
 					'attributes' => [
 						'name' => $this->_lang->GET('responsibility.assigned'),
-						'multiple' => true
+						'multiple' => true,
+						'data-loss' => 'prevent'
 					],
 					'datalist' => $user_datalist
 				];
@@ -523,6 +527,7 @@ class RESPONSIBILITY extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('responsibility.proxy'),
 								'value' => $user['name'],
+								'data-loss' => 'prevent'
 							],
 							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => $property]) : null
 						];
@@ -533,7 +538,8 @@ class RESPONSIBILITY extends API {
 					'type' => 'text',
 					'attributes' => [
 						'name' => $this->_lang->GET('responsibility.proxy'),
-						'multiple' => true
+						'multiple' => true,
+						'data-loss' => 'prevent'
 					],
 					'datalist' => $user_datalist
 				];

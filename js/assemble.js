@@ -131,8 +131,7 @@ export class Masonry {
 			// retrieve nodes
 			let container = document.querySelector("main>form");
 			if (!container || !container.firstChild || ["article"].includes(container.firstChild.localName)) container = document.querySelector("main>div:first-of-type"); // e.g. in document composer, where an initial empty form is preplaced before visible content and later filled with shadow inputs
-			console.log(container, container.children);
-			resolve();
+			if (!container || !container.firstChild || ["article"].includes(container.firstChild.localName)) {resolve();return}
 			let children = [...container.childNodes];
 
 			// get number of overall columns as per stylesheet breakpoints
@@ -157,6 +156,7 @@ export class Masonry {
 			if (columns === 1) {
 				container.style.height = null;
 				resolve();
+				return;
 			}
 
 			// get gap size

@@ -284,7 +284,7 @@ class RISK extends API {
 								'numeration' => 'prevent',
 								'attributes' => [
 									'name' => $process,
-									'onchange' => "if (this.value !== '...') api.risk('get', 'risk', this.value)"
+									'onchange' => "if (this.value && this.value !== '...') api.risk('get', 'risk', this.value)"
 								],
 								'content' => $dbrisks
 							];
@@ -323,6 +323,7 @@ class RISK extends API {
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.process'),
 										'value' => $risk['process'] ? : '',
+										'data-loss' => 'prevent'
 									],
 									'datalist' => isset($datalist['process']) ? array_values($datalist['process']) : []
 								], [
@@ -330,6 +331,7 @@ class RISK extends API {
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.type.characteristic'),
 										'value' => $risk['measure'] ? : '',
+										'data-loss' => 'prevent'
 									],
 									'datalist' => isset($datalist['measure']) ? array_values($datalist['measure']) : []
 								], [
@@ -347,12 +349,14 @@ class RISK extends API {
 										'name' => $this->_lang->GET('risk.cause'),
 										'value' => $risk['cause'] ? : '',
 										'rows' => 4,
+										'data-loss' => 'prevent'
 									],
 									'autocomplete' => isset($datalist['cause']) ? array_values($datalist['cause']) : null
 								], [
 									'type' => 'checkbox2text',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.risk_related'),
+										'data-loss' => 'prevent'
 									],
 									'content' => $risks
 								]
@@ -496,12 +500,14 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.process'),
 									'value' => $risk['process'] ? : '',
+									'data-loss' => 'prevent'
 								],
 								'datalist' => isset($datalist['process']) ? array_values($datalist['process']) : []
 							], [
 								'type' => 'checkbox2text',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.risk'),
+									'data-loss' => 'prevent'
 								],
 								'content' => $risks
 							], [
@@ -518,7 +524,8 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.cause'),
 									'value' => $risk['cause'] ? : '',
-									'rows' => 4
+									'rows' => 4,
+									'data-loss' => 'prevent'
 								],
 								'autocomplete' => isset($datalist['cause']) ? array_values($datalist['cause']) : null
 							], [
@@ -529,6 +536,7 @@ class RISK extends API {
 									'name' => $this->_lang->GET('risk.effect'),
 									'value' => $risk['effect'] ? : '',
 									'rows' => 4,
+									'data-loss' => 'prevent'
 								],
 								'autocomplete' => isset($datalist['effect']) ? array_values($datalist['effect']) : null
 							], [
@@ -556,7 +564,8 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.measure'),
 									'value' => $risk['measure'] ? : '',
-									'rows' => 4
+									'rows' => 4,
+									'data-loss' => 'prevent'
 								],
 								'autocomplete' => isset($datalist['measure']) ? array_values($datalist['measure']) : null
 							], [
@@ -584,7 +593,8 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.risk_benefit'),
 									'value' => $risk['risk_benefit'] ? : '',
-									'rows' => 4
+									'rows' => 4,
+									'data-loss' => 'prevent'
 								],
 								'autocomplete' => isset($datalist['risk_benefit']) ? array_values($datalist['risk_benefit']) : null
 							], [
@@ -594,13 +604,15 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.measure_remainder'),
 									'value' => $risk['measure_remainder'] ? : '',
-									'rows' => 4
+									'rows' => 4,
+									'data-loss' => 'prevent'
 								],
 								'autocomplete' => isset($datalist['measure_remainder']) ? array_values($datalist['measure_remainder']) : null
 							], [
 								'type' => 'checkbox2text',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.proof'),
+									'data-loss' => 'prevent'
 								],
 								'content' => $insertdocument 
 							]

@@ -1796,7 +1796,7 @@ class AUDIT extends API {
 							'attributes' => [
 								'name' => $issue,
 								'value' => isset($managementreview['content'][$key]) ? $managementreview['content'][$key] : '',
-								'dataloss' => 'prevent'
+								'data-loss' => 'prevent'
 							],
 							'autocomplete' => isset($datalist[$key]) ? array_values($datalist[$key]) : null
 						]
