@@ -130,8 +130,12 @@ export class Masonry {
 			const startTime = Date.now();
 			// retrieve nodes
 			let container = document.querySelector("main>form");
-			if (!container || !container.firstChild || ["article"].includes(container.firstChild.localName)) container = document.querySelector("main>div:first-of-type"); // e.g. in document composer, where an initial empty form is preplaced before visible content and later filled with shadow inputs
-			if (!container || !container.firstChild || ["article"].includes(container.firstChild.localName)) {resolve();return}
+			if (!container || !container.firstChild || !["article"].includes(container.firstChild.localName)) container = document.querySelector("main>div:first-of-type"); // e.g. in document composer, where an initial empty form is preplaced before visible content and later filled with shadow inputs
+			if (!container || !container.firstChild || !["article"].includes(container.firstChild.localName)) {
+				container.style.height = null;
+				resolve();
+				return;
+			}
 			let children = [...container.childNodes];
 
 			// get number of overall columns as per stylesheet breakpoints
@@ -1790,7 +1794,7 @@ export class Assemble {
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
-		if (type === "search") this.currentElement.hint = (this.currentElement.hint || "") + " \u21B5" + api._lang.GET('assemble.render.search_hint');
+		if (type === "search") this.currentElement.hint = (this.currentElement.hint || "") + " \u21B5" + api._lang.GET("assemble.render.search_hint");
 		hint = this.hint();
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
