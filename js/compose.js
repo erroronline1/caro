@@ -119,9 +119,9 @@ export class Composer {
 			if (!["label", "header", "input"].includes(sibling.localName)) {
 				continue;
 			}
-			if (sibling.localName === "header") {
+			if (sibling.localName === "header" && element.type === undefined) {
 				// e.g. calendarbutton, hr
-				if (element.type === undefined) element["type"] = sibling.dataset.type;
+				element["type"] = sibling.dataset.type;
 				if (buttonDefaultValues[sibling.dataset.type]) element["attributes"] = { value: buttonDefaultValues[sibling.dataset.type] };
 				else delete element.attributes;
 				continue;
@@ -228,6 +228,8 @@ export class Composer {
 			if (siblingName === api._lang.GET("assemble.compose.component.required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.autocomplete") && sibling.checked && !("autocomplete" in element)) element.autocomplete = true;
+
+			// documentbutton value should have been assigned in previous loops
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
 				element.attributes.onclick = "api.record('get','displayonly', '" + element.attributes.value + "')";
 				element.attributes.value = api._lang.GET("assemble.compose.component.link_document_display_button", { ":document": element.attributes.value });
