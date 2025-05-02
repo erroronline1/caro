@@ -386,6 +386,13 @@ export class Dialog {
 			}).then((response) => {
 				let result;
 
+				if (this.stlviewer.viewer) {
+					// release ressources
+					this.stlviewer.canvas.remove();
+					this.stlviewer = {};
+					return;
+				}
+
 				/**
 				 * recursive value getter for nested rendered form
 				 * @param {node} parent
