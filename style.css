@@ -469,10 +469,10 @@ html[data-useragent*="safari"] body {
 
 .visually-hidden {
 	/* visually hide screenreader-only components*/
-	width:0;
-	height:0;
-	padding:0;
-	margin:0;
+	width: 0;
+	height: 0;
+	padding: 0;
+	margin: 0;
 	overflow: hidden;
 }
 
@@ -719,7 +719,7 @@ button {
 	font-weight: bold;
 	font-size: 1.15em;
 	overflow-wrap: break-word;
-	
+
 	&.floatright {
 		float: right;
 		width: fit-content;
@@ -1233,56 +1233,6 @@ section > div > hr {
 hope default value is ridiculously high enough in the medium future.
 min width will be reduced to a reasonable size by api.js in case user settings activate masonry style */
 
-/*main {
-	> div,
-	> form {
-		display: grid;
-		align-items: flex-start;
-		gap: 2em;
-		grid-template-columns: repeat(1, calc(100% - 1.5rem));
-		> article {
-			padding: 1em;
-			border: 1px solid var(--3d-border);
-			border-radius: 0.2em;
-			background-color: var(--article);
-			box-shadow: var(--shadow);
-			transition: ease 0.2s;
-		}
-	}
-	> div[draggable] {
-		display: block;
-		max-width: 48.5rem;
-		margin: auto;
-		transform: translateX(-0.75em);
-	}
-}
-
-@media only screen and (min-width: 2000rem) {
-	/* two colum breakpoint, adjusting see above * /
-	main {
-		max-width: 105rem;
-		> div:not([draggable]),
-		> form {
-			grid-template-columns: repeat(2, calc(50% - 1.5rem));
-		}
-	}
-}
-
-@media only screen and (min-width: 3000rem) {
-	/* three colum breakpoint, adjusting see above * /
-	main {
-		max-width: 155rem;
-		> div:not([draggable]),
-		> form {
-			grid-template-columns: repeat(3, calc(33% - 1.5rem));
-		}
-		> div[draggable] {
-			max-width: 49.5rem;
-			transform: translateX(-1em);
-		}
-	}
-}*/
-
 main {
 	margin: 2rem auto 0;
 	width: 100%;
@@ -1290,20 +1240,21 @@ main {
 	margin-bottom: 6rem;
 	> div,
 	> form {
-		--gap:1em;
+		--gap: 1em;
 		display: flex;
 		flex-flow: column wrap;
 		gap: var(--gap);
-		>article{
-			width:100%;
+		> article {
+			width: 100%;
 			padding: 1em;
 			border: 1px solid var(--3d-border);
 			border-radius: 0.2em;
 			background-color: var(--article);
 			box-shadow: var(--shadow);
 			transition: ease 0.2s;
-		}>button {
-			width:100%;
+		}
+		> button {
+			width: 100%;
 			padding: 1em;
 			box-shadow: var(--shadow);
 			transition: ease 0.2s;
@@ -1311,9 +1262,8 @@ main {
 	}
 	> div[draggable] {
 		display: block;
-		max-width: 48.5rem;
+		max-width: 50rem;
 		margin: auto;
-		transform: translateX(-0.75em);
 	}
 }
 
@@ -1323,8 +1273,9 @@ main {
 		max-width: 105rem;
 		> div:not([draggable]),
 		> form {
-			>article,>button{
-				width:calc(50% - var(--gap))
+			> article,
+			> button {
+				width: calc(50% - var(--gap));
 			}
 			:nth-child(2n + 1) {
 				order: 1;
@@ -1351,8 +1302,9 @@ main {
 		max-width: 155rem;
 		> div:not([draggable]),
 		> form {
-			>article,>button{
-				width:calc(100% / 3 - var(--gap))
+			> article,
+			> button {
+				width: calc(100% / 3 - var(--gap));
 			}
 			:nth-child(3n + 1) {
 				order: 1;
@@ -1372,6 +1324,9 @@ main {
 			flex-basis: 100%;
 			width: 0;
 			order: 2;
+		}
+		> div[draggable] {
+			transform: translateX(0.5em);
 		}
 	}
 }
