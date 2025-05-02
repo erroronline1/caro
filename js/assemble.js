@@ -2037,7 +2037,7 @@ export class Assemble {
 			icon.alt = api._lang.GET("assemble.render.aria.image", { ":image": this.currentElement.content.user });
 			if (onclick_forward) {
 				icon.onclick = new Function(onclick_forward);
-				icon.onkeydown = new Function("if (event.key==='Enter') " + onclick_forward);
+				icon.onkeydown = new Function("if (event.key === 'Enter') " + onclick_forward);
 				icon.title = api._lang.GET("message.forward", { ":user": this.currentElement.content.user });
 				icon.role = "link";
 				icon.tabIndex = 0;
@@ -2100,7 +2100,7 @@ export class Assemble {
 			if ("onclick" in this.currentElement.attributes) {
 				message.role = "link";
 				message.title = api._lang.GET("message.open", { ":user": this.currentElement.content.user });
-				message.onkeydown = new Function("if (event.key==='Enter') " + this.currentElement.attributes.onclick);
+				message.onkeydown = new Function("if (event.key === 'Enter') " + this.currentElement.attributes.onclick);
 				message.tabIndex = 0;
 			}
 		}
@@ -2316,7 +2316,7 @@ export class Assemble {
 							type: "search",
 							attributes: {
 								name: api._lang.GET("consumables.product.search"),
-								onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'productsearch', 'null', this.value, 'productselection');}",
+								onkeypress: "if (event.key === 'Enter') {event.preventDefault(); api.purchase('get', 'productsearch', 'null', this.value, 'productselection');}",
 								id: "productsearch",
 							},
 						},
