@@ -136,7 +136,7 @@ class API {
 						$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
 						$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
 						$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
-						$_SESSION['user']['image'] = './' . $user['image'];
+						$_SESSION['user']['image'] = 'https://localhost/caro/api/api.php/file/stream/' . $user['image'];
 					}
 					//else $this->response([strlen($payload), $payload], 401);
 					else $this->response([], 401);
@@ -266,7 +266,7 @@ class API {
 					$_SESSION['user']['permissions'] = explode(',', $user['permissions']);
 					$_SESSION['user']['units'] = explode(',', $user['units']);
 					$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-					$_SESSION['user']['image'] = './' . $user['image'];
+					$_SESSION['user']['image'] = 'https://localhost/caro/api/api.php/file/stream/' . $user['image'];
 
 					// renew session timeout except for defined requests
 					if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
