@@ -1031,7 +1031,7 @@ export const _client = {
 										":vendor": "element.vendor",
 										":info": "element.information" || "",
 										":commission": "element.commission",
-										":aut_idem": "element.aut_idem"
+										":aut_idem": "element.aut_idem",
 									})
 									.replace("\\n", "\n"),
 								buttons
@@ -1453,6 +1453,28 @@ export const _client = {
 		 */
 		initStlViewer: function (file) {
 			if (file === "../null") return;
+			const download = {};
+			download[file] = { href: file, target: "_blank" };
+			new _client.Dialog({
+				type: "input",
+				header: "stl",
+				render: [
+					[
+						{
+							type: "stlviewer",
+						},
+						{
+							type: "links",
+							attributes: {
+								name: "download",
+							},
+							content: 
+								download
+							,
+						},
+					],
+				],
+			});
 			const canvas = document.getElementById("stlviewer_canvas");
 			canvas.title = api._lang.GET("assemble.render.aria.stl", { ":file": file });
 			canvas.replaceChildren();

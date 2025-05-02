@@ -496,46 +496,5 @@ class TOOL extends API {
 		]];
 		$this->response($result);
 	}
-	
-	/**
-	 *       _   _     _
-	 *   ___| |_| |_ _|_|___ _ _ _ ___ ___
-	 *  |_ -|  _| | | | | -_| | | | -_|  _|
-	 *  |___|_| |_|\_/|_|___|_____|___|_|
-	 *
-	 */
-	public function stlviewer(){
-		$files = UTILITY::listFiles(UTILITY::directory('sharepoint'),'asc');
-		$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-		foreach ($folders as $folder) {
-			$files = array_merge($files, UTILITY::listFiles($folder ,'asc'));
-		}
-
-		$external = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
-		if ($external) $files = array_merge($files, array_column($files, 'path'));
-		
-		$options = ['...' => ['value' => 'null']];
-		foreach ($files as $path){
-			if (pathinfo($path)['extension'] === 'stl') $options[$path] = ['value' => '../api/api.php/file/stream/' . substr($path, 3)];
-		}
-		ksort($options);
-		if (count($options) > 1) {
-			$result['render'] = ['content' => [
-				[
-					[
-						'type' => 'select',
-						'attributes' => [
-							'name' => $this->_lang->GET('tool.stl_viewer.select'),
-							'onchange' => "_client.tool.initStlViewer('../' + this.value)"
-						],
-						'content' => $options
-					], [
-						'type' => 'stlviewer',
-					]
-				]
-			]];
-		} else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
-		$this->response($result);
-	}
 }
 ?>

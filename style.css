@@ -184,7 +184,7 @@ dialog {
 	opacity: 0;
 	transition: ease 0.3s;
 	pointer-events: none;
-	width: 40rem;
+	width: 50rem;
 
 	&#toast,
 	&#sessionwarning {
@@ -919,8 +919,8 @@ canvas {
 }
 
 .stlviewer {
-	height: 45em;
-	margin-bottom: 2em;
+	height: 35em;
+	overflow:hidden;
 }
 
 .contextmenu {
@@ -1726,6 +1726,12 @@ button[data-type="search"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/signature.svg");
 	mask-image: url("./media/signature.svg");
+}
+
+[data-type="stl"]::before {
+	background-color: var(--cta_darker);
+	-webkit-mask-image: url("./media/cube.svg");
+	mask-image: url("./media/cube.svg");
 }
 
 [data-type="submitbutton"]::before {

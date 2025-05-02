@@ -80,7 +80,10 @@ class FILE extends API {
 			// construct file links to external files per bundle
 			foreach (json_decode($row['content'], true) as $file => $path){
 				if (stristr($path, CONFIG['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
-				$list[substr_replace($file, '.', strrpos($file, '_'), 1)]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'];
+				$file = substr_replace($file, '.', strrpos($file, '_'), 1);
+				
+				if (str_ends_with($file, '.stl')) $matches[$file] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file . "', render:{name: '" . $file . "', url: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'stl'];
+				else $list[$file]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'];
 			}
 			// append bundle
 			$result['render']['content'][] = [
@@ -508,14 +511,16 @@ class FILE extends API {
 								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 							}
 
+							$link = [];
+							if (str_ends_with($file['name'], '.stl')) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+							else $link[$file['name']]= ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+			
 							// append file, link and options
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
 									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => UTILITY::dateFormat($file['retired'])]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
-									'content' => [
-										$file['name'] => ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => $file['path']]
-									],
+									'content' => $link,
 									'data-filtered' => $file['path']
 								],
 								[
@@ -719,14 +724,16 @@ class FILE extends API {
 								];
 								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(CONFIG['application']['timezone']));
 
+								$link = [];
+								if (str_ends_with($file['name'], '.stl')) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+								else $link[$file['name']]= ['href' => $file['linnk'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+	
 								// append file options
 								array_push($result['render']['content'][1],
 									[
 										'type' => 'links',
 										'description' => UTILITY::dateFormat($filedate->format('Y-m-d H:i')),
-										'content' => [
-											$file['path'] => ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => $file['path']]
-										],
+										'content' => $link,
 										'data-filtered' => $file['path']
 									],
 									[
@@ -844,8 +851,9 @@ class FILE extends API {
 					// distinguish between uploaded files and linked ressources
 					if (preg_match('/^\.\.\//', $file))	$file = ['name' => pathinfo($file)['basename'], 'path' => './api/api.php/file/stream/' . substr($file, 1)];
 					else $file = ['name' => $file, 'path' => $file];
-					
-					$matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
+
+					if (str_ends_with($file['name'], '.stl')) $matches[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+					else $matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 				}
 
 				// reassign displayed folder name
@@ -966,7 +974,9 @@ class FILE extends API {
 						// add remaining files
 						else {
 							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
-							$display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
+
+							if (str_ends_with($file['name'], '.stl')) $display[$name] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . substr($file['path'], 1) . "'}})", 'data-filtered' => substr($file['path'], 1), 'data-type' => 'stl'];
+							else $display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
 						}
 					}
 				}

@@ -95,7 +95,7 @@ Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Be
 * Textempfehlungen
     * Standard- und anpassbare [Textvorschläge](#textvorschläge) können definiert werden um eine durchgängige Sprachregelung zu unterstützen.
 * Dateiverteilung
-    * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien und einen [STL-Betrachter](#werkzeuge) um vereinfacht Informationen austauschen zu können.
+    * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien mit integriertem STL-Betrachter um vereinfacht Informationen austauschen zu können.
 * CSV-Filterung
     * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
 
@@ -676,7 +676,7 @@ Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exporti
 
 Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
 
-Beide Speicherorte sowie externe Dokumente bestücken den [STL-Betrachter](#werkzeuge).
+STL-Dateien haben eine automatische Vorschau.
 
 Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird jedoch empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionskonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
@@ -900,7 +900,7 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lös
 ## Werkzeuge
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20de.png)
 
-Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, der Betrachtung von STL-Dateien, der Unterstützung bei wiederkehrenden Berechnungen und Bildskalierung zur Verfügung.
+Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, sowie der Unterstützung bei wiederkehrenden Berechnungen und Bildskalierung zur Verfügung.
 
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 

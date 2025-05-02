@@ -222,7 +222,7 @@ export class Masonry {
 
 export class Dialog {
 	/**
-	 * @requires api, Html5QrcodeScanner, Assemble
+	 * @requires api, Html5QrcodeScanner, StVviewer, Assemble
 	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}} options
 	 * @returns promise, prepared answer on resolve according to type
 	 * @example ```js
@@ -240,6 +240,9 @@ export class Dialog {
 	 * new Dialog({type:'confirm', header:'confirm this', options:{'abort': false, 'yes, i agree': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {
 	 *  	if (confirmation) huzzah());
 	 * 	});
+	 * ```
+	 * @example ```js
+	 * new Dialog({type:'stl', header:'display and download', render:{name: 'filename', url:'urlToFile');
 	 * ```
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
@@ -259,6 +262,7 @@ export class Dialog {
 		this.render = options.render || null;
 		this.options = options.options || {};
 		this.scannerElements = {};
+		this.stlviewer = {};
 		this.assemble = null;
 		this.modal = "modal";
 		this.form = null;
@@ -362,6 +366,16 @@ export class Dialog {
 					scanner.canvas.replaceChildren(document.createTextNode(api._lang.GET("general.scan_successful")));
 				}
 				scanner.scanner.render(scanSuccess);
+			}
+			if (this.type === "stl") {
+				this.stlviewer.viewer = new StlViewer(this.stlviewer.canvas, {
+					models: [
+						{
+							id: 0,
+							filename: '../../' + this.render.url,
+						},
+					],
+				});
 			}
 			if (this.assemble) this.assemble.processAfterInsertion(dialog);
 
@@ -566,6 +580,24 @@ export class Dialog {
 				if (opt) opt.scrollIntoView();
 			});
 		return [buttons];
+	}
+
+	/**
+	 *
+	 */
+	stl() {
+		const div = document.createElement("div");
+		div.id = "stlviewer_canvas";
+		div.classList = "stlviewer";
+		div.title = api._lang.GET("assemble.render.aria.stl", { ":file": this.render.name || this.render.url });
+		this.stlviewer.canvas = div;
+
+		const a = document.createElement("a");
+		a.href = this.render.url;
+		a.target = "_blank";
+		a.download = this.render.name || this.render.url
+		a.append(document.createTextNode(this.render.name || this.render.url));
+		return [div, a];
 	}
 }
 

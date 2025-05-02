@@ -1027,8 +1027,7 @@
 			"header": "Tools",
 			"image": "Image resizing and watermark",
 			"regulatory": "Regulatory evaluations and summaries",
-			"scanner": "2D-scanner",
-			"stl_viewer": "STL viewer"
+			"scanner": "2D-scanner"
 		}
 	},
 	"measure": {
@@ -1483,8 +1482,7 @@
 			"size": "Maximum size",
 			"source": "Image"
 		},
-		"scanner": { "result": "Result" },
-		"stl_viewer": { "select": "Select file to view" }
+		"scanner": { "result": "Result" }
 	},
 	"user": {
 		"add_training": "Add training",

@@ -1027,8 +1027,7 @@
 			"header": "Werkzeuge",
 			"image": "Bildskalierung und Wasserzeichen",
 			"regulatory": "Regulatorische Auswertungen und Zusammenfassungen",
-			"scanner": "2D-Scanner",
-			"stl_viewer": "STL-Betrachter"
+			"scanner": "2D-Scanner"
 		}
 	},
 	"measure": {
@@ -1483,8 +1482,7 @@
 			"size": "Maximale Größe",
 			"source": "Bild"
 		},
-		"scanner": { "result": "Ergebnis" },
-		"stl_viewer": { "select": "Wähle eine Datei für die Darstellung" }
+		"scanner": { "result": "Ergebnis" }
 	},
 	"user": {
 		"add_training": "Schulung hinzufügen",

@@ -31,6 +31,7 @@ graph LR;
     * handle hidden attribute?
 * svg selection widget, e.g. cad order document
     * ideas about long term data safety?
+* review masonry on document/component approval
 
 ## Content
 * [Aims](#aims)
@@ -183,7 +184,7 @@ Orders can be deleted by administrative users and requesting unit members at any
 * Text recommendations
     * Default and adaptive [texts can be defined](#text-recommendations) to support a consistent company language.
 * File sharing
-    * The application has a [sharepoint](#files) for files and an [STL-viewer](#tools) to easily exchange information.
+    * The application has a [sharepoint](#files) for files and an integrated STL-viewer to easily exchange information.
 * CSV filtering
     * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
 
@@ -774,7 +775,7 @@ Exports are ordered by user name with exporting user coming first regardless, fo
 
 Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
 
-Both cloud storages live equip the [tools STL-Viewer](#tools) with sources to display.
+STL-files have a preview by default.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 
@@ -992,7 +993,7 @@ Sample checks are added to the records. New checks trigger a sytem message to th
 ## Tools
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu.png)
 
-Some general tools are available to read and create 2D-barcodes, view STL-files (e.g. for communication of a CAD-unit with another manufacturing unit), support recurring calculations and image scaling.
+Some general tools are available to read and create 2D-barcodes, as well as support recurring calculations and image scaling.
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 
@@ -1936,7 +1937,7 @@ Evidences of conformity according to the documents described above:
 | ----- | ------- | ---------------- | --------------- |
 | Development | Regular meetings to match requirements | Gain required functionality | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible |
 | Development | Arrange meetings with specific users, particularly less tech savvy, supervisors, ceo and qmo | Gain required functionality, assess frontend usability | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
-| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; stl-viewer<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; audit | Assess frontend usability | Adapt structure, styling and assemble-framework |
+| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; audit | Assess frontend usability | Adapt structure, styling and assemble-framework |
 | Full deployment | Enable all modules, register personal accounts | Assess frontend usability | Adapt structure, styling and assemble-framework |
 
 [Content](#content)
@@ -2226,7 +2227,7 @@ can be tested and verified importing unittest.js and calling `rendertest('app')`
 * erroronline1.js is fundamental as it handles requests and form data processing
 
 Other libraries rely on dynamic data and have to be tested in development runtime
-* viewstl: upload an stl-file and view it within the respective tool-module
+* viewstl: upload an stl-file and view it within the file selection
 * TCPDF: generate a record and export it as pdf
 * xlsxwriter: generate orders and export the order statistic from the audit-module
 
@@ -4403,24 +4404,6 @@ Parameters
 Sample response
 ```
 {"render": {"content": [[{"type": "scanner","description": "2D-scanner","destination": "tool_scanner"},{"type": "textarea","attributes": {"name": "Result","rows": 8,"readonly": true,"id": "tool_scanner"}}]]}}
-```
-
-> GET ./api/api.php/tool/stlviewer
-
-Returns a selection of available stl files (files, sharepoint) and canvas to display these.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
-Sample response
-```
-{"render": {"content": [[{"type": "select","attributes": {"name": "Select file to view","onchange": "_client.tool.initStlViewer('../' + this.value)"},"content": {"...": {"value": "null"},"../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl": {"value": "../fileserver/sharepoint/error on line 1_toh gelenk metall-Slice.0.stl"}}},{"type": "stlviewer"}]]}}
-```
-Sample response if no files are available
-```
-{"render": {"content": [[{"type": "nocontent","content": "Currently there are no files, everything is tidied up :)"}]]}}
 ```
 
 [Content](#content)
