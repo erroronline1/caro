@@ -1422,6 +1422,7 @@ export const api = {
 									let article = document.querySelector("#inputmodal form article");
 									let sibling = article.children[3], // as per assemble after button, label and hidden input
 										deletesibling;
+									sibling = sibling.nextSibling;
 									if (sibling) {
 										do {
 											deletesibling = sibling;
