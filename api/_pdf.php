@@ -164,7 +164,8 @@ class PDF{
 
 				switch ($value['type']){
 					case 'textsection':
-						$this->_pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
+						$textsectionLines = $this->_pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
+						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 						break;
 					case 'image':
 						if (array_key_exists($document, $content['images']) && in_array($value['value'], $content['images'][$document])) {
