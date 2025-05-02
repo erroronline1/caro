@@ -95,7 +95,7 @@ export const _serviceWorker = {
 					if (notif) notif.setAttribute("data-notification", data.responsibilities);
 					responsibilities = data.responsibilities;
 				}
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]"); // labmain menu labelel
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]"); // main menu label
 				if (notif) notif.setAttribute("data-notification", parseInt(message_unseen, 10) + parseInt(responsibilities, 10));
 			}
 			if ("measure_unclosed" in data) {
