@@ -82,7 +82,7 @@ class FILE extends API {
 				if (stristr($path, CONFIG['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
 				$file = substr_replace($file, '.', strrpos($file, '_'), 1);
 				
-				if (str_ends_with($file, '.stl')) $matches[$file] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file . "', render:{name: '" . $file . "', url: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'stl'];
+				if (str_ends_with($file, '.stl')) $list[$file] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file . "', render:{name: '" . $file . "', url: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'stl'];
 				else $list[$file]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'];
 			}
 			// append bundle
