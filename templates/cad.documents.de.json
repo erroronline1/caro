@@ -203,6 +203,13 @@
 						"hint": "Es können mehrere handgefertigte Skizzen als Foto bereitgestellt werden."
 					},
 					{
+						"type": "file",
+						"attributes": {
+							"name": "Konstruktionsdateien",
+							"multiple": true
+						}
+					},
+					{
 						"type": "scanner",
 						"attributes": {
 							"name": "vergleiche Vorgang, Konstruktion"
