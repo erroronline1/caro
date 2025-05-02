@@ -372,7 +372,7 @@ export class Dialog {
 					models: [
 						{
 							id: 0,
-							filename: '../../' + this.render.url,
+							filename: "../../" + this.render.url, // relative url since StlViewer executes within own library directory
 						},
 					],
 				});
@@ -595,7 +595,7 @@ export class Dialog {
 		const a = document.createElement("a");
 		a.href = this.render.url;
 		a.target = "_blank";
-		a.download = this.render.name || this.render.url
+		a.download = this.render.name || this.render.url;
 		a.append(document.createTextNode(this.render.name || this.render.url));
 		return [div, a];
 	}
@@ -2725,24 +2725,6 @@ export class Assemble {
 		result = result.concat(this.deletebutton()); // hint would be added here as well
 		this.signaturePad = true;
 		return result;
-	}
-
-	/**
-	 * creates an stlviewer div
-	 * @returns {domNode} div
-	 * @example this.currentElement
-	 * ```json
-	 * 	{
-	 * 		"type": "stlviewer",
-	 * 		"description": "viewstl"
-	 * 	}
-	 * ```
-	 */
-	stlviewer() {
-		const div = document.createElement("div");
-		div.id = "stlviewer_canvas";
-		div.classList = "stlviewer";
-		return div;
 	}
 
 	/**

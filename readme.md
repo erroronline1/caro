@@ -29,7 +29,7 @@ graph LR;
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-* svg selection widget, e.g. cad order document
+* stl selection widget, e.g. cad order document
     * ideas about long term data safety?
 * review masonry on document/component approval
 

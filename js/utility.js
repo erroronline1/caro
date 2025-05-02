@@ -1444,48 +1444,4 @@ export const _client = {
 			}
 		},
 	},
-	tool: {
-		stlviewer: null,
-		/**
-		 * init stl viewer with selected file
-		 * @param {string} file
-		 * @event stl viewer initialisation
-		 */
-		initStlViewer: function (file) {
-			if (file === "../null") return;
-			const download = {};
-			download[file] = { href: file, target: "_blank" };
-			new _client.Dialog({
-				type: "input",
-				header: "stl",
-				render: [
-					[
-						{
-							type: "stlviewer",
-						},
-						{
-							type: "links",
-							attributes: {
-								name: "download",
-							},
-							content: 
-								download
-							,
-						},
-					],
-				],
-			});
-			const canvas = document.getElementById("stlviewer_canvas");
-			canvas.title = api._lang.GET("assemble.render.aria.stl", { ":file": file });
-			canvas.replaceChildren();
-			this.stlviewer = new StlViewer(canvas, {
-				models: [
-					{
-						id: 0,
-						filename: file,
-					},
-				],
-			});
-		},
-	},
 };
