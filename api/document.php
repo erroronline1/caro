@@ -1339,6 +1339,16 @@ class DOCUMENT extends API {
 						foreach(array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
 					}
 					elseif ($subs['type'] === 'documentbutton'){
+						// strip language chunk from wrappers to extract only the linkes documents name
+						$language = [$_lang->GET('assemble.compose.component.link_document_display_button'),$_lang->GET('assemble.compose.component.link_document_continue_button')];
+						foreach($language as $chunk){
+							$chunk = preg_replace('/\:document/', '(.+?)', $chunk);
+							preg_match('/' . $chunk . '/', $name, $document);
+							if (isset($document[1])){
+								$name = $document[1];
+								break;
+							}
+						};
 						$content['content'][$_lang->GET('assemble.render.export_element.' . $subs['type']). ': ' . $name] = ['type' => 'textsection', 'value' => ''];
 					}
 					elseif ($subs['type'] === 'calendarbutton'){
