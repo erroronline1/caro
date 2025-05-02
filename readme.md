@@ -31,6 +31,7 @@ graph LR;
     * handle hidden attribute?
 * svg selection widget, e.g. cad order document
     * ideas about long term data safety?
+* document export issues on longer line headers without content? does it miss counting lines for next item alignment?
 
 ## Content
 * [Aims](#aims)
