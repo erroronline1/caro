@@ -480,7 +480,7 @@ export const api = {
 				};
 				break;
 			case "menu":
-				successFn = function (data) {
+				successFn = async function (data) {
 					// construct backend provided application menu
 					if (!data.render) return;
 					const menu = document.querySelector("nav"),
@@ -585,9 +585,17 @@ export const api = {
 					button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-right.svg')";
 					elements.push(button);
 
+					const observer = new MutationObserver(async (mutations) => {
+						observer.disconnect();
+						// trigger notifications only after navigation has been successufully added to the dom
+						_serviceWorker.postMessage("getnotifications");
+					});
+					observer.observe(document.querySelector("nav"), {
+						childList: true,
+						subtree: true,
+					});
+
 					menu.replaceChildren(...elements);
-					// trigger notifications
-					_serviceWorker.postMessage("getnotifications");
 				};
 				break;
 			case "start":
