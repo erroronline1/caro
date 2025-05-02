@@ -1572,6 +1572,8 @@ export class Assemble {
 		if (this.currentElement.attributes.multiple) {
 			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
 		}
+		if (!this.currentElement.hint) this.currentElement.hint = " "; // quick and dirty hack to avoid messed up linebreaks after inline buttons
+
 		input.setAttribute("aria-label", this.currentElement.description);
 		input = this.apply_attributes(this.currentElement.attributes, input);
 		if (this.currentElement.attributes.multiple !== undefined)
@@ -2170,7 +2172,7 @@ export class Assemble {
 			img = document.createElement("img"),
 			resetbutton = document.createElement("button"),
 			addbutton = document.createElement("button"),
-			hint = [...this.hint()],
+			hint,
 			multiple;
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
 		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
@@ -2179,7 +2181,8 @@ export class Assemble {
 			// delete for input apply_attributes
 			delete this.currentElement.attributes.multiple;
 		}
-
+		if (!this.currentElement.hint) this.currentElement.hint = " "; // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		hint = [...this.hint()];
 		function changeEvent() {
 			this.nextSibling.nextSibling.innerHTML = this.files.length
 				? Array.from(this.files)
