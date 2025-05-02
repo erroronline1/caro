@@ -1,0 +1,320 @@
+[
+	{
+		"comment": "following are cad components #################################################################################################"
+	},
+
+	{
+		"name": "Digitale Modellerstellung",
+		"alias": "",
+		"context": "component",
+		"unit": "cad",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Zusätzlich erforderlich"
+						},
+						"content": "Scan, ggf. Röntgenbild"
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Rumpforthetik"
+						},
+						"content": {
+							"...": [],
+							"Skoliosekortsett nach Chêneau": [],
+							"Reklinationskorsett": [],
+							"CBB": [],
+							"Kopf-Hals-Orthese": [],
+							"Kopf-Hals-Orthese mit Rumpfabstützung": [],
+							"Schiefhalsorthese": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Skoliose King Klassifikation"
+						},
+						"content": {
+							"...": [],
+							"King 1": [],
+							"King 1/2": [],
+							"King 2": [],
+							"Non3Non4": [],
+							"King 3": [],
+							"King 4": [],
+							"King 5": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstige Rumpforthese"
+						}
+					}
+				],
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Beinorthetik"
+						},
+						"content": {
+							"...": [],
+							"KLF Standard": [],
+							"KLF PostOP": [],
+							"Unterschenkelorthese": [],
+							"Unterschenkelmodell": [],
+							"Oberschenkelorthese": [],
+							"Oberschenkelmodell": [],
+							"BBO Beckenteil": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstige Beinorthese"
+						}
+					}
+				],
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Beinprothetik"
+						},
+						"content": {
+							"...": [],
+							"Unterschenkelmodell nach Maß": [],
+							"Oberschenkelmodell nach Maß": [],
+							"Modell nach Innenscan": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstige Beinprothese"
+						}
+					}
+				],
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Schaumstofflagerung"
+						},
+						"content": {
+							"...": [],
+							"Modell belassen": [],
+							"Modifikation nach Rücksprache": []
+						}
+					}
+				],
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Fußorthetik"
+						},
+						"content": {
+							"...": [],
+							"Einlage": []
+						}
+					}
+				],
+				[
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Anprobedatum"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Lieferung bis"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Herstellungsverfahren"
+						},
+						"content": {
+							"FDM-Druck": [],
+							"Fräsmodell": []
+						},
+						"hint": "Hülsen und Schäfte sind nicht im FDM-Druck verfügbar."
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Anmerkungen"
+						}
+					}
+				]
+			]
+		}
+	},
+
+	{
+		"name": "Digitale Fertigung",
+		"alias": "",
+		"context": "component",
+		"unit": "cad",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Auftrag für"
+						},
+						"content": {
+							"Modell": [],
+							"Dummy": [],
+							"Werkzeug": [],
+							"Sonderanfertigung Patientenversorgung": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Konstruktion"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Skizze",
+							"multiple": true
+						},
+						"hint": "Es können mehrere handgefertigte Skizzen als Foto bereitgestellt werden."
+					},
+					{
+						"type": "scanner",
+						"attributes": {
+							"name": "vergleiche Vorgang, Konstruktion"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Besonderes Risiko"
+						},
+						"content": {
+							"Hautkontakt": [],
+							"Strukturteil": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstiges Risiko"
+						}
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Erforderliche Stellungnahme, ggf. VA Entwicklung beachten"
+						},
+						"content": "• Gibt es Alternativprodukte und warum kommen sie nicht in Frage?\n• Kommt die Entwicklung in Hautkontakt?\n• Welche Materialauswahl und welches Herstellungsverfahren sind geplant?\n• Unterliegt die Entwicklung besonderen statischen und dynamischen Belastungen?\n• Gibt es chemische oder mechanische Wechselwirkungen mit anderen Komponenten?\n• Welche Risiken existieren (z.B. Brandgefahr, Reizung, Verletzungen durch (Bruch-)Kanten, Klemmen, Sturz, Risiko der Gesamtstabilität?"
+					},
+					{
+						"type": "documentbutton",
+						"attributes": {
+							"value": "VA Entwicklung anzeigen",
+							"onclick": "api.record('get','displayonly', 'VA Entwicklung')"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Stellungnahme zum Risiko"
+						},
+						"autocomplete": true
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Herstellungsverfahren"
+						},
+						"content": {
+							"FDM": [],
+							"MultiJetFusion": [],
+							"SLS": [],
+							"Hartschaummodell": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstiges Herstellungsverfahren"
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Maßnahmen zur Weiterverarbeitung oder Verwendung"
+						},
+						"autocomplete": true
+					}
+				]
+			]
+		}
+	},
+	{
+		"comment": "following are cad documents #################################################################################################"
+	},
+
+	{
+		"name": "Digitale Modellerstellung Patientenversorgung",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "cad",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "identifikator,Digitale Modellerstellung"
+	},
+	{
+		"name": "Digitale Fertigung Patientenversorgung",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "cad",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_3_1,iso13485_7_3_2,iso13485_7_3_3,iso13485_7_3_4,iso13485_7_3_5,iso13485_7_3_8,iso13485_7_3_9,iso13485_7_3_10,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "identifikator,Digitale Fertigung"
+	},
+	{
+		"name": "Digitale Fertigung Produktionsbedarf",
+		"alias": "",
+		"context": "generalrecords",
+		"unit": "cad",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_5_5_3,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "identifikator,Digitale Fertigung"
+	}
+]
