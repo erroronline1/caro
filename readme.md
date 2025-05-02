@@ -1,6 +1,37 @@
 ![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
 # CARO - Cloud Assisted Records and Operations
 
+# CURRENT PRE-RELEASE STATE
+see also [Usability test plan](#usability-test-plan) and [Usability test](#usability-tests)
+```mermaid
+graph LR;
+    Prototyping-->test[Test environment];
+    test-->alpha["Alpha testing
+    with selected users"];
+    alpha-.->it{{IT approval}};
+    it-.->network{{Network environment}};
+    network-.->beta{{"Beta testing
+    with with limited modules"}};
+    beta-.->union{{Union approval}};
+    union-.->release{{Full release}}
+```
+## discussion
+* recall option (how?)
+* post-market surveillance (how?)
+* post-market evaluation (how?)
+
+## to do
+* verify osx [safari compatibility](#safaris-special-needs), ios compatibility
+* data deletion in accordance to dsgvo, eg. recommend deletion after x years?
+* unittests
+* update readme pictures, add responsibilities, appointment
+* improve screenreader accessibility
+* qm handbook template with descriptions on caro functionalities considering iso chapters
+* responsibilities
+    * handle hidden attribute?
+* svg selection widget, e.g. cad order document
+    * ideas about long term data safety?
+
 ## Content
 * [Aims](#aims)
     * [Key aspects](#key-aspects)
@@ -113,22 +144,6 @@
 * [License](#license)
 
 The most recent documentation is available at [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
-
-# PRE ALPHA STATE
-## discussion
-* recall option (how?)
-* post-market surveillance (how?)
-* post-market evaluation (how?)
-
-## development
-* verify osx [safari compatibility](#safaris-special-needs), ios compatibility
-* data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-* unittests
-* update readme pictures, add responsibilities, appointment
-* improve screenreader accessibility
-* qm handbook template with descriptions on caro functionalities considering iso chapters
-* responsibilities
-    * handle hidden attribute?
 
 # Aims
 This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
