@@ -719,7 +719,7 @@ export const _client = {
 					type: "filtered",
 					attributes: {
 						name: api._lang.GET("order.order_filter_label"),
-						onkeypress: "if (event.key === 'Enter') {api.purchase('get', 'approved', this.value);}",
+						onkeydown: "if (event.key === 'Enter') {api.purchase('get', 'approved', this.value);}",
 						id: "productsearch",
 						value: data.filter ? data.filter : "",
 					},

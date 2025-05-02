@@ -1934,7 +1934,7 @@ class CONSUMABLES extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors_search'),
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($datalist))
 							]
@@ -2027,7 +2027,7 @@ class CONSUMABLES extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.edit_existing_vendors_search'),
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'vendor', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($datalist))
 							]

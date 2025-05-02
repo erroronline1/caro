@@ -66,7 +66,7 @@ class FILE extends API {
 						'type' => 'filtered',
 						'attributes' => [
 							'name' => $this->_lang->GET('file.bundle_filter_label'),
-							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value)}",
+							'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'bundlefilter', this.value)}",
 							'id' => 'filesearch'
 						]
 					]
@@ -276,7 +276,7 @@ class FILE extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('file.bundle.existing_bundle'),
-									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($datalist))
 							]
@@ -708,7 +708,7 @@ class FILE extends API {
 								'type' => 'filtered',
 								'attributes' => [
 									'name' => $this->_lang->GET('file.file_filter_label'),
-									'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value)}",
+									'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value)}",
 									'id' => 'filefilter'
 								]
 							]
@@ -822,7 +822,7 @@ class FILE extends API {
 						'type' => 'filtered',
 						'attributes' => [
 							'name' => $this->_lang->GET('file.file_filter_label'),
-							'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value);}",
+							'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', '" . ($this->_requestedFolder ? : 'null') . "', this.value);}",
 							'id' => 'filesearch'
 						]
 					]
@@ -987,7 +987,7 @@ class FILE extends API {
 							'type' => 'filtered',
 							'attributes' => [
 								'name' => $this->_lang->GET('file.file_filter_label'),
-								'onkeypress' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value)}",
+								'onkeydown' => "if (event.key === 'Enter') {api.file('get', 'filter', 'sharepoint', this.value)}",
 								'id' => 'filefilter'
 							]
 						]

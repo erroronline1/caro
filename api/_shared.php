@@ -230,7 +230,7 @@ class SHARED {
 					'type' => 'search',
 					'attributes' => [
 						'name' => $this->_lang->GET('risk.search'),
-						'onkeypress' => "if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}",
+						'onkeydown' => "if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}",
 						'value' => isset($parameter['search']) ? $parameter['search'] : ''
 					]
 				]
@@ -356,7 +356,7 @@ class SHARED {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.search'),
-									'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, '" . $usecase . "'); return false;}",
+									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, '" . $usecase . "'); return false;}",
 									'id' => 'productsearch',
 									'value' => isset($parameter['search']) ? trim($parameter['search']) : ''
 								]
@@ -409,7 +409,7 @@ class SHARED {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.search'),
-										'onkeypress' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'order'); return false;}",
+										'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'order'); return false;}",
 									'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'order'); return false;}",
 									'id' => 'productsearch',
 									'value' => isset($parameter['search']) ? trim($parameter['search']) : ''

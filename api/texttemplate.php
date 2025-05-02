@@ -227,7 +227,7 @@ class TEXTTEMPLATE extends API {
 									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
+										'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
 									],
 									'datalist' => array_values(array_unique($chunkdatalist))
 								]
@@ -239,7 +239,7 @@ class TEXTTEMPLATE extends API {
 									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-										'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
+										'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
 									],
 									'datalist' => array_values(array_unique($chunkdatalist))
 								]
@@ -512,7 +512,7 @@ class TEXTTEMPLATE extends API {
 								'numeration' => 'prevent',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-									'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($templatedatalist))
 							]
@@ -524,7 +524,7 @@ class TEXTTEMPLATE extends API {
 								'numeration' => 'prevent',
 								'attributes' => [
 									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-									'onkeypress' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($templatedatalist))
 							]

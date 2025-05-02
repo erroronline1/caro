@@ -215,7 +215,7 @@ class CSVFILTER extends API {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('csvfilter.edit.filter'),
-									'onkeypress' => "if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"
+									'onkeydown' => "if (event.key === 'Enter') {api.csvfilter('get', 'filter', this.value); return false;}"
 								],
 								'datalist' => array_values(array_unique($filterdatalist))
 							]
@@ -430,7 +430,7 @@ class CSVFILTER extends API {
 									'type' => 'search',
 									'attributes' => [
 										'name' => $this->_lang->GET('csvfilter.edit.filter'),
-										'onkeypress' => "if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"
+										'onkeydown' => "if (event.key === 'Enter') {api.csvfilter('get', 'rule', this.value); return false;}"
 									],
 									'datalist' => array_values(array_unique($filterdatalist))
 								]

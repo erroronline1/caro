@@ -471,7 +471,7 @@ class DOCUMENT extends API {
 									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle'),
-										'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"
+										'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"
 									],
 									'datalist' => array_values(array_unique($bundledatalist))
 								]
@@ -610,7 +610,7 @@ class DOCUMENT extends API {
 					'attributes' => [
 						'id' => '_bundlefilter',
 						'name' => $this->_lang->GET('assemble.compose.document_filter'),
-						'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value);}",
+						'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value);}",
 						'value' => $this->_requestedID ? : ''
 					],
 					'datalist' => array_keys($bundles)
@@ -1042,7 +1042,7 @@ class DOCUMENT extends API {
 							'numeration' => 'prevent',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.component.existing_components'),
-								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component_editor', this.value); return false;}"
+								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component_editor', this.value); return false;}"
 							],
 							'datalist' => array_values(array_unique($componentdatalist))
 						]
@@ -1865,7 +1865,7 @@ class DOCUMENT extends API {
 							'numeration' => 'prevent',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.document.existing_documents'),
-								'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'document_editor', this.value); return false;}"
+								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'document_editor', this.value); return false;}"
 							],
 							'datalist' => array_values(array_unique($documentdatalist))
 						]
@@ -1892,7 +1892,7 @@ class DOCUMENT extends API {
 						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('assemble.compose.document.add_component'),
-							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'component', this.value); return false;}"
+							'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component', this.value); return false;}"
 						],
 						'datalist' => array_values(array_unique($componentdatalist))
 					]
@@ -2018,7 +2018,7 @@ class DOCUMENT extends API {
 							'id' => '_documentfilter',
 							'value' => $this->_requestedID && $this->_requestedID !== 'null' ? $this->_requestedID : '',
 							'name' => $this->_lang->GET('assemble.compose.document_filter'),
-							'onkeypress' => "if (event.key === 'Enter') {api.document('get', 'documents', this.value)}",
+							'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'documents', this.value)}",
 						],
 						'datalist' => array_values(array_unique($documentdatalist)),
 						'hint' => $this->_lang->GET('assemble.compose.document_filter_hint')

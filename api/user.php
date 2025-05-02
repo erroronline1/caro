@@ -1002,7 +1002,7 @@ class USER extends API {
 							'type' => 'search',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.existing_user'),
-								'onkeypress' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
+								'onkeydown' => "if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"
 							],
 							'datalist' => array_values(array_unique($datalist))
 						]
