@@ -2316,7 +2316,7 @@ export class Assemble {
 							type: "search",
 							attributes: {
 								name: api._lang.GET("consumables.product.search"),
-								onkeypress: "if (event.key === 'Enter') {event.preventDefault(); api.purchase('get', 'productsearch', 'null', this.value, 'productselection');}",
+								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.purchase('get', 'productsearch', 'null', this.value, 'productselection');}",
 								id: "productsearch",
 							},
 						},
