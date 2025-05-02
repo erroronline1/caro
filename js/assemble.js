@@ -132,7 +132,6 @@ export class Masonry {
 			let container = document.querySelector("main>form");
 			if (!container || !container.firstChild || !["article"].includes(container.firstChild.localName)) container = document.querySelector("main>div:first-of-type"); // e.g. in document composer, where an initial empty form is preplaced before visible content and later filled with shadow inputs
 			if (!container || !container.firstChild || !["article"].includes(container.firstChild.localName)) {
-				container.style.height = null;
 				resolve();
 				return;
 			}
