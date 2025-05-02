@@ -1981,7 +1981,7 @@ export const api = {
 				code: api._lang.GET("menu.tools.digital_codes"),
 				calculator: api._lang.GET("menu.tools.calculator"),
 				scanner: api._lang.GET("menu.tools.scanner"),
-				stlviewer: api._lang.GET("menu.tools.stl_viewer"),
+				zip: api._lang.GET("menu.tools.zip"),
 				image: api._lang.GET("menu.tools.image"),
 			};
 		switch (method) {
@@ -1994,23 +1994,24 @@ export const api = {
 						break;
 					case "code":
 						payload = _.getInputs("[data-usecase=tool_create_code]", true);
-						if (request[2] === "qrcode_appointment") {
-							successFn = function (data) {
-								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-								if (data.render !== undefined) {
-									const options = {};
-									options[api._lang.GET("general.ok_button")] = false;
-									new Dialog({
-										type: "input",
-										render: data.render,
-										options: options,
-									});
-								}
-							};
-						}
 						break;
 					case "image":
 						payload = _.getInputs("[data-usecase=tool_image]", true);
+						break;
+					case "zip":
+						payload = _.getInputs("[data-usecase=tool_zip]", true);
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.render !== undefined) {
+								const options = {};
+								options[api._lang.GET("general.ok_button")] = false;
+								new Dialog({
+									type: "input",
+									render: data.render,
+									options: options,
+								});
+							}
+						};
 						break;
 				}
 				break;

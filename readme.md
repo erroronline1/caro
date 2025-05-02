@@ -993,7 +993,7 @@ Sample checks are added to the records. New checks trigger a sytem message to th
 ## Tools
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu.png)
 
-Some general tools are available to read and create 2D-barcodes, as well as support recurring calculations and image scaling.
+Some general tools are available to read and create 2D-barcodes, as well as support recurring calculations, image scaling and zip archiving.
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 

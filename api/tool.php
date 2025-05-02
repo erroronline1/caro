@@ -496,5 +496,72 @@ class TOOL extends API {
 		]];
 		$this->response($result);
 	}
+
+	/**
+	 * 
+	 */
+	public function zip(){
+		$result['render'] = [
+			'form' => [
+				'data-usecase' => 'tool_zip',
+				'action' => "javascript:api.tool('post', 'zip')"
+			],
+			'content' => [
+				[
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('tool.zip.hint')
+						],
+						'content' => $this->_lang->GET('tool.zip.hint_content')
+					], [
+						'type' => 'file',
+						'attributes' => [
+							'name' => $this->_lang->GET('tool.zip.files'),
+							'multiple' => true
+						]
+					]
+				]
+			]
+		];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (isset($_FILES[$this->_lang->PROPERTY('tool.zip.files')]) && $_FILES[$this->_lang->PROPERTY('tool.zip.files')]['tmp_name'][0]) {
+					// create filename by concatenation
+					$zipname = '';
+					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.files')]['name'] as $filename){
+						$zipname .= preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $filename);
+					}
+					// create zip
+					$zip = new ZipArchive();
+					$zip->open(UTILITY::directory('tmp') . '/' . $zipname .'.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.files')]['tmp_name'] as $index => $file){
+						$zip->addFile($file, $_FILES[$this->_lang->PROPERTY('tool.zip.files')]['name'][$index]);
+					}
+					$zip->close();
+
+					$downloadfiles = [];
+					$downloadfiles[$zipname .'.zip'] = [
+						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 3) . '/' . $zipname .'.zip',
+						'download' => $zipname .'.zip'
+					];			
+					$body = [];
+					array_push($body, 
+						[[
+							'type' => 'links',
+							'description' =>  $this->_lang->GET('tool.zip.download'),
+							'content' => $downloadfiles
+						]]
+					);
+					$this->response([
+						'render' => $body,
+					]);
+				}
+		}
+
+		$this->response($result);
+
+	}
 }
 ?>

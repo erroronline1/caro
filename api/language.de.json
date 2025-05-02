@@ -1027,7 +1027,8 @@
 			"header": "Werkzeuge",
 			"image": "Bildskalierung und Wasserzeichen",
 			"regulatory": "Regulatorische Auswertungen und Zusammenfassungen",
-			"scanner": "2D-Scanner"
+			"scanner": "2D-Scanner",
+			"zip": "Zip-Archiv erstellen"
 		}
 	},
 	"measure": {
@@ -1482,7 +1483,13 @@
 			"size": "Maximale Größe",
 			"source": "Bild"
 		},
-		"scanner": { "result": "Ergebnis" }
+		"scanner": { "result": "Ergebnis" },
+		"zip": {
+			"download": "Archiv herunterladen, du kannst es dann noch umbenennen. Beachte den Datenschutz. Für die Sicherheit exportierter Daten bist du selbst veranwortlich.",
+			"files": "Dateien zum Archiv hinzufügen",
+			"hint": "Wähle Dateien aus um sie zu einem ZIP-Archiv hinzuzufügen.",
+			"hint_content": "Diese Datei kann dann einfach an CAD oder den Einkauf geschickt oder zur Dokumentation hinzugefügt werden, ohne das unterwegs etwas verloren geht. Beachte den Datenschutz!"
+		}
 	},
 	"user": {
 		"add_training": "Schulung hinzufügen",

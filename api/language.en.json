@@ -1027,7 +1027,8 @@
 			"header": "Tools",
 			"image": "Image resizing and watermark",
 			"regulatory": "Regulatory evaluations and summaries",
-			"scanner": "2D-scanner"
+			"scanner": "2D-scanner",
+			"zip": "Create a ZIP-archive"
 		}
 	},
 	"measure": {
@@ -1482,7 +1483,13 @@
 			"size": "Maximum size",
 			"source": "Image"
 		},
-		"scanner": { "result": "Result" }
+		"scanner": { "result": "Result" },
+		"zip": {
+			"download": "Download archive. You may rename it at your convenience. On exporting sensitive data you are responsible for their safety.",
+			"files": "Files to add to archive",
+			"hint": "Select files to add to a ZIP-archive.",
+			"hint_content": "This file then can easily be transferred to CAD, Purchase or documentation without something getting lost along the way. Adhere to data safety!"
+		}
 	},
 	"user": {
 		"add_training": "Add training",

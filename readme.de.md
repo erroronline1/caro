@@ -900,7 +900,7 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lös
 ## Werkzeuge
 ![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20de.png)
 
-Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, sowie der Unterstützung bei wiederkehrenden Berechnungen und Bildskalierung zur Verfügung.
+Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, sowie der Unterstützung bei wiederkehrenden Berechnungen, Bildskalierung und ZIP-Archivierung zur Verfügung.
 
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 

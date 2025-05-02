@@ -427,6 +427,7 @@ class APPLICATION extends API {
 				$this->_lang->GET('menu.tools.scanner') => ['onclick' => "api.tool('get', 'scanner')"],
 				$this->_lang->GET('menu.tools.calculator') => ['onclick' => "api.tool('get', 'calculator')"],
 				$this->_lang->GET('menu.tools.image') => ['onclick' => "api.tool('get', 'image')"],
+				$this->_lang->GET('menu.tools.zip') => ['onclick' => "api.tool('get', 'zip')"],
 			],
 		];
 
