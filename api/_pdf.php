@@ -308,7 +308,6 @@ class PDF{
 				$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
 			}
 			if (array_key_exists($document, $content['images'])){
-				$ln = 0;
 				foreach ($content['images'][$document] as $image){
 					$imagedata = pathinfo($image);
 					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
