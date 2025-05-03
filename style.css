@@ -465,6 +465,420 @@ html[data-useragent*="safari"] body {
 	}
 }
 
+/*************************** main with breakpoints for bigger screen masonry ******************************/
+/* hope default value is ridiculously high enough in the medium future.
+min width will be reduced to a reasonable size by api.js in case user settings activate masonry style */
+
+main {
+	margin: 2rem auto 0;
+	width: 100%;
+	max-width: 50rem;
+	margin-bottom: 6rem;
+	> div,
+	> form {
+		--gap: 1em;
+		display: flex;
+		flex-flow: column wrap;
+		gap: var(--gap);
+		> article {
+			width: 100%;
+			padding: 1em;
+			border: 1px solid var(--3d-border);
+			border-radius: 0.2em;
+			background-color: var(--article);
+			box-shadow: var(--shadow);
+			transition: ease 0.2s;
+		}
+		> button {
+			width: 100%;
+			padding: 1em;
+			box-shadow: var(--shadow);
+			transition: ease 0.2s;
+		}
+	}
+	> div[draggable] {
+		display: block;
+		max-width: 50rem;
+		margin: auto;
+	}
+	hr {
+		margin: 1em auto;
+		height: 1px;
+		width: 100%;
+		border-color: var(--darkshadow);
+	}
+}
+
+@media only screen and (min-width: 2000rem) {
+	/* two colum breakpoint, adjusting see above */
+	main {
+		max-width: 105rem;
+		> div:not([draggable]),
+		> form {
+			> article,
+			> button, hr {
+				width: calc(50% - var(--gap));
+			}
+			> :nth-child(2n + 1) {
+				order: 1;
+			}
+			> :nth-child(2n) {
+				order: 2;
+			}
+		}
+		> div:not([draggable])::before,
+		> div:not([draggable])::after,
+		> form::before,
+		> form::after {
+			content: "";
+			flex-basis: 100%;
+			width: 0;
+			order: 2;
+		}
+	}
+}
+
+@media only screen and (min-width: 3000rem) {
+	/* three colum breakpoint, adjusting see above */
+	main {
+		max-width: 155rem;
+		> div:not([draggable]),
+		> form {
+			> article,
+			> button,hr {
+				width: calc(100% / 3 - var(--gap));
+			}
+			> :nth-child(3n + 1) {
+				order: 1;
+			}
+			> :nth-child(3n + 2) {
+				order: 2;
+			}
+			> :nth-child(3n) {
+				order: 3;
+			}
+		}
+		> div:not([draggable])::before,
+		> div:not([draggable])::after,
+		> form::before,
+		> form::after {
+			content: "";
+			flex-basis: 100%;
+			width: 0;
+			order: 2;
+		}
+		> div[draggable] {
+			transform: translateX(0.5em);
+		}
+	}
+}
+
+/*************************** article elements and boxes ******************************/
+
+article > header {
+	margin: 0 0 0 1.75em;
+	width: auto;
+	text-align: left;
+	display: block;
+}
+[data-type="order"],
+[data-type="cancellation"],
+[data-type="return"] {
+	display: inline-block;
+}
+
+article > span[data-type] {
+	padding: 0;
+	width: 0;
+}
+
+/* hint messages below */
+.hint {
+	margin: -1em 0 1em 2rem;
+	font-size: 0.75em;
+	clear: both;
+}
+.editor + .hint {
+	margin: 1.3em 0 0 2.3em;
+}
+.links-hint,
+.range-hint,
+button + .hint {
+	margin-top: 1em;
+}
+label + button + .hint {
+	/* productselection */
+	margin-top: -1em;
+}
+
+button + div,
+input[type="checkbox"] + label + div,
+input[type="radio"] + label + div {
+	margin: 1em 0 0 2.3em;
+	font-size: 0.75em;
+}
+
+canvas {
+	display: block;
+	height: 15em;
+	margin-bottom: 2em;
+}
+
+.stlviewer {
+	height: 35em;
+	overflow:hidden;
+}
+
+.contextmenu {
+	margin: 1em 0;
+	padding: 1em;
+	width: fit-content;
+	display: block;
+	z-index: 10;
+	position: absolute;
+	padding-top: 2.5em;
+	border: 1px solid var(--3d-border);
+	border-radius: 0.2em;
+	background-color: var(--article);
+	box-shadow: var(--shadow);
+	transition: ease 0.2s;
+	img.close {
+		width: 1.5em;
+		height: 1.5em;
+		position: absolute;
+		top: 1em;
+		right: 1em;
+	}
+}
+
+section {
+	border: 1px solid var(--darkshadow);
+	border-radius: 0.1em;
+	display: flex;
+	flex-direction: row;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	overflow: scroll;
+	margin: -0.5em;
+}
+
+article[data-type],
+[data-type="addButton"] {
+	padding: 1em 2em 1em 3.5em;
+}
+
+/*[data-type="links"] {
+	max-height: 15em;
+	overflow: auto;
+}*/
+
+[data-type="composer-form"] > [data-type="links"] {
+	/* otherwise composer displays faulty */
+	max-height: none;
+	overflow: auto;
+}
+
+section > form,
+section > article,
+section > div[draggable] {
+	width: 100%;
+	padding: 1em;
+	margin-top: 0;
+	scroll-snap-align: center;
+	flex: none;
+	overflow: auto;
+	box-shadow: none;
+	border: none;
+	background: none;
+}
+
+form > article,
+section > div > article {
+	padding: 1em;
+	box-shadow: none;
+	border: none;
+	background: none;
+}
+
+article:has(> article) {
+	/* tile container */
+	display: flex;
+	flex-wrap: wrap;
+	align-content: stretch;
+
+	article {
+		/*tile*/
+		width: calc(50% - 1em);
+		min-width: 13em;
+		margin: 0.5em;
+		padding: 1em;
+		vertical-align: top;
+		overflow: hidden;
+		display: inline-block;
+		border: 1px solid var(--3d-border);
+		border-radius: 0.2em;
+		background-color: var(--article);
+		box-shadow: var(--shadow);
+		transition: ease 0.2s;
+	}
+	*:not(article) {
+		width: 90%;
+	}
+}
+
+.collapsible {
+	overflow: hidden;
+	transition: ease 0.3s;
+	mask-image: linear-gradient(180deg, #000 80%, transparent);
+	img.close {
+		width: 1.5em;
+		height: 1.5em;
+		float: right;
+		margin: 0.5em;
+		transition: all ease 0.3s;
+	}
+}
+.em8 {
+	max-height: 8em;
+}
+.em16 {
+	max-height: 16em;
+}
+
+.collapsible.extended {
+	max-height: 100em;
+	overflow: auto;
+	mask-image: none;
+
+	img.close {
+		transform: rotate(45deg);
+	}
+}
+
+.order2dcode {
+	width: 15em !important;
+	height: 5em !important;
+	float: inline-end !important;
+}
+
+.imagealigned {
+	width: calc(98% - 15em);
+	float: inline-start;
+}
+
+.sectionindicator {
+	text-align: center;
+	width: 100%;
+	margin-top: 1em;
+
+	svg {
+		vertical-align: middle;
+	}
+}
+
+.imagecanvas,
+.photoupload {
+	shape-outside: margin-box;
+	display: block;
+	margin-bottom: 0;
+	float: right;
+	height: 4em;
+	width: 4em;
+	object-fit: contain;
+}
+
+/*************************** calendar ******************************/
+
+.day {
+	width: calc(99% / 7 - 1em);
+	height: 4em;
+	margin: 0.5em;
+	padding: 0.5em;
+	display: inline-block;
+	vertical-align: top;
+}
+.displayDay {
+	background-color: var(--article);
+	box-shadow: var(--shadow);
+	color: var(--foreground);
+}
+.today {
+	border: 2px solid var(--green);
+}
+.selected {
+	border: 2px solid var(--yellow);
+}
+.holiday {
+	opacity: 0.4;
+}
+
+.schedule {
+	margin: 0.5em 0.25em 0.5em 1.75em;
+	div {
+		border: 1px solid var(--foreground);
+		border-radius: 2px;
+		margin: 0;
+		height: 1em;
+		display: inline-block;
+	}
+	label.schedule {
+		writing-mode: vertical-lr;
+		margin: 0;
+		padding: 0;
+		border-left: 1px solid var(--foreground);
+		font-size: 0.5em;
+		max-height: 3.3em;
+		overflow: hidden;
+	}
+}
+/*************************** messages ******************************/
+
+.message {
+	width: 100%;
+	img {
+		margin: 0 0.5em 0.5em 0;
+		float: left;
+		width: 3em;
+		height: 3em;
+		border-radius: 50%;
+	}
+	div:nth-of-type(1) {
+		background-color: var(--red);
+		color: var(--article);
+		width: fit-content;
+		font-size: 0.75em;
+		margin-left: 98%;
+		padding: 0 0.25em;
+		border-radius: 3px;
+	}
+	p {
+		a::before {
+			margin: 0 0.2em !important;
+		}
+	}
+}
+.message.conversation {
+	padding: 0 5em 0 0;
+}
+.message.right {
+	text-align: right;
+	padding: 0 0 0 5em;
+	img {
+		margin: 0 0em 0.5em 0.5em;
+		float: right;
+	}
+}
+
+/*************************** general elements ******************************/
+
+h1 {
+	color: var(--foreground);
+}
+
+br {
+	clear: both;
+}
+
 /*************************** input elements and call to action *******************************/
 
 .visually-hidden {
@@ -867,312 +1281,6 @@ button.productselection {
 	margin: 0 0 0 1em;
 }
 
-/*************************** article elements and boxes ******************************/
-
-article > header {
-	margin: 0 0 0 1.75em;
-	width: auto;
-	text-align: left;
-	display: block;
-}
-[data-type="order"],
-[data-type="cancellation"],
-[data-type="return"] {
-	display: inline-block;
-}
-
-article > span[data-type] {
-	padding: 0;
-	width: 0;
-}
-
-/* hint messages below */
-.hint {
-	margin: -1em 0 1em 2rem;
-	font-size: 0.75em;
-	clear: both;
-}
-.editor + .hint {
-	margin: 1.3em 0 0 2.3em;
-}
-.links-hint,
-.range-hint,
-button + .hint {
-	margin-top: 1em;
-}
-label + button + .hint {
-	/* productselection */
-	margin-top: -1em;
-}
-
-button + div,
-input[type="checkbox"] + label + div,
-input[type="radio"] + label + div {
-	margin: 1em 0 0 2.3em;
-	font-size: 0.75em;
-}
-
-canvas {
-	display: block;
-	height: 15em;
-	margin-bottom: 2em;
-}
-
-.stlviewer {
-	height: 35em;
-	overflow:hidden;
-}
-
-.contextmenu {
-	margin: 1em 0;
-	padding: 1em;
-	width: fit-content;
-	display: block;
-	z-index: 10;
-	position: absolute;
-	padding-top: 2.5em;
-	border: 1px solid var(--3d-border);
-	border-radius: 0.2em;
-	background-color: var(--article);
-	box-shadow: var(--shadow);
-	transition: ease 0.2s;
-	img.close {
-		width: 1.5em;
-		height: 1.5em;
-		position: absolute;
-		top: 1em;
-		right: 1em;
-	}
-}
-
-section {
-	border: 1px solid var(--darkshadow);
-	border-radius: 0.1em;
-	display: flex;
-	flex-direction: row;
-	scroll-snap-type: x mandatory;
-	scroll-behavior: smooth;
-	overflow: scroll;
-	margin: -0.5em;
-}
-
-article[data-type],
-[data-type="addButton"] {
-	padding: 1em 2em 1em 3.5em;
-}
-
-/*[data-type="links"] {
-	max-height: 15em;
-	overflow: auto;
-}*/
-
-[data-type="composer-form"] > [data-type="links"] {
-	/* otherwise composer displays faulty */
-	max-height: none;
-	overflow: auto;
-}
-
-section > form,
-section > article,
-section > div[draggable] {
-	width: 100%;
-	padding: 1em;
-	margin-top: 0;
-	scroll-snap-align: center;
-	flex: none;
-	overflow: auto;
-	box-shadow: none;
-	border: none;
-	background: none;
-}
-
-form > article,
-section > div > article {
-	padding: 1em;
-	box-shadow: none;
-	border: none;
-	background: none;
-}
-
-article:has(> article) {
-	/* tile container */
-	display: flex;
-	flex-wrap: wrap;
-	align-content: stretch;
-
-	article {
-		/*tile*/
-		width: calc(50% - 1em);
-		min-width: 13em;
-		margin: 0.5em;
-		padding: 1em;
-		vertical-align: top;
-		overflow: hidden;
-		display: inline-block;
-		border: 1px solid var(--3d-border);
-		border-radius: 0.2em;
-		background-color: var(--article);
-		box-shadow: var(--shadow);
-		transition: ease 0.2s;
-	}
-	*:not(article) {
-		width: 90%;
-	}
-}
-
-.collapsible {
-	overflow: hidden;
-	transition: ease 0.3s;
-	mask-image: linear-gradient(180deg, #000 80%, transparent);
-	img.close {
-		width: 1.5em;
-		height: 1.5em;
-		float: right;
-		margin: 0.5em;
-		transition: all ease 0.3s;
-	}
-}
-.em8 {
-	max-height: 8em;
-}
-.em16 {
-	max-height: 16em;
-}
-
-.collapsible.extended {
-	max-height: 100em;
-	overflow: auto;
-	mask-image: none;
-
-	img.close {
-		transform: rotate(45deg);
-	}
-}
-
-.order2dcode {
-	width: 15em !important;
-	height: 5em !important;
-	float: inline-end !important;
-}
-
-.imagealigned {
-	width: calc(98% - 15em);
-	float: inline-start;
-}
-
-.sectionindicator {
-	text-align: center;
-	width: 100%;
-	margin-top: 1em;
-
-	svg {
-		vertical-align: middle;
-	}
-}
-
-.imagecanvas,
-.photoupload {
-	shape-outside: margin-box;
-	display: block;
-	margin-bottom: 0;
-	float: right;
-	height: 4em;
-	width: 4em;
-	object-fit: contain;
-}
-
-/*************************** calendar ******************************/
-
-.day {
-	width: calc(99% / 7 - 1em);
-	height: 4em;
-	margin: 0.5em;
-	padding: 0.5em;
-	display: inline-block;
-	vertical-align: top;
-}
-.displayDay {
-	background-color: var(--article);
-	box-shadow: var(--shadow);
-	color: var(--foreground);
-}
-.today {
-	border: 2px solid var(--green);
-}
-.selected {
-	border: 2px solid var(--yellow);
-}
-.holiday {
-	opacity: 0.4;
-}
-
-.schedule {
-	margin: 0.5em 0.25em 0.5em 1.75em;
-	div {
-		border: 1px solid var(--foreground);
-		border-radius: 2px;
-		margin: 0;
-		height: 1em;
-		display: inline-block;
-	}
-	label.schedule {
-		writing-mode: vertical-lr;
-		margin: 0;
-		padding: 0;
-		border-left: 1px solid var(--foreground);
-		font-size: 0.5em;
-		max-height: 3.3em;
-		overflow: hidden;
-	}
-}
-/*************************** messages ******************************/
-
-.message {
-	width: 100%;
-	img {
-		margin: 0 0.5em 0.5em 0;
-		float: left;
-		width: 3em;
-		height: 3em;
-		border-radius: 50%;
-	}
-	div:nth-of-type(1) {
-		background-color: var(--red);
-		color: var(--article);
-		width: fit-content;
-		font-size: 0.75em;
-		margin-left: 98%;
-		padding: 0 0.25em;
-		border-radius: 3px;
-	}
-	p {
-		a::before {
-			margin: 0 0.2em !important;
-		}
-	}
-}
-.message.conversation {
-	padding: 0 5em 0 0;
-}
-.message.right {
-	text-align: right;
-	padding: 0 0 0 5em;
-	img {
-		margin: 0 0em 0.5em 0.5em;
-		float: right;
-	}
-}
-
-/*************************** general elements ******************************/
-
-h1 {
-	color: var(--foreground);
-}
-
-br {
-	clear: both;
-}
-
 /*************************** decorators ******************************/
 
 .red {
@@ -1191,13 +1299,6 @@ br {
 	color: var(--green);
 }
 
-hr {
-	margin: 1em auto;
-	height: 1px;
-	width: 100%;
-	border-color: var(--darkshadow);
-}
-
 hr.insertionArea {
 	margin: 1em auto;
 	height: 1em;
@@ -1210,7 +1311,8 @@ hr.insertionArea {
 	background-color: var(--green);
 }
 
-section > div > hr {
+section > div > hr,
+article>hr {
 	width: 95% !important;
 }
 
@@ -1226,109 +1328,6 @@ section > div > hr {
 
 .articleactive {
 	fill: var(--foreground);
-}
-
-/*************************** bigger screen masonry ******************************/
-/* quite at the bottom to override previous values.
-hope default value is ridiculously high enough in the medium future.
-min width will be reduced to a reasonable size by api.js in case user settings activate masonry style */
-
-main {
-	margin: 2rem auto 0;
-	width: 100%;
-	max-width: 50rem;
-	margin-bottom: 6rem;
-	> div,
-	> form {
-		--gap: 1em;
-		display: flex;
-		flex-flow: column wrap;
-		gap: var(--gap);
-		> article {
-			width: 100%;
-			padding: 1em;
-			border: 1px solid var(--3d-border);
-			border-radius: 0.2em;
-			background-color: var(--article);
-			box-shadow: var(--shadow);
-			transition: ease 0.2s;
-		}
-		> button {
-			width: 100%;
-			padding: 1em;
-			box-shadow: var(--shadow);
-			transition: ease 0.2s;
-		}
-	}
-	> div[draggable] {
-		display: block;
-		max-width: 50rem;
-		margin: auto;
-	}
-}
-
-@media only screen and (min-width: 2000rem) {
-	/* two colum breakpoint, adjusting see above */
-	main {
-		max-width: 105rem;
-		> div:not([draggable]),
-		> form {
-			> article,
-			> button {
-				width: calc(50% - var(--gap));
-			}
-			> :nth-child(2n + 1) {
-				order: 1;
-			}
-			> :nth-child(2n) {
-				order: 2;
-			}
-		}
-		> div:not([draggable])::before,
-		> div:not([draggable])::after,
-		> form::before,
-		> form::after {
-			content: "";
-			flex-basis: 100%;
-			width: 0;
-			order: 2;
-		}
-	}
-}
-
-@media only screen and (min-width: 3000rem) {
-	/* three colum breakpoint, adjusting see above */
-	main {
-		max-width: 155rem;
-		> div:not([draggable]),
-		> form {
-			> article,
-			> button {
-				width: calc(100% / 3 - var(--gap));
-			}
-			> :nth-child(3n + 1) {
-				order: 1;
-			}
-			> :nth-child(3n + 2) {
-				order: 2;
-			}
-			> :nth-child(3n) {
-				order: 3;
-			}
-		}
-		> div:not([draggable])::before,
-		> div:not([draggable])::after,
-		> form::before,
-		> form::after {
-			content: "";
-			flex-basis: 100%;
-			width: 0;
-			order: 2;
-		}
-		> div[draggable] {
-			transform: translateX(0.5em);
-		}
-	}
 }
 
 /*************************** icons and cursors ******************************/
