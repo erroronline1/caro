@@ -3,7 +3,7 @@
 		"comment": "following are common components #################################################################################################"
 	},
 	{
-		"name": "identifikator",
+		"name": "Identifikator",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -25,7 +25,7 @@
 		}
 	},
 	{
-		"name": "basisdaten",
+		"name": "Basisdaten",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -115,7 +115,7 @@
 		}
 	},
 	{
-		"name": "datenverarbeitung auftragserteilung schweigepflichtentbindung",
+		"name": "Datenverarbeitung Auftragserteilung Schweigepflichtentbindung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -222,7 +222,7 @@
 		}
 	},
 	{
-		"name": "empfangsbestätigung",
+		"name": "Empfangsbestätigung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -299,7 +299,7 @@
 		}
 	},
 	{
-		"name": "erlaubnis zur ausstellung und veröffentlichung",
+		"name": "Erlaubnis zur Ausstellung und Veröffentlichung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -380,7 +380,7 @@
 		}
 	},
 	{
-		"name": "versorgungsmaßnahme",
+		"name": "Versorgungsmaßnahme",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -452,7 +452,7 @@
 		}
 	},
 	{
-		"name": "versorgungsausführung",
+		"name": "Versorgungsausführung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -508,7 +508,7 @@
 		}
 	},
 	{
-		"name": "gebrauchsanweisung allgemein",
+		"name": "Gebrauchsanweisung Allgemein",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -545,7 +545,7 @@
 		}
 	},
 	{
-		"name": "gebrauchsanweisung handhabung",
+		"name": "Gebrauchsanweisung Handhabung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -568,7 +568,7 @@
 		}
 	},
 	{
-		"name": "gebrauchsanweisung körperpflege",
+		"name": "Gebrauchsanweisung Körperpflege",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -591,7 +591,7 @@
 		}
 	},
 	{
-		"name": "gebrauchsanweisung reinigung",
+		"name": "Gebrauchsanweisung Reinigung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -614,7 +614,7 @@
 		}
 	},
 	{
-		"name": "gebrauchsanweisung instandhaltung",
+		"name": "Gebrauchsanweisung Instandhaltung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -664,7 +664,7 @@
 		}
 	},
 	{
-		"name": "gebrauchsanweisung entsorgung",
+		"name": "Gebrauchsanweisung Entsorgung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -687,7 +687,7 @@
 		}
 	},
 	{
-		"name": "gebrauchsanweisung therapeuteninformation",
+		"name": "Gebrauchsanweisung Therapeuteninformation",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -710,7 +710,7 @@
 		}
 	},
 	{
-		"name": "konformitätserklärung",
+		"name": "Konformitätserklärung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -769,7 +769,7 @@
 		}
 	},
 	{
-		"name": "vorgangsprotokoll",
+		"name": "Vorgangsprotokoll",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -807,7 +807,7 @@
 		}
 	},
 	{
-		"name": "konfektionsversorgung",
+		"name": "Konfektionsversorgung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -901,7 +901,7 @@
 		}
 	},
 	{
-		"name": "produkteinführung",
+		"name": "Produkteinführung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -949,7 +949,7 @@
 		}
 	},
 	{
-		"name": "stichprobenprüfung",
+		"name": "Stichprobenprüfung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -1024,7 +1024,7 @@
 		}
 	},
 	{
-		"name": "schulungsbewertung",
+		"name": "Schulungsbewertung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -1059,7 +1059,7 @@
 		}
 	},
 	{
-		"name": "lieferantenbewertung",
+		"name": "Lieferantenbewertung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
@@ -1135,7 +1135,7 @@
 		}
 	},
 	{
-		"name": "vorkommnismeldung",
+		"name": "Vorkommnismeldung",
 		"alias": "",
 		"context": "component",
 		"unit": "common",
