@@ -311,19 +311,71 @@ Nur nicht so. Bitte vorher Hilfe aufsuchen:
 
 ![cloud storage meme](http://toh.erroronline.one/caro/cloudstoragememe.jpg)
 
-Um gelenkte und versionierte Dokumente und Dokumente anzulegen, müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Dokumente anschließend zusammensetzen lassen. Komponenten und Dokumente müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Dokumente für den jeweiligen Anwendungsfall berücksichtigt wurden.
+Dokumente sind modular. Um gelenkte und versionierte Dokumente anzulegen, müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Dokumente anschließend zusammensetzen lassen. Komponenten und Dokumente werden Bereichen zugeordnet. Dies verbessert die Übersicht im Editor und reduziert die Ablenkung während der regulären Nutzung da Nutzer die zur Auswahl stehenden Dokumente Bereichweise filtern können.
 
-Eine Freigabe-Anfrage für Komponenten und Dokumente wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der berechtigten Rolle während der Anmeldung in der Anwendung. Alle Nutzer erhalten eine Mitteilung über aktualisierte Dokumente.
+#### Komponentenbearbeitung
+Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
+* Scannerfeld, optional als Mehrfachauswahl und Identifikator
+* Textabschnitt für informative Zwecke ohne Eingabe
+* Bild um beispielsweise Informationgrafiken einzubinden
+* einfaches Textfeld, optional als Mehrfachauswahl und mit Vorschlag vorheriger Eingaben
+* mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge und mit Vorschlag vorheriger Eingaben
+* Nummernfeld, optional als Mehrfachauswahl. Steuert das Erscheinungbild der Tastatur auf mobilen Geräten
+* Datumsfeld. Steuert das Erscheinungbild der Eingabeoptionen
+* Telefonnummernfeld. Steuert das Erscheinungsbild der Tastatur auf mobilen Geräten
+* eMail-Adressenfeld. Steuert das Erscheinungsbild der Testatur auf mobilen Geräten
+* Verknüpfung-Eingabe. Umschließt automatisch den eingegebenen Wert mit der spezifischen Zeichenfolge *href='{WERT}'* um immerhalb der Anwendung als Verknüpfung angezeigt zu werden. Das funktioniert im Prinzip auch manuell bei anderen Eingabefeldern, sofern ein solcher Wert eingegeben wird. Dieses möglicherweise unerwünschte Verhalten wird in der [Risikoanalyse](#risikoanalyse) berücksichtigt
+* Produktauswahlfeld, optional als Mehrfachauswahl. Hat Zugriff auf die Artikeldatenbank
+* Schieberegler, Mindest-, Höchstwert und Schritte optional
+* Verknüpfungen (Links)
+* Mehrfachauswahl
+* Einfachauswahl (Buttons)
+* Einfachauswahl (Liste), optional als Mehrfachauswahl. Einträge erscheinen in der Reihenfolge wie angegeben. Sollte diese alphabetisch sein (Sonderzeichen, A-Z, a-z) wird die Liste ab 12 Einträgen nach Anfangsbuchstaben gruppiert.
+* Datei-Upload, optional als Mehrfachauswahl
+* Foto-Upload, optional als Mehrfachauswahl. Mobile Geräte greifen auf die Kamera zu, Desktop-Geräte öffnen eine Dateiauswahl
+* Unterschriftenfeld
+* Kalenderschaltfläche
+* Dokumentenverknüpfung, nur zur Ansicht oder als Weiterleitung mit Übernahme eines Identifikators
+* horizontale Linie zur Dokumentenstrukturierung
 
-Komponenten können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Dokumente können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
+Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren.
+Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
+
+> [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Dieser Export beinhaltet die jeweils neusten Daten der verschiedenen Fragestellungen innerhalb der Dokumente in einer entsprechenden Tabellenspalte. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
+
+#### *Caveat:*
+Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
+* Datei-,
+* Foto-Uploads,
+* Produktauswahlfelder,
+* Unterschriftenfelder und
+* Kalenderschaltflächen
+
+sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert. Vorschläge vorheriger Eingaben sind hier nicht verfügbar.
+
+Elemente können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Die meisten Elemente können bearbeitet werden - ihr Inhalt kann in den entsprechenden Editor importiert werden um geändert oder ergänzt und anschießend wieder hinzugefügt zu werden. Das Original-Element verbleibt dabei und muss manuell entfernt werden.
 
 Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
 
-Dokumente können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Foto- und Dateiuploads sowie Bedienfelder durch Hinweise ersetzt und Identifikatoren in der Kopfzeile implementiert. Dokumente können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden und eine bessere Datensammlung innerhalb der Anwendung zu fördern. Ersteller der Dokumente können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird), wobei in diesem Fall die Durchsuchbarkeit und Übersicht leidet.
+#### Dokumentenbearbeitung
+Dokument können durch die Auswahl beliebiger freigegebener Komponenten zusammengestellt werden. Komponenten können mit der [Maus sortiert und positioniert](#verschiedenes) werden.
+
+Dokumente können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
 
 Dokumente können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche).
 
+Dokumente können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Foto- und Dateiuploads sowie Bedienfelder durch Hinweise ersetzt und Identifikatoren in der Kopfzeile implementiert. Dokumente können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden und eine bessere Datensammlung innerhalb der Anwendung zu fördern. Ersteller der Dokumente können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird), wobei in diesem Fall die Durchsuchbarkeit und Übersicht leidet.
+
+Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
+
 ![document composer screenshot](http://toh.erroronline.one/caro/document%20manager%20de.png)
+
+#### Dokumentenlenkung
+Komponenten und Dokumente müssen von berechtigten Nutzern freigegeben werden bevor sie genutzt werden können. Eine Freigabe-Anfrage für Komponenten und Dokumente wird über den internen [Nachrichtendienst](#unterhaltungen) and die definierten Nutzergruppen versandt; sofern für die Freigabe definiert, Bereichsleiter des in der Bearbeitungsmaske festgelegten Bereichs. Die Freigabe erfolgt durch die Auswahl der zutreffenden Option in der berechtigten Rolle während der Anmeldung in der Anwendung. Alle Nutzer erhalten eine Mitteilung über aktualisierte Dokumente.
+
+Die Versionierung findet über einen Zeitstempel statt.
+
+Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Dokumente für den jeweiligen Anwendungsfall berücksichtigt wurden. Dokumentenpakete unterliegen keiner Freigabe oder Versionierung, können aber auch nicht gelöscht sondern nur verborgen werden.
 
 ```mermaid
 graph TD;
@@ -372,45 +424,6 @@ graph TD;
     sofern dieser nicht verborgen,
     vollständig freigegeben ist und die Berechtigungen übereinstimmen")
 ```
-
-Verfügbare Elemente für Dokumente sind:
-* Scannerfeld, optional als Mehrfachauswahl und Identifikator
-* Textabschnitt für informative Zwecke ohne Eingabe
-* Bild um beispielsweise Informationgrafiken einzubinden
-* einfaches Textfeld, optional als Mehrfachauswahl und mit Vorschlag vorheriger Eingaben
-* mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge und mit Vorschlag vorheriger Eingaben
-* Nummernfeld, optional als Mehrfachauswahl. Steuert das Erscheinungbild der Tastatur auf mobilen Geräten
-* Datumsfeld. Steuert das Erscheinungbild der Eingabeoptionen
-* Telefonnummernfeld. Steuert das Erscheinungsbild der Tastatur auf mobilen Geräten
-* eMail-Adressenfeld. Steuert das Erscheinungsbild der Testatur auf mobilen Geräten
-* Verknüpfung-Eingabe. Umschließt automatisch den eingegebenen Wert mit der spezifischen Zeichenfolge *href='{WERT}'* um immerhalb der Anwendung als Verknüpfung angezeigt zu werden. Das funktioniert im Prinzip auch manuell bei anderen Eingabefeldern, sofern ein solcher Wert eingegeben wird. Dieses möglicherweise unerwünschte Verhalten wird in der [Risikoanalyse](#risikoanalyse) berücksichtigt
-* Produktauswahlfeld, optional als Mehrfachauswahl. Hat Zugriff auf die Artikeldatenbank
-* Schieberegler, Mindest-, Höchstwert und Schritte optional
-* Verknüpfungen (Links)
-* Mehrfachauswahl
-* Einfachauswahl (Buttons)
-* Einfachauswahl (Liste), optional als Mehrfachauswahl. Einträge erscheinen in der Reihenfolge wie angegeben. Sollte diese alphabetisch sein (Sonderzeichen, A-Z, a-z) wird die Liste ab 12 Einträgen nach Anfangsbuchstaben gruppiert.
-* Datei-Upload, optional als Mehrfachauswahl
-* Foto-Upload, optional als Mehrfachauswahl. Mobile Geräte greifen auf die Kamera zu, Desktop-Geräte öffnen eine Dateiauswahl
-* Unterschriftenfeld
-* Kalenderschaltfläche
-* Dokumentenverknüpfung, nur zur Ansicht oder als Weiterleitung mit Übernahme eines Identifikators
-* horizontale Linie zur Dokumentenstrukturierung
-
-Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren.
-Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
-
-> [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Dieser Export beinhaltet die jeweils neusten Daten der verschiedenen Fragestellungen innerhalb der Dokumente in einer entsprechenden Tabellenspalte. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
-
-#### *Caveat:*
-Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
-* Datei-,
-* Foto-Uploads,
-* Produktauswahlfelder,
-* Unterschriftenfelder und
-* Kalenderschaltflächen
-
-sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert. Vorschläge vorheriger Eingaben sind hier nicht verfügbar.
 
 Bildschirmformular
 
