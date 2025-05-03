@@ -498,7 +498,11 @@ class TOOL extends API {
 	}
 
 	/**
-	 * 
+	 *       _     
+	 *   ___|_|___ 
+	 *  |- _| | . |
+	 *  |___|_|  _|
+	 *        |_|  
 	 */
 	public function zip(){
 		$result['render'] = [
@@ -561,7 +565,6 @@ class TOOL extends API {
 		}
 
 		$this->response($result);
-
 	}
 }
 ?>
