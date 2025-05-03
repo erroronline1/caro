@@ -222,8 +222,18 @@ class DOCUMENT extends API {
 					}
 
 					// unset requires attributes in advance to posting approval to avoid unneccessary formvalidation
+					$dependeddocuments = [];
 					if ($approve['context'] === 'component'){
 						array_push($return['render']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
+						// check for dependencies in documents
+						$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+						$hidden = [];
+						foreach($fd as $row) {
+							if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
+							if (isset($approve['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($approve['name'], explode(',', $row['content']))) {
+								$dependeddocuments[] = $row['name'];
+							}
+						}
 					}
 					else {
 						foreach(explode(',', $approve['content']) as $component){
@@ -240,11 +250,12 @@ class DOCUMENT extends API {
 					}
 
 					// gather informal document properties
-					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => UTILITY::dateFormat(substr($approve['date'], 1, -3))]);
+					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => UTILITY::dateFormat($approve['date'])]);
 					if ($approve['alias']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_alias') . ': ' . $approve['alias'];
 					if ($approve['regulatory_context']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_regulatory_context') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['regulatory'][$context], explode(',', $approve['regulatory_context'])));
 					if ($approve['restricted_access']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_restricted_access') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['permissions'][$context], explode(',', $approve['restricted_access'])));
 					if ($approve['permitted_export']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_permitted_export');
+					if ($dependeddocuments) $documentproperties .= "\n \n" . $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(', ', $dependeddocuments)]);
 
 					array_push($return['render']['content'], 
 						[
@@ -254,7 +265,7 @@ class DOCUMENT extends API {
 						], [
 							[
 								'type' => 'textsection',
-								'content' => $documentproperties
+								'content' => $documentproperties,
 							],							
 							[
 								'type' => 'checkbox',
@@ -1136,7 +1147,7 @@ class DOCUMENT extends API {
 					'value' => $component['name'],
 					'hint' => ($component['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $component['author'], ':date' => UTILITY::dateFormat(substr($component['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
 						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
-						($dependeddocuments ? $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(',', $dependeddocuments)]) : ''),
+						($dependeddocuments ? $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(', ', $dependeddocuments)]) : ''),
 					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : null,
 					'approve' => $approve
 				]],
