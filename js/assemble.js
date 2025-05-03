@@ -176,12 +176,12 @@ export class Masonry {
 				child = children[index];
 				column = index % columns;
 				// get current height
-				childHeight = child.hasChildNodes() ? child.getBoundingClientRect().height + gap : 0;
+				childHeight = child.hasChildNodes() || child.constructor === HTMLHRElement ? child.getBoundingClientRect().height + gap : 0;
 				// insert spacer if and where applicable
 				if (init && Date.now() - startTime < this.timeout) {
 					// if the next columns bottom including the current childs height is higher (less) than the current columns height including the current childs height
 					// then shift child to next column by inserting an invisible pseudo article
-					if (child.hasChildNodes() || child.constructor === HTMLHRElement) {
+					if (childHeight > 0) {
 						// check for the following max columns - 1
 						for (let addColumn = 0; addColumn < columns - 1; addColumn++) {
 							currentColumn = (columnHeight[column + addColumn] !== undefined ? column : -1) + addColumn;
