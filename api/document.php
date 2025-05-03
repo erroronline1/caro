@@ -181,10 +181,8 @@ class DOCUMENT extends API {
 						'content' => $documentselection
 					];
 				}
-				if ($componentselection || $documentselection) $return['render']['content'][] = [
-					[
-						'type' => 'hr'
-					]
+				if ($componentselection || $documentselection) $return['render']['content'][count($return['render']['content']) - 1][] = [
+					'type' => 'hr'
 				];
 				else $this->response(['render' => ['content' => $this->noContentAvailable($this->_lang->GET('assemble.approve.no_approvals'))]]);
 
@@ -261,13 +259,10 @@ class DOCUMENT extends API {
 						[
 							[
 								'type' => 'hr'
-							]
-						], [
-							[
+							], [
 								'type' => 'textsection',
 								'content' => $documentproperties,
-							],							
-							[
+							], [
 								'type' => 'checkbox',
 								'content' => $approvalposition,
 								'attributes' => [
