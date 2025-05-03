@@ -396,19 +396,71 @@ Just don't do it like this. Seek help before doing this:
 
 ![cloud storage meme](http://toh.erroronline.one/caro/cloudstoragememe.jpg)
 
-To create tracked and versioned documents and documents, create reusable document components and assemble documents from components. Components and documents have to be approved by defined authorized users to take effect. Furthermore documents can be grouped to document bundles. This way anyone can check if all necessary documents have been taken into account for defined use cases.
+Documents are modular. To create tracked and versioned documents, create reusable document components and assemble documents from components. Components and documents are assigned to units. This enhances the overwiew within the editor and allows for reduced distraction during regular use for the user being able to filter selecteable documents unitwise.
 
-An approvement request for documents and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. All registered users get a message on document updates.
+#### Component editing
+Available elements for components or rather documents are:
+* scanner field, optional as multiple and context identifier
+* text section for information purpose without input
+* image for including e.g. infographics
+* single line text input, optional as multiple and with former inputs recommended
+* multi line text input, optional access to text templates and with former inputs recommended
+* number input, optional as multiple. Controls appearance of keypad on mobile devices
+* date input. Controls appearance of input options
+* phone input. Controls appearance of keypad on mobile devices
+* mail input. Controls appearance of keypad on mobile devices
+* link input. Wraps the value with the specific character pattern *href='{VALUE}'* to be displayed as a link within the application. This works in principle manually for other fields as well, if this kind of value is provided. This possible adverse behaviour is recognized within the [risk assessment](#risk-assessment)
+* product selection input, optional as multiple. Accesses the products database
+* range input, min, max and step optional
+* links
+* multiple selection options
+* single selection options (buttons)
+* single selection options (list), optional as multiple. Entries are displayed in the given order. If provided in alphabetical order (punctuation, A-Z, a-z) the list will be grouped by initials on more than 12 entries. 
+* file upload, optional as multiple
+* photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
+* signature field
+* calendar button
+* document link, just for display or to continue transferring identifier
+* horizontal line for document structure
 
-Components can be rearranged via [drag and drop editor](#miscellaneous). Documents can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended.
+Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
+Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
+
+> [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) allow for an export of records data. This export contains the most recent data of distinct document issues in their respective table column. It is beneficial and recommended that document issues do not repeat themself within components and documents. Repetitions do not harm the documentation per se, but may limit the analytical possibilities for the data dump.
+
+#### *Caveat:*
+Some elements are only processible as proper records.
+* file,
+* photo,
+* product selection,
+* signature and
+* calendarbutton
+
+are not processable for document-contexts within the [languagefiles](#customisation) group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored. Former input recommendations are not available.
+
+Elements can be rearranged via [drag and drop editor](#miscellaneous). Most elements can be edited - their content can be imported into the respective editor to be altered or appended and reinserted afterwards. The original element remains though and has to be deleted manually. 
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-Documents can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Photo- and upload-options as well as buttons are replaced by a hint, identifiers are embedded in the header. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized document creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable document), while in the latter case any searchability and quick overviews suffer.
+#### Document editing
+Documents can be assembled by selecting any of the approved components. Components can be rearranged via [drag and drop editor](#miscellaneous).
+
+Documents can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended.
 
 Documents can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
 
+Documents can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Photo- and upload-options as well as buttons are replaced by a hint, identifiers are embedded in the header. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized document creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable document), while in the latter case any searchability and quick overviews suffer.
+
+The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
+
 ![document composer screenshot](http://toh.erroronline.one/caro/document%20manager.png)
+
+#### Document control
+Components and documents have to be approved by defined authorized users to take effect. An approvement request for documents and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. All registered users get a message on document updates.
+
+Versioning is achieved by a timestamp. 
+
+Furthermore documents can be grouped to document bundles. This way anyone can check if all necessary documents have been taken into account for defined use cases. Document bundles are not subject to approval and versioning but also can not be deleted, only hidden.
 
 ```mermaid
 graph TD;
@@ -468,45 +520,6 @@ graph TD;
     if named item is not hidden,
     approved and permissions match")
 ```
-
-Available elements for documents are:
-* scanner field, optional as multiple and context identifier
-* text section for information purpose without input
-* image for including e.g. infographics
-* single line text input, optional as multiple and with former inputs recommended
-* multi line text input, optional access to text templates and with former inputs recommended
-* number input, optional as multiple. Controls appearance of keypad on mobile devices
-* date input. Controls appearance of input options
-* phone input. Controls appearance of keypad on mobile devices
-* mail input. Controls appearance of keypad on mobile devices
-* link input. Wraps the value with the specific character pattern *href='{VALUE}'* to be displayed as a link within the application. This works in principle manually for other fields as well, if this kind of value is provided. This possible adverse behaviour is recognized within the [risk assessment](#risk-assessment)
-* product selection input, optional as multiple. Accesses the products database
-* range input, min, max and step optional
-* links
-* multiple selection options
-* single selection options (buttons)
-* single selection options (list), optional as multiple. Entries are displayed in the given order. If provided in alphabetical order (punctuation, A-Z, a-z) the list will be grouped by initials on more than 12 entries. 
-* file upload, optional as multiple
-* photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
-* signature field
-* calendar button
-* document link, just for display or to continue transferring identifier
-* horizontal line for document structure
-
-Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
-Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
-
-> [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) allow for an export of records data. This export contains the most recent data of distinct document issues in their respective table column. It is beneficial and recommended that document issues do not repeat themself within components and documents. Repetitions do not harm the documentation per se, but limit the analytical possibilities for the data dump.
-
-#### *Caveat:*
-Some elements are only processible as proper records.
-* file,
-* photo,
-* product selection,
-* signature and
-* calendarbutton
-
-are not processable for document-contexts within the [languagefiles](#customisation) group documentcontext.notdisplayedinrecords (by default: MDR §14 Sample Check, Product incorporation, Training evaluation and Vendor evaluation). These input fields will be ignored. Former input recommendations are not available.
 
 Screen document
 
