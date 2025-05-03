@@ -497,9 +497,11 @@ main {
 		}
 	}
 	> div[draggable] {
-		display: block;
+		display: flex;
 		max-width: 50rem;
 		margin: auto;
+		flex-flow: column;
+		gap: var(--gap);
 	}
 	hr {
 		margin: 1em auto;
