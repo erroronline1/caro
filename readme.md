@@ -30,7 +30,7 @@ graph LR;
 * responsibilities
     * handle hidden attribute?
 * stl filepicker
-    * limit file filter to stl files -> _shared search functions using placeholders!?
+    * limit file filter to stl files, auto append *.stl ?
 
 ## Content
 * [Aims](#aims)

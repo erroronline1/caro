@@ -1432,18 +1432,18 @@ class RECORD extends API {
 		$available_units = array_unique($available_units);
 		sort($available_units);
 		$assignable = true;
-		$organizational_units[$this->_lang->GET('record.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', document.getElementById('_recordfilter').value || 'null')"];
+		$organizational_units[$this->_lang->GET('record.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', encodeURIComponent(document.getElementById('_recordfilter').value) || 'null')"];
 		if (!$this->_unit) $organizational_units[$this->_lang->GET('record.mine')]['checked'] = true;
 		foreach($available_units as $unit){
 			if (!$unit) {
 				$assignable = false;
 				continue;
 			}
-			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', document.getElementById('_recordfilter').value || 'null', '" . $unit . "')"];
+			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', encodeURIComponent(document.getElementById('_recordfilter').value) || 'null', '" . $unit . "')"];
 			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 		}
 		if (!$assignable) {
-			$organizational_units[$this->_lang->GET('record.unassigned')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', document.getElementById('_recordfilter').value || 'null', '_unassigned')"];
+			$organizational_units[$this->_lang->GET('record.unassigned')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', encodeURIComponent(document.getElementById('_recordfilter').value) || 'null', '_unassigned')"];
 			if ($this->_unit === '_unassigned') $organizational_units[$this->_lang->GET('record.unassigned')]['checked'] = true;
 		}
 
@@ -1459,7 +1459,7 @@ class RECORD extends API {
 					'attributes' => [
 						'id' => '_recordfilter',
 						'name' => $this->_lang->GET('record.filter'),
-						'onkeydown' => "if (event.key === 'Enter') {api.record('get', 'records', this.value);}",
+						'onkeydown' => "if (event.key === 'Enter') {api.record('get', 'records', encodeURIComponent(this.value));}",
 						'value' => ($this->_requestedID && $this->_requestedID !== 'null') ? $this->_requestedID : ''
 					],
 					'datalist' => array_values(array_unique($recorddatalist))

@@ -477,7 +477,7 @@ class DOCUMENT extends API {
 									'numeration' => 'prevent',
 									'attributes' => [
 										'name' => $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle'),
-										'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'bundle', this.value); return false;}"
+										'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'bundle', encodeURIComponent(this.value)); return false;}"
 									],
 									'datalist' => array_values(array_unique($bundledatalist))
 								]
@@ -569,7 +569,7 @@ class DOCUMENT extends API {
 	public function bundles(){
 		if ($this->_requestedID === 'null') $this->_requestedID = null;
 		$available_units = [];
-
+		$this->_requestedID = urldecode($this->_requestedID);
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = $bundles = [];
 		foreach($bd as $key => $row) {
@@ -583,7 +583,7 @@ class DOCUMENT extends API {
 
 			// add to result
 			if ($this->_requestedID) similar_text($this->_requestedID, $row['name'], $percent); // filter by similarity if search is requested
-			if (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity']) {
+			if (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity'] || fnmatch($this->_requestedID, $row['name'], FNM_CASEFOLD)) {
 				if (($documents = $row['content'] ? explode(',', $row['content']) : false) !== false){
 					if (!isset($bundles[$row['name']])) $bundles[$row['name']] = [];
 					foreach ($documents as $key => $documentname){
@@ -599,13 +599,13 @@ class DOCUMENT extends API {
 		$organizational_units = [];
 		$available_units = array_unique($available_units);
 		sort($available_units);
-		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'bundles', document.getElementById('_bundlefilter').value || 'null')"];
+		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'bundles', encodeURIComponent(document.getElementById('_bundlefilter').value) || 'null')"];
 		if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 		foreach($available_units as $unit){
 			if (!$unit) {
 				continue;
 			}
-			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'bundles', document.getElementById('_bundlefilter').value || 'null', '" . $unit . "')"];
+			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'bundles', encodeURIComponent(document.getElementById('_bundlefilter').value) || 'null', '" . $unit . "')"];
 			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 		}
 
@@ -616,7 +616,7 @@ class DOCUMENT extends API {
 					'attributes' => [
 						'id' => '_bundlefilter',
 						'name' => $this->_lang->GET('assemble.compose.document_filter'),
-						'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'bundles', this.value);}",
+						'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'bundles', encodeURIComponent(this.value));}",
 						'value' => $this->_requestedID ? : ''
 					],
 					'datalist' => array_keys($bundles)
@@ -1048,7 +1048,7 @@ class DOCUMENT extends API {
 							'numeration' => 'prevent',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.component.existing_components'),
-								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component_editor', this.value); return false;}"
+								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component_editor', encodeURIComponent(this.value)); return false;}"
 							],
 							'datalist' => array_values(array_unique($componentdatalist))
 						]
@@ -1874,7 +1874,7 @@ class DOCUMENT extends API {
 							'numeration' => 'prevent',
 							'attributes' => [
 								'name' => $this->_lang->GET('assemble.compose.document.existing_documents'),
-								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'document_editor', this.value); return false;}"
+								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'document_editor', encodeURIComponent(this.value)); return false;}"
 							],
 							'datalist' => array_values(array_unique($documentdatalist))
 						]
@@ -1901,7 +1901,7 @@ class DOCUMENT extends API {
 						'numeration' => 'prevent',
 						'attributes' => [
 							'name' => $this->_lang->GET('assemble.compose.document.add_component'),
-							'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component', this.value); return false;}"
+							'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component', encodeURIComponent(this.value)); return false;}"
 						],
 						'datalist' => array_values(array_unique($componentdatalist))
 					]
@@ -2008,13 +2008,13 @@ class DOCUMENT extends API {
 		$organizational_units = [];
 		$available_units = array_unique($available_units);
 		sort($available_units);
-		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'documents', document.getElementById('_documentfilter').value || 'null')"];
+		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'documents', encodeURIComponent(document.getElementById('_documentfilter').value) || 'null')"];
 		if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 		foreach($available_units as $unit){
 			if (!$unit) {
 				continue;
 			}
-			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'documents', document.getElementById('_documentfilter').value || 'null', '" . $unit . "')"];
+			$organizational_units[$this->_lang->_USER['units'][$unit]] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'documents', encodeURIComponent(document.getElementById('_documentfilter').value) || 'null', '" . $unit . "')"];
 			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 		}
 				
@@ -2027,7 +2027,7 @@ class DOCUMENT extends API {
 							'id' => '_documentfilter',
 							'value' => $this->_requestedID && $this->_requestedID !== 'null' ? $this->_requestedID : '',
 							'name' => $this->_lang->GET('assemble.compose.document_filter'),
-							'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'documents', this.value)}",
+							'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'documents', encodeURIComponent(this.value))}",
 						],
 						'datalist' => array_values(array_unique($documentdatalist)),
 						'hint' => $this->_lang->GET('assemble.compose.document_filter_hint')

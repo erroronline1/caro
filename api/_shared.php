@@ -57,9 +57,10 @@ class SHARED {
 		// return based on similarity if search is provided
 		// also converting the path
 		$matches = [];
+		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
 		foreach ($files as $file){
-			similar_text($parameter['search'], pathinfo($file)['filename'], $percent);
-			if (!$parameter['search'] || $percent >= CONFIG['likeliness']['file_search_similarity']) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
+			similar_text($parameter['search'], pathinfo($file)['basename'], $percent);
+			if (!$parameter['search'] || $percent >= CONFIG['likeliness']['file_search_similarity'] || fnmatch($parameter['search'], pathinfo($file)['basename'], FNM_CASEFOLD)) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
 		}
 		return $matches;
 	}
@@ -78,6 +79,8 @@ class SHARED {
 	public function documentsearch($parameter = []){
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $matches = [];
+
+		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
 
 		/**
 		 * looks for names, descriptions, hints and contents similar to search string
@@ -107,7 +110,8 @@ class SHARED {
 					}
 					foreach($comparisons as $term) {
 						similar_text($search, $term, $percent);
-						if (stristr($term, $search) || $percent >= CONFIG['likeliness']['file_search_similarity']) return true;
+						// suppress errors on long terms for fnmatch limit
+						if (stristr($term, $search) || $percent >= CONFIG['likeliness']['file_search_similarity'] || @fnmatch($search, $term, FNM_CASEFOLD)) return true;
 					}
 				}
 			}
@@ -125,7 +129,7 @@ class SHARED {
 					// limit search to similarity
 					if ($parameter['search']){
 						similar_text($parameter['search'], $term, $percent);
-						if ($percent < CONFIG['likeliness']['file_search_similarity']) continue;
+						if ($percent < CONFIG['likeliness']['file_search_similarity'] && !fnmatch($parameter['search'], $term, FNM_CASEFOLD)) continue;
 					}
 					$matches[] = $row;
 				}
@@ -145,7 +149,7 @@ class SHARED {
 					'values' => [
 						':name' => $row['name']
 					]]);
-				if (findInComponent($document['content'], $parameter['search'])) {
+				if ($parameter['search'] && findInComponent($document['content'], $parameter['search'])) {
 					$matches[] = $row;
 				}
 			}
@@ -167,13 +171,15 @@ class SHARED {
 	public function recordsearch($parameter = []){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 
+		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
+
 		$contexts = [];
 
 		foreach($data as $row){
 			// limit search to similarity
 			if ($parameter['search']){
 				similar_text($parameter['search'], $row['identifier'], $percent);
-				if ($percent < CONFIG['likeliness']['records_search_similarity']) continue;
+				if ($percent < CONFIG['likeliness']['records_search_similarity'] && !fnmatch($parameter['search'], $row['identifier'], FNM_CASEFOLD)) continue;
 			}
 
 			// continue if record has been closed unless explicitly searched for
@@ -224,6 +230,9 @@ class SHARED {
 	public function risksearch($parameter = []){
 		$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 		$productsPerSlide = 0;
+
+		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
+
 		$slides = [
 			[
 				[
@@ -231,7 +240,7 @@ class SHARED {
 					'attributes' => [
 						'name' => $this->_lang->GET('risk.search'),
 						'onkeydown' => "if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}",
-						'value' => isset($parameter['search']) ? $parameter['search'] : ''
+						'value' => $parameter['search'] ? : ''
 					]
 				]
 			]
@@ -239,7 +248,12 @@ class SHARED {
 		foreach($risk_datalist as $row){
 			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 			$row['risk'] = implode(' ', array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
-			if (isset($parameter['search']) && trim($parameter['search']) && stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search'])){
+			if ($parameter['search'] && trim($parameter['search']) && 
+				(
+					stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search']) ||
+					// suppress errors on long terms for fnmatch limit
+					@fnmatch($parameter['search'], $row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], FNM_CASEFOLD)
+				)){
 
 				if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
 					$slides[] = [

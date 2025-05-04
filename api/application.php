@@ -711,7 +711,7 @@ class APPLICATION extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('application.search'),
 					'value' => $this->_search,
-					'onkeydown' => "if (event.key === 'Enter') {api.application('get', 'start', this.value); return false;}",
+					'onkeydown' => "if (event.key === 'Enter') {api.application('get', 'start', encodeURIComponent(this.value)); return false;}",
 				]
 			]
 		];

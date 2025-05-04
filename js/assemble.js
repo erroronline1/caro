@@ -2817,7 +2817,7 @@ export class Assemble {
 							type: "search",
 							attributes: {
 								name: api._lang.GET("file.file_filter_label"),
-								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', this.value, 'stlpicker');}",
+								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', encodeURIComponent(this.value), 'stlpicker');}",
 							},
 						},
 						{

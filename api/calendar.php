@@ -862,14 +862,14 @@ class CALENDAR extends API {
 						'value' => $this->_requestedId,
 						'id' => 'recordfilter',
 						'name' => $this->_lang->GET('calendar.schedule.search'),
-						'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value)}",
+						'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', 'search', encodeURIComponent(this.value))}",
 					],
 					'hint' => $this->_lang->GET('calendar.schedule.search_hint'),
 				]
 			]
 		]]];
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		$dbevents = $calendar->search($this->_requestedId);
+		$dbevents = $calendar->search(urldecode($this->_requestedId));
 
 		// append filtered events
 		$events = $this->scheduledEvents($dbevents, $calendar) ? : [
@@ -1023,7 +1023,7 @@ class CALENDAR extends API {
 						'attributes' => [
 							'id' => 'recordfilter',
 							'name' => $this->_lang->GET('calendar.schedule.search'),
-							'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', 'search', this.value);}",
+							'onkeydown' => "if (event.key === 'Enter') {api.calendar('get', 'search', encodeURIComponent(this.value))}",
 						],
 						'hint' => $this->_lang->GET('calendar.schedule.search_hint'),
 					]
