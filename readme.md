@@ -29,6 +29,8 @@ graph LR;
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
+* stl filepicker
+    * limit file filter to stl files -> _shared search functions using placeholders!?
 
 ## Content
 * [Aims](#aims)
@@ -417,6 +419,7 @@ Available elements for components or rather documents are:
 * photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
 * signature field
 * calendar button
+* STL-file picker. Accesses provided files, preview included
 * document link, just for display or to continue transferring identifier
 * horizontal line for document structure
 

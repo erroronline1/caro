@@ -1065,6 +1065,30 @@ export const api = {
 			case "get":
 				switch (request[1]) {
 					case "filter":
+						if (request[4] === 'stlpicker'){
+							// stlpicker coming from assemble.js widget
+							successFn = function (data) {
+								let article = document.querySelector("#inputmodal form article");
+								let sibling = article.children[2], // as per assemble after label and hidden input
+									deletesibling;
+								sibling = sibling.nextSibling;
+								if (sibling) {
+									do {
+										deletesibling = sibling;
+										sibling = sibling.nextSibling;
+										deletesibling.remove();
+									} while (sibling);
+								}
+								if (data.data) {
+									const options = _client.record.stlpicker(data.data);
+									const render = new Assemble(options);
+									render.initializeSection(null, article.children[2]);
+									render.processAfterInsertion();
+								}
+								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							};
+						}
+						else {
 						successFn = function (data) {
 							if (data.data) {
 								const all = document.querySelectorAll("[data-filtered]");
@@ -1076,6 +1100,7 @@ export const api = {
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
+					}
 						break;
 					case "bundlefilter":
 						successFn = function (data) {

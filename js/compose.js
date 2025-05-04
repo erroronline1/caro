@@ -152,7 +152,7 @@ export class Composer {
 					if (element.content === undefined) element.content = {};
 					element.content[siblingValue] = {};
 				}
-			} else if (["file", "photo", "scanner", "signature", "identify"].includes(element.type)) {
+			} else if (["file", "photo", "scanner", "signature", "identify", "stlpicker"].includes(element.type)) {
 				if (siblingName === api._lang.GET("assemble.compose.component.simple_element")) {
 					if (siblingValue) element.attributes.name = siblingValue;
 					else return;
@@ -2277,6 +2277,25 @@ export class Compose extends Assemble {
 		};
 		result = result.concat(...this.button());
 		return result;
+	}
+
+	/**
+	 * creates editor to add an stlpicker
+	 * @see this.compose_simpleElement()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_stlpicker"
+	 * 	}
+	 */
+	compose_stlpicker() {
+		return this.compose_simpleElement({
+			type: "stlpicker",
+			description: api._lang.GET("assemble.compose.component.stlpicker"),
+			required: "optional",
+			multiple: "optional",
+			hint: api._lang.GET("assemble.compose.component.stlpicker_hint"),
+		});
 	}
 
 	/**

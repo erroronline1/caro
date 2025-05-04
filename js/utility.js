@@ -1383,6 +1383,59 @@ export const _client = {
 					anchor.style.display = "block";
 				});
 		},
+		/**
+		 * radio selection with stl preview
+		 * @param {array} files array
+		 * @returns assemble radio widget
+		 */
+		stlpicker: (files) => {
+			const content = {};
+			const stloptions = {};
+			stloptions[api._lang.GET("assemble.render.stlpicker_decline")] = false;
+			stloptions[api._lang.GET("assemble.render.stlpicker_select")] = { value: true, class: "reducedCTA" };
+
+			for (const url of files) {
+				let path = url.split("documents/");
+				path = path[1] ? path[1] : path[0];
+
+				content[path] = {
+					value: path,
+					onclick: function () {
+						new _client.Dialog({
+							type: "stl",
+							header: "lkjlkjn",
+							render: {
+								name: "stlpath",
+								url: "stlurl",
+								transfer: true,
+							},
+							options: stloptions,
+						}).then((response) => {
+							if (!response) {
+								this.checked = false;
+								document.getElementById("_selectedfile").value = "";
+							}
+						});
+					}
+						.toString()
+						._replaceArray(["stlpath", "stlurl", "stloptions"], [path, url, JSON.stringify(stloptions)]),
+					onchange: function () {
+						document.getElementById("_selectedfile").value = this.value;
+					},
+				};
+			}
+			return {
+				content: [
+					{
+						type: "radio",
+						attributes: {
+							name: api._lang.GET("assemble.render.stlpicker_results"),
+						},
+						content: content,
+					},
+				],
+			};
+		},
 	},
 	texttemplate: {
 		data: null,

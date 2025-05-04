@@ -354,6 +354,8 @@
 				"signature": "Füge ein Unterschriftenfeld hinzu",
 				"signature_hint": "Zur Erinnerung: die Unterschrift ist mangels Zertifizierung nicht dokumentensicher",
 				"simple_element": "Gib einen Namen für das Element an",
+				"stlpicker": "Füge eine STL-Datei-Auswahl hinzu",
+				"stlpicker_hint": "Es stehen die bereitgestellten STL-Dateien zur Verfügung.",
 				"tel": "Füge ein Telefonnummernfeld hinzu",
 				"text": "Füge ein einfaches Textfeld hinzu",
 				"textarea": "Füge ein mehrzeiliges Textfeld hinzu",
@@ -467,6 +469,9 @@
 			"scan_button": "Einen Code für :field scannen",
 			"scan_multiple": "Nach dem Scan oder einer Eingabe erscheint ein weiteres Feld.",
 			"select_multiple": "Nach der Auswahl erscheint eine weitere Liste.",
+			"stlpicker_decline": "doch nicht",
+			"stlpicker_results": "Ergebnisse",
+			"stlpicker_select": "das ist es",
 			"textarea_autocomplete": "Drücke die :forth- oder :back-Taste um durch die verfügbaren Optionen zu schalten."
 		}
 	},

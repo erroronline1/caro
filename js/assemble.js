@@ -242,7 +242,7 @@ export class Dialog {
 	 * 	});
 	 * ```
 	 * @example ```js
-	 * new Dialog({type:'stl', header:'display and download', render:{name: 'filename', url:'urlToFile');
+	 * new Dialog({type:'stl', header:'display and download', render:{name: 'filename', url:'urlToFile', transfer:undefined || true);
 	 * ```
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
@@ -271,10 +271,10 @@ export class Dialog {
 		if (this.type) {
 			// define output dialog
 			if (this.type === "input") this.modal = "inputmodal";
-			if (this.type === "input2") {
+			if (["input2", "stl"].includes(this.type)) {
 				this.modal = "inputmodal2";
-				this.type = "input";
 			}
+			if (this.type === "input2") this.type = "input";
 
 			// assemble render data
 			if (this.type === "input") {
@@ -390,7 +390,7 @@ export class Dialog {
 					// release ressources
 					this.stlviewer.canvas.remove();
 					this.stlviewer = {};
-					return;
+					if (!this.render.transfer) return;
 				}
 
 				/**
@@ -599,12 +599,16 @@ export class Dialog {
 		div.title = api._lang.GET("assemble.render.aria.stl", { ":file": this.render.name || this.render.url });
 		this.stlviewer.canvas = div;
 
-		const a = document.createElement("a");
-		a.href = this.render.url;
-		a.target = "_blank";
-		a.download = this.render.name || this.render.url;
-		a.append(document.createTextNode(this.render.name || this.render.url));
-		return [div, a];
+		if (this.render.transfer) {
+			return [div, ...this.confirm()];
+		} else {
+			const a = document.createElement("a");
+			a.href = this.render.url;
+			a.target = "_blank";
+			a.download = this.render.name || this.render.url;
+			a.append(document.createTextNode(this.render.name || this.render.url));
+			return [div, a];
+		}
 	}
 }
 
@@ -1572,7 +1576,8 @@ export class Assemble {
 		if (this.currentElement.attributes.multiple) {
 			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
 		}
-		if (!this.currentElement.hint) this.currentElement.hint = " "; // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		else hint = [...this.hint()];
 
 		input.setAttribute("aria-label", this.currentElement.description);
 		input = this.apply_attributes(this.currentElement.attributes, input);
@@ -1617,7 +1622,7 @@ export class Assemble {
 		// accessibility setting; hide "select"-button, as input can be accessed directly
 		label.tabIndex = -1;
 		label.setAttribute("aria-hidden", true);
-		return [...this.header(), input, label, button, ...this.hint()];
+		return [...this.header(), input, label, button, ...hint];
 	}
 
 	/**
@@ -2181,8 +2186,8 @@ export class Assemble {
 			// delete for input apply_attributes
 			delete this.currentElement.attributes.multiple;
 		}
-		if (!this.currentElement.hint) this.currentElement.hint = " "; // quick and dirty hack to avoid messed up linebreaks after inline buttons
-		hint = [...this.hint()];
+		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		else hint = [...this.hint()];
 		function changeEvent() {
 			this.nextSibling.nextSibling.innerHTML = this.files.length
 				? Array.from(this.files)
@@ -2267,7 +2272,7 @@ export class Assemble {
 			label = document.createElement("label"),
 			span = document.createElement("span"),
 			button = document.createElement("button"),
-			hint = [...this.hint()];
+			hint;
 		const productselectionClone = structuredClone(this.currentElement);
 		input.type = "text";
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
@@ -2277,6 +2282,9 @@ export class Assemble {
 		if (this.currentElement.attributes.required) span.dataset.required = true;
 		if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
 		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
+
+		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		else hint = [...this.hint()];
 
 		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
 		if (this.currentElement.attributes.multiple) {
@@ -2735,6 +2743,102 @@ export class Assemble {
 		result = result.concat(this.deletebutton()); // hint would be added here as well
 		this.signaturePad = true;
 		return result;
+	}
+
+	/**
+	 * creates a stl file selection input type text with button to open up an api stl search
+	 * @returns {domNodes} icon, input, button, label, hint
+	 * @example this.currentElement
+	 * ```json
+	 *  {
+	 * 		"type": "stlpicker",
+	 * 		"hint": "somethingsomething"...,
+	 * 		"numeration": "anything resulting in true to prevent enumeration",
+	 * 		"attributes": {
+	 * 			"name": "variable name will be used as label",
+	 * 			"multiple": "bool on changing the input field another appends"
+	 * 		}
+	 * 	}
+	 * ```
+	 */
+	stlpicker() {
+		let input = document.createElement("input"),
+			label = document.createElement("label"),
+			span = document.createElement("span"),
+			button = document.createElement("button"),
+			hint;
+		const productselectionClone = structuredClone(this.currentElement);
+		input.type = "text";
+		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
+		input.autocomplete = "off";
+		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
+		label.classList.add("productselection");
+		if (this.currentElement.attributes.required) span.dataset.required = true;
+		if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
+		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
+
+		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		else hint = [...this.hint()];
+
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.multiple) {
+			input.onchange = () => {
+				// arrow function for reference of this.names
+				if (input.value) {
+					productselectionClone.attributes.name = productselectionClone.attributes.name.replace(/\(\d+\)$/gm, "");
+					delete productselectionClone.attributes.value;
+					new Assemble({
+						content: [[productselectionClone]],
+						composer: "elementClone",
+						names: this.names,
+					}).initializeSection(null, hint.length ? hint[0] : label);
+					window.Masonry.masonry();
+				}
+			};
+		}
+		input = this.apply_attributes(this.currentElement.attributes, input);
+
+		label.dataset.type = this.currentElement.type;
+		label.append(span, input);
+
+		button.classList.add("productselection");
+		button.dataset.type = "search";
+		button.title = api._lang.GET("assemble.render.aria.search");
+		button.onclick = function () {
+			const options = {};
+			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({
+				type: "input",
+				header: api._lang.GET("file.file_filter_label"),
+				render: [
+					[
+						{
+							type: "search",
+							attributes: {
+								name: api._lang.GET("file.file_filter_label"),
+								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', this.value, 'stlpicker');}",
+							},
+						},
+						{
+							type: "hidden",
+							attributes: {
+								name: "_selectedfile",
+								id: "_selectedfile",
+							},
+						},
+					],
+				],
+				options: options,
+			}).then((response) => {
+				if (response) {
+					const inputfield = document.getElementById(input.id);
+					inputfield.value = response._selectedfile || "";
+					inputfield.dispatchEvent(new Event("change"));
+				}
+			});
+		};
+		return [label, button, ...hint];
 	}
 
 	/**

@@ -1134,6 +1134,9 @@ class DOCUMENT extends API {
 						'content' => $approveddocuments
 					]], [[
 						'form' => true,
+						'type' => 'compose_stlpicker'
+					]], [[
+						'form' => true,
 						'type' => 'compose_hr',
 					]]
 				],
