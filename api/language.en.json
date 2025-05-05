@@ -354,8 +354,8 @@
 				"signature": "Add a signature pad",
 				"signature_hint": "Remember this signature not being document proof for lacking certification",
 				"simple_element": "Enter name for element",
-				"stlpicker": "Add an STL-File-Picker",
-				"stlpicker_hint": "Provided STL-files are available.",
+				"filereference": "Add a file reference",
+				"filereference_hint": "Provided files are available.",
 				"tel": "Add a phone number input",
 				"text": "Add a single line text input",
 				"textarea": "Add a multiline text input",
@@ -469,9 +469,9 @@
 			"scan_button": "Scan a Code for :field",
 			"scan_multiple": "Another scan option will appear after success or input.",
 			"select_multiple": "Another selection will appear after input.",
-			"stlpicker_decline": "I changed my mind",
-			"stlpicker_results": "Results",
-			"stlpicker_select": "this is fine",
+			"filereference_decline": "I changed my mind",
+			"filereference_results": "Results",
+			"filereference_select": "this is fine",
 			"textarea_autocomplete": "Press the :forth- or :back-key to toggle through available options."
 		}
 	},

@@ -207,8 +207,9 @@
 						"attributes": {
 							"name": "vergleiche Vorgang"
 						}
-					},					{
-						"type": "stlpicker",
+					},
+					{
+						"type": "filereference",
 						"attributes": {
 							"name": "vergleiche Modell",
 							"multiple": true

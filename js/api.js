@@ -1065,8 +1065,9 @@ export const api = {
 			case "get":
 				switch (request[1]) {
 					case "filter":
-						if (request[4] === 'stlpicker'){
-							// stlpicker coming from assemble.js widget
+						if (request[4] === "filereference") {
+							// filereference coming from assemble.js widget
+							api.preventDataloss.monitor = false;
 							successFn = function (data) {
 								let article = document.querySelector("#inputmodal form article");
 								let sibling = article.children[2], // as per assemble after label and hidden input
@@ -1080,27 +1081,27 @@ export const api = {
 									} while (sibling);
 								}
 								if (data.data) {
-									const options = _client.record.stlpicker(data.data);
+									const options = _client.record.filereference(data.data);
 									const render = new Assemble(options);
 									render.initializeSection(null, article.children[2]);
 									render.processAfterInsertion();
 								}
 								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+								api.preventDataloss.monitor = true;
+							};
+						} else {
+							successFn = function (data) {
+								if (data.data) {
+									const all = document.querySelectorAll("[data-filtered]");
+									for (const file of all) {
+										if (request[1] === "bundle") {
+											file.parentNode.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.parentNode.localName) : "none";
+										} else file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
+									}
+								}
+								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							};
 						}
-						else {
-						successFn = function (data) {
-							if (data.data) {
-								const all = document.querySelectorAll("[data-filtered]");
-								for (const file of all) {
-									if (request[1] === "bundle") {
-										file.parentNode.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.parentNode.localName) : "none";
-									} else file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
-								}
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-					}
 						break;
 					case "bundlefilter":
 						successFn = function (data) {

@@ -2751,7 +2751,7 @@ export class Assemble {
 	 * @example this.currentElement
 	 * ```json
 	 *  {
-	 * 		"type": "stlpicker",
+	 * 		"type": "filereference",
 	 * 		"hint": "somethingsomething"...,
 	 * 		"numeration": "anything resulting in true to prevent enumeration",
 	 * 		"attributes": {
@@ -2761,7 +2761,7 @@ export class Assemble {
 	 * 	}
 	 * ```
 	 */
-	stlpicker() {
+	filereference() {
 		let input = document.createElement("input"),
 			label = document.createElement("label"),
 			span = document.createElement("span"),
@@ -2817,7 +2817,7 @@ export class Assemble {
 							type: "search",
 							attributes: {
 								name: api._lang.GET("file.file_filter_label"),
-								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', encodeURIComponent(this.value), 'stlpicker');}",
+								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', encodeURIComponent(this.value), 'filereference');}",
 							},
 						},
 						{

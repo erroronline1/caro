@@ -1388,22 +1388,31 @@ export const _client = {
 		 * @param {array} files array
 		 * @returns assemble radio widget
 		 */
-		stlpicker: (files) => {
-			const content = {};
-			const stloptions = {};
-			stloptions[api._lang.GET("assemble.render.stlpicker_decline")] = false;
-			stloptions[api._lang.GET("assemble.render.stlpicker_select")] = { value: true, class: "reducedCTA" };
+		filereference: (files) => {
+			const content = {},
+				stloptions = {};
+			let path, filename;
+
+			stloptions[api._lang.GET("assemble.render.filereference_decline")] = false;
+			stloptions[api._lang.GET("assemble.render.filereference_select")] = { value: true, class: "reducedCTA" };
 
 			for (const url of files) {
-				let path = url.split("documents/");
+				path = url.split("documents/");
+				filename = url.split("/");
 				path = path[1] ? path[1] : path[0];
 
 				content[path] = {
 					value: path,
-					onclick: function () {
+					onchange: function () {
+						document.getElementById("_selectedfile").value = this.value;
+					},
+				};
+				if (path.endsWith(".stl")) {
+					content[path]["data-type"] = "stl";
+					content[path].onclick = function () {
 						new _client.Dialog({
 							type: "stl",
-							header: "lkjlkjn",
+							header: "filename",
 							render: {
 								name: "stlpath",
 								url: "stlurl",
@@ -1418,18 +1427,15 @@ export const _client = {
 						});
 					}
 						.toString()
-						._replaceArray(["stlpath", "stlurl", "stloptions"], [path, url, JSON.stringify(stloptions)]),
-					onchange: function () {
-						document.getElementById("_selectedfile").value = this.value;
-					},
-				};
+						._replaceArray(["filename", "stlpath", "stlurl", "stloptions"], [filename[filename.length - 1], path, url, JSON.stringify(stloptions)]);
+				}
 			}
 			return {
 				content: [
 					{
 						type: "radio",
 						attributes: {
-							name: api._lang.GET("assemble.render.stlpicker_results"),
+							name: api._lang.GET("assemble.render.filereference_results"),
 						},
 						content: content,
 					},

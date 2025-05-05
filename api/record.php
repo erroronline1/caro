@@ -275,7 +275,7 @@ class RECORD extends API {
 							'range',
 							'scanner',
 							'select',
-							'stlpicker',
+							'filereference',
 							'tel',
 							'text',
 							'textarea',

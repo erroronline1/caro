@@ -3476,7 +3476,7 @@ Sample response
 {"response":{"msg":"Regulatory context has been updated","type":"success"}}
 ```
 
-> GET ./api/api.php/file/filter/{directory}/{query}
+> GET ./api/api.php/file/filter/{directory}/{query}/{route}
 
 Returns a list of paths that have a similarity to query.
 
@@ -3485,6 +3485,7 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {directory} | path parameter | optional | specified sharepoint dir, user dir, other documents if null |
 | {query} | path parameter | optional | search string, returns all files if null |
+| {route} | path parameter | optional | additional string to handle response within frontent api |
 
 Sample response
 ```

@@ -518,7 +518,8 @@ main {
 		> div:not([draggable]),
 		> form {
 			> article,
-			> button, hr {
+			> button,
+			hr {
 				width: calc(50% - var(--gap));
 			}
 			> :nth-child(2n + 1) {
@@ -547,7 +548,8 @@ main {
 		> div:not([draggable]),
 		> form {
 			> article,
-			> button,hr {
+			> button,
+			hr {
 				width: calc(100% / 3 - var(--gap));
 			}
 			> :nth-child(3n + 1) {
@@ -627,8 +629,8 @@ canvas {
 }
 
 .stlviewer {
-	height: 35em;
-	overflow:hidden;
+	height: 33em;
+	overflow: hidden;
 }
 
 .contextmenu {
@@ -1314,7 +1316,7 @@ hr.insertionArea {
 }
 
 section > div > hr,
-article>hr {
+article > hr {
 	width: 95% !important;
 }
 
@@ -1735,10 +1737,10 @@ button[data-type="search"]::before {
 	mask-image: url("./media/cube.svg");
 }
 
-[data-type="stlpicker"]::before {
+[data-type="filereference"]::before {
 	background-color: var(--foreground);
-	-webkit-mask-image: url("./media/cube.svg");
-	mask-image: url("./media/cube.svg");
+	-webkit-mask-image: url("./media/file-alt.svg");
+	mask-image: url("./media/file-alt.svg");
 }
 
 [data-type="submitbutton"]::before {
