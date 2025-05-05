@@ -1569,7 +1569,8 @@ export class Assemble {
 		/**/
 		let input = document.createElement("input"),
 			label = document.createElement("button"),
-			button = document.createElement("button");
+			button = document.createElement("button"),
+			hint;
 		input.type = "file";
 		input.id = getNextElementID();
 		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
