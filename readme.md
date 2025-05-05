@@ -34,15 +34,6 @@ graph LR;
     * prepared functions checking menu items by query selector 
     * timeout 10 seconds with camera overlay in corner and timeout circle, display x of y within console 
     * https://hackernoon.com/how-to-take-screenshots-in-the-browser-using-javascript-l92k3xq7
-* zip 
-    * api endpoint 
-    * extract 
-    * manual 
-* stlpicker 
-    * ->filereference use file-alt.svg
-    * radio label data-type stl (if applicable) and preview 
-    * icon? 
-* file filter api endpoint 4th parameter
 
 ## Content
 * [Aims](#aims)
@@ -4430,6 +4421,34 @@ Parameters
 Sample response
 ```
 {"render": {"content": [[{"type": "scanner","description": "2D-scanner","destination": "tool_scanner"},{"type": "textarea","attributes": {"name": "Result","rows": 8,"readonly": true,"id": "tool_scanner"}}]]}}
+```
+
+> GET ./api/api.php/tool/zip
+
+Returns a form to select files for zipping and unzipping.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none |  |  |  |
+
+Sample response
+```
+{"form": {"data-usecase": "tool_zip", "action": "javascript:api.tool('post', 'zip')"}, "content": [ [ {"type": "textsection", "attributes": {"name": "Select files to add to a ZIP-archive"}, "content": "This file then can easily be transferred to CAD, Purchase or documentation without something getting lost along the way. Adhere to data safety!"}, {"type": "file", "attributes": {"name": "Files to add to archive", "multiple": true}} ], [ {"type": "textsection", "attributes": {"name": Choose an archive to extract files from."}, "content": "You can then download the files separately. Adhere to data safety!"}, {"type": "file", "attributes": {"name": "Archive to unpack"}} ] ]}
+```
+
+> POST ./api/api.php/tool/image
+
+Returns files to download. these can contain a zip file from previously selected other types or extracted files from a provided archive
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | files |
+
+Sample response
+```
+{"render": [ [ {"type": "links", "description": "Download file(s). You may rename archives at your convenience. On exporting sensitive data you are responsible for their safety.", "content": {"app installation.png": {"href": "./api/api.php/file/stream/fileserver/tmp/app installation.png", "download": "app installation.png"}, "testuser_token.png": {"href": "./api/api.php/file/stream/fileserver/tmp/testuser_token.png", "download": "testuser_token.png"}, "app installation.pngtestuser_token.png.zip": {"href": "./api/api.php/file/stream/fileserver/tmp/app installation.pngtestuser_token.png.zip", "download": "app installation.pngtestuser_token.png.zip"}}} ] ]}
 ```
 
 [Content](#content)
