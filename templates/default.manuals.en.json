@@ -79,7 +79,7 @@
 	},
 	{
 		"title": "Tools",
-		"content": "You can create qr-codes and barcodes. Some special formats may be prepared. You can also scan these codes to obtain their secret.\nThe stl-viewer dispays any file within the provided files or sharepoint.\nThere are some basic calculation options for recurring tasks within production.\nImages can be resized or embedded a watermark e.g. for speeches.",
+		"content": "You can create qr-codes and barcodes. Some special formats may be prepared. You can also scan these codes to obtain their secret.\nYou can create or unpack ZIP-archives.\nThere are some basic calculation options for recurring tasks within production.\nImages can be resized or embedded a watermark e.g. for speeches.",
 		"permissions": "user,group"
 	},
 	{

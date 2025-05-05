@@ -79,7 +79,7 @@
 	},
 	{
 		"title": "Werkzeuge",
-		"content": "Du kannst QR-Codes und Barcodes erstellen. Es können dabei spezielle Formate vorbereitet sein. Du kannst solche Codes auch scannen um ihnen ihre Geheimnisse zu entlocken.\nDer STL-Betrachter zeigt Dateien an, die bereitgestellt wurden oder im Sharepoint liegen.\nEs gibt ein paar grundlegende Rechenoptionen für wiederkehrende Aufgaben der Produktion.\nBilder können skaliert oder mit einem Wasserzeichen versehen werden, z.B. für Vorträge.",
+		"content": "Du kannst QR-Codes und Barcodes erstellen. Es können dabei spezielle Formate vorbereitet sein. Du kannst solche Codes auch scannen um ihnen ihre Geheimnisse zu entlocken.\nDu kannst ZIP-Dateien erstellen oder entpacken.\nEs gibt ein paar grundlegende Rechenoptionen für wiederkehrende Aufgaben der Produktion.\nBilder können skaliert oder mit einem Wasserzeichen versehen werden, z.B. für Vorträge.",
 		"permissions": "user,group"
 	},
 	{
