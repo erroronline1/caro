@@ -29,8 +29,20 @@ graph LR;
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-* stl filepicker
-    * limit file filter to stl files, auto append *.stl ?
+*screenshot 'automation' iterate over
+    * prepared api calls within unittest screenshot function 
+    * prepared functions checking menu items by query selector 
+    * timeout 10 seconds with camera overlay in corner and timeout circle, display x of y within console 
+    * https://hackernoon.com/how-to-take-screenshots-in-the-browser-using-javascript-l92k3xq7
+* zip 
+    * api endpoint 
+    * extract 
+    * manual 
+* stlpicker 
+    * ->filereference use file-alt.svg
+    * radio label data-type stl (if applicable) and preview 
+    * icon? 
+* file filter api endpoint 4th parameter
 
 ## Content
 * [Aims](#aims)
