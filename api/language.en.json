@@ -1033,7 +1033,7 @@
 			"image": "Image resizing and watermark",
 			"regulatory": "Regulatory evaluations and summaries",
 			"scanner": "2D-scanner",
-			"zip": "Create a ZIP-archive"
+			"zip": "Create or unpack a ZIP-archive"
 		}
 	},
 	"measure": {
@@ -1490,10 +1490,13 @@
 		},
 		"scanner": { "result": "Result" },
 		"zip": {
-			"download": "Download archive. You may rename it at your convenience. On exporting sensitive data you are responsible for their safety.",
-			"files": "Files to add to archive",
-			"hint": "Select files to add to a ZIP-archive.",
-			"hint_content": "This file then can easily be transferred to CAD, Purchase or documentation without something getting lost along the way. Adhere to data safety!"
+			"download": "Download file(s). You may rename archives at your convenience. On exporting sensitive data you are responsible for their safety.",
+			"add": "Files to add to archive",
+			"add_hint": "Select files to add to a ZIP-archive.",
+			"add_hint_content": "This file then can easily be transferred to CAD, Purchase or documentation without something getting lost along the way. Adhere to data safety!",
+			"extract": "Archive to unpack",
+			"extract_hint": "Choose an archive to extract files from.",
+			"extract_hint_content": "You can then download the files separately. Adhere to data safety!"
 		}
 	},
 	"user": {

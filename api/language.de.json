@@ -1033,7 +1033,7 @@
 			"image": "Bildskalierung und Wasserzeichen",
 			"regulatory": "Regulatorische Auswertungen und Zusammenfassungen",
 			"scanner": "2D-Scanner",
-			"zip": "Zip-Archiv erstellen"
+			"zip": "Zip-Archiv erstellen / entpacken"
 		}
 	},
 	"measure": {
@@ -1490,10 +1490,13 @@
 		},
 		"scanner": { "result": "Ergebnis" },
 		"zip": {
-			"download": "Archiv herunterladen, du kannst es dann noch umbenennen. Beachte den Datenschutz. Für die Sicherheit exportierter Daten bist du selbst veranwortlich.",
-			"files": "Dateien zum Archiv hinzufügen",
-			"hint": "Wähle Dateien aus um sie zu einem ZIP-Archiv hinzuzufügen.",
-			"hint_content": "Diese Datei kann dann einfach an CAD oder den Einkauf geschickt oder zur Dokumentation hinzugefügt werden, ohne das unterwegs etwas verloren geht. Beachte den Datenschutz!"
+			"download": "Datei(en) herunterladen. Archive kannst dann noch umbenennen. Beachte den Datenschutz. Für die Sicherheit exportierter Daten bist du selbst veranwortlich.",
+			"add": "Dateien zum Archiv hinzufügen",
+			"add_hint": "Wähle Dateien aus um sie zu einem ZIP-Archiv hinzuzufügen.",
+			"add_hint_content": "Diese Datei kann dann einfach an CAD oder den Einkauf geschickt oder zur Dokumentation hinzugefügt werden, ohne das unterwegs etwas verloren geht. Beachte den Datenschutz!",
+			"extract": "Archiv zum entpacken auswählen",
+			"extract_hint": "Wähle ein Archiv aus um die Daten zu entpacken.",
+			"extract_hint_content": "Die Dateien kannst du anschließend einzeln herunterladen. Beachte den Datenschutz!"
 		}
 	},
 	"user": {

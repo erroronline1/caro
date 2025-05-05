@@ -515,14 +515,27 @@ class TOOL extends API {
 					[
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => $this->_lang->GET('tool.zip.hint')
+							'name' => $this->_lang->GET('tool.zip.add_hint')
 						],
-						'content' => $this->_lang->GET('tool.zip.hint_content')
+						'content' => $this->_lang->GET('tool.zip.add_hint_content')
 					], [
 						'type' => 'file',
 						'attributes' => [
-							'name' => $this->_lang->GET('tool.zip.files'),
+							'name' => $this->_lang->GET('tool.zip.add'),
 							'multiple' => true
+						]
+					]
+				], [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('tool.zip.extract_hint')
+						],
+						'content' => $this->_lang->GET('tool.zip.extract_hint_content')
+					], [
+						'type' => 'file',
+						'attributes' => [
+							'name' => $this->_lang->GET('tool.zip.extract'),
 						]
 					]
 				]
@@ -531,37 +544,56 @@ class TOOL extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				if (isset($_FILES[$this->_lang->PROPERTY('tool.zip.files')]) && $_FILES[$this->_lang->PROPERTY('tool.zip.files')]['tmp_name'][0]) {
+				$downloadfiles = [];
+				if (isset($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]) && $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name']
+					&& $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'] && str_ends_with($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'], 'zip')) {
+					$file = $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name'];
+					//unpack an archive
+					$zip = new ZipArchive;
+					if ($zip->open($file)){
+						for($i = 0; $i < $zip->numFiles; $i++) {
+							$filename = $zip->getNameIndex($i);
+							$fileinfo = pathinfo($filename);
+							copy('zip://' . $file . '#' . $filename, UTILITY::directory('tmp') . '/' . $fileinfo['basename']);
+							$downloadfiles[$filename] = [
+								'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 3) . '/' . $fileinfo['basename'],
+								'download' => $fileinfo['basename']
+							];
+						}							
+						$zip->close();
+					}
+				}
+				if (isset($_FILES[$this->_lang->PROPERTY('tool.zip.add')]) && $_FILES[$this->_lang->PROPERTY('tool.zip.add')]['tmp_name'][0]) {
+					// create an archive
 					// create filename by concatenation
 					$zipname = '';
-					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.files')]['name'] as $filename){
+					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'] as $filename){
 						$zipname .= preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $filename);
 					}
 					// create zip
 					$zip = new ZipArchive();
 					$zip->open(UTILITY::directory('tmp') . '/' . $zipname .'.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
-					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.files')]['tmp_name'] as $index => $file){
-						$zip->addFile($file, $_FILES[$this->_lang->PROPERTY('tool.zip.files')]['name'][$index]);
+					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['tmp_name'] as $index => $file){
+						$zip->addFile($file, $_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'][$index]);
 					}
 					$zip->close();
 
-					$downloadfiles = [];
 					$downloadfiles[$zipname .'.zip'] = [
 						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 3) . '/' . $zipname .'.zip',
 						'download' => $zipname .'.zip'
-					];			
-					$body = [];
-					array_push($body, 
-						[[
-							'type' => 'links',
-							'description' =>  $this->_lang->GET('tool.zip.download'),
-							'content' => $downloadfiles
-						]]
-					);
-					$this->response([
-						'render' => $body,
-					]);
+					];
 				}
+				$body = [];
+				array_push($body, 
+					[[
+						'type' => 'links',
+						'description' =>  $this->_lang->GET('tool.zip.download'),
+						'content' => $downloadfiles
+					]]
+				);
+				$this->response([
+					'render' => $body,
+				]);
 		}
 
 		$this->response($result);
