@@ -355,7 +355,7 @@
 				"signature_hint": "Zur Erinnerung: die Unterschrift ist mangels Zertifizierung nicht dokumentensicher",
 				"simple_element": "Gib einen Namen für das Element an",
 				"filereference": "Füge einen Dateiverweis hinzu",
-				"filereference_hint": "Es stehen die bereitgestellten Dateien zur Verfügung.",
+				"filereference_hint": "Es stehen die bereitgestellten Dateien zur Verfügung. Bitte beachte, dass die Dateien möglicherweise nicht dauerhaft zur Verfügung stehen und dieses Feld daher nur für eine kurzfristige Kommunikation geeignet ist.",
 				"tel": "Füge ein Telefonnummernfeld hinzu",
 				"text": "Füge ein einfaches Textfeld hinzu",
 				"textarea": "Füge ein mehrzeiliges Textfeld hinzu",

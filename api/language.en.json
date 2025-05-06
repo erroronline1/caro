@@ -355,7 +355,7 @@
 				"signature_hint": "Remember this signature not being document proof for lacking certification",
 				"simple_element": "Enter name for element",
 				"filereference": "Add a file reference",
-				"filereference_hint": "Provided files are available.",
+				"filereference_hint": "Provided files are available. Consider that files may not be permanent and this field only suffices for short term information transfer.",
 				"tel": "Add a phone number input",
 				"text": "Add a single line text input",
 				"textarea": "Add a multiline text input",
