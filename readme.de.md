@@ -335,7 +335,7 @@ Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
 * Foto-Upload, optional als Mehrfachauswahl. Mobile Geräte greifen auf die Kamera zu, Desktop-Geräte öffnen eine Dateiauswahl
 * Unterschriftenfeld
 * Kalenderschaltfläche
-* STL-Datei-Auswahl. Hat Zugriff auf die bereitgestellten Dateien, inclusive Vorschau
+* Dateiverweis-Auswahl, optional als Mehrfachauswahl. Hat Zugriff auf die bereitgestellten Dateien und übernimmt deren Speicherort, inclusive STL-Vorschau sofern anwendbar. Dateien könnten jedoch nicht dauerhaft verfügbar sein, daher ist dies nur für eine kurzfristige Kommunikation sinnvoll.
 * Dokumentenverknüpfung, nur zur Ansicht oder als Weiterleitung mit Übernahme eines Identifikators
 * horizontale Linie zur Dokumentenstrukturierung
 

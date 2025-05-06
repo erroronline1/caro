@@ -29,7 +29,7 @@ graph LR;
 * qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
-*screenshot 'automation' iterate over
+* screenshot 'automation' iterate over
     * prepared api calls within unittest screenshot function 
     * prepared functions checking menu items by query selector 
     * timeout 10 seconds with camera overlay in corner and timeout circle, display x of y within console 
@@ -157,7 +157,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Document management: full version control, reusable components, with access to former versions
 * Easy form creation: simplified form assembly and seamless integration into the application
 * Risk management: with alignment check of risks and medical device characteristics
-* Trainings and skills management: quick overwiew with evaluation reminder and highlighted expiries
+* Trainings and skills management: quick overview with evaluation reminder and highlighted expiries
 * Task and absence schedules: plan tasks while having an overview on personnel ressources
 * Structured procurement: reduced inquiries, automated reminders, incorporation records and sample checks
 * Role management: defined user permissions and appropriate information load
@@ -373,7 +373,7 @@ graph TD;
 [Content](#content)
 
 ### Responsibilities
-Authorized users can define responsibilities for given tasks and assign users as well as their proxy. Assigned users will retrieve a message and a menu notification to review the assignments and accept the responsibilities. Responsibilities have a mandatory applicability timespan after which a calendar entry reminds admin to renew the expired item. Responsibilities can be edited at any time, only users have to reaccept their assignment for transparency reasons. Responsibilities are not a persistent record as they serve primarily operational information. The overwiew can be filtered by units as well as displaying only own responsibilities. 
+Authorized users can define responsibilities for given tasks and assign users as well as their proxy. Assigned users will retrieve a message and a menu notification to review the assignments and accept the responsibilities. Responsibilities have a mandatory applicability timespan after which a calendar entry reminds admin to renew the expired item. Responsibilities can be edited at any time, only users have to reaccept their assignment for transparency reasons. Responsibilities are not a persistent record as they serve primarily operational information. The overview can be filtered by units as well as displaying only own responsibilities. 
 
 ![responsibilities screenshot](http://toh.erroronline.one/caro/responsibilities.png)
 
@@ -398,7 +398,7 @@ Just don't do it like this. Seek help before doing this:
 
 ![cloud storage meme](http://toh.erroronline.one/caro/cloudstoragememe.jpg)
 
-Documents are modular. To create tracked and versioned documents, create reusable document components and assemble documents from components. Components and documents are assigned to units. This enhances the overwiew within the editor and allows for reduced distraction during regular use for the user being able to filter selecteable documents unitwise.
+Documents are modular. To create tracked and versioned documents, create reusable document components and assemble documents from components. Components and documents are assigned to units. This enhances the overview within the editor and allows for reduced distraction during regular use for the user being able to filter selecteable documents unitwise.
 
 #### Component editing
 Available elements for components or rather documents are:
@@ -422,7 +422,7 @@ Available elements for components or rather documents are:
 * photo upload, optional as multiple. Mobile devices access camera, desktops open a file selection
 * signature field
 * calendar button
-* STL-file picker. Accesses provided files, preview included
+* file reference picker, optional as multiple. Accesses provided files and returns their location, STL preview included if applicable. Consider that files may not be permanent and this field only suffices for short term information transfer.
 * document link, just for display or to continue transferring identifier
 * horizontal line for document structure
 
@@ -1447,7 +1447,7 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 ### General
 This software has been developed with good intend. It is supposed to make managing regulatory requirements a little less exhausting. However the usecase is tailored to the [teams](#the-team) personal experiences working in a medical aid providing facility, hopefully scalable to your basic demands.
 
-Life, the medical field and regulatory requirements are complicated, agile and unpredictable. Behind each corner another new directive possibly lurkes. So the CARO App tries to be agile as well to quickly match the auditors next idea. This can (possibly due to the teams incapacity) hardly be implemented completely within an easy comprehensible user interface. By personal experience less than 1 percent of staff can comprehend regular expressions and the sheer amount of settings this kind of software requires to handle the indended tasks. Therefore after some fruitless attempts finally the decision has been made to leave these dials as they are. Especially dataprocessing of inhomogenuous tables with the [CSV Processor](#csv-processor) and defining [runtime variables](#runtime-variables) may need a somewhat advanced computer enthusiast to set up.
+Life, the medical field and regulatory requirements are complicated, agile and unpredictable. Behind each corner another new directive possibly lurkes. So the CARO App tries to be agile as well to quickly match the auditors next idea. This can (possibly due to the teams incapacity) hardly be implemented completely within an easy comprehensible user interface. By personal experience less than 1 percent of staff can comprehend regular expressions and the sheer amount of settings this kind of software requires to handle the intended tasks. Therefore after some fruitless attempts finally the decision has been made to leave these dials as they are. Especially dataprocessing of inhomogenuous tables with the [CSV Processor](#csv-processor) and defining [runtime variables](#runtime-variables) may need a somewhat advanced computer enthusiast to set up.
 
 ### Network connection handling
 * The application caches requests. Get requests return the latest successful retrieved version, which might not always be the recent system state on connection loss, but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
