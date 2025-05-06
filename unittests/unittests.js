@@ -112,6 +112,14 @@ export function rendertest(element) {
 						},
 						hint: "Opens a dialog to select from the product database. If created as multiple another one will be appended.",
 					},
+					{
+						type: "filereference",
+						attributes: {
+							name: "File reference",
+							multiple: true,
+						},
+						hint: "Opens a Dialog to return the location of a file. If created as multiple another one will be appended.",
+					},
 				],
 				[
 					{
@@ -282,6 +290,14 @@ export function rendertest(element) {
 							multiple: true,
 						},
 						hint: "Öffnet einen Dialog um ein Produkt aus der Datenbank auszuwählen. Bei Mehrfachauswahl erscheint nach der Eingabe ein weiteres Feld.",
+					},
+					{
+						type: "filereference",
+						attributes: {
+							name: "Dateiverweis",
+							multiple: true,
+						},
+						hint: "Öffnet einen Dialog um den Speicherort einer Datei zu übernehmen. Bei Mehrfachauswahl erscheint nach der Eingabe ein weiteres Feld.",
 					},
 				],
 				[
