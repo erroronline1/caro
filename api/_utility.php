@@ -192,19 +192,14 @@ class UTILITY {
 	 *  |  _|  _| -_| .'|  _| -_| . | |  _| -_|  _|  _| . |  _| | |
 	 *  |___|_| |___|__,|_| |___|___|_|_| |___|___|_| |___|_| |_  |
 	 *                                                        |___|
-	 * creates a directory and inserts a .htaccess-file preventing any access
+	 * creates a directory and secures by default (even if parent directory might already be inaccessible)
 	 * @param string $dir path
 	 * 
 	 * @return bool on success
 	 */
 	private static function createDirectory($dir){
 		if (!file_exists($dir) && mkdir($dir, 0777, true)) {
-			$file = fopen($dir . '/.htaccess', 'w');
-			fwrite($file, "Order deny,allow\n<FilesMatch \"*\" >\nDeny from all\n</FilesMatch>");
-			fclose($file);
-			$file = fopen($dir . '/web.config', 'w');
-			fwrite($file, '<?xml version="1.0" encoding="UTF-8"?><configuration><system.webServer><rewrite><rules><rule name="deny"><match url=".*" ignoreCase="true" /><action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" /></rule></rules></rewrite></system.webServer></configuration>');
-			fclose($file);
+			self::secureDirectory($dir);
 			return true;
 		}
 		return false;
@@ -572,6 +567,31 @@ class UTILITY {
 	public static function propertySet($object, $property){
 		if (gettype($object) === 'array') return isset($object[$property]) ? $object[$property] : false;
 		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
+	}
+
+	/**
+	 *                             _ _             _
+	 *   ___ ___ ___ _ _ ___ ___ _| |_|___ ___ ___| |_ ___ ___ _ _
+	 *  |_ -| -_|  _| | |  _| -_| . | |  _| -_|  _|  _| . |  _| | |
+	 *  |___|___|___|___|_| |___|___|_|_| |___|___|_| |___|_| |_  |
+	 *                                                        |___|
+	 * secures a directory by inserting an .htaccess- and web.config file preventing any access without authorization
+	 * @param string $dir path
+	 * 
+	 * @return bool on success
+	 */
+	public static function secureDirectory($dir){
+		if (!file_exists($dir . '/.htaccess')) {
+			$file = fopen($dir . '/.htaccess', 'w');
+			fwrite($file, "Order deny,allow\n<FilesMatch \"*\" >\nDeny from all\n</FilesMatch>");
+			fclose($file);
+		}
+		if (!file_exists($dir . '/web.config')) {
+			$file = fopen($dir . '/web.config', 'w');
+			fwrite($file, '<?xml version="1.0" encoding="UTF-8"?><configuration><system.webServer><rewrite><rules><rule name="deny"><match url=".*" ignoreCase="true" /><action type="CustomResponse" statusCode="403" statusReason="Forbidden" statusDescription="Forbidden" /></rule></rules></rewrite></system.webServer></configuration>');
+			fclose($file);
+		}
+		return true;
 	}
 
 	/**

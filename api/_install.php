@@ -808,6 +808,9 @@ class INSTALL {
 	 * installs tables and default user if not already present
 	 */
 	public function installDatabase(){
+		//secure fileserver by default
+		UTILITY::secureDirectory('../fileserver');
+
 		try {
 			// if table is not found this will lead to an exception
 			$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
