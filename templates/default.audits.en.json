@@ -53,6 +53,11 @@
 				"question": "How is degradation due to long term storage prevented?",
 				"regulatory": "iso13485_7_5_11",
 				"hint": ""
+			},
+			{
+				"question": "Have there been any novelties?",
+				"regulatory": "",
+				"hint": ""
 			}
 		]
 	},

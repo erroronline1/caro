@@ -78,6 +78,11 @@
 				"question": "Welche Software kommt zum Einsatz und wie wird die Funktion sichergestellt?",
 				"regulatory": "iso13485_4_1_6",
 				"hint": "ggf. Protokolle, Versionsstand abgleichen"
+			},
+			{
+				"question": "Welche Neuerungen gab es in diesem Bereich?",
+				"regulatory": "",
+				"hint": ""
 			}
 		]
 	},
@@ -134,6 +139,11 @@
 			{
 				"question": "Wie wird eine Überlagerung verhindert?",
 				"regulatory": "iso13485_7_5_11",
+				"hint": ""
+			},
+			{
+				"question": "Welche Neuerungen gab es in diesem Bereich?",
+				"regulatory": "",
 				"hint": ""
 			}
 		]
@@ -196,6 +206,11 @@
 			{
 				"question": "Gibt es Besonderheiten nach einem Softwareupdate?",
 				"regulatory": "iso13485_4_1_6",
+				"hint": ""
+			},
+			{
+				"question": "Welche Neuerungen gab es in diesem Bereich?",
+				"regulatory": "",
 				"hint": ""
 			}
 		]
