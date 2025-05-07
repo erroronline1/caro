@@ -467,8 +467,8 @@ class SHARED {
 										]
 									])
 									."'), options:{".
-										"'".$this->_lang->GET('order.add_manually_confirm')."': {value: true},".
-										"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false, class: 'reducedCTA'},".
+										"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false},".
+										"'".$this->_lang->GET('order.add_manually_confirm')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(response => {if (Object.keys(response).length) {".
 										"_client.order.addProduct(response[api._lang.GET('order.quantity_label')] || '', response[api._lang.GET('order.unit_label')] || '', response[api._lang.GET('order.ordernumber_label')] || '', response[api._lang.GET('order.productname_label')] || '', response[api._lang.GET('order.barcode_label')] || '', response[api._lang.GET('order.vendor_label')] || '');".
 										"api.preventDataloss.monitor = true;}".
