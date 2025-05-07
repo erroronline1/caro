@@ -26,7 +26,6 @@ graph LR;
 * unittests
 * update readme pictures, add responsibilities, appointment
 * improve screenreader accessibility
-* qm handbook template with descriptions on caro functionalities considering iso chapters
 * responsibilities
     * handle hidden attribute?
 * screenshot 'automation' iterate over
@@ -34,6 +33,9 @@ graph LR;
     * prepared functions checking menu items by query selector 
     * timeout 10 seconds with camera overlay in corner and timeout circle, display x of y within console 
     * https://hackernoon.com/how-to-take-screenshots-in-the-browser-using-javascript-l92k3xq7
+* image preview like stl
+    * download button within dialog
+    * download button for stls too (icon for recognition)
 
 ## Content
 * [Aims](#aims)
@@ -1114,7 +1116,7 @@ Application support legend:
 | ISO 13485 8.3.2 Measures on identified non-compliant products in advance of delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.3 Measures on identified non-compliant products after delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.4 Rework | yes, structural | &bull; Records require a statement if it happens in context with a rework. Documents do not differ though, so recording measures follows the same processes than a general treatment process. | [Records](#records) |
-| ISO 13485 8.4 Data analysis | partial | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though. | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 8.4 Data analysis | partial | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.<br />&bull; Vendor evaluations and internal audits are available | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
