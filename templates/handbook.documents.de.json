@@ -1,0 +1,350 @@
+[
+	{
+		"comment": "following are qm handbook components, customize and append to your needs #################################################################################################"
+	},
+
+	{
+		"name": "Handbuch 3 Begriffe",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "3 Begriffe"
+						},
+						"content": "• QM-Software: CARO App (https://github.com/erroronline1/caro), eine ausführliche Beschreibung der Programmabläufe ist den Anwendungshandbüchern zu entnehmen."
+					}
+				]
+			]
+		}
+	},{
+		"name": "Handbuch 4.2.4 Lenkung von Dokumenten",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "4.2.4 Lenkung von Dokumenten"
+						},
+						"content": "Die Dokumentenerstellung und -verteilung findet über die QM-Software statt. Dokumente werden durch die Leitung, den Qualitätsmanagementbeauftragten oder dessen Stellvertreter und Bereichsleitungen freigegeben. Eine Einsicht in den Bearbeitungsstand zur Bewertung der Angemessenheit ist im Vorfeld sichergestellt. Der Zugriff auf und die Verwendung von Dokumenten ist erst nach der vollständigen Freigabe über die QM-Software möglich.\nDurch die Limitierung von Exporten der Dokumente wird sichergestellt, dass nur gültige Fassungen verwendet werden. Im Falle von Änderungen oder Neuanlagen von Dokumenten werden alle Mitarbeitenden informiert.\nZur Bewertung der Angemessenheit der Dokumente kann die Nutzungsfrequenz hinzugezogen werden.\n \nExterne Dokumente werden erfasst und müssen aktiv als verfügbar markiert werden. Inaktive externe Dokumente sind für die Mitarbeitenden über die QM-Software nicht erreichbar.\n \nEine Löschung interner und gelenkter externer Dokumente ist nicht vorgesehen. Berechtigte Mitarbeitende können vorausgehende Versionen jederzeit einsehen."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 4.2.5 Lenkung von Aufzeichnungen",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "4.2.5 Lenkung von Aufzeichnungen"
+						},
+						"content": "Der Zugriff auf personenbezogene Daten und Aufzeichnungen über die QM-Software ist nur mit einem Benutzerzugang möglich. Aufzeichnungen innerhalb der Dokumente, sowie Dateianlagen zu Lieferanten und Produkten die über die QM-Software getätigt werden, sind permanent. Aufzeichnungen können nur ergänzt, jedoch nicht abgeändert werden. Personenbezogene Daten unterliegen dem Datenschutz und der Schweigepflicht, bei jedem Export der Daten aus der QM-Software heraus wird auf die Erfordernis eines gewissenhaften Umgangs hingewiesen."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 5.5.1 Verantwortung und Befugnis",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "5.5.1 Verantwortung und Befugnis"
+						},
+						"content": "Verantwortlichkeiten, Befugnisse und Rollen werden in der QM-Software festgelegt, beschrieben und sind jederzeit für alle Mitarbeitenden mit Zugang zur Software einsehbar. Dies schließt definierte Medizinprodukteberater und die verantwortliche Person nach MDR mit ein. Bei der Neuanlage von Nutzerzugängen erfolgt zudem eine Mitteilung über die Schlüsselpositionen und Ansprechpartner."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 5.5.3 Interne Kommunikation",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "5.5.3 Interne Kommunikation"
+						},
+						"content": "Die QM-Software beinhaltet einen Nachrichtendienst, Planungskalender und Dateien-Austausch. Diese Funktionen unterstützen eine zielgerichtete interne Kommunikation. Der Nachrichtendienst wird zudem bei Rückfragen oder Aktualisierungen von Vorgängen oder Bestellungen verwendet. Die QM-Software trägt teilweise Ablaufdaten von Lieferantenzertifikaten, Schulungen und Verantwortlichkeiten in den Kalender ein, dessen aktuelle Fälligkeiten bereits auf der Startseite angezeigt werden. Zudem wird an die Weiterbearbeitung oder den Abschluss zeitkritischer Prozesse intervallartig erinnert."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 5.6.1 Managementbewertung allgemein",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "5.6.1 Managementbewertung allgemein"
+						},
+						"content": "Die Managementbewertung wird in der QM-Software erfasst. Nach dem Abschluss der Bewertung verbleiben die Aufzeichnungen permanent in der Software."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 5.6.2 Eingaben für die Managementbewertung",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "5.6.2 Eingaben für die Managementbewertung"
+						},
+						"content": "Die normativ geforderten Angaben sind fester Bestandteil der Eingabemaske für die Managementbewertung. Entsprechende Auswertungen und Dateneingaben werden durch die QM-Software unterstützt."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 5.6.3 Ergebnisse der Bewertung",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "5.6.3 Ergebnisse der Bewertung"
+						},
+						"content": "Nach dem Abschluss der Bewertung verbleiben die Aufzeichnungen permanent in der Software. Der Bericht wird zudem an alle Mitarbeitenden der Leitungsebene weitergeleitet."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 6.2 Personelle Ressourcen",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "6.2 Personelle Ressourcen"
+						},
+						"content": "Die Qualifikationen und Schulungen werden personenbezogen in der QM-Software erfasst und sind in einer Übersicht darstellbar. Schulungen werden bewertet, Ablaufdaten in der Übersicht verdeutlicht. Jeder Mitarbeitende kann den aktuellen Status seiner Qualifikationen und Schulungen einsehen."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 7.4.1 Beschaffungsprozess",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "7.4.1 Beschaffungsprozess"
+						},
+						"content": "Der Beschaffungsprozess wird durch die QM-Software unterstützt. Im System erfasste Lieferanten werden bewertet, die Bewertungen sind als dauerhafte Aufzeichnung in der Lieferantenübersicht einsehbar.\nFür die Bewertung kann eine Auswertung der in der QM-Software erfassten Bestellvorgänge hinzugezogen werden.\n \nEs ist vorgesehen das Produkte vor ihrer Verwendung bewertet und eingeführt werden. Die Produkteinführung bedarf einer abschließenden Freigabe durch die Leitung, die verantwortliche Person nach MDR und die Bereichsleitung.\n \nMitarbeitende können Produkte aus der softwareeigenen Produktdatenbank zu einer Order zusammenstellen. Die Order muss von einer berechtigten Person freigegeben werden. Die Warenwirtschaft erhält automatisch eine Mitteilung über neue Bestellungen und kann für einen transparenten Informationsfluss den aktuellen Bearbeitungsstand markieren, gezielt Rückfragen stellen oder Änderungen am Lieferstatus mitteilen."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 7.4.2 Beschaffungsangaben",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "7.4.2 Beschaffungsangaben"
+						},
+						"content": "Mitarbeitende können Produkte aus der QM-softwareeigenen Produktdatenbank zu einer Order zusammenstellen. Die Datenbank enthält Artikelnummer und Artikelbeschreibung für eine vollständige Identifizierung des Produkts, sofern dies Lieferantenseitig angemessen und vorgesehen ist."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 7.4.3 Verifizierung von beschafften Produkten",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "7.4.3 Verifizierung von beschafften Produkten"
+						},
+						"content": "Handelswaren werden regelmäßig stichprobenartig auf die Erfüllung regulatorischer Anforderungen hin überprüft. Qualifizierte Produkte fordern in der Bestellübersicht der QM-Software zur Prüfung auf und können unmittelbar beim Wareneingang diesbezüglich bearbeitet werden. Die Ergebnisse der Prüfungen verbleiben dauerhaft als Aufzeichnung in der Software und sind jederzeit einsehbar."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 8.2.4 Internes Audit",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "8.2.4 Internes Audit"
+						},
+						"content": "Interne Audits werden angemessen vorbereitet und geplant, die Terminierung kann unmittelbar im Kalender der QM-Software eingetragen werden. Audits werden in der QM-Software erfasst. Nach dem Abschluss der Audits verbleiben die Aufzeichnungen permanent in der Software. Der Bericht wird zudem an alle Mitarbeitenden des auditierten Bereichs weitergeleitet."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 8.3.4 Nacharbeit",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "8.3.4 Nacharbeit"
+						},
+						"content": "Aufzeichnungen werden in der QM-Software als Nacharbeit definiert, sofern dies angemessen ist. Da ansonsten die selben Dokumente für die Aufzeichnungen gelten wird konsequent das ursprüngliche Verfahren weitergeführt."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Handbuch 8.4 Datenanalyse",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "8.4 Datenanalyse"
+						},
+						"content": "Für die Datenanalyse stellt die QM-Software Bestellstatistiken der Lieferanten, Lieferantenbewertungen in der Lieferantenübersicht sowie interne Audits zur Verfügung."
+					}
+				]
+			]
+		}
+	}
+]
