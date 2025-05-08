@@ -961,10 +961,14 @@ export class Composer {
 	 */
 	drop_insert(evnt, droppedUpon, allowSections) {
 		evnt.preventDefault();
-		if (!evnt.dataTransfer.getData("text")) return;
+		let draggedElement;
+ 		// determine target:
+		// target is element
+		if (evnt.target.classList.contains("draggableDocumentElement")) draggedElement = evnt.target; // draggable element container
+		else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) draggedElement = evnt.target.parentNode; // draggable element container content
+		else if (evnt.target.parentNode.parentNode.classList.contains("draggableDocumentElement")) draggedElement = evnt.target.parentNode.parentNode; // draggable element container content
 
-		const draggedElement = document.getElementById(evnt.dataTransfer.getData("text")),
-			draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
+		const draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
 			originParent = draggedElement.parentNode;
 		//console.log('dragged', draggedElement.id, 'dropped on', droppedUpon.id, 'target', evnt.target);
 		if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
@@ -1059,7 +1063,15 @@ export class Composer {
 	 * @event updates this.componentIdentify and this.componentSignature count
 	 */
 	drop_delete(evnt) {
-		const draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
+		let draggedElement;
+		// determine target:
+		// target is element
+		if (evnt.target.classList.contains("draggableDocumentElement")) draggedElement = evnt.target; // draggable element container
+		else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) draggedElement = evnt.target.parentNode; // draggable element container content
+		// target is container
+		else if (["main", "section"].includes(evnt.target.parentNode.localName)) draggedElement = evnt.target; // draggable div container
+		else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) draggedElement = evnt.target.parentNode; // draggable div container content
+
 		if (!draggedElement) {
 			new _client.Toast(api._lang.GET("assemble.compose.context_delete_error"), "error");
 			return;
