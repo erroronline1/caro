@@ -72,7 +72,7 @@ class RECORD extends API {
 				if ($case){
 					$current_record = [
 						'author' => $_SESSION['user']['name'],
-						'date' => $this->_currentdate->format('Y-m-d H:i:s'),
+						'date' => $this->_date['current']->format('Y-m-d H:i:s'),
 						'document' => 0,
 						'content' => UTILITY::json_encode([
 							$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET($this->_caseStateBoolean === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
@@ -201,7 +201,7 @@ class RECORD extends API {
 
 		$data['closed'][$this->_passedIdentify] = [
 			'name' => $_SESSION['user']['name'],
-			'date' => $this->_currentdate->format('Y-m-d H:i')
+			'date' => $this->_date['current']->format('Y-m-d H:i')
 		];
 
 		SQLQUERY::EXECUTE($this->_pdo, 'records_close', [
@@ -235,7 +235,7 @@ class RECORD extends API {
 		]];
 
 		// prefill identify if passed, prepare calendar button and autocomplete if part of the document
-		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $document['unit']]]);
 		function setidentifier($element, $identify, $calendar, $_lang, $datalists){
 			$content = [];
@@ -352,14 +352,14 @@ class RECORD extends API {
 					'type' => 'date',
 					'attributes' => [
 						'name' => 'DEFAULT_' . $this->_lang->GET('record.date'),
-						'value' => $this->_currentdate->format('Y-m-d'),
+						'value' => $this->_date['current']->format('Y-m-d'),
 						'required' => true
 					]
 				], [
 					'type' => 'time',
 					'attributes' => [
 						'name' => 'DEFAULT_' . $this->_lang->GET('record.time'),
-						'value' => $this->_currentdate->format('H:i'),
+						'value' => $this->_date['current']->format('H:i'),
 						'required' => true
 					]
 				]
@@ -507,7 +507,7 @@ class RECORD extends API {
 						new DateTime($possibledate);
 					}
 					catch (Exception $e){
-						if ($this->_appendDate) $content .= ' ' . $this->_currentdate->format('Y-m-d H:i');
+						if ($this->_appendDate) $content .= ' ' . $this->_date['current']->format('Y-m-d H:i');
 					}
 				}
 				if ($content){
@@ -638,7 +638,7 @@ class RECORD extends API {
 	 * @return array|bool either query row or false
 	 */
 	private function latestApprovedName($query = '', $name = '', $requestedTimestamp = null){
-		$requestedTimestamp = $requestedTimestamp ? : $this->_currentdate->format('Y-m-d') . ' ' . $this->_currentdate->format('H:i:59');
+		$requestedTimestamp = $requestedTimestamp ? : $this->_date['current']->format('Y-m-d') . ' ' . $this->_date['current']->format('H:i:59');
 
 		// get latest approved by name
 		$element = [];
@@ -758,7 +758,7 @@ class RECORD extends API {
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-					$entry_timestamp = $this->_currentdate->format('Y-m-d H:i');
+					$entry_timestamp = $this->_date['current']->format('Y-m-d H:i');
 				}
 
 				// create proper identifier with timestamp if not provided
@@ -799,7 +799,7 @@ class RECORD extends API {
 				if (!file_exists(UTILITY::directory('record_attachments'))) mkdir(UTILITY::directory('record_attachments'), 0777, true);
 				$attachments = [];
 				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_currentdate->format('YmdHis') . '_' . $fileinput)], null, false)){
+					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('record_attachments'), [preg_replace('/[^\w\d]/m', '', $identifier . '_' . $this->_date['current']->format('YmdHis') . '_' . $fileinput)], null, false)){
 						if (gettype($files['name']) === 'array'){
 							for($i = 0; $i < count($files['name']); $i++){
 								if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
@@ -821,7 +821,7 @@ class RECORD extends API {
 				if (boolval((array) $this->_payload)){
 					// update record datalists if passed document contains issues permitting autocompletion
 					require_once('_shared.php');
-					$documentfinder = new SHARED($this->_pdo);
+					$documentfinder = new SHARED($this->_pdo, $this->_date);
 					if ($useddocument = $documentfinder->recentdocument('document_get', [
 						'values' => [
 							':id' => $document_id
@@ -1332,7 +1332,7 @@ class RECORD extends API {
 						array_splice($return['render']['content'][$last_element], 1, 0, [[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $this->_lang->GET('record.closed', [':role' => $this->_lang->GET('permissions.' . $role), ':name' => $property['name'], ':date' => UTILITY::dateFormat($property['date'])])
+								'name' => $this->_lang->GET('record.closed', [':role' => $this->_lang->GET('permissions.' . $role), ':name' => $property['name'], ':date' => $this->dateFormat($property['date'])])
 							]
 						]]);
 					}
@@ -1390,7 +1390,7 @@ class RECORD extends API {
 		$this->_requestedID = $this->_requestedID === 'null' ? null : $this->_requestedID;
 		// get all records or these fitting the search
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo);
+		$search = new SHARED($this->_pdo, $this->_date);
 		$data = $search->recordsearch(['search' => $this->_requestedID]);
 
 		// prepare datalists, display values, available units to select and styling
@@ -1411,7 +1411,7 @@ class RECORD extends API {
 				// add to result
 				$linkdisplay = $this->_lang->GET('record.list_touched', [
 					':identifier' => $record['identifier'],
-					':date' => UTILITY::dateFormat($record['last_touch']),
+					':date' => $this->dateFormat($record['last_touch']),
 					':document' => $record['last_document']
 					]);
 				$contexts[$contextkey][$linkdisplay] = [
@@ -1519,7 +1519,7 @@ class RECORD extends API {
 			new DateTime($possibledate);
 		}
 		catch (Exception $e){
-			$new_id .= ' ' . $this->_currentdate->format('Y-m-d H:i');
+			$new_id .= ' ' . $this->_date['current']->format('Y-m-d H:i');
 		}
 
 		// compare identifiers, warn if similarity is too low
@@ -1602,7 +1602,7 @@ class RECORD extends API {
 		$merge['content'] = json_decode($merge['content'], true);
 		$merge['content'][] = [
 			'author' => $_SESSION['user']['name'],
-			'date' => $this->_currentdate->format('Y-m-d H:i:s'),
+			'date' => $this->_date['current']->format('Y-m-d H:i:s'),
 			'document' => 0,
 			'content' => [
 				$this->_lang->GET('record.reidentify_pseudodocument_name', [], true) => ($original ? $this->_lang->GET('record.reidentify_merge_content', [':identifier' => $entry_id], true) : $this->_lang->GET('record.reidentify_identify_content', [':identifier' => $entry_id], true))
@@ -1684,7 +1684,7 @@ class RECORD extends API {
 			$original['content'] = json_decode($original['content'], true);
 			$original['content'][] = [
 				'author' => $_SESSION['user']['name'],
-				'date' => $this->_currentdate->format('Y-m-d H:i'),
+				'date' => $this->_date['current']->format('Y-m-d H:i'),
 				'document' => 0,
 				'content' => [
 					$this->_lang->GET('record.retype_pseudodocument_name', [], true) => $this->_lang->GET('record.retype_content', [
@@ -1760,13 +1760,13 @@ class RECORD extends API {
 		if (!$data) return false;
 		//set up summary
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_requestedID . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_requestedID . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('menu.records.record_summary', [], true),
-			'date' => UTILITY::dateFormat($this->_currentdate->format('Y-m-d H:i')),
+			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true),
 			'closed' => $data['closed'],
 			'record_type' => $data['record_type'],
 			'units' => $data['units'] ? explode(',', $data['units']) : [],
@@ -1801,7 +1801,7 @@ class RECORD extends API {
 					$value = '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
 				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
-				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => UTILITY::dateFormat(substr($record['date'], 0, -3))], true)];
+				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => $this->dateFormat(substr($record['date'], 0, -3), true)], true)];
 				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
 			}
 		}
@@ -1848,7 +1848,7 @@ class RECORD extends API {
 		if ($export) {
 			// reiterate over document, add textsections and empty document fields
 			require_once('_shared.php');
-			$documentfinder = new SHARED($this->_pdo);
+			$documentfinder = new SHARED($this->_pdo, $this->_date);
 
 			function enumerate($name, $enumerate = [], $number = 1){
 				if (isset($enumerate[$name])) $enumerate[$name] += $number;
@@ -1912,7 +1912,7 @@ class RECORD extends API {
 			if ($type === 'simplifieddocument'){
 				// convert summary contents to a simpler view. this allows document formatting suitable to hand over to patients/customers, e.g. a manual with the latest record entries
 				$summary['content'] = [' ' => $printablecontent[$useddocument['name']]];
-				$summary['date'] = UTILITY::dateFormat($this->_currentdate->format('Y-m-d H:i'));
+				$summary['date'] = $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true);
 				$summary['title'] = $useddocument['name'];
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}

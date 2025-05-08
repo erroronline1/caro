@@ -69,7 +69,7 @@ class DOCUMENT extends API {
 					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array($this->_lang->GET('permissions.' . $permission), $approveas)){
 						$approve['approval'][$permission] = [
 							'name' => $_SESSION['user']['name'],
-							'date' => $this->_currentdate->format('Y-m-d H:i')
+							'date' => $this->_date['current']->format('Y-m-d H:i')
 						];
 					}
 				}
@@ -248,7 +248,7 @@ class DOCUMENT extends API {
 					}
 
 					// gather informal document properties
-					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => UTILITY::dateFormat($approve['date'])]);
+					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => $this->dateFormat($approve['date'])]);
 					if ($approve['alias']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_alias') . ': ' . $approve['alias'];
 					if ($approve['regulatory_context']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_regulatory_context') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['regulatory'][$context], explode(',', $approve['regulatory_context'])));
 					if ($approve['restricted_access']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_restricted_access') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['permissions'][$context], explode(',', $approve['restricted_access'])));
@@ -347,7 +347,7 @@ class DOCUMENT extends API {
 							':unit' => $bundle[':unit'],
 							':author' => $exists['author'],
 							':content' => $exists['content'],
-							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 							':approval' => $exists['approval'],
 							':regulatory_context' => '',
 							':permitted_export' => null,
@@ -502,7 +502,7 @@ class DOCUMENT extends API {
 									'data-loss' => 'prevent'
 								],
 								'datalist' => array_values(array_unique($bundledatalist)),
-								'hint' => ($bundle['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => UTILITY::dateFormat(substr($bundle['date'], 0, -3))]) . '<br>' : $this->_lang->GET('assemble.compose.component.component_name_hint'))
+								'hint' => ($bundle['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => $this->dateFormat(substr($bundle['date'], 0, -3))]) . '<br>' : $this->_lang->GET('assemble.compose.component.component_name_hint'))
 							], [
 								'type' => 'select',
 								'attributes' => [
@@ -548,7 +548,7 @@ class DOCUMENT extends API {
 					if ($bundle['hidden']) {
 						$bundle['hidden'] = json_decode($bundle['hidden'], true);
 						$hidden['content'][$this->_lang->GET('assemble.compose.bundle.hidden')]['checked'] = true;
-						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.compose.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => UTILITY::dateFormat($bundle['hidden']['date'])]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.compose.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $this->dateFormat($bundle['hidden']['date'])]);
 					}
 					array_push($return['render']['content'][1], $hidden);
 				}
@@ -745,7 +745,7 @@ class DOCUMENT extends API {
 				if (isset($exists['id'])){ 
 					if (!$approved) {
 						// update anything, delete unused images, reset approval
-						$exists_date = new DateTime($exists['date'], new DateTimeZone(CONFIG['application']['timezone']));
+						$exists_date = new DateTime($exists['date'], new DateTimeZone($this->_date['timezone']));
 						$component['content'] = fileupload($component['content'], $exists['name'], $exists_date->format('YmdHis'));
 
 						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));
@@ -759,7 +759,7 @@ class DOCUMENT extends API {
 								':unit' => $component_approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => UTILITY::json_encode($component),
-								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -788,7 +788,7 @@ class DOCUMENT extends API {
 								':unit' => $component_approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -817,7 +817,7 @@ class DOCUMENT extends API {
 				// check for forbidden name
 				if(UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
-				$component['content'] = fileupload($component['content'], $component_name, $this->_currentdate->format('YmdHis'));
+				$component['content'] = fileupload($component['content'], $component_name, $this->_date['current']->format('YmdHis'));
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => [
 						':name' => $component_name,
@@ -1027,7 +1027,7 @@ class DOCUMENT extends API {
 				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
-					':date' => UTILITY::dateFormat($data['date']),
+					':date' => $this->dateFormat($data['date']),
 				]) . "\n";
 			}
 		}
@@ -1143,7 +1143,7 @@ class DOCUMENT extends API {
 				[[
 					'type' => 'compose_component',
 					'value' => $component['name'],
-					'hint' => ($component['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $component['author'], ':date' => UTILITY::dateFormat(substr($component['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
+					'hint' => ($component['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $component['author'], ':date' => $this->dateFormat(substr($component['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
 						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
 						($dependeddocuments ? $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(', ', $dependeddocuments)]) : ''),
 					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : null,
@@ -1197,7 +1197,7 @@ class DOCUMENT extends API {
 
 		// used by audit for export of outdated documents
 		if ($maxDocumentTimestamp = UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp')) unset($this->_payload->_maxDocumentTimestamp);
-		else $maxDocumentTimestamp = $this->_currentdate->format('Y-m-d H:i:s');
+		else $maxDocumentTimestamp = $this->_date['current']->format('Y-m-d H:i:s');
 
 		$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 			'values' => [
@@ -1210,7 +1210,7 @@ class DOCUMENT extends API {
 
 		$entry_timestamp = $entry_date . ' ' . $entry_time;
 		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-			$entry_timestamp = $this->_currentdate->format('Y-m-d H:i');
+			$entry_timestamp = $this->_date['current']->format('Y-m-d H:i');
 		}
 
 		// create proper identifier with timestamp if not provided
@@ -1237,13 +1237,13 @@ class DOCUMENT extends API {
 		}
 		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier', [] , true): null;
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $document['name'] . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $document['name'] . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $document['name'],
-			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => UTILITY::dateFormat($this->_currentdate->format('y-m-d H:i'))], true)
+			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->dateFormat($this->_date['current']->format('y-m-d H:i'), true)], true)
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){
@@ -1538,7 +1538,7 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => implode(',', $this->_payload->content),
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
@@ -1567,7 +1567,7 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
@@ -1853,7 +1853,7 @@ class DOCUMENT extends API {
 				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
-					':date' => UTILITY::dateFormat($data['date']),
+					':date' => $this->dateFormat($data['date']),
 				]) . "\n";
 			}
 		}
@@ -1918,7 +1918,7 @@ class DOCUMENT extends API {
 							'content' => $contextoptions,
 							'hint' => $this->_lang->GET('assemble.compose.document.document_context_hint')
 						],
-						'hint' => ($document['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => UTILITY::dateFormat(substr($document['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
+						'hint' => ($document['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $this->dateFormat(substr($document['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
 						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
 						($dependedbundles ? $this->_lang->GET('assemble.compose.document.document_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
 						($dependedcomponents ? $this->_lang->GET('assemble.compose.document.document_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')
@@ -1983,7 +1983,7 @@ class DOCUMENT extends API {
 
 		// get all documents or these fitting the search
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo);
+		$search = new SHARED($this->_pdo, $this->_date);
 		$documents = $search->documentsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
 
 		// prepare existing documents lists grouped by context

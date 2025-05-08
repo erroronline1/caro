@@ -640,7 +640,7 @@ class INSTALL {
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
-		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['calendar']['timezones'][array_key_first(CONFIG['calendar']['timezones'])]));
 
 		$this->_lang = new LANG();
 	}

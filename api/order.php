@@ -372,16 +372,16 @@ class ORDER extends API {
 						continue;
 					}
 					$vendor = $vendors[array_search($product['vendor_id'], array_column($vendors, 'id'))];
-					$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
-					if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_currentdate)->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
+					$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+					if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['current'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
 						$checkable[$product['vendor_id']][] = $product['id'];
 					}
 				}
 				// drop vendors that have been checked within their sample check interval
 				foreach($products as $product){
 					if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_id']])) continue;
-					$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
-					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_currentdate)->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
+					$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['current'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 						unset($checkable[$product['vendor_id']]);
 					}
 				}
@@ -442,7 +442,7 @@ class ORDER extends API {
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
-						'ordertext' => $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . UTILITY::dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : '') ,
+						'ordertext' => $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : '') ,
 						'quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : null,
 						'unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : null,
 						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
@@ -454,7 +454,7 @@ class ORDER extends API {
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
-						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => UTILITY::dateFormat(substr($product['last_order'], 0, -9))]) : null,
+						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => $this->dateFormat(substr($product['last_order'], 0, -9))]) : null,
 						'orderer' => $orderer,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
@@ -478,7 +478,7 @@ class ORDER extends API {
 					}
 
 					// add approval
-					$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.approved') . ': ' . UTILITY::dateFormat($row['approved']) . ' ';
+					$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.approved') . ': ' . $this->dateFormat($row['approved']) . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) {
 						$data['ordertext'] .= "\n". $row['approval'];
 					} else {
@@ -495,7 +495,7 @@ class ORDER extends API {
 						if (!isset($data['state'][$s])) $data['state'][$s] = [];
 						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
-							$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.' . $s) . ': ' . UTILITY::dateFormat($row[$s]);
+							$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.' . $s) . ': ' . $this->dateFormat($row[$s]);
 						}
 						switch ($s){
 							case 'ordered':
@@ -793,7 +793,7 @@ class ORDER extends API {
 
 				// render search and selection
 				require_once('_shared.php');
-				$search = new SHARED($this->_pdo);
+				$search = new SHARED($this->_pdo, $this->_date);
 				$result['render'] = ['form' => [
 					'data-usecase'=> 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
@@ -1457,14 +1457,14 @@ class ORDER extends API {
 		// handle attachments
 		$attachments = [];
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_date['current']->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
 		}
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_currentdate->format('YmdHis')]));
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_date['current']->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);

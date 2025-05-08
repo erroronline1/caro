@@ -91,34 +91,34 @@ class CALENDAR extends API {
 
 					$content = [
 						'title' => $this->_lang->GET('calendar.appointment.title', [], true),
-						'date' => UTILITY::dateFormat($this->_currentdate->format('Y-m-d')),
+						'date' => $this->dateFormat($this->_date['current']->format('Y-m-d')),
 						'content' => [
 							$ics,
 							$this->_lang->GET('calendar.appointment.readable', [
 								':company' => $this->_lang->GET('company.address'),
 								':occasion' => $appointment['occasion'],
-								':start' => UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']),
-								':end' => UTILITY::dateFormat(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600)),
+								':start' => $this->dateFormat($appointment['date'] . ' ' . $appointment['time']),
+								':end' => $this->dateFormat(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600)),
 								':reminder' => $appointment['reminder'],
 								':phone' => $this->_lang->GET('company.phone'),
 								':mail' => $this->_lang->GET('company.mail')
 							], true)
 						],
-						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']))
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf') . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time']))
 					];
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
 						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
 					];
 
 					// add ics file to send by mail
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics';
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, $ics);
 					fclose($file);
 					// provide downloadfile
 					$downloadfiles[$this->_lang->GET('calendar.appointment.ics')] = [
 						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-						'download' => $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . UTILITY::dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics'
+						'download' => $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics'
 					];
 
 					$body = [
@@ -226,7 +226,7 @@ class CALENDAR extends API {
 		$alert = null;
 		if ($this->_requestedCalendarType === 'schedule') $alert = intval($response[$this->_requestedCalendarType][intval($this->_requestedComplete === 'true')]);
 
-		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		require_once('notification.php');
 		$notifications = new NOTIFICATION;
 		if ($calendar->complete($this->_requestedId, $this->_requestedComplete === 'true', $alert)) $this->response([
@@ -270,9 +270,9 @@ class CALENDAR extends API {
 
 				// new planning
 				if (isset($this->_payload->{$this->_lang->PROPERTY('calendar.longtermplanning.select')})){
-					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')), new DateTimeZone(CONFIG['application']['timezone']));
+					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')), new DateTimeZone($this->_date['timezone']));
 					$start->modify('first day of this month');
-					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')), new DateTimeZone(CONFIG['application']['timezone']));
+					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')), new DateTimeZone($this->_date['timezone']));
 					$end->modify('last day of this month');
 					$span = $start->diff($end)->format('%m') * 2; // half months
 					if ($span < 2) $this->response([], 406);
@@ -347,7 +347,7 @@ class CALENDAR extends API {
 					$content = json_decode($this->_payload->content, true);
 					$preset = json_decode($this->_payload->preset, true);
 					$id = $this->_payload->id;
-					$closed = intval($this->_payload->closed) ? UTILITY::json_encode(['user' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d')]) : null;
+					$closed = intval($this->_payload->closed) ? UTILITY::json_encode(['user' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d')]) : null;
 					if (!$content) $this->response([], 406);
 
 					if (intval($id) > 0){
@@ -425,7 +425,7 @@ class CALENDAR extends API {
 					if (!PERMISSION::permissionFor('longtermplanning') && !$schedule['closed']) continue;
 					$schedule['closed'] = json_decode($schedule['closed'] ? : '', true);
 					$select['edit'][$schedule['subject'] . (isset($schedule['closed']['date']) ? (' - ' . $schedule['closed']['date']) :'')] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
-					if ($schedule['span_end'] > $this->_currentdate->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
+					if ($schedule['span_end'] > $this->_date['current']->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
 				}
 
 				$result['render']['content'][] = [
@@ -570,7 +570,7 @@ class CALENDAR extends API {
 	 * gathers all the entries though, supposed to be filtered by different methods 
 	 */
 	public function monthlyTimesheets(){
-		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		// set up calendar
 		$calendar->days('month', $this->_requestedTimespan);
 		$holidays = $calendar->holidays(substr($this->_requestedTimespan, 0, 4));
@@ -649,8 +649,8 @@ class CALENDAR extends API {
 					];
 				}
 				
-				$span_start = new DateTime($entry['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
-				$span_end = new DateTime($entry['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
+				$span_start = new DateTime($entry['span_start'], new DateTimeZone($this->_date['timezone']));
+				$span_end = new DateTime($entry['span_end'], new DateTimeZone($this->_date['timezone']));
 				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
 					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
 					&& !isset($timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')])){
@@ -700,13 +700,13 @@ class CALENDAR extends API {
 		array_splice($timesheets, 0, 0, $self);
 
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('menu.calendar.timesheet', [], true) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('menu.calendar.timesheet', [], true) . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => $this->prepareTimesheetOutput($timesheets),
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('menu.calendar.timesheet', [], true),
-			'date' => $this->_currentdate->format('Y-m-d H:i')
+			'date' => $this->_date['current']->format('Y-m-d H:i')
 		];
 
 		$downloadfiles = [];
@@ -797,7 +797,7 @@ class CALENDAR extends API {
 					if (isset($day['note']) && $day['note']) $dayinfo[] = $day['note'];
 					
 					$rows[] = [
-						[$day['weekday'] . ' ' . UTILITY::dateFormat($date), $day['holiday']],
+						[$day['weekday'] . ' ' . $this->dateFormat($date), $day['holiday']],
 						implode(', ', $dayinfo)
 					];
 				}
@@ -868,7 +868,7 @@ class CALENDAR extends API {
 				]
 			]
 		]]];
-		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$dbevents = $calendar->search(urldecode($this->_requestedId || ''));
 
 		// append filtered events
@@ -901,7 +901,7 @@ class CALENDAR extends API {
 	 * responds with render data for assemble.js
 	 */
 	public function schedule(){
-		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		require_once('notification.php');
 		$notifications = new NOTIFICATION;
 
@@ -927,7 +927,7 @@ class CALENDAR extends API {
 
 				// default end if not provided
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start'], new DateTimeZone(CONFIG['application']['timezone']));
+					$due = new DateTime($event[':span_start'], new DateTimeZone($this->_date['timezone']));
 					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
@@ -969,7 +969,7 @@ class CALENDAR extends API {
 
 				// default end if not provided
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start'], new DateTimeZone(CONFIG['application']['timezone']));
+					$due = new DateTime($event[':span_start'], new DateTimeZone($this->_date['timezone']));
 					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
@@ -1058,7 +1058,7 @@ class CALENDAR extends API {
 				];
 				// default requestedDate as today
 				if (!$this->_requestedDate){
-					$today = $this->_currentdate;
+					$today = $this->_date['current'];
 					$this->_requestedDate = $today->format('Y-m-d');
 				}
 
@@ -1075,7 +1075,7 @@ class CALENDAR extends API {
 				$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 				foreach ($thisDaysEvents as $id => $row){
 					if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user'); // fallback message
-					if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". UTILITY::dateFormat(substr($row['span_start'], 0, 10)) . " - ". UTILITY::dateFormat(substr($row['span_end'], 0, 10)) . "\n";
+					if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->dateFormat(substr($row['span_start'], 0, 10)) . " - ". $this->dateFormat(substr($row['span_end'], 0, 10)) . "\n";
 				}
 
 				// add absent mates
@@ -1084,7 +1084,7 @@ class CALENDAR extends API {
 					'content' => $displayabsentmates,
 					'attributes' => [
 						'data-type' => 'calendar',
-						'name' => UTILITY::dateFormat($this->_requestedDate)
+						'name' => $this->dateFormat($this->_requestedDate)
 					]
 				];
 
@@ -1102,7 +1102,7 @@ class CALENDAR extends API {
 				$result['render']['content'][] = $events;
 
 				// add past unclosed events for user units
-				$today = new DateTime($this->_requestedDate, new DateTimeZone(CONFIG['application']['timezone']));
+				$today = new DateTime($this->_requestedDate, new DateTimeZone($this->_date['timezone']));
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
 					$uncompleted = [];
@@ -1161,14 +1161,14 @@ class CALENDAR extends API {
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'); // to eventually match affected_user_id
 
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
-			$due = new DateTime($row['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
+			$date = new DateTime($row['span_start'], new DateTimeZone($this->_date['timezone']));
+			$due = new DateTime($row['span_end'], new DateTimeZone($this->_date['timezone']));
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			if ((!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !in_array($_SESSION['user']['id'], [$row['author_id'], $row['affected_user_id']])) || $row['type'] !== 'schedule' ) continue; // skip not schedule and not user unit affecting
 
 			// construct event information
-			$display = $this->_lang->GET('calendar.schedule.date') . ': ' . UTILITY::dateFormat($date->format('Y-m-d')) . "\n" .
-				$this->_lang->GET('calendar.schedule.due') . ': ' . UTILITY::dateFormat($due->format('Y-m-d')) . "\n";
+			$display = $this->_lang->GET('calendar.schedule.date') . ': ' . $this->dateFormat($date->format('Y-m-d')) . "\n" .
+				$this->_lang->GET('calendar.schedule.due') . ': ' . $this->dateFormat($due->format('Y-m-d')) . "\n";
 			$display .= implode(', ', array_map(Fn($unit) => $this->_lang->_USER['units'][$unit], explode(',', $row['organizational_unit'])));
 			if ($row['affected_user_id'] && $userrow = array_search($row['affected_user_id'], array_column($users, 'id'))){
 				$display .= "\n" . $users[$userrow]['name'];
@@ -1184,7 +1184,7 @@ class CALENDAR extends API {
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.schedule.complete')]['checked'] = true;
 				$row['closed'] = json_decode($row['closed'], true);
-				$completed_hint = $this->_lang->GET('calendar.schedule.completed_state', [':user' => $row['closed']['user'], ':date' => UTILITY::dateFormat($row['closed']['date'])]);
+				$completed_hint = $this->_lang->GET('calendar.schedule.completed_state', [':user' => $row['closed']['user'], ':date' => $this->dateFormat($row['closed']['date'])]);
 			}
 
 			// add event tile
@@ -1264,7 +1264,7 @@ class CALENDAR extends API {
 	 * responds with render data for assemble.js
 	 */
 	public function timesheet(){
-		$calendar = new CALENDARUTILITY($this->_pdo);
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.affected_user'));
@@ -1441,7 +1441,7 @@ class CALENDAR extends API {
 
 				// default requestedDate as today
 				if (!$this->_requestedDate){
-					$today = $this->_currentdate;
+					$today = $this->_date['current'];
 					$this->_requestedDate = $today->format('Y-m-d');
 				}
 
@@ -1464,7 +1464,7 @@ class CALENDAR extends API {
 					// display absent workmates for own units
 					if ($row['type'] === 'timesheet'
 						&& !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons'])
-						&& array_intersect($row['affected_user_units'], ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". UTILITY::dateFormat(substr($row['span_start'], 0, 10)) . " - ". UTILITY::dateFormat(substr($row['span_end'], 0, 10)) . "\n";
+						&& array_intersect($row['affected_user_units'], ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->dateFormat(substr($row['span_start'], 0, 10)) . " - ". $this->dateFormat(substr($row['span_end'], 0, 10)) . "\n";
 					
 					// allow approval for fullaccess and supervisors of affected user units
 					if ($row['type'] === 'timesheet'
@@ -1480,7 +1480,7 @@ class CALENDAR extends API {
 					'content' => $displayabsentmates,
 					'attributes' => [
 						'data-type' => 'calendar',
-						'name' => UTILITY::dateFormat($this->_requestedDate)
+						'name' => $this->dateFormat($this->_requestedDate)
 					]
 				];
 
@@ -1514,7 +1514,7 @@ class CALENDAR extends API {
 				}
 
 				// display current scheduled events to raise awareness
-				$today = new DateTime($this->_requestedDate, new DateTimeZone(CONFIG['application']['timezone']));
+				$today = new DateTime($this->_requestedDate, new DateTimeZone($this->_date['timezone']));
 				if ($thisMonthsEvents = $calendar->getWithinDateRange($today->modify('first day of this month')->format('Y-m-d'), $today->modify('last day of this month')->format('Y-m-d'))) {
 					$timesheetentries = false;
 					foreach($thisMonthsEvents as $evt) if ($evt['type']==='timesheet') $timesheetentries = true;
@@ -1530,7 +1530,7 @@ class CALENDAR extends API {
 				$result['render']['content'][] = $events;
 
 				// display past unclosed scheduled events to raise awareness
-				$today = new DateTime($this->_requestedDate, new DateTimeZone(CONFIG['application']['timezone']));
+				$today = new DateTime($this->_requestedDate, new DateTimeZone($this->_date['timezone']));
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
 					foreach ($pastEvents as $id => $row){
@@ -1594,8 +1594,8 @@ class CALENDAR extends API {
 	 private function timesheetEntries($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start'], new DateTimeZone(CONFIG['application']['timezone']));
-			$due = new DateTime($row['span_end'], new DateTimeZone(CONFIG['application']['timezone']));
+			$date = new DateTime($row['span_start'], new DateTimeZone($this->_date['timezone']));
+			$due = new DateTime($row['span_end'], new DateTimeZone($this->_date['timezone']));
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			$row['organizational_unit'] = explode(',', $row['organizational_unit']);
 			if ($row['type'] !== 'timesheet'
@@ -1613,8 +1613,8 @@ class CALENDAR extends API {
 			$hint = '';
 			$display = '';
 			if ($row['subject']) $display .= $this->_lang->GET('calendar.timesheet.irregular') . ': ' . $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . "\n";
-			$display .=	$this->_lang->GET('calendar.timesheet.start') . ': ' . UTILITY::dateFormat($date->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i')) . "\n" .
-				$this->_lang->GET('calendar.timesheet.end') . ': ' . UTILITY::dateFormat($due->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i')) . "\n";
+			$display .=	$this->_lang->GET('calendar.timesheet.start') . ': ' . $this->dateFormat($date->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i')) . "\n" .
+				$this->_lang->GET('calendar.timesheet.end') . ': ' . $this->dateFormat($due->format($row['subject'] ? 'Y-m-d' : 'Y-m-d H:i')) . "\n";
 			if ($row['misc']){
 				$misc = json_decode($row['misc'], true);
 				if (!$row['subject'] && isset($misc['break'])) $display .= $this->_lang->GET('calendar.timesheet.break') . ': ' . $misc['break'] . "\n";
@@ -1654,7 +1654,7 @@ class CALENDAR extends API {
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.timesheet.approve')]['checked'] = true;
 				$row['closed'] = json_decode($row['closed'], true);
-				$completed_hint = $this->_lang->GET('calendar.timesheet.approved_state', [':user' => $row['closed']['user'], ':date' => UTILITY::dateFormat($row['closed']['date'])]);
+				$completed_hint = $this->_lang->GET('calendar.timesheet.approved_state', [':user' => $row['closed']['user'], ':date' => $this->dateFormat($row['closed']['date'])]);
 			}
 			$events[count($events)-1]['content'][] = [
 				'type' => 'checkbox',

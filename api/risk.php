@@ -142,7 +142,7 @@ class RISK extends API {
 					':id' => intval($this->_requestedID),
 					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')) ? : null,
 					':proof' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.proof')) ? : null,
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 					':probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.probability'))) ? : null,
 					':damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.damage'))) ? : null,
 					':measure_probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_probability'))) ? : null,
@@ -256,7 +256,7 @@ class RISK extends API {
 				}
 
 				require_once('_shared.php');
-				$search = new SHARED($this->_pdo);
+				$search = new SHARED($this->_pdo, $this->_date);
 				$result = ['render' => ['content' => $search->risksearch()]];		
 				
 				// render selection of types and their content, one selection per process
@@ -311,7 +311,7 @@ class RISK extends API {
 									'attributes' => [
 										'name' => $this->_lang->_USER['risk']['type'][$risk['type']]
 									],
-									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => UTILITY::dateFormat($risk['date'])]) : null
+									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $this->dateFormat($risk['date'])]) : null
 								], [
 									'type' => 'hidden',
 									'attributes' => [
@@ -381,7 +381,7 @@ class RISK extends API {
 								$hidden = null;
 								if ($risk['hidden']) {
 									$hiddenproperties = json_decode($risk['hidden'], true);
-									$hidden = $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+									$hidden = $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 								}
 								$result['render']['content'][$last][] = [
 									'type' => 'radio',
@@ -404,7 +404,7 @@ class RISK extends API {
 										'attributes' => [
 											'name' => $this->_lang->_USER['risk']['type'][$risk['type']]
 										],
-										'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => UTILITY::dateFormat($risk['date'])]) : null
+										'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $this->dateFormat($risk['date'])]) : null
 									], [
 										'type' => 'textsection',
 										'attributes' => [
@@ -488,7 +488,7 @@ class RISK extends API {
 								'attributes' => [
 									'name' => $this->_lang->_USER['risk']['type'][$risk['type']]
 								],
-								'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => UTILITY::dateFormat($risk['date'])]) : null
+								'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $this->dateFormat($risk['date'])]) : null
 							], [
 								'type' => 'hidden',
 								'attributes' => [
@@ -636,7 +636,7 @@ class RISK extends API {
 							$hidden = null;
 							if ($risk['hidden']) {
 								$hiddenproperties = json_decode($risk['hidden'], true);
-								$hidden = $this->_lang->GET('risk.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+								$hidden = $this->_lang->GET('risk.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 							}
 							$result['render']['content'][$last][] = [
 								'type' => 'radio',
@@ -659,7 +659,7 @@ class RISK extends API {
 									'attributes' => [
 										'name' => $this->_lang->_USER['risk']['type'][$risk['type']]
 									],
-									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => UTILITY::dateFormat($risk['date'])]) : null
+									'content' => $risk['author'] ? $this->_lang->GET('risk.author', [':author' => $risk['author'], ':date' => $this->dateFormat($risk['date'])]) : null
 								],[
 									'type' => 'textsection',
 									'attributes' => [
@@ -734,7 +734,7 @@ class RISK extends API {
 	 */
 	public function search(){
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo);
+		$search = new SHARED($this->_pdo, $this->_date);
 		if ($result = $search->risksearch(['search' => $this->_search])) {
 			$this->response(['render' => ['content' => $result]]);
 		}

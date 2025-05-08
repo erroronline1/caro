@@ -87,7 +87,7 @@ class MEASURE extends API {
 					boolval($measure['closed']) == boolval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')))
 				);
 				$measure['measures'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure'));
-				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? UTILITY::json_encode(['date' => $this->_currentdate->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
+				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? UTILITY::json_encode(['date' =>$this->_date['current']->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
 				$measure['id'] = $this->_requestedID;
 				$measure['last_user'] = $_SESSION['user']['name'];
 
@@ -184,7 +184,7 @@ class MEASURE extends API {
 					$measurecontent[] = [
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => ($measure['user_name'] ? : $this->_lang->GET('measure.anonymous_user')) . ' ' . UTILITY::dateFormat($measure['timestamp'])
+							'name' => ($measure['user_name'] ? : $this->_lang->GET('measure.anonymous_user')) . ' ' . $this->dateFormat($measure['timestamp'])
 						],
 						'content' => $measure['content']
 					];
@@ -232,7 +232,7 @@ class MEASURE extends API {
 								'name' => $this->_lang->GET('measure.measure')
 							],
 							'content' => $measure['measures'],
-							'hint' => $this->_lang->GET('measure.last_touch', [':user' => $measure['last_user'], ':date' => UTILITY::dateFormat($measure['last_touch'])])
+							'hint' => $this->_lang->GET('measure.last_touch', [':user' => $measure['last_user'], ':date' => $this->dateFormat($measure['last_touch'])])
 						];
 					if (PERMISSION::permissionFor('measureedit')) {
 						$measurecontent[] = [

@@ -106,11 +106,20 @@ class USER extends API {
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_force_desktop'));
 				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_homeoffice'));
-				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_language')) ? : 'en';
+				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_language')) ? : CONFIG['application']['defaultlanguage'];
 				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_theme'));
 				$user['app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_masonry'));
 				$user['app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_forth'));
 				$user['app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_back'));
+				$user['app_settings']['dateformat'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_dateformat'));
+				$user['app_settings']['location'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_location'));
+				$user['app_settings']['timezone'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_timezone'));
+
+				// unset defaults
+				if ($user['app_settings']['language'] === CONFIG['application']['defaultlanguage']) $user['app_settings']['language'] = null;
+				if ($user['app_settings']['dateformat'] === array_key_first(CONFIG['calendar']['dateformats'])) $user['app_settings']['dateformat'] = null;
+				if ($user['app_settings']['location'] === array_key_first(CONFIG['locations'])) $user['app_settings']['location'] = null;
+				if ($user['app_settings']['timezone'] === array_key_first(CONFIG['calendar']['timezones'])) $user['app_settings']['timezone'] = null;
 
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, $this->_lang->_USER['units']);
@@ -121,6 +130,7 @@ class USER extends API {
 					else
 						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
 				}
+
 				foreach($user['app_settings'] as $key => $value){
 					if (!$value) unset($user['app_settings'][$key]);
 				}
@@ -166,7 +176,7 @@ class USER extends API {
 				if (!$user) $this->response(null, 406);
 
 				// import calendar to process timesheet data
-				$calendar = new CALENDARUTILITY($this->_pdo);
+				$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 				$timesheet_stats = $calendar->timesheetSummary([$user]);//, '2024-05-01'));
 				$usertimesheet = array_search($user['id'], array_column($timesheet_stats, '_id'));
 				if ($usertimesheet !== false) $timesheet_stats = $timesheet_stats[$usertimesheet];
@@ -248,18 +258,18 @@ class USER extends API {
 				]);
 				$usertrainings = [];
 				foreach ($alltrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . UTILITY::dateFormat($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
-						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
+						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
+							if ($expire < $this->_date['current']) $attributes['class'] = 'orange';
 						}
 					}
 					$usertrainings[] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . UTILITY::dateFormat($row['expires']),
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->dateFormat($row['expires']),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $usertrainings[] = [
@@ -287,7 +297,7 @@ class USER extends API {
 				]);
 				$sessions = [];
 				foreach($usersessions as $session){
-					$sessions[] = UTILITY::dateFormat($session['date']);
+					$sessions[] = $this->dateFormat($session['date']);
 				}
 				if ($sessions) $user_data[] = [
 					[
@@ -334,7 +344,7 @@ class USER extends API {
 								'description' => $this->_lang->GET('user.export_user_image'),
 								'attributes' => [
 									'name' => $user['name'] . '_pic',
-									'url' => $user['image']
+									'url' => './api/api.php/file/stream/' . $user['image']
 								]
 							]
 						],
@@ -360,8 +370,45 @@ class USER extends API {
 					if (in_array($name, ['style'])) continue;
 					$theme[ucfirst($name)] = (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === $name) ? ['checked' => true, 'value' => $name] : ['value' => $name];
 				}
+				// available timezones
+				$timezones = [];
+				foreach(CONFIG['calendar']['timezones'] as $tz => $name){
+					$timezones[$name] = (isset($user['app_settings']['timezone']) && $user['app_settings']['timezone'] === $tz) ? ['selected' => true, 'value' => $tz] : ['value' => $tz]; 
+				}
+				// available date formats
+				$dateformats = [];
+				foreach(CONFIG['calendar']['dateformats'] as $df => $name){
+					$dateformats[$name] = (isset($user['app_settings']['dateformat']) && $user['app_settings']['dateformat'] === $df) ? ['selected' => true, 'value' => $df] : ['value' => $df]; 
+				}
+				// available states / holiday options
+				$locations = [];
+				foreach(CONFIG['locations'] as $location => $void){
+					$locations[$location] = (isset($user['app_settings']['location']) && $user['app_settings']['location'] === $location) ? ['selected' => true, 'value' => $location] : ['value' => $state]; 
+				}
 				// append application settings
-				$result['render']['content'][] = [
+				$applicationSettings = [];
+
+				// append primary unit selection for orders
+				if ($units) {
+					$applicationSettings[] = [
+						'type' => 'radio',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.settings_primary_unit')
+						],
+						'content' => $primary_unit
+					];
+				}
+				// append primary case state selection for records
+				$applicationSettings[] = [
+					'type' => 'radio',
+					'attributes' => [
+						'name' => $this->_lang->GET('user.settings_primary_recordstate')
+					],
+					'hint' => $this->_lang->GET('user.settings_hint'),
+					'content' => $primary_casestates
+				];
+
+				array_push($applicationSettings, ...[
 					[
 						'type' => 'checkbox',
 						'attributes' => [
@@ -372,13 +419,6 @@ class USER extends API {
 							$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
 							$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
 							]
-					], [
-						'type' => 'select',
-						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_language')
-						],
-						'content' => $languages,
-						'hint' => $this->_lang->GET('user.settings_language_hint', [':lang' => CONFIG['application']['defaultlanguage']])
 					], [
 						'type' => 'radio',
 						'attributes' => [
@@ -401,28 +441,46 @@ class USER extends API {
 							'onkeydown' => 'event.preventDefault(); this.value = event.key',
 							'onkeyup' => 'event.preventDefault()'
 						]
-					]
-				];
-				// append primary unit selection for orders
-				if ($units) {
-					$result['render']['content'][count($result['render']['content'])-1][] = [
-						'type' => 'radio',
+					], [
+						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_primary_unit')
+							'name' => $this->_lang->GET('user.settings_language')
 						],
-						'content' => $primary_unit
+						'content' => $languages,
+						'hint' => $this->_lang->GET('user.settings_language_hint', [':lang' => CONFIG['application']['defaultlanguage']])
+					]
+				]);
+
+				if (count($dateformats) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])){
+					$applicationSettings[] = [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.settings_dateformat')
+						],
+						'content' => $dateformats
 					];
 				}
-				// append primary case state selection for records
-				$result['render']['content'][count($result['render']['content'])-1][] = [
-					'type' => 'radio',
-					'attributes' => [
-						'name' => $this->_lang->GET('user.settings_primary_recordstate')
-					],
-					'hint' => $this->_lang->GET('user.settings_hint'),
-					'content' => $primary_casestates
-				];
+				if (count($locations) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])){
+					$applicationSettings[] = [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.settings_location'),
+							'onchange' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('user.settings_location_change_alert') . "'})"
+						],
+						'content' => $locations
+					];
+				}
+				if (count($timezones) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])){
+					$applicationSettings[] = [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.settings_timezone')
+						],
+						'content' => $timezones
+					];
+				}
 
+				$result['render']['content'][] = $applicationSettings;
 
 				$this->response($result);
 				break;
@@ -553,14 +611,14 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
 					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
 					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 						'user' => $_SESSION['user']['name'],
-						'date' => $this->_currentdate->format('Y-m-d H:i'),
+						'date' => $this->_date['current']->format('Y-m-d H:i'),
 						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
 					]): null;
 						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
@@ -762,14 +820,14 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
 					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
 					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 						'user' => $_SESSION['user']['name'],
-						'date' => $this->_currentdate->format('Y-m-d H:i'),
+						'date' => $this->_date['current']->format('Y-m-d H:i'),
 						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
 					]): null;
 						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
@@ -928,18 +986,18 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . UTILITY::dateFormat($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
-						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
+						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
+							if ($expire < $this->_date['current']) $attributes['class'] = 'orange';
 						}
 					}
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . UTILITY::dateFormat($row['expires']),
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->dateFormat($row['expires']),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $skillmatrix[0][] = [
@@ -1117,7 +1175,7 @@ class USER extends API {
 									'description' => $this->_lang->GET('user.export_user_image'),
 									'attributes' => [
 										'name' => $user['name'] . '_pic',
-										'url' => $user['image']
+										'url' => './api/api.php/file/stream/' . $user['image']
 									]
 								]
 							],

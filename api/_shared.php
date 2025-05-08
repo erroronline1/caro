@@ -22,13 +22,13 @@
 
 class SHARED {
     private $_pdo = null;
-	private $_currentdate = null;
 	public $_lang = null;
+	public $_date = [];
 
-	public function __construct($pdo = null){
+	public function __construct($pdo, $date){
         $this->_pdo = $pdo;
 		$this->_lang = new LANG();
-		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+		$this->_date = $date;
 	}
 
 	/**
@@ -640,7 +640,7 @@ class SHARED {
 	 * @return array document components or document names within bundles
 	 */
 	public function recentdocument($query = '', $parameters = [], $requestedTimestamp = null){
-		$requestedTimestamp = $requestedTimestamp ? : $this->_currentdate->format('Y-m-d') . ' ' . $this->_currentdate->format('H:i:59');
+		$requestedTimestamp = $requestedTimestamp ? : $this->_date['current']->format('Y-m-d') . ' ' . $this->_date['current']->format('H:i:59');
 
 		$result = [];
 		$contentBody = [];

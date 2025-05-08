@@ -71,15 +71,15 @@ class NOTIFICATION extends API {
 		foreach ($data as $row){
 			if ($row['closed']) continue;
 			// alert if applicable
-			$last = new DateTime($row['last_touch'], new DateTimeZone(CONFIG['application']['timezone']));
-			$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
+			$last = new DateTime($row['last_touch'], new DateTimeZone($this->_date['timezone']));
+			$diff = intval(abs($last->diff($this->_date['current'])->days / CONFIG['lifespan']['open_record_reminder']));
 			$row['notified'] = $row['notified'] || 0;
 			if ($row['notified'] < $diff){
 				$this->alertUserGroup(
 					['permission' => [...PERMISSION::permissionFor('audit', true)]],
 					$this->_lang->GET('audit.audit.reminder_message', [
-						':days' => $last->diff($this->_currentdate)->days,
-						':date' => UTILITY::dateFormat(substr($row['last_touch'], 0, -3)),
+						':days' => $last->diff($this->_date['current'])->days,
+						':date' => $this->dateFormat(substr($row['last_touch'], 0, -3)),
 						':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
 					], true)
 				);
@@ -106,15 +106,15 @@ class NOTIFICATION extends API {
 	 * alerts a user group if selected
 	 */
 	public function calendar(){
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new DateTime('now', new DateTimeZone($this->_date['timezone']));
 		$today->setTime(0, 0);
 
 		// schedule certificate request
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach ($vendors as $vendor){
 			$certificate = json_decode($vendor['certificate'] ? : '', true);
-			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone(CONFIG['application']['timezone']));
+			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone($this->_date['timezone']));
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
@@ -148,15 +148,15 @@ class NOTIFICATION extends API {
 		]);
 		foreach($trainings as $training){
 			if ($training['evaluation']) continue;
-			$trainingdate = new DateTime($training['date'], new DateTimeZone(CONFIG['application']['timezone']));
-			if (intval(abs($trainingdate->diff($this->_currentdate)->days)) > CONFIG['lifespan']['training_evaluation']){
+			$trainingdate = new DateTime($training['date'], new DateTimeZone($this->_date['timezone']));
+			if (intval(abs($trainingdate->diff($this->_date['current'])->days)) > CONFIG['lifespan']['training_evaluation']){
 				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) {// no deleted users
 					// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
 					$subject = $this->_lang->GET('audit.userskills_notification_message', [
 						':user' => $users[$user]['name'],
 						':training' => $training['name'],
 						':module' => $this->_lang->GET('menu.tools.regulatory', [], true),
-						':date' => UTILITY::dateFormat($training['date'])
+						':date' => $this->dateFormat($training['date'])
 					], true);
 					$reminders = $calendar->search($subject);
 					$open = false;
@@ -387,14 +387,14 @@ class NOTIFICATION extends API {
 			foreach($undelivered as $order){
 				$update = false;
 				$decoded_order_data = null;
-				$ordered = new DateTime($order['ordered'] ? : '', new DateTimeZone(CONFIG['application']['timezone']));
-				$receive_interval = intval(abs($ordered->diff($this->_currentdate)->days / CONFIG['lifespan']['order_unreceived']));
+				$ordered = new DateTime($order['ordered'] ? : '', new DateTimeZone($this->_date['timezone']));
+				$receive_interval = intval(abs($ordered->diff($this->_date['current'])->days / CONFIG['lifespan']['order_unreceived']));
 				if ($order['ordered'] && $order['notified_received'] < $receive_interval){
 					$decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['permission' => ['purchase']],
 						$this->_lang->GET('order.alert_unreceived_order', [
-							':days' => $ordered->diff($this->_currentdate)->days,
+							':days' => $ordered->diff($this->_date['current'])->days,
 							':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
@@ -408,14 +408,14 @@ class NOTIFICATION extends API {
 					$update = true;
 				} else $receive_interval = $order['notified_received'];
 
-				$received = new DateTime($order['received'] ? : '', new DateTimeZone(CONFIG['application']['timezone']));
-				$delivery_interval = intval(abs($received->diff($this->_currentdate)->days / CONFIG['lifespan']['order_undelivered']));
+				$received = new DateTime($order['received'] ? : '', new DateTimeZone($this->_date['timezone']));
+				$delivery_interval = intval(abs($received->diff($this->_date['current'])->days / CONFIG['lifespan']['order_undelivered']));
 				if ($order['received'] && $order['notified_delivered'] < $delivery_interval){
 					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['unit' => [$order['organizational_unit']]],
 						$this->_lang->GET('order.alert_undelivered_order', [
-							':days' => $received->diff($this->_currentdate)->days,
+							':days' => $received->diff($this->_date['current'])->days,
 							':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
@@ -423,7 +423,7 @@ class NOTIFICATION extends API {
 							':name' => isset($decoded_order_data['productname_label']) ? $decoded_order_data['productname_label'] : '',
 							':vendor' => isset($decoded_order_data['vendor_label']) ? $decoded_order_data['vendor_label'] : '',
 							':commission' => $decoded_order_data['commission'],
-							':receival' => UTILITY::dateFormat($order['received'])
+							':receival' => $this->dateFormat($order['received'])
 						], true)
 					);
 					$update = true;
@@ -492,8 +492,8 @@ class NOTIFICATION extends API {
 				// rise counter for unit member
 				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $number++;
 				// alert if applicable
-				$last = new DateTime($row['last_touch'], new DateTimeZone(CONFIG['application']['timezone']));
-				$diff = intval(abs($last->diff($this->_currentdate)->days / CONFIG['lifespan']['open_record_reminder']));
+				$last = new DateTime($row['last_touch'], new DateTimeZone($this->_date['timezone']));
+				$diff = intval(abs($last->diff($this->_date['current'])->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered document
 					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)];
@@ -501,8 +501,8 @@ class NOTIFICATION extends API {
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
 						$this->_lang->GET('record.reminder_message', [
-							':days' => $last->diff($this->_currentdate)->days,
-							':date' => UTILITY::dateFormat(substr($row['last_touch'], 0, -3)),
+							':days' => $last->diff($this->_date['current'])->days,
+							':date' => $this->dateFormat(substr($row['last_touch'], 0, -3)),
 							':document' => $lastdocument['name'],			
 							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 						], true)
@@ -534,14 +534,14 @@ class NOTIFICATION extends API {
 	 */
 	public function responsibilities(){
 		$number = 0;
-		$calendar = new CALENDARUTILITY($this->_pdo);
-		$today = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new DateTime('now', new DateTimeZone($this->_date['timezone']));
 		$today->setTime(0, 0);
 
 		$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
 		foreach($responsibilities as $row){
 			if ($row['hidden']) continue;
-			if (substr($row['span_end'], 0, 10) < $this->_currentdate->format('Y-m-d')) {
+			if (substr($row['span_end'], 0, 10) < $this->_date['current']->format('Y-m-d')) {
 				// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
 				$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'])))], true));
 				$open = false;

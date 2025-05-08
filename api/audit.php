@@ -335,7 +335,7 @@ class AUDIT extends API {
 								'name' => $this->_lang->_USER['units'][$template['unit']]
 							],
 							'content' => $template['objectives'] .
-								($audit['id'] ? "\n \n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => UTILITY::dateFormat($audit['last_touch']), ':user' => $audit['last_user']]) : '')
+								($audit['id'] ? "\n \n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $this->dateFormat($audit['last_touch']), ':user' => $audit['last_user']]) : '')
 						]
 					];
 
@@ -560,7 +560,7 @@ class AUDIT extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->_DEFAULT['units'][$audit['unit']] . ' ' . UTILITY::dateFormat($audit['last_touch']) . ' ' . $audit['last_user']
+						'name' => $this->_lang->_DEFAULT['units'][$audit['unit']] . ' ' . $this->dateFormat($audit['last_touch']) . ' ' . $audit['last_user']
 					],
 					'content' => $this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives']
 				]
@@ -718,7 +718,7 @@ class AUDIT extends API {
 				$datalist = ['objectives'=> [], 'questions' => [], 'hints' => []];
 				$templatehints = [];
 				$select = ['...' . $this->_lang->GET('audit.audit.template.new') => ['value' => '0']];
-				$calendar = new CALENDARUTILITY($this->_pdo);
+				$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
 
 				if($this->_requestedID && $this->_requestedID !== 'false' && ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'];
@@ -797,7 +797,7 @@ class AUDIT extends API {
 				$result['render']['content'][] = [
 					[
 						'type' => 'textsection',
-						'content' => $template['author'] ? $this->_lang->GET('risk.author', [':author' => $template['author'], ':date' => UTILITY::dateFormat($template['date'])]) : null
+						'content' => $template['author'] ? $this->_lang->GET('risk.author', [':author' => $template['author'], ':date' => $this->dateFormat($template['date'])]) : null
 					], [
 						'type' => 'select',
 						'attributes' => [
@@ -1099,8 +1099,8 @@ class AUDIT extends API {
 	private function documents(){
 		$content = [];
 
-		$this->_requestedDate = $this->_requestedDate ? : $this->_currentdate->format('Y-m-d');
-		$this->_requestedTime = $this->_requestedTime ? : $this->_currentdate->format('H:i:59');
+		$this->_requestedDate = $this->_requestedDate ? : $this->_date['current']->format('Y-m-d');
+		$this->_requestedTime = $this->_requestedTime ? : $this->_date['current']->format('H:i:59');
 
 		function latestApprovedComponent($components, $requestedTimestamp, $name = ''){
 			if (!$name) return false;
@@ -1180,7 +1180,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $this->_lang->GET('audit.documents_in_use_documents')
 				],
-				'content' => $this->_lang->GET('audit.documents_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
+				'content' => $this->_lang->GET('audit.documents_export_timestamp', [':timestamp' => $this->dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
 			]
 		];
 
@@ -1193,7 +1193,7 @@ class AUDIT extends API {
 				$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
-					':date' => UTILITY::dateFormat($data['date']),
+					':date' => $this->dateFormat($data['date']),
 				]) . "\n";
 			}
 			// display component approval
@@ -1202,12 +1202,12 @@ class AUDIT extends API {
 				if ($cmpnnt = latestApprovedComponent($components, $this->_requestedDate . ' ' . $this->_requestedTime, $used_component_name)){
 					$has_components = true;
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
-					$entry .= " \n" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $cmpnnt['author'], ':date' => UTILITY::dateFormat($cmpnnt['date'])]) . "\n";
+					$entry .= " \n" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $cmpnnt['author'], ':date' => $this->dateFormat($cmpnnt['date'])]) . "\n";
 					foreach($cmpnnt['approval'] as $position => $data){
 						$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
 							':permission' => $this->_lang->GET('permissions.' . $position),
 							':name' => $data['name'],
-							':date' => UTILITY::dateFormat($data['date']),
+							':date' => $this->dateFormat($data['date']),
 						]) . "\n";
 					}
 				}
@@ -1219,7 +1219,7 @@ class AUDIT extends API {
 			$documentscontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => UTILITY::dateFormat($document['date'])])
+					'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $this->dateFormat($document['date'])])
 				],
 				'content' => $entry
 			];
@@ -1238,7 +1238,7 @@ class AUDIT extends API {
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => UTILITY::dateFormat($document['date'])])
+									'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $this->dateFormat($document['date'])])
 								],
 							],
 							[
@@ -1302,7 +1302,7 @@ class AUDIT extends API {
 			$bundlescontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => UTILITY::dateFormat($bundle['date'])])
+					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => $this->dateFormat($bundle['date'])])
 				],
 				'content' => implode("\n", $documentslist)
 			];
@@ -1317,13 +1317,13 @@ class AUDIT extends API {
 	 */
 	private function exportdocuments(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true)
 		];
 
 		$documents = $this->documents();
@@ -1418,7 +1418,7 @@ class AUDIT extends API {
 					'style' => 'color:rgb(' . 200 - $color . ',' . $color . ',0)'
 				],
 				'linkedcontent' => $this->_lang->GET('audit.documentusage_info', [
-					':date' => UTILITY::dateFormat($document['date']),
+					':date' => $this->dateFormat($document['date']),
 					':regulatory' => implode(', ', $document['regulatory_context']),
 					':count' => $count,
 					':unit' => $this->_lang->_USER['units'][$document['unit']]
@@ -1555,14 +1555,14 @@ class AUDIT extends API {
 			'attributes' => [
 				'name' => $this->_lang->GET('audit.checks_type.incorporation')
 			],
-			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
+			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime, true])
 		];
 		foreach($incorporated as $product){
 			if (!isset($incorporations[$product['vendor_name']])) $incorporations[$product['vendor_name']] = [];
 
 			$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 			foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
-				if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . UTILITY::dateFormat($product['incorporated'][$permission]['date']);
+				if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->dateFormat($product['incorporated'][$permission]['date'], true);
 			}
 			$incorporations[$product['vendor_name']][] = [
 				'type' => 'textsection',
@@ -1580,7 +1580,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.incorporation_export_vendor', [':vendor' => $vendor])
 					],
-					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
+					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime, true])
 				],
 				...$vendorchecks
 			];
@@ -1593,13 +1593,13 @@ class AUDIT extends API {
 	 */
 	private function exportincorporation(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->_date['current']->format('y-m-d H:i')
 		];
 
 		$documents = $this->incorporation();
@@ -1784,7 +1784,7 @@ class AUDIT extends API {
 					$result['render']['content'][] = [
 						[
 							'type' => 'textsection',
-							'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => UTILITY::dateFormat($managementreview['last_touch']), ':user' => $managementreview['last_user']]) : '')
+							'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->dateFormat($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : '')
 						]
 					];
 				}
@@ -1913,7 +1913,7 @@ class AUDIT extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => UTILITY::dateFormat($managementreview['last_touch']) . ' ' . $managementreview['last_user']
+						'name' => $this->dateFormat($managementreview['last_touch'], true) . ' ' . $managementreview['last_user']
 					]
 				]
 			];
@@ -1983,16 +1983,16 @@ class AUDIT extends API {
 				continue;
 			}
 			$vendor = $vendors[array_search($product['vendor_name'], array_column($vendors, 'name'))];
-			$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
-			if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_currentdate)->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
+			$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+			if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['current'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
 				$checkable[$product['vendor_name']][] = $product['id'];
 			}
 		}
 		// drop vendors that have been checked within their sample check interval
 		foreach($products as $product){
 			if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_name']])) continue;
-			$check = new DateTime($product['checked'], new DateTimeZone(CONFIG['application']['timezone']));
-			if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_currentdate)->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
+			$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+			if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['current'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 				unset($checkable[$product['vendor_name']]);
 			}
 		}
@@ -2063,7 +2063,7 @@ class AUDIT extends API {
 			$product['sample_checks'] = json_decode($product['sample_checks'], true);
 			$productchecks = [];
 			foreach($product['sample_checks'] as $check){
-				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => UTILITY::dateFormat($check['date'])], true) . "\n" . $check['content'];
+				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => $this->dateFormat($check['date'])], true) . "\n" . $check['content'];
 			}
 			$checks[$product['vendor_name']][] = [
 				'type' => 'textsection',
@@ -2094,7 +2094,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.mdrsamplecheck_export_vendor', [':vendor' => $vendor])
 					],
-					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
+					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime, true])
 				],
 				...$vendorchecks
 			];
@@ -2107,13 +2107,13 @@ class AUDIT extends API {
 	 */
 	private function exportmdrsamplecheck(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.' . $this->_requestedType) . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->_date['current']->format('y-m-d H:i')
 		];
 
 		$checks = $this->mdrsamplecheck();
@@ -2161,7 +2161,7 @@ class AUDIT extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.orderstatistics_number', [':number' => count($orders), ':from' => UTILITY::dateFormat($from), ':until' => UTILITY::dateFormat($until)])
+					'name' => $this->_lang->GET('audit.orderstatistics_number', [':number' => count($orders), ':from' => $this->dateFormat($from), ':until' => $this->dateFormat($until)])
 				],
 				'content' => count($orders) ? $this->_lang->GET('audit.orderstatistics_info') : ''
 			]
@@ -2222,7 +2222,7 @@ class AUDIT extends API {
 			$order['order_data'] = json_decode($order['order_data'], true);
 			$deliverytime = '';
 			if ($order['received']){
-				$datetimezone = new DateTimeZone(CONFIG['application']['timezone']);
+				$datetimezone = new DateTimeZone($this->_date['timezone']);
 				$ordered = $order['ordered'] ? new DateTime($order['ordered'], $datetimezone) : '-';
 				$received = $order['received'] ? new DateTime($order['received'], $datetimezone) : '-';
 				$deliverytime = ($order['ordered'] && $order['received']) ? intval($ordered->diff($received)->format('%a')) : '-';
@@ -2239,13 +2239,13 @@ class AUDIT extends API {
 				isset($order['order_data']['ordernumber_label']) ? $order['order_data']['ordernumber_label'] : '',
 				isset($order['order_data']['productname_label']) ? $order['order_data']['productname_label'] : '',
 				isset($order['order_data']['additional_info']) ? preg_replace('/\\\\n|\\n/', "\n", $order['order_data']['additional_info']) : '',
-				UTILITY::dateFormat($order['ordered']),
-				UTILITY::dateFormat($order['partially_received']),
-				UTILITY::dateFormat($order['received']),
+				$this->dateFormat($order['ordered']),
+				$this->dateFormat($order['partially_received']),
+				$this->dateFormat($order['received']),
 				$deliverytime
 			];
 		}
-		$tempFile = UTILITY::directory('tmp') . '/' . preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_currentdate->format('Y-m-d H:i')) . '.xlsx';
+		$tempFile = UTILITY::directory('tmp') . '/' . preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['current']->format('Y-m-d H:i')) . '.xlsx';
 		$writer = new XLSXWriter();
 		$writer->setAuthor($_SESSION['user']['name']); 
 
@@ -2311,7 +2311,7 @@ class AUDIT extends API {
 					'type' => 'date',
 					'attributes' => [
 						'name' => $this->_lang->GET('audit.records_end_date'),
-						'value' => $this->_currentdate->format('Y-m-d'),
+						'value' => $this->_date['current']->format('Y-m-d'),
 						'id' => '_records_end_date'
 					]
 				], [
@@ -2335,7 +2335,7 @@ class AUDIT extends API {
 	 */
 	private function exportrecords(){
 		$startDate = $this->_requestedDate ? : '2023-10-01';
-		$endDate = $this->_requestedTime ? : $this->_currentdate->format('Y-m-d');
+		$endDate = $this->_requestedTime ? : $this->_date['current']->format('Y-m-d');
 
 		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
@@ -2364,8 +2364,8 @@ class AUDIT extends API {
 					break;
 				}
 				// set timespan information for record
-				if (!isset($line[$defaultColumn['from']])) $line[$defaultColumn['from']] = UTILITY::dateFormat($currentdate);
-				$line[$defaultColumn['until']] = UTILITY::dateFormat($currentdate);
+				if (!isset($line[$defaultColumn['from']])) $line[$defaultColumn['from']] = $this->dateFormat($currentdate);
+				$line[$defaultColumn['until']] = $this->dateFormat($currentdate);
 				$document_name = '';
 				if ($docid = array_search($entry['document'], array_column($documents, 'id'))){
 					// get document title to add to issue
@@ -2402,7 +2402,7 @@ class AUDIT extends API {
 		);
 	
 		// write csv file
-		$tempFile = UTILITY::directory('tmp') . '/' . $this->_currentdate->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv';
+		$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['current']->format('Y-m-d H-i-s ') . $this->_lang->_DEFAULT['audit']['checks_type']['records'] . '.csv';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 		// header
@@ -2420,8 +2420,8 @@ class AUDIT extends API {
 			$line = array_merge([
 				$defaultColumn['identifier'] => $line[$defaultColumn['identifier']],
 				$defaultColumn['units'] => $line[$defaultColumn['units']],
-				$defaultColumn['from'] => UTILITY::dateFormat($line[$defaultColumn['from']]),
-				$defaultColumn['until'] => UTILITY::dateFormat($line[$defaultColumn['until']]),
+				$defaultColumn['from'] => $this->dateFormat($line[$defaultColumn['from']]),
+				$defaultColumn['until'] => $this->dateFormat($line[$defaultColumn['until']]),
 				$defaultColumn['type'] => $line[$defaultColumn['type']]
 			], $line);
 
@@ -2476,7 +2476,7 @@ class AUDIT extends API {
 							if (preg_match('/^' . $row['name'] . ' \(/', $key)) $satisfied = true;
 						}
 					}
-					if (!$satisfied) $regulatory[$regulatory_context][$row['name'] . ' (' . UTILITY::dateFormat($row['date']) . ')'] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
+					if (!$satisfied) $regulatory[$regulatory_context][$row['name'] . ' (' . $this->dateFormat($row['date']) . ')'] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
 				}
 			}
 		}
@@ -2527,13 +2527,13 @@ class AUDIT extends API {
 	 */
 	private function exportregulatory(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.regulatory') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.regulatory') . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.regulatory'),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true)
 		];
 
 		$issues = $this->regulatory();
@@ -2579,8 +2579,8 @@ class AUDIT extends API {
 	private function risks(){
 		$content = $issues = [];
 
-		$this->_requestedDate = $this->_requestedDate ? : $this->_currentdate->format('Y-m-d');
-		$this->_requestedTime = $this->_requestedTime ? : $this->_currentdate->format('H:i:59');
+		$this->_requestedDate = $this->_requestedDate ? : $this->_date['current']->format('Y-m-d');
+		$this->_requestedTime = $this->_requestedTime ? : $this->_date['current']->format('H:i:59');
 
 		// prepare existing risks lists
 		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
@@ -2687,7 +2687,7 @@ class AUDIT extends API {
 		$content[] = [
 			'type' => 'textsection',
 			'attributes' => [
-				'name' => $this->_lang->GET('audit.risk_issues_report', [':date' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
+				'name' => $this->_lang->GET('audit.risk_issues_report', [':date' => $this->dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime])
 			]		
 		];
 		
@@ -2701,13 +2701,13 @@ class AUDIT extends API {
 	 */
 	private function exportrisks(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.risks') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.risks') . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.risks'),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->_date['current']->format('y-m-d H:i')
 		];
 		$downloadfiles = [];
 
@@ -2789,7 +2789,7 @@ class AUDIT extends API {
 					foreach($words[0] as $word){
 						$sheetname .= substr($word, 0, 1) . preg_replace('/[\Waeiou]/i', '', substr($word, 1));
 					}
-					$writer->writeSheetRow($sheetname, [$process, $type, $this->_lang->GET('audit.risk_export_column.effective_date', [':date' => UTILITY::dateFormat($this->_requestedDate) . ' ' . $this->_requestedTime], true)]);
+					$writer->writeSheetRow($sheetname, [$process, $type, $this->_lang->GET('audit.risk_export_column.effective_date', [':date' => $this->dateFormat($this->_requestedDate, true) . ' ' . $this->_requestedTime], true)]);
 					$writer->writeSheetRow($sheetname, []);
 
 					$writer->writeSheetRow($sheetname, array_keys($lines[0]));
@@ -2860,7 +2860,7 @@ class AUDIT extends API {
 							':id' => $this->_requestedID,
 							':evaluation' => UTILITY::json_encode([
 								'user' => $_SESSION['user']['name'],
-								'date' => $this->_currentdate->format('Y-m-d H:i'),
+								'date' => $this->_date['current']->format('Y-m-d H:i'),
 								'content' => (array) $this->_payload
 							])
 						]
@@ -2893,7 +2893,7 @@ class AUDIT extends API {
 			'content' => $options
 		];
 		require_once('_shared.php');
-		$sharedfunction = new SHARED($this->_pdo);
+		$sharedfunction = new SHARED($this->_pdo, $this->_date);
 		$evaluationdocument = $sharedfunction->recentdocument('document_document_get_by_context', [
 			'values' => [
 				':context' => 'training_evaluation_document'
@@ -2924,25 +2924,25 @@ class AUDIT extends API {
 					if ($this->_requestedOption === 'closed' && !$row['evaluation']) continue;
 
 					$row['evaluation'] = json_decode($row['evaluation'] ? : '', true);
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . UTILITY::dateFormat($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
-						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
+						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
+							if ($expire < $this->_date['current']) $attributes['class'] = 'orange';
 						}
 					}
 
 					$evaluation = $row['evaluation'] ? "\n\n" . $this->_lang->GET('audit.userskills_training_evaluation', [
 						':user' => $row['evaluation']['user'],
-						':date' => UTILITY::dateFormat($row['evaluation']['date']),
+						':date' => $this->dateFormat($row['evaluation']['date']),
 						':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
 					]) : '';
 
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . UTILITY::dateFormat($row['expires']) . $evaluation,
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->dateFormat($row['expires']) . $evaluation,
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $content[count($content) - 1][] = [
@@ -3014,7 +3014,7 @@ class AUDIT extends API {
 					if ($row['experience_points']){
 						if (!isset($years[$year])) $years[$year] = ['xp' => 0, 'paths' => []];
 						$years[$year]['xp'] += $row['experience_points'];
-						if ($row['file_path']) $years[$year]['paths'][$row['name'] . ' ' . UTILITY::dateFormat($row['date'])] = ['href' => './api/api.php/file/stream/' . $row['file_path']];
+						if ($row['file_path']) $years[$year]['paths'][$row['name'] . ' ' . $this->dateFormat($row['date'])] = ['href' => './api/api.php/file/stream/' . $row['file_path']];
 					}
 				}
 				if ($years){
@@ -3047,13 +3047,13 @@ class AUDIT extends API {
 	 */
 	private function exportuserexperience(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.userexperience') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.userexperience') . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.userexperience'),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->_date['current']->format('y-m-d H:i')
 		];
 
 		$experience = $this->userexperience();
@@ -3112,14 +3112,14 @@ class AUDIT extends API {
 			]);
 			if ($users && $training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 
-				$date = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
+				$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
 				$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
 				$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 				$training[':experience_points'] = 0;
 				$training[':file_path'] = '';
 				$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 					'user' => $_SESSION['user']['name'],
-					'date' => $this->_currentdate->format('Y-m-d H:i'),
+					'date' => $this->_date['current']->format('Y-m-d H:i'),
 					'content' => [$this->_lang->PROPERTY('user.add_training_evaluation', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
 				]): null;
 
@@ -3192,27 +3192,27 @@ class AUDIT extends API {
 				return $row['user_id'] === $user_id;
 			})){
 				foreach ($usertrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . UTILITY::dateFormat($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone(CONFIG['application']['timezone']));
-						if ($expire < $this->_currentdate) $attributes['class'] = 'red';
+						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $this->_currentdate) $attributes['class'] = 'orange';
+							if ($expire < $this->_date['current']) $attributes['class'] = 'orange';
 						}
 					}
 					if ($row['evaluation']){
 						$row['evaluation'] = json_decode($row['evaluation'], true);
 						$evaluation = $this->_lang->GET('audit.userskills_training_evaluation', [
 							':user' => $row['evaluation']['user'],
-							':date' => UTILITY::dateFormat($row['evaluation']['date']),
+							':date' => $this->dateFormat($row['evaluation']['date']),
 							':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
 						]);
 					} else $evaluation = $this->_lang->GET('audit.userskills_training_evaluation_pending');
 
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . UTILITY::dateFormat($row['expires']) . " \n" . $evaluation,
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->dateFormat($row['expires']) . " \n" . $evaluation,
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $content[count($content) - 1][] = [
@@ -3333,13 +3333,13 @@ class AUDIT extends API {
 	 */
 	private function exportuserskills(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.userskills') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.userskills') . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.userskills'),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->_date['current']->format('y-m-d H:i')
 		];
 
 		$skills = $this->userskills();
@@ -3421,7 +3421,7 @@ class AUDIT extends API {
 			if ($vendor['evaluation']){
 				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
 				foreach($vendor['evaluation'] as $evaluation){
-					$info .= " \n". $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $evaluation['_author'], ':date' => UTILITY::dateFormat($evaluation['_date'])]) . "\n";
+					$info .= " \n". $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $evaluation['_author'], ':date' => $this->dateFormat($evaluation['_date'])]) . "\n";
 					unset($evaluation['_author'], $evaluation['_date']);
 					foreach($evaluation as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";	
 				}
@@ -3457,13 +3457,13 @@ class AUDIT extends API {
 	 */
 	private function exportvendors(){
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.vendors') . '_' . $this->_currentdate->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.checks_type.vendors') . '_' . $this->_date['current']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.vendors'),
-			'date' => $this->_currentdate->format('y-m-d H:i')
+			'date' => $this->_date['current']->format('y-m-d H:i')
 		];
 
 		$incorporations = $this->vendors();

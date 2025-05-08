@@ -54,7 +54,7 @@ class TEXTTEMPLATE extends API {
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.content')),
 					':language' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.language')),
 					':type' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.type')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.availability')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.availability')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 				];
 
 				// check forbidden names
@@ -316,7 +316,7 @@ class TEXTTEMPLATE extends API {
 					if ($chunk['hidden']) {
 						$hidden['content'][$this->_lang->GET('texttemplate.chunk.hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($chunk['hidden'], true);
-						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . $this->_lang->GET('texttemplate.chunk.dependencies', [':templates' => implode(', ', $dependedtemplates)]);
 					array_push($return['render']['content'][1], $hidden);
@@ -345,7 +345,7 @@ class TEXTTEMPLATE extends API {
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
 					':type' => 'template',
-					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
 				];
 
 				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);
@@ -590,7 +590,7 @@ class TEXTTEMPLATE extends API {
 					if ($template['hidden']) {
 						$hidden['content'][$this->_lang->GET('texttemplate.template.hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($template['hidden'], true);
-						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					array_push($return['render']['content'][1], $hidden);
 				}
@@ -752,7 +752,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $this->_lang->GET('texttemplate.use.import', [':placeholders' => implode(', ', array_keys($clientimport))]),
 						'onclick' => "_client.texttemplate.import('" . $this->_clientimport . "');"
 					],
-					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => UTILITY::dateFormat($row['date'])])
+					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])])
 				];	
 			}
 
@@ -780,7 +780,7 @@ class TEXTTEMPLATE extends API {
 					'onclick' => '_client.texttemplate.update();',
 					'data-type' => 'generateupdate'
 				],
-				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => UTILITY::dateFormat($row['date'])])
+				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])])
 			];
 
 			// append inputs

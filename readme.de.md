@@ -669,7 +669,7 @@ Dies soll eine transparente Kommunikation, einen vertraulichen Umgang mit den Da
 
 Dienstfreie Tage der übereinstimmenden Bereiche werden sowohl bei den geplanten Ereignissen angezeigt als auch andersherum, um für das Arbeitsaufkommen der verbleibenden Belegschaft zu sensibilisieren.
 
-*Warnung: die aktuelle Implementierung hat eine recht starre Definition von Feiertagen und berücksichtigt weder unterschiedliche Regionen, noch mögliche Änderungen gesetzlicher Feiertage. Derzeit würden Änderungen auch vergangene Zeiterfassungen berücksichtigen und unterschiedliche Berechnungen ergeben. Bei kleineren Änderungen wird empfohlen die neuesten Zeiterfassungen zu exportieren und innerhalb der Anwendung neu zu beginnen.*
+*Warnung: die aktuelle Implementierung berücksichtigt weder mögliche Änderungen gesetzlicher Feiertage noch den Wechsel des Bundeslandes, sofern mehrere in den Profileinstellungen zur Auswahl stehen. Derzeit würden Änderungen auch vergangene Zeiterfassungen betreffen und unterschiedliche Berechnungen ergeben. Bei Änderungen wird empfohlen zuvor die neuesten Zeiterfassungen zu exportieren und innerhalb der Anwendung neu zu beginnen.*
 
 Die Zeiterfassung unterstützt jedoch Änderungen der Wochenarbeitszeit und des Jahresurlaubs. Die jeweiligen Start-Daten und Werte sind Bestandteil der Nutzereinstellungen.
 
@@ -1158,27 +1158,24 @@ issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf 
 order_auth = "token, signature" ; Optionen: token, signature; pin ist Standard, da dieser die Bestellberechtigung repräsentiert
 order_gtin_barcode = no ; yes: ja, no: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
 require_complaint_selection = yes ; yes: ja, no: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
-timezone = "Europe/Berlin" ; Zeitzone für den Kalender
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
 
 [calendar]
-dateformat = ""; gemäß https://www.php.net/manual/en/datetime.format.php, z.B. "d.m.Y"; leer für ISO 8601 Y-m-d
-holidays = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31" ; Monat-Tag
-; nicht anwendbare Feiertage können auskommentiert werden
-; der zweite Schlüssel dient dem Verständnis, der Wert ist der Abstand an Tagen zu Ostersonntag
-; easter_holidays[gruendonnerstag] = -3
-easter_holidays[karfreitag] = -2
-; easter_holidays[ostersamstag] = -1
-easter_holidays[ostermontag] = 1
-easter_holidays[himmelfahrt] = 39
-easter_holidays[pfingsten] = 50
-easter_holidays[frohnleichnahm] = 60
+timezones[europeberlin] = "Europe/Berlin" ; um weitere tz Zeitzonen je nach verbreitung ergänzen, in den Profileinstellungen wählbar
 
-workdays = "1, 2, 3, 4, 5" ; Montag=1 bis Sonntag=7, Tage wie z.B. Wochenenden mit der gleichen Markierung wie Feiertage auslassen
+dateformats["Y-m-d"] = "Y-m-d"; gemäß https://www.php.net/manual/en/datetime.format.php, z.B. "d.m.Y"; leer für ISO 8601 Y-m-d; der oberste Eintrag wird als Standard für Exporte genutzt
+dateformats["d.m.Y"] = "d.m.Y" ; um gewünschte Optionen erweitern, in den Profileinstellungen wählbar, Schlüssel dürfen ?{}|&~![()^" nicht enthalten - Werte dürfen
+
 default_due = 7 ; Standardeinstellung für Fälligkeiten von Terminen
 
 hide_offduty_reasons[] = "" ; bitte nicht ändern
 ; hide_offduty_reasons[] = "sickleave" ; Ursachen gemäß Sprachdatei können in Übereinstimmung mit unternehmensspezifischen Datenschutzbestimmungen ausgeblendet werden
+
+[locations]
+; erster Schlüssel ist Bundesland, um Standorte erweitern, in den Profileinstellungen wählbar
+D-BW[workdays] = "1, 2, 3, 4, 5" ; Montag=1 bis Sonntag=7, Tage wie z.B. Wochenenden mit der gleichen Markierung wie Feiertage auslassen
+D-BW[holidays] = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"; feste Feiertage, Monat-Tag
+D-BW[easter] = "-2, 1, 39, 50, 60" ; anwendbare Abstände zu Ostersonntag, Gründonnerstag -3, Karfreitag -2, Karsamstag -1, Ostermontag 1, Himmelfahrt 39, Pfingsten 50, Frohnleichnahm 60
 
 ; Standardeinstellungen für CSV-Verarbeitung falls nicht im Filter definiert
 [csv]
@@ -1393,7 +1390,6 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 * Das Ziehen von Dokumentelementen für die Sortierung in der Dokumentenverwaltung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Dokumente und deren Komponenten müssen daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen um den Quelltext nicht unnötig zu vergrößern.
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
-* Es wird nur eine Zeitzone unterstützt.
 
 [Übersicht](#übersicht)
 

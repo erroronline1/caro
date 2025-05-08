@@ -50,11 +50,6 @@ class API {
 	private $_httpResponse = 200;
 
 	/**
-	 * current date with correct timezone
-	 */
-	public $_currentdate;
-	
-	/**
 	 * message array for accumulated user messages
 	 * to be populated by message as key and user ids as value array
 	 * see alertUserGroup() and alertUserGroupSubmit()
@@ -77,6 +72,12 @@ class API {
 	public $_auth = [];
 
 	/**
+	 * public date settings to be updated by user settings
+	 * containing location, timezone, date format and current date as DateTime-object
+	 */
+	public $_date = [];
+
+	/**
 	 * constructor prepares payload and database connection
 	 * no parameters, no response
 	 */
@@ -91,8 +92,6 @@ class API {
 		$this->_pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
-
-		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['application']['timezone']));
 
 		$this->_lang = new LANG();
 
@@ -151,6 +150,10 @@ class API {
 			session_write_close();
 			session_unset();
 		}
+
+		// set date settings according to defaults or session user settings
+		$this->_date = $this->date();
+
 	}
 	
 	/**
@@ -270,6 +273,7 @@ class API {
 
 					// renew session timeout except for defined requests
 					if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();
+					$this->_date = $this->date();
 
 					$this->session_set();
 					$valid = true;
@@ -352,6 +356,45 @@ class API {
 		$this->response($response, 511);
 	}
 
+	/**
+	 * declares default or set configuration for timezones, desired date format and applicable holidays
+	 * @return array containing timezone, dateformat, holidays and current datetime
+	 */
+	private function date(){
+		// top config entries are default
+		$return = [
+			'timezone' => CONFIG['calendar']['timezones'][array_key_first(CONFIG['calendar']['timezones'])],
+			'dateformat' => CONFIG['calendar']['dateformats'][array_key_first(CONFIG['calendar']['dateformats'])],
+			'locations' => CONFIG['locations'][array_key_first(CONFIG['locations'])],
+		];
+		// override with user-selected config options
+		if (isset($_SESSION['user']['app_settings']['timezone'])) $return['timezone'] = CONFIG['calendar']['timezones'][$_SESSION['user']['app_settings']['timezone']];
+		if (isset($_SESSION['user']['app_settings']['dateformat'])) $return['dateformat'] = CONFIG['calendar']['dateformats'][$_SESSION['user']['app_settings']['dateformat']];
+		if (isset($_SESSION['user']['app_settings']['location'])) $return['locations'] = CONFIG['locations'][$_SESSION['user']['app_settings']['location']];
+
+		$return['current'] = new DateTime('now', new DateTimeZone($return['timezone']));
+		return $return;
+	}
+
+	/**
+	 * formats ISO 8601 date to custom as per config 
+	 * @param string $input YYYY-MM-DD (time optional)
+	 * @param bool $default for return of default date format
+	 * @return string
+	 */
+	public function dateFormat($input, $default = false){
+		if (!$input) return '';
+		if (!$this->_date['dateformat']) return $input;
+		if (!CONFIG['calendar']['dateformats']) return $input;
+		try {
+			$date = new DateTime(substr($input, 0, 10), new DateTimeZone($this->_date['timezone']));
+		}
+		catch (Exception $e) {
+			return $input;
+		}
+		return $date->format($default ? CONFIG['calendar']['dateformats'][array_key_first(CONFIG['calendar']['dateformats'])]: $this->_date['dateformat']) . (strlen($input) > 10 ? substr($input, 10) : '');
+	}
+	
 	/**
 	 * @return string readable http status message based on $this->_httpResponse
 	 */
@@ -458,7 +501,7 @@ class API {
 	 * store a valid user session, delete outdated
 	 */
 	public function session_set(){
-		$deldate = clone ($this->_currentdate);
+		$deldate = clone ($this->_date['current']);
 		$deldate->modify('-' . CONFIG['lifespan']['sessions'] . ' days');
 		SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
 			'values' => [

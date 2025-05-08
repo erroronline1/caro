@@ -53,11 +53,11 @@ class RESPONSIBILITY extends API {
 				$responsibility = $responsibility ? $responsibility[0]: null;
 				if (!$responsibility) $this->response([], 404);
 				$responsibility['assigned_users'] = json_decode($responsibility['assigned_users'], true);
-				if (array_key_exists($_SESSION['user']['id'], $responsibility['assigned_users'])) $responsibility['assigned_users'][$_SESSION['user']['id']] = $this->_currentdate->format('Y-m-d');
+				if (array_key_exists($_SESSION['user']['id'], $responsibility['assigned_users'])) $responsibility['assigned_users'][$_SESSION['user']['id']] = $this->_date['current']->format('Y-m-d');
 				else {
 					// only if not found for itsybity performance reasons
 					$responsibility['proxy_users'] = json_decode($responsibility['proxy_users'], true);
-					if (array_key_exists($_SESSION['user']['id'], $responsibility['proxy_users'])) $responsibility['proxy_users'][$_SESSION['user']['id']] = $this->_currentdate->format('Y-m-d');
+					if (array_key_exists($_SESSION['user']['id'], $responsibility['proxy_users'])) $responsibility['proxy_users'][$_SESSION['user']['id']] = $this->_date['current']->format('Y-m-d');
 					$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
 				}
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_accept', [
@@ -167,7 +167,7 @@ class RESPONSIBILITY extends API {
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $row['responsibility'],
-								'class' => substr($row['span_end'], 0, 10) < $this->_currentdate->format('Y-m-d') ? 'red' : ''
+								'class' => substr($row['span_end'], 0, 10) < $this->_date['current']->format('Y-m-d') ? 'red' : ''
 							],
 							'content' => $row['description']
 						];
@@ -189,9 +189,9 @@ class RESPONSIBILITY extends API {
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('responsibility.applicability'),
-								'class' => substr($row['span_end'], 0, 10) < $this->_currentdate->format('Y-m-d') ? 'red' : ''
+								'class' => substr($row['span_end'], 0, 10) < $this->_date['current']->format('Y-m-d') ? 'red' : ''
 							],
-							'content' => $this->_lang->GET('responsibility.apply', [':start' => UTILITY::dateFormat(substr($row['span_start'], 0, 10)), ':end' => UTILITY::dateFormat(substr($row['span_end'], 0, 10))])
+							'content' => $this->_lang->GET('responsibility.apply', [':start' => $this->dateFormat(substr($row['span_start'], 0, 10)), ':end' => $this->dateFormat(substr($row['span_end'], 0, 10))])
 						];
 						if (PERMISSION::permissionFor('responsibilities')) $content[] = [
 							'type' => 'button',
@@ -492,7 +492,7 @@ class RESPONSIBILITY extends API {
 								'value' => $user['name'],
 								'data-loss' => 'prevent'
 							],
-							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => UTILITY::dateFormat($property)]) : null
+							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => $this->dateFormat($property)]) : null
 						];
 					}
 				}

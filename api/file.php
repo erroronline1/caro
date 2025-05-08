@@ -159,7 +159,7 @@ class FILE extends API {
 				$name = $this->_payload->$save_name;
 				unset ($this->_payload->$save_name);
 				$hidden = $this->_lang->PROPERTY('file.bundle.availability');
-				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_currentdate->format('Y-m-d H:i:s')]) : null;
+				$hidden = $this->_payload->$hidden === $this->_lang->GET('file.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null;
 				unset ($this->_payload->{$this->_lang->PROPERTY('file.bundle.availability')});
 				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
@@ -337,7 +337,7 @@ class FILE extends API {
 				$hidden = null;
 				if ($bundle['hidden']) {
 					$hiddenproperties = json_decode($bundle['hidden'], true);
-					$hidden = $this->_lang->GET('file.manager.edit_hidden_set', [':date' => UTILITY::dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+					$hidden = $this->_lang->GET('file.manager.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
 				$return['render']['content'][] = [
 					[
@@ -346,7 +346,7 @@ class FILE extends API {
 							'name'=> $this->_lang->GET('file.bundle.save_bundle'),
 							'value' => $bundle['name']
 						],
-						'hint' => $bundle['name'] ? $this->_lang->GET('file.last_edit', [':user' => $bundle['author'], ':date' => UTILITY::dateFormat($bundle['date'])]): ''
+						'hint' => $bundle['name'] ? $this->_lang->GET('file.last_edit', [':user' => $bundle['author'], ':date' => $this->dateFormat($bundle['date'])]): ''
 					],
 					[
 						'type' => 'radio',
@@ -519,7 +519,7 @@ class FILE extends API {
 							array_push($result['render']['content'][1],
 								[
 									'type' => 'links',
-									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => UTILITY::dateFormat($file['retired'])]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
+									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => $this->dateFormat($file['retired'])]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
 									'content' => $link,
 									'data-filtered' => $file['path']
 								],
@@ -649,12 +649,12 @@ class FILE extends API {
 						foreach ($folders as $folder){
 							// prepare each folders properties
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
-							$filedate = new DateTime('@' . filemtime($folder), new DateTimeZone(CONFIG['application']['timezone']));
+							$filedate = new DateTime('@' . filemtime($folder), new DateTimeZone($this->_date['timezone']));
 							// append folder link and delete button
 							array_push($result['render']['content'][0],
 								[
 									'type' => 'links',
-									'description' => $this->_lang->GET('file.manager.folder_header', [':date' => UTILITY::dateFormat($filedate->format('Y-m-d H:i'))]),
+									'description' => $this->_lang->GET('file.manager.folder_header', [':date' => $this->dateFormat($filedate->format('Y-m-d H:i'))]),
 									'content' => [
 										$foldername => ['href' => "javascript:api.file('get', 'filemanager', '" . $foldername . "')"]
 									]
@@ -722,7 +722,7 @@ class FILE extends API {
 									'name' => pathinfo($file)['basename'],
 									'link' => './api/api.php/file/stream/' . substr($file, 1)
 								];
-								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone(CONFIG['application']['timezone']));
+								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone($this->_date['timezone']));
 
 								$link = [];
 								if (str_ends_with($file['name'], '.stl')) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
@@ -732,7 +732,7 @@ class FILE extends API {
 								array_push($result['render']['content'][1],
 									[
 										'type' => 'links',
-										'description' => UTILITY::dateFormat($filedate->format('Y-m-d H:i')),
+										'description' => $this->dateFormat($filedate->format('Y-m-d H:i')),
 										'content' => $link,
 										'data-filtered' => $file['path']
 									],
@@ -910,7 +910,7 @@ class FILE extends API {
 	 */
 	public function filter(){
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo);
+		$search = new SHARED($this->_pdo, $this->_date);
 		$matches = [];
 		if ($files = $search->filesearch(['search' => $this->_requestedFile, 'folder' => $this->_requestedFolder === 'null' ? null : $this->_requestedFolder])){
 			foreach ($files as $file){
