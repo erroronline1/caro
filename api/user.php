@@ -465,7 +465,7 @@ class USER extends API {
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('user.settings_location'),
-							'onchange' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('user.settings_location_change_alert') . "'})"
+							'onchange' => "new _client.Dialog({type:'alert', header:'" . $this->_lang->GET('user.settings_location_change_alert') . "'})"
 						],
 						'content' => $locations
 					];
