@@ -36,6 +36,10 @@ graph LR;
 * image preview like stl
     * download button within dialog
     * download button for stls too (icon for recognition)
+* timezones and holidays
+    * arrays within config, primary on top
+    * selecteable county and timezone within user settings
+* document packages link broken
 
 ## Content
 * [Aims](#aims)
