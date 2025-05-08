@@ -39,7 +39,6 @@ graph LR;
 * timezones and holidays
     * arrays within config, primary on top
     * selecteable county and timezone within user settings
-* document packages link broken
 
 ## Content
 * [Aims](#aims)

@@ -869,7 +869,7 @@ class CALENDAR extends API {
 			]
 		]]];
 		$calendar = new CALENDARUTILITY($this->_pdo);
-		$dbevents = $calendar->search(urldecode($this->_requestedId));
+		$dbevents = $calendar->search(urldecode($this->_requestedId || ''));
 
 		// append filtered events
 		$events = $this->scheduledEvents($dbevents, $calendar) ? : [
