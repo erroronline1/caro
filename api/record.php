@@ -1117,7 +1117,7 @@ class RECORD extends API {
 							'content' => $content['files'][$document]
 						]); 
 					}
-					if ($document != $this->_lang->GET('record.altering_pseudodocument_name', [], true)){
+					if ($document != $this->_lang->GET('record.altering_pseudodocument_name', [])){
 						// option to append to document entries
 						if (in_array($document, $includedDocuments) && in_array($document, $validDocuments) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
 							'type' => 'button',
@@ -1159,7 +1159,7 @@ class RECORD extends API {
 						if (in_array($recommended, $validDocuments)) // document is permitted
 						$recommendation[$recommended] = ['href' => "javascript:api.record('get', 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
 					}
-					if ($recommendation) $body[]= [[
+					if ($recommendation) $body[] = [[
 						'type' => 'links',
 						'description' => $this->_lang->GET('record.append_missing_document') . ' ' . $bundle,
 						'content' => $recommendation
@@ -1765,8 +1765,8 @@ class RECORD extends API {
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => $this->_lang->GET('menu.records.record_summary', [], true),
-			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true),
+			'title' => $this->_lang->GET('menu.records.record_summary', [], $export),
+			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), $export),
 			'closed' => $data['closed'],
 			'record_type' => $data['record_type'],
 			'units' => $data['units'] ? explode(',', $data['units']) : [],
@@ -1785,7 +1785,7 @@ class RECORD extends API {
 			if (in_array($type, ['document', 'simplifieddocument']) && ($document['name'] != $this->_documentExport)) continue; 
 			if ($record['document'] == 0) { // retype and casestate pseudodocument
 				if (in_array($type, ['simplified', 'simplifieddocument'])) continue;
-				$useddocument = $this->_lang->GET('record.altering_pseudodocument_name', [], true);
+				$useddocument = $this->_lang->GET('record.altering_pseudodocument_name', [], $export);
 			}
 			else $useddocument = $document['name'];
 
@@ -1801,7 +1801,7 @@ class RECORD extends API {
 					$value = '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
 				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
-				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => $this->dateFormat(substr($record['date'], 0, -3), true)], true)];
+				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => $this->dateFormat(substr($record['date'], 0, -3), $export)], $export)];
 				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
 			}
 		}
@@ -1912,7 +1912,7 @@ class RECORD extends API {
 			if ($type === 'simplifieddocument'){
 				// convert summary contents to a simpler view. this allows document formatting suitable to hand over to patients/customers, e.g. a manual with the latest record entries
 				$summary['content'] = [' ' => $printablecontent[$useddocument['name']]];
-				$summary['date'] = $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true);
+				$summary['date'] = $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), $export);
 				$summary['title'] = $useddocument['name'];
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}
