@@ -383,7 +383,7 @@ class USER extends API {
 				// available states / holiday options
 				$locations = [];
 				foreach(CONFIG['locations'] as $location => $void){
-					$locations[$location] = (isset($user['app_settings']['location']) && $user['app_settings']['location'] === $location) ? ['selected' => true, 'value' => $location] : ['value' => $state]; 
+					$locations[$location] = (isset($user['app_settings']['location']) && $user['app_settings']['location'] === $location) ? ['selected' => true, 'value' => $location] : ['value' => $location]; 
 				}
 				// append application settings
 				$applicationSettings = [];
