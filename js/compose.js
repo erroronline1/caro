@@ -961,16 +961,16 @@ export class Composer {
 	 */
 	drop_insert(evnt, droppedUpon, allowSections) {
 		evnt.preventDefault();
-		let draggedElement;
+		let draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
  		// determine target:
 		// target is element
-		if (evnt.target.classList.contains("draggableDocumentElement")) draggedElement = evnt.target; // draggable element container
-		else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) draggedElement = evnt.target.parentNode; // draggable element container content
-		else if (evnt.target.parentNode.parentNode.classList.contains("draggableDocumentElement")) draggedElement = evnt.target.parentNode.parentNode; // draggable element container content
+
+		if (draggedElement.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode; // convert dragged label to draggable element container content 
+		else if (draggedElement.parentNode.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode.parentNode; // convert dragged input to draggable element container content
 
 		const draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
 			originParent = draggedElement.parentNode;
-		//console.log('dragged', draggedElement.id, 'dropped on', droppedUpon.id, 'target', evnt.target);
+		//console.log('dragged', draggedElement, 'dropped on', droppedUpon, 'target', evnt.target);
 		if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
 
 		// dragging single widget
