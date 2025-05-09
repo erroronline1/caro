@@ -1525,6 +1525,12 @@ button[data-type="download"]::before {
 	mask-image: url("./media/cloud-download.svg");
 }
 
+[data-type="download"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/cloud-download.svg");
+	mask-image: url("./media/cloud-download.svg");
+}
+
 [data-type="email"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/at.svg");

@@ -596,7 +596,7 @@ export class Dialog {
 		const div = document.createElement("div");
 		div.id = "stlviewer_canvas";
 		div.classList = "stlviewer";
-		div.title = api._lang.GET("assemble.render.aria.stl", { ":file": this.render.name || this.render.url });
+		div.title = api._lang.GET("assemble.render.aria.preview", { ":file": this.render.name || this.render.url });
 		this.stlviewer.canvas = div;
 
 		if (this.render.transfer) {
@@ -606,6 +606,7 @@ export class Dialog {
 			a.href = this.render.url;
 			a.target = "_blank";
 			a.download = this.render.name || this.render.url;
+			a.dataset.type='download';
 			a.append(document.createTextNode(this.render.name || this.render.url));
 			return [div, a];
 		}
@@ -2224,7 +2225,7 @@ export class Assemble {
 		button.setAttribute("aria-hidden", true);
 
 		img.classList.add("photoupload");
-		img.alt = api._lang.GET("assemble.render.aria.preview");
+		img.alt = api._lang.GET("assemble.render.aria.preview", { ":file": "" });
 
 		resetbutton.onclick = () => {
 			let e = document.getElementById(input.id);
