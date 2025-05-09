@@ -280,6 +280,7 @@ export const api = {
 					api.session_timeout.events = null;
 					new Toast(null, null, null, "sessionwarning");
 					api.application("get", "authentify");
+					return;
 				}
 				if (api._settings.config.lifespan.idle > 0 && remaining_visual > 0) {
 					// render the indicator as long as there is time left
