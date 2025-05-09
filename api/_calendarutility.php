@@ -61,9 +61,9 @@ class CALENDARUTILITY {
 		$this->_lang = new LANG();
 		$this->_date = $date;
 
-		$this->_holidays = preg_split('/[^\d-]+/', $this->_date['locations']['holidays']); // mm-dd, mm-dd, ...
-		$this->_easter_holidays = preg_split('/[^\d-]+/', $this->_date['locations']['easter']); // offsets from easter sunday
-		$this->_workdays = preg_split('/[^\d-]+/', $this->_date['locations']['workdays']); // 1-7 starting on monday
+		$this->_holidays = array_filter(preg_split('/[^\d-]+/', $this->_date['locations']['holidays']), fn($v) => boolval($v)); // mm-dd, mm-dd, ...
+		$this->_easter_holidays = array_filter(preg_split('/[^\d-]+/', $this->_date['locations']['easter']), fn($v) => boolval($v)); // offsets from easter sunday
+		$this->_workdays = array_filter(preg_split('/[^\d-]+/', $this->_date['locations']['workdays']), fn($v) => boolval($v)); // 1-7 starting on monday
 	}
 
 	/**
