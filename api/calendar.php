@@ -91,34 +91,34 @@ class CALENDAR extends API {
 
 					$content = [
 						'title' => $this->_lang->GET('calendar.appointment.title', [], true),
-						'date' => $this->dateFormat($this->_date['current']->format('Y-m-d')),
+						'date' => $this->dateFormat($this->_date['current']->format('Y-m-d'), true),
 						'content' => [
 							$ics,
 							$this->_lang->GET('calendar.appointment.readable', [
 								':company' => $this->_lang->GET('company.address'),
 								':occasion' => $appointment['occasion'],
-								':start' => $this->dateFormat($appointment['date'] . ' ' . $appointment['time']),
-								':end' => $this->dateFormat(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600)),
+								':start' => $this->dateFormat($appointment['date'] . ' ' . $appointment['time'], true),
+								':end' => $this->dateFormat(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600), true),
 								':reminder' => $appointment['reminder'],
 								':phone' => $this->_lang->GET('company.phone'),
 								':mail' => $this->_lang->GET('company.mail')
 							], true)
 						],
-						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf') . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time']))
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time'], true))
 					];
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
 						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
 					];
 
 					// add ics file to send by mail
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics';
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time'], true) . '.ics';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, $ics);
 					fclose($file);
 					// provide downloadfile
 					$downloadfiles[$this->_lang->GET('calendar.appointment.ics')] = [
 						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-						'download' => $this->_lang->GET('calendar.appointment.ics') . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time']) . '.ics'
+						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->dateFormat($appointment['date'] . ' ' . $appointment['time'], true) . '.ics'
 					];
 
 					$body = [
