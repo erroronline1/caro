@@ -1161,7 +1161,7 @@ require_complaint_selection = yes ; yes: ja, no: nein; die Auswahl ob eine Aufze
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
 
 [calendar]
-timezones[europeberlin] = "Europe/Berlin" ; um weitere tz Zeitzonen je nach verbreitung ergänzen, in den Profileinstellungen wählbar
+timezones[europeberlin] = "Europe/Berlin" ; der erste Eintrag muss der Serverstandort sein; um weitere tz Zeitzonen je nach Standorten ergänzen, in den Profileinstellungen wählbar
 
 dateformats["Y-m-d"] = "Y-m-d"; gemäß https://www.php.net/manual/en/datetime.format.php, z.B. "d.m.Y"; leer für ISO 8601 Y-m-d; der oberste Eintrag wird als Standard für Exporte genutzt
 dateformats["d.m.Y"] = "d.m.Y" ; um gewünschte Optionen erweitern, in den Profileinstellungen wählbar, Schlüssel dürfen ?{}|&~![()^" nicht enthalten - Werte dürfen

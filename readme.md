@@ -38,6 +38,9 @@ graph LR;
     * download button for stls too (icon for recognition)
 * export dates default top entry
     * sanitize, especially audit
+* time zones
+    * actually convert timezones from local(default) to user selected? wherever current_timestamp has been applied
+    * calendar convert user entries by timezone to default server timezone
 
 ## Content
 * [Aims](#aims)
@@ -1260,7 +1263,7 @@ require_record_type_selection = yes ; yes, no; require selection on records e.g.
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
 
 [calendar]
-timezones[europeberlin] = "Europe/Berlin" ; append tz time zones to your customs, selecteable within user settings
+timezones[europeberlin] = "Europe/Berlin" ; initial entry has to be server location; append tz time zones to your customs, selecteable within user settings
 
 dateformats["Y-m-d"] = "Y-m-d"; according to https://www.php.net/manual/en/datetime.format.php, e.g. "d.m.Y"; empty for ISO 8601 Y-m-d; top entry is used on exports by default
 dateformats["d.m.Y"] = "d.m.Y" ; append desired options, selecteable within user settings, keys must not contain ?{}|&~![()^" - values can
