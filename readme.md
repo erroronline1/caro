@@ -28,11 +28,6 @@ graph LR;
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
-* screenshot 'automation' iterate over
-    * prepared api calls within unittest screenshot function 
-    * prepared functions checking menu items by query selector 
-    * timeout 10 seconds with camera overlay in corner and timeout circle, display x of y within console 
-    * https://hackernoon.com/how-to-take-screenshots-in-the-browser-using-javascript-l92k3xq7
 * image preview like stl
     * download button within dialog
     * download button for stls too (icon for recognition)

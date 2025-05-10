@@ -1751,7 +1751,102 @@ export function rendertest(element) {
 	render.processAfterInsertion();
 }
 
-export function screenshot() {
+export async function screenshot(lang = null) {
+	// yield functions
+	function* menucall(index) {
+		const targets = document.querySelectorAll("nav > input");
+		while (index < targets.length) {
+			yield targets[index];
+			index++;
+		}
+	}
+
+	function* apicalls1(index) {
+		// with still fixed navigation
+		const targets = [
+			{ en: "api.file('get', 'files')", de: "" },
+			{ en: "api.measure('get', 'measure')", de: "" },
+		];
+		while (index < targets.length) {
+			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
+			index++;
+		}
+	}
+
+	function* apicalls2(index) {
+		// after unfixing navigation
+		const targets = [
+			{ en: "rendertest('app')", de: "rendertest('app_de')" },
+			{ en: "rendertest('documents')", de: "rendertest('documents_de')" },
+			{ en: "api.audit('get', 'audit', 11)", de: "" }, // customize to appropriate caro_audit_and_management id
+			{ en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)" }, // customize to appropriate caro_audit_templates id
+			{ en: "api.calendar('get', 'schedule')", de: "" },
+			{ en: "api.application('get', 'start')", de: "" },
+			{ en: "api.document('get', 'document_editor', 127)", de: "" }, // customize id to approprate caro_documents id
+			{ en: "api.record('get', 'document', 'Basisdaten')", de: "" }, // customize document name to appropriate caro_documents name
+			{ en: "api.calendar('get', 'longtermplanning', 11)", de: "" }, // customize id to appropriate caro_calendar id
+			{ en: "api.purchase('get', 'approved')", de: "" },
+			{ en: "api.responsibility('get', 'responsibilities')", de: "" },
+			{ en: "api.user('get', 'profile')", de: "" },
+			{ en: "api.audit('get', 'checks', 'risks')", de: "" },
+			{ en: "api.texttemplate('get', 'text', 40)", de: "" }, // customize id to appropriate caro_texttemplates id
+			{ en: "api.user('get', 'user', 'error%20on%20line%201')", de: "" }, // customize user name to appropriate caro_user name
+			{ en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "" }, // customize vendor name to appropriate caro_consumables_vendors name
+		];
+		while (index < targets.length) {
+			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
+			index++;
+		}
+	}
+
+	const timeout = 8;
+	// instructions
+
+	if (!lang) {
+		return "language en or de have not been specified. call by screenshot('en') or screenshot('de') and paste ':screenshot --fullpage' into console during the countdown to capture the screen after preparing custom language and screen view.";
+	}
+
+	console.log(`starting in in ${timeout} seconds. we'll start with menu items, after whose we'll iterate over provided endpoints. in the meantime the menu will be set to unfixed for longer contents.`);
+	console.log(`menu items will pop up every ${timeout} seconds, type or preferrably paste ':screenshot --fullpage' into console during the countdown to capture the screen.`);
+	await _.sleep(timeout * 1000);
+
+	let iterator = menucall(0),
+		value,
+		s;
+	while ((value = iterator.next().value)) {
+		s = timeout;
+		value.checked = true;
+		while (s > 0) {
+			console.log(s);
+			await _.sleep(1000);
+			s--;
+		}
+		console.clear();
+	}
+
+	console.log(`menu will be cleared in ${timeout} seconds. endpoints will load every ${timeout} seconds, type or preferrably paste ':screenshot --fullpage' into console during the countdown to capture the screen.`);
+	await _.sleep(timeout * 1000);
+	for (const item of document.querySelectorAll("nav > input")) {
+		item.checked = false;
+	}
+
+	iterator = apicalls1(0);
+	while ((value = iterator.next().value)) {
+		s = timeout;
+		console.log(value);
+		eval(value);
+		while (s > 0) {
+			console.log(s);
+			await _.sleep(1000);
+			s--;
+		}
+		console.clear();
+	}
+
+	console.log(`menu will be set to unfixed in ${timeout} seconds. endpoints will load every ${timeout} seconds, type or preferrably paste ':screenshot --fullpage' into console during the countdown to capture the screen.`);
+	await _.sleep(timeout * 1000);
+
+	// modify nav styling
 	const body = document.querySelector("body"),
 		nav = document.querySelector("body>nav"),
 		main = document.querySelector("main");
@@ -1762,5 +1857,18 @@ export function screenshot() {
 	nav2.style.width = "calc(100% + 1.9rem)";
 	body.append(nav2);
 	nav.remove();
-	return "reload to return to normal";
+
+	iterator = apicalls2(0);
+	while ((value = iterator.next().value)) {
+		s = timeout;
+		console.log(value);
+		eval(value);
+		while (s > 0) {
+			console.log(s);
+			await _.sleep(1000);
+			s--;
+		}
+		console.clear();
+	}
+	console.log("done. reload to return to normal.");
 }
