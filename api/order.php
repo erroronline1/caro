@@ -1246,7 +1246,6 @@ class ORDER extends API {
 				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 				// display all orders assigned to organizational unit
 				if ($this->_requestedID) $units = [$this->_requestedID]; // see orders from selected unit
-				elseif (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // see only orders for own units
 
 				// filter by organizational unit
@@ -1262,11 +1261,12 @@ class ORDER extends API {
 				// users with order authorization can access all prepared orders by request
 				if ($_SESSION['user']['orderauth']){
 					$organizational_units = [];
+					$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared')"];
 					foreach($this->_lang->_USER['units'] as $unit => $description){
 						$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared', '" . $unit . "')"];
 					}
-					if (!$this->_requestedID && isset($_SESSION['user']['app_settings']['primaryUnit'])) $organizational_units[$this->_lang->GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
-					elseif($this->_requestedID) $organizational_units[$this->_lang->GET('units.' . $this->_requestedID)]['checked'] = true;
+					if (!$this->_requestedID) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
+					else $organizational_units[$this->_lang->GET('units.' . $this->_requestedID)]['checked'] = true;
 					$result['render']['content'][] = [
 						['type' => 'radio',
 						'attributes' => [
