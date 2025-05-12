@@ -1793,7 +1793,12 @@ export async function screenshot(lang = null) {
 			{ en: "api.user('get', 'user', 'error%20on%20line%201')", de: "" }, // customize user name to appropriate caro_user name
 			{ en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "" }, // customize vendor name to appropriate caro_consumables_vendors name
 		];
+		const rendertesttitle = [
+			{ en: "Sample application elements", de: "Beispiel Anwendungs-Elemente" },
+			{ en: "Sample document elements", de: "Beispiel Dokumenten-Elemente" },
+		];
 		while (index < targets.length) {
+			if (rendertesttitle[index]) api.update_header(rendertesttitle[index][lang]);
 			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
 			index++;
 		}
@@ -1813,7 +1818,7 @@ export async function screenshot(lang = null) {
 	let iterator = menucall(0),
 		value,
 		s;
-	while ((value = iterator.next().value)) {
+	while (false && (value = iterator.next().value)) {
 		s = timeout;
 		value.checked = true;
 		while (s > 0) {
@@ -1831,7 +1836,7 @@ export async function screenshot(lang = null) {
 	}
 
 	iterator = apicalls1(0);
-	while ((value = iterator.next().value)) {
+	while (false && (value = iterator.next().value)) {
 		s = timeout;
 		console.log(value);
 		eval(value);
