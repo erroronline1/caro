@@ -1818,7 +1818,7 @@ export async function screenshot(lang = null) {
 	let iterator = menucall(0),
 		value,
 		s;
-	while (false && (value = iterator.next().value)) {
+	while ((value = iterator.next().value)) {
 		s = timeout;
 		value.checked = true;
 		while (s > 0) {
@@ -1836,7 +1836,7 @@ export async function screenshot(lang = null) {
 	}
 
 	iterator = apicalls1(0);
-	while (false && (value = iterator.next().value)) {
+	while ((value = iterator.next().value)) {
 		s = timeout;
 		console.log(value);
 		eval(value);
