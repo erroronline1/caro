@@ -463,7 +463,6 @@ class NOTIFICATION extends API {
 		$prepared = 0;
 		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 		$units = $_SESSION['user']['units']; // see only orders for own units
-		$organizational_orders = [];
 		foreach($orders as $key => $row) {
 			$order_data = json_decode($row['order_data'], true);
 			if (array_intersect([$order_data['organizational_unit']], $units)) {
