@@ -136,6 +136,8 @@ class API {
 						$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
 						$_SESSION['user']['app_settings'] = json_decode($user['app_settings'] ? : '', true);
 						$_SESSION['user']['image'] = ($user['id'] > 1 ? './api/api.php/file/stream/' : '') . $user['image'];
+						// default primary unit if only one unit is assigned
+						if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
 					}
 					//else $this->response([strlen($payload), $payload], 401);
 					else $this->response([], 401);
@@ -270,6 +272,8 @@ class API {
 					$_SESSION['user']['units'] = explode(',', $user['units']);
 					$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 					$_SESSION['user']['image'] = ($user['id'] > 1 ? './api/api.php/file/stream/' : '') . $user['image'];
+					// default primary unit if only one unit is assigned
+					if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
 
 					// renew session timeout except for defined requests
 					if (!in_array(REQUEST[0], ['notification'])) $_SESSION['lastrequest'] = time();

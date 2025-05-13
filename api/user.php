@@ -538,8 +538,6 @@ class USER extends API {
 						$units[] = array_search($setunit, $this->_lang->_USER['units']);
 					}
 				}
-				// set default primary unit if only one has been selected
-				if (count($units) && count($units) < 2)$user['app_settings']['primaryUnit'] = $units[0];
 				$user['units'] = implode(',', $units);
 
 				// gather timesheet setup
@@ -740,8 +738,6 @@ class USER extends API {
 						$units[] = $unit;
 					}
 				}
-				// set default primary unit if only one has been selected
-				if (count($units) && count($units) < 2) $user['app_settings']['primaryUnit'] = $units[0];
 				$user['units'] = implode(',', $units);
 
 				// update timesheet settings
