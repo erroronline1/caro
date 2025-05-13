@@ -973,6 +973,7 @@ class FILE extends API {
 						}
 						// add remaining files
 						else {
+							$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
 
 							if (str_ends_with($file['name'], '.stl')) $display[$name] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . substr($file['path'], 1) . "'}})", 'data-filtered' => substr($file['path'], 1), 'data-type' => 'stl'];
