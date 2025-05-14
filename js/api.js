@@ -336,8 +336,7 @@ export const api = {
 			if (!history) return; // history is not written yet!!!
 			if (dir === "back") this.currentStep = ++this.currentStep <= history.length ? this.currentStep : history.length;
 			else this.currentStep = --this.currentStep > 0 ? this.currentStep : 1;
-			if (typeof history[history.length - this.currentStep] !== "undefined") {
-				request = history[history.length - this.currentStep];
+			if (request = history[history.length - this.currentStep]) {
 				api[request.shift()]("get", ...request);
 			}
 			this.buttoncolor();
@@ -455,7 +454,7 @@ export const api = {
 										_serviceWorker.postMessage("getnotifications");
 									}, _serviceWorker.notif.interval_duration);
 
-									if (api._unauthorizedRequest.request && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
+									if (api._unauthorizedRequest.request.length && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
 										// resend last request
 										api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
 									}
