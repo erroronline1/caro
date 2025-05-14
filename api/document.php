@@ -898,7 +898,7 @@ class DOCUMENT extends API {
 					]
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('assemble.compose.component.component_delete_success'),
-					'type' => 'success',
+					'type' => 'deleted',
 					'reload' => 'component_editor'
 					]]);
 				break;
@@ -1642,7 +1642,7 @@ class DOCUMENT extends API {
 					]
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('assemble.compose.document.document_delete_success'),
-					'type' => 'success',
+					'type' => 'deleted',
 					'reload' => 'document_editor',
 					]]);
 				break;

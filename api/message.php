@@ -194,7 +194,7 @@ class MESSAGE extends API {
 					'response' => [
 						'msg' => $this->_lang->GET('message.delete_success'),
 						'redirect' => ['conversation'],
-						'type' => 'success'
+						'type' => 'deleted'
 					]]);
 				else $this->response([
 					'response' => [

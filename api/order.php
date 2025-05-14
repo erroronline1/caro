@@ -587,7 +587,7 @@ class ORDER extends API {
 					'response' => [
 						'id' => false,
 						'msg' => $this->_lang->GET('order.deleted'),
-						'type' => 'success'
+						'type' => 'deleted'
 					],
 					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 				}
@@ -1025,7 +1025,7 @@ class ORDER extends API {
 					'response' => [
 						'id' => false,
 						'msg' => $this->_lang->GET('order.deleted'),
-						'type' => 'success'
+						'type' => 'deleted'
 					]];
 				}
 				else $result = [

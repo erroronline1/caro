@@ -552,7 +552,7 @@ class RESPONSIBILITY extends API {
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('responsibility.delete_success'),
-						'type' => 'success'
+						'type' => 'deleted'
 					]]);
 				else $this->response([
 					'response' => [

@@ -1254,7 +1254,7 @@ class USER extends API {
 					'response' => [
 						'msg' => $this->_lang->GET('user.user_deleted', [':name' => $user['name']]),
 						'id' => false,
-						'type' => 'success'
+						'type' => 'deleted'
 					]]);
 				else $this->response([
 					'response' => [

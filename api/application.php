@@ -358,7 +358,7 @@ class APPLICATION extends API {
 					'response' => [
 						'msg' => $this->_lang->GET('application.manual.deleted'),
 						'id' => false,
-						'type' => 'success'
+						'type' => 'deleted'
 					]]);
 				else $this->response([
 					'response' => [

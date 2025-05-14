@@ -462,7 +462,7 @@ class AUDIT extends API {
 					]
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.execute.delete_success'),
-					'type' => 'success'
+					'type' => 'deleted'
 					]]);
 				else $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.execute.delete_error'),
@@ -930,7 +930,7 @@ class AUDIT extends API {
 					]
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.template.delete_success'),
-					'type' => 'success'
+					'type' => 'deleted'
 					]]);
 				else $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.audit.template.delete_error'),
@@ -1839,7 +1839,7 @@ class AUDIT extends API {
 					]
 				])) $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.managementreview.delete_success'),
-					'type' => 'success'
+					'type' => 'deleted'
 					]]);
 				else $this->response(['response' => [
 					'msg' => $this->_lang->GET('audit.managementreview.delete_error'),
@@ -2281,7 +2281,7 @@ class AUDIT extends API {
 		$this->response([
 			'response' => [
 				'msg' => $this->_lang->GET('audit.orderstatistics_truncate_success'),
-				'type' => 'success'
+				'type' => 'deleted'
 			]
 		]);
 	}

@@ -795,7 +795,7 @@ class FILE extends API {
 				if ($success) $this->response(['response' => [
 					'msg' => $this->_lang->GET('file.manager.deleted_file', [':file' => $this->_requestedFile ? : $this->_requestedFolder]),
 					'redirect' => ['filemanager',  $this->_requestedFile ? $this->_requestedFolder : null],
-					'type' => 'success'
+					'type' => 'deleted'
 				]]);
 				else $this->response(['response' => [
 					'msg' => $this->_lang->GET('file.manager.error'),

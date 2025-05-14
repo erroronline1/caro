@@ -644,7 +644,7 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('order.sample_check.revoked'),
-						'type' => 'success'
+						'type' => 'deleted'
 					]]);
 				$this->response([
 					'response' => [
@@ -1383,7 +1383,7 @@ class CONSUMABLES extends API {
 				'response' => [
 					'msg' => $this->_lang->GET('consumables.product.deleted', [':name' => $product['article_name']]),
 					'id' => false,
-					'type' => 'success'
+					'type' => 'deleted'
 				]]);
 			else $this->response([
 				'response' => [

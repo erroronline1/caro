@@ -547,7 +547,7 @@ class CALENDAR extends API {
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('calendar.longtermplanning.delete_success'),
-						'type' => 'success'
+						'type' => 'deleted'
 					]]);
 				else $this->response([
 					'response' => [
@@ -1130,7 +1130,7 @@ class CALENDAR extends API {
 				if ($calendar->delete($this->_requestedId)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('calendar.schedule.deleted'),
-						'type' => 'success'
+						'type' => 'deleted'
 					],
 					'data' => ['calendar_uncompletedevents' => $notifications->calendar()]]);
 				else $this->response([
@@ -1567,7 +1567,7 @@ class CALENDAR extends API {
 				if ($calendar->delete($this->_requestedId)) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('calendar.schedule.deleted'),
-						'type' => 'success'
+						'type' => 'deleted'
 					]]);
 				else $this->response([
 					'response' => [
