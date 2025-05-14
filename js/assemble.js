@@ -20,6 +20,7 @@
 this module helps to assemble content according to the passed simplified object notation.
 */
 import SignaturePad from "../libraries/signature_pad.umd.js";
+import Icons from "./icons.json" with {type: "json"};
 
 var ELEMENT_ID = 0,
 	SIGNATURE_CANVAS = null,
@@ -606,7 +607,7 @@ export class Dialog {
 			a.href = this.render.url;
 			a.target = "_blank";
 			a.download = this.render.name || this.render.url;
-			a.dataset.type='download';
+			a.dataset.type = "download";
 			a.append(document.createTextNode(this.render.name || this.render.url));
 			return [div, a];
 		}
@@ -614,16 +615,18 @@ export class Dialog {
 }
 
 export class Toast {
+	// an icon list, grouped by available types with arrays of icons that will be selected randomly
+	// for pure graphical reasons
+	// intended for gaining traction by providing cheap dopamine, given cute icons you have the rights to use
+	icons = Icons.toast;
+
 	/**
 	 * displays a toast message for defined time
 	 * @param {string} message
-	 * @param {string} type success|error|info
+	 * @param {string} type success|error|deleted|info
 	 * @param {int} duration in milliseconds
 	 * @param {string} destination toast or sessionwarning
 	 * @example new Toast('message', 'success')
-	 *
-	 * duration is a bit fuzzy, idk why
-	 *
 	 */
 	constructor(message = "", type = "", duration = 5000, destination = "toast") {
 		this.message = message || undefined;
@@ -632,12 +635,17 @@ export class Toast {
 		this.destination = destination;
 		this.toast = document.getElementById(destination);
 		this.toast.removeAttribute("class");
+		this.toast.style = "--icon: url('')";
 		if (this.message) {
 			const closeimg = document.createElement("img"),
 				pauseimg = document.createElement("img"),
 				msg = document.createElement("span"),
 				div = document.createElement("div");
-			if (type) this.toast.classList.add(type);
+			if (type) {
+				console.log(this.icons);
+				this.toast.classList.add(type);
+				if (this.icons[type] && this.icons[type].length) this.toast.style = "--icon: url('" + this.icons[type][Math.floor(Math.random() * this.icons[type].length)] + "')";
+			}
 			closeimg.classList.add("close");
 			closeimg.src = "./media/times.svg";
 			closeimg.alt = api._lang.GET("assemble.render.aria.cancel");

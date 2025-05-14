@@ -36,6 +36,9 @@ graph LR;
 * time zones
     * actually convert timezones from local(default) to user selected? wherever current_timestamp has been applied
     * calendar convert user entries by timezone to default server timezone
+* audit
+    * proof file uploads e.g. for audit by documents
+    * send report on checkbox only
 
 ## Content
 * [Aims](#aims)
@@ -79,6 +82,7 @@ graph LR;
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Known deficencies](#known-deficencies)
     * [Customisation](#customisation)
+    * [User acceptance considerations](#user-acceptance-considerations)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
 * [CSV processor](#csv-processor)
 * [Regulatory software requirements](#regulatory-software-requirements)
@@ -446,6 +450,8 @@ are not processable for document-contexts within the [languagefiles](#customisat
 Elements can be rearranged via [drag and drop editor](#miscellaneous). Most elements can be edited - their content can be imported into the respective editor to be altered or appended and reinserted afterwards. The original element remains though and has to be deleted manually. 
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
+
+also see [User acceptance considerations](#user-acceptance-considerations)
 
 #### Document editing
 Documents can be assembled by selecting any of the approved components. Components can be rearranged via [drag and drop editor](#miscellaneous).
@@ -1230,6 +1236,7 @@ If you are going to prepare the deployment you are free to create multiple files
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to manual templates.
 * [Customize](#customisation) your appropriate language-files (language.XX.env/.json and manual templates)
+* *optional:* provide and customize icons to be displayed on [response-popups](#user-acceptance-considerations).
 * Select an installation password for the system user.
 
 ### Installation procedure
@@ -1529,6 +1536,15 @@ If you ever fiddle around with the sourcecode:
 * Settings to access a local server on the development machine: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 * The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results. Options best have a value independent on their label.
+
+[Content](#content)
+
+## User acceptance considerations
+The application is intended to make documentation bearable. The appearance has been crafted to contain easy comprehensible and recognizeable elements for interaction. Visual payload has been reduced as have been distracting images and animations.
+
+As huge parts of the application are custom forms, persons responsible for creating documents must always keep the user in mind as well and create meaningful input names, decent selections and grouping of contents, and avoid inappropriate nesting and chaining.
+
+A weekend of mastering psychology \s has lead to the decision to personify the application. Goal is to gain traction by making use of the app a bit more fun giving cute images being provided and possibly enhance identification with the application. By default there may be set up images ressources not being tracked by this repository thus possibly creating an error for not being found. The file `js/icons.json` has to be modified or sanitized for that. It is not advised to use apps like ZEPETO for this as the rights remain at their operator.
 
 [Content](#content)
 

@@ -1,0 +1,35 @@
+{
+	"toast": {
+		"success": [
+            "./assets/success1.jpg",
+            "./assets/success2.jpg",
+            "./assets/success3.jpg",
+            "./assets/success4.jpg",
+            "./assets/success5.jpg",
+            "./assets/success6.jpg",
+            "./assets/success7.jpg",
+            "./assets/success8.jpg",
+            "./assets/success9.jpg",
+            "./assets/success10.jpg",
+            "./assets/success11.jpg"
+        ],
+		"error": [
+            "./assets/error1.jpg",
+            "./assets/error2.jpg",
+            "./assets/error3.jpg",
+            "./assets/error4.jpg",
+            "./assets/error5.jpg",
+            "./assets/error6.jpg",
+            "./assets/error7.jpg"
+        ],
+		"deleted": [
+            "./assets/deleted1.jpg"
+        ],
+		"info": [
+            "./assets/info1.jpg",
+            "./assets/info2.jpg",
+            "./assets/info3.jpg",
+            "./assets/info4.jpg"
+        ]
+	}
+}

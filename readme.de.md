@@ -43,6 +43,7 @@
     * [Anmerkungen und Hinweise zur Nutzung](#anmerkungen-und-hinweise-zur-nutzung)
     * [Bekannte Schwachstellen](#bekannte-schwachstellen)
     * [Anpassung](#anpassung)
+    * [Erwägungen zur Nutzerakzeptanz](#erwägungen-zur-nutzerakzeptanz)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [CSV Prozessor](#csv-prozessor)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
@@ -357,6 +358,8 @@ sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe]
 Elemente können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Die meisten Elemente können bearbeitet werden - ihr Inhalt kann in den entsprechenden Editor importiert werden um geändert oder ergänzt und anschießend wieder hinzugefügt zu werden. Das Original-Element verbleibt dabei und muss manuell entfernt werden.
 
 Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
+
+siehe auch [Erwägungen zur Nutzerakzeptanz](#erwägungen-zur-nutzerakzeptanz)
 
 #### Dokumentenbearbeitung
 Dokument können durch die Auswahl beliebiger freigegebener Komponenten zusammengestellt werden. Komponenten können mit der [Maus sortiert und positioniert](#verschiedenes) werden.
@@ -1133,6 +1136,7 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
 * Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in Manual-Vorlagen.
 * [Anpassung](#anpassung) der sachgemäßen Sprachdateien (language.XX.env/.json und Manual-Vorlagen)
+* Bereitstellung und Anpassung von Bildern, die auf [Antwort-PopUps](#erwägungen-zur-nutzerakzeptanz) angezeigt werden.
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
 ### Installation
@@ -1433,6 +1437,15 @@ Im Falle einer Anpassung des Quelltexts:
 * Einstellungen um einen lokalen Server der Entwicklungsumgebung zu erreichen: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 * Das checkbox2text-Widget verkettet die gewählten Optionen mit `, ` (Komma und ein Leerzeichen). Optionen dürfen diese Zeichen daher nicht enthalten (z.B. regulatorische Anforderungen für Audit-Vorlagen) oder das Verarbeiten der Optionen benätigt einen eigenen Handler (Produktverwaltung). Anderfalls kann eine erneute Auswahl zu unerwarteten Ergebnissen führen. Falls möglich sollten die gewählten Optionen einen Wert zugewiesen bekommen, unabhängig von der Bezeichnung.
+
+[Übersicht](#übersicht)
+
+## Erwägungen zur Nutzerakzeptanz
+Die Anwenung soll Dokumentation erträglich machen. Die Gestaltung wurde so umgesetzt, dass Elemente für die Interaktion leicht verständlich und wiedererkennbar sind. Die visuelle Nutzlast wurde reduziert, ebenso ablenkende Bilder und Animationen.
+
+Da eigene Formulare eine großer Teil der Anwendung sind, muss auch die für die Dokumente verantwortliche Person die Nutzer berücksichtiegen und aussagekräftige Namen für Eingabefelder, geeignete Auswahloptionen und Gruppierungen verwenden und unangemessene Verschachtelungen und Verkettungen vermeiden.
+
+Ein Wochenende Psychologiestudium \s führte zu der Entscheidung die Anwendung zu personifizieren. Ziel ist die Nutzung zu steigern indem diese durch die Bereitstellung von süßen Bildchen als etwas unterhaltsamer empfunden wird und möglicherweise die Identifizierung mit der Anwendung zu verbessern. Standardmäßig werden möglicherweise Quellen angegeben die nicht Bestandteil dieses Repositorys sind und einen Fehler erzeugen können, wenn sie nicht gefunden werden. Die Datei js/icons.json muss dafür angepasst, bzw. korrigiert werden. Es wird nicht empfohlen Apps wie ZEPETO zu verwenden, da die Rechte am Bildmaterial beim Betreiber liegen.
 
 [Übersicht](#übersicht)
 

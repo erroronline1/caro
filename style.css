@@ -184,11 +184,13 @@ dialog {
 	opacity: 0;
 	transition: ease 0.3s;
 	pointer-events: none;
-	width: 50rem;
+	max-width: 50rem;
+	width: 90%;
 
 	&#toast,
 	&#sessionwarning {
 		bottom: 6rem;
+		padding-left: 4rem;
 		border: 3px solid transparent !important;
 		span {
 			display: block;
@@ -202,8 +204,20 @@ dialog {
 			margin: 0;
 			background: var(--yellow);
 		}
+		&::before {
+			content: "";
+			background-size: cover;
+			background-image: var(--icon);
+			width: 5rem;
+			height: 5rem;
+			border-radius: 50%;
+			position: absolute;
+			margin-left: -5.5rem;
+			margin-top: -3.5rem;
+		}
 	}
 	&#toast.success,
+	&#toast.deleted,
 	&#sessionwarning.success {
 		border: 3px solid var(--green) !important;
 	}
