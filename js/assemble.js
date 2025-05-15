@@ -642,7 +642,6 @@ export class Toast {
 				msg = document.createElement("span"),
 				div = document.createElement("div");
 			if (type) {
-				console.log(this.icons);
 				this.toast.classList.add(type);
 				if (this.icons[type] && this.icons[type].length) this.toast.style = "--icon: url('" + this.icons[type][Math.floor(Math.random() * this.icons[type].length)] + "')";
 			}
