@@ -1015,9 +1015,11 @@ export const _client = {
 					buttons[api._lang.GET("order.add_information_cancel")] = false;
 					buttons[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
 					links = {};
-					links[api._lang.GET("order.message_orderer", { ":orderer": element.orderer })] = {
+					links[api._lang.GET("order.message_orderer", { ":orderer": element.orderer.name })] = {
 						href: "javascript:void(0)",
 						"data-type": "input",
+						class: "messageto",
+						style: "--icon: url('" + (element.orderer.image || "") + "')",
 						onclick: function () {
 							_client.message.newMessage(
 								api._lang.GET("order.message_orderer", { ":orderer": "element.orderer" }),
@@ -1041,7 +1043,7 @@ export const _client = {
 							._replaceArray(
 								["element.orderer", "element.quantity", "element.unit", "element.ordernumber", "element.name", "element.vendor", "element.information", "element.commission", "element.aut_idem", "buttons"],
 								[
-									element.orderer,
+									element.orderer.name,
 									element.quantity,
 									element.unit ? element.unit.replaceAll('"', '\\"') : "",
 									element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",

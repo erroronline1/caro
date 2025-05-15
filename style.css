@@ -887,6 +887,11 @@ article:has(> article) {
 	}
 }
 
+.messageto {
+	margin: 1em 0 0 5.5em;
+	display: block;
+}
+
 /*************************** general elements ******************************/
 
 h1 {
@@ -1430,6 +1435,18 @@ dialog a:not([data-type])::before {
 	background-color: var(--cta_darker);
 	-webkit-mask-image: url("./media/external-link-alt.svg");
 	mask-image: url("./media/external-link-alt.svg");
+}
+
+.messageto::before {
+	/* here after link and general data-type styling */
+	content: "";
+	background-size: cover;
+	background-image: var(--icon);
+	width: 2em;
+	height: 2em;
+	border-radius: 50%;
+	position: relative;
+	margin-left: -4em;
 }
 
 [data-type="addblock"]::before {
