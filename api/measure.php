@@ -100,7 +100,7 @@ class MEASURE extends API {
 					])) $this->response([
 						'response' => [
 							'msg' => $this->_lang->GET('measure.deleted'),
-							'type' => 'success'
+							'type' => 'deleted'
 						]]);
 					else $this->response([
 						'response' => [
@@ -302,9 +302,14 @@ class MEASURE extends API {
 						'msg' => $this->_lang->GET('measure.vote_error'),
 						'type' => 'error'
 					]]);
-
-				if (isset($measure['votes'][$_SESSION['user']['id']]) && $measure['votes'][$_SESSION['user']['id']] === $this->_requestedVote) unset($measure['votes'][$_SESSION['user']['id']]); // revoke vote
-				else $measure['votes'][$_SESSION['user']['id']] = $this->_requestedVote; // insert or update vote
+				if (isset($measure['votes'][$_SESSION['user']['id']]) && $measure['votes'][$_SESSION['user']['id']] === $this->_requestedVote) {
+					unset($measure['votes'][$_SESSION['user']['id']]); // revoke vote
+					$voted = 'deleted';
+				}
+				else {
+					$measure['votes'][$_SESSION['user']['id']] = $this->_requestedVote; // insert or update vote
+					$voted = 'success';
+				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_vote', [
 					'values' => [
@@ -314,7 +319,7 @@ class MEASURE extends API {
 				])) $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('measure.vote_confirm'),
-						'type' => 'success'
+						'type' => $voted
 					]]);
 				else $this->response([
 					'response' => [
