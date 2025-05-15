@@ -69,7 +69,7 @@ class ORDER extends API {
 									'response' => [
 										'id' => false,
 										'msg' => $this->_lang->GET('order.deleted'),
-										'type' => 'success'
+										'type' => 'deleted'
 									],
 									'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 								}
@@ -437,8 +437,8 @@ class ORDER extends API {
 					}
 					// data chunks to be assembled by js _client.order.approved()
 					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
-					if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
-					else $orderer = $this->_lang->GET('message.deleted_user');
+					if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = ['name' => $users[$orderer]['name'], 'image' => './api/api.php/file/stream/' . $users[$orderer]['image']];
+					else $orderer = ['name' => $this->_lang->GET('message.deleted_user'), 'image' => null];
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
@@ -502,8 +502,8 @@ class ORDER extends API {
 								if (!$row['received'] && $data['aut_idem']){
 									$data['state'][$s]['onchange'] =
 										"new _client.Dialog({type:'confirm', header:'" . 
-										$this->_lang->GET('order.aut_idem_order_confirmation_header', [':user' => $data['orderer'], ':product' => $data['name']]) .
-										"', render:'" . $this->_lang->GET('order.aut_idem_order_confirmation_render', [':user' => $data['orderer']]) .
+										$this->_lang->GET('order.aut_idem_order_confirmation_header', [':user' => $data['orderer']['name'], ':product' => $data['name']]) .
+										"', render:'" . $this->_lang->GET('order.aut_idem_order_confirmation_render', [':user' => $data['orderer']['name']]) .
 										"', options:{'" . $this->_lang->GET('general.prevent_dataloss_cancel') . "': false, '" . $this->_lang->GET('general.prevent_dataloss_ok') . "': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {" .
 	 									"if (confirmation) {api.purchase('put', 'approved', '" . $data['id'] . "', '" . $s . "', this.checked); this.setAttribute('data-" . $s . "', this.checked.toString());}" .
 										"else {this.checked = false; return}" .
