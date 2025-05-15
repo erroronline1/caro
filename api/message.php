@@ -73,7 +73,7 @@ class MESSAGE extends API {
 						$conversation_content[] = [
 							'type' => 'message',
 							'content' => [
-								'img' => $conversation['image'],
+								'img' => ($conversation['conversation_user'] > 1 ? './api/api.php/file/stream/' : '') . $conversation['image'],
 								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('message.deleted_user'),
 								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
 								'date' => $this->dateFormat($conversation['timestamp']),
@@ -169,9 +169,9 @@ class MESSAGE extends API {
 								[
 									'type' => 'message',
 									'content' => [
-										'img' => $conversation['image'],
+										'img' => ($conversation['conversation_user'] > 1 ? './api/api.php/file/stream/' : '') . $conversation['image'],
 										'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('message.deleted_user'),
-										'text' => (strlen($conversation['message'])>128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
+										'text' => (strlen($conversation['message']) > 128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
 										'date' => $this->dateFormat($conversation['timestamp']),
 										'unseen' => $unseen
 									],
@@ -292,18 +292,18 @@ class MESSAGE extends API {
 			if ($user['id'] == 1) continue; // skip system user
 
 			// sort to groups, units, etc.
-			$groups['name'][] = $user['name'];
-			if ($user['orderauth']) $groups['orderauth'][] = $user['name'];
+			$groups['name'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
+			if ($user['orderauth']) $groups['orderauth'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 			if ($user['units'])
 				foreach(explode(',', $user['units']) as $unit){
 					if (!isset($groups['units'][$unit])) $groups['units'][$unit] = [];
-					$groups['units'][$unit][] = $user['name'];
+					$groups['units'][$unit][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
 			if ($user['permissions'])
 				foreach(explode(',', $user['permissions']) as $permission){
 					if (in_array($permission, ['user', 'group'])) continue;
 					if (!isset($groups['permissions'][$permission])) $groups['permissions'][$permission] = [];
-					$groups['permissions'][$permission][] = $user['name'];
+					$groups['permissions'][$permission][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
 		}
 
@@ -315,10 +315,12 @@ class MESSAGE extends API {
 				ksort($content);
 
 				// assemble message link
-				foreach($content as $user) $links[$user] = [
+				foreach($content as $user) $links[$user['name']] = [
 					'href' => 'javascript:void(0)',
 					'data-type' => 'input',
-					'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) . "', '" . $user . "', '', {}, [])"
+					'class' => 'messageto',
+					'style' => "--icon: url('" . $user['image']. "')",
+					'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user['name']]) . "', '" . $user['name'] . "', '', {}, [])"
 				];
 				switch ($group){
 					case 'name':
@@ -339,7 +341,7 @@ class MESSAGE extends API {
 				// display units and permissions as slideable multipanels
 				$panel = [];
 				foreach($content as $sub => $users){
-					$users = array_unique($users);
+					$users = array_unique($users, SORT_REGULAR);
 					ksort($users);
 
 					// add "message to all users" of the panel
@@ -347,15 +349,19 @@ class MESSAGE extends API {
 						$this->_lang->GET('message.register_message_all') => [
 							'href' => 'javascript:void(0)',
 							'data-type' => 'input',
-							'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => implode(', ', $users)]) ."', '" . implode(', ', $users) . "', '', {}, [])"
+							'class' => 'messageto',
+							'style' => "--icon: url('')",
+							'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => implode(', ', array_column($users, 'name'))]) ."', '" . implode(', ', array_column($users, 'name')) . "', '', {}, [])"
 						]
 					];
 
 					// add "message to user"
-					foreach($users as $user) $links[$user] = [
+					foreach($users as $user) $links[$user['name']] = [
 						'href' => 'javascript:void(0)',
 						'data-type' => 'input',
-						'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user]) ."', '" . $user . "', '', {}, [])"
+						'class' => 'messageto',
+						'style' => "--icon: url('" . $user['image']. "')",
+						'onclick' => "_client.message.newMessage('". $this->_lang->GET('order.message_orderer', [':orderer' => $user['name']]) ."', '" . $user['name'] . "', '', {}, [])"
 					];
 
 					// append panel
