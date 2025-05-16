@@ -14,6 +14,13 @@
 			"filesetting": {
 				"headerrowindex": 0,
 				"columns": ["article_no", "article_name", "article_unit", "article_ean", "trading_good", "has_expiry_date", "special_attention"]
+			},
+			"modify": {
+				"add": {
+					"trading_good": "1",
+					"stock_item": "0"
+				},
+				"conditional_or": [["stock_item", "1", ["article_no", "3401|TS40"]]]
 			}
 		}
 	},
@@ -247,8 +254,10 @@
 			],
 			"modify": {
 				"add": {
-					"trading_good": "1"
+					"trading_good": "1",
+					"stock_item": "0"
 				},
+				"conditional_or": [["stock_item", "1", ["Artikel-Nr.", "984100|984120"]]],
 				"rewrite": [
 					{
 						"article_no": ["Artikel-Nr."],
@@ -278,7 +287,8 @@
 			"modify": {
 				"add": {
 					"trading_good": "0",
-					"has_expiry_date": "0"
+					"has_expiry_date": "0",
+					"stock_item": "0"
 				},
 				"replace": [["EAN GTIN", "\\s+", ""]],
 				"conditional_or": [
@@ -286,7 +296,8 @@
 						"trading_good",
 						"1",
 						["Artikelname", "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."]
-					]
+					],
+					["stock_item", "1", ["Art-Nr", "29715-0-02|8615.201(?:R|L)-(?:XS|S|M|L|XL)|8615.2/001-(?:S|M)|8618.201R-L|8618.201L-M"]]
 				],
 				"rewrite": [
 					{
@@ -361,7 +372,7 @@
 		},
 		"pricelist": {
 			"filesetting": {
-				"columns": ["Artikelnr.", "Bezeichnung", "Größe", "Farbe", "Seite / Ausführung", "Einheit", "EAN", "CCL"]
+				"columns": ["Variante", "Bezeichnung", "Größe", "Farbe", "Seite / Ausführung", "Einheit", "EAN", "CCL"]
 			},
 			"filter": [
 				{
@@ -380,13 +391,17 @@
 			"modify": {
 				"add": {
 					"trading_good": "1",
-					"has_expiry_date": "0"
+					"has_expiry_date": "0",
+					"stock_item": "0"
 				},
-				"conditional_or": [["trading_good", "0", ["Bezeichnung", "ersatz|f(?:ü|Ü)r|tausch|bezug|luft"], ["Größe", ""]]],
+				"conditional_or": [
+					["trading_good", "0", ["Bezeichnung", "ersatz|f(?:ü|Ü)r|tausch|bezug|luft"], ["Größe", ""]],
+					["stock_item", "1", ["Variante", "93014[1-5]|190530|1333[1-2][2356]|9304[12][2-7]"]]
+				],
 				"remove": ["CCL"],
 				"rewrite": [
 					{
-						"article_no": ["Artikelnr."],
+						"article_no": ["Variante"],
 						"article_name": ["Bezeichnung", ", ", "Größe", ", ", "Farbe", ", ", "Seite / Ausführung"],
 						"article_unit": ["Einheit"],
 						"article_ean": ["EAN"]
@@ -431,9 +446,20 @@
 			},
 			"modify": {
 				"add": {
-					"special_attention": 0
+					"special_attention": 0,
+					"stock_item": "0"
 				},
-				"conditional_or": [["special_attention", "1", ["Bezeichnung", "Ziegen-Narbenleder|macanta|liegeschalen|neoprene|nappa|multiform"]]],
+				"conditional_or": [
+					["special_attention", "1", ["Bezeichnung", "Ziegen-Narbenleder|macanta|liegeschalen|neoprene|nappa|multiform"]],
+					[
+						"stock_item",
+						"1",
+						[
+							"article_no",
+							"1000039|L88113|L88114|L88144|L88154|L06961|L06728|L18545|L18041|L04551|L05221|17030|L41050|L41320|L42320|L41838|L42838|L41830|L42830|L42850|L41850|L42420|L41420|K42430|L41430|L41450|L42450|L42350|L41350|L42330|L41330|L42550|L41550|L42530|L41530|L42520|L41520|L42130|L41130|L42120|L41120|L42150|L41150|L36820|L35820|L36830|L35830|L36850|L35850|L36320|L35320|L36320|L35330|L36350|L35350|L35420|L36430|L35430|L36450|L35450|L36520|L35520|L36530|L35430|L36550|L35550|L36130|L35130|L36150|L35150|L36120|L35120"
+						]
+					]
+				],
 				"rewrite": [
 					{
 						"article_no": ["article_no"],
@@ -540,9 +566,13 @@
 			},
 			"modify": {
 				"add": {
-					"trading_good": "1"
+					"trading_good": "1",
+					"stock_item": "0"
 				},
-				"conditional_or": [["trading_good", "0", ["Kategorie", "zubeh(?:ö|Ö)r|tapes|Sohlensysteme"]]],
+				"conditional_or": [
+					["trading_good", "0", ["Kategorie", "zubeh(?:ö|Ö)r|tapes|Sohlensysteme"]],
+					["stock_item", "1", ["Artikel-Nr", "BAPT2|BAPT3"]]
+				],
 				"remove": ["Kategorie"],
 				"rewrite": [
 					{
@@ -840,9 +870,13 @@
 			},
 			"modify": {
 				"add": {
-					"has_expiry_date": "0"
+					"has_expiry_date": "0",
+					"stock_item": "0"
 				},
-				"conditional_or": [["has_expiry_date", "1", ["Bezeichnung", "trikotschlauch"]]],
+				"conditional_or": [
+					["has_expiry_date", "1", ["Bezeichnung", "trikotschlauch"]],
+					["stock_item", "1", ["Material", "14799|1480[0-4]|25411|25414|25413"]]
+				],
 				"rewrite": [
 					{
 						"article_no": ["Material"],
@@ -908,9 +942,20 @@
 			"modify": {
 				"add": {
 					"trading_good": "1",
-					"special_attention": "0"
+					"special_attention": "0",
+					"stock_item": "0"
 				},
-				"conditional_or": [["special_attention", "1", ["Bezeichnung", "noppenhaft"]]],
+				"conditional_or": [
+					["special_attention", "1", ["Bezeichnung", "noppenhaft"]],
+					[
+						"stock_item",
+						"1",
+						[
+							"ArtikelNr",
+							"K10090(?:1|2|3|6)|5650223|5650132|5650224|5650222|R013313|R013314|R013312000|R013212|R133302000|R133303000|R133304000|R013213|R012214|R133202000|R133203000|R133204000|G061391|G061392|G061393|G061394|G061395|G061396|G061291|G061292|G061293|G061294|G061295|G061296"
+						]
+					]
+				],
 				"replace": [["EAN-Nummer", "\\.", ""]],
 				"rewrite": [
 					{
@@ -952,9 +997,13 @@
 			],
 			"modify": {
 				"add": {
-					"special_attention": "0"
+					"special_attention": "0",
+					"stock_item": "0"
 				},
-				"conditional_or": [["special_attention", "1", ["Staffel", "pryx|deusith"]]],
+				"conditional_or": [
+					["special_attention", "1", ["Staffel", "pryx|deusith"]],
+					["stock_item", "1", ["Artikelnummer", "425706-000|405004-024|405006-000"]]
+				],
 				"rewrite": [
 					{
 						"article_no": ["Artikelnummer"],
@@ -1144,11 +1193,17 @@
 			"modify": {
 				"add": {
 					"trading_good": "0",
-					"has_expiry_date": "0"
+					"has_expiry_date": "0",
+					"stock_item": "0"
 				},
 				"conditional_or": [
 					["trading_good", "1", ["BEZEICHNUNG", "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"]],
-					["has_expiry_date", "1", ["BEZEICHNUNG", "solvent"]]
+					["has_expiry_date", "1", ["BEZEICHNUNG", "solvent"]],
+					[
+						"stock_item",
+						"1",
+						["ART-NR", "A-114030|A-235300|A-233100|A-235100|A-135100|A-325100|A-322100|A-742010|A-746010|L-551002|L-552000|A-746020|A-748030|A-342100|A-442100|A-445100|A-545140|A-545110|A-545130|A-345100|A-245300|21002(?:0|2|4)|21001(?:4|6|8)"]
+					]
 				],
 				"replace": [
 					["ART-NR", "(I-4443|I-CL63|I-CW63|I-CL43|I-CW43|I-CL53)(XX)", 16, 18, 20, 22, 23.5, 25, 26.5, 28, 30, 32, 34, 36, 40],
@@ -1281,7 +1336,8 @@
 				"add": {
 					"trading_good": "0",
 					"has_expiry_date": "0",
-					"special_attention": "0"
+					"special_attention": "0",
+					"stock_item": "0"
 				},
 				"conditional_or": [
 					[
@@ -1297,7 +1353,8 @@
 						"special_attention",
 						"1",
 						["Bezeichnung", "extrasoft|plastazote|multisoft|lunairmed|evazote|lunalastik|lunasoft|orthosoft|lunacell|neopren|syncrosoft|htv silikon|silikonfarbe|polyethylen|polypropylen|ppc|laminierharz|gießharz|drell|plex|cat-flex"]
-					]
+					],
+					["stock_item", "1", ["Art.Nr.", "M297015|M297020|53869"]]
 				],
 				"replace": [
 					[
@@ -1487,12 +1544,21 @@
 				"add": {
 					"trading_good": "0",
 					"has_expiry_date": "0",
-					"special_attention": "0"
+					"special_attention": "0",
+					"stock_item": "0"
 				},
 				"conditional_or": [
 					["trading_good", "1", ["Materialtext", "knee comfort|strumpf|t(?:ü|Ü)binger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
 					["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|617s\\d=|85h.+|636K.+|616T111|453h10|646m453"]],
-					["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen|innenlack|thermolyn"]]
+					["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen|innenlack|thermolyn"]],
+					[
+						"stock_item",
+						"1",
+						[
+							"Art.Nr.",
+							"29C3=M4|718Y130|17B54=16|17B57=16|17B53=16|17B59=16|17B2[16]=[LR]16|17B42=16|17B100=16|17B45=16|17B101=16|17B92=[LR]16|17F34=5|17F34=6|17B84=16|17B85=16|4R56|4R51|2R14|4R41|2R38|2R37|4R54|7U33|17B36=[LR]16|17B39=16|17B39=20|2R41=1|21Y40=40|21Y77|21Y145|21Y12|5R9|21Y105|2R48|2R40=2|4R60|17F55=5|17K32=4|17K32=5|17F54=125x2.5|17K33=6|17K33=4|17K34=5|17K29=6|17K29=5|17B23=[LR]16|5R1=6|28F10=[SML]|623T8=12|623T8=15|99B25|636K8=20X2X10|616F10=19|617B1|639A1=1|749Y7=[BC]45X58|716Z1|642K13|636K6|754B1|617H46=0,090|640Z5=1|633F7=1|754M3|640F13|642T8=1200x400|99B14=[1-4]|99B16=[1-3]|6R6|453D7=2|453D4=2|453D7=5|453D7=4|453D7=3|453D4=3|453D7=6|453D7=7|3S107=L44|3R24=L44|3R6=R44|3S107=R44|3R6=L44|616G6=1X1|616T111=9|616T111=12|453H10-N|50K13N=[LR]-(?:S|M|L|XL|XXL)|28L10=[SML]|50C30=8-0|50C30=10-0|50C30=12-0|617S7=6|617S3=H5|617S3=H6|617S3=H2|617S7=25|617S7=18|617S7=12|617S7=6|617S7=6|617S7=3|617S7=12|617S7=18|616T3=1000x500x1|634A3=8.400|635L13|636K18|617P37=0.150|617P14=0.500|634A80=2.5"
+						]
+					]
 				],
 				"rewrite": [
 					{
@@ -1689,9 +1755,9 @@
 			},
 			"modify": {
 				"add": {
-					"trading_good": "0"
+					"trading_good": "0",
+					"stock_item": "0"
 				},
-				"conditional_or": [["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehst(?:ü|Ü)tze|achselst(?:ü|Ü)tze|toiletten|gehgestell|vierfuß|fischer"]]],
 				"rewrite": [
 					{
 						"article_no": ["Art-Nr"],
@@ -1699,6 +1765,10 @@
 						"article_unit": ["ME"],
 						"article_ean": ["EAN_GTIN"]
 					}
+				],
+				"conditional_or": [
+					["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehst(?:ü|Ü)tze|achselst(?:ü|Ü)tze|toiletten|gehgestell|vierfuß|fischer"]],
+					["stock_item", "1", ["Art-Nr", "122.95|106.04.10"]]
 				]
 			}
 		}
@@ -1826,9 +1896,9 @@
 			},
 			"modify": {
 				"add": {
-					"trading_good": "0"
+					"trading_good": "0",
+					"stock_item": "0"
 				},
-				"conditional_or": [["trading_good", "1", ["article_name", "einlage|schuh|orthese"]]],
 				"rewrite": [
 					{
 						"article_no": ["Artikelnummer"],
@@ -1836,6 +1906,10 @@
 						"article_unit": ["Basiseinheit"],
 						"article_ean": [""]
 					}
+				],
+				"conditional_or": [
+					["trading_good", "1", ["article_name", "einlage|schuh|orthese"]],
+					["stock_item", "1", ["Artikelnummer", "62897000|64010100"]]
 				]
 			}
 		}
@@ -1859,8 +1933,10 @@
 			"modify": {
 				"add": {
 					"trading_good": "1",
-					"has_expiry_date": "1"
+					"has_expiry_date": "1",
+					"stock_item": "0"
 				},
+				"conditional_or": [["stock_item", "1", ["Bestell-Nr", "4029925024287|4029925024331|4029925024294|4029925024348|4029925024300|4029925024355|4029925024317|4029925024362"]]],
 				"rewrite": [
 					{
 						"article_no": ["Bestell-Nr"],
@@ -1892,7 +1968,8 @@
 				"add": {
 					"trading_good": "0",
 					"has_expiry_date": "0",
-					"special_attention": "0"
+					"special_attention": "0",
+					"stock_item": "0"
 				},
 				"conditional_or": [
 					[
@@ -1904,7 +1981,15 @@
 						]
 					],
 					["has_expiry_date", "1", ["Bezeichnung", "silikonspray|sekundenkleber"]],
-					["special_attention", "1", ["Bezeichnung", "kon-gel|varioform|streifydur|streifylast|PET glasklar|streifyflex|drell|jaquard|satine|elastinova|bandagengurt|diabetikermaterial|multiform"]]
+					["special_attention", "1", ["Bezeichnung", "kon-gel|varioform|streifydur|streifylast|PET glasklar|streifyflex|drell|jaquard|satine|elastinova|bandagengurt|diabetikermaterial|multiform"]],
+					[
+						"stock_item",
+						"1",
+						[
+							"Artikelnummer",
+							"164P12/K|66P10/O-1|66P22/O-1|66P25/O-1|66P22/U-1|66P25/U-1|66P10/U-1|61P10|U43P8/50|43P5/30|43P5/20|43P5/50R|43P5/50B|43P5/50S|95P17/15|95P17/20|95P17/6|95P17/8|95P17/10|95P17/12|60T70/30R|60T70/30B|2T25S/H|53T9/45H|52T4/22H|119P21|119P13/6|119P12/50|161P86/40|161P86/80|161P03/60|161P02/60|161P01/60|161P49/24|161P50/80|161P73/40|161P76/150|161P76/40|161P72/80|161P48/24|161P65/3|161P64/3|161P72/40|161P65/2|161P41/40|161P42/80|161P41/80|161P42/40|161P25A/2|107P54/80|161P50/40|158P3/HR|158P3/R|158P3/F|158P2/HR|158P2/R|164P9|98P1|60A8|95P8|95P10|192P20/5S|192P20/5M|192P20/5L|192P20/5XL|192P20/10S|192P20/10M|192P20/10L|192P20/10XL|111P76/3|111P76/4|111P74/3|111P79/3|111P79/4|111P53/2|111P53/5|111P74/4|111P72/5|111P72/4|111P72/3|111P73/5|111P73/4|111P73/3|111P73/2|112P81/2|112P80/5"
+						]
+					]
 				],
 				"rewrite": [
 					{
@@ -2000,9 +2085,20 @@
 				"add": {
 					"trading_good": "1",
 					"special_attention": "0",
-					"has_expiry_date": "1"
+					"has_expiry_date": "1",
+					"stock_item": "0"
 				},
-				"conditional_or": [["trading_good", "0", ["Art.-Bez. 1 NEU", "COTTON SHORT STRETCH|LOMBAMUM|binden|spray|biplast|pelotte|kulanz|pauschale|wechselpolster|flexi-pads|ersatz|verl(?:ä|Ä)ngerungs|haftpad"]]],
+				"conditional_or": [
+					["trading_good", "0", ["Art.-Bez. 1 NEU", "COTTON SHORT STRETCH|LOMBAMUM|binden|spray|biplast|pelotte|kulanz|pauschale|wechselpolster|flexi-pads|ersatz|verl(?:ä|Ä)ngerungs|haftpad"]],
+					[
+						"stock_item",
+						"1",
+						[
+							"Artikel-Nummer",
+							"23510120100199|23510120300199|23510120200199|23510220000199|20023E21503022|20023H21303022|20023H21403022|20023H21503022|20023H21603022|20023E21103022|20023E21203022|20023E21303022|20023E21403022|20023E21503022|20023E21603022"
+						]
+					]
+				],
 				"rewrite": [
 					{
 						"article_no": ["Artikel-Nummer"],
@@ -2032,9 +2128,9 @@
 			},
 			"modify": {
 				"add": {
-					"trading_good": "0"
+					"trading_good": "0",
+					"stock_item": "0"
 				},
-				"conditional_and": [["trading_good", "1", ["article_name", "WS-Bandage|Wirbels(?:ä|Ä)ulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]]],
 				"rewrite": [
 					{
 						"article_no": ["Bestellnr"],
@@ -2042,6 +2138,10 @@
 						"article_unit": ["Verpackung1"],
 						"article_ean": [""]
 					}
+				],
+				"conditional_and": [
+					["trading_good", "1", ["article_name", "WS-Bandage|Wirbels(?:ä|Ä)ulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]],
+					["stock_item", "1", ["Bestellnr", "81339/5|81339/6|61335/5|61335/6|61339/5|61339/6|61339/4|81339/4|61335/4|61339/3|81339/3|61335/3|61339/1|61339/2|81339/1|81339/2|61335/1|61335/2"]]
 				]
 			}
 		}
@@ -2097,11 +2197,20 @@
 				"add": {
 					"trading_good": "0",
 					"has_expiry_date": "0",
-					"special_attention": "0"
+					"special_attention": "0",
+					"stock_item": "0"
 				},
 				"conditional_or": [
 					["trading_good", "1", ["Beschreibung", "^bob|^daho|liner|philadelphia"]],
-					["special_attention", "1", ["Beschreibung", "thermoflex"]]
+					["special_attention", "1", ["Beschreibung", "thermoflex"]],
+					[
+						"stock_item",
+						"1",
+						[
+							"Artikel-Nr",
+							"41150100000064|41150100200084|MG201|42110600100013|45330200200340|45330200200290|45330200200260|45330200100400|45330200100260|42080200208100|42080200108100|42080200408100|42080200608100|42080200108130|46910100108130|423608000000(?:20|25|30|35|40)|423615000000(?:20|25|30|35)|423613000890(?:20|30|35|40)|423625002000(?:20|25|30|35|40)|423625001000(?:20|25|30|35|40)|423602000890(?:20|25|30|35|40|45|50)|423601000890(?:20|25|30|35|40)|423603000890(?:20|25|30|35|40)|423617000000(?:20|25|30|35)|423625004000(?:20|25|30|35|40)|423625003000(?:20|25|30|35|40)|29000021(?:20|25|30|35|40|45|50)|42362200(?:1|2|3)00000|41520100(?:3|4|5)00002|42112500500050|4211210000001(?:2|5)|42112500750050|42112500100040|42112500250050|42112501000000|42112501250100|42060100000046|42050200100150"
+						]
+					]
 				],
 				"rewrite": [
 					{
@@ -2168,7 +2277,8 @@
 			},
 			"modify": {
 				"add": {
-					"trading_good": "0"
+					"trading_good": "0",
+					"stock_item": "0"
 				},
 				"rewrite": [
 					{
@@ -2178,7 +2288,10 @@
 						"article_ean": ["EAN"]
 					}
 				],
-				"conditional_and": [["trading_good", "1", ["article_name", "Arthrodesenkissen"]]]
+				"conditional_and": [
+					["trading_good", "1", ["article_name", "Arthrodesenkissen"]],
+					["stock_item", "1", ["article_name", "Arthrodesenkissen"]]
+				]
 			}
 		}
 	},
