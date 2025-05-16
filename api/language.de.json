@@ -868,6 +868,8 @@
 			"pricelist_export_hint": "Dies wird nur für kleine Artikellisten empfohlen, die nicht auf einen Import zurückgehen. Der Filter funktioniert nur für exportierte Listen. Vernünftige Preislisten und anständig formulierte Filter werden bevorzugt.",
 			"pricelist_filter": "Preislisten Importfilter",
 			"pricelist_filter_json_error": "Es gibt ein Problem mit deinem Preislisten-Importfilter. Bitte stelle ein valides JSON-Format sicher.",
+			"pricelist_match": "Vergleiche mit EVA-Export um die EVA-Nummer gemäß Filter zu übernehmen",
+			"pricelist_match_hint": "Das funktioniert natürlich nur zuverlässig bei einem aufgeräumten Artikelstamm im ERP-System",
 			"pricelist_update": "Preisliste importieren",
 			"pricelist_update_error": ", aber die Preisliste konnte nicht importiert werden. Bitte gleiche den Filter mit der Datei ab.",
 			"pricelist_validity": "Letzter Preislistenimport am",

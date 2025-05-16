@@ -1473,12 +1473,23 @@ class CONSUMABLES extends API {
 	 * 
 	 * chunkifies requests to avoid overflow
 	 */
-	private function update_pricelist($file, $filter, $vendorID){
+	private function update_pricelist($files, $filter, $vendorID){
 		$filter = json_decode($filter, true);
-		$filter['filesetting']['source'] = $file;
+		$filter['filesetting']['source'] = $files['pricelist'];
 		$filter['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
 		if (!isset($filter['filesetting']['headerrowindex'])) $filter['filesetting']['headerrowindex'] = CONFIG['csv']['headerrowindex'];
 		if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
+
+		// update csv-filter filter_by_comparison_file if set
+		if (isset($files['match']) && $files['match']){
+			if (isset($filter['filter'])){
+				foreach($filter['filter'] as &$rule) {
+					if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF"))
+						$rule['filesetting']['source'] = $files['match'];
+				}
+			}
+		}
+
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
@@ -1511,7 +1522,7 @@ class CONSUMABLES extends API {
 				]
 			]);
 			foreach($remained as $row) {
-				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated']];
+				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated'], 'erp_id' => $row['erp_id']];
 			}
 
 			// update remainders
@@ -1527,7 +1538,7 @@ class CONSUMABLES extends API {
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 'NULL',
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 'NULL',
 					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : 'NULL',
-					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['stock_item']) : 'NULL',
+					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['stock_item']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				]) . '; ');
 			}
@@ -1760,7 +1771,13 @@ class CONSUMABLES extends API {
 				// update pricelist
 				$pricelistImportError = '';
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name']) {
-					$vendor['pricelist']['validity'] = $this->update_pricelist($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name'][0], $vendor['pricelist']['filter'], $vendor['id']);
+					$files = [
+						'pricelist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name'][0],
+					];
+					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name']){
+						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name'][0];
+					}
+					$vendor['pricelist']['validity'] = $this->update_pricelist($files, $vendor['pricelist']['filter'], $vendor['id']);
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
 				}
 
@@ -2194,6 +2211,13 @@ class CONSUMABLES extends API {
 									'name' => $this->_lang->GET('consumables.vendor.pricelist_update'),
 									'accept' => '.csv'
 								]
+							], [
+								'type' => 'file',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.vendor.pricelist_match'),
+									'accept' => '.csv'
+								],
+								'hint' => $this->_lang->GET('consumables.vendor.pricelist_match_hint'),
 							]]]
 						);
 
