@@ -361,9 +361,9 @@ class SHARED {
 							$display = $row['name'];
 							if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 							$vendorselection[$display] = ['value' => $row['id']];
+							if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$display]['selected'] = true;
 						}
 						ksort($vendorselection);
-
 						$slides[] = [
 							[
 								'type' => 'scanner',
@@ -408,6 +408,7 @@ class SHARED {
 							if ($row['hidden']) continue;
 							$datalist[] = $row['name'];
 							$vendorselection[$row['name']] = ['value' => $row['id']];
+							if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$row['name']]['selected'] = true;
 						}
 						ksort($vendorselection);
 		
