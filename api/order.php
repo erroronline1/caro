@@ -470,7 +470,8 @@ class ORDER extends API {
 						'samplecheck' => [],
 						'specialattention' => $product ? array_search($product['id'], $special_attention) !== false : null,
 						'collapsed' => !$permission['orderprocessing'],
-						'addproduct' => null
+						'addproduct' => null,
+						'editproduct' => null,
 					];
 
 					// add identified group user
@@ -568,8 +569,9 @@ class ORDER extends API {
 					}
 
 					// request adding unknown product
-					if (PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !$product){
-						$data['addproduct'] = true;
+					if (PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')){
+						if (!$product) $data['addproduct'] = true;
+						else $data['editproduct'] = $product ? $product['id'] : null;
 					}
 
 					array_push($result['data']['order'], array_filter($data, fn($property)=> $property || $property === 0));

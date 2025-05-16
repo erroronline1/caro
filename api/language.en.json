@@ -786,7 +786,7 @@
 		"product": {
 			"availability": "Product availablility",
 			"available": "active and available",
-			"add_new": "Add new product",
+			"add_new": "Add new article",
 			"article_alias": "Article alias",
 			"article_ean": "EAN",
 			"article_info": "Information",
@@ -806,6 +806,7 @@
 			"documents_update": "Add documents",
 			"documents_update_hint": "Once documents are added, the product can not be deleted, just deactivated.",
 			"edit_hidden_set": "Deactivated on :date by :name",
+			"edit_product": "Edit article",
 			"erp_id": "ERP-ID",
 			"error_product_not_found": "Product :name could not be found in database, please try something else.",
 			"expiry_date": "Has an expiry date",

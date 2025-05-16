@@ -1372,6 +1372,17 @@ export const _client = {
 						},
 					});
 				}
+				// append options to add product to database
+				if (element.editproduct) {
+					order.push({
+						type: "button",
+						attributes: {
+							value: api._lang.GET("consumables.product.edit_product"),
+							type: "button",
+							onclick: "api.purchase('get', 'product', " + element.editproduct + ");",
+						},
+					});
+				}
 				content.push(order);
 			}
 			const render = new Assemble({ content: content });

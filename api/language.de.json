@@ -786,7 +786,7 @@
 		"product": {
 			"availability": "Produktverfügbarkeit",
 			"available": "verfügbar",
-			"add_new": "Neues Produkt hinzufügen",
+			"add_new": "Neuen Artikel hinzufügen",
 			"article_alias": "Artikelalias",
 			"article_ean": "EAN",
 			"article_info": "Information",
@@ -806,6 +806,7 @@
 			"documents_update": "Dokumente hinzufügen",
 			"documents_update_hint": "Wenn Dokumente hinzugefügt werden kann der Artikel nicht mehr gelöscht und nur noch deaktiviert werden.",
 			"edit_hidden_set": "Verborgen am :date von :name",
+			"edit_product": "Artikel bearbeiten",
 			"erp_id": "EVA-Nummer",
 			"error_product_not_found": ":name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
 			"expiry_date": "hat ein Verfallsdatum",
