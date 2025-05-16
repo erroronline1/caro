@@ -41,9 +41,8 @@ graph LR;
     * send report on checkbox only
 * products
     * import erp-product ids
-    * add another column
     * additional file selection on pricelist import for erp dump
-    * integrate matching into vendor import filter by name, article-no?
+    * integrate matching into vendor import filter by vendor-name, article-no?
 
 ## Content
 * [Aims](#aims)

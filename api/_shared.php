@@ -517,6 +517,7 @@ class SHARED {
 									[
 										'type' => 'textsection',
 										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
+											. ($row['erp_id'] ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
 									]
 								]
 							];
@@ -558,6 +559,7 @@ class SHARED {
 											'data-type' => 'cart'
 										],
 										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
+											. ($row['erp_id'] ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
 									]
 								]
 							];

@@ -727,6 +727,7 @@ class CONSUMABLES extends API {
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
 					'special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null,
 					'stock_item' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null,
+					'erp_id' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.erp_id')) ? : null,
 				];
 
 				// validate vendor
@@ -760,6 +761,7 @@ class CONSUMABLES extends API {
 						':has_expiry_date' => $product['has_expiry_date'],
 						':special_attention' => $product['special_attention'],
 						':stock_item' => $product['stock_item'],
+						':erp_id' => $product['erp_id'],
 					]
 				])) $this->response([
 					'response' => [
@@ -800,6 +802,7 @@ class CONSUMABLES extends API {
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
 					$product['stock_item'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null;
+					$product['erp_id'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.erp_id')) ? : null;
 				}
 
 				// handle incorporation options that have not yet been approved
@@ -902,6 +905,7 @@ class CONSUMABLES extends API {
 						':has_expiry_date' => $product['has_expiry_date'],
 						':special_attention' => $product['special_attention'],
 						':stock_item' => $product['stock_item'],
+						':erp_id' => $product['erp_id'],
 					]
 				])) $this->response([
 					'response' => [
@@ -953,6 +957,7 @@ class CONSUMABLES extends API {
 					'has_expiry_date' => '',
 					'special_attention' => '',
 					'stock_item' => '',
+					'erp_id' => '',
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -1167,6 +1172,12 @@ class CONSUMABLES extends API {
 									'value' => $product['article_ean'],
 								]
 							], [
+								'type' => 'text',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.erp_id'),
+									'value' => $product['erp_id'],
+								]
+							], [
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.article_info'),
@@ -1193,12 +1204,13 @@ class CONSUMABLES extends API {
 						$result['render']['content'][1][4]['attributes']['readonly'] = // article alias
 						$result['render']['content'][1][5]['attributes']['readonly'] = // order unit
 						$result['render']['content'][1][6]['attributes']['readonly'] = // article ean
-						$result['render']['content'][1][7]['attributes']['readonly'] = // article info
+						$result['render']['content'][1][7]['attributes']['readonly'] = // erp_id
+						$result['render']['content'][1][8]['attributes']['readonly'] = // article info
 						true; 
 					}
 					if (PERMISSION::permissionFor('productslimited')){
 						unset($result['render']['content'][1][4]['attributes']['readonly']); // article alias
-						unset($result['render']['content'][1][7]['attributes']['readonly']); // article info
+						unset($result['render']['content'][1][8]['attributes']['readonly']); // article info
 					}
 
 					// append toggles
@@ -1515,6 +1527,7 @@ class CONSUMABLES extends API {
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 'NULL',
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 'NULL',
 					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : 'NULL',
+					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['stock_item']) : 'NULL',
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				]) . '; ');
 			}
@@ -1537,6 +1550,7 @@ class CONSUMABLES extends API {
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : null,
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : null,
 					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : null,
+					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['erp_id']) : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));

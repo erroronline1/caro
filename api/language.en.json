@@ -806,6 +806,7 @@
 			"documents_update": "Add documents",
 			"documents_update_hint": "Once documents are added, the product can not be deleted, just deactivated.",
 			"edit_hidden_set": "Deactivated on :date by :name",
+			"erp_id": "ERP-ID",
 			"error_product_not_found": "Product :name could not be found in database, please try something else.",
 			"expiry_date": "Has an expiry date",
 			"filter_vendors": "Filter vendors",

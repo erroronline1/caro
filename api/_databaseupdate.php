@@ -40,7 +40,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach(['_2025_05_15'] as $update){
+		foreach(['_2025_05_16'] as $update){
 			foreach($this->{$update}() as $query){
 				echo $query . '<br />';
 				if (SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[0]) !== false)	SQLQUERY::EXECUTE($this->_pdo, $query);
@@ -105,16 +105,16 @@ class UPDATE{
 			]
 		][$this->driver];
 	}
-	private function _2025_05_15(){
+	private function _2025_05_16(){
 		return [
 			'mysql' => [
-				"ALTER TABLE caro_consumables_products ADD COLUMN IF NOT EXISTS stock_item tinyint NULL DEFAULT NULL;"
+				"ALTER TABLE caro_consumables_products ADD COLUMN IF NOT EXISTS erp_id tinytext NULL DEFAULT NULL;"
 			],
 			'sqlsrv' => [
-				"IF COL_LENGTH('caro_consumables_products', 'stock_item') IS NULL" .
+				"IF COL_LENGTH('caro_consumables_products', 'erp_id') IS NULL" .
 				" BEGIN" .
 				"    ALTER TABLE caro_consumables_products" .
-				"    ADD stock_item tinyint NULL DEFAULT NULL" .
+				"    ADD erp_id VARCHAR(255) NULL DEFAULT NULL" .
 				" END"
 			]
 		][$this->driver];
