@@ -57,7 +57,9 @@ class SHARED {
 		// return based on similarity if search is provided
 		// also converting the path
 		$matches = [];
-		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
+
+		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
+
 		foreach ($files as $file){
 			similar_text($parameter['search'], pathinfo($file)['basename'], $percent);
 			if (!$parameter['search'] || $percent >= CONFIG['likeliness']['file_search_similarity'] || fnmatch($parameter['search'], pathinfo($file)['basename'], FNM_CASEFOLD)) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
@@ -80,7 +82,7 @@ class SHARED {
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $matches = [];
 
-		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
 
 		/**
 		 * looks for names, descriptions, hints and contents similar to search string
@@ -171,7 +173,7 @@ class SHARED {
 	public function recordsearch($parameter = []){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 
-		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
 
 		$contexts = [];
 
@@ -179,7 +181,10 @@ class SHARED {
 			// limit search to similarity
 			if ($parameter['search']){
 				similar_text($parameter['search'], $row['identifier'], $percent);
-				if ($percent < CONFIG['likeliness']['records_search_similarity'] && !fnmatch($parameter['search'], $row['identifier'], FNM_CASEFOLD)) continue;
+				if ($percent < CONFIG['likeliness']['records_search_similarity'] // considering typos
+					&& !fnmatch($parameter['search'], $row['identifier'], FNM_CASEFOLD) // considering wildcards
+					&& !stristr($row['content'], $parameter['search']) // literal search e.g. for serial numbers
+				) continue;
 			}
 
 			// continue if record has been closed unless explicitly searched for
@@ -231,7 +236,7 @@ class SHARED {
 		$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 		$productsPerSlide = 0;
 
-		$parameter['search'] = isset($parameter['search']) ? urldecode($parameter['search']) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
 
 		$slides = [
 			[
@@ -239,7 +244,7 @@ class SHARED {
 					'type' => 'search',
 					'attributes' => [
 						'name' => $this->_lang->GET('risk.search'),
-						'onkeydown' => "if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}",
+						'onkeydown' => "if (event.key === 'Enter') {api.risk('get', 'search', encodeURIComponent(this.value)); return false;}",
 						'value' => $parameter['search'] ? : ''
 					]
 				]
@@ -248,7 +253,7 @@ class SHARED {
 		foreach($risk_datalist as $row){
 			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 			$row['risk'] = implode(' ', array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
-			if ($parameter['search'] && trim($parameter['search']) && 
+			if ($parameter['search'] && 
 				(
 					stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search']) ||
 					// suppress errors on long terms for fnmatch limit
@@ -298,7 +303,7 @@ class SHARED {
 				];
 			}
 		}
-		if (isset($parameter['search']) && $parameter['search'] && !isset($slides[1])) return false;
+		if ($parameter['search'] && !isset($slides[1])) return false;
 		return [array_values($slides)];
 	}
 
@@ -325,10 +330,14 @@ class SHARED {
 					$parameter['vendors'] = implode('_', array_values(array_column($vendors, 'id')));
 				}
 
+				$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
+
 				$search = [];
-				if (isset($parameter['search'])) $search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
+
+				// this is appears to be the most performant way, iterating over the whole database with fnsearch and similarity is horribly slow 2025-05-16
+				if ($parameter['search']) $search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 					'values' => [
-						':search' => trim($parameter['search'])
+						':search' => $parameter['search']
 					],
 					'replacements' => [
 						':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
@@ -370,9 +379,9 @@ class SHARED {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.search'),
-									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, '" . $usecase . "'); return false;}",
+									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), '" . $usecase . "'); return false;}",
 									'id' => 'productsearch',
-									'value' => isset($parameter['search']) ? trim($parameter['search']) : ''
+									'value' => $parameter['search'] ? : ''
 								]
 							]
 						];
@@ -423,10 +432,9 @@ class SHARED {
 								'type' => 'search',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.search'),
-										'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'order'); return false;}",
-									'onblur' => "if (this.value) {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, this.value, 'order'); return false;}",
+									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), 'order'); return false;}",
 									'id' => 'productsearch',
-									'value' => isset($parameter['search']) ? trim($parameter['search']) : ''
+									'value' => $parameter['search'] ? : ''
 								]
 							], [
 								'type' => 'button',
@@ -555,7 +563,7 @@ class SHARED {
 							];
 					}
 				}
-				if (isset($parameter['search']) && !isset($slides[$usecase === 'productselection' ? 0 : 1])) return false;
+				if ($parameter['search'] && !isset($slides[$usecase === 'productselection' ? 0 : 1])) return false;
 				break;
 			}
 		return [array_values($slides)]; // return a proper nested article
