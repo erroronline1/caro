@@ -725,6 +725,15 @@ export const _client = {
 					},
 				},
 			]);
+			if (data.export) {
+				content[content.length - 1].push({
+					type: "button",
+					attributes: {
+						value: api._lang.GET("order.export"),
+						onclick: 'api.purchase("get", "export", document.getElementById("productsearch").value || "null", "null", "' + data.state + '")',
+					},
+				});
+			}
 
 			// iterate over orders and construct Assemble syntax
 			for (const element of data.order) {

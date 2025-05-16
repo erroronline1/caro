@@ -827,6 +827,7 @@
 			"similar_count": "There are :number products with a likely similar article number by this vendor",
 			"similar_hint": "These settings will be applied to all selected similar products as well.",
 			"special_attention": "Requires a batch number",
+			"stock_item": "Stock item",
 			"tile_title": "display :product by :vendor",
 			"vendor": "or type their name",
 			"vendor_select": "Select vendor",
@@ -1143,6 +1144,8 @@
 		"disapprove_message_cancel": "No, thank you",
 		"disapprove_message_ok": "Yes, disapprove",
 		"edit_prepared_order": "Edit order",
+		"export": "Export ordered stock items",
+		"export_hint": "Open the link, save or print the export. On exporting sensitive data you are responsible for their safety.",
 		"failed_delete": "Some error occured, order could not be deleted, please try again.",
 		"failed_save": "Order could not be saved. Please try again.",
 		"incorporation": {

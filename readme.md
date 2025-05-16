@@ -39,9 +39,6 @@ graph LR;
 * audit
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
-* products
-    * local stock article flag, display within info
-    * printable list of unprocessed stock articles for purchase only
 
 ## Content
 * [Aims](#aims)
@@ -818,23 +815,24 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ### Vendor and product management
 Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor).
 
-Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
-
-Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
-
 Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default. Here certificate files can be added too. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
 > Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
 
+Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
+
 While editing products, one can edit the
 * *trading good*-setting,
 * *has expiry date*-setting,
 * *special attention*-setting (meaning being defined within languagefile),
+* *stock item*-setting
 * revoke a possible *incorporated*-state and
 * set the product *active and available* or *inactive*.
 
 On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)).
+
+Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
 ![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager.png)
 
@@ -1581,7 +1579,8 @@ while setting up a vendor an import rule must be defined like:
         "add": {
             "trading_good": "0",
             "has_expiry_date": "0",
-            "special_attention": "0"
+            "special_attention": "0",
+			"stock_item": "0"
         },
         "replace":[
             ["EAN", "\\s+", ""]
@@ -1591,7 +1590,8 @@ while setting up a vendor an import rule must be defined like:
         ],
         "conditional_or": [
             ["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
-            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]]
+            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
+			["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]],
         ],
         "rewrite": [{
             "article_no": ["Article Number"],
@@ -1643,7 +1643,8 @@ If not provided a simple import filter will be generated on export of pricelists
             "article_ean", 
             "trading_good",
             "has_expiry_date",
-            "special_attention"
+            "special_attention",
+            "stock_item"
         ]
     }
 }
@@ -2084,8 +2085,8 @@ Stakeholder identification:
 | Configurable time format output | User | 2025-04-16 | Implemented; 2025-04-17 |
 | Keyboard input jumping to select modal options | User | 2025-04-16 | Implemented; 2025-04-18 |
 | Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16 |
-| Stock article flag | Purchase | 2025-05-15 | |
-| Printable List of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | |
+| Stock article flag | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
+| Printable list of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -3788,6 +3789,22 @@ Parameters
 Sample response
 ```
 {"response": {"msg": "Information has been added set","type": "info"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
+```
+
+> GET ./api/api.php/order/export/{search}/{null}/{state}
+
+Returns a PDF-export of approved order by selected state.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | optional | true, false |
+| {null} | path parameter | optional but necessary by use of {state} |  |
+| {state} | path parameter | optional | ordered, received, delivered, archived |
+
+Sample response
+```
+{"render": [[{"type": "links", "description": "Open the link, save or print the export. On exporting sensitive data you are responsible for their safety.", "content": {"Export to print": {"href": "./api/api.php/file/stream/./fileserver/tmp/New order - Unprocessed_2025-05-15 1329.pdf"}}}]]}
 ```
 
 > DELETE ./api/api.php/order/order/{id}

@@ -827,6 +827,7 @@
 			"similar_count": "Es gibt :number Artikel mit einer ähnlichen Artikelnummer von diesem Lieferanten",
 			"similar_hint": "Diese Einstellungen werden auch auf die gewählten Produkte angewandt.",
 			"special_attention": "erfordert eine Chargennummer",
+			"stock_item": "Lagerware",
 			"tile_title": ":product von :vendor anzeigen",
 			"vendor": "oder gib den Namen ein",
 			"vendor_select": "Wähle einen Lieferanten",
@@ -1143,6 +1144,8 @@
 		"disapprove_message_cancel": "Nein danke",
 		"disapprove_message_ok": "Ja, zurückweisen",
 		"edit_prepared_order": "Bestellung bearbeiten",
+		"export": "Druckexport von Lagerware",
+		"export_hint": "Öffne den Link, speichere oder drucke den Export. Du bist für die Sicherheit exportierter Daten selbst verantwortlich.",
 		"failed_delete": "Es trat ein Fehler auf, die Bestellung konnte nicht gelöscht werden, bitte versuche es erneut.",
 		"failed_save": "Die Bestellung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"incorporation": {

@@ -336,7 +336,7 @@ export const api = {
 			if (!history) return; // history is not written yet!!!
 			if (dir === "back") this.currentStep = ++this.currentStep <= history.length ? this.currentStep : history.length;
 			else this.currentStep = --this.currentStep > 0 ? this.currentStep : 1;
-			if (request = history[history.length - this.currentStep]) {
+			if ((request = history[history.length - this.currentStep])) {
 				api[request.shift()]("get", ...request);
 			}
 			this.buttoncolor();
@@ -1510,6 +1510,20 @@ export const api = {
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
+					case "export":
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.render !== undefined) {
+								const options = {};
+								options[api._lang.GET("general.ok_button")] = false;
+								new Dialog({
+									type: "input",
+									render: data.render,
+									options: options,
+								});
+							}
 						};
 						break;
 					case "product":

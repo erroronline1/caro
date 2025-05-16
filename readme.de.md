@@ -709,23 +709,24 @@ Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werd
 ### Lieferanten- und Artikelverwaltung
 Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der [Import von Preislisten](#importierung-von-lieferantenpreislisten) nutzt den [CSV-Prozessor](#csv-prozessor).
 
-Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschützt markiert sind. Lieferanten können nicht gelöscht werden.
-
-Besondere berechtigte Nutzer (z.B. *Einkaufsassistent*) können Aliasbezeichnungen von Artikeln anpassen um den Einkauf zu entlasten und die Identifikation von Artikeln mit betriebsinternen Gepflogenheiten zu verbessern.
-
 Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus. Hier können auch Zertifikate beigefügt werden. Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
 Die Bearbeitungsansicht für Lieferanten erlaubt die Auswahl von [Textvorschlägen](#textvorschläge). Sofern diese ordnungsgemäß vorbereitet sind können vorbereitete Werte einfach in die Platzhalter eingefügt werden. 
 Kleinere Lieferantenportfolios könnten primär oder anfänglich innerhalb der Anwendung verwaltet werden. Artikellisten können zusammen mit dem Import-Filter exportiert werden. Letzterer [wird erzeugt](#standardfilter-bei-export) sofern nicht definiert.
 > Erzeugte Filter funktionieren nicht mit Herstellerpreislisten, exportierte Artikellisten funktionieren nicht mit angepassten Filterregeln!
 
+Besondere berechtigte Nutzer (z.B. *Einkaufsassistent*) können Aliasbezeichnungen von Artikeln anpassen um den Einkauf zu entlasten und die Identifikation von Artikeln mit betriebsinternen Gepflogenheiten zu verbessern.
+
 Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bearbeitet werden:
 * Handelsware,
 * Verfallsdatum,
 * besondere Beachtung (die konkrete Bedeutung wird in der Sprachdatei festgelegt, z.B. Hautkontakt),
+* Lagerware,
 * Entzug der Produkteinführung,
 * den Artikel als *verfügbar* oder *nicht verfügbar* markieren.
 
 Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [config.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
+
+Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschützt markiert sind. Lieferanten können nicht gelöscht werden.
 
 ![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20de.png)
 
@@ -1479,7 +1480,8 @@ Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden äh
         "add": {
             "trading_good": "0",
             "has_expiry_date": "0",
-            "special_attention": "0"
+            "special_attention": "0",
+			"stock_item": "0"
         },
         "replace":[
             ["EAN", "\\s+", ""]
@@ -1489,7 +1491,8 @@ Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden äh
         ],
         "conditional_or": [
             ["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
-            ["special_attention", "1", ["Artikelnummer", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]]
+            ["special_attention", "1", ["Artikelnummer", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]],
+			["stock_item", "1", ["Article Number", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die lagernd sind"]],
         ],
         "rewrite": [{
             "article_no": ["Artikelnummer"],
@@ -1541,7 +1544,8 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
             "article_ean", 
             "trading_good",
             "has_expiry_date",
-            "special_attention"
+            "special_attention",
+            "stock_item"
         ]
     }
 }

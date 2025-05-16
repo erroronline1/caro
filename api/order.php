@@ -322,7 +322,7 @@ class ORDER extends API {
 				$result = ['data' => [
 					'filter' => $this->_requestedID ? : '', // preset search term
 					'state' => $this->_subMethodState ? : 'unprocessed', // preset the appropriate language key
-					'order' => [], 'approval' => []]];
+					'order' => [], 'approval' => [], 'export' => false]];
 				// set available units
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
@@ -415,6 +415,7 @@ class ORDER extends API {
 					'ordercancel' => PERMISSION::permissionFor('ordercancel') && !in_array('group', $_SESSION['user']['permissions']),
 					'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
 				];
+				$result['data']['export'] = $permission['orderprocessing'];
 
 				// userlist to decode orderer
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -428,7 +429,7 @@ class ORDER extends API {
 					if ((!$this->_subMethodState && $row['ordered']) || ($this->_subMethodState && !$row[$this->_subMethodState])) continue;
 					
 					$decoded_order_data = json_decode($row['order_data'], true);
-					
+
 					$product = null;
 					if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'] )){
 						if (isset($allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']])){
@@ -442,7 +443,7 @@ class ORDER extends API {
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
-						'ordertext' => $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : '') ,
+						'ordertext' => ($product && $product['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') . "\n" : '') . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''),
 						'quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : null,
 						'unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : null,
 						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
@@ -633,6 +634,102 @@ class ORDER extends API {
 		]);
 	}
 	
+	/**
+	 *                       _
+	 *   ___ _ _ ___ ___ ___| |_
+	 *  | -_|_'_| . | . |  _|  _|
+	 *  |___|_,_|  _|___|_| |_|
+	 *          |_|
+	 * export a printable list from approved orders
+	 */
+	public function export(){
+		require_once('./_pdf.php');
+		// set available units
+		if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
+		else $units = $_SESSION['user']['units']; // display only orders for own units
+		// sanitize search
+		$this->_requestedID = in_array($this->_requestedID, ['null']) ? '' : trim($this->_requestedID ? : '');
+		$this->_subMethodState = $this->_subMethodState === 'unprocessed' ? null : $this->_subMethodState;
+
+		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+			'values' => [
+				':orderfilter' => $this->_requestedID ? : ''
+			],
+			'replacements' => [
+				':organizational_unit' => implode(",", $units)
+			]
+		]);
+
+		// userlist to decode orderer
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
+		// gather product information on stock item flag
+		$stock_items = [];
+		foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
+			if ($product['stock_item']) $stock_items[] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
+		}
+
+		$data = [];
+		$item = 1;
+		foreach($order as $row) {
+			// filter selected state or default to unprocessed
+			if ((!$this->_subMethodState && $row['ordered']) || ($this->_subMethodState && !$row[$this->_subMethodState])) continue;
+			
+			$decoded_order_data = json_decode($row['order_data'], true);
+
+			if (isset($decoded_order_data['vendor_label']) && isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['productname_label'])
+				&& !in_array($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $stock_items)
+			){
+				continue;
+			}
+
+			$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
+			if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
+			else $orderer = $this->_lang->GET('message.deleted_user');
+
+			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
+				':quantity'=> UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : '',
+				':unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : '',
+				':number' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '',
+				':name' => UTILITY::propertySet($decoded_order_data, 'productname_label') ? : '',
+				':vendor' => UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : '',
+				':aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? : '',
+				]
+			) . ("\n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''))
+			. "\n" . ($this->_lang->GET('order.orderer') . ': ' . $orderer);
+		}
+		if (!$data) $this->response([], 404);
+
+		//set up summary
+		$title = $this->_lang->GET('menu.purchase.order') . ' - ' . $this->_lang->GET('consumables.product.stock_item') . ' - ' . $this->_lang->GET('order.order.' . ($this->_subMethodState ? : 'unprocessed'));
+		$summary = [
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $title . '_' . $this->_date['current']->format('Y-m-d H:i')),
+			'identifier' => null,
+			'content' => $data,
+			'files' => [],
+			'images' => [],
+			'title' => $title,
+			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true)
+		];
+		$downloadfiles = [];
+		$PDF = new PDF(CONFIG['pdf']['record']);
+		$downloadfiles[$this->_lang->GET('order.export')] = [
+			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+		];
+
+		$body = [];
+		array_push($body, 
+			[[
+				'type' => 'links',
+				'description' =>  $this->_lang->GET('order.export_hint'),
+				'content' => $downloadfiles
+			]]
+		);
+		$this->response([
+			'render' => $body,
+		]);
+	}
+
 	/**
 	 *             _
 	 *   ___ ___ _| |___ ___
