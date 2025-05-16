@@ -11,7 +11,8 @@
             "./assets/success8.jpg",
             "./assets/success9.jpg",
             "./assets/success10.jpg",
-            "./assets/success11.jpg"
+            "./assets/success11.jpg",
+            "./assets/success12.jpg"
         ],
 		"error": [
             "./assets/error1.jpg",
@@ -23,7 +24,9 @@
             "./assets/error7.jpg"
         ],
 		"deleted": [
-            "./assets/deleted1.jpg"
+            "./assets/deleted1.jpg",
+            "./assets/deleted2.jpg",
+            "./assets/deleted3.jpg"
         ],
 		"info": [
             "./assets/info1.jpg",
