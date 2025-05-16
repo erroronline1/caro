@@ -1575,7 +1575,7 @@ class CONSUMABLES extends API {
 					die();
 				}
 			}
-			return $date;
+			return [$date, $pricelist->_log];
 		}
 		return '';
 	}
@@ -1770,6 +1770,7 @@ class CONSUMABLES extends API {
 				}
 				// update pricelist
 				$pricelistImportError = '';
+				$pricelistImportResult = [];
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name']) {
 					$files = [
 						'pricelist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name'][0],
@@ -1777,7 +1778,8 @@ class CONSUMABLES extends API {
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name']){
 						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name'][0];
 					}
-					$vendor['pricelist']['validity'] = $this->update_pricelist($files, $vendor['pricelist']['filter'], $vendor['id']);
+					$pricelistImportResult = $this->update_pricelist($files, $vendor['pricelist']['filter'], $vendor['id']);
+					$vendor['pricelist']['validity'] = $pricelistImportResult[0];
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
 				}
 
@@ -1869,7 +1871,7 @@ class CONSUMABLES extends API {
 				]) !== false) $this->response([
 					'response' => [
 						'id' => $vendor['id'],
-						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . $pricelistImportError,
+						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . $pricelistImportError . (isset($pricelistImportResult[1]) ? " \n \n" . implode(" \n", $pricelistImportResult[1]) : ''),
 						'type' => 'info'
 					]]);
 				else $this->response([
