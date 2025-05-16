@@ -40,7 +40,8 @@ class CONSUMABLES extends API {
 			"add": {
 				"trading_good": "0",
 				"has_expiry_date": "0",
-				"special_attention": "0"
+				"special_attention": "0",
+				"stock_item": "0"
 			},
 			"replace":[
 				["EAN", "\\s+", ""]
@@ -50,7 +51,8 @@ class CONSUMABLES extends API {
 			],
 			"conditional_or": [
 				["has_expiry_date", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]],
-				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT"]]
+				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT"]],
+				["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]],
 			],
 			"rewrite": [{
 				"article_no": ["Article Number"],
@@ -108,7 +110,7 @@ class CONSUMABLES extends API {
 			]]);
 
 		// create csv
-		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention'];
+		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item'];
 		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'pricelist.csv';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
@@ -724,6 +726,7 @@ class CONSUMABLES extends API {
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
 					'special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null,
+					'stock_item' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null,
 				];
 
 				// validate vendor
@@ -756,6 +759,7 @@ class CONSUMABLES extends API {
 						':trading_good' => $product['trading_good'],
 						':has_expiry_date' => $product['has_expiry_date'],
 						':special_attention' => $product['special_attention'],
+						':stock_item' => $product['stock_item'],
 					]
 				])) $this->response([
 					'response' => [
@@ -795,6 +799,7 @@ class CONSUMABLES extends API {
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null;
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
+					$product['stock_item'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null;
 				}
 
 				// handle incorporation options that have not yet been approved
@@ -849,12 +854,12 @@ class CONSUMABLES extends API {
 					]);
 				}
 
-				// update trading good, expiry date or special attention on similar products
+				// update trading good, expiry date, special attention or stock item on similar products
 				$_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate');
 				if (PERMISSION::permissionFor('products') && $_batchupdate){
 					$batchids = explode(',', $_batchupdate);
 
-					foreach(['trading_good', 'has_expiry_date', 'special_attention'] as $field){ // apply setting to selected similar products
+					foreach(['trading_good', 'has_expiry_date', 'special_attention', 'stock_item'] as $field){ // apply setting to selected similar products
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 							'values' => [
 								':value' => $product[$field],
@@ -896,6 +901,7 @@ class CONSUMABLES extends API {
 						':incorporated' => $product['incorporated'] ? : null,
 						':has_expiry_date' => $product['has_expiry_date'],
 						':special_attention' => $product['special_attention'],
+						':stock_item' => $product['stock_item'],
 					]
 				])) $this->response([
 					'response' => [
@@ -946,6 +952,7 @@ class CONSUMABLES extends API {
 					'incorporated' => '',
 					'has_expiry_date' => '',
 					'special_attention' => '',
+					'stock_item' => '',
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -984,11 +991,13 @@ class CONSUMABLES extends API {
 					$this->_lang->GET('consumables.product.article_trading_good') => ($product['trading_good']) ? ['checked' => true] : [],
 					$this->_lang->GET('consumables.product.expiry_date') => $product['has_expiry_date'] ? ['checked' => true] : [],
 					$this->_lang->GET('consumables.product.special_attention') => $product['special_attention'] ? ['checked' => true] : [],
+					$this->_lang->GET('consumables.product.stock_item') => $product['stock_item'] ? ['checked' => true] : [],
 				];
 				if ($similarproducts) {
 					$regulatoryoptions[$this->_lang->GET('consumables.product.article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 					$regulatoryoptions[$this->_lang->GET('consumables.product.expiry_date')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 					$regulatoryoptions[$this->_lang->GET('consumables.product.special_attention')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
+					$regulatoryoptions[$this->_lang->GET('consumables.product.stock_item')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 				}
 
 				// prepare existing vendor lists
@@ -1505,6 +1514,7 @@ class CONSUMABLES extends API {
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 'NULL',
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 'NULL',
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 'NULL',
+					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : 'NULL',
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				]) . '; ');
 			}
@@ -1526,6 +1536,7 @@ class CONSUMABLES extends API {
 					':incorporated' => null,
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : null,
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : null,
+					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));

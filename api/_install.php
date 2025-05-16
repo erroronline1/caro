@@ -118,6 +118,7 @@ define('DEFAULTSQL', [
 				"	`has_expiry_date` tinyint NULL DEFAULT NULL," .
 				"	`special_attention` tinyint NULL DEFAULT NULL," .
 				"	`last_order` datetime NULL DEFAULT NULL," .
+				"	`stock_item` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -405,7 +406,8 @@ define('DEFAULTSQL', [
 				"	incorporated varchar(MAX) NULL DEFAULT NULL," .
 				"	has_expiry_date tinyint NULL DEFAULT NULL," .
 				"	special_attention tinyint NULL DEFAULT NULL," .
-				"	last_order smalldatetime NULL DEFAULT NULL" .
+				"	last_order smalldatetime NULL DEFAULT NULL," .
+				"	stock_item tinyint NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .

@@ -85,7 +85,8 @@ in the output files if it is not possible to edit the following filter according
 		"add": {
 			"trading_good": "",
 			"has_expiry_date": "",
-			"special_attention": ""
+			"special_attention": "",
+			"stock_item": ""
 		},
 		"remove": [
 			"REFERENZ",
