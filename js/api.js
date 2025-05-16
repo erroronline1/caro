@@ -655,8 +655,8 @@ export const api = {
 											break;
 										}
 										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 64rem)") {
-												stylesheet[i].media.mediaText = "only screen and (min-width: 0)";
+											if (stylesheet[i].conditionText === "only screen and (max-width: 64rem)") {
+												stylesheet[i].media.mediaText = "only screen and (max-width: 1rem)";
 											}
 										}
 									}

@@ -1145,7 +1145,7 @@ html[data-useragent*="safari"] body {
 
 button {
 	margin: 1em 0;
-	padding: 1em;
+	padding: .75em;
 	width: 100%;
 	display: block;
 	border: none;
@@ -1154,7 +1154,7 @@ button {
 	transition: ease 0.15s;
 	color: var(--article);
 	font-weight: bold;
-	font-size: 1.15em;
+	font-size: 1em;
 	overflow-wrap: break-word;
 
 	&.floatright {
@@ -1193,10 +1193,10 @@ input[type="range"],
 	text-align: center;
 }
 
-/* desktop */
-@media only screen and (min-width: 64rem) {
+/* tablets */
+@media only screen and (max-width: 64rem) {
 	button {
-		font-size: 90%;
+		font-size: 110%;
 	}
 }
 
@@ -1205,6 +1205,7 @@ input[type="range"],
 	within modal and menu
 	*/
 	font-size: 1.15em;
+	padding: 1em;
 	width: 100%;
 	border: none;
 	background: transparent;
