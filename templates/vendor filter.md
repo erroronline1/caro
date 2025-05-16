@@ -80,8 +80,10 @@ in the output files if it is not possible to edit the following filter according
 				"article_no": ["BESTELL_NUMMER"],
 				"article_name": ["BEZEICHNUNG", " ", "Zusatzinformation", " ", "MODELL_NAME", " ", "GROESSEN_NAME", " ", "FARBEN_NAME"],
 				"article_unit": ["BESTELL_EINHEIT"],
-				"article_ean": ["EAN"]}
-			],
+				"article_ean": ["EAN"],
+				"erp_id": ["REFERENZ"]
+			}
+		],
 		"add": {
 			"trading_good": "",
 			"has_expiry_date": "",
