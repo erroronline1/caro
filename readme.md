@@ -39,6 +39,11 @@ graph LR;
 * audit
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
+* products
+    * import erp-product ids
+    * add another column
+    * additional file selection on pricelist import for erp dump
+    * integrate matching into vendor import filter by name, article-no?
 
 ## Content
 * [Aims](#aims)
@@ -2087,6 +2092,7 @@ Stakeholder identification:
 | Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16 |
 | Stock article flag | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
 | Printable list of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
+| Import ERP article ids | Purchase | 2025-05-16 | |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -2100,7 +2106,7 @@ Stakeholder identification:
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; stock article flag, printable list of unprocessed stock articles |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; stock article flag, printable list of unprocessed stock articles<br />&bull; import erp article ids |
 
 [Content](#content)
 
