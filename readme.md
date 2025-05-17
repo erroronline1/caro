@@ -1462,7 +1462,6 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 * Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
-* Images are always exported as PNG which may be occasionally bigger in size than JPG but lossless. A behavioural change can be done within the image()-method of the Assemble-class.
 
 ### Safaris special needs
 as opposed to proper browsers. At least on macOS.

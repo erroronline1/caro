@@ -1366,7 +1366,6 @@ Das Leben, das medizinische Feld und regulatorische Anforderungen sind komplizie
 * Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden.
 * Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
-* Bilder werden immer als PNG exportiert, wodurch sie gelegentlich größer als JPG sind, dabei aber verlustfrei. Eine Anpassung im Quelltext kann in der image()-Methode der Assemble-Klasse erfolgen.
 
 ### Safaris besondere Bedürfnisse
 im Gegensatz zu richtigen Browsern, zumindest auf macOS.

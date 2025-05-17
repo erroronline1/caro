@@ -741,6 +741,7 @@ export class Dialog {
 	/**
 	 * preview for supported file types
 	 * currently stl, qrcode, barcode, image (png, jpg, jpeg, gif)
+	 * create canvases for preview and download link if applicable
 	 */
 	preview() {
 		if (this.render.type === "stl") {
@@ -777,6 +778,7 @@ export class Dialog {
 			result.push(canvas);
 			this.previewElements.canvas = canvas;
 			a.href = "javascript:void(0)";
+			// invisible pseudo anchor for downloading rendered canvas content from libraries to file
 			a.onclick = () => {
 				canvas.toBlob(
 					function (blob) {
@@ -794,12 +796,14 @@ export class Dialog {
 		}
 		if (this.render.type === "image") {
 			const filetype = this.render.content.split(".");
-			if (["png", "jpg", "jpeg", "gif"].includes(filetype[filetype.length - 1].toLowerCase()) || this.render.content.startsWith("data:image")) {
+			if (["png", "jpg", "jpeg", "gif"].includes(filetype[filetype.length - 1].toLowerCase()) ||
+				this.render.content.startsWith("data:image")) {
 				result.push(canvas);
 				this.previewElements.canvas = canvas;
 			} else {
-				// not supported
+				// not supported; currently no need for fallback as preview is prepared by backend with filtered file types as well
 			}
+			// direct download, lossless and original format
 			a.href = this.render.content;
 		}
 		result.push(a);
