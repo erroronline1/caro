@@ -28,13 +28,14 @@ class CONSUMABLES extends API {
 	private $_usecase = '';
 	private $filtersample = <<<'END'
 	{
-		"filesettings": {
-			"columns": [
-				"Article Number",
-				"Article Name",
-				"EAN",
-				"Sales Unit"
-			]
+		"filesetting": {
+			"headerrowindex": 0,
+			"dialect": {
+				"separator": ";",
+				"enclosure": "\"",
+				"escape": ""
+			},
+			"columns": ["Article Number", "Article Name", "EAN", "Sales Unit"]
 		},
 		"modify": {
 			"add": {
@@ -43,24 +44,54 @@ class CONSUMABLES extends API {
 				"special_attention": "0",
 				"stock_item": "0"
 			},
-			"replace":[
-				["EAN", "\\s+", ""]
-			],
-			"conditional_and": [
-				["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
-			],
+			"replace": [["EAN", "\\s+", ""]],
+			"conditional_and": [["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]],
 			"conditional_or": [
-				["has_expiry_date", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT HAVE AN EXPIRY DATE"]],
-				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT"]],
-				["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]],
+				["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
+				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
+				["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]]
 			],
-			"rewrite": [{
-				"article_no": ["Article Number"],
-				"article_name": ["Article Name"],
-				"article_ean": ["EAN"],
-				"article_unit": ["Sales Unit"]
-			}]
-		}
+			"rewrite": [
+				{
+					"article_no": ["Article Number"],
+					"article_name": ["Article Name"],
+					"article_ean": ["EAN"],
+					"article_unit": ["Sales Unit"]
+				}
+			]
+		},
+		"filter": [
+			{
+				"apply": "filter_by_comparison_file",
+				"comment": "transfer erp_id. source will be set if match file is provided",
+				"filesetting": {
+					"source": "ERPDUMP.csv",
+					"headerrowindex": 1,
+					"columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete inactive articles and unneccessary vendors",
+						"keep": true,
+						"match": {
+							"all": {
+								"INACTIVE": "false",
+								"VENDOR": "magnificent.+?distributor"
+							}
+						}
+					}
+				],
+				"match": {
+					"all": {
+						"Article Number": "ARTICLE_NO"
+					}
+				},
+				"transfer": {
+					"erp_id": "ID"
+				}
+			}
+		]
 	}
 	END;
 

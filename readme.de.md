@@ -1462,45 +1462,70 @@ Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar 
 Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden ähnlich:
 ```js
 {
-    "filesetting": {
-        "headerrowindex": 0,
-        "dialect": {
-            "separator": ";",
-            "enclosure": "\"",
-            "escape": ""
-        },
-        "columns": [
-            "Artikelnummer",
-            "Artikelbezeichnung",
-            "EAN",
-            "Verkaufseinheit"
-        ]
-    },
-    "modify": {
-        "add": {
-            "trading_good": "0",
-            "has_expiry_date": "0",
-            "special_attention": "0",
+	"filesetting": {
+		"headerrowindex": 0,
+		"dialect": {
+			"separator": ";",
+			"enclosure": "\"",
+			"escape": ""
+		},
+		"columns": ["Artikelnummer", "Artikelbezeichnung", "EAN", "Verkaufseinheit"]
+	},
+	"modify": {
+		"add": {
+			"trading_good": "0",
+			"has_expiry_date": "0",
+			"special_attention": "0",
 			"stock_item": "0"
-        },
-        "replace":[
-            ["EAN", "\\s+", ""]
-        ],
-        "conditional_and": [
-            ["trading_good", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die als Handelsware erkannt werden sollen"]]
-        ],
-        "conditional_or": [
-            ["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
-            ["special_attention", "1", ["Artikelnummer", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]],
-			["stock_item", "1", ["Article Number", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die lagernd sind"]],
-        ],
-        "rewrite": [{
-            "article_no": ["Artikelnummer"],
-            "article_name": ["Artikelbezeichnung"],
-            "article_ean": ["EAN"],
-            "article_unit": ["Verkaufseinheit"]
-        }]
-    }
+		},
+		"replace": [["EAN", "\\s+", ""]],
+		"conditional_and": [["trading_good", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die als Handelsware erkannt werden sollen"]]],
+		"conditional_or": [
+			["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
+			["special_attention", "1", ["Artikelnummer", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]],
+			["stock_item", "1", ["Article Number", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die lagernd sind"]]
+		],
+		"rewrite": [
+			{
+				"article_no": ["Artikelnummer"],
+				"article_name": ["Artikelbezeichnung"],
+				"article_ean": ["EAN"],
+				"article_unit": ["Verkaufseinheit"]
+			}
+		]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_comparison_file",
+			"comment": "Übertrage ERP-ID. Source wird von der Anwendung gesetzt, sofern eine Datei bereitgestellt wird.",
+			"filesetting": {
+				"source": "ERPDUMP.csv",
+				"headerrowindex": 1,
+				"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+			},
+			"filter": [
+				{
+					"apply": "filter_by_expression",
+					"comment": "lösche inaktive Produkte und ungenutzte Lieferanten",
+					"keep": true,
+					"match": {
+						"all": {
+							"STATUS": "false",
+							"LIEFERANTENNAME": "toller.+?lieferant"
+						}
+					}
+				}
+			],
+			"match": {
+				"all": {
+					"Artikelnummer": "BESTELL_NUMMER"
+				}
+			},
+			"transfer": {
+				"erp_id": "REFERENZ"
+			}
+		}
+	]
 }
 ```
 *headerrowindex* und *dialect* werden mit dem Standardwert der config.ini ergänzt, falls sie nicht Teil des Filters sind.
@@ -1597,15 +1622,15 @@ Beschreibung der Optionen:
 
 		"apply": "filter_by_comparison_file",
 		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen, nicht gesetzt oder null um nur Werte von Treffern zu übertragen
 		"compare": Behalte oder lösche z.B. bestimmte Werte gemäß Vergleichsdatei, basierend auf dem selben Identifikator
 			"filesetting": die gleiche Struktur wie allgmein. Wenn source = "SELF" wird die Ursprungsdatei verarbeitet
 			"filter": die gleiche Struktur wie allgemein
 			"modify": die gleiche Struktur wie allgemein
 			"match":
-				"all": Object mit ein oder mehreren "ORIGININDEX": "COMPAREFILEINDEX" - Paaren, alle Vergleiche müssen zutreffen
-				"any": Object mit ein oder mehreren "ORIGININDEX": "COMPAREFILEINDEX" - Paaren, mindestens ein Vergleich muss zutreffen
-		"transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der Vergleichsdatei hinzu
+				"all": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, alle Vergleiche müssen zutreffen
+				"any": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, mindestens ein Vergleich muss zutreffen
+		"transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der passenden (all) oder ersten gefundenen (any) Zeile der Vergleichsdatei hinzu
 
 		"apply": "filter_by_monthinterval",
 		"comment": Beschreibung, wird angezeigt

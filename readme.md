@@ -39,10 +39,6 @@ graph LR;
 * audit
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
-* products
-    * import erp-product ids
-    * additional file selection on pricelist import for erp dump
-    * integrate matching into vendor import filter by vendor-name, article-no?
 
 ## Content
 * [Aims](#aims)
@@ -1565,45 +1561,70 @@ Vendor pricelists must have an easy structure to be importable. It may need addi
 while setting up a vendor an import rule must be defined like:
 ```js
 {
-    "filesetting": {
-        "headerrowindex": 0,
-        "dialect": {
-            "separator": ";",
-            "enclosure": "\"",
-            "escape": ""
-        },
-        "columns": [
-            "Article Number",
-            "Article Name",
-            "EAN",
-            "Sales Unit"
-        ]
-    },
-    "modify": {
-        "add": {
-            "trading_good": "0",
-            "has_expiry_date": "0",
-            "special_attention": "0",
+	"filesetting": {
+		"headerrowindex": 0,
+		"dialect": {
+			"separator": ";",
+			"enclosure": "\"",
+			"escape": ""
+		},
+		"columns": ["Article Number", "Article Name", "EAN", "Sales Unit"]
+	},
+	"modify": {
+		"add": {
+			"trading_good": "0",
+			"has_expiry_date": "0",
+			"special_attention": "0",
 			"stock_item": "0"
-        },
-        "replace":[
-            ["EAN", "\\s+", ""]
-        ],
-        "conditional_and": [
-            ["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]
-        ],
-        "conditional_or": [
-            ["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
-            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
-			["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]],
-        ],
-        "rewrite": [{
-            "article_no": ["Article Number"],
-            "article_name": ["Article Name"],
-            "article_ean": ["EAN"],
-            "article_unit": ["Sales Unit"]
-        }]
-    }
+		},
+		"replace": [["EAN", "\\s+", ""]],
+		"conditional_and": [["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]],
+		"conditional_or": [
+			["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
+			["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
+			["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]]
+		],
+		"rewrite": [
+			{
+				"article_no": ["Article Number"],
+				"article_name": ["Article Name"],
+				"article_ean": ["EAN"],
+				"article_unit": ["Sales Unit"]
+			}
+		]
+	},
+	"filter": [
+		{
+			"apply": "filter_by_comparison_file",
+			"comment": "transfer erp_id. source will be set if match file is provided",
+			"filesetting": {
+				"source": "ERPDUMP.csv",
+				"headerrowindex": 1,
+				"columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO"]
+			},
+			"filter": [
+				{
+					"apply": "filter_by_expression",
+					"comment": "delete inactive articles and unneccessary vendors",
+					"keep": true,
+					"match": {
+						"all": {
+							"INACTIVE": "false",
+							"VENDOR": "magnificent.+?distributor"
+						}
+					}
+				}
+			],
+			"match": {
+				"all": {
+					"Article Number": "ARTICLE_NO"
+				}
+			},
+			"transfer": {
+				"erp_id": "ID"
+			}
+		}
+	]
 }
 ```
 *headerrowindex* and *dialect* are added with a default value from config.ini if left out.
@@ -1699,16 +1720,16 @@ Description of options:
 			"amount": Integer > 0
 
 		"apply": "filter_by_comparison_file",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"compare": Keep or discard explicit excemptions as stated in excemption file, based on same identifier
-			"filesetting": Same structure as base. if source == "SELF" the origin file will be processed
-			"filter": Same structure as base
-			"modify": Same structure as base
+		"comment": description, will be displayed
+		"keep": boolean if matches are kept or omitted, not set or null to only transfer matching 
+		"compare": keep or discard explicit excemptions as stated in excemption file, based on same identifier
+			"filesetting": same structure as base. if source == "SELF" the origin file will be processed
+			"filter": same structure as base
+			"modify": same structure as base
 			"match":
-				"all": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if all match
-				"any": Dict with one or multiple "ORIGININDEX": "COMPAREFILEINDEX", kept if at least one matches
-		"transfer": Add a new column with comparison value
+				"all": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if all match
+				"any": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if at least one matches
+		"transfer": add a new column with comparison value of all kept matching rows or first match of any
 
 		"apply": "filter_by_monthinterval",
 		"comment": Description, will be displayed
@@ -2091,7 +2112,7 @@ Stakeholder identification:
 | Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16 |
 | Stock article flag | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
 | Printable list of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
-| Import ERP article ids | Purchase | 2025-05-16 | |
+| Import ERP article ids | Purchase | 2025-05-16 | Implemented; 2025-05-17|
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
