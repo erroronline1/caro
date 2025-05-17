@@ -20,6 +20,7 @@
 this module helps to assemble content according to the passed simplified object notation.
 */
 import SignaturePad from "../libraries/signature_pad.umd.js";
+import QrCreator from "../libraries/qr-creator.js";
 import Icons from "./icons.json" with {type: "json"};
 
 var ELEMENT_ID = 0,
@@ -221,9 +222,125 @@ export class Masonry {
 	}
 }
 
+class ImageHandler {
+	/**
+	 * image handling. lazyloading on entering viewport, drawing images to canvases
+	 * @requires api, QrCreator, JsBarcode
+	 * @param {{qrCodes: [], barCodes: [], images: []}}
+	 * @returns rendered content
+	 *
+	 * usable even without proper construction if methods are called directly with passed content options
+	 */
+	images = {
+		qrCodes: [], // array of objects with canvas id and content, reset on assemble init
+		barCodes: [], // array of objects with canvas id and content, reset on assemble init
+		images: [], // array of objects with canvas id and content, reset on assemble init
+	};
+
+	constructor(images = {}) {
+		this.images = images;
+	}
+	/**
+	 * event handler onscroll
+	 * iterates over the above arrays to populate the canvasses if within viewport
+	 * removes entries once being handled
+	 * neccessary e.g. on thousands of approved orders where repeatedly calling the libraries crashes the browser
+	 *
+	 * @requires Assemble populated arrays
+	 * @event QrCreator, JsBarcode and/or proprietary img2canvas
+	 */
+	lazyload() {
+		let content;
+		if (this.images.qrCodes.length) {
+			for (let i = 0; i < this.images.qrCodes.length; i++) {
+				if (!(content = this.images.qrCodes[i])) continue;
+				var rect = document.getElementById(content.id).getBoundingClientRect();
+				if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
+					this.qrcode(content);
+					delete this.images.qrCodes[i]; // prevent repeatedly rendering
+				}
+			}
+			this.images.qrCodes = this.images.qrCodes.filter((v) => v);
+		}
+		if (this.images.barCodes.length) {
+			for (let i = 0; i < this.images.barCodes.length; i++) {
+				if (!(content = this.images.barCodes[i])) continue;
+				var rect = document.getElementById(content.id).getBoundingClientRect();
+				if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
+					this.barcode(content);
+					delete this.images.barCodes[i]; // prevent repeatedly rendering
+				}
+			}
+			this.images.barCodes = this.images.barCodes.filter((v) => v);
+		}
+		if (this.images.images.length) {
+			for (let i = 0; i < this.images.images.length; i++) {
+				if (!(content = this.images.images[i])) continue;
+				var rect = document.getElementById(content.id).getBoundingClientRect();
+				if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
+					this.image(content);
+					delete this.images.images[i]; // prevent repeatedly rendering
+				}
+			}
+			this.images.images = this.images.images.filter((v) => v);
+		}
+	}
+	qrcode(content) {
+		// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
+		QrCreator.render(
+			{
+				text: content.content,
+				size: 1024,
+				ecLevel: api._settings.config.limits && api._settings.config.limits.qr_errorlevel ? api._settings.config.limits.qr_errorlevel : "M",
+				background: null,
+				fill: "#000000",
+				radius: 0,
+			},
+			document.getElementById(content.id)
+		);
+	}
+	barcode(content) {
+		try {
+			JsBarcode("#" + content.id, content.content.value, {
+				format: content.content.format || "CODE128",
+				background: "transparent",
+				displayValue: content.content.displayValue != undefined ? content.content.displayValue : true,
+			});
+		} catch (e) {
+			new Toast(api._lang.GET("jsbarcode.error"), "error");
+		}
+	}
+	image(content) {
+		let imgcanvas = document.getElementById(content.id),
+			img = new Image();
+		img.src = content.content;
+		img.addEventListener("load", function (e) {
+			let x = imgcanvas.width,
+				y = imgcanvas.height,
+				w = this.width,
+				h = this.height,
+				xoffset = 0,
+				yoffset = 0;
+			if (imgcanvas.width > w || imgcanvas.height > h) {
+				// aka square by default if dimensions have not been passed
+				if (w >= h) {
+					y = (imgcanvas.height * h) / w;
+					yoffset = (x - y) / 2;
+				} else {
+					x = (imgcanvas.width * w) / h;
+					xoffset = (y - x) / 2;
+				}
+			}
+			imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
+		});
+		img.dispatchEvent(new Event("load"));
+		// DO NOT URL.revokeObjectURL(img.src);
+	}
+}
+
 export class Dialog {
 	/**
-	 * @requires api, Html5QrcodeScanner, StVviewer, Assemble
+	 * @requires api, Html5QrcodeScanner, StlViewer, Assemble
 	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}} options
 	 * @returns promise, prepared answer on resolve according to type
 	 * @example ```js
@@ -769,7 +886,6 @@ export class Assemble {
 		this.imageUrl = [];
 		this.names = setup.names || {};
 		this.composer = setup.composer;
-		_client.application.lazyload.qrCodes = _client.application.lazyload.barCodes = _client.application.lazyload.images = [];
 	}
 
 	/**
@@ -849,14 +965,25 @@ export class Assemble {
 			this.initialize_SignaturePad();
 		}
 
-		if (this.imageQrCode.length) _client.application.lazyload.qrCodes = this.imageQrCode;
-		if (this.imageBarCode.length) _client.application.lazyload.barCodes = this.imageBarCode;
-		if (this.imageUrl.length) _client.application.lazyload.images = this.imageUrl;
+		const lazyload = new ImageHandler({
+			qrCodes: this.imageQrCode,
+			barCodes: this.imageBarCode,
+			images: this.imageUrl,
+		});
+
 		if (this.imageQrCode.length || this.imageBarCode.length || this.imageUrl.length) {
-			_client.application.lazyload.load();
-			eventListenerTarget.addEventListener("scroll", _client.application.lazyload.load, false);
+			lazyload.lazyload();
+			eventListenerTarget.addEventListener(
+				"scroll",
+				() => {
+					lazyload.lazyload();
+				},
+				false
+			);
 		} else {
-			eventListenerTarget.removeEventListener("scroll", _client.application.lazyload.load);
+			eventListenerTarget.removeEventListener("scroll", () => {
+				lazyload.lazyload();
+			});
 		}
 		document.querySelector("main").focus();
 		if (document.querySelector("[autofocus]")) document.querySelector("[autofocus]").focus();
