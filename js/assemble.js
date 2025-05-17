@@ -21,7 +21,7 @@ this module helps to assemble content according to the passed simplified object 
 */
 import SignaturePad from "../libraries/signature_pad.umd.js";
 import QrCreator from "../libraries/qr-creator.js";
-import Icons from "./icons.json" with {type: "json"};
+import Icons from "./icons.json" with { type: "json" };
 
 var ELEMENT_ID = 0,
 	SIGNATURE_CANVAS = null,
@@ -286,6 +286,10 @@ class ImageHandler {
 		}
 	}
 	qrcode(content) {
+		const canvas = document.getElementById(content.id);
+		// adjust canvas dimensions to square
+		let min = Math.min(canvas.height, canvas.width);
+		canvas.style.maxHeight = canvas.style.maxWidth = min + "px";
 		// availableSettings = ['text', 'radius', 'ecLevel', 'fill', 'background', 'size']
 		QrCreator.render(
 			{
@@ -296,7 +300,7 @@ class ImageHandler {
 				fill: "#000000",
 				radius: 0,
 			},
-			document.getElementById(content.id)
+			canvas
 		);
 	}
 	barcode(content) {
@@ -311,27 +315,13 @@ class ImageHandler {
 		}
 	}
 	image(content) {
-		let imgcanvas = document.getElementById(content.id),
+		let canvas = document.getElementById(content.id),
 			img = new Image();
 		img.src = content.content;
 		img.addEventListener("load", function (e) {
-			let x = imgcanvas.width,
-				y = imgcanvas.height,
-				w = this.width,
-				h = this.height,
-				xoffset = 0,
-				yoffset = 0;
-			if (imgcanvas.width > w || imgcanvas.height > h) {
-				// aka square by default if dimensions have not been passed
-				if (w >= h) {
-					y = (imgcanvas.height * h) / w;
-					yoffset = (x - y) / 2;
-				} else {
-					x = (imgcanvas.width * w) / h;
-					xoffset = (y - x) / 2;
-				}
-			}
-			imgcanvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
+			canvas.width = this.width;
+			canvas.height = this.height;
+			canvas.getContext("2d").drawImage(this, 0, 0, this.width, this.height);
 		});
 		img.dispatchEvent(new Event("load"));
 		// DO NOT URL.revokeObjectURL(img.src);
@@ -360,7 +350,16 @@ export class Dialog {
 	 * 	});
 	 * ```
 	 * @example ```js
-	 * new Dialog({type:'stl', header:'display and download', render:{name: 'filename', url: 'urlToFile', transfer: undefined || true);
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'stl', name: 'filename', url: 'urlToFile', transfer: undefined || true});
+	 * ```
+	 * @example ```js
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'qrcode', name: 'filename', content: 'data'});
+	 * ```
+	 * @example ```js
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'barcode', name: 'filename', content: {content: 'data', format: 'CODE128'}});
+	 * ```
+	 * @example ```js
+	 * new Dialog({type:'preview', header:'display and download', render:{type: 'image', name: 'filename', content: 'urlToFile'});
 	 * ```
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
@@ -380,7 +379,7 @@ export class Dialog {
 		this.render = options.render || null;
 		this.options = options.options || {};
 		this.scannerElements = {};
-		this.stlviewer = {};
+		this.previewElements = {};
 		this.assemble = null;
 		this.modal = "modal";
 		this.form = null;
@@ -389,7 +388,7 @@ export class Dialog {
 		if (this.type) {
 			// define output dialog
 			if (this.type === "input") this.modal = "inputmodal";
-			if (["input2", "stl", "preview"].includes(this.type)) {
+			if (["input2", "preview"].includes(this.type)) {
 				this.modal = "inputmodal2";
 			}
 			if (this.type === "input2") this.type = "input";
@@ -484,15 +483,48 @@ export class Dialog {
 				}
 				scanner.scanner.render(scanSuccess);
 			}
-			if (this.type === "stl") {
-				this.stlviewer.viewer = new StlViewer(this.stlviewer.canvas, {
-					models: [
-						{
-							id: 0,
-							filename: "../../" + this.render.url, // relative url since StlViewer executes within own library directory
-						},
-					],
-				});
+			if (this.type === "preview") {
+				// render after canvases or divs have been appended to the dom
+				switch (this.render.type) {
+					case "stl":
+						this.previewElements.viewer = new StlViewer(this.previewElements.canvas, {
+							models: [
+								{
+									id: 0,
+									filename: "../../" + this.render.url, // relative url since StlViewer executes within own library directory
+								},
+							],
+						});
+
+						break;
+					case "qrcode":
+						if (this.previewElements.canvas) {
+							const img = new ImageHandler();
+							img.qrcode({
+								id: this.previewElements.canvas.id,
+								content: this.render.content,
+							});
+						}
+						break;
+					case "barcode":
+						if (this.previewElements.canvas) {
+							const img = new ImageHandler();
+							img.barcode({
+								id: this.previewElements.canvas.id,
+								content: this.render.content,
+							});
+						}
+						break;
+					case "image":
+						if (this.previewElements.canvas) {
+							const img = new ImageHandler();
+							img.image({
+								id: this.previewElements.canvas.id,
+								content: this.render.content,
+							});
+						}
+						break;
+				}
 			}
 			if (this.assemble) this.assemble.processAfterInsertion(dialog);
 
@@ -503,10 +535,10 @@ export class Dialog {
 			}).then((response) => {
 				let result;
 
-				if (this.stlviewer.viewer) {
+				if (this.previewElements.canvas) {
 					// release ressources
-					this.stlviewer.canvas.remove();
-					this.stlviewer = {};
+					this.previewElements.canvas.remove();
+					this.previewElements = {};
 					if (!this.render.transfer) return;
 				}
 
@@ -706,98 +738,72 @@ export class Dialog {
 		return [buttons];
 	}
 
-	stl() {
-		const div = document.createElement("div");
-		div.id = "stlviewer_canvas";
-		div.classList = "stlviewer";
-		div.title = api._lang.GET("assemble.render.aria.preview", { ":file": this.render.name || this.render.url });
-		this.stlviewer.canvas = div;
-
-		if (this.render.transfer) {
-			return [div, ...this.confirm()];
-		} else {
-			const a = document.createElement("a");
-			a.href = this.render.url;
-			a.target = "_blank";
-			a.download = this.render.name || this.render.url;
-			a.dataset.type = "download";
-			a.append(document.createTextNode(this.render.name || this.render.url));
-			return [div, a];
-		}
-	}
-
 	/**
 	 * preview for supported file types
-	 * currently svg, png, jpg, gif
+	 * currently stl, qrcode, barcode, image (png, jpg, jpeg, gif)
 	 */
 	preview() {
-		let type = this.render.url.split("."),
-			result;
-		switch (type[type.length - 1].toLowerCase()) {
-			case "svg":
-				const div = document.createElement("div");
-				div.id = "stlviewer_canvas";
-				div.classList = "stlviewer";
-				div.title = api._lang.GET("assemble.render.aria.preview", { ":file": this.render.name || this.render.url });
-				this.stlviewer.canvas = div;
+		if (this.render.type === "stl") {
+			const div = document.createElement("div");
+			div.id = "stlviewer_canvas";
+			div.classList = "preview stlviewer";
+			div.title = api._lang.GET("assemble.render.aria.preview", { ":file": this.render.name || this.render.url });
+			this.previewElements.canvas = div;
 
-				if (this.render.transfer) {
-					result = [div, ...this.confirm()];
-				} else {
-					const a = document.createElement("a");
-					a.href = this.render.url;
-					a.target = "_blank";
-					a.download = this.render.name || this.render.url;
-					a.dataset.type = "download";
-					a.append(document.createTextNode(this.render.name || this.render.url));
-					result = [div, a];
-				}
-				break;
-			case "png":
-			case "jpg":
-			case "jpeg":
-			case "gif":
-				// create canvas
-				const canvas = document.createElement("canvas");
-				canvas.title = api._lang.GET("assemble.render.aria.image", { ":image": this.render.name });
-				canvas.classList = "stlviewer";
-				canvas.width = canvas.height = 1024;
-				// draw image on canvas
-				let img = new Image();
-				img.src = this.render.url;
-				img.addEventListener("load", function (e) {
-					let x = canvas.width,
-						y = canvas.height,
-						w = this.width,
-						h = this.height,
-						xoffset = 0,
-						yoffset = 0;
-					if (canvas.width > w || canvas.height > h) {
-						// aka square by default if dimensions have not been passed
-						if (w >= h) {
-							y = (canvas.height * h) / w;
-							yoffset = (x - y) / 2;
-						} else {
-							x = (canvas.width * w) / h;
-							xoffset = (y - x) / 2;
-						}
-					}
-					canvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
-				});
-				img.dispatchEvent(new Event("load"));
-
+			if (this.render.transfer) {
+				return [div, ...this.confirm()];
+			} else {
 				const a = document.createElement("a");
 				a.href = this.render.url;
 				a.target = "_blank";
 				a.download = this.render.name || this.render.url;
-				a.dataset.type = "download";
+				a.dataset.type = "downloadlink";
 				a.append(document.createTextNode(this.render.name || this.render.url));
-				result = [canvas, a];
-
-				break;
-			default:
-			// not supported
+				return [div, a];
+			}
 		}
+		let result = [];
+		const canvas = document.createElement("canvas");
+		canvas.id = getNextElementID();
+		canvas.classList.add("preview");
+		canvas.title = api._lang.GET("assemble.render.aria.image", { ":image": this.render.name });
+
+		const a = document.createElement("a");
+		a.target = "_blank";
+		a.download = this.render.name || this.render.content;
+		a.dataset.type = "downloadlink";
+		a.append(document.createTextNode(this.render.name || this.render.content));
+		if (["qrcode", "barcode"].includes(this.render.type)) {
+			result.push(canvas);
+			this.previewElements.canvas = canvas;
+			a.href = "javascript:void(0)";
+			a.onclick = () => {
+				canvas.toBlob(
+					function (blob) {
+						const blobUrl = URL.createObjectURL(blob),
+							link = document.createElement("a");
+						link.href = blobUrl;
+						link.download = a.download + ".png";
+						link.click();
+						URL.revokeObjectURL(blobUrl);
+					},
+					"image/png",
+					1
+				);
+			};
+		}
+		if (this.render.type === "image") {
+			const filetype = this.render.content.split(".");
+			if (["png", "jpg", "jpeg", "gif"].includes(filetype[filetype.length - 1].toLowerCase()) || this.render.content.startsWith("data:image")) {
+				result.push(canvas);
+				this.previewElements.canvas = canvas;
+			} else {
+				// not supported
+			}
+			a.href = this.render.content;
+		}
+		result.push(a);
+
 		return result;
 	}
 }
@@ -1942,7 +1948,8 @@ export class Assemble {
 	 * 	}
 	 */
 	image() {
-		let result = [];
+		let result = [],
+			previewRender = {};
 		const canvas = document.createElement("canvas");
 		let disabled = true;
 		canvas.id = getNextElementID();
@@ -1963,6 +1970,7 @@ export class Assemble {
 				content: this.currentElement.attributes.qrcode,
 			});
 			disabled = false;
+			previewRender = { type: "qrcode", name: this.currentElement.attributes.name, content: this.currentElement.attributes.qrcode };
 		}
 		if (this.currentElement.attributes.barcode) {
 			this.imageBarCode.push({
@@ -1970,6 +1978,7 @@ export class Assemble {
 				content: this.currentElement.attributes.barcode,
 			});
 			disabled = false;
+			previewRender = { type: "barcode", name: this.currentElement.attributes.name, content: this.currentElement.attributes.barcode };
 		}
 		if (this.currentElement.attributes.url) {
 			this.imageUrl.push({
@@ -1977,6 +1986,7 @@ export class Assemble {
 				content: this.currentElement.attributes.url,
 			});
 			disabled = false;
+			previewRender = { type: "image", name: this.currentElement.attributes.name, content: this.currentElement.attributes.url };
 		}
 
 		// accessibility setting
@@ -1985,16 +1995,13 @@ export class Assemble {
 		result.push(canvas);
 
 		if (!this.currentElement.attributes.imageonly) {
-			const filename = this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, "\\\\fakepath\\\\"),
-				url = this.currentElement.attributes.url,
-				button = document.createElement("button");
+			const button = document.createElement("button");
 			button.type = "button";
 			button.dataset.type = "image";
 			button.classList.add("inlinebutton");
 			button.append(document.createTextNode(this.currentElement.description));
 			button.onclick = () => {
-				console.log(filename);
-				new Dialog({ type: "preview", header: filename, render: { name: filename, url: url } });
+				new Dialog({ type: "preview", header: this.currentElement.attributes.name, render: previewRender });
 			};
 			if (disabled) button.disabled = true;
 

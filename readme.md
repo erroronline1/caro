@@ -28,9 +28,6 @@ graph LR;
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
-* image preview like stl
-    * download button within dialog
-    * download button for stls too (icon for recognition)
 * export dates default top entry
     * sanitize, especially audit
 * time zones

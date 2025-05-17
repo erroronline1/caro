@@ -207,6 +207,7 @@ dialog {
 		&::before {
 			content: "";
 			background-size: cover;
+			background-position: center;
 			background-image: var(--icon);
 			width: 5rem;
 			height: 5rem;
@@ -638,13 +639,17 @@ input[type="radio"] + label + div {
 
 canvas {
 	display: block;
-	height: 15em;
 	margin-bottom: 2em;
+	max-height: 33em;
+	max-width: calc(100% - 2rem);
+	margin: 0 auto;
 }
-
+.preview {
+	max-height: 33em;
+	overflow: hidden;
+}
 .stlviewer {
 	height: 33em;
-	overflow: hidden;
 }
 
 .contextmenu {
@@ -936,7 +941,7 @@ a.inline {
 input,
 textarea,
 select,
-canvas,
+#signaturecanvas,
 .scanner,
 .rangedatalist,
 .editor {
@@ -1145,7 +1150,7 @@ html[data-useragent*="safari"] body {
 
 button {
 	margin: 1em 0;
-	padding: .75em;
+	padding: 0.75em;
 	width: 100%;
 	display: block;
 	border: none;
@@ -1271,6 +1276,7 @@ button:active {
 
 #signaturecanvas {
 	border-bottom: 1px solid var(--foreground);
+	height: 15em;
 }
 
 input:invalid.input_required_alert,
@@ -1442,6 +1448,7 @@ dialog a:not([data-type])::before {
 	/* here after link and general data-type styling */
 	content: "";
 	background-size: cover;
+	background-position: center;
 	background-image: var(--icon);
 	width: 2em;
 	height: 2em;
@@ -1563,6 +1570,12 @@ button[data-type="download"]::before {
 	mask-image: url("./media/cloud-download.svg");
 }
 
+[data-type="downloadlink"]::before {
+	background-color: var(--cta_darker);
+	-webkit-mask-image: url("./media/cloud-download.svg");
+	mask-image: url("./media/cloud-download.svg");
+}
+
 [data-type="email"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/at.svg");
@@ -1609,6 +1622,12 @@ button[data-type="file"]::before {
 button[data-type="image"]::before {
 	background-image: none;
 	background-color: var(--article);
+	-webkit-mask-image: url("./media/image.svg");
+	mask-image: url("./media/image.svg");
+}
+
+[data-type="imagelink"]::before {
+	background-color: var(--cta_darker);
 	-webkit-mask-image: url("./media/image.svg");
 	mask-image: url("./media/image.svg");
 }
