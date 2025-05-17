@@ -1538,7 +1538,7 @@ class CONSUMABLES extends API {
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 'NULL',
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 'NULL',
 					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : 'NULL',
-					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['stock_item']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
+					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				]) . '; ');
 			}
