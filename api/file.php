@@ -81,8 +81,10 @@ class FILE extends API {
 			foreach (json_decode($row['content'], true) as $file => $path){
 				if (stristr($path, CONFIG['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
 				$file = substr_replace($file, '.', strrpos($file, '_'), 1);
-				
-				if (str_ends_with($file, '.stl')) $list[$file] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file . "', render:{name: '" . $file . "', url: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'stl'];
+
+				$fileinfo = pathinfo($file);
+				if (in_array($fileinfo['extension'], ['stl'])) $list[$file] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file . "', render:{type: 'stl', name: '" . $file . "', url: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'stl'];
+				elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $list[$file] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file . "', render:{type: 'image', name: '" . $file . "', content: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'imagelink'];
 				else $list[$file]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'];
 			}
 			// append bundle
@@ -498,8 +500,10 @@ class FILE extends API {
 					foreach ($files as $file){
 						if ($file) {
 							// distinguish between uploaded files and linked ressources
+							$fileinfo = pathinfo($file['path']);
+
 							if (preg_match('/^\.\.\//', $file['path'])){
-								$file['name'] = pathinfo($file['path'])['basename'];
+								$file['name'] = $fileinfo['basename'];
 								$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 							}
 							else $file['name'] = $file['path'];
@@ -512,7 +516,8 @@ class FILE extends API {
 							}
 
 							$link = [];
-							if (str_ends_with($file['name'], '.stl')) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+							if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+							elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
 							else $link[$file['name']]= ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => 'breakline'];
 			
 							// append file, link and options
@@ -717,16 +722,19 @@ class FILE extends API {
 						foreach ($files as $file){
 							if ($file) {
 								// set up file properties
+								$fileinfo = pathinfo($file);
+
 								$file = [
 									'path' => substr($file, 1),
-									'name' => pathinfo($file)['basename'],
+									'name' => $fileinfo['basename'],
 									'link' => './api/api.php/file/stream/' . substr($file, 1)
 								];
 								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone($this->_date['timezone']));
 
 								$link = [];
-								if (str_ends_with($file['name'], '.stl')) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
-								else $link[$file['name']]= ['href' => $file['linnk'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+								if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+								elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
+								else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
 	
 								// append file options
 								array_push($result['render']['content'][1],
@@ -849,10 +857,11 @@ class FILE extends API {
 				$matches = [];
 				foreach ($content as $file){
 					// distinguish between uploaded files and linked ressources
-					if (preg_match('/^\.\.\//', $file))	$file = ['name' => pathinfo($file)['basename'], 'path' => './api/api.php/file/stream/' . substr($file, 1)];
+					$fileinfo = pathinfo($file);
+					if (preg_match('/^\.\.\//', $file))	$file = ['name' => $fileinfo['basename'], 'path' => './api/api.php/file/stream/' . substr($file, 1)];
 					else $file = ['name' => $file, 'path' => $file];
-
-					if (str_ends_with($file['name'], '.stl')) $matches[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+					if (in_array($fileinfo['extension'], ['stl'])) $matches[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+					elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $matches[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
 					else $matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
 				}
 
@@ -975,8 +984,9 @@ class FILE extends API {
 						else {
 							$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
-
-							if (str_ends_with($file['name'], '.stl')) $display[$name] = ['href' => "javascript:new _client.Dialog({type: 'stl', header: '" . $file['name'] . "', render:{name: '" . $file['name'] . "', url: '" . substr($file['path'], 1) . "'}})", 'data-filtered' => substr($file['path'], 1), 'data-type' => 'stl'];
+							$fileinfo = pathinfo($file['path']);
+							if (in_array($fileinfo['extension'], ['stl'])) $display[$name] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . substr($file['path'], 1) . "'}})", 'data-filtered' => substr($file['path'], 1), 'data-type' => 'stl'];
+							elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $display[$name] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . substr($file['path'], 1) . "'}})", 'data-filtered' => substr($file['path'], 1), 'data-type' => 'imagelink'];
 							else $display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
 						}
 					}
