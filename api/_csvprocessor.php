@@ -400,12 +400,13 @@ class Listprocessor {
 		if (isset($rule['transfer'])){
 			foreach ($rule['transfer'] as $newcolumn => $from){
 				if (!isset($this->setting['filesetting']['columns'][$newcolumn])) $this->_setting['filesetting']['columns'][] = $newcolumn;
-				foreach($matched as $match){
-					if (isset($this->_list[$match[0]])){
-						$self_row = $this->_list[$match[0]];
-						$self_row[$newcolumn] = $compare_list->_list[1][$match[1]][$from];
-						$this->_list[$index] = $self_row;
+				foreach ($this->_list as $i => $row){
+					if (!$row) continue;
+					$row[$newcolumn] = '';
+					if ($match = array_search($i, array_column($matched, 0))){
+						$row[$newcolumn] = $compare_list->_list[1][$matched[$match][1]][$from];
 					}
+					$this->_list[$i] = $row;
 				}
 			}
 		}
