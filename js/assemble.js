@@ -235,7 +235,7 @@ export class Dialog {
 	 *
 	 * options with boolean values true|false as well as 'true'|'false' return selected booleans not strings. other strings will be returned as such.
 	 * @example ```js
-	 * new Dialog({type:'alert', header:'acknowledge this!', render:'infotext'})
+	 * new Dialog({type: 'alert', header: 'acknowledge this!', render: 'infotext'})
 	 * ```
 	 * @example ```js
 	 * new Dialog({type:'confirm', header:'confirm this', options:{'abort': false, 'yes, i agree': {'value': true, class: 'reducedCTA'}}}).then(confirmation => {
@@ -243,7 +243,7 @@ export class Dialog {
 	 * 	});
 	 * ```
 	 * @example ```js
-	 * new Dialog({type:'stl', header:'display and download', render:{name: 'filename', url:'urlToFile', transfer:undefined || true);
+	 * new Dialog({type:'stl', header:'display and download', render:{name: 'filename', url: 'urlToFile', transfer: undefined || true);
 	 * ```
 	 * input needs button options as well, response keys in accordance to assemble content input names
 	 * image and signature are NOT supported for having to be rendered in advance to filling their canvases.
@@ -272,7 +272,7 @@ export class Dialog {
 		if (this.type) {
 			// define output dialog
 			if (this.type === "input") this.modal = "inputmodal";
-			if (["input2", "stl"].includes(this.type)) {
+			if (["input2", "stl", "preview"].includes(this.type)) {
 				this.modal = "inputmodal2";
 			}
 			if (this.type === "input2") this.type = "input";
@@ -327,7 +327,6 @@ export class Dialog {
 				}
 				this.form.append(header);
 			}
-
 			// append select buttons if applicable
 			if (this.type === "select") this.form.style.display = "flex";
 			for (const element of this[this.type]()) {
@@ -590,9 +589,6 @@ export class Dialog {
 		return [buttons];
 	}
 
-	/**
-	 *
-	 */
 	stl() {
 		const div = document.createElement("div");
 		div.id = "stlviewer_canvas";
@@ -611,6 +607,81 @@ export class Dialog {
 			a.append(document.createTextNode(this.render.name || this.render.url));
 			return [div, a];
 		}
+	}
+
+	/**
+	 * preview for supported file types
+	 * currently svg, png, jpg, gif
+	 */
+	preview() {
+		let type = this.render.url.split("."),
+			result;
+		switch (type[type.length - 1].toLowerCase()) {
+			case "svg":
+				const div = document.createElement("div");
+				div.id = "stlviewer_canvas";
+				div.classList = "stlviewer";
+				div.title = api._lang.GET("assemble.render.aria.preview", { ":file": this.render.name || this.render.url });
+				this.stlviewer.canvas = div;
+
+				if (this.render.transfer) {
+					result = [div, ...this.confirm()];
+				} else {
+					const a = document.createElement("a");
+					a.href = this.render.url;
+					a.target = "_blank";
+					a.download = this.render.name || this.render.url;
+					a.dataset.type = "download";
+					a.append(document.createTextNode(this.render.name || this.render.url));
+					result = [div, a];
+				}
+				break;
+			case "png":
+			case "jpg":
+			case "jpeg":
+			case "gif":
+				// create canvas
+				const canvas = document.createElement("canvas");
+				canvas.title = api._lang.GET("assemble.render.aria.image", { ":image": this.render.name });
+				canvas.classList = "stlviewer";
+				canvas.width = canvas.height = 1024;
+				// draw image on canvas
+				let img = new Image();
+				img.src = this.render.url;
+				img.addEventListener("load", function (e) {
+					let x = canvas.width,
+						y = canvas.height,
+						w = this.width,
+						h = this.height,
+						xoffset = 0,
+						yoffset = 0;
+					if (canvas.width > w || canvas.height > h) {
+						// aka square by default if dimensions have not been passed
+						if (w >= h) {
+							y = (canvas.height * h) / w;
+							yoffset = (x - y) / 2;
+						} else {
+							x = (canvas.width * w) / h;
+							xoffset = (y - x) / 2;
+						}
+					}
+					canvas.getContext("2d").drawImage(this, xoffset, yoffset, x, y);
+				});
+				img.dispatchEvent(new Event("load"));
+
+				const a = document.createElement("a");
+				a.href = this.render.url;
+				a.target = "_blank";
+				a.download = this.render.name || this.render.url;
+				a.dataset.type = "download";
+				a.append(document.createTextNode(this.render.name || this.render.url));
+				result = [canvas, a];
+
+				break;
+			default:
+			// not supported
+		}
+		return result;
 	}
 }
 
@@ -1787,36 +1858,20 @@ export class Assemble {
 		result.push(canvas);
 
 		if (!this.currentElement.attributes.imageonly) {
-			// this tile does not process attributes, therefore they can be reassigned
-			// escape \ for fakepath to avoid SyntaxError: malformed Unicode character escape sequence for filenames starting with u or other supposed control characters during new image type creation within composer
-			const create_virtual_link_and_click = {
-				name: this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, "\\\\fakepath\\\\"),
-				canvas_id: canvas.id,
-				fn: () => {
-					document.getElementById("canvas_id").toBlob(
-						function (blob) {
-							const blobUrl = URL.createObjectURL(blob),
-								link = document.createElement("a");
-							link.href = blobUrl;
-							link.download = "name" + ".png";
-							link.click();
-							URL.revokeObjectURL(blobUrl);
-						},
-						"image/png",
-						1
-					);
-				},
+			const filename = this.currentElement.attributes.name.replaceAll(/\\fakepath\\/gi, "\\\\fakepath\\\\"),
+				url = this.currentElement.attributes.url,
+				button = document.createElement("button");
+			button.type = "button";
+			button.dataset.type = "image";
+			button.classList.add("inlinebutton");
+			button.append(document.createTextNode(this.currentElement.description));
+			button.onclick = () => {
+				console.log(filename);
+				new Dialog({ type: "preview", header: filename, render: { name: filename, url: url } });
 			};
+			if (disabled) button.disabled = true;
 
-			this.currentElement.attributes = {
-				value: this.currentElement.description,
-				type: "button",
-				class: "inlinebutton",
-				"data-type": this.currentElement.type,
-				onclick: create_virtual_link_and_click.fn.toString().replace("name", create_virtual_link_and_click.name).replace("canvas_id", create_virtual_link_and_click.canvas_id),
-			};
-			if (disabled) this.currentElement.attributes.disabled = true;
-			result = result.concat(this.button());
+			result.push(button);
 		}
 		return result;
 	}
