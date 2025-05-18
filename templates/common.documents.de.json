@@ -1390,9 +1390,9 @@
 		"unit": "common",
 		"author": "Caro App",
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
-		"permitted_export": null,
+		"permitted_export": 1,
 		"restricted_access": null,
-		"content": "identifikator,konfektionsversorgung"
+		"content": "identifikator,datenverarbeitung auftragserteilung schweigepflichtentbindung,konfektionsversorgung"
 	},
 	{
 		"name": "Produkteinführung",
@@ -1448,5 +1448,20 @@
 		"permitted_export": null,
 		"restricted_access": "prrc,qmo,ceo",
 		"content": "identifikator,vorkommnismeldung"
+	},
+		{
+		"comment": "following are prosthetics ii bundles #################################################################################################"
+	},
+	{
+		"name": "Konfektionsversorgung",
+		"alias": "",
+		"context": "bundle",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Konfektionsversorgung,Empfangsbestätigung"
 	}
+
 ]
