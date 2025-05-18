@@ -1780,6 +1780,8 @@ export async function screenshot(lang = null) {
 			{ en: "rendertest('documents')", de: "rendertest('documents_de')" },
 			{ en: "api.audit('get', 'audit', 11)", de: "" }, // customize to appropriate caro_audit_and_management id
 			{ en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)" }, // customize to appropriate caro_audit_templates id
+			{ en: "api.message('get', 'conversation')", de: "" }, // customize to appropriate caro_audit_templates id
+			{ en: "api.risk('get', 'risk')", de: "" }, // customize to appropriate caro_audit_templates id
 			{ en: "api.calendar('get', 'schedule')", de: "" },
 			{ en: "api.application('get', 'start')", de: "" },
 			{ en: "api.document('get', 'document_editor', 127)", de: "" }, // customize id to approprate caro_documents id

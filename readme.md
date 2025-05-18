@@ -24,7 +24,6 @@ graph LR;
 * verify osx [safari compatibility](#safaris-special-needs), ios compatibility
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
-* update readme pictures, add responsibilities, appointment
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
@@ -378,7 +377,7 @@ graph TD;
 ### Responsibilities
 Authorized users can define responsibilities for given tasks and assign users as well as their proxy. Assigned users will retrieve a message and a menu notification to review the assignments and accept the responsibilities. Responsibilities have a mandatory applicability timespan after which a calendar entry reminds admin to renew the expired item. Responsibilities can be edited at any time, only users have to reaccept their assignment for transparency reasons. Responsibilities are not a persistent record as they serve primarily operational information. The overview can be filtered by units as well as displaying only own responsibilities. 
 
-![responsibilities screenshot](http://toh.erroronline.one/caro/responsibilities.png)
+![responsibilities screenshot](http://toh.erroronline.one/caro/responsibility.png)
 
 [Content](#content)
 
@@ -796,7 +795,7 @@ Exports are ordered by user name with exporting user coming first regardless, fo
 
 Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
 
-STL-files have a preview by default.
+STL- and image-files have a preview by default.
 
 This source can also be used to provide documents that are [unsuitable to be filled out digitally](#data-integrity). *Enable export permission for internal documents to avoid version confusion though; register external documents for the same reason.*
 

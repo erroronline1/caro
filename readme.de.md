@@ -289,7 +289,7 @@ graph TD;
 ### Verantwortlichkeiten
 Berechtigte Nutzer können Verantwortlichkeiten für Aufgaben erstellen und Nutzer und deren Stellvertreter zuordnen. Zugeordnete Nutzer erhalten eine Nachricht und Menü-Benachrichtigung um die Zuordnung zu prüfen und die Verantwortlichkeit zu akzeptieren. Verantwortlichkeiten haben eine verpflichtende Dauer, nach deren Ablauf ein Kalendereintrag die Leitung daran erinnert die Abgelaufenen Einträge zu erneuern. Verantwortlichkeiten können jederzeit geändert werden, aus Transparenzgründen müssen die Nutzer ihre Akzeptanz jedoch erneut bestätigen. Verantwortlichkeiten sind keine Aufzeichnungen, da sie primär der operativen Information dienen. Die Übersicht kann nach Bereichen gefiltert werden oder auch nur die eigenen Verantwortlichkeiten darstellen.
 
-![responsibilities screenshot](http://toh.erroronline.one/caro/responsibilities%20de.png)
+![responsibilities screenshot](http://toh.erroronline.one/caro/responsibility%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -566,7 +566,7 @@ Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Unterbrech
 ### Terminvereinbarung
 Es kann eine Terminerinnerung für Kunden erstellt werden. Nach der Eingabe der relevanten Daten kann entweder eine ausgedruckte Version mit den Daten sowie einem QR-Code für den Import in einen Kalender auf einem Mobilgerät, oder direkt eine ICS-Datei für den Versand per eMail oder Nachrichtendienst verwendet werden.
 
-![appointment screenshot](http://toh.erroronline.one/caro/appointment.png)
+![appointment screenshot](http://toh.erroronline.one/caro/appointment%20de.png)
 
 [Übersicht](#übersicht)
 
@@ -693,7 +693,7 @@ Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exporti
 
 Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
 
-STL-Dateien haben eine automatische Vorschau.
+STL- und Bild-Dateien haben eine automatische Vorschau.
 
 Diese Quellen können auch dafür verwendet werden um Dokumente bereitzustellen, die [nicht digital ausgefüllt](#datenintegrität) werden können. *Es wird jedoch empfohlen interne Dokumente mit einer Exportberechtigung zu versehen um Versionskonflikte zu vermeiden; dies betrifft auch die ordnungsgemäße Registrierung externer Dokumente.*
 
