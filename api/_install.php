@@ -1374,6 +1374,79 @@ class INSTALL {
 			$this->printSuccess('novel entries by name for vendors have been installed.');
 		else $this->printWarning('there were no novelties to install from vendor ressources.');
 	}
+
+	/**
+	 * update vendors info and/or pricelist by name
+	 */
+	public function updateVendors(){
+		$json = $this->importJSON('../templates/', 'vendors');
+		// gather possibly existing entries
+		$DBall = [
+			...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
+		];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$insertions = [];
+				foreach ($json as $entry){
+					// documents are only transferred if the name is not already taken
+					if (!(
+						isset($entry['name']) && $entry['name']
+						)){
+						$this->printError('The following dataset is invalid and will be skipped:', $entry);
+						continue;
+					}
+					$vendor = null;
+					if ($vendor = array_search($entry['name'], array_column($DBall, 'name'))) {
+						if (!$vendor) {
+							$this->printError('The following vendor has not been found in database:', $entry['name']);
+							continue;
+						}
+						$vendor = $DBall[$vendor];
+						// whitespaces and periods replaced with underscore as in request parameters
+						$infovar = preg_replace('/[\s\.]/', '_', $vendor['name'] . '_info');
+						$filtervar = preg_replace('/[\s\.]/', '_', $vendor['name'] . '_pricelistfilter');
+						if (!(isset($_POST[$infovar]) || isset($_POST[$filtervar])))
+							continue;
+
+						$update = [
+							':name' => $vendor['name'],
+							':evaluation' => $vendor['evaluation'],
+							':hidden' => $vendor['hidden'],
+							':certificate' => $vendor['certificate'],
+							':info' => $vendor['info'],
+							':pricelist' => $vendor['pricelist'],
+						];
+						if (isset($_POST[$infovar])) {
+							$update[':info'] = isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : $vendor['info'];
+						}
+						if (isset($_POST[$filtervar])) {
+							$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
+							if (!($newpricelistfilter = isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode(['filter' => UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT)]) : null))
+								continue;
+							$vendor['pricelist']['filter'] = $newpricelistfilter;
+							$update[':pricelist'] = UTILITY::json_encode($vendor['pricelist']['filter']);
+						}
+
+						$insertions[] = $update;
+					}
+				}
+				if ($insertions && $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_put_vendor'), $insertions)))
+					$this->printSuccess('entries by name for vendors have been updated.');
+				else $this->printWarning('there were no updates. select items to update or check vendor names matching your database entries.');
+				break;
+			case 'GET':
+				echo 'check what to update by vendor. if template has any value it will override the database, otherwise the original will be kept.';
+				echo '<form method="post">';
+				foreach($DBall as $vendor){
+					echo '<br /><br />' . $vendor['name'] . ($vendor['hidden'] ? ' (this vendor is marked as hidden)' : '');
+					echo '<br /><label><input type="checkbox" name="' . $vendor['name'] . '_info" /> info</label> | ' . '<label><input type="checkbox" name="' . $vendor['name'] . '_pricelistfilter" /> pricelist filter</label>';
+				}
+				echo '<br /><br /><input type="submit" value="update selected" />';
+				echo '</form>';
+				break;
+		}
+	}
 }
 
 // check requesting script as stresstest extends install
