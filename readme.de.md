@@ -1131,6 +1131,7 @@ Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronlin
     * vendors
 * die Standardsprache der Anwendung, wie sie in der  [Laufzeitvariablen](#laufzeitvariablen) festgelegt ist
 * die Dateinamenerweiterung `.json` optional von `.env`-Dateien erweitert wird (siehe auch [Anpassung](#anpassung))
+* die Standardautorin von Inhalten *CARO App* ist und diese in einen berechtigten nutzer geänder werden sollte um Verwirrungen bei Auditoren zu vermeiden
 
 Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können mehrere Dateien eines Typs mit einem frei wählbaren Namensteil angelegt werden um die Übersicht zu behalten (vor dieser Designentscheidung hatten die Risiken 30.000 Zeilen, die noch unüberisichtlicher waren). Das ist jedoch nur eine Option, sofern keine Berührungsängste bestehen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch in jedem Fall nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
 
@@ -1141,7 +1142,8 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 * Auswahl eines Installationskennworts für die Systemnutzerin.
 
 ### Installation
-* Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*, Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind.
+* Aufruf api/_install.php, beziehungsweise api/_install.php/installDatabase/*das_gewählte_Installationskennwort*
+* Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind. Die Durchführung kann nur erfolgen, wenn ein Nutzer mit Administrator-Berechtigung angemeldet ist.
 * Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
 * Eine [Installation als Progressive Web App (PWA)](https://developer.mozilla.org/de/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_aus_dem_web) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
 

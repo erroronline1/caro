@@ -45,6 +45,12 @@ class STRESSTEST extends INSTALL{
 	public function navigation($method){
 		if (method_exists($this, $method)) {
 			echo '<a href="../_stresstest.php">back</a><br />';
+
+			if ($method !== 'installDatabase' && (!isset($_SESSION['user']) || !array_intersect(['admin'], $_SESSION['user']['permissions']))){
+				$this->printError('You have to be logged in with administrator privilege to run this. <a href="../../index.html" target="_blank">Open Caro App in new window</a>');
+				die();
+			}
+
 			$this->{$method}();
 		}
 		else {

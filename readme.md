@@ -31,10 +31,11 @@ graph LR;
     * sanitize, especially audit
 * time zones
     * actually convert timezones from local(default) to user selected? wherever current_timestamp has been applied
-    * calendar convert user entries by timezone to default server timezone
+    * calendar, etc. convert user entries by timezone to default server timezone
 * audit
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
+    * implement [audit methods](http://www.17020-audit.de/auditmethoden/)
 
 ## Content
 * [Aims](#aims)
@@ -1227,6 +1228,7 @@ The default provides [template files](#https://github.com/erroronline1/caro/tree
     * vendors
 * the default language of the application as specified within the [runtime variables](#runtime-variables)
 * the extension being `.json` by default with the option to extended by `.env` files (also see [customisation](#customisation))
+* the default user is set to *CARO App* and should be changed in advance to a justified name for document creation to avoid confusion with auditors
 
 If you are going to prepare the deployment you are free to create multiple files of one type with a choosable name part for enhanced comprehensibility (before this design choice default risks had about 30k lines which was an even worse of a mess to track). This is optional and if you feel comfortable enough only. Also approvals, evaluations and pricelist imports have to be done the regular way after installation though. The templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
 
@@ -1237,7 +1239,8 @@ If you are going to prepare the deployment you are free to create multiple files
 * Select an installation password for the system user.
 
 ### Installation procedure
-* Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*, choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken.
+* Run api/_install.php/ or rather api/_install.php/installDatabase/*your_selected_installation_password*
+* choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken. You must be logged in with adminstrator privileges to take these actions.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * [Install as progressive web app (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_from_the_web) from the initial browser request and give requested permissions on any elegible workplace.
 
