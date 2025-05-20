@@ -17,6 +17,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// actions require an application user with admin permission to be logged in onve the database has been installed
+session_set_cookie_params([
+	'domain' => $_SERVER['HTTP_HOST'],
+	'secure' => true,
+	'httponly' => true,
+]);
+session_start();
+
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
@@ -655,6 +663,12 @@ class INSTALL {
 	public function navigation($method){
 		if (method_exists($this, $method)) {
 			echo '<a href="' . (isset(REQUEST[1]) ? '../': '') . '../_install.php">back</a><br />';
+
+			if ($method !== 'installDatabase' && (!isset($_SESSION['user']) || !array_intersect(['admin'], $_SESSION['user']['permissions']))){
+				$this->printError('You have to be logged in with administrator privilege to run this. <a href="../../index.html" target="_blank">Open Caro App in new window</a>');
+				die();
+			}
+
 			$this->{$method}();
 		}
 		else {
@@ -662,7 +676,8 @@ class INSTALL {
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
-			echo '<br />Please adhere to the manual for initial database setup, request _install.php/installDatabase/*your_selected_installation_password*<br /><br />';
+			echo '<br />Please adhere to the manual for initial database setup, request _install.php/installDatabase/*your_selected_installation_password*<br />';
+			echo 'You must be logged in with administrator privileges to do anything beside database installation.<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
 			foreach($methods as $methodName){
@@ -903,8 +918,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('audit_post_template'), $insertions)))
-			$this->printSuccess('novel entries by unit and objectives from audits have been installed.');
-		else $this->printWarning('there were no novelties to install from audits ressources.');
+			$this->printSuccess('Novel entries by unit and objectives from audits have been installed.');
+		else $this->printWarning('There were no novelties to install from audits ressources.');
 	}
 	
 	/**
@@ -941,8 +956,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('csvfilter_post'), $insertions)))
-			$this->printSuccess('novel entries by name and content from csv-filter have been installed.');
-		else $this->printWarning('there were no novelties to install from csv-filter ressources.');
+			$this->printSuccess('Novel entries by name and content from csv-filter have been installed.');
+		else $this->printWarning('There were no novelties to install from csv-filter ressources.');
 	}
 	
 	/**
@@ -1030,8 +1045,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('document_post'), $insertions)))
-			$this->printSuccess('novel entries by name from documents have been installed.');
-		else $this->printWarning('there were no novelties to install from documents ressources.');
+			$this->printSuccess('Novel entries by name from documents have been installed.');
+		else $this->printWarning('There were no novelties to install from documents ressources.');
 	}
 
 	/**
@@ -1078,8 +1093,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('application_post_manual'), $insertions)))
-			$this->printSuccess('novel entries by name from manuas have been installed.');
-		else $this->printWarning('there were no novelties to install from manuals ressources.');
+			$this->printSuccess('Novel entries by name from manuals have been installed.');
+		else $this->printWarning('There were no novelties to install from manuals ressources.');
 	}
 
 	/**
@@ -1177,8 +1192,8 @@ class INSTALL {
 			$this->printError('The following dataset is invalid and will be skipped:', $entry);
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('risk_post'), $insertions)))
-			$this->printSuccess('novel entries by process+risk+cause+measure from risks have been installed.');
-		else $this->printWarning('there were no novelties to install from risks ressources.');
+			$this->printSuccess('Novel entries by process+risk+cause+measure from risks have been installed.');
+		else $this->printWarning('There were no novelties to install from risks ressources.');
 	}
 	/**
 	 * installs texttemplates by novel name
@@ -1242,8 +1257,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
-			$this->printSuccess('novel entries by name from textx have been installed.');
-		else $this->printWarning('there were no novelties to install from texts ressources.');
+			$this->printSuccess('Novel entries by name from textx have been installed.');
+		else $this->printWarning('There were no novelties to install from texts ressources.');
 	}
 
 	/**
@@ -1325,8 +1340,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('user_post'), $insertions)))
-			$this->printSuccess('novel entries by name from users have been installed.');
-		else $this->printWarning('there were no novelties to install from user ressources.');
+			$this->printSuccess('Novel entries by name from users have been installed.');
+		else $this->printWarning('There were no novelties to install from user ressources.');
 	}
 
 	/**
@@ -1371,8 +1386,8 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_vendor'), $insertions)))
-			$this->printSuccess('novel entries by name for vendors have been installed.');
-		else $this->printWarning('there were no novelties to install from vendor ressources.');
+			$this->printSuccess('Novel entries by name for vendors have been installed.');
+		else $this->printWarning('There were no novelties to install from vendor ressources.');
 	}
 
 	/**
@@ -1387,7 +1402,7 @@ class INSTALL {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$insertions = [];
+				$sqlchunks = [];
 				foreach ($json as $entry){
 					// documents are only transferred if the name is not already taken
 					if (!(
@@ -1409,34 +1424,42 @@ class INSTALL {
 						if (!(isset($_POST[$infovar]) || isset($_POST[$filtervar])))
 							continue;
 
-						$update = [
-							':name' => $vendor['name'],
-							':evaluation' => $vendor['evaluation'],
-							':hidden' => $vendor['hidden'],
-							':certificate' => $vendor['certificate'],
-							':info' => $vendor['info'],
-							':pricelist' => $vendor['pricelist'],
-						];
 						if (isset($_POST[$infovar])) {
-							$update[':info'] = isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : $vendor['info'];
+							$vendor['info'] = isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : $vendor['info'];
 						}
 						if (isset($_POST[$filtervar])) {
-							$vendor['pricelist'] = json_decode($vendor['pricelist'], true);
-							if (!($newpricelistfilter = isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode(['filter' => UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT)]) : null))
-								continue;
-							$vendor['pricelist']['filter'] = $newpricelistfilter;
-							$update[':pricelist'] = UTILITY::json_encode($vendor['pricelist']['filter']);
+							$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
+							$newpricelistfilter = (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array') ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null;
+							$vendor['pricelist']['filter'] = $newpricelistfilter ? : (isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : null);
+							$vendor['pricelist'] = UTILITY::json_encode($vendor['pricelist']);
 						}
 
-						$insertions[] = $update;
+						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_vendor'),
+						[
+							':id' => $vendor['id'],
+							':name' => $this->_pdo->quote($vendor['name']),
+							':evaluation' => $this->_pdo->quote($vendor['evaluation']),
+							':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
+							':certificate' => $vendor['certificate'] ? $this->_pdo->quote($vendor['certificate']) : 'NULL',
+							':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
+							':pricelist' => $vendor['pricelist'] ? $this->_pdo->quote($vendor['pricelist']) : 'NULL',
+						]) . '; ');
 					}
 				}
-				if ($insertions && $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_put_vendor'), $insertions)))
-					$this->printSuccess('entries by name for vendors have been updated.');
-				else $this->printWarning('there were no updates. select items to update or check vendor names matching your database entries.');
+				foreach ($sqlchunks as $chunk){
+					try {
+						SQLQUERY::EXECUTE($this->_pdo, $chunk);
+					}
+					catch (Exception $e) {
+						$this->printWarning('there has been an issue', [$e, $chunk]);
+						die();
+					}
+				}
+				if ($sqlchunks)	$this->printSuccess('Entries by name for vendors have been updated.');
+				else $this->printWarning('There were no updates. Select items to update or check vendor names matching your database entries.');
 				break;
 			case 'GET':
-				echo 'check what to update by vendor. if template has any value it will override the database, otherwise the original will be kept.';
+				echo 'Check what to update by vendor. If template has any value it will override the database, otherwise the original will be kept.';
 				echo '<form method="post">';
 				foreach($DBall as $vendor){
 					echo '<br /><br />' . $vendor['name'] . ($vendor['hidden'] ? ' (this vendor is marked as hidden)' : '');
