@@ -1461,7 +1461,9 @@ class INSTALL {
 			case 'GET':
 				echo 'Check what to update by vendor. If template has any value it will override the database, otherwise the original will be kept.';
 				echo '<form method="post">';
+				$intersections=array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
 				foreach($DBall as $vendor){
+					if (!in_array($vendor['name'], $intersections)) continue;
 					echo '<br /><br />' . $vendor['name'] . ($vendor['hidden'] ? ' (this vendor is marked as hidden)' : '');
 					echo '<br /><label><input type="checkbox" name="' . $vendor['name'] . '_info" /> info</label> | ' . '<label><input type="checkbox" name="' . $vendor['name'] . '_pricelistfilter" /> pricelist filter</label>';
 				}
