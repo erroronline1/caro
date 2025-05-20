@@ -355,7 +355,7 @@ class ORDER extends API {
 				// this is actually faster than a nested sql query
 				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				foreach($vendors as &$vendor){
-					$vendor['pricelist'] = json_decode($vendor['pricelist'], true); 
+					$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true); 
 				}
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
 					'replacements' => [
@@ -666,9 +666,10 @@ class ORDER extends API {
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 		// gather product information on stock item flag
-		$stock_items = [];
+		$stock_items = $erp_ids = [];
 		foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
 			if ($product['stock_item']) $stock_items[] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
+			if ($product['erp_id']) $erp_ids[$product['erp_id']] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
 		}
 
 		$data = [];
@@ -689,6 +690,7 @@ class ORDER extends API {
 			if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
 			else $orderer = $this->_lang->GET('message.deleted_user');
 
+			$erp_id = array_search($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $erp_ids);
 			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
 				':quantity'=> UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : '',
 				':unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : '',
@@ -697,7 +699,10 @@ class ORDER extends API {
 				':vendor' => UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : '',
 				':aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? : '',
 				]
-			) . ("\n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''))
+			)
+			. ($erp_id ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ': ' . $erp_id: '')
+			. ("\n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit'])
+			. (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''))
 			. "\n" . ($this->_lang->GET('order.orderer') . ': ' . $orderer);
 		}
 		if (!$data) $this->response([], 404);
