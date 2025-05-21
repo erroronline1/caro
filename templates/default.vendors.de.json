@@ -588,7 +588,27 @@
 		},
 		"pricelist": {
 			"filesetting": {
-				"columns": ["Variante", "Bezeichnung", "Größe", "Farbe", "Seite / Ausführung", "Einheit", "EAN", "CCL"]
+				"columns": ["Artikelnr.", "Variante", "Bezeichnung", "Größe", "Farbe", "Seite / Ausführung", "Einheit", "EAN", "CCL"]
+			},
+			"modify": {
+				"add": {
+					"trading_good": "1",
+					"has_expiry_date": "0",
+					"stock_item": "0"
+				},
+				"conditional_or": [
+					["trading_good", "0", ["Bezeichnung", "ersatz|f(?:ü|Ü)r|tausch|bezug|luft"], ["Größe", ""]],
+					["stock_item", "1", ["Variante", "93014[1-5]|190530|1333[1-2][2356]|9304[12][2-7]"]]
+				],
+				"remove": ["CCL"],
+				"rewrite": [
+					{
+						"article_no": ["Artikelnr.", "-", "Variante"],
+						"article_name": ["Bezeichnung", ", ", "Größe", ", ", "Farbe", ", ", "Seite / Ausführung"],
+						"article_unit": ["Einheit"],
+						"article_ean": ["EAN"]
+					}
+				]
 			},
 			"filter": [
 				{
@@ -626,34 +646,14 @@
 					],
 					"match": {
 						"all": {
-							"Variante": "BESTELL_NUMMER"
+							"article_no": "BESTELL_NUMMER"
 						}
 					},
 					"transfer": {
 						"erp_id": "REFERENZ"
 					}
 				}
-			],
-			"modify": {
-				"add": {
-					"trading_good": "1",
-					"has_expiry_date": "0",
-					"stock_item": "0"
-				},
-				"conditional_or": [
-					["trading_good", "0", ["Bezeichnung", "ersatz|f(?:ü|Ü)r|tausch|bezug|luft"], ["Größe", ""]],
-					["stock_item", "1", ["Variante", "93014[1-5]|190530|1333[1-2][2356]|9304[12][2-7]"]]
-				],
-				"remove": ["CCL"],
-				"rewrite": [
-					{
-						"article_no": ["Variante"],
-						"article_name": ["Bezeichnung", ", ", "Größe", ", ", "Farbe", ", ", "Seite / Ausführung"],
-						"article_unit": ["Einheit"],
-						"article_ean": ["EAN"]
-					}
-				]
-			}
+			]
 		}
 	},
 	{
@@ -1945,7 +1945,7 @@
 		}
 	},
 	{
-		"name": "Össur Deutschland GmbH ",
+		"name": "Össur Deutschland GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: Listen zusammenführen, Produktbeschreibung anpassen für: Knit-Rite Soft Socken (1SB1XXYY3, ff)",
 			"infotext": "",
