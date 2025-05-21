@@ -772,7 +772,7 @@
 				"conditional_or": [["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband"]]],
 				"rewrite": [
 					{
-						"article_no": ["NeueArtikelNummer"],
+						"article_no": ["Artikelnummer"],
 						"article_name": ["Bezeichnung"],
 						"article_unit": [""],
 						"article_ean": ["GTIN"]
@@ -803,7 +803,7 @@
 					],
 					"match": {
 						"all": {
-							"NeueArtikelNummer": "BESTELL_NUMMER"
+							"Artikelnummer": "BESTELL_NUMMER"
 						}
 					},
 					"transfer": {
@@ -2491,8 +2491,8 @@
 							"keep": true,
 							"match": {
 								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "otto.*?bock"
+									"LIEFERANTENNAME": "otto.*?bock",
+									"STATUS": "false"
 								}
 							}
 						}
