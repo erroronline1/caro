@@ -231,12 +231,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_user WHERE token = :token"
 		],
 		'application_get_permission_group' => [
-			'mysql' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%,', :group, ',%')",
-			'sqlsrv' => "SELECT id FROM caro_user WHERE permissions LIKE CONCAT('%,', :group, ',%')"
+			'mysql' => "SELECT id FROM caro_user WHERE (permissions LIKE :group OR permissions LIKE CONCAT(:group, ',%') OR permissions LIKE CONCAT('%,', :group, ',%') OR permissions LIKE CONCAT('%,', :group))",
+			'sqlsrv' => "SELECT id FROM caro_user WHERE (permissions LIKE :group OR permissions LIKE CONCAT(:group, ',%') OR permissions LIKE CONCAT('%,', :group, ',%') OR permissions LIKE CONCAT('%,', :group))"
 		],
 		'application_get_unit_group' => [
-			'mysql' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%,', :group, ',%')",
-			'sqlsrv' => "SELECT id FROM caro_user WHERE units LIKE CONCAT('%,', :group, ',%')"
+			'mysql' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))",
+			'sqlsrv' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))"
 		],
 		'application_post_manual' => [
 			'mysql' => "INSERT INTO caro_manual (id, title, content, permissions) VALUES (NULL, :title, :content, :permissions)",
@@ -399,8 +399,11 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE CONVERT(VARCHAR, caro_consumables_vendors.id) IN (:ids)"
 		],
 		'consumables_delete_all_unprotected_products' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL AND last_order IS NULL",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL AND last_order IS NULL"
+// leave for now to check iis settings on timeouts for wrong filter increases execution time
+//			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL AND last_order IS NULL",
+//			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND(protected IS NULL AND last_order IS NULL"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND (protected IS NULL OR protected = 0) AND last_order IS NULL",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND (protected IS NULL OR protected = 0) AND last_order IS NULL"
 		],
 		'consumables_delete_unprotected_product' => [
 			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL",
