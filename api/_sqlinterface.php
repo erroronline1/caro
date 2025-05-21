@@ -73,12 +73,15 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
-		$statement = $_pdo->prepare($query);
-		//var_dump($statement->queryString);
-
-		//$statement->execute($parameters['values']);
-		//var_dump($statement->debugDumpParams());
-		if (!$statement->execute($parameters['values'])) return false;
+		try {
+			$statement = $_pdo->prepare($query);
+			if (!$statement->execute($parameters['values'])) return false;
+		}
+		catch (Exception $e) {
+			// remove in production
+			var_dump($e, $statement->queryString, $statement->debugDumpParams());
+			die();
+		}
 		if (str_starts_with($query, 'SELECT')) {
 			//var_dump($statement->debugDumpParams());
 			$result = $statement->fetchAll();
