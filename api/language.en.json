@@ -155,6 +155,7 @@
 		"prevent_dataloss": "You have unprocessed changes. Sure to continue?",
 		"prevent_dataloss_cancel": "I want to stay",
 		"prevent_dataloss_ok": "Yes, nevermind",
+		"save": "Save :title?",
 		"scan_successful": "Scan has been successful",
 		"service_worker_get_cache_fallback": "Serving last available version due to current connectivity loss!",
 		"service_worker_post_cache_fallback": "Request will be synced on next network access!",

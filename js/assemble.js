@@ -1242,7 +1242,7 @@ export class Assemble {
 			const options = {};
 			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
 			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.document.document"), options: options }).then((confirmation) => {
+			new Dialog({ type: "confirm", header: api._lang.GET("general.save", {":title": document.querySelector("header>h1").innerHTML}), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
 		} else new Toast(api._lang.GET("general.missing_form_data"), "error");

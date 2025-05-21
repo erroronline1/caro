@@ -155,6 +155,7 @@
 		"prevent_dataloss": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du fortfahren möchtest?",
 		"prevent_dataloss_cancel": "Ich möchte weiter bearbeiten",
 		"prevent_dataloss_ok": "Ja, ist in Ordnung",
+		"save": ":title speichern?",
 		"scan_successful": "Der Scan war erfolgreich",
 		"service_worker_get_cache_fallback": "Aufgrund eines Verbindungsabbruchs wir die letzte verfügbare Version angezeigt!",
 		"service_worker_post_cache_fallback": "Die Anfrage wird mit der nächsten Netzwerkverbindung verarbeitet!",
