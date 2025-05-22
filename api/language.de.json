@@ -1549,6 +1549,8 @@
 		"settings_force_desktop": "Desktop-Modus erzwingen",
 		"settings_hint": "Manche Einstellungen erfordern ein erneutes Laden der Oberfläche. Nutze dazu die Schaltfläche, Strg + F5 oder Strg + r.",
 		"settings_homeoffice": "Homeoffice",
+		"settings_idle": "Zeit nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt",
+		"settings_idle_hint": "Die Verlängerung des Standardmindestwerts von :idle Sekunden kann im Sinne der Barrierefreiheit erforderlich sein, oder für den Einkauf bei komplexen Preislistenimports.",
 		"settings_initial_overtime": "Überzeit zu Beginn der Zeiterfassung",
 		"settings_initial_overtime_hint": "Anzahl in Stunden",
 		"settings_language": "Sprache",

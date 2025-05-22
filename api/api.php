@@ -245,7 +245,8 @@ class API {
 		$reAuthUser = (
 			//(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
 			//||
-			(isset($_SESSION['lastrequest']) && (time() - $_SESSION['lastrequest'] > min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')))) // session timeout
+			(isset($_SESSION['lastrequest'])
+			&& (time() - $_SESSION['lastrequest'] > (isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
 		);
 		$returnUser = (
 			(!$reAuthUser && isset($_SESSION['user'])) // if there are no reasons for reauthentification on valid user session return if applicable
@@ -299,7 +300,7 @@ class API {
 						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
 					],
 					'lifespan' => [
-						'idle' => min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+						'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
 					],
 					'limits' => [
 						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']

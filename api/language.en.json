@@ -1549,6 +1549,8 @@
 		"settings_dateformat": "Date format",
 		"settings_hint": "Some settings require a reload. Use the browsers button, Ctrl + F5 or Ctrl + r for this.",
 		"settings_homeoffice": "Homeoffice",
+		"settings_idle": "Idle time before reauthentification",
+		"settings_idle_hint": "Prolonging the default minimum value of :idle seconds may be required for accessibility reasons or for purchase on complex pricelist imports.",
 		"settings_initial_overtime": "Overtime hours on starting time tracking",
 		"settings_initial_overtime_hint": "Number of hours",
 		"settings_language": "Language",

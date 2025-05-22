@@ -36,9 +36,6 @@ graph LR;
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
     * implement [audit methods](http://www.17020-audit.de/auditmethoden/)
-* individual session timeout
-    * accessibility
-    * everyone updating vendor pricelists
 
 ## Content
 * [Aims](#aims)
@@ -2228,7 +2225,7 @@ Despite my best efforts to ensure the accessibility of the CARO App, I am aware 
 Known limitations for the CARO App:
 * Color contrast ratios are not meeting desired thresholds by default. You are able to select a hopefully adequate theme within your user profile.
 * Some horizontal scrollable regions lack direct keyboard access. Desktop mode does provide buttons to navigate these regions. Navigation buttons are hidden for screen readers. Horizontal scrollable regions reduce visual information load for secondary, yet related information, and are therefore considered beneficial in general, even while possibly conflicting reflow criterion.
-* Connection timeout is not individually adjustable as this is a server setting. Please discuss this [general adjustable setting](#server-setup) with your operator.
+* Connection timeout can be prolonged to three times the default setting by administrative users. However this may be still limited by the server settings. Please discuss this [general adjustable setting](#server-setup) with your operator if necessary.
 * Longterm planning happens with colourizing small areas on the screen. Accessibility my be reduced for this particular function due to dimensions and contrast. Beside the legend no additional description can be provided for colourisation.
 
 [Content](#content)

@@ -1901,7 +1901,7 @@ Trotz meiner Bemühungen, die CARO App barrierefrei zu gestalten, bin ich mir ve
 Bekannte Einschränkungen auf der CARO App:
 * Farbkontrast-Verhältnisse erreichen standardmäßig nicht die gewünschte Grenze. Sie können ein hoffentlich adäquates Farbschema im Nutzerprofil wählen.
 * Manche horizontal scrollbare Bereiche haben keine direkte Tastaturerreichbarkeit. Der Desktopmodus stellt Bedienelemente für die Navigation zur Verfügung. Für Bildschirmleser sind diese verborgen. Horizontal scrollbare Bereiche reduzieren die visuelle Informationsfülle für zweitranginge aber zugehörige Informationen und werden daher als insgesamt vorteilhaft betrachtet, auch trotz möglicher Konflikte mit dem Informationsfluss-Kriterium.
-* Der Ablauf von Verbindungen ist nicht individuell anpassbar, da dies eine Servereinstellung ist. Bitte besprechen sie diese [allgemein anpassbare Einstellung](#servereinrichtung) mit Ihrem Betreiber.
+* Der Ablauf von Verbindungen kann durch administrative Nutzer auf das bis zu Dreifache des Standardlimits erhöht werden. Es kann jedoch auch durch die Serverkonfiguration limitiert sein. Bitte besprechen sie diese [allgemein anpassbare Einstellung](#servereinrichtung) mit Ihrem Betreiber falls notwendig.
 * Langzeitplanungen werden durch die Einfärbung kleiner Bildschirmbereiche umgesetzt. Die Barrierefreiheit für diese spezielle Funktion kann aufgrund der Dimensionen und Kontraste beeinträchtigt sein. Für die Einfärbung kann neben der Legende keine zusätzliche Beschreibung zur Verfügung gestellt werden.
 
 [Übersicht](#übersicht)

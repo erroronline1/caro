@@ -564,6 +564,13 @@ class USER extends API {
 					}
 				}
 
+				// set custom idle timeout
+				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_idle'));
+				if ($idle != CONFIG['lifespan']['idle']){
+					$user['app_settings']['idle'] = $idle;
+				}
+				else unset ($user['app_settings']['idle']);
+
 				// gather user skills
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === '_LEVEL') continue;
@@ -763,6 +770,13 @@ class USER extends API {
 						}
 					}
 				}
+
+				// set custom idle timeout
+				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_idle'));
+				if ($idle != CONFIG['lifespan']['idle']){
+					$user['app_settings']['idle'] = $idle;
+				}
+				else unset ($user['app_settings']['timeout']);
 
 				// update skills
 				$user['skills'] = [];
@@ -1084,6 +1098,17 @@ class USER extends API {
 							],
 							'content' => $units,
 							'hint' => $this->_lang->GET('user.units_hint')
+						],
+						[
+							'type' => 'range',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings_idle'),
+								'value' => isset($user['app_settings']['idle']) ? $user['app_settings']['idle'] : CONFIG['lifespan']['idle'],
+								'min' => CONFIG['lifespan']['idle'],
+								'max' => CONFIG['lifespan']['idle'] * 3,
+								'step' => CONFIG['lifespan']['idle'] / 2
+							],
+							'hint' => $this->_lang->GET('user.settings_idle_hint', [':idle' => CONFIG['lifespan']['idle']])
 						]
 					], [
 						[
