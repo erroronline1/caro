@@ -1511,16 +1511,16 @@ class CONSUMABLES extends API {
 		if (!isset($filter['filesetting']['headerrowindex'])) $filter['filesetting']['headerrowindex'] = CONFIG['csv']['headerrowindex'];
 		if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 
-		// update csv-filter filter_by_comparison_file if set
-		if (isset($files['match']) && $files['match']){
-			if (isset($filter['filter'])){
-				foreach($filter['filter'] as &$rule) {
-					if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF"))
-						$rule['filesetting']['source'] = $files['match'];
+		// update csv-filter filter_by_comparison_file if set or drop if not
+		if (isset($filter['filter'])){
+			foreach($filter['filter'] as $ruleindex => &$rule) {
+				if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
+					if (isset($files['match']) && $files['match']) $rule['filesetting']['source'] = $files['match'];
+					else unset($filter['filter'][$ruleindex]);
 				}
 			}
 		}
-
+		
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
@@ -1556,6 +1556,8 @@ class CONSUMABLES extends API {
 				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated'], 'erp_id' => $row['erp_id']];
 			}
 
+//var_dump($pricelist->_list[1]);
+//die();
 			// update remainders
 			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
@@ -1565,11 +1567,11 @@ class CONSUMABLES extends API {
 					':article_name' => $pricelist->_list[1][$index]['article_name'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_name'])) : 'NULL',
 					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_unit'])) : 'NULL',
 					':article_ean' => $pricelist->_list[1][$index]['article_ean'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_ean'])) : 'NULL',
-					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : 'NULL',
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : 'NULL',
-					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : 'NULL',
-					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : 'NULL',
-					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
+					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) && intval($pricelist->_list[1][$index]['trading_good']) ? 1 : 'NULL',
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ? 1 : 'NULL',
+					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) && intval($pricelist->_list[1][$index]['special_attention']) ? 1 : 'NULL',
+					':stock_item' => isset($pricelist->_list[1][$index]['stock_item'])  && intval($pricelist->_list[1][$index]['stock_item']) ? 1 : 'NULL',
+					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) && $pricelist->_list[1][$index]['erp_id'] ? $this->_pdo->quote($pricelist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				]) . '; ');
 			}
@@ -1587,16 +1589,15 @@ class CONSUMABLES extends API {
 					':article_info' => null,
 					':hidden' => null,
 					':protected' => null,
-					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) ? intval($pricelist->_list[1][$index]['trading_good']) : null,
+					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) && intval($pricelist->_list[1][$index]['trading_good']) ? 1 : null,
 					':incorporated' => null,
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) ? intval($pricelist->_list[1][$index]['has_expiry_date']) : null,
-					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) ? intval($pricelist->_list[1][$index]['special_attention']) : null,
-					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) ? intval($pricelist->_list[1][$index]['stock_item']) : null,
-					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) ? $this->_pdo->quote($pricelist->_list[1][$index]['erp_id']) : null,
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ?1 : null,
+					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) && intval($pricelist->_list[1][$index]['special_attention']) ? 1 : null,
+					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) && intval($pricelist->_list[1][$index]['stock_item']) ? 1 : null,
+					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) && $pricelist->_list[1][$index]['erp_id'] ? $pricelist->_list[1][$index]['erp_id'] : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
-
 			foreach ($sqlchunks as $chunk){
 				try {
 					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_date['current']->format("Y-m-d");
