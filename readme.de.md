@@ -1100,9 +1100,10 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
     * [CSV Verarbeitung](#importierung-von-lieferantenpreislisten) @ 100MB beansprucht etwa 2.3GB Speicher
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config für IIS entsprechend der erwarteten Dateigrößen für z.B. Sharepoint und CSV-Dateien ~350MB. Für IIS sollte die [uploadReadAheadSize](#https://techcommunity.microsoft.com/blog/iis-support-blog/solution-for-%E2%80%9Crequest-entity-too-large%E2%80%9D-error/501134) entsprechend konfiguriert werden.
 * php.ini max_input_time -1 für das Teilen großer Uploads mit max_execution_time, abhängig von der erwarteten Verbindungsgeschwindigkeit.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) da die [CSV-Verarbeitung](#csv-prozessor) in Abhängigkeit des Datenaufkommens und jeweiliger Filter eine Weile dauern kann.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) da die [CSV-Verarbeitung](#csv-prozessor) in Abhängigkeit des Datenaufkommens und jeweiliger Filter eine Weile dauern kann. Möglicherweise muss auch eine Anpassung des Prozessor-Timeouts im Anwendungspool von IIS und des [idle-limits](#laufzeitvariablen) vorgenommen werden.
     * Preislistenimport @ 220k Zeilen benötigt etwa 1 Minute mit Uniform Server, 1 Minute mit SQL Server
     * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
+    * der Preislistenimport benötigt mehr Zeit für die [Aktualisierung von Artikeln](#importierung-von-lieferantenpreislisten) als für das Löschen und Wiedereinfügen
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[limits][idle_logout]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
@@ -1361,7 +1362,7 @@ Das Leben, das medizinische Feld und regulatorische Anforderungen sind komplizie
 
 ### Handhabe der Netzwerkverbindung
 * Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Dokumentenversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
-* POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die ServiceWorker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von Aufzeichnungen sicher.
+* POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die ServiceWorker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von (zwischengespeicherten) Aufzeichnungen sicher.
 
 ### Verschiedenes
 * Eine Festlegung der Paketgröße für die SQL-Umgebung auf einen größeren Wert als die Standardkonfiguration neben der Anpassung des Wertes in der config.ini ist sinnvoll. Es ist vorgesehen, dass Stapel-Abfragen aufgeteilt werden, es kann aber vorkommen, dass einzelne Anfragen mit gelegentlich Base64-codierten Bildern die Standardbegrenzung überschreiten.
@@ -1549,6 +1550,13 @@ Andere Lieferanten listen Artikel deren Bestellnummer noch eine Farbvariante ang
 ```
 
 Natürlich können auch beliebige andere Filter eingefügt werden, z.B. um ohnehin ungenutzte Artikel von vorneherein beim Import auszuschließen oder den nächsten Import durch den Ausschluss nicht eingeführter Produkte zu beschleunigen.
+
+Produkte werden im Falle einer Preislistenaktualisierung automatisch gelöscht, es sei denn
+* es fand eine Produkteinführung statt,
+* es wurde eine Stichprobenprüfung durchgeführt,
+* es wurde ein Dokument beigefügt,
+* es wurde ein Alias festgelegt
+* oder es wurde schon einmal bestellt.
 
 ### Stichprobenprüfung, Verfallsdaten und besondere Aufmerksamkeit
 *modify.add* und *modify.conditional* definieren Handelswaren für die Stichprobenprüfung nach MDR §14 und Artikel mit Verfallsdaten oder besonderer Aufmerksamkeit. *conditional* kann auch nach dem *rewrite* von "article_name" angewendet werden, sofern diese Spalte aus zusammenhängenden Ursprungsspalten besteht. Sollen alle Artikel des Lieferanten als Handelswaren markiert werden kann "trading_good" als 1 ergänzt (*add*) und *conditional* ausgelassen werden. Wenn bekanntermaßen keine Handelswaren in der Preisliste enthalten sind kann dies komplett entfallen, da "trading_good" standardmäßig mit 0 angelegt wird. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.

@@ -36,6 +36,9 @@ graph LR;
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
     * implement [audit methods](http://www.17020-audit.de/auditmethoden/)
+* individual session timeout
+    * accessibility
+    * everyone updating vendor pricelists
 
 ## Content
 * [Aims](#aims)
@@ -1197,9 +1200,10 @@ It is strongly recommended to create an additional development environment to te
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB. On IIS [uploadReadAheadSize](#https://techcommunity.microsoft.com/blog/iis-support-blog/solution-for-%E2%80%9Crequest-entity-too-large%E2%80%9D-error/501134) should be configured accordingly.
 * php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though. This might have to be adjusted. Possibly there has to be an adjustment for processor timout within the app pool settings of IIS and [session timeout](#runtime-variables) as well.
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
+    * pricelist import does take a lot longer on [updating products](#importing-vendor-pricelists) than deleting and reinserting
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * optional php.ini session.gc_maxlifetime in relation to [CONFIG[limits][idle_logout]](#runtime-variables)
 * php.ini enable extensions:
@@ -1457,7 +1461,7 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 
 ### Network connection handling
 * The application caches requests. Get requests return the latest successful retrieved version, which might not always be the recent system state on connection loss, but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing records.
+* POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing (cached) records.
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
@@ -1645,6 +1649,13 @@ Other vendors may list products missing color variants appended to the article n
 ```
 
 You can, of course, decide to go the extra mile and apply any additional filter, e.g. to omit products you will not use anyway, speed up the import for next time by leaving out products that did not fit incorporation, etc.
+
+Products are deleted by default on update of the pricelist unless
+* an incorporation has been made,
+* a sample check has been made,
+* any document to the product has been provided,
+* an alias has been modified
+* or it has been ordered.
 
 ### Sample check, expiry dates and special attention
 *modify.add* and *modify.conditional* define trading goods for the MDR §14 sample check and the expiry date attribute or special attention. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates and special attention.
