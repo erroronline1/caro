@@ -107,6 +107,7 @@ const _ = {
 			method: method, // *GET, POST, PUT, DELETE, etc.
 			cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
 			body: method == "GET" ? null : form_data ? payload : JSON.stringify(payload), // body data type must match "Content-Type" header
+			timeout: false
 		}).then(async (response) => {
 			if (response.statusText === "OK" || response.status === 511)
 				return {
@@ -114,6 +115,8 @@ const _ = {
 					body: await response.json(),
 				};
 			else throw new Error("server responded " + response.status + ": " + httpResponse[response.status]);
+		}).catch(e => {
+			console.trace(e);
 		});
 		return response;
 		/* use like 
