@@ -485,7 +485,7 @@ class APPLICATION extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('application.timeout_aria', [':minutes' => round(min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')) / 60)])
+					'name' => $this->_lang->GET('application.timeout_aria', [':minutes' => round((isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime'))) / 60)])
 				]
 			]
 		];
