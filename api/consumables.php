@@ -1553,16 +1553,28 @@ class CONSUMABLES extends API {
 				]
 			]);
 			foreach($remained as $row) {
-				$remainder[] = ['id' => $row['id'], 'article_no' => $row['article_no'], 'incorporated' => $row['incorporated'], 'erp_id' => $row['erp_id']];
+				$remainder[] = [
+					'id' => $row['id'],
+					'article_no' => $row['article_no'],
+
+					'article_unit' => $row['article_unit'],
+					'article_ean' => $row['article_ean'],
+					'trading_good' => $row['trading_good'],
+					'has_expiry_date' => $row['has_expiry_date'],
+					'special_attention' => $row['special_attention'],
+					'stock_item' => $row['stock_item'],
+					'incorporated' => $row['incorporated'],
+					'erp_id' => $row['incorporated'],
+				];
 			}
 
-//var_dump($pricelist->_list[1]);
-//die();
 			// update remainders
 			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
-				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_product_pricelist_import'),
-				[
+
+				// prepare query
+				$query = SQLQUERY::PREPARE('consumables_put_product_pricelist_import');
+				$replace = [
 					':id' => $remainder[$update]['id'],
 					':article_name' => $pricelist->_list[1][$index]['article_name'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_name'])) : 'NULL',
 					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_unit'])) : 'NULL',
@@ -1573,7 +1585,26 @@ class CONSUMABLES extends API {
 					':stock_item' => isset($pricelist->_list[1][$index]['stock_item'])  && intval($pricelist->_list[1][$index]['stock_item']) ? 1 : 'NULL',
 					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) && $pricelist->_list[1][$index]['erp_id'] ? $this->_pdo->quote($pricelist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
-				]) . '; ');
+				];
+				// iterate over columns and values, strip equals to shorten each query and crunch more into one the chunks to speed up sql
+				foreach([
+					// 'article_name', leave one out to remain a valid query
+					'article_unit',
+					'article_ean',
+					'trading_good',
+					'has_expiry_date',
+					'special_attention',
+					'stock_item',
+					'erp_id',
+					'incorporated'
+				] as $column){
+					if ( ($replace[':' . $column] === $remainder[$update][$column])
+						|| (!$remainder[$update][$column] && $replace[':' . $column] === 'NULL')
+					) {
+						$query = preg_replace('/,{0,1} ' . $column . ' = :' . $column . '/', '', $query);
+					}
+				}
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
 			}
 
 			// insert replacements
