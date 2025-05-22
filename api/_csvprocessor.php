@@ -357,7 +357,7 @@ class Listprocessor {
 	
 		// match lists
 		foreach($thislistwithoutempty as $index => $self_row){
-			foreach ($rule['match'] as $any_or_all => $compare_columns){
+			foreach ($rule['match'] as $compareType => $compare_columns){
 				$corresponds = [];
 				$cmp_index = null;
 				// detect index from compare file for matching column
@@ -366,13 +366,13 @@ class Listprocessor {
 						if (!isset($corresponds[$index])) $corresponds[$index] = [];
 						$corresponds[$index][] = $cmp_index;
 					}
-					if ($any_or_all === 'any') break;
+					if ($compareType === 'any') break;
 				}
 				foreach($corresponds as $index => $corresponding){
-					if (($any_or_all === 'any' && count($corresponding)) ||
-						($any_or_all === 'all' && count($corresponding) === count(array_keys($compare_columns)) && count(array_unique($corresponding)) === 1)) {
+					if (($compareType === 'any' && count($corresponding)) ||
+						($compareType === 'all' && count($corresponding) === count(array_keys($compare_columns)) && count(array_unique($corresponding)) === 1)) {
 						$matched[] = [$index, $cmp_index];
-					}	
+					}
 				}
 			}
 		}
@@ -395,17 +395,16 @@ class Listprocessor {
 				}	
 			}
 		}
-
 		// transfer values from comparison list to main list
 		if (isset($rule['transfer'])){
+			$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
 			foreach ($rule['transfer'] as $newcolumn => $from){
 				if (!isset($this->setting['filesetting']['columns'][$newcolumn])) $this->_setting['filesetting']['columns'][] = $newcolumn;
-				foreach ($this->_list as $i => $row){
-					if (!$row) continue;
-					$row[$newcolumn] = '';
-					if ($match = array_search($i, array_column($matched, 0))){
+				foreach ($thislistwithoutempty as $i => $row){
+					if (($match = array_search($i, array_column($matched, 0))) !== false){
 						$row[$newcolumn] = $compare_list->_list[1][$matched[$match][1]][$from];
 					}
+					else $row[$newcolumn] = '';
 					$this->_list[$i] = $row;
 				}
 			}
