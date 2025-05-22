@@ -1103,10 +1103,10 @@ class USER extends API {
 							'type' => 'range',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.settings_idle'),
-								'value' => isset($user['app_settings']['idle']) ? $user['app_settings']['idle'] : CONFIG['lifespan']['idle'],
 								'min' => CONFIG['lifespan']['idle'],
 								'max' => CONFIG['lifespan']['idle'] * 3,
-								'step' => CONFIG['lifespan']['idle'] / 2
+								'step' => CONFIG['lifespan']['idle'] / 2,
+								'value' => strval(isset($user['app_settings']['idle']) ? $user['app_settings']['idle'] : CONFIG['lifespan']['idle']),
 							],
 							'hint' => $this->_lang->GET('user.settings_idle_hint', [':idle' => CONFIG['lifespan']['idle']])
 						]
