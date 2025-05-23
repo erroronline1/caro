@@ -172,6 +172,14 @@
 		"welcome_header": "Welcome:user"
 	},
 	"application": {
+		"about": {
+			"license": "Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n \nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.",
+			"license_header": "CARO - Cloud Assisted Records and Operations",
+			"lines": ":code lines of code\n:documentation lines of documentation\n:configuration lines of configuration",
+			"lines_header": "Affectionate crafted",
+			"source": "https://github.com/erroronline1/caro",
+			"source_header": "Source"
+		},
 		"dashboard": {
 			"audits": ":number audits await completion",
 			"cases": "There are :number open cases for your assigned units",
@@ -206,14 +214,6 @@
 			"504": "Gateway Timeout",
 			"505": "HTTP Version Not Supported",
 			"507": "Insufficient Storage"
-		},
-		"info": {
-			"license": "Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n \nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.",
-			"license_header": "CARO - Cloud Assisted Records and Operations",
-			"lines": ":code lines of code\n:documentation lines of documentation\n:configuration lines of configuration",
-			"lines_header": "Affectionate crafted",
-			"source": "https://github.com/erroronline1/caro",
-			"source_header": "Source"
 		},
 		"login": "User authentification",
 		"manual": {
@@ -965,8 +965,8 @@
 	},
 	"menu": {
 		"application": {
+			"about": "About",
 			"header": "Application",
-			"info": "Info",
 			"manual_manager": "Edit manual",
 			"signin": "Please sign in",
 			"signout_user": "sign out :name",

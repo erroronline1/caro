@@ -86,14 +86,14 @@ class APPLICATION extends API {
 	}
 
 	/**
-	 *   _     ___     
-	 *  |_|___|  _|___ 
-	 *  | |   |  _| . |
-	 *  |_|_|_|_| |___|
-	 *
+	 *       _           _   
+	 *   ___| |_ ___ _ _| |_ 
+	 *  | .'| . | . | | |  _|
+	 *  |__,|___|___|___|_|  
+	 * 
 	 * display application info 
 	 */
-	public function info(){
+	public function about(){
 		$lines = ['frontend' => 0, 'backend' => 0, 'code' => 0, 'documentation' => 0, 'configuration' => 0];
 		foreach (['../', '../js', '../api'] as $dir){
 			foreach (scandir($dir) as $file){
@@ -126,23 +126,23 @@ class APPLICATION extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('application.info.license_header')
+					'name' => $this->_lang->GET('application.about.license_header')
 				],
-				'content' => $this->_lang->GET('application.info.license')
+				'content' => $this->_lang->GET('application.about.license')
 			],
 			[
 				'type' => 'links',
-				'description' => $this->_lang->GET('application.info.source_header'),
+				'description' => $this->_lang->GET('application.about.source_header'),
 				'content' => [
-					$this->_lang->GET('application.info.source') => ['target' => '_blank']
+					$this->_lang->GET('application.about.source') => ['target' => '_blank']
 				]
 			],
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('application.info.lines_header')
+					'name' => $this->_lang->GET('application.about.lines_header')
 				],
-				'content' => $this->_lang->GET('application.info.lines', [':code' => $lines['code'], ':documentation' => $lines['documentation'], ':configuration' => $lines['configuration']])
+				'content' => $this->_lang->GET('application.about.lines', [':code' => $lines['code'], ':documentation' => $lines['documentation'], ':configuration' => $lines['configuration']])
 			],
 		]]];
 		$this->response($response);
@@ -383,7 +383,7 @@ class APPLICATION extends API {
 		// get permission based menu items
 		if (!isset($_SESSION['user'])) $this->response(['render' => [$this->_lang->GET('menu.application.header') => [
 			$this->_lang->GET('menu.application.signin') => ['onclick' => "api.application('get', 'start')"],
-			$this->_lang->GET('menu.application.info') => ['onclick' => "api.application('get', 'info')"]
+			$this->_lang->GET('menu.application.about') => ['onclick' => "api.application('get', 'about')"]
 			]]]);	// early exit
 
 		//////////////////////////////////
@@ -455,15 +455,15 @@ class APPLICATION extends API {
 		// application
 		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onclick' => "api.user('get', 'user')"];
 		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onclick' => "api.application('get', 'manual')"];
-		// make sure info comes last so this is an an order exception without special permission
-		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.info')] = ['onclick' => "api.application('get', 'info')"];
+		// make sure about comes last so this is an an order exception without special permission
+		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.about')] = ['onclick' => "api.application('get', 'about')"];
 
 		// purchase
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
 		// tools
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
 
 		$this->response(['render' => $menu]);
 	}

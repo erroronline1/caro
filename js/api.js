@@ -466,9 +466,9 @@ export const api = {
 						payload = request.pop();
 				}
 				break;
-			case "info":
+			case "about":
 				successFn = function (data) {
-					api.update_header(api._lang.GET("menu.application.info"));
+					api.update_header(api._lang.GET("menu.application.about"));
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
