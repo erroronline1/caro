@@ -606,14 +606,16 @@ export const api = {
 
 					// import server side settings
 					await api.application("get", "language");
-					await api.application("get", "menu");
-					api.history.buttoncolor();
 
-					if (api._settings.user) _serviceWorker.register();
+					if (api._settings.user) await _serviceWorker.register();
 					else {
 						clearInterval(_serviceWorker.notif.interval);
 						_serviceWorker.notif.interval = null;
+						_serviceWorker.terminate();
 					}
+
+					await api.application("get", "menu");
+					api.history.buttoncolor();
 
 					// replace "please sign in" with user name for landing page
 					let signin = api._lang.GET("menu.application.signin"),
@@ -1446,7 +1448,7 @@ export const api = {
 							case "productselection": // coming from assemble.js widget
 								successFn = function (data) {
 									let article = document.querySelector("#inputmodal form article");
-									let sibling = article.children[3], // as per assemble after button, label and hidden input
+									let sibling = article.children[3], // as per assemble after button, label, hint and hidden input
 										deletesibling;
 									sibling = sibling.nextSibling;
 									if (sibling) {
@@ -1458,7 +1460,7 @@ export const api = {
 									}
 									if (data.render && data.render.content) {
 										const render = new Assemble(data.render);
-										render.initializeSection(null, article.children[2]);
+										render.initializeSection(null, article.children[3]);
 										render.processAfterInsertion();
 									}
 									if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
