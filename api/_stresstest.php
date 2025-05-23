@@ -323,7 +323,8 @@ class STRESSTEST extends INSTALL{
 					isset($entry['unit']) &&
 					$dbentry['unit'] === $entry['unit'] &&
 					$dbentry['hint'] == $entry['hint'] && // empty !== null
-					$dbentry['objectives'] === $entry['objectives']
+					$dbentry['objectives'] === $entry['objectives'] &&
+					$dbentry['method'] === $entry['method']
 					// no checking if $dbentry['content'] === $entry['content'] for db-specific character encoding
 				){
 					SQLQUERY::EXECUTE($this->_pdo, 'audit_delete_template', [

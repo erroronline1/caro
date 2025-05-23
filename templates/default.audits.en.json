@@ -3,6 +3,7 @@
 		"unit": "office",
 		"hint": "purchase",
 		"objectives": "The internal audit is supposed to check if this unit complies to relevant regulatory requirements and processes according to ISO 13485.\n \nAudit goals:\n- Assessment of management system conformity grade\n- Assessment of ability of management system to ensure regulatory requirements fulfilment\n- Assessment of effectiveness of management system reaching the defined goals\n- Assessment of ability of management system to provide compliant products\n- Possible improvements\n \nBasis:\n- EN ISO 13485\n- QM-handbook and appending documents",
+		"method": "interview",
 		"content": [
 			{
 				"question": "How is an order processed?",
@@ -65,6 +66,7 @@
 		"unit": "",
 		"hint": "",
 		"objectives": "",
+		"method": "",
 		"content": [
 			{
 				"question": "",

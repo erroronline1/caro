@@ -3,6 +3,7 @@
 		"unit": "prosthetics2",
 		"hint": "",
 		"objectives": "Das interne Audit des Bereichs Prothetik II - Armprothetik soll prüfen, ob der Bereich alle relevanten regulatorischen Anforderungen und Prozessabläufe gemäß ISO 13485 erfüllt.\n \nAuditziele:\n- Feststellung des Grades der Konformität des Managementsystems\n- Beurteilung der Fähigkeit des Managementsystems die Erfüllung regulatorischer Anforderungen sicherzustellen\n- Beurteilung der Wirksamkeit des Managementsystems die festgelegten Ziele zu erreichen\n- Beurteilung der Fähigkeit des Managementsystems konforme Produkte bereitzustellen\n- Nennung möglicher Verbesserungen\n \nGrundlagen:\n- EN ISO 13485\n- QM-Handbuch und anhängige Dokumente",
+		"method": "interview",
 		"content": [
 			{
 				"question": "Gab es neue Produkte, die in Versorgungen eingesetzt werden?",
@@ -90,6 +91,7 @@
 		"unit": "office",
 		"hint": "Beschaffung",
 		"objectives": "Das interne Audit des Bereichs Beschaffung soll prüfen, ob der Bereich alle relevanten regulatorischen Anforderungen und Prozessabläufe gemäß ISO 13485 erfüllt.\n \nAuditziele:\n- Feststellung des Grades der Konformität des Managementsystems\n- Beurteilung der Fähigkeit des Managementsystems die Erfüllung regulatorischer Anforderungen sicherzustellen\n- Beurteilung der Wirksamkeit des Managementsystems die festgelegten Ziele zu erreichen\n- Beurteilung der Fähigkeit des Managementsystems konforme Produkte bereitzustellen\n- Nennung möglicher Verbesserungen\n \nGrundlagen:\n- EN ISO 13485\n- QM-Handbuch und anhängige Dokumente",
+		"method": "interview",
 		"content": [
 			{
 				"question": "Wie läuft eine Bestellung ab?",
@@ -152,6 +154,7 @@
 		"unit": "office",
 		"hint": "Verwaltung",
 		"objectives": "Das interne Audit des Bereichs Verwaltung soll prüfen, ob der Bereich alle relevanten regulatorischen Anforderungen und Prozessabläufe gemäß ISO 13485 erfüllt.\n \nAuditziele:\n- Feststellung des Grades der Konformität des Managementsystems\n- Beurteilung der Fähigkeit des Managementsystems die Erfüllung regulatorischer Anforderungen sicherzustellen\n- Beurteilung der Wirksamkeit des Managementsystems die festgelegten Ziele zu erreichen\n- Beurteilung der Fähigkeit des Managementsystems konforme Produkte bereitzustellen\n- Nennung möglicher Verbesserungen\n \nGrundlagen:\n- EN ISO 13485\n- QM-Handbuch und anhängige Dokumente",
+		"method": "interview",
 		"content": [
 			{
 				"question": "Wie läuft eine Kostenvoranschlagserstellung ab?",

@@ -881,7 +881,8 @@ class INSTALL {
 			if (!(
 				isset($entry['unit']) && $entry['unit'] &&
 				isset($entry['objectives']) && $entry['objectives'] &&
-				isset($entry['content']) && $entry['content']
+				isset($entry['content']) && $entry['content'] &&
+				isset($entry['method']) && $entry['method']
 				)){
 				$this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
@@ -892,6 +893,8 @@ class INSTALL {
 			$similar = array_filter($DBall, fn($audit) => $audit['unit'] === $entry['unit']);
 			// keep only by current objectives
 			$similar = array_filter($similar, fn($audit) => $audit['objectives'] === $entry['objectives']);
+			// keep only by current method
+			$similar = array_filter($similar, fn($audit) => $audit['method'] === $entry['method']);
 			// keep only by current hints, compare boolval for empty and null values
 			$similar = array_filter($similar, fn($audit) => ($audit['hint'] === $entry['hint'] || boolval($audit['hint']) === boolval($entry['hint'])));
 			// proceed only if NO similar items remain
@@ -916,6 +919,7 @@ class INSTALL {
 					':unit' => $entry['unit'],
 					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
 					':hint' => $entry['hint'] ? : null,
+					':method' => $entry['method']
 				];
 			}
 		}
