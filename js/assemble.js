@@ -2157,8 +2157,10 @@ export class Assemble {
 			imagealigned = true;
 			this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 		}
+		
+		if ('onkeydown' in this.currentElement.attributes) this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') event.preventDefault(); " + this.currentElement.attributes.onkeydown;
+		else this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') event.preventDefault();"
 		input = this.apply_attributes(this.currentElement.attributes, input);
-		input.onkeydown = new Function("if (event.key === 'Enter') event.preventDefault()");
 
 		if (this.currentElement.datalist !== undefined && this.currentElement.datalist.length) {
 			datalist = document.createElement("datalist");
