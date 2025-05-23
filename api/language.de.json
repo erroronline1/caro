@@ -483,7 +483,7 @@
 			"edit": "Laufendes Audit fortsetzen",
 			"execute": {
 				"close": "abgeschlossen",
-				"close_confirm": "Nach dem Abschluss ist eine weitere Bearbeitung nicht mehr möglich. Fortfahren?",
+				"close_confirm": "Nach dem Abschluss ist eine weitere Bearbeitung nicht mehr möglich. Der auditierte Bereich erhält eine Nachricht mit der Zusammenfassung. Fortfahren?",
 				"conversation_partner": "Gesprächspartner",
 				"delete_confirm_header": "Audit für :unit dauerhaft löschen?",
 				"delete_confirm_ok": "Ja, Audit löschen",

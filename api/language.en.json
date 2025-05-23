@@ -483,7 +483,7 @@
 			"edit": "Proceed with ongoing audit",
 			"execute": {
 				"close": "completed",
-				"close_confirm": "After closing editing is not longer possible. Proceed?",
+				"close_confirm": "After closing editing is not longer possible. The audited unit will be sent a message with the summary. Proceed?",
 				"conversation_partner": "Conversation partner",
 				"delete_confirm_header": "Delete Audit for :unit permanently?",
 				"delete_confirm_ok": "Yes, delete",
