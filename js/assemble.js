@@ -51,11 +51,18 @@ export class Masonry {
 	 * performance is not that great at above 300 children of different heights:
 	 * * at 300 orders stresstest render time is above 10 seconds
 	 * -> limit masonry reordering to this.timeout as maximum added time to interface rendering since as of today only orders may be affected by this and shifting is not that crucial here
+	 * 
+	 * breakpoints can be applied or revoked if necessary
 	 */
 
+	columns = null;
+	cssBreakpoints = {
+		"only screen and (min-width: 2000rem)": "only screen and (min-width: 110rem)",
+		"only screen and (min-width: 3000rem)": "only screen and (min-width: 165rem)",
+	};
+	timeout = 5000; // milliseconds
+
 	constructor() {
-		this.timeout = 5000; // milliseconds
-		this.columns = null;
 		this.observer = new MutationObserver(async (mutations) => {
 			this.observer.disconnect();
 
@@ -88,6 +95,30 @@ export class Masonry {
 			childList: true,
 			subtree: true,
 		});
+	}
+
+	/**
+	 * sets stylesheet breakpoints
+	 * @param {boolean} set
+	 */
+	async breakpoints(apply = false) {
+		let stylesheet;
+		for (const [i, sname] of Object.entries(document.styleSheets)) {
+			if (!sname.href.includes("style.css")) continue;
+			stylesheet = document.styleSheets[i].cssRules;
+			break;
+		}
+		for (let i = 0; i < stylesheet.length; i++) {
+			if (apply) {
+				if (stylesheet[i].conditionText in this.cssBreakpoints) {
+					stylesheet[i].media.mediaText = this.cssBreakpoints[stylesheet[i].conditionText];
+				}
+			} else {
+				if (Object.values(this.cssBreakpoints).includes(stylesheet[i].conditionText)) {
+					stylesheet[i].media.mediaText = Object.keys(this.cssBreakpoints).find((key) => this.cssBreakpoints[key] === stylesheet[i].conditionText);
+				}
+			}
+		}
 	}
 
 	/**
@@ -132,8 +163,8 @@ export class Masonry {
 			const startTime = Date.now();
 			// retrieve nodes
 			let container = document.querySelector("main>form");
-			if (!container || !container.firstChild || !["article"].includes(container.firstChild.localName)) container = document.querySelector("main>div:first-of-type"); // e.g. in document composer, where an initial empty form is preplaced before visible content and later filled with shadow inputs
-			if (!container || !container.firstChild || !["article"].includes(container.firstChild.localName)) {
+			if (!container || !container.firstChild || !["article", "button"].includes(container.firstChild.localName)) container = document.querySelector("main>div:first-of-type"); // e.g. in document composer, where an initial empty form is preplaced before visible content and later filled with shadow inputs
+			if (!container || !container.firstChild || !["article", "button"].includes(container.firstChild.localName)) {
 				resolve();
 				return;
 			}
@@ -796,8 +827,7 @@ export class Dialog {
 		}
 		if (this.render.type === "image") {
 			const filetype = this.render.content.split(".");
-			if (["png", "jpg", "jpeg", "gif"].includes(filetype[filetype.length - 1].toLowerCase()) ||
-				this.render.content.startsWith("data:image")) {
+			if (["png", "jpg", "jpeg", "gif"].includes(filetype[filetype.length - 1].toLowerCase()) || this.render.content.startsWith("data:image")) {
 				result.push(canvas);
 				this.previewElements.canvas = canvas;
 			} else {
@@ -1242,7 +1272,7 @@ export class Assemble {
 			const options = {};
 			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
 			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({ type: "confirm", header: api._lang.GET("general.save", {":title": document.querySelector("header>h1").innerHTML}), options: options }).then((confirmation) => {
+			new Dialog({ type: "confirm", header: api._lang.GET("general.save", { ":title": document.querySelector("header>h1").innerHTML }), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
 		} else new Toast(api._lang.GET("general.missing_form_data"), "error");
