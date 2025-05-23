@@ -334,6 +334,7 @@ export class Composer {
 		const unit = document.getElementById("TemplateUnit").value,
 			objectives = document.getElementById("TemplateObjectives").value,
 			hint = document.getElementById("TemplateHint").value,
+			method = document.getElementById("TemplateMethod").value,
 			data = new FormData();
 
 		/**
@@ -364,6 +365,7 @@ export class Composer {
 			data.append("content", JSON.stringify(templateContent));
 			data.append("objectives", objectives);
 			data.append("hint", hint);
+			data.append("method", method);
 			return data;
 		}
 		new Toast(api._lang.GET("audit.audit.template.not_saved_missing"), "error");

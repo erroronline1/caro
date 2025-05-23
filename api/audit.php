@@ -77,6 +77,7 @@ class AUDIT extends API {
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
 				$audit[':content'] = [
 					'objectives' => $template['objectives'],
+					'method' => $template['method'],
 					'summary' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.summary')) ? : null,
 					'questions' => []
 				];
@@ -165,6 +166,7 @@ class AUDIT extends API {
 				// reset content to passed values
 				$audit['content'] = [
 					'objectives' => $template['objectives'],
+					'method' => $template['method'],
 					'summary' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.summary')) ? : null,
 					'questions' => []
 				];
@@ -335,6 +337,7 @@ class AUDIT extends API {
 								'name' => $this->_lang->_USER['units'][$template['unit']]
 							],
 							'content' => $template['objectives'] .
+								(!$template['method'] ? '' : " \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $template['method'])) .
 								($audit['id'] ? "\n \n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $this->dateFormat($audit['last_touch']), ':user' => $audit['last_user']]) : '')
 						]
 					];
@@ -494,6 +497,7 @@ class AUDIT extends API {
 		
 		$summary['content'][$audit['last_user']] = '';
 		$summary['content'][$this->_lang->GET('audit.audit.objectives', [], true)] = $audit['content']['objectives'];
+		$summary['content'][$this->_lang->GET('audit.audit.method', [], true)] = $audit['content']['method'] ? $this->_lang->GET('audit.audit.methods.' . $audit['content']['method']) : '';
 		foreach($audit['content']['questions'] as $question){
 			$currentquestion = null;
 			// assign question as key and current question direct response as initial value
@@ -562,7 +566,8 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $this->_lang->_DEFAULT['units'][$audit['unit']] . ' ' . $this->dateFormat($audit['last_touch']) . ' ' . $audit['last_user']
 					],
-					'content' => $this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives']
+					'content' => $this->_lang->GET('audit.audit.objectives', [], true). "\n \n" . $audit['content']['objectives'] .
+						(!isset($audit['content']['method']) ? '' : " \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $audit['content']['method']))
 				]
 			];
 			foreach($audit['content']['questions'] as $question){
@@ -651,16 +656,24 @@ class AUDIT extends API {
 					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 					':hint' =>  UTILITY::propertySet($this->_payload, 'hint'),
+					':method' => null,
 				];
-				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives']) $this->response([], 400);
 
 				// sanitize payload content and translate regulatory to keys
+				foreach($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
+					if ($description === UTILITY::propertySet($this->_payload, 'method')){
+						$template[':method'] = $method;
+						break;
+					}
+				}
+				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives'] || !$template[':method']) $this->response([], 400);
 				$template[':content'] = json_decode($template[':content'] ? : '', true);
 				$template[':content'] = sanitizeQuestionNesting($template[':content']);
 				foreach($template[':content'] as &$question){
 					$question['regulatory'] = explode(', ', $question['regulatory']);
 					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
+
 				$template[':content'] = UTILITY::json_encode($template[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', [
@@ -685,17 +698,25 @@ class AUDIT extends API {
 					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 					':hint' =>  UTILITY::propertySet($this->_payload, 'hint'),
-					':id' => $this->_requestedID
+					':id' => $this->_requestedID,
+					':method' => null,
 				];
-				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives']) $this->response([], 400);
 
 				// sanitize payload content and translate regulatory to keys
+				foreach($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
+					if ($description === UTILITY::propertySet($this->_payload, 'method')){
+						$template[':method'] = $method;
+						break;
+					}
+				}
+				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives'] || !$template[':method']) $this->response([], 400);
 				$template[':content'] = json_decode($template[':content'] ? : '', true);
 				$template[':content'] = sanitizeQuestionNesting($template[':content']);
 				foreach($template[':content'] as &$question){
 					$question['regulatory'] = explode(', ', $question['regulatory']);
 					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
+
 				$template[':content'] = UTILITY::json_encode($template[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put_template', [
@@ -731,7 +752,8 @@ class AUDIT extends API {
 						'objectives' => '',
 						'author' => '',
 						'date' => null,
-						'hint' => null
+						'hint' => null,
+						'method' => null,
 					];
 				}
 
@@ -747,6 +769,7 @@ class AUDIT extends API {
 					$units[$description] = $unit === $template['unit'] ? ['selected' => true] : [];
 				}
 				
+				// prepare selection and datalists
 				foreach($data as $row){
 					// selection
 					$select[$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
@@ -769,6 +792,12 @@ class AUDIT extends API {
 				$templatehints = array_unique($templatehints);
 				$templatehints = array_filter($values, fn($v) => boolval($v));
 				ksort($templatehints);
+
+				// prepare methods
+				$auditmethods = [];
+				foreach($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
+					$auditmethods[$description] = $method === $template['method'] ? ['selected' => true] : [];
+				}
 
 				// prepare and append content for editor rendering
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
@@ -826,6 +855,13 @@ class AUDIT extends API {
 							'data-loss' => 'prevent'
 						],
 						'autocomplete' => array_values($datalist['objectives']) ? : null
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'name' => $this->_lang->GET('audit.audit.method'),
+							'id' => 'TemplateMethod'
+						],
+						'content' => $auditmethods,
 					], [
 						'type' => 'button',
 						'attributes' => [

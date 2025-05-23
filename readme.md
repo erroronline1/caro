@@ -34,7 +34,6 @@ graph LR;
 * audit
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
-    * implement [audit methods](http://www.17020-audit.de/auditmethoden/)
 * review permissions in safari context
     * https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
 
@@ -648,7 +647,7 @@ Entries are persistent and can be exported if desired through the [evaluation an
 [Content](#content)
 
 ### Audit
-The application enables you to prepare internal audits, including programme objectives and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted, reordered by [dragging and dropping](#miscellaneous) and reimported. The summary of a previous audit for the respective unit can be imported for upcoming reference.
+The application enables you to prepare internal audits, including programme objectives, audit method and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted, reordered by [dragging and dropping](#miscellaneous) and reimported. The summary of a previous audit for the respective unit can be imported for upcoming reference.
 Audits can be added to the calendar from the form as well, informing selected units.
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template.png)

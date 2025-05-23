@@ -56,6 +56,7 @@ define('DEFAULTSQL', [
 				"	`date` datetime NOT NULL," .
 				"	`author` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`hint` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`method` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -344,7 +345,8 @@ define('DEFAULTSQL', [
 				"	unit varchar(255) NOT NULL," .
 				"	date smalldatetime NOT NULL," .
 				"	author varchar(MAX) NULL DEFAULT NULL," .
-				"	hint varchar(255) NULL DEFAULT NULL" .
+				"	hint varchar(255) NULL DEFAULT NULL," .
+				"	method varchar(255) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_calendar', N'U') IS NULL " .

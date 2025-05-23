@@ -207,12 +207,12 @@ class SQLQUERY {
 	
 		
 		'audit_post_template' => [
-			'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives, unit, date, author, hint) VALUES (NULL, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint)",
-			'sqlsrv' => "INSERT INTO caro_audit_templates (content, objectives, unit, date, author, hint) VALUES (:content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint)"
+			'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives, unit, date, author, hint, method) VALUES (NULL, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method)",
+			'sqlsrv' => "INSERT INTO caro_audit_templates (content, objectives, unit, date, author, hint, method) VALUES (:content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method)"
 		],
 		'audit_put_template' => [
-			'mysql' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, hint = :hint, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, hint = :hint, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id"
+			'mysql' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id"
 		],
 		'audit_get_templates' => [
 			'mysql' => "SELECT * FROM caro_audit_templates",

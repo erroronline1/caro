@@ -507,6 +507,14 @@
 				"summary": "Zusammenfassung"
 			},
 			"hint": "Hinweis",
+			"method": "Auditmethode",
+			"methods": {
+				"checklist": "Abarbeitung einer Checkliste",
+				"data": "Datenanlyse",
+				"documents": "Dokumentenprüfung",
+				"interview": "Befragung verantwortlicher Mitarbeiter",
+				"observe": "Beobachtung von Tätigkeiten"
+			},
 			"objectives": "Auditprogrammziele",
 			"reminder_message": "Es sind :days Tage vergangen seit der letzten Bearbeitung des Audits für :unit. Die letzte Bearbeitung fand am :date statt.\nBitte schließe das Audit ab.",
 			"template": {

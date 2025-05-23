@@ -544,7 +544,7 @@ Die Einträge können nicht gelöscht und durch das [Regulatorische Auswertungen
 [Übersicht](#übersicht)
 
 ### Audit
-Die Anwendung ermöglicht die Vorbereitung von internen Audits, inklusive der Ziele und eines Imports vorausgegangener Zusammenfassungen des gewählten Bereichs. Die Formulierung von Fragen anderer Vorlagen kann wiederverwendet und den Fragen der regulatorische Zusammenhang zugeordnet werden. Bei der Erstellung eines Auditprogramms können Fragen hinzugefügt, entfernt, [umsortiert](#verschiedenes) und reimportiert werden. Die Zusammenfassung des vorherigen Audits für den jeweiligen Bereich kann importiert werden um beim bevorstehenden Audit Bezug zu nehmen.
+Die Anwendung ermöglicht die Vorbereitung von internen Audits, inklusive der Ziele, der Auditmethode und eines Imports vorausgegangener Zusammenfassungen des gewählten Bereichs. Die Formulierung von Fragen anderer Vorlagen kann wiederverwendet und den Fragen der regulatorische Zusammenhang zugeordnet werden. Bei der Erstellung eines Auditprogramms können Fragen hinzugefügt, entfernt, [umsortiert](#verschiedenes) und reimportiert werden. Die Zusammenfassung des vorherigen Audits für den jeweiligen Bereich kann importiert werden um beim bevorstehenden Audit Bezug zu nehmen.
 Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt werden um die jeweiligen Bereiche zu informieren.
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20de.png)
@@ -1395,7 +1395,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 [Übersicht](#übersicht)
 
 ## Bekannte Schwachstellen
-* Das Ziehen von Elementen für die Sortierung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Dokumente und deren Komponenten, Audits und Textvorschläge sollten daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen.
+* Das Ziehen von Elementen für die Sortierung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Safari in iOS kann bei langen Berühren zwar verschieben, dafür jedoch nicht das Kontextmenu öffnen. Dokumente und deren Komponenten, Audits und Textvorschläge sollten daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen.
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 

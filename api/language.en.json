@@ -507,6 +507,14 @@
 				"summary": "Summary"
 			},
 			"hint": "Hint",
+			"method": "Audit method",
+			"methods": {
+				"checklist": "Checklist",
+				"data": "Data analysis",
+				"documents": "Document surveillance",
+				"interview": "Interview responsible employees",
+				"observe": "Observation of activities"
+			},
 			"objectives": "Audit programme objectives",
 			"reminder_message": "It has been :days days since the last record edit of the audit of :unit. The last edit happened on :date.\nPlease finalize the audit.",
 			"template": {
