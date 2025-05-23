@@ -99,6 +99,17 @@ export const api = {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
 		api.loadindicator(true);
+
+		// revert masonry breakpoint if former call (current history has been set by recent api call) had prevented this
+		// currently masonry is counterproductive for conversations
+		// add other expected calls if necessary like message_conversation_\d|application_start
+		const history = JSON.parse(sessionStorage.getItem("history"));
+		if (history) {
+			const back = api.history && history[api.history.currentStep + 1] ? history[api.history.currentStep + 1].join("_") : "";
+			const forth = api.history && history[api.history.currentStep - 1] ? history[api.history.currentStep - 1].join("_") : "";
+			if (api._settings.user.app_settings && api._settings.user.app_settings.masonry && (back.match(/message_conversation_\d+/g) || forth.match(/message_conversation_\d+/g))) await window.Masonry.breakpoints(true);
+		}
+
 		if (api._settings.user && api._settings.user.fingerprint && ["post", "put"].includes(method)) {
 			let sanitizedpayload = {};
 			if (payload instanceof FormData) {
@@ -665,20 +676,7 @@ export const api = {
 									break;
 								case "masonry":
 									if (value) {
-										let stylesheet;
-										for (const [i, sname] of Object.entries(document.styleSheets)) {
-											if (!sname.href.includes("style.css")) continue;
-											stylesheet = document.styleSheets[i].cssRules;
-											break;
-										}
-										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (min-width: 2000rem)") {
-												stylesheet[i].media.mediaText = "only screen and (min-width: 110rem)";
-											}
-											if (stylesheet[i].conditionText === "only screen and (min-width: 3000rem)") {
-												stylesheet[i].media.mediaText = "only screen and (min-width: 165rem)";
-											}
-										}
+										window.Masonry.breakpoints(true);
 									}
 									break;
 								case "theme":
@@ -1378,8 +1376,9 @@ export const api = {
 
 		switch (method) {
 			case "get":
-				successFn = function (data) {
+				successFn = async function (data) {
 					if (data.render) {
+						if (request[2]) await window.Masonry.breakpoints(false);
 						api.update_header(title[request[1]]);
 						const render = new Assemble(data.render);
 						document.getElementById("main").replaceChildren(render.initializeSection());
