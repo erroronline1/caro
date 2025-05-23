@@ -1105,6 +1105,11 @@ html[data-useragent*="safari"] body {
 		-webkit-appearance: none;
 		appearance: initial;
 	}
+	input[type="date"],
+	input[type="time"] {
+		-webkit-min-logical-width: calc(100% - 3.125rem);
+		-webkit-logical-height: 3em;
+	}
 }
 
 .editor {
@@ -1302,7 +1307,7 @@ input:invalid + label.input_required_alert,
 }
 
 label.productselection {
-	width: calc(98% - 5em);
+	width: calc(98% - 6em);
 	display: inline-block;
 }
 button.productselection {
