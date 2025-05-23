@@ -676,7 +676,7 @@ export const api = {
 									break;
 								case "masonry":
 									if (value) {
-										window.Masonry.breakpoints(true);
+										await window.Masonry.breakpoints(true);
 									}
 									break;
 								case "theme":
