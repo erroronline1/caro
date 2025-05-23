@@ -1966,7 +1966,7 @@ class AUDIT extends API {
 		// this is actually faster than a nested sql query
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach($vendors as &$vendor){
-			$vendor['pricelist'] = json_decode($vendor['pricelist'], true); 
+			$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true); 
 		}
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
 			'replacements' => [
