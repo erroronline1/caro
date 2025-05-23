@@ -2128,6 +2128,7 @@ export class Assemble {
 			this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 		}
 		input = this.apply_attributes(this.currentElement.attributes, input);
+		input.onkeydown = new Function("if (event.key === 'Enter') event.preventDefault()");
 
 		if (this.currentElement.datalist !== undefined && this.currentElement.datalist.length) {
 			datalist = document.createElement("datalist");
@@ -2512,6 +2513,7 @@ export class Assemble {
 		button.classList.add("productselection");
 		button.dataset.type = "search";
 		button.title = api._lang.GET("assemble.render.aria.search");
+		button.type = "button";
 		button.onclick = function () {
 			const options = {};
 			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
