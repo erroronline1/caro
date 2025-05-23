@@ -84,12 +84,24 @@ class AUDIT extends API {
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.summary')});
 
 				// process content
+				// process files
+				foreach ($_FILES as $fileinput => $files){
+					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('audit_attachments'), [preg_replace('/[^\w\d]/m', '', $this->_date['current']->format('YmdHis') . '_' . $template['unit'])], null, true)){
+						for($i = 0; $i < count($files['name']); $i++){
+							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+							preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
+							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
+							else $audit[':content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
+						}
+					}
+				}
+
 				// iterate over payload, match template question index, input name and possible multiples
 				// values always will be stored within an array to handle multiples by default
 				foreach($this->_payload as $key => $value){
 					if ($key === 'null') continue;
 					if (!$value) $value = ''; // the audit has to contain all questions as planned
-					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // [1] setindex, [2] input, isset [3] possible multiple field
+					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
 					$set[2] = str_replace('_', ' ', $set[2]);
 					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
 						// translateable system fields
@@ -98,6 +110,7 @@ class AUDIT extends API {
 						// manual human template question
 						$audit[':content']['questions'][intval($set[1])][$set[2]][0] = $value;
 				}
+
 				$audit[':content'] = UTILITY::json_encode($audit[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_post', [
@@ -173,12 +186,24 @@ class AUDIT extends API {
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.summary')});
 
 				// process content
+				// process files
+				foreach ($_FILES as $fileinput => $files){
+					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('audit_attachments'), [preg_replace('/[^\w\d]/m', '', $this->_date['current']->format('YmdHis') . '_' . $template['unit'])], null, true)){
+						for($i = 0; $i < count($files['name']); $i++){
+							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
+							preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
+							if (isset($audit['content']['questions'][intval($set[1])]['files'])) $audit['content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
+							else $audit['content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
+						}
+					}
+				}
+
 				// iterate over payload, match template question index, input name and possible multiples
 				// values always will be stored within an array to handle multiples by default
 				foreach($this->_payload as $key => $value){
 					if ($key === 'null') continue;
 					if (!$value) $value = ''; // the audit has to contain all questions as planned
-					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // [1] setindex, [2] input, isset [3] possible multiple field
+					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
 					$set[2] = str_replace('_', ' ', $set[2]);
 					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
 						// translateable system fields
@@ -368,13 +393,56 @@ class AUDIT extends API {
 									];
 							}
 						}
-						$proof[] = ['type' => 'scanner',
-							'attributes' => [
-								'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
-								'multiple' => true,
-								'data-loss' => 'prevent'
-							]
-						];
+						$proof[] = [
+							'type' => 'scanner',
+								'attributes' => [
+									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.proof'),
+									'multiple' => true,
+									'data-loss' => 'prevent'
+								]
+							];
+						if (isset($preset['files'])){
+							foreach($preset['files'] as $file){
+								$link = [];
+								foreach($preset['files'] as $file){
+									$fileinfo = pathinfo($file);
+									$file = [
+										'path' => substr($file, 1),
+										'name' => $fileinfo['basename'],
+										'link' => './api/api.php/file/stream/' . substr($file, 1)
+									];
+									if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+									elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
+									else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+								}
+								if ($link) {
+									$proof[] = [
+										'type' => 'links',
+										'description' => $this->_lang->GET('audit.audit.execute.files'),
+										'content' => $link
+									];
+									$proof[] = [
+										'type' => 'br'
+									];
+								}
+							}
+						}
+						$proof[] = [
+							'type' => 'file',
+								'attributes' => [
+									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.files'),
+									'multiple' => true,
+									'data-loss' => 'prevent'
+								]
+							];
+						$proof[] = [
+							'type' => 'photo',
+								'attributes' => [
+									'name' => $number + 1 . ': ' . $this->_lang->GET('audit.audit.execute.photos'),
+									'multiple' => true,
+									'data-loss' => 'prevent'
+								]
+							];
 
 						// render regular inputs
 						$result['render']['content'][] = [
@@ -591,6 +659,8 @@ class AUDIT extends API {
 							case 'regulatory':
 								$currentanswer .= implode(', ' , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
 								break;
+							case 'files':
+								break;
 							default:
 								$currentanswer .= implode("\n", $values);
 						}
@@ -605,6 +675,31 @@ class AUDIT extends API {
 					],
 					'content' => $currentanswer
 				];
+
+				if (isset($question['files'])){
+					$link = [];
+					foreach($question['files'] as $file){
+						$fileinfo = pathinfo($file);
+						$file = [
+							'path' => substr($file, 1),
+							'name' => $fileinfo['basename'],
+							'link' => './api/api.php/file/stream/' . substr($file, 1)
+						];
+						if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+						elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
+						else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+					}
+					if ($link) {
+						$current[] = [
+							'type' => 'links',
+							'description' => $this->_lang->GET('audit.audit.execute.files'),
+							'content' => $link
+						];
+						$current[] = [
+							'type' => 'br'
+						];
+					}
+				}
 			}
 			$current[] = [
 				'type' => 'textsection',

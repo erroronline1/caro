@@ -32,7 +32,6 @@ graph LR;
     * actually convert timezones from local(default) to user selected? wherever current_timestamp has been applied
     * calendar, etc. convert user entries by timezone to default server timezone
 * audit
-    * proof file uploads e.g. for audit by documents
     * send report on checkbox only
 * review permissions in safari context
     * https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API

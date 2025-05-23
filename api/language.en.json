@@ -489,10 +489,12 @@
 				"delete_confirm_ok": "Yes, delete",
 				"delete_error": "The audit could not be deleted",
 				"delete_success": "Audit deleted",
+				"files": "Files(s) of proof",
 				"last_edit": "Last edit on :date by :user",
 				"new": "New Audit",
 				"not_found": "Audit not found",
 				"not_saved": "Audit could not be saved.",
+				"photos": "Photo as proof",
 				"proof": "Proof",
 				"rating": "Rating",
 				"rating_steps": {

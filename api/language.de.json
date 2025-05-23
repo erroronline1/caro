@@ -489,10 +489,12 @@
 				"delete_confirm_ok": "Ja, Audit löschen",
 				"delete_error": "Das Audit konnte nicht gelöscht werden.",
 				"delete_success": "Das Audit wurde gelöscht",
+				"files": "Datei(en) als Nachweis",
 				"last_edit": "Letzte Bearbeitung am :date von :user",
 				"new": "Neues Audit",
 				"not_found": "Audit nicht gefunden",
 				"not_saved": "Audit konnte nicht gespeichert werden.",
+				"photos": "Foto als Nachweis",
 				"proof": "Nachweis",
 				"rating": "Bewertung",
 				"rating_steps": {
