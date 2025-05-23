@@ -17,7 +17,6 @@
  */
 
 import { Assemble, Dialog, Toast } from "./assemble.js";
-import QrCreator from "../libraries/qr-creator.js";
 
 export const _serviceWorker = {
 	worker: null,
@@ -72,7 +71,8 @@ export const _serviceWorker = {
 		},
 
 		interval: null,
-		interval_duration: 300000,
+		interval_duration: 10000,
+		permission: null,
 
 		/**
 		 * updates styleable data-for=userMenu for communication menu
@@ -195,7 +195,11 @@ export const _serviceWorker = {
 	register: async function () {
 		if ("serviceWorker" in navigator) {
 			this.worker = await navigator.serviceWorker.register("./service-worker.js");
-			this.permission = await window.Notification.requestPermission();
+			if (window.Notification) {
+				this.permission = window.Notification.requestPermission();
+			} else {
+				// safari sucks
+			}
 			navigator.serviceWorker.ready.then((registration) => {
 				if (registration && !_serviceWorker.notif.interval) {
 					_serviceWorker.notif.interval = setInterval(() => {
@@ -210,21 +214,6 @@ export const _serviceWorker = {
 	},
 
 	/**
-	 * request permission to send notifications
-	 * @event request permission
-	 */
-	requestNotificationPermission: async function () {
-		const permission = await window.Notification.requestPermission();
-		// value of permission can be 'granted', 'default', 'denied'
-		// granted: user has accepted the request
-		// default: user has dismissed the notification permission popup by clicking on x
-		// denied: user has denied the request.
-		if (permission !== "granted") {
-			throw new Error("Permission not granted for Notification");
-		}
-	},
-
-	/**
 	 * show system notification
 	 * @param {string} title
 	 * @param {string} body
@@ -236,7 +225,14 @@ export const _serviceWorker = {
 			icon: "./media/favicon/android/android-launchericon-192-192.png",
 			// here you can add more properties like icon, image, vibrate, etc.
 		};
-		if (this.worker.active) this.worker.showNotification(title, options);
+		if (document.querySelector('html[data-useragent*="safari"]'))
+			// fallback
+			new Toast(body, "info");
+		else
+			this.worker.showNotification(title, options).catch((e) => {
+				// fallback
+				new Toast(body, "info");
+			});
 	},
 };
 
