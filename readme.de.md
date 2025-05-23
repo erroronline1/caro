@@ -1366,7 +1366,7 @@ Das Leben, das medizinische Feld und regulatorische Anforderungen sind komplizie
 
 ### Verschiedenes
 * Eine Festlegung der Paketgröße für die SQL-Umgebung auf einen größeren Wert als die Standardkonfiguration neben der Anpassung des Wertes in der config.ini ist sinnvoll. Es ist vorgesehen, dass Stapel-Abfragen aufgeteilt werden, es kann aber vorkommen, dass einzelne Anfragen mit gelegentlich Base64-codierten Bildern die Standardbegrenzung überschreiten.
-* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden.
+* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden. Benachrichtigungen funktionieren nicht im Privatsphären-Modus.
 * Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 
@@ -1379,14 +1379,15 @@ Tests:
 * dialog **bestanden**
 * serviceworker **bestanden**
 * document composer **bestanden**
-* notifications **fehlgeschlagen auf macOS Desktop**
-* scanner **fehlgeschlagen in Testumgebung, bestanden auf iPad (iOS 17) via https://scanapp.org**
-* stlviewer **fehlgeschlagen in Testumgebung, bestanden auf iPad (iOS 17) via https://viewstl.com** 
+* notifications **fehlgeschlagen auf macOS Desktop und iOS aufgrund fehlender Notification-API Unterstützung**
+* notification indicators **fehlgeschlagen auf iOS in Safari, als PWA bestanden**
+* scanner **bestanden**
+* stlviewer **bestanden**
 
 Anmerkungen:
-* Benachrichtigungen in Safari funktionieren vermutlich nur in der mobilen Variante wenn die Anwendung als PWA über die *Teilen*-Option zum Startbildschirm hinzugefügt wird.
+* Benachrichtigungen in Safari funktionieren nur in der mobilen Variante wenn die Anwendung als PWA über die *Teilen*-Option zum Startbildschirm hinzugefügt wird. Benachrichtigungen scheinen in diesem Fall standardmäßig aktiviert zu sein. Dies kann in den Systemeinstellungen des Geräts gändert werden.
+* iOS PWAs scheinen Frontend-Code nicht zu aktualisieren uns müssen ggf. bei Änderungen neu installiert werden.
 * Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
-* Da die WebGL-Implementierung Berichten zufolge einen Fehler aufzuweisen scheint ([1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)) funktioniert der STL-Betrachter möglicherweise nicht. [Funktion testen](https://get.webgl.org)
 * Disclaimer: es ist möglich dass einige Einschränkungen aufgrund eines selbst signierten Zertifikats der Entwicklungsumgebung für die SSL-Verbindung auftreten. Einstellungen der Vertrauenswürdigkeit waren jedoch unter macOS auch nicht erfolgreich. Es können auch Einschränkungen aufgrund einer virtuellen Testumgebung auftreten.
 
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
@@ -1394,7 +1395,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 [Übersicht](#übersicht)
 
 ## Bekannte Schwachstellen
-* Das Ziehen von Dokumentelementen für die Sortierung in der Dokumentenverwaltung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Dokumente und deren Komponenten müssen daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen um den Quelltext nicht unnötig zu vergrößern.
+* Das Ziehen von Elementen für die Sortierung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Dokumente und deren Komponenten, Audits und Textvorschläge sollten daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen.
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
 

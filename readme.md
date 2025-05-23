@@ -21,7 +21,6 @@ graph LR;
 * post-market evaluation (how?)
 
 ## to do
-* verify osx [safari compatibility](#safaris-special-needs), ios compatibility
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * improve screenreader accessibility
@@ -36,6 +35,8 @@ graph LR;
     * proof file uploads e.g. for audit by documents
     * send report on checkbox only
     * implement [audit methods](http://www.17020-audit.de/auditmethoden/)
+* review permissions in safari context
+    * https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
 
 ## Content
 * [Aims](#aims)
@@ -1462,7 +1463,7 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services.
+* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services. Notifications will not work in private modes.
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 
@@ -1475,14 +1476,15 @@ Tests:
 * dialog **passed**
 * serviceworker **passed**
 * document composer **passed**
-* notifications **failed on macOS desktop**
-* scanner **failing on test environment, passing on iPad via https://scanapp.org**
-* stlviewer **failed on test environment, passing on iPad via https://viewstl.com**
+* notifications **failed on macOS desktop and iOS due to unsupported Notification-API**
+* notification indicators **failed on iOS Safari, passed as PWA**
+* scanner **passed**
+* stlviewer **passed**
 
 Notes:
-* Notifications in Safari might only work on mobile if the application is added to the home screen as a progressive web app via the *Share*-option.
+* Notifications in Safari only work on mobile if the application is added to the home screen as a progressive web app via the *Share*-option. Notifications seem to be enabled by default in this case. This can be changed within the system settings of the device.
+* iOS PWAs seem to not being updated regarding front end code and may have to be reinstalled on changes.
 * Styling is slightly different because of inconsistent following of web standards
-* WebGL-implementation reportedly seems to have a bug ([1](https://discussions.apple.com/thread/255393181), [2](https://discussions.apple.com/thread/255658137?answerId=260549714022#260549714022)), so the STL-Viewer might not work. [Test function](https://get.webgl.org)
 * Disclaimer: it is possible that some restrictions happen because of a self signed certificate for the developer environment SSL-connection. Trust settings were unsuccessful on macOS as well. Also there may be limits due to a virtual test environment.
 
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
@@ -1490,7 +1492,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
 [Content](#content)
 
 ## Known deficencies
-* Dragging document elements for reordering within the document-editors doesn't work on handhelds because touch-events do not include this function. Constructing document components and documents will need devices with mice or a supported pointer to avoid bloating scripts.
+* Dragging elements for reordering doesn't work on Android because touch-events do not include this function. Safari in iOS triggers the drag event on longpress but is not capable of triggering the context menu in this case. Constructing document components and documents, audits and text templates most probably need devices with mice or a supported pointer.
 * Reordered images will disappear - but not being lost in the currently edited data-structure.
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 
