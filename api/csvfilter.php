@@ -396,7 +396,6 @@ class CSVFILTER extends API {
 				// prepare existing filter lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
-				$dependedtemplates = [];
 				foreach($filters as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
@@ -408,8 +407,6 @@ class CSVFILTER extends API {
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$display] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
-				ksort($options);
-				ksort($alloptions);
 
 				// append form, filter selection and inputs for adding filter 
 				$return['render'] = [
