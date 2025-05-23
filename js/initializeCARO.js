@@ -39,11 +39,6 @@ window.screenshot = screenshot;
 
 // INITIALIZE APPLICATION
 
-// serviceWorker
-window.addEventListener("load", async () => {
-	await _serviceWorker.register();
-});
-
 // scroll indicator event listener for vertical distance
 window.addEventListener("scroll", function () {
 	const percentScrolled = (window.scrollY / (document.body.clientHeight - window.innerHeight + 100)) * 100;
