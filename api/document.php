@@ -1243,7 +1243,7 @@ class DOCUMENT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $document['name'],
-			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->dateFormat($this->_date['current']->format('y-m-d H:i'), true)], true)
+			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true)], true)
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){

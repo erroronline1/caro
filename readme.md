@@ -26,8 +26,6 @@ graph LR;
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
-* export dates default top entry
-    * sanitize, especially audit
 * time zones
     * actually convert timezones from local(default) to user selected? wherever current_timestamp has been applied
     * calendar, etc. convert user entries by timezone to default server timezone
