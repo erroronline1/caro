@@ -170,7 +170,7 @@ class TEXTTEMPLATE extends API {
 						}
 					}
 
-					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
+					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])]);
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
@@ -191,7 +191,6 @@ class TEXTTEMPLATE extends API {
 				// one selection per unit
 				$renderalloptions = [];
 				foreach($alloptions as $unit => &$templates){
-					ksort($templates);
 					$renderalloptions[] = [
 						'type' => 'select',
 						'numeration' => 'prevent',
@@ -440,7 +439,7 @@ class TEXTTEMPLATE extends API {
 							$templatedatalist[] = $row['name'];
 							$options[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-						$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $row['date']]);
+						$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])]);
 						if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 						$alloptions[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
@@ -470,7 +469,6 @@ class TEXTTEMPLATE extends API {
 				// one selection per unit
 				$renderalloptions = [];
 				foreach($alloptions as $unit => &$templates){
-					ksort($templates);
 					$renderalloptions[] = [
 						'type' => 'select',
 						'numeration' => 'prevent',

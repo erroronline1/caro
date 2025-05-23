@@ -420,11 +420,18 @@ class CALENDAR extends API {
 					]
 				];
 				$schedules = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_type', ['values' => [':type' => 'longtermplanning']]);
-
+				// sort by closed date desc since sql query sorts different
+				usort($schedules, function ($a, $b) {
+					$a['closed'] = json_decode($a['closed'] ? : '', true);
+					if (!isset($a['closed']['date'])) $a['closed']['date'] = 0;
+					$b['closed'] = json_decode($b['closed'] ? : '', true);
+					if (!isset($b['closed']['date'])) $b['closed']['date'] = 0;
+					return $a['closed']['date'] === $b['closed']['date'] ? 0 : ($a['closed']['date'] < $b['closed']['date'] ? 1 : -1); 
+				});
 				foreach($schedules as $schedule){
 					if (!PERMISSION::permissionFor('longtermplanning') && !$schedule['closed']) continue;
 					$schedule['closed'] = json_decode($schedule['closed'] ? : '', true);
-					$select['edit'][$schedule['subject'] . (isset($schedule['closed']['date']) ? (' - ' . $schedule['closed']['date']) :'')] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
+					$select['edit'][$schedule['subject'] . (isset($schedule['closed']['date']) ? (' - ' . $this->dateFormat($schedule['closed']['date'])) :'')] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
 					if ($schedule['span_end'] > $this->_date['current']->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
 				}
 

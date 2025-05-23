@@ -431,12 +431,11 @@ class DOCUMENT extends API {
 							$bundledatalist[] = $row['name'];
 							$options[$row['name']] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-					$display = $row['name'] . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]);
+					$display = $row['name'] . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat(substr($row['date'], 0, -3))]);
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$display] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 				ksort($options);
-				ksort($alloptions);
 				// prepare available documents lists
 				// get latest approved by name
 				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
@@ -960,7 +959,7 @@ class DOCUMENT extends API {
 			}
 
 			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
-			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved;
+			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat(substr($row['date'], 0, -3))]) . ' - ' . $approved;
 			if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 			$alloptions[$row['unit']][$display] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
@@ -1709,7 +1708,7 @@ class DOCUMENT extends API {
 			}
 			
 			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
-			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => substr($row['date'], 0, -3)]) . ' - ' . $approved;
+			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat(substr($row['date'], 0, -3))]) . ' - ' . $approved;
 			if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 			$alloptions[$row['unit']][$display] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}

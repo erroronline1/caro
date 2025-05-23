@@ -291,13 +291,13 @@ class AUDIT extends API {
 
 				//template selection
 				foreach($templates as $row){
-					$select['templates'][$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $row['date']] = ['value' => $row['id']];
+					$select['templates'][$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $this->dateFormat($row['date'])] = ['value' => $row['id']];
 				}
 
 				// audit selections
 				foreach($audits as $row){
 					if (!$row['closed']){
-						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $row['last_touch']] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $this->dateFormat($row['last_touch'])] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 				}
 
@@ -1872,7 +1872,7 @@ class AUDIT extends API {
 						$datalist[$key][] = $value;
 					}
 					if ($row['closed']) continue;
-					$select['edit'][$row['last_touch']] = $row['id'] == $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					$select['edit'][$this->dateFormat($row['last_touch'])] = $row['id'] == $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 				// sanitize datalists
 				foreach($datalist as $data => &$values){
