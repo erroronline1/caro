@@ -270,9 +270,9 @@ class CALENDAR extends API {
 
 				// new planning
 				if (isset($this->_payload->{$this->_lang->PROPERTY('calendar.longtermplanning.select')})){
-					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')), new DateTimeZone($this->_date['timezone']));
+					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')));
 					$start->modify('first day of this month');
-					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')), new DateTimeZone($this->_date['timezone']));
+					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')));
 					$end->modify('last day of this month');
 					$span = $start->diff($end)->format('%m') * 2; // half months
 					if ($span < 2) $this->response([], 406);
@@ -656,8 +656,8 @@ class CALENDAR extends API {
 					];
 				}
 				
-				$span_start = new DateTime($entry['span_start'], new DateTimeZone($this->_date['timezone']));
-				$span_end = new DateTime($entry['span_end'], new DateTimeZone($this->_date['timezone']));
+				$span_start = new DateTime($entry['span_start']);
+				$span_end = new DateTime($entry['span_end']);
 				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
 					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
 					&& !isset($timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')])){
@@ -934,7 +934,7 @@ class CALENDAR extends API {
 
 				// default end if not provided
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start'], new DateTimeZone($this->_date['timezone']));
+					$due = new DateTime($event[':span_start']);
 					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
@@ -976,7 +976,7 @@ class CALENDAR extends API {
 
 				// default end if not provided
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start'], new DateTimeZone($this->_date['timezone']));
+					$due = new DateTime($event[':span_start']);
 					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
@@ -1109,7 +1109,7 @@ class CALENDAR extends API {
 				$result['render']['content'][] = $events;
 
 				// add past unclosed events for user units
-				$today = new DateTime($this->_requestedDate, new DateTimeZone($this->_date['timezone']));
+				$today = new DateTime($this->_requestedDate);
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
 					$uncompleted = [];
@@ -1168,8 +1168,8 @@ class CALENDAR extends API {
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'); // to eventually match affected_user_id
 
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start'], new DateTimeZone($this->_date['timezone']));
-			$due = new DateTime($row['span_end'], new DateTimeZone($this->_date['timezone']));
+			$date = new DateTime($row['span_start']);
+			$due = new DateTime($row['span_end']);
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			if ((!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !in_array($_SESSION['user']['id'], [$row['author_id'], $row['affected_user_id']])) || $row['type'] !== 'schedule' ) continue; // skip not schedule and not user unit affecting
 
@@ -1521,7 +1521,7 @@ class CALENDAR extends API {
 				}
 
 				// display current scheduled events to raise awareness
-				$today = new DateTime($this->_requestedDate, new DateTimeZone($this->_date['timezone']));
+				$today = new DateTime($this->_requestedDate);
 				if ($thisMonthsEvents = $calendar->getWithinDateRange($today->modify('first day of this month')->format('Y-m-d'), $today->modify('last day of this month')->format('Y-m-d'))) {
 					$timesheetentries = false;
 					foreach($thisMonthsEvents as $evt) if ($evt['type']==='timesheet') $timesheetentries = true;
@@ -1537,7 +1537,7 @@ class CALENDAR extends API {
 				$result['render']['content'][] = $events;
 
 				// display past unclosed scheduled events to raise awareness
-				$today = new DateTime($this->_requestedDate, new DateTimeZone($this->_date['timezone']));
+				$today = new DateTime($this->_requestedDate);
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
 					foreach ($pastEvents as $id => $row){
@@ -1601,8 +1601,8 @@ class CALENDAR extends API {
 	 private function timesheetEntries($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start'], new DateTimeZone($this->_date['timezone']));
-			$due = new DateTime($row['span_end'], new DateTimeZone($this->_date['timezone']));
+			$date = new DateTime($row['span_start']);
+			$due = new DateTime($row['span_end']);
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			$row['organizational_unit'] = explode(',', $row['organizational_unit']);
 			if ($row['type'] !== 'timesheet'

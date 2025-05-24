@@ -71,7 +71,7 @@ class NOTIFICATION extends API {
 		foreach ($data as $row){
 			if ($row['closed']) continue;
 			// alert if applicable
-			$last = new DateTime($row['last_touch'], new DateTimeZone($this->_date['timezone']));
+			$last = new DateTime($row['last_touch']);
 			$diff = intval(abs($last->diff($this->_date['current'])->days / CONFIG['lifespan']['open_record_reminder']));
 			$row['notified'] = $row['notified'] || 0;
 			if ($row['notified'] < $diff){
@@ -107,14 +107,14 @@ class NOTIFICATION extends API {
 	 */
 	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$today = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+		$today = new DateTime('now');
 		$today->setTime(0, 0);
 
 		// schedule certificate request
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach ($vendors as $vendor){
 			$certificate = json_decode($vendor['certificate'] ? : '', true);
-			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity'], new DateTimeZone($this->_date['timezone']));
+			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity']);
 			else continue;
 			if ($validity > $today) continue;
 			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
@@ -148,7 +148,7 @@ class NOTIFICATION extends API {
 		]);
 		foreach($trainings as $training){
 			if ($training['evaluation']) continue;
-			$trainingdate = new DateTime($training['date'], new DateTimeZone($this->_date['timezone']));
+			$trainingdate = new DateTime($training['date']);
 			if (intval(abs($trainingdate->diff($this->_date['current'])->days)) > CONFIG['lifespan']['training_evaluation']){
 				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) {// no deleted users
 					// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
@@ -387,7 +387,7 @@ class NOTIFICATION extends API {
 			foreach($undelivered as $order){
 				$update = false;
 				$decoded_order_data = null;
-				$ordered = new DateTime($order['ordered'] ? : '', new DateTimeZone($this->_date['timezone']));
+				$ordered = new DateTime($order['ordered'] ? : '');
 				$receive_interval = intval(abs($ordered->diff($this->_date['current'])->days / CONFIG['lifespan']['order_unreceived']));
 				if ($order['ordered'] && $order['notified_received'] < $receive_interval){
 					$decoded_order_data = json_decode($order['order_data'], true);
@@ -408,7 +408,7 @@ class NOTIFICATION extends API {
 					$update = true;
 				} else $receive_interval = $order['notified_received'];
 
-				$received = new DateTime($order['received'] ? : '', new DateTimeZone($this->_date['timezone']));
+				$received = new DateTime($order['received'] ? : '');
 				$delivery_interval = intval(abs($received->diff($this->_date['current'])->days / CONFIG['lifespan']['order_undelivered']));
 				if ($order['received'] && $order['notified_delivered'] < $delivery_interval){
 					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
@@ -491,7 +491,7 @@ class NOTIFICATION extends API {
 				// rise counter for unit member
 				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $number++;
 				// alert if applicable
-				$last = new DateTime($row['last_touch'], new DateTimeZone($this->_date['timezone']));
+				$last = new DateTime($row['last_touch']);
 				$diff = intval(abs($last->diff($this->_date['current'])->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered document
@@ -534,7 +534,7 @@ class NOTIFICATION extends API {
 	public function responsibilities(){
 		$number = 0;
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$today = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+		$today = new DateTime('now');
 		$today->setTime(0, 0);
 
 		$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');

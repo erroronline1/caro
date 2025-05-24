@@ -90,7 +90,7 @@ class CALENDARUTILITY {
 	 * @return int affected rows
 	 */
 	public function complete($id = '0', $close = null, $alert = null){
-		$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+		$date = new DateTime('now');
 		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => $date->format('Y-m-d')];
 		$sqlchunks = [];
 		$affected_rows = 0;
@@ -135,7 +135,7 @@ class CALENDARUTILITY {
 		if (!$input) return '';
 		if (!$this->_date['dateformat']) return $input;
 		try {
-			$date = new DateTime(substr($input, 0, 10), new DateTimeZone($this->_date['timezone']));
+			$date = new DateTime(substr($input, 0, 10));
 		}
 		catch (Exception $e) {
 			return $input;
@@ -156,7 +156,7 @@ class CALENDARUTILITY {
 	 */
 	public function days($format = '', $date = ''){
 		$result = [];
-		$date = new DateTime($date ? : 'now', new DateTimeZone($this->_date['timezone']));
+		$date = new DateTime($date ? : 'now');
 		$date->setTime(0, 0);
 
 		// prepare dates for requested week
@@ -264,13 +264,13 @@ class CALENDARUTILITY {
 		// set up defaults
 		$alert = $span_start = $span_end = null; 
 		$alert = [$this->_lang->GET('calendar.schedule.alert') => $columns[':alert'] ? ['checked' => true] : []];		
-		$span_start = new DateTime($columns[':span_start'] ? : 'now', new DateTimeZone($this->_date['timezone']));
+		$span_start = new DateTime($columns[':span_start'] ? : 'now');
 
 		// assemble by type
 		switch ($columns[':type']){
 			case 'schedule':
 				// set end date to preset of CONFIG default
-				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone($this->_date['timezone']));
+				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end']);
 				else {
 					$span_end = clone $span_start;
 					$span_end->modify('+' . CONFIG['calendar']['default_due'] . ' days');
@@ -341,7 +341,7 @@ class CALENDARUTILITY {
 				break;
 			case 'timesheet':
 				// set end date to preset of CONFIG default
-				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end'], new DateTimeZone($this->_date['timezone']));
+				if ($columns[':span_end']) $span_end = new DateTime($columns[':span_end']);
 				else {
 					$span_end = clone $span_start;
 					$span_end->modify('+1 hour');
@@ -542,7 +542,7 @@ class CALENDARUTILITY {
 		$holidays = array_map(Fn($d) => $year . '-'. $d, $holidays);
 
 		// apply all holidays depended on easter sunday
-		$easter = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+		$easter = new DateTime('now');
 		$easter->setTimestamp(easter_date($year));
 		foreach($this->_easter_holidays as $day => $offset){
 			$easterholiday = clone $easter;
@@ -653,7 +653,7 @@ class CALENDARUTILITY {
 		$result = ['header' => null, 'content' => []];
 		if (!$this->_days || $date) $this->days($format, $date);
 
-		$today = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+		$today = new DateTime('now');
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
@@ -732,11 +732,10 @@ class CALENDARUTILITY {
 	 */
 	public function timesheetSummary($users = [], $from_date = '', $to_date = ''){
 		// construct timespan
-		$datetimezone = new DateTimeZone($this->_date['timezone']);
 		$minuteInterval = new DateInterval('PT1M');
-		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1970-01-01', $datetimezone);
+		$from_date = gettype($from_date) === 'object' ? $from_date : new DateTime($from_date ? : '1970-01-01');
 		$from_date->modify('first day of this month')->setTime(0, 0);
-		$to_date = gettype($to_date) === 'object' ? $to_date : new DateTime($to_date ? : 'now', $datetimezone);
+		$to_date = gettype($to_date) === 'object' ? $to_date : new DateTime($to_date ? : 'now');
 		$to_date->modify('last day of this month')->setTime(23, 59, 59);
 
 		$entries = $this->getWithinDateRange($from_date->format('Y-m-d H:i:s'), $to_date->format('Y-m-d H:i:s'));
@@ -776,10 +775,10 @@ class CALENDARUTILITY {
 						// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
 						preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						// append datetime value and contract value
-						if ($line && isset($lineentry[1]) && isset($lineentry[2])) $hours_vacation[] = ['date' => new DateTime($lineentry[1], $datetimezone), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
+						if ($line && isset($lineentry[1]) && isset($lineentry[2])) $hours_vacation[] = ['date' => new DateTime($lineentry[1]), 'value' => floatval(str_replace(',', '.', $lineentry[2]))];
 					}
 				}
-				if (!$hours_vacation) $hours_vacation[] = ['date' => new DateTime('1970-01-01', $datetimezone), 'value' => 0];
+				if (!$hours_vacation) $hours_vacation[] = ['date' => new DateTime('1970-01-01'), 'value' => 0];
 				array_multisort(array_column($hours_vacation, 'date'), SORT_ASC, $hours_vacation);
 				$users[$row]['timesheet']['_' . $setting] = $hours_vacation;
 			}
@@ -794,9 +793,9 @@ class CALENDARUTILITY {
 			$user = $users[$row];
 
 			// convert to datetime, limit to month boundaries if necessary
-			$span_start = new DateTime($entry['span_start'], $datetimezone);
+			$span_start = new DateTime($entry['span_start']);
 			if ($span_start < $from_date) $span_start = clone $from_date;
-			$span_end = new DateTime($entry['span_end'], $datetimezone);
+			$span_end = new DateTime($entry['span_end']);
 			if ($span_end > $to_date) $span_end = clone $to_date;
 
 			// get breaks and homeoffice times

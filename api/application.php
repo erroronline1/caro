@@ -800,7 +800,7 @@ class APPLICATION extends API {
 		];
 
 		$displayevents = $displayabsentmates = '';
-		$today = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+		$today = new DateTime('now');
 		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 		// sort events
 		foreach ($thisDaysEvents as $row){

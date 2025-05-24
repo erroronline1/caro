@@ -744,7 +744,7 @@ class DOCUMENT extends API {
 				if (isset($exists['id'])){ 
 					if (!$approved) {
 						// update anything, delete unused images, reset approval
-						$exists_date = new DateTime($exists['date'], new DateTimeZone($this->_date['timezone']));
+						$exists_date = new DateTime($exists['date']);
 						$component['content'] = fileupload($component['content'], $exists['name'], $exists_date->format('YmdHis'));
 
 						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));

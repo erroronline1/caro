@@ -260,7 +260,7 @@ class USER extends API {
 				foreach ($alltrainings as $row){
 					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
@@ -616,7 +616,7 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+					$date = new DateTime('now');
 					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
@@ -830,7 +830,7 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+					$date = new DateTime('now');
 					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
 					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
@@ -998,7 +998,7 @@ class USER extends API {
 				foreach ($trainings as $row){
 					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');

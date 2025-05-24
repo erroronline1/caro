@@ -372,7 +372,7 @@ class ORDER extends API {
 						continue;
 					}
 					$vendor = $vendors[array_search($product['vendor_id'], array_column($vendors, 'id'))];
-					$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+					$check = new DateTime($product['checked']);
 					if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['current'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
 						$checkable[$product['vendor_id']][] = $product['id'];
 					}
@@ -380,7 +380,7 @@ class ORDER extends API {
 				// drop vendors that have been checked within their sample check interval
 				foreach($products as $product){
 					if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_id']])) continue;
-					$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+					$check = new DateTime($product['checked']);
 					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['current'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 						unset($checkable[$product['vendor_id']]);
 					}

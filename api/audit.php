@@ -2114,7 +2114,7 @@ class AUDIT extends API {
 				continue;
 			}
 			$vendor = $vendors[array_search($product['vendor_name'], array_column($vendors, 'name'))];
-			$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+			$check = new DateTime($product['checked']);
 			if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['current'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
 				$checkable[$product['vendor_name']][] = $product['id'];
 			}
@@ -2122,7 +2122,7 @@ class AUDIT extends API {
 		// drop vendors that have been checked within their sample check interval
 		foreach($products as $product){
 			if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_name']])) continue;
-			$check = new DateTime($product['checked'], new DateTimeZone($this->_date['timezone']));
+			$check = new DateTime($product['checked']);
 			if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['current'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 				unset($checkable[$product['vendor_name']]);
 			}
@@ -2353,9 +2353,8 @@ class AUDIT extends API {
 			$order['order_data'] = json_decode($order['order_data'], true);
 			$deliverytime = '';
 			if ($order['received']){
-				$datetimezone = new DateTimeZone($this->_date['timezone']);
-				$ordered = $order['ordered'] ? new DateTime($order['ordered'], $datetimezone) : '-';
-				$received = $order['received'] ? new DateTime($order['received'], $datetimezone) : '-';
+				$ordered = $order['ordered'] ? new DateTime($order['ordered']) : '-';
+				$received = $order['received'] ? new DateTime($order['received']) : '-';
 				$deliverytime = ($order['ordered'] && $order['received']) ? intval($ordered->diff($received)->format('%a')) : '-';
 			}
 
@@ -3057,7 +3056,7 @@ class AUDIT extends API {
 					$row['evaluation'] = json_decode($row['evaluation'] ? : '', true);
 					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
@@ -3243,7 +3242,7 @@ class AUDIT extends API {
 			]);
 			if ($users && $training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 
-				$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+				$date = new DateTime('now');
 				$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
 				$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
 				$training[':experience_points'] = 0;
@@ -3325,7 +3324,7 @@ class AUDIT extends API {
 				foreach ($usertrainings as $row){
 					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires'], new DateTimeZone($this->_date['timezone']));
+						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
