@@ -635,7 +635,7 @@ class CALENDAR extends API {
 
 				// add summaries to user if not already set
 				if (!isset($timesheets[$entry['affected_user_id']])) {
-					$units = array_map(Fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $entry['affected_user_units']));
+					$units = array_map(Fn($u) => isset($this->_lang->_DEFAULT['units'][$u]) ? $this->_lang->_DEFAULT['units'][$u] : false, explode(',', $entry['affected_user_units']));
 					$pto = [];
 					foreach($this->_lang->_DEFAULT['calendar']['timesheet']['pto'] as $key => $translation){
 						if (isset($stats_month_row[$key])) $pto[$key] = $stats_month_row[$key];
@@ -643,7 +643,7 @@ class CALENDAR extends API {
 					$timesheets[$entry['affected_user_id']] = [
 						'name' => $entry['affected_user'],
 						'user_id' => $entry['affected_user_id'],
-						'units' => implode(', ', $units),
+						'units' => $units[0] ? implode(', ', $units): $this->_lang->_DEFAULT['units']['common'],
 						'month' => $this->_lang->_DEFAULT['general']['month'][$day->format('n')] . ' ' . $day->format('Y'),
 						'days' => [],
 						'pto' => $pto,
