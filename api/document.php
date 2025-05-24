@@ -248,7 +248,7 @@ class DOCUMENT extends API {
 					}
 
 					// gather informal document properties
-					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => $this->dateFormat($approve['date'])]);
+					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => $this->convertFromServerTime($approve['date'])]);
 					if ($approve['alias']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_alias') . ': ' . $approve['alias'];
 					if ($approve['regulatory_context']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_regulatory_context') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['regulatory'][$context], explode(',', $approve['regulatory_context'])));
 					if ($approve['restricted_access']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_restricted_access') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['permissions'][$context], explode(',', $approve['restricted_access'])));
@@ -431,7 +431,7 @@ class DOCUMENT extends API {
 							$bundledatalist[] = $row['name'];
 							$options[$row['name']] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-					$display = $row['name'] . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat(substr($row['date'], 0, -3))]);
+					$display = $row['name'] . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime(substr($row['date'], 0, -3))]);
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$display] = ($row['name'] == $bundle['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
@@ -501,7 +501,7 @@ class DOCUMENT extends API {
 									'data-loss' => 'prevent'
 								],
 								'datalist' => array_values(array_unique($bundledatalist)),
-								'hint' => ($bundle['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => $this->dateFormat(substr($bundle['date'], 0, -3))]) . '<br>' : $this->_lang->GET('assemble.compose.component.component_name_hint'))
+								'hint' => ($bundle['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => $this->convertFromServerTime(substr($bundle['date'], 0, -3))]) . '<br>' : $this->_lang->GET('assemble.compose.component.component_name_hint'))
 							], [
 								'type' => 'select',
 								'attributes' => [
@@ -547,7 +547,7 @@ class DOCUMENT extends API {
 					if ($bundle['hidden']) {
 						$bundle['hidden'] = json_decode($bundle['hidden'], true);
 						$hidden['content'][$this->_lang->GET('assemble.compose.bundle.hidden')]['checked'] = true;
-						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.compose.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $this->dateFormat($bundle['hidden']['date'])]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.compose.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $this->convertFromServerTime($bundle['hidden']['date'])]);
 					}
 					array_push($return['render']['content'][1], $hidden);
 				}
@@ -959,7 +959,7 @@ class DOCUMENT extends API {
 			}
 
 			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
-			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat(substr($row['date'], 0, -3))]) . ' - ' . $approved;
+			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime(substr($row['date'], 0, -3))]) . ' - ' . $approved;
 			if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 			$alloptions[$row['unit']][$display] = ($row['name'] == $component['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
@@ -1026,7 +1026,7 @@ class DOCUMENT extends API {
 				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
-					':date' => $this->dateFormat($data['date']),
+					':date' => $this->convertFromServerTime($data['date']),
 				]) . "\n";
 			}
 		}
@@ -1142,7 +1142,7 @@ class DOCUMENT extends API {
 				[[
 					'type' => 'compose_component',
 					'value' => $component['name'],
-					'hint' => ($component['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $component['author'], ':date' => $this->dateFormat(substr($component['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
+					'hint' => ($component['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $component['author'], ':date' => $this->convertFromServerTime(substr($component['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
 						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
 						($dependeddocuments ? $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(', ', $dependeddocuments)]) : ''),
 					'hidden' => $component['name'] ? json_decode($component['hidden'] ? : '', true) : null,
@@ -1242,7 +1242,7 @@ class DOCUMENT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $document['name'],
-			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true)], true)
+			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->convertFromServerTime($this->_date['current']->format('Y-m-d H:i'), true)], true)
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){
@@ -1708,7 +1708,7 @@ class DOCUMENT extends API {
 			}
 			
 			$approved = PERMISSION::fullyapproved('documentapproval', $row['approval']) ? $this->_lang->GET('assemble.approve.approved') : $this->_lang->GET('assemble.approve.unapproved');
-			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat(substr($row['date'], 0, -3))]) . ' - ' . $approved;
+			$display = $row['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime(substr($row['date'], 0, -3))]) . ' - ' . $approved;
 			if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 			$alloptions[$row['unit']][$display] = ($row['name'] === $document['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 		}
@@ -1852,7 +1852,7 @@ class DOCUMENT extends API {
 				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
-					':date' => $this->dateFormat($data['date']),
+					':date' => $this->convertFromServerTime($data['date']),
 				]) . "\n";
 			}
 		}
@@ -1917,7 +1917,7 @@ class DOCUMENT extends API {
 							'content' => $contextoptions,
 							'hint' => $this->_lang->GET('assemble.compose.document.document_context_hint')
 						],
-						'hint' => ($document['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $this->dateFormat(substr($document['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
+						'hint' => ($document['name'] ? $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $this->convertFromServerTime(substr($document['date'], 0, -3))]) . '\n' : $this->_lang->GET('assemble.compose.component.component_name_hint')) .
 						($pending_approvals ? $this->_lang->GET('assemble.approve.pending', [':approvals' => implode(', ', array_map(Fn($permission) => $this->_lang->_USER['permissions'][$permission], $pending_approvals))]) : $fullyapproved) . '\n \n' .
 						($dependedbundles ? $this->_lang->GET('assemble.compose.document.document_bundle_dependencies', [':bundles' => implode(',', $dependedbundles)]) . '\n' : '') .
 						($dependedcomponents ? $this->_lang->GET('assemble.compose.document.document_component_dependencies', [':components' => implode(',', $dependedcomponents)]) . '\n' : '')

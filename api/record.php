@@ -1332,7 +1332,7 @@ class RECORD extends API {
 						array_splice($return['render']['content'][$last_element], 1, 0, [[
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $this->_lang->GET('record.closed', [':role' => $this->_lang->GET('permissions.' . $role), ':name' => $property['name'], ':date' => $this->dateFormat($property['date'])])
+								'name' => $this->_lang->GET('record.closed', [':role' => $this->_lang->GET('permissions.' . $role), ':name' => $property['name'], ':date' => $this->convertFromServerTime($property['date'])])
 							]
 						]]);
 					}
@@ -1411,7 +1411,7 @@ class RECORD extends API {
 				// add to result
 				$linkdisplay = $this->_lang->GET('record.list_touched', [
 					':identifier' => $record['identifier'],
-					':date' => $this->dateFormat($record['last_touch']),
+					':date' => $this->convertFromServerTime($record['last_touch']),
 					':document' => $record['last_document']
 					]);
 				$contexts[$contextkey][$linkdisplay] = [
@@ -1766,7 +1766,7 @@ class RECORD extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('menu.records.record_summary', [], $export),
-			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), $export),
+			'date' => $this->convertFromServerTime($this->_date['current']->format('Y-m-d H:i'), $export),
 			'closed' => $data['closed'],
 			'record_type' => $data['record_type'],
 			'units' => $data['units'] ? explode(',', $data['units']) : [],
@@ -1801,7 +1801,7 @@ class RECORD extends API {
 					$value = '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
 				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
-				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => $this->dateFormat(substr($record['date'], 0, -3), $export)], $export)];
+				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => $this->convertFromServerTime(substr($record['date'], 0, -3), $export)], $export)];
 				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $record['date'];
 			}
 		}
@@ -1912,7 +1912,7 @@ class RECORD extends API {
 			if ($type === 'simplifieddocument'){
 				// convert summary contents to a simpler view. this allows document formatting suitable to hand over to patients/customers, e.g. a manual with the latest record entries
 				$summary['content'] = [' ' => $printablecontent[$useddocument['name']]];
-				$summary['date'] = $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), $export);
+				$summary['date'] = $this->convertFromServerTime($this->_date['current']->format('Y-m-d H:i'), $export);
 				$summary['title'] = $useddocument['name'];
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}

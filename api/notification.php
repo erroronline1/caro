@@ -79,7 +79,7 @@ class NOTIFICATION extends API {
 					['permission' => [...PERMISSION::permissionFor('audit', true)]],
 					$this->_lang->GET('audit.audit.reminder_message', [
 						':days' => $last->diff($this->_date['current'])->days,
-						':date' => $this->dateFormat(substr($row['last_touch'], 0, -3), true),
+						':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
 						':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
 					], true)
 				);
@@ -156,7 +156,7 @@ class NOTIFICATION extends API {
 						':user' => $users[$user]['name'],
 						':training' => $training['name'],
 						':module' => $this->_lang->GET('menu.tools.regulatory', [], true),
-						':date' => $this->dateFormat($training['date'], true)
+						':date' => $this->convertFromServerTime($training['date'], true)
 					], true);
 					$reminders = $calendar->search($subject);
 					$open = false;
@@ -423,7 +423,7 @@ class NOTIFICATION extends API {
 							':name' => isset($decoded_order_data['productname_label']) ? $decoded_order_data['productname_label'] : '',
 							':vendor' => isset($decoded_order_data['vendor_label']) ? $decoded_order_data['vendor_label'] : '',
 							':commission' => $decoded_order_data['commission'],
-							':receival' => $this->dateFormat($order['received'], true)
+							':receival' => $this->convertFromServerTime($order['received'], true)
 						], true)
 					);
 					$update = true;
@@ -501,7 +501,7 @@ class NOTIFICATION extends API {
 						['unit' => explode(',', $row['units'])],
 						$this->_lang->GET('record.reminder_message', [
 							':days' => $last->diff($this->_date['current'])->days,
-							':date' => $this->dateFormat(substr($row['last_touch'], 0, -3), true),
+							':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
 							':document' => $lastdocument['name'],			
 							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 						], true)

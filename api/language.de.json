@@ -1572,6 +1572,7 @@
 		"settings_location_change_alert": "Die Änderung des Bundeslandes hat mit den verknüpften Feiertagen Auswirkungen auf deine Arbeitszeitberechnungen. Bei einer Änderung muss diese zwingend neu angelegt werden!",
 		"settings_theme": "Farbschema",
 		"settings_timezone": "Zeitzone",
+		"settings_timezone_hint": "Daten und Uhrzeiten werden in deiner lokalen Zeit angezeigt",
 		"settings_weekly_hours": "Wochenarbeitszeit",
 		"settings_weekly_hours_hint": "YYYY-MM-DD; Stunden in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung empfohlen, frühere Kalendereinträge werden nicht mit berechnet.",
 		"take_photo": "Wähle ein Foto für das Profil",

@@ -191,7 +191,7 @@ class RESPONSIBILITY extends API {
 								'name' => $this->_lang->GET('responsibility.applicability'),
 								'class' => substr($row['span_end'], 0, 10) < $this->_date['current']->format('Y-m-d') ? 'red' : ''
 							],
-							'content' => $this->_lang->GET('responsibility.apply', [':start' => $this->dateFormat(substr($row['span_start'], 0, 10)), ':end' => $this->dateFormat(substr($row['span_end'], 0, 10))])
+							'content' => $this->_lang->GET('responsibility.apply', [':start' => $this->convertFromServerTime(substr($row['span_start'], 0, 10)), ':end' => $this->convertFromServerTime(substr($row['span_end'], 0, 10))])
 						];
 						if (PERMISSION::permissionFor('responsibilities')) $content[] = [
 							'type' => 'button',
@@ -492,7 +492,7 @@ class RESPONSIBILITY extends API {
 								'value' => $user['name'],
 								'data-loss' => 'prevent'
 							],
-							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => $this->dateFormat($property)]) : null
+							'hint' => $property ? $this->_lang->GET('responsibility.accepted', [':date' => $this->convertFromServerTime($property)]) : null
 						];
 					}
 				}

@@ -368,7 +368,7 @@ class API {
 	private function date(){
 		// top config entries are default
 		$return = [
-			'timezone' => CONFIG['calendar']['timezones'][array_key_first(CONFIG['calendar']['timezones'])],
+			'timezone' => date_default_timezone_get(),
 			'dateformat' => CONFIG['calendar']['dateformats'][array_key_first(CONFIG['calendar']['dateformats'])],
 			'locations' => CONFIG['locations'][array_key_first(CONFIG['locations'])],
 		];
@@ -379,25 +379,6 @@ class API {
 
 		$return['current'] = new DateTime('now', new DateTimeZone($return['timezone']));
 		return $return;
-	}
-
-	/**
-	 * formats ISO 8601 date to custom as per config 
-	 * @param string $input YYYY-MM-DD (time optional)
-	 * @param bool $default for return of default date format
-	 * @return string
-	 */
-	public function dateFormat($input, $default = false){
-		if (!$input) return '';
-		if (!$this->_date['dateformat']) return $input;
-		if (!CONFIG['calendar']['dateformats']) return $input;
-		try {
-			$date = new DateTime(substr($input, 0, 10), new DateTimeZone($this->_date['timezone']));
-		}
-		catch (Exception $e) {
-			return $input;
-		}
-		return $date->format($default ? CONFIG['calendar']['dateformats'][array_key_first(CONFIG['calendar']['dateformats'])]: $this->_date['dateformat']) . (strlen($input) > 10 ? substr($input, 10) : '');
 	}
 	
 	/**
@@ -557,6 +538,50 @@ class API {
 		$this->set_headers();
 		echo $data;
 		exit();
+	}
+
+	/**
+	 * converts a date-string to user timezone and formats default ISO 8601 date to custom as per config 
+	 * @param string $input YYYY-MM-DD H:i (:s optional)
+	 * @param bool $defaultFormat for return of default date format for official exports independent of user preference
+	 * @return string *dateformat* H:i (:s optional)
+	 */
+	public function convertFromServerTime($input, $defaultFormat = false){
+		if (!$input) return '';
+
+		$parse = $input;
+		if (strlen($input) === 16) $parse .= ':00'; // append seconds to get a valid datetime format
+		// create a datetime
+		try {
+			$date = new DateTime($parse);
+		}
+		catch (Exception $e) {
+			return $input;
+		} 
+		// convert timezone if user setting exists and differs from server setting
+		if ($this->_date['timezone'] !== date_default_timezone_get()){
+			$date->setTimezone(new DateTimeZone($this->_date['timezone']));
+		}
+
+		// return formatted datetime string, abbreviated if applicable 
+		return substr($date->format($defaultFormat ? CONFIG['calendar']['dateformats'][array_key_first(CONFIG['calendar']['dateformats'])] . ' H:i:s' : $this->_date['dateformat'] . ' H:i:s'), 0, strlen($input));
+	}
+
+	/**
+	 * converts a date-string from user timezone to server time
+	 * @param string $input *dateformat* H:i:s, supposed to be a payload date
+	 * @return string YYYY-MM-DD H:i
+	 */
+	public function convertToServerTime($input){
+		if (!$input) return '';
+		try {
+			$date = DateTime::createFromFormat($this->_date['dateformat'] . ' H:i:s', $input, new DateTimeZone(CONFIG['calendar']['timezones'][array_key_first(CONFIG['calendar']['timezones'])] ? : (date_default_timezone_get() ? : ini_get('date.timezone'))));
+		}
+		catch (Exception $e) {
+			return $input;
+		}
+		// return formatted datetime string
+		return $date->format('Y-m-d H:i:s');
 	}
 }
 

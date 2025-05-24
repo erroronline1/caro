@@ -170,7 +170,7 @@ class TEXTTEMPLATE extends API {
 						}
 					}
 
-					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])]);
+					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
@@ -315,7 +315,7 @@ class TEXTTEMPLATE extends API {
 					if ($chunk['hidden']) {
 						$hidden['content'][$this->_lang->GET('texttemplate.chunk.hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($chunk['hidden'], true);
-						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . $this->_lang->GET('texttemplate.chunk.dependencies', [':templates' => implode(', ', $dependedtemplates)]);
 					array_push($return['render']['content'][1], $hidden);
@@ -439,7 +439,7 @@ class TEXTTEMPLATE extends API {
 							$templatedatalist[] = $row['name'];
 							$options[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-						$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])]);
+						$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
 						if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 						$alloptions[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
@@ -588,7 +588,7 @@ class TEXTTEMPLATE extends API {
 					if ($template['hidden']) {
 						$hidden['content'][$this->_lang->GET('texttemplate.template.hidden')]['checked'] = true;
 						$hiddenproperties = json_decode($template['hidden'], true);
-						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					array_push($return['render']['content'][1], $hidden);
 				}
@@ -750,7 +750,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $this->_lang->GET('texttemplate.use.import', [':placeholders' => implode(', ', array_keys($clientimport))]),
 						'onclick' => "_client.texttemplate.import('" . $this->_clientimport . "');"
 					],
-					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])])
+					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])])
 				];	
 			}
 
@@ -778,7 +778,7 @@ class TEXTTEMPLATE extends API {
 					'onclick' => '_client.texttemplate.update();',
 					'data-type' => 'generateupdate'
 				],
-				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->dateFormat($row['date'])])
+				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])])
 			];
 
 			// append inputs

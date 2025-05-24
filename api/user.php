@@ -258,7 +258,7 @@ class USER extends API {
 				]);
 				$usertrainings = [];
 				foreach ($alltrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
@@ -269,7 +269,7 @@ class USER extends API {
 					}
 					$usertrainings[] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->dateFormat($row['expires']),
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->convertFromServerTime($row['expires']),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $usertrainings[] = [
@@ -297,7 +297,7 @@ class USER extends API {
 				]);
 				$sessions = [];
 				foreach($usersessions as $session){
-					$sessions[] = $this->dateFormat($session['date']);
+					$sessions[] = $this->convertFromServerTime($session['date']);
 				}
 				if ($sessions) $user_data[] = [
 					[
@@ -476,7 +476,8 @@ class USER extends API {
 						'attributes' => [
 							'name' => $this->_lang->GET('user.settings_timezone')
 						],
-						'content' => $timezones
+						'content' => $timezones,
+						'hint' => $this->_lang->GET('user.settings_timezone_hint')
 					];
 				}
 
@@ -996,7 +997,7 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->dateFormat($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
@@ -1007,7 +1008,7 @@ class USER extends API {
 					}
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->dateFormat($row['expires']),
+						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->convertFromServerTime($row['expires']),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $skillmatrix[0][] = [

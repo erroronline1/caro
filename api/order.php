@@ -443,7 +443,7 @@ class ORDER extends API {
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
-						'ordertext' => ($product && $product['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') . "\n" : '') . ($product && $product['erp_id'] ? $this->_lang->GET('consumables.product.erp_id') . ": " . $product['erp_id'] . "\n" : '') . " \n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''),
+						'ordertext' => ($product && $product['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') . "\n" : '') . ($product && $product['erp_id'] ? $this->_lang->GET('consumables.product.erp_id') . ": " . $product['erp_id'] . "\n" : '') . " \n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->convertFromServerTime(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''),
 						'quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : null,
 						'unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : null,
 						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
@@ -455,7 +455,7 @@ class ORDER extends API {
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
-						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => $this->dateFormat(substr($product['last_order'], 0, -9))]) : null,
+						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))]) : null,
 						'orderer' => $orderer,
 						'organizationalunit' => $row['organizational_unit'],
 						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
@@ -480,7 +480,7 @@ class ORDER extends API {
 					}
 
 					// add approval
-					$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.approved') . ': ' . $this->dateFormat($row['approved']) . ' ';
+					$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.approved') . ': ' . $this->convertFromServerTime($row['approved']) . ' ';
 					if (!str_contains($row['approval'], 'data:image/png')) {
 						$data['ordertext'] .= "\n". $row['approval'];
 					} else {
@@ -497,7 +497,7 @@ class ORDER extends API {
 						if (!isset($data['state'][$s])) $data['state'][$s] = [];
 						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
-							$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.' . $s) . ': ' . $this->dateFormat($row[$s]);
+							$data['ordertext'] .= "\n" . $this->_lang->GET('order.order.' . $s) . ': ' . $this->convertFromServerTime($row[$s]);
 						}
 						switch ($s){
 							case 'ordered':
@@ -702,7 +702,7 @@ class ORDER extends API {
 			)
 			. ($erp_id ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ': ' . $erp_id: '')
 			. ("\n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit'])
-			. (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->dateFormat(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''))
+			. (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->convertFromServerTime(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''))
 			. "\n" . ($this->_lang->GET('order.orderer') . ': ' . $orderer);
 		}
 		if (!$data) $this->response([], 404);
@@ -716,7 +716,7 @@ class ORDER extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $title,
-			'date' => $this->dateFormat($this->_date['current']->format('Y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['current']->format('Y-m-d H:i'), true)
 		];
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);

@@ -1058,7 +1058,7 @@ class CONSUMABLES extends API {
 				$hidden = null;
 				if ($product['hidden']) {
 					$hiddenproperties = json_decode($product['hidden'], true);
-					$hidden = $this->_lang->GET('consumables.product.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+					$hidden = $this->_lang->GET('consumables.product.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
 
 				// render search and selection
@@ -1109,7 +1109,7 @@ class CONSUMABLES extends API {
 							$result['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $this->_lang->GET('order.order_last_ordered', [':date' => $this->dateFormat(substr($product['last_order'], 0, -9))])
+									'name' => $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))])
 								],
 							];
 						}
@@ -1315,7 +1315,7 @@ class CONSUMABLES extends API {
 						$result['render']['content'][1][] = [
 							'type' => 'textsection',
 							'attributes' => [
-								'name' => $this->_lang->GET('order.order_last_ordered', [':date' => $this->dateFormat(substr($product['last_order'], 0, -9))])
+								'name' => $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))])
 							]
 						];
 					}
@@ -2021,7 +2021,7 @@ class CONSUMABLES extends API {
 				$hidden = null;
 				if ($vendor['hidden']) {
 					$hiddenproperties = json_decode($vendor['hidden'], true);
-					$hidden = $this->_lang->GET('consumables.vendor.edit_hidden_set', [':date' => $this->dateFormat($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
+					$hidden = $this->_lang->GET('consumables.vendor.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
 
 				// switch between display- and edit mode 
@@ -2116,7 +2116,7 @@ class CONSUMABLES extends API {
 					if (isset($latest_vendor_evaluation['_author'])) $evaluationdocument[0][] = [
 						'type' => 'textsection',
 						'attributes' => [
-							'name' => $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $latest_vendor_evaluation['_author'], ':date' => $this->dateFormat($latest_vendor_evaluation['_date'])])
+							'name' => $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $latest_vendor_evaluation['_author'], ':date' => $this->convertFromServerTime($latest_vendor_evaluation['_date'])])
 						]
 					];
 
