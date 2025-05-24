@@ -307,6 +307,7 @@ class ImageHandler {
 		if (this.images.images.length) {
 			for (let i = 0; i < this.images.images.length; i++) {
 				if (!(content = this.images.images[i])) continue;
+				if (!content.id) continue; // idk why, but sometimes this is erroneous
 				var rect = document.getElementById(content.id).getBoundingClientRect();
 				if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
 					this.image(content);
