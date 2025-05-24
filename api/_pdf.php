@@ -334,9 +334,10 @@ class PDF{
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		$this->_pdf->SetFont('helvetica', '', 8); // font size
 		
+		$page = 0;
 		foreach($content['content'] as $user){
-			$this->_pdf->startPageGroup();
-			$this->_pdf->AddPage();
+			//$this->_pdf->startPageGroup();
+			if ($page++)$this->_pdf->AddPage();
 			foreach($user as $row){
 				$key = array_key_exists(0, $row) ? $row[0][0] : '';
 				$value = array_key_exists(1, $row) ? $row[1] : '';
