@@ -110,7 +110,7 @@ class CSVFILTER extends API {
 							// write each to temp file
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
 							$subsetname = preg_replace(CONFIG['forbidden']['names']['characters'], '_', $subsetname);
-							$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['current']->format('Y-m-d H-i-s ') . $subsetname . '.csv';
+							$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $subsetname . '.csv';
 							$file = fopen($tempFile, 'w');
 							fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 							fputcsv($file, $datalist->_setting['filesetting']['columns'],
@@ -133,7 +133,7 @@ class CSVFILTER extends API {
 						break;
 					case 'xls': // do nothing, let xlsx catch
 					case 'xlsx':
-						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['current']->format('Y-m-d H-i-s ') . '.xlsx';
+						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . '.xlsx';
 						$writer = new XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']); 
 						foreach($datalist->_list as $subsetname => $subset){
@@ -242,14 +242,14 @@ class CSVFILTER extends API {
 							'type' => 'number',
 							'attributes' => [
 								'name' => $this->_lang->GET('csvfilter.use.filter_month'),
-								'value' => $this->_date['current']->format('m'),
+								'value' => $this->_date['usertime']->format('m'),
 								'readonly' => true
 							]
 						], [
 							'type' => 'number',
 							'attributes' => [
 								'name' => $this->_lang->GET('csvfilter.use.filter_year'),
-								'value' => $this->_date['current']->format('Y'),
+								'value' => $this->_date['usertime']->format('Y'),
 								'readonly' => true
 							]
 						]
@@ -314,7 +314,7 @@ class CSVFILTER extends API {
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_name')),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_content')),
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.edit.filter_availability')) === $this->_lang->PROPERTY('csvfilter.edit.filter_hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 				];
 
 				// early exit

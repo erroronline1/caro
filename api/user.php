@@ -261,10 +261,10 @@ class USER extends API {
 					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
-						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
+						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $this->_date['current']) $attributes['class'] = 'orange';
+							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
 					$usertrainings[] = [
@@ -617,14 +617,14 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now');
-					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
-					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
+					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
+					$training[':date'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d'));
+					$training[':expires'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06');
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
 					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 						'user' => $_SESSION['user']['name'],
-						'date' => $this->_date['current']->format('Y-m-d H:i'),
+						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
 					]): null;
 						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
@@ -831,14 +831,14 @@ class USER extends API {
 				$training = [];
 				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
 					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now');
+					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
 					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
-					$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
+					$training[':expires'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06');
 					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
 					$training[':file_path'] = '';
 					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
 						'user' => $_SESSION['user']['name'],
-						'date' => $this->_date['current']->format('Y-m-d H:i'),
+						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
 					]): null;
 						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
@@ -1000,10 +1000,10 @@ class USER extends API {
 					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
-						if ($expire < $this->_date['current']) $attributes['class'] = 'red';
+						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
-							if ($expire < $this->_date['current']) $attributes['class'] = 'orange';
+							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
 					$skillmatrix[0][] = [

@@ -69,7 +69,7 @@ class DOCUMENT extends API {
 					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array($this->_lang->GET('permissions.' . $permission), $approveas)){
 						$approve['approval'][$permission] = [
 							'name' => $_SESSION['user']['name'],
-							'date' => $this->_date['current']->format('Y-m-d H:i')
+							'date' => $this->_date['servertime']->format('Y-m-d H:i')
 						];
 					}
 				}
@@ -347,7 +347,7 @@ class DOCUMENT extends API {
 							':unit' => $bundle[':unit'],
 							':author' => $exists['author'],
 							':content' => $exists['content'],
-							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 							':approval' => $exists['approval'],
 							':regulatory_context' => '',
 							':permitted_export' => null,
@@ -758,7 +758,7 @@ class DOCUMENT extends API {
 								':unit' => $component_approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => UTILITY::json_encode($component),
-								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -787,7 +787,7 @@ class DOCUMENT extends API {
 								':unit' => $component_approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => '',
 								':permitted_export' => null,
@@ -816,7 +816,7 @@ class DOCUMENT extends API {
 				// check for forbidden name
 				if(UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
-				$component['content'] = fileupload($component['content'], $component_name, $this->_date['current']->format('YmdHis'));
+				$component['content'] = fileupload($component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => [
 						':name' => $component_name,
@@ -1195,8 +1195,8 @@ class DOCUMENT extends API {
 		if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
 
 		// used by audit for export of outdated documents
-		if ($maxDocumentTimestamp = UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp')) unset($this->_payload->_maxDocumentTimestamp);
-		else $maxDocumentTimestamp = $this->_date['current']->format('Y-m-d H:i:s');
+		if ($maxDocumentTimestamp = $this->convertToServerTime(UTILITY::propertySet($this->_payload, '_maxDocumentTimestamp'))) unset($this->_payload->_maxDocumentTimestamp);
+		else $maxDocumentTimestamp = $this->_date['servertime']->format('Y-m-d H:i:s');
 
 		$document = SQLQUERY::EXECUTE($this->_pdo, 'document_get', [
 			'values' => [
@@ -1209,7 +1209,7 @@ class DOCUMENT extends API {
 
 		$entry_timestamp = $entry_date . ' ' . $entry_time;
 		if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
-			$entry_timestamp = $this->_date['current']->format('Y-m-d H:i');
+			$entry_timestamp = $this->_date['usertime']->format('Y-m-d H:i');
 		}
 
 		// create proper identifier with timestamp if not provided
@@ -1222,7 +1222,7 @@ class DOCUMENT extends API {
 				unset ($this->_payload->$key);
 				try {
 					$possibledate = substr($identifier, -16);
-					new DateTime($possibledate);
+					new DateTime($possibledate, new DateTimeZone($this->_date['timezone']));
 				}
 				catch (Exception $e){
 					$identifier .= ' ' . $entry_timestamp;
@@ -1236,13 +1236,13 @@ class DOCUMENT extends API {
 		}
 		if (!$identifier) $identifier = in_array($document['context'], array_keys($this->_lang->_USER['documentcontext']['identify'])) ? $this->_lang->GET('assemble.render.export_identifier', [] , true): null;
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $document['name'] . '_' . $this->_date['current']->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $document['name'] . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => $identifier,
 			'content' => [],
 			'files' => [],
 			'images' => [],
 			'title' => $document['name'],
-			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->convertFromServerTime($this->_date['current']->format('Y-m-d H:i'), true)], true)
+			'date' => $this->_lang->GET('assemble.render.export_document', [':version' => substr($document['date'], 0, -3), ':date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)], true)
 		];
 
 		function enumerate($name, $enumerate = [], $number = 1){
@@ -1309,7 +1309,7 @@ class DOCUMENT extends API {
 
 							// dynamic multiple select
 							$dynamicMultiples = preg_grep('/' . preg_quote(str_replace(' ', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
-							foreach($dynamicMultiples as $matchkey => $submitted){
+							foreach($dynamicMultiples as $submitted){
 								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
 							}
 	
@@ -1537,7 +1537,7 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $_SESSION['user']['name'],
 								':content' => implode(',', $this->_payload->content),
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 								':approval' => null,
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
@@ -1566,7 +1566,7 @@ class DOCUMENT extends API {
 								':unit' => $this->_payload->approve ? : null,
 								':author' => $exists['author'],
 								':content' => $exists['content'],
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 								':approval' => $exists['approval'],
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,

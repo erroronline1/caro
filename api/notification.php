@@ -72,13 +72,13 @@ class NOTIFICATION extends API {
 			if ($row['closed']) continue;
 			// alert if applicable
 			$last = new DateTime($row['last_touch']);
-			$diff = intval(abs($last->diff($this->_date['current'])->days / CONFIG['lifespan']['open_record_reminder']));
+			$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['open_record_reminder']));
 			$row['notified'] = $row['notified'] || 0;
 			if ($row['notified'] < $diff){
 				$this->alertUserGroup(
 					['permission' => [...PERMISSION::permissionFor('audit', true)]],
 					$this->_lang->GET('audit.audit.reminder_message', [
-						':days' => $last->diff($this->_date['current'])->days,
+						':days' => $last->diff($this->_date['servertime'])->days,
 						':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
 						':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
 					], true)
@@ -149,7 +149,7 @@ class NOTIFICATION extends API {
 		foreach($trainings as $training){
 			if ($training['evaluation']) continue;
 			$trainingdate = new DateTime($training['date']);
-			if (intval(abs($trainingdate->diff($this->_date['current'])->days)) > CONFIG['lifespan']['training_evaluation']){
+			if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
 				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) {// no deleted users
 					// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
 					$subject = $this->_lang->GET('audit.userskills_notification_message', [
@@ -388,13 +388,13 @@ class NOTIFICATION extends API {
 				$update = false;
 				$decoded_order_data = null;
 				$ordered = new DateTime($order['ordered'] ? : '');
-				$receive_interval = intval(abs($ordered->diff($this->_date['current'])->days / CONFIG['lifespan']['order_unreceived']));
+				$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order_unreceived']));
 				if ($order['ordered'] && $order['notified_received'] < $receive_interval){
 					$decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['permission' => ['purchase']],
 						$this->_lang->GET('order.alert_unreceived_order', [
-							':days' => $ordered->diff($this->_date['current'])->days,
+							':days' => $ordered->diff($this->_date['servertime'])->days,
 							':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
@@ -409,13 +409,13 @@ class NOTIFICATION extends API {
 				} else $receive_interval = $order['notified_received'];
 
 				$received = new DateTime($order['received'] ? : '');
-				$delivery_interval = intval(abs($received->diff($this->_date['current'])->days / CONFIG['lifespan']['order_undelivered']));
+				$delivery_interval = intval(abs($received->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order_undelivered']));
 				if ($order['received'] && $order['notified_delivered'] < $delivery_interval){
 					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['unit' => [$order['organizational_unit']]],
 						$this->_lang->GET('order.alert_undelivered_order', [
-							':days' => $received->diff($this->_date['current'])->days,
+							':days' => $received->diff($this->_date['servertime'])->days,
 							':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'null\', \'null\', \'received\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
 							':quantity' => $decoded_order_data['quantity_label'],
 							':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
@@ -492,7 +492,7 @@ class NOTIFICATION extends API {
 				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $number++;
 				// alert if applicable
 				$last = new DateTime($row['last_touch']);
-				$diff = intval(abs($last->diff($this->_date['current'])->days / CONFIG['lifespan']['open_record_reminder']));
+				$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['open_record_reminder']));
 				if ($row['notified'] < $diff){
 					// get last considered document
 					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)];
@@ -500,7 +500,7 @@ class NOTIFICATION extends API {
 					$this->alertUserGroup(
 						['unit' => explode(',', $row['units'])],
 						$this->_lang->GET('record.reminder_message', [
-							':days' => $last->diff($this->_date['current'])->days,
+							':days' => $last->diff($this->_date['servertime'])->days,
 							':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
 							':document' => $lastdocument['name'],			
 							':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
@@ -540,7 +540,7 @@ class NOTIFICATION extends API {
 		$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
 		foreach($responsibilities as $row){
 			if ($row['hidden']) continue;
-			if (substr($row['span_end'], 0, 10) < $this->_date['current']->format('Y-m-d')) {
+			if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 				// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
 				$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'])))], true));
 				$open = false;

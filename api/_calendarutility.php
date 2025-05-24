@@ -90,8 +90,7 @@ class CALENDARUTILITY {
 	 * @return int affected rows
 	 */
 	public function complete($id = '0', $close = null, $alert = null){
-		$date = new DateTime('now');
-		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => $date->format('Y-m-d')];
+		if ($close) $close = ['user' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d')];
 		$sqlchunks = [];
 		$affected_rows = 0;
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
@@ -653,7 +652,6 @@ class CALENDARUTILITY {
 		$result = ['header' => null, 'content' => []];
 		if (!$this->_days || $date) $this->days($format, $date);
 
-		$today = new DateTime('now');
 		foreach ($this->_days as $day){
 			if ($day === null) $result['content'][] = null;
 			else {
@@ -679,7 +677,7 @@ class CALENDARUTILITY {
 				$result['content'][] = [
 					'date' => $day->format('Y-m-d'),
 					'display' => $this->_lang->_USER['general']['weekday'][$day->format('N')] . ' ' . $day->format('j') . ($numbers ? "\n" . $numbers : ''),
-					'today' => $day->format('Y-m-d') === $today->format('Y-m-d'),
+					'today' => $day->format('Y-m-d') === $this->_date['usertime']->format('Y-m-d'),
 					'selected' => $date === $day->format('Y-m-d'),
 					'holiday' => in_array($day->format('Y-m-d'), $this->holidays($day->format('Y'))) || !in_array($day->format('N'), $this->_workdays),
 					'title' => $this->_lang->GET('calendar.daily_title', [':day' => $this->_lang->_USER['general']['weekday'][$day->format('N')] . ' ' . $this->dateFormat($day->format('Y-m-d')), ':number' => $numbers])

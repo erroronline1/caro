@@ -73,52 +73,52 @@ class CALENDAR extends API {
 					$appointment['reminder'] .= ' ' . $this->_lang->GET('calendar.appointment.reminder_default', [], true);
 
 					$ics = "BEGIN:VCALENDAR\n".
-					"PRODID:-//" . CONFIG['system']['caroapp'] . "//CALENDAR//EN\n" .
-					"VERSION:2.0\n" .
-					"BEGIN:VEVENT\n" .
-					"UID:" . implode('-', str_split(md5(CONFIG['system']['caroapp'] . time()), 5)) . "\n" .
-					"CREATED:" . date('Ymd\THis') . "\n" .
-					"DTSTAMP:" . date('Ymd\THis') . "\n" .
-					"DTSTART:" . str_replace('-', '', $appointment['date']) . 'T' . str_replace(':', '', $appointment['time']) . "00\n" .
-					"DTEND:" . date("Ymd\THis", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600) . "\n" .
-					wordwrap("DESCRIPTION:" . $appointment['reminder'], 75, "\n ") . "\n" .
-					wordwrap("SUMMARY:" . $appointment['occasion'], 75, "\n ")  . "\n" .
-					"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
-					"CONTACT:" . $this->_lang->GET('company.phone') . "\n" .
-					"ORGANIZER:" . $this->_lang->GET('company.mail') . "\n" .
-					"END:VEVENT\n" .
-					"END:VCALENDAR";
+						"PRODID:-//" . CONFIG['system']['caroapp'] . "//CALENDAR//EN\n" .
+						"VERSION:2.0\n" .
+						"BEGIN:VEVENT\n" .
+						"UID:" . implode('-', str_split(md5(CONFIG['system']['caroapp'] . time()), 5)) . "\n" .
+						"CREATED:" . date('Ymd\THis') . "\n" .
+						"DTSTAMP:" . date('Ymd\THis') . "\n" .
+						"DTSTART:" . str_replace('-', '', $appointment['date']) . 'T' . str_replace(':', '', $appointment['time']) . "00\n" .
+						"DTEND:" . date("Ymd\THis", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600) . "\n" .
+						wordwrap("DESCRIPTION:" . $appointment['reminder'], 75, "\n ") . "\n" .
+						wordwrap("SUMMARY:" . $appointment['occasion'], 75, "\n ")  . "\n" .
+						"LOCATION:" . $this->_lang->GET('company.address') . "\n" .
+						"CONTACT:" . $this->_lang->GET('company.phone') . "\n" .
+						"ORGANIZER:" . $this->_lang->GET('company.mail') . "\n" .
+						"END:VEVENT\n" .
+						"END:VCALENDAR";
 
 					$content = [
 						'title' => $this->_lang->GET('calendar.appointment.title', [], true),
-						'date' => $this->convertFromServerTime($this->_date['current']->format('Y-m-d'), true),
+						'date' => $this->convertFromServerTime($this->_date['servertime']->format('Y-m-d'), true),
 						'content' => [
 							$ics,
 							$this->_lang->GET('calendar.appointment.readable', [
 								':company' => $this->_lang->GET('company.address'),
 								':occasion' => $appointment['occasion'],
-								':start' => $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true),
-								':end' => $this->convertFromServerTime(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600), true),
+								':start' => $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false),
+								':end' => $this->convertFromServerTime(date("Y-m-d H:i", strtotime($appointment['date'] . ' ' . $appointment['time']) + intval($appointment['duration']) * 3600), true, false),
 								':reminder' => $appointment['reminder'],
 								':phone' => $this->_lang->GET('company.phone'),
 								':mail' => $this->_lang->GET('company.mail')
 							], true)
 						],
-						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true))
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false))
 					];
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
 						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
 					];
 
 					// add ics file to send by mail
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true) . '.ics';
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false) . '.ics';
 					$file = fopen($tempFile, 'w');
 					fwrite($file, $ics);
 					fclose($file);
 					// provide downloadfile
 					$downloadfiles[$this->_lang->GET('calendar.appointment.ics')] = [
 						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true) . '.ics'
+						'download' => $this->_lang->GET('calendar.appointment.ics', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false) . '.ics'
 					];
 
 					$body = [
@@ -347,7 +347,7 @@ class CALENDAR extends API {
 					$content = json_decode($this->_payload->content, true);
 					$preset = json_decode($this->_payload->preset, true);
 					$id = $this->_payload->id;
-					$closed = intval($this->_payload->closed) ? UTILITY::json_encode(['user' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d')]) : null;
+					$closed = intval($this->_payload->closed) ? UTILITY::json_encode(['user' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d')]) : null;
 					if (!$content) $this->response([], 406);
 
 					if (intval($id) > 0){
@@ -431,8 +431,8 @@ class CALENDAR extends API {
 				foreach($schedules as $schedule){
 					if (!PERMISSION::permissionFor('longtermplanning') && !$schedule['closed']) continue;
 					$schedule['closed'] = json_decode($schedule['closed'] ? : '', true);
-					$select['edit'][$schedule['subject'] . (isset($schedule['closed']['date']) ? (' - ' . $this->convertFromServerTime($schedule['closed']['date'])) :'')] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
-					if ($schedule['span_end'] > $this->_date['current']->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
+					$select['edit'][$schedule['subject'] . (isset($schedule['closed']['date']) ? (' - ' . $this->convertFromServerTime($schedule['closed']['date'])) : '')] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
+					if ($schedule['span_end'] > $this->_date['usertime']->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
 				}
 
 				$result['render']['content'][] = [
@@ -707,13 +707,13 @@ class CALENDAR extends API {
 		array_splice($timesheets, 0, 0, $self);
 
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('menu.calendar.timesheet', [], true) . '_' . $this->_date['current']->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('menu.calendar.timesheet', [], true) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => $this->prepareTimesheetOutput($timesheets),
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('menu.calendar.timesheet', [], true),
-			'date' => $this->_date['current']->format('Y-m-d H:i')
+			'date' => $this->_date['usertime']->format('Y-m-d H:i')
 		];
 
 		$downloadfiles = [];
@@ -804,7 +804,7 @@ class CALENDAR extends API {
 					if (isset($day['note']) && $day['note']) $dayinfo[] = $day['note'];
 					
 					$rows[] = [
-						[$day['weekday'] . ' ' . $this->convertFromServerTime($date), $day['holiday']],
+						[$day['weekday'] . ' ' . $this->convertFromServerTime($date, false, false), $day['holiday']],
 						implode(', ', $dayinfo)
 					];
 				}
@@ -920,8 +920,8 @@ class CALENDAR extends API {
 				// set up event properties
 				$event = [
 					':type' => 'schedule',
-					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.date')),
-					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.due')),
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.date'))),
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.due'))),
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.organizational_unit')),
@@ -962,8 +962,8 @@ class CALENDAR extends API {
 				// set up event properties from payload
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
-					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.date')),
-					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.due')),
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.date'))),
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.due'))),
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.organizational_unit')),
@@ -1065,7 +1065,7 @@ class CALENDAR extends API {
 				];
 				// default requestedDate as today
 				if (!$this->_requestedDate){
-					$today = $this->_date['current'];
+					$today = $this->_date['usertime'];
 					$this->_requestedDate = $today->format('Y-m-d');
 				}
 
@@ -1091,7 +1091,7 @@ class CALENDAR extends API {
 					'content' => $displayabsentmates,
 					'attributes' => [
 						'data-type' => 'calendar',
-						'name' => $this->convertFromServerTime($this->_requestedDate)
+						'name' => $this->convertFromServerTime($this->_requestedDate, false, true)
 					]
 				];
 
@@ -1286,8 +1286,8 @@ class CALENDAR extends API {
 				// set up event properties
 				$event = [
 					':type' => 'timesheet',
-					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_time')) . ':00',
-					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00',
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_time')) . ':00'),
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00'),
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
 					':organizational_unit' => null,
@@ -1354,8 +1354,8 @@ class CALENDAR extends API {
 				// set up event properties with payload
 				$event = [
 					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
-					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_time')) . ':00',
-					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00',
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_time')) . ':00'),
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00'),
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user['id'],
 					':organizational_unit' => null,
@@ -1448,7 +1448,7 @@ class CALENDAR extends API {
 
 				// default requestedDate as today
 				if (!$this->_requestedDate){
-					$today = $this->_date['current'];
+					$today = $this->_date['usertime'];
 					$this->_requestedDate = $today->format('Y-m-d');
 				}
 

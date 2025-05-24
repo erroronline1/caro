@@ -87,7 +87,7 @@ class MEASURE extends API {
 					boolval($measure['closed']) == boolval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')))
 				);
 				$measure['measures'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure'));
-				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? UTILITY::json_encode(['date' =>$this->_date['current']->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
+				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? UTILITY::json_encode(['date' =>$this->_date['servertime']->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
 				$measure['id'] = $this->_requestedID;
 				$measure['last_user'] = $_SESSION['user']['name'];
 

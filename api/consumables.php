@@ -269,7 +269,7 @@ class CONSUMABLES extends API {
 						if ($checkcontent){
 							foreach (array_filter($products, fn($p) => $p['trading_good']) as $product){
 								$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
-								$product['sample_checks'][] = ['date' => $this->_date['current']->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
+								$product['sample_checks'][] = ['date' => $this->_date['servertime']->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
 				
 								if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 									'values' => [
@@ -332,7 +332,7 @@ class CONSUMABLES extends API {
 					if (in_array($permission, $_SESSION['user']['permissions'])){
 						$approve[$permission] = [
 							'name' => $_SESSION['user']['name'],
-							'date' => $this->_date['current']->format('Y-m-d H:i')
+							'date' => $this->_date['servertime']->format('Y-m-d H:i')
 						];
 					}
 				}
@@ -583,7 +583,7 @@ class CONSUMABLES extends API {
 				$checkcontent = implode("\n", array_map(fn($k, $v) => $k . ': ' . $v, array_keys($check), array_values($check)));
 				// append to products sample checks
 				$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
-				$product['sample_checks'][] = ['date' => $this->_date['current']->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
+				$product['sample_checks'][] = ['date' => $this->_date['servertime']->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 					'values' => [
@@ -752,7 +752,7 @@ class CONSUMABLES extends API {
 					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
 					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
 					'article_info' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null,
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					'protected' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
@@ -773,7 +773,7 @@ class CONSUMABLES extends API {
 
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['current']->format('Ymd') . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -828,7 +828,7 @@ class CONSUMABLES extends API {
 					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null;
 					$product['article_unit'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null;
 					$product['article_ean'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null;
-					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null;
+					$product['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null;
 					$product['trading_good'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null;
 					$product['has_expiry_date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null;
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
@@ -846,7 +846,7 @@ class CONSUMABLES extends API {
 							foreach($this->_lang->_USER['permissions'] as $permission => $translation){
 								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
 									'name' => $_SESSION['user']['name'],
-									'date' => $this->_date['current']->format('Y-m-d H:i')
+									'date' => $this->_date['servertime']->format('Y-m-d H:i')
 								];
 							}
 							$product['incorporated'] = UTILITY::json_encode($product['incorporated']);
@@ -866,7 +866,7 @@ class CONSUMABLES extends API {
 				
 				// save documents
 				if (PERMISSION::permissionFor('products') && isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['current']->format('Ymd') . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -1631,7 +1631,7 @@ class CONSUMABLES extends API {
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
 			foreach ($sqlchunks as $chunk){
 				try {
-					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_date['current']->format("Y-m-d");
+					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_date['servertime']->format("Y-m-d");
 				}
 				catch (Exception $e) {
 					echo $e, $chunk;
@@ -1690,11 +1690,11 @@ class CONSUMABLES extends API {
 				 */
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null,
+					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
 					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
-					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_date['current']->format('Ymd'),
+					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_date['servertime']->format('Ymd'),
 					'evaluation' => []
 				];
 				
@@ -1706,11 +1706,11 @@ class CONSUMABLES extends API {
 
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['current']->format('Ymd')]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
 				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['current']->format('Ymd')]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
 				}
 
 				// unset all beckend defined payload variables leaving vendor evaluation inputs
@@ -1755,7 +1755,7 @@ class CONSUMABLES extends API {
 				}
 				if ($evaluation){
 					$evaluation['_author'] = $_SESSION['user']['name'];
-					$evaluation['_date'] = $this->_date['current']->format('Y-m-d');
+					$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
 					$vendor['evaluation'][] = $evaluation;
 				}
 				else $vendor['evaluation'] = null;
@@ -1807,7 +1807,7 @@ class CONSUMABLES extends API {
 				if (!$vendor) $this->response(null, 406);
 
 				// update vendor data
-				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['current']->format('Y-m-d H:i:s')]) : null;
+				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
 				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
@@ -1825,11 +1825,11 @@ class CONSUMABLES extends API {
 
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['current']->format('Ymd')]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
 				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['current']->format('Ymd')]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
 				}
 				// update pricelist
 				$pricelistImportError = '';
@@ -1903,7 +1903,7 @@ class CONSUMABLES extends API {
 				if ($latest_vendor_evaluation != $evaluation) {
 					if ($evaluation){
 						$evaluation['_author'] = $_SESSION['user']['name'];
-						$evaluation['_date'] = $this->_date['current']->format('Y-m-d');
+						$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
 						$vendor['evaluation'][] = $evaluation;
 					}
 				}

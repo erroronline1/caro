@@ -26,9 +26,6 @@ graph LR;
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
-* time zones
-    * actually convert timezones from local(default) to user selected? wherever current_timestamp has been applied
-    * calendar, etc. convert user entries by timezone to default server timezone
 * review permissions in safari context
     * https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
 
@@ -187,6 +184,8 @@ Orders can be deleted by administrative users and requesting unit members at any
     * The application has a [sharepoint](#files) for files and an integrated STL-viewer to easily exchange information.
 * CSV filtering
     * The application is capable of versatile [filtering and processing of CSV-files](#csv-processor).
+* Timezones and states
+    * The application can handle different timezones and states regarding holidays, depending on your sites.
 
 [Content](#content)
 

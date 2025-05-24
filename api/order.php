@@ -373,7 +373,7 @@ class ORDER extends API {
 					}
 					$vendor = $vendors[array_search($product['vendor_id'], array_column($vendors, 'id'))];
 					$check = new DateTime($product['checked']);
-					if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['current'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
+					if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
 						$checkable[$product['vendor_id']][] = $product['id'];
 					}
 				}
@@ -381,7 +381,7 @@ class ORDER extends API {
 				foreach($products as $product){
 					if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_id']])) continue;
 					$check = new DateTime($product['checked']);
-					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['current'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
+					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['servertime'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 						unset($checkable[$product['vendor_id']]);
 					}
 				}
@@ -710,13 +710,13 @@ class ORDER extends API {
 		//set up summary
 		$title = $this->_lang->GET('menu.purchase.order') . ' - ' . $this->_lang->GET('consumables.product.stock_item') . ' - ' . $this->_lang->GET('order.order.' . ($this->_subMethodState ? : 'unprocessed'));
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $title . '_' . $this->_date['current']->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $title . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => $data,
 			'files' => [],
 			'images' => [],
 			'title' => $title,
-			'date' => $this->convertFromServerTime($this->_date['current']->format('Y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
@@ -1561,14 +1561,14 @@ class ORDER extends API {
 		// handle attachments
 		$attachments = [];
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_date['current']->format('YmdHis')]));
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
 		}
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
-			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_date['current']->format('YmdHis')]));
+			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')]));
 			foreach($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);

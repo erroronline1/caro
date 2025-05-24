@@ -53,11 +53,11 @@ class RESPONSIBILITY extends API {
 				$responsibility = $responsibility ? $responsibility[0]: null;
 				if (!$responsibility) $this->response([], 404);
 				$responsibility['assigned_users'] = json_decode($responsibility['assigned_users'], true);
-				if (array_key_exists($_SESSION['user']['id'], $responsibility['assigned_users'])) $responsibility['assigned_users'][$_SESSION['user']['id']] = $this->_date['current']->format('Y-m-d');
+				if (array_key_exists($_SESSION['user']['id'], $responsibility['assigned_users'])) $responsibility['assigned_users'][$_SESSION['user']['id']] = $this->_date['servertime']->format('Y-m-d');
 				else {
 					// only if not found for itsybity performance reasons
 					$responsibility['proxy_users'] = json_decode($responsibility['proxy_users'], true);
-					if (array_key_exists($_SESSION['user']['id'], $responsibility['proxy_users'])) $responsibility['proxy_users'][$_SESSION['user']['id']] = $this->_date['current']->format('Y-m-d');
+					if (array_key_exists($_SESSION['user']['id'], $responsibility['proxy_users'])) $responsibility['proxy_users'][$_SESSION['user']['id']] = $this->_date['servertime']->format('Y-m-d');
 					$responsibility['proxy_users'] = UTILITY::json_encode($responsibility['proxy_users']);
 				}
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_accept', [
@@ -167,7 +167,7 @@ class RESPONSIBILITY extends API {
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $row['responsibility'],
-								'class' => substr($row['span_end'], 0, 10) < $this->_date['current']->format('Y-m-d') ? 'red' : ''
+								'class' => substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d') ? 'red' : ''
 							],
 							'content' => $row['description']
 						];
@@ -189,7 +189,7 @@ class RESPONSIBILITY extends API {
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('responsibility.applicability'),
-								'class' => substr($row['span_end'], 0, 10) < $this->_date['current']->format('Y-m-d') ? 'red' : ''
+								'class' => substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d') ? 'red' : ''
 							],
 							'content' => $this->_lang->GET('responsibility.apply', [':start' => $this->convertFromServerTime(substr($row['span_start'], 0, 10)), ':end' => $this->convertFromServerTime(substr($row['span_end'], 0, 10))])
 						];
@@ -242,8 +242,8 @@ class RESPONSIBILITY extends API {
 					':units' => [],
 					':assigned_users' => [],
 					':proxy_users' => [],
-					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_start')),
-					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end')),
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_start'))),
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end'))),
 					':responsibility' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.task')),
 					':description' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.context')),
 					':hidden' => null,
@@ -304,8 +304,8 @@ class RESPONSIBILITY extends API {
 					':units' => [],
 					':assigned_users' => [],
 					':proxy_users' => [],
-					':span_start' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_start')),
-					':span_end' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end')),
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_start'))),
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end'))),
 					':responsibility' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.task')),
 					':description' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.context')),
 					':hidden' => null,
@@ -437,14 +437,14 @@ class RESPONSIBILITY extends API {
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.applicability_start'),
-							'value' => substr($responsibility['span_start'], 0, 10),
+							'value' => $this->convertFromServerTime(substr($responsibility['span_start'], 0, 10)),
 							'required' => true
 						]
 					], [
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.applicability_end'),
-							'value' => substr($responsibility['span_end'], 0, 10),
+							'value' => $this->convertFromServerTime(substr($responsibility['span_end'], 0, 10)),
 							'required' => true
 						]
 					]

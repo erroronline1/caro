@@ -99,6 +99,9 @@ Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Be
     * Die Anwendung hat einen [Sharepoint](#dateien) für Dateien mit integriertem STL-Betrachter um vereinfacht Informationen austauschen zu können.
 * CSV-Filterung
     * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
+* Zeitzonen und Bundesländer
+    * Die Anwendung kann unterschiedliche Zeitzonen und Bundesländer in bezug auf Feiertage verarbeiten, je nach Standortverteilung.
+
 
 [Übersicht](#übersicht)
 

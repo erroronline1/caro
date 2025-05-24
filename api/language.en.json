@@ -1572,6 +1572,7 @@
 		"settings_location_change_alert": "Changing the state with its linked holidays has an effect on your timesheet calculations. On changing this must be initialized anew!",
 		"settings_theme": "Colour scheme",
 		"settings_timezone": "Timezone",
+		"settings_timezone_hint": "Dates and Times will be displayed in your local time",
 		"settings_weekly_hours": "Average weekly hours",
 		"settings_weekly_hours_hint": "YYYY-MM-DD hours within every new line\nFirst entry recommended with start date of tracking, earlier entries will not be calculated",
 		"take_photo": "Take a photo for your profile",

@@ -652,7 +652,7 @@ class SHARED {
 	 * @return array document components or document names within bundles
 	 */
 	public function recentdocument($query = '', $parameters = [], $requestedTimestamp = null){
-		$requestedTimestamp = $requestedTimestamp ? : $this->_date['current']->format('Y-m-d') . ' ' . $this->_date['current']->format('H:i:59');
+		$requestedTimestamp = $requestedTimestamp ? : $this->_date['servertime']->format('Y-m-d H:i:59');
 
 		$result = [];
 		$contentBody = [];
