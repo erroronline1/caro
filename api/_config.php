@@ -44,4 +44,7 @@ if (is_file('config.env')){
 	$defaultconfig = override($defaultconfig, $envconfig);
 }
 define ('CONFIG', $defaultconfig);
+
+// set runtime settings as per config
+if (isset(CONFIG['calendar']['timezones']))	date_default_timezone_set(CONFIG['calendar']['timezones'][array_key_first(CONFIG['calendar']['timezones'])]);
 ?>
