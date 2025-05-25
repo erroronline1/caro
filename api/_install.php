@@ -323,8 +323,10 @@ define('DEFAULTSQL', [
 				"	`experience_points` int NULL," .
 				"	`file_path` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`planned` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+
 		'sqlsrv' => "IF OBJECT_ID(N'caro_audit_and_management', N'U') IS NULL " .
 				"CREATE TABLE caro_audit_and_management (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
@@ -615,7 +617,8 @@ define('DEFAULTSQL', [
 				"	expires date NULL," .
 				"	experience_points int NULL," .
 				"	file_path varchar(MAX) NULL DEFAULT NULL," .
-				"	evaluation varchar(MAX) NULL DEFAULT NULL" .
+				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
+				"	planned varchar(255) NULL DEFAULT NULL" .
 				");"
 		],
 

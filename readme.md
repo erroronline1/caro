@@ -28,6 +28,16 @@ graph LR;
     * handle hidden attribute?
 * review permissions in safari context
     * https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
+* schedule user trainings
+    * sqlsrv alter date default null
+    * audit search for *add planning option*
+    * _shared method for dialog assembly
+    * implement dialog content response as render response in case of complaint record
+    * username with dataset
+    * planned json author, date, scheduled time
+    * convert scheduled training to fulfilled, add date, expiry, experience points
+    * review file upload options from dialog form
+    * consider file uploads within training evaluation form by default to append certificates
 
 ## Content
 * [Aims](#aims)

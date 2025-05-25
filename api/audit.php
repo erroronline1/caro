@@ -3228,9 +3228,10 @@ class AUDIT extends API {
 	 *  |___|___|___|_| |___|_,_|_|_|_|___|
 	 *
 	 * returns all users with their skills and trainings
+	 * batch insert and plan trainings
 	 */
 	private function userskills(){
-		if ($_SERVER['REQUEST_METHOD']==='POST' && PERMISSION::permissionFor('users')){
+		if ($_SERVER['REQUEST_METHOD']==='POST' && (count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions']))){
 			$training = $users = $requested = [];
 
 			if ($name = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.userskills_bulk_user'))) if ($name !== '...' ) $requested[] = $name;
@@ -3297,6 +3298,7 @@ class AUDIT extends API {
 
 			$bulkselection[$user['name']] = [];
 
+			// construct fulfilled skills
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			$skillmatrix = '';
 			foreach ($this->_lang->_USER['skills'] as $duty => $skills){
@@ -3320,6 +3322,8 @@ class AUDIT extends API {
 					'content' => $skillmatrix
 				]
 			];
+
+			// get individual trainings
 			$user_id = $user['id'];
 			if ($usertrainings = array_filter($trainings, function ($row) use($user_id){
 				return $row['user_id'] === $user_id;
@@ -3356,60 +3360,70 @@ class AUDIT extends API {
 					];
 				}	
 			}
+
+			if ((array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true)) === ['supervisor']
+				&& array_intersect($_SESSION['user']['units'], explode(',', $user['units'])))
+				|| count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])
+				){
+				// add planning option
+
+			}
 		}
-		// also see user.php
-		$skillmatrix = [
-			[
+		if (count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])){
+			// also see user.php
+			$skillmatrix = [
 				[
-					'type' => 'text',
-					'attributes' => [
-						'name' => $this->_lang->GET('user.add_training')
-					],
-				], [
-					'type' => 'date',
-					'attributes' => [
-						'name' => $this->_lang->GET('user.add_training_date')
-					],
-				], [
-					'type' => 'date',
-					'attributes' => [
-						'name' => $this->_lang->GET('user.add_training_expires')
-					],
-				], [
-					'type' => 'select',
-					'attributes' => [
-						'multiple' => true,
-						'name' => $this->_lang->GET('audit.userskills_bulk_user'),
-						'id' => '_bulkskillupdate'
-					],
-					'content' => $bulkselection
-				], [
-					'type' => 'checkbox',
-					'attributes' => [
-						'name' => $this->_lang->GET("user.add_training_evaluation")
-					],
-					'content' => [
-						$this->_lang->GET('user.add_training_evaluation_unreasonable') => []
+					[
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.add_training')
+						],
+					], [
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.add_training_date')
+						],
+					], [
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('user.add_training_expires')
+						],
+					], [
+						'type' => 'select',
+						'attributes' => [
+							'multiple' => true,
+							'name' => $this->_lang->GET('audit.userskills_bulk_user'),
+							'id' => '_bulkskillupdate'
+						],
+						'content' => $bulkselection
+					], [
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET("user.add_training_evaluation")
+						],
+						'content' => [
+							$this->_lang->GET('user.add_training_evaluation_unreasonable') => []
+						]
 					]
 				]
-			]
-		];
+			];
 
-		array_splice($content, 1, 0,  [[
-			[
-				'type' => 'button',
-				'attributes' => [
+			array_splice($content, 1, 0, [[
+				[
 					'type' => 'button',
-					'value' => $this->_lang->GET('audit.userskills_bulk_training'),
-					'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . UTILITY::json_encode(
-						$skillmatrix
-					) . "'), options:{".
-					"'" . $this->_lang->GET('general.cancel_button') . "': false,".
-					"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-					"}}).then(response => {if (response) api.audit('post', 'checks', 'userskills', _client.application.dialogToFormdata())})"
+					'attributes' => [
+						'type' => 'button',
+						'value' => $this->_lang->GET('audit.userskills_bulk_training'),
+						'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . UTILITY::json_encode(
+							$skillmatrix
+						) . "'), options:{".
+						"'" . $this->_lang->GET('general.cancel_button') . "': false,".
+						"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+						"}}).then(response => {if (response) api.audit('post', 'checks', 'userskills', _client.application.dialogToFormdata())})"
+					]
 				]
-			]
-		]]);
+			]]);
+		}
 
 		if ($unfulfilledskills){
 			$content = [
