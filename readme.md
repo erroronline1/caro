@@ -26,8 +26,6 @@ graph LR;
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
-* review permissions in safari context
-    * https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API
 * schedule user trainings
     * sqlsrv alter date default null
     * audit search for *add planning option*
@@ -1181,6 +1179,7 @@ Tested operating systems, browsers and devices:
 * Linux Mint 21.3 Firefox 133 (from 2024-05-30)
 * Android 12 Firefox 133
 * macOS 13 Ventura [Safari 18](#safaris-special-needs), Edge 131, Firefox 133
+* iOS 18.4.1 [Safari](#safaris-special-needs)
 * Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a defective recognition of special characters on default installation on Win10)
 
 External scanners must be able to scan 2D-Codes and read UTF-8 character encoding.
@@ -1466,12 +1465,12 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services. Notifications will not work in private modes.
+* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services. Notifications will not work in private modes and [Safari](#safaris-special-needs).
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
 
 ### Safaris special needs
-as opposed to proper browsers. At least on macOS.
+as opposed to proper browsers.
 
 Tests:
 * rendertest **passed**
@@ -1479,16 +1478,14 @@ Tests:
 * dialog **passed**
 * serviceworker **passed**
 * document composer **passed**
-* notifications **failed on macOS desktop and iOS due to unsupported Notification-API**
-* notification indicators **failed on iOS Safari, passed as PWA**
+* notifications **failed on macOS desktop and iOS due to unsupported Notification-API, unintegrated Push-API**
+* notification indicators **passed**
 * scanner **passed**
 * stlviewer **passed**
 
 Notes:
-* Notifications in Safari only work on mobile if the application is added to the home screen as a progressive web app via the *Share*-option. Notifications seem to be enabled by default in this case. This can be changed within the system settings of the device.
 * iOS PWAs seem to not being updated regarding front end code and may have to be reinstalled on changes.
 * Styling is slightly different because of inconsistent following of web standards
-* Disclaimer: it is possible that some restrictions happen because of a self signed certificate for the developer environment SSL-connection. Trust settings were unsuccessful on macOS as well. Also there may be limits due to a virtual test environment.
 
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
 

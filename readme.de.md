@@ -1083,6 +1083,7 @@ Getestete Betriebssysteme, Browser und Geräte:
 * Linux Mint 21.3 Firefox 133 (seit 2024-05-30)
 * Android 12 Firefox 133
 * macOS 13 Ventura [Safari 18](#safaris-besondere-bedürfnisse), Edge 131, Firefox 133
+* iOS 18.4.1 [Safari](#safaris-special-needs)
 * Opticon USB Barcode Reader L-46X (funktioniert am Bildschirm und auf Papier, CODE128 und QR gemäß Spezifikationen, aber scheinbar limitiert auf [ASCII](https://www.asciitable.com/) mit fehlerhafter Auflösung von Sonderzeichen (z.B. Umlaute) bei Standardinstallation an Win10)
 
 Externe Scanner müssen 2D-Codes scannen und UTF-8 Zeichencodierung auswerten können.
@@ -1369,12 +1370,12 @@ Das Leben, das medizinische Feld und regulatorische Anforderungen sind komplizie
 
 ### Verschiedenes
 * Eine Festlegung der Paketgröße für die SQL-Umgebung auf einen größeren Wert als die Standardkonfiguration neben der Anpassung des Wertes in der config.ini ist sinnvoll. Es ist vorgesehen, dass Stapel-Abfragen aufgeteilt werden, es kann aber vorkommen, dass einzelne Anfragen mit gelegentlich Base64-codierten Bildern die Standardbegrenzung überschreiten.
-* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden. Benachrichtigungen funktionieren nicht im Privatsphären-Modus.
+* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden. Benachrichtigungen funktionieren nicht im Privatsphären-Modus und [Safari](#safaris-besondere-bedürfnisse).
 * Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 
 ### Safaris besondere Bedürfnisse
-im Gegensatz zu richtigen Browsern, zumindest auf macOS.
+im Gegensatz zu richtigen Browsern.
 
 Tests:
 * rendertest **bestanden**
@@ -1382,16 +1383,14 @@ Tests:
 * dialog **bestanden**
 * serviceworker **bestanden**
 * document composer **bestanden**
-* notifications **fehlgeschlagen auf macOS Desktop und iOS aufgrund fehlender Notification-API Unterstützung**
-* notification indicators **fehlgeschlagen auf iOS in Safari, als PWA bestanden**
+* notifications **fehlgeschlagen auf macOS Desktop und iOS aufgrund fehlender Notification-API Unterstützung, nicht integrierter Push-API**
+* notification indicators **bestanden**
 * scanner **bestanden**
 * stlviewer **bestanden**
 
 Anmerkungen:
-* Benachrichtigungen in Safari funktionieren nur in der mobilen Variante wenn die Anwendung als PWA über die *Teilen*-Option zum Startbildschirm hinzugefügt wird. Benachrichtigungen scheinen in diesem Fall standardmäßig aktiviert zu sein. Dies kann in den Systemeinstellungen des Geräts gändert werden.
 * iOS PWAs scheinen Frontend-Code nicht zu aktualisieren uns müssen ggf. bei Änderungen neu installiert werden.
 * Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
-* Disclaimer: es ist möglich dass einige Einschränkungen aufgrund eines selbst signierten Zertifikats der Entwicklungsumgebung für die SSL-Verbindung auftreten. Einstellungen der Vertrauenswürdigkeit waren jedoch unter macOS auch nicht erfolgreich. Es können auch Einschränkungen aufgrund einer virtuellen Testumgebung auftreten.
 
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
 

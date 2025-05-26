@@ -71,7 +71,7 @@ export const _serviceWorker = {
 		},
 
 		interval: null,
-		interval_duration: 10000,
+		interval_duration: 300000,
 		permission: null,
 
 		/**
@@ -151,16 +151,15 @@ export const _serviceWorker = {
 			return;
 		}
 		document.querySelector("header>div:nth-of-type(3)").style.display = "none";
-		if ("message_unnotified" in data) {
-			if (parseInt(data.message_unnotified, 10)) {
-				let body =
-					data.message_unnotified > 1
-						? api._lang.GET("message.new_messages", {
-								":amount": data.message_unnotified,
-						  })
-						: api._lang.GET("message.new_message");
-				this.showLocalNotification(api._lang.GET("menu.communication.header"), body);
-			}
+
+		if ("message_unnotified" in data && parseInt(data.message_unnotified, 10)) {
+			let body =
+				data.message_unnotified > 1
+					? api._lang.GET("message.new_messages", {
+							":amount": data.message_unnotified,
+						})
+					: api._lang.GET("message.new_message");
+			this.showLocalNotification(api._lang.GET("menu.communication.header"), body);
 		}
 		this.notif.communication(data);
 		this.notif.consumables(data);
@@ -195,7 +194,7 @@ export const _serviceWorker = {
 	register: async function () {
 		if ("serviceWorker" in navigator) {
 			this.worker = await navigator.serviceWorker.register("./service-worker.js");
-			if (window.Notification) {
+			if (document.querySelector('html[data-useragent*="safari"]') === undefined && window.Notification) {
 				this.permission = window.Notification.requestPermission();
 			} else {
 				// safari sucks
