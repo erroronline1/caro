@@ -318,7 +318,7 @@ define('DEFAULTSQL', [
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`user_id` int NOT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`date` date NOT NULL," .
+				"	`date` date NULL," .
 				"	`expires` date NULL," .
 				"	`experience_points` int NULL," .
 				"	`file_path` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
@@ -613,7 +613,7 @@ define('DEFAULTSQL', [
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	user_id int NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
-				"	date date NOT NULL," .
+				"	date date NULL," .
 				"	expires date NULL," .
 				"	experience_points int NULL," .
 				"	file_path varchar(MAX) NULL DEFAULT NULL," .
