@@ -952,42 +952,6 @@ class USER extends API {
 				// also see audit.php
 				$skillmatrix = [
 					[
-						/*
-						[
-							'type' => 'text',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.add_training')
-							],
-						], [
-							'type' => 'date',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.add_training_date')
-							],
-						], [
-							'type' => 'date',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.add_training_expires')
-							],
-						], [
-							'type' => 'number',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.add_training_experience_points')
-							],
-						], [
-							'type' => 'checkbox',
-							'attributes' => [
-								'name' => $this->_lang->GET("user.add_training_evaluation")
-							],
-							'content' => [
-								$this->_lang->GET('user.add_training_evaluation_unreasonable') => []
-							]
-						], [
-							'type' => 'file',
-							'attributes' => [
-								'name' => $this->_lang->GET('user.add_training_document')
-							],
-							'hint' => $this->_lang->GET('user.add_training_hint')
-						]*/
 						[
 							'type' => 'button',
 							'attributes' => [
@@ -1348,6 +1312,8 @@ class USER extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				break;
+			case 'PUT':
+				break;
 			case 'GET':
 				$preseletedUser = '';
 				$datalist = [];
@@ -1413,7 +1379,8 @@ class USER extends API {
 						]
 					]
 				]]];
-
+				break;
+			case 'DELETE':
 				break;
 		}
 		$this->response($result);
