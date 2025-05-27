@@ -1577,7 +1577,7 @@
 			"add_evaluation": "Bewertung",
 			"add_evaluation_unreasonable": "Eine Schulungsbewertung ist nicht angemessen, da es sich um eine verpflichtende Schulung handelt.",
 			"add_experience_points": "Erfahrungspunkte",
-			"add_expires": "Erfahrungspunkte",
+			"add_expires": "Gültig bis",
 			"add_hint": "Ohne einen Titel werden alle anderen Eingaben ignoriert. Ohne Angabe eines Datums wird das heutige verwendet. Ablaufdatum und Erfahrungspunkte sind optional.",
 			"delete": "Schulung löschen",
 			"display": "Schulung",
