@@ -3057,7 +3057,7 @@ class AUDIT extends API {
 					if ($this->_requestedOption === 'closed' && !$row['evaluation']) continue;
 
 					$row['evaluation'] = json_decode($row['evaluation'] ? : '', true);
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
@@ -3075,7 +3075,7 @@ class AUDIT extends API {
 
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->convertFromServerTime($row['expires']) . $evaluation,
+						'content' => $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires']) . $evaluation,
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $content[count($content) - 1][] = [
@@ -3244,17 +3244,17 @@ class AUDIT extends API {
 					':name' => implode(',', $requested)
 				]
 			]);
-			if ($users && $training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
+			if ($users && $training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_training'))){
 
 				$date = new DateTime('now');
-				$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
-				$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06';
+				$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_date')) ? : $date->format('Y-m-d');
+				$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_expires')) ? : '2079-06-06';
 				$training[':experience_points'] = 0;
 				$training[':file_path'] = '';
-				$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
+				$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation')) ? UTILITY::json_encode([
 					'user' => $_SESSION['user']['name'],
 					'date' => $this->_date['servertime']->format('Y-m-d H:i'),
-					'content' => [$this->_lang->PROPERTY('user.add_training_evaluation', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
+					'content' => [$this->_lang->PROPERTY('user.training.add_evaluation', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation'))]
 				]): null;
 
 				foreach ($users as $user){
@@ -3329,7 +3329,7 @@ class AUDIT extends API {
 				return $row['user_id'] === $user_id;
 			})){
 				foreach ($usertrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
@@ -3349,7 +3349,7 @@ class AUDIT extends API {
 
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->convertFromServerTime($row['expires'], true) . " \n" . $evaluation,
+						'content' => $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires'], true) . " \n" . $evaluation,
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $content[count($content) - 1][] = [
@@ -3365,8 +3365,14 @@ class AUDIT extends API {
 				&& array_intersect($_SESSION['user']['units'], explode(',', $user['units'])))
 				|| count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])
 				){
-				// add planning option
-
+					$content[count($content) - 1][] = [
+						'type' => 'button',
+						'attributes' => [
+							'type' => 'button',
+							'value' => $this->_lang->GET('user.training.add_training'),
+							'onclick' => "api.user('get', 'training', " . $user['id'] . ")"
+						]
+					];
 			}
 		}
 		if (count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])){
@@ -3376,17 +3382,17 @@ class AUDIT extends API {
 					[
 						'type' => 'text',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.add_training')
+							'name' => $this->_lang->GET('user.training.add_training')
 						],
 					], [
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.add_training_date')
+							'name' => $this->_lang->GET('user.training.add_date')
 						],
 					], [
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.add_training_expires')
+							'name' => $this->_lang->GET('user.training.add_expires')
 						],
 					], [
 						'type' => 'select',
@@ -3399,10 +3405,10 @@ class AUDIT extends API {
 					], [
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => $this->_lang->GET("user.add_training_evaluation")
+							'name' => $this->_lang->GET("user.training.add_evaluation")
 						],
 						'content' => [
-							$this->_lang->GET('user.add_training_evaluation_unreasonable') => []
+							$this->_lang->GET('user.training.add_evaluation_unreasonable') => []
 						]
 					]
 				]
