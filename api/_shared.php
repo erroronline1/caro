@@ -610,34 +610,6 @@ class SHARED {
 	}
 
 	/**
-	 *                     _       _         _                 _           _ 
-	 *   _ _ ___ _____ ___| |_ ___| |_ ___ _| |___ ___ ___ _ _|_|___ ___ _| |
-	 *  | | |   |     | .'|  _|  _|   | -_| . |  _| -_| . | | | |  _| -_| . |
-	 *  |___|_|_|_|_|_|__,|_| |___|_|_|___|___|_| |___|_  |___|_|_| |___|___|
-	 *                                                  |_|   
-	 * check whether all required fields of a document have been considered
-	 * @param array $element document structure
-	 * @param array $values payload
-	 * 
-	 * @return array of unmatched document names
-	 */
-	public function unmatchedrequired($element, $values){
-		$content = [];
-		foreach($element as $subs){
-			if (!isset($subs['type'])){
-				array_push($content, ...self::unmatchedrequired($subs, $values));
-			}
-			else {
-				$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
-				if (isset($subs['attributes']['name']) && isset($subs['attributes']['required']) && !(isset($values[$underscored_name]) || isset($values[$subs['attributes']['name']]))){
-					$content[] = $subs['attributes']['name'];
-				}
-			}
-		}
-		return $content;
-	}
-
-	/**
 	 *                       _     _                           _   
 	 *   ___ ___ ___ ___ ___| |_ _| |___ ___ _ _ _____ ___ ___| |_ 
 	 *  |  _| -_|  _| -_|   |  _| . | . |  _| | |     | -_|   |  _|
@@ -696,6 +668,34 @@ class SHARED {
 		$result['content'] = $contentBody;
 		}
 		return $result;
+	}
+
+	/**
+	 *                     _       _         _                 _           _ 
+	 *   _ _ ___ _____ ___| |_ ___| |_ ___ _| |___ ___ ___ _ _|_|___ ___ _| |
+	 *  | | |   |     | .'|  _|  _|   | -_| . |  _| -_| . | | | |  _| -_| . |
+	 *  |___|_|_|_|_|_|__,|_| |___|_|_|___|___|_| |___|_  |___|_|_| |___|___|
+	 *                                                  |_|   
+	 * check whether all required fields of a document have been considered
+	 * @param array $element document structure
+	 * @param array $values payload
+	 * 
+	 * @return array of unmatched document names
+	 */
+	public function unmatchedrequired($element, $values){
+		$content = [];
+		foreach($element as $subs){
+			if (!isset($subs['type'])){
+				array_push($content, ...self::unmatchedrequired($subs, $values));
+			}
+			else {
+				$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+				if (isset($subs['attributes']['name']) && isset($subs['attributes']['required']) && !(isset($values[$underscored_name]) || isset($values[$subs['attributes']['name']]))){
+					$content[] = $subs['attributes']['name'];
+				}
+			}
+		}
+		return $content;
 	}
 }
 ?>
