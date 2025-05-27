@@ -952,6 +952,7 @@ class USER extends API {
 				// also see audit.php
 				$skillmatrix = [
 					[
+						/*
 						[
 							'type' => 'text',
 							'attributes' => [
@@ -986,6 +987,14 @@ class USER extends API {
 								'name' => $this->_lang->GET('user.add_training_document')
 							],
 							'hint' => $this->_lang->GET('user.add_training_hint')
+						]*/
+						[
+							'type' => 'button',
+							'attributes' => [
+								'type' => 'button',
+								'value' => $this->_lang->GET('user.training.add_training'),
+								'onclick' => "api.user('get', 'training', " . $user['id'] . ")"
+							]
 						]
 					]
 				];
@@ -997,7 +1006,7 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
@@ -1008,7 +1017,7 @@ class USER extends API {
 					}
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->convertFromServerTime($row['expires']),
+						'content' => $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires']),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $skillmatrix[0][] = [
@@ -1020,7 +1029,7 @@ class USER extends API {
 					$skillmatrix[0][] = [
 						'type' => 'checkbox',
 						'content' => [
-							$this->_lang->GET('user.delete_training') . '[]' => ['value' => $row['id']]
+							$this->_lang->GET('user.training.delete') . '[]' => ['value' => $row['id']]
 						]
 					];
 				}
@@ -1333,6 +1342,81 @@ class USER extends API {
 		$image = ob_get_contents();
 		ob_end_clean();
 		return $image;
+	}
+
+	public function training(){
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				break;
+			case 'GET':
+				$preseletedUser = '';
+				$datalist = [];
+				// prepare existing users lists
+				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				foreach($user as $row) {
+					if ($row['id'] > 1 ) $datalist[] = $row['name'];
+					if ($this->_requestedID && $row['id'] == $this->_requestedID) $preseletedUser = $row['name'];
+				}
+
+				$result = ['render' => ['content' => [
+					[
+						[
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.training.name'),
+								'value' => $preseletedUser
+							],
+							'hint' => $this->_lang->GET('user.training.name_hint'),
+							'datalist' => $datalist
+						], [
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.training.add_training')
+							],
+						], [
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.training.schedule_timespan'),
+							],
+							'hint' => $this->_lang->GET('user.training.schedule_timespan_hint'),
+						], [
+							'type' => 'hr'
+						], [
+							'type' => 'date',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.training.add_date')
+							],
+						], [
+							'type' => 'date',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.training.add_expires')
+							],
+						], [
+							'type' => 'number',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.training.add_experience_points')
+							],
+						], [
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => $this->_lang->GET("user.training.add_evaluation")
+							],
+							'content' => [
+								$this->_lang->GET('user.training.add_evaluation_unreasonable') => []
+							]
+						], [
+							'type' => 'file',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.training.add_document')
+							],
+							'hint' => $this->_lang->GET('user.training.add_hint')
+						]
+					]
+				]]];
+
+				break;
+		}
+		$this->response($result);
 	}
 }
 ?>
