@@ -1794,6 +1794,23 @@ export const api = {
 					payload = request[3]; // form data object passed by utility.js
 					delete request[3];
 				} else payload = _.getInputs("[data-usecase=record]", true);
+				successFn = function (data) {
+					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+					if (data.render !== undefined) {
+						const options = {};
+						options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
+						options[api._lang.GET("general.cancel_button")] = false;
+						new Dialog({
+							type: "input",
+							render: data.render,
+							options: options,
+						}).then((response) => {
+							console.log(response);
+							alert("yet to be implemented");
+						});
+					}
+				};
+
 				break;
 			case "put":
 				break;
@@ -2116,9 +2133,9 @@ export const api = {
 									type: "input",
 									render: data.render,
 									options: options,
-								}).then(response => {
+								}).then((response) => {
 									console.log(response);
-									alert('yet to be implemented');
+									alert("yet to be implemented");
 								});
 							}
 						};
