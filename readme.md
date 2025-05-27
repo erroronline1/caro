@@ -26,16 +26,13 @@ graph LR;
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
-* schedule user trainings
-    * sqlsrv alter date default null
-    * audit search for *add planning option*
-    * implement dialog content response as render response in case of complaint record closing
+* user trainings endpoint
     * planned json author, date, scheduled time
-    * convert scheduled training to fulfilled, add date, expiry, experience points
+    * convert scheduled training to fulfilled, add date, expiry, experience points (user training put)
     * review file upload options from dialog form
     * consider file uploads within training evaluation form by default to append certificates
     * scheduled trainings for own unit on dashboard
-    * user endpoint training to add scheduled or actual trainings, api request get, post
+    * user endpoint training to add scheduled or actual trainings, [api request](#statement-on-technical-guidelines-on-data-security)
 * file uploads from modals
     * consider incorporation and sample check too
 
@@ -4610,6 +4607,58 @@ Parameters
 Sample response
 ```
 {"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
+```
+
+> DELETE ./api/api.php/user/training/{id}
+
+Deletes a training.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | training id |
+
+Sample response
+```
+```
+
+> GET ./api/api.php/user/training/{id}
+
+Retrieves the dialog form to add a training.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | user id to prefill the trainee field |
+
+Sample response
+```
+```
+
+> POST ./api/api.php/user/training
+
+Stores a new or scheduled training.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required |  |
+
+Sample response
+```
+```
+
+> PUT ./api/api.php/user/training/{id}
+
+Updates a training.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | training id |
+
+Sample response
+```
 ```
 
 [Content](#content)
