@@ -1229,7 +1229,19 @@ class RECORD extends API {
 							'linkedcontent' => $typeaction
 						]
 					];
-					$last_element = count($return['render']['content'])-1;
+					// add training button if type would possibly suggest one
+					if (in_array($content['record_type'], ['complaint'])) {
+						$return['render']['content'][count($return['render']['content']) - 1][] = [
+							'type' => 'button',
+							'attributes' => [
+								'type' => 'button',
+								'value' => $this->_lang->GET('user.training.add_training'),
+								'onclick' => "api.user('get', 'training')"
+							]
+						];
+					}
+
+					$last_element = count($return['render']['content']) - 1;
 				}
 				else $last_element = count($return['render']['content']);
 
