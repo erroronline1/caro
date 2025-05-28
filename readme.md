@@ -26,12 +26,8 @@ graph LR;
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
-* user trainings endpoint
-    * scheduled trainings for own unit on dashboard
-    * user endpoint training to add scheduled or actual trainings, [api request](#statement-on-technical-guidelines-on-data-security)
-    * review training for multiple users
-* file uploads from modals
-    * consider incorporation and sample check too
+* audit training
+    * filter by unit (my, all, ...available)
 
 ## Content
 * [Aims](#aims)
@@ -156,7 +152,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Document management: full version control, reusable components, with access to former versions
 * Easy form creation: simplified form assembly and seamless integration into the application
 * Risk management: with alignment check of risks and medical device characteristics
-* Trainings and skills management: quick overview with evaluation reminder and highlighted expiries
+* Trainings and skills management: planning, quick overview with evaluation reminder and highlighted expiries
 * Task and absence schedules: plan tasks while having an overview on personnel ressources
 * Structured procurement: reduced inquiries, automated reminders, incorporation records and sample checks
 * Role management: defined user permissions and appropriate information load
@@ -434,8 +430,6 @@ Form fields declared as multiple will only show up in document exports if they h
 
 #### *Caveat:*
 Some elements are only processible as proper records.
-* file,
-* photo,
 * product selection,
 * signature and
 * calendarbutton
@@ -1299,7 +1293,7 @@ names[underscorestart] = "^_" ; names must not start with _
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
 
-filename[characters] = "[,]" ; replace matched characters to avoid link errors, as experienced on iis (NOT apache)
+filename[characters] = "[,\/\\]" ; replace matched characters to avoid link error
 
 [lifespan]
 idle = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
@@ -4617,6 +4611,7 @@ Parameters
 
 Sample response
 ```
+{"response":{"msg":"Training deleted","type":"deleted"}}
 ```
 
 > GET ./api/api.php/user/training/{training_id}/{user_id}
@@ -4631,6 +4626,7 @@ Parameters
 
 Sample response
 ```
+{"render":{"content":[[{"type":"text","attributes":{"name":"Trainee","value":"error on line 1","readonly":true},"datalist":["error on line 1","user"]},{"type":"text","attributes":{"name":"Add training","value":""}},{"type":"text","attributes":{"name":"Time of scheduled training","value":""},"hint":"e.g. a date, month or calendar quarter"},{"type":"hr"},{"type":"date","attributes":{"name":"Date of training"}},{"type":"date","attributes":{"name":"Date of expiry"}},{"type":"number","attributes":{"name":"Experience points"}},{"type":"checkbox","attributes":{"name":"Evaluation"},"content":{"Evaluation is unreasonable, this is a mandatory training.":[]}},{"type":"file","attributes":{"name":"Add document"},"hint":"Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional."}]]}}
 ```
 
 > POST ./api/api.php/user/training/null
@@ -4644,6 +4640,7 @@ Parameters
 
 Sample response
 ```
+{"response":{"msg":"undefined language","type":"success"}}
 ```
 
 > PUT ./api/api.php/user/training/{id}
@@ -4657,6 +4654,7 @@ Parameters
 
 Sample response
 ```
+{"response":{"msg":"undefined language","type":"success"}}
 ```
 
 [Content](#content)

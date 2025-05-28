@@ -67,7 +67,7 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Dokumentenverwaltung: volle Versionskontrolle, wiederverwendbare Komponenten, Zugriff auf frühere Versionen
 * einfache Formularerstellung: Formulare einfach zusammenstellen und nahtlose Integration in die Anwendung
 * Risikomanagment: mit Abgleich zwischen Risiken und Eigenschaften von Medizinprodukten
-* Schulungs- und Qualifikationsverwaltung: schnelle Übersicht mit Beurteilungserinnerung und hervorgehobenen Ablaufdaten
+* Schulungs- und Qualifikationsverwaltung: Planung, schnelle Übersicht mit Beurteilungserinnerung und hervorgehobenen Ablaufdaten
 * Aufgaben- und Abwesenheitsplaner: Arbeiten planen mit gleichzeitiger Übersicht über Abwesenheiten
 * strukturierte Beschaffung: reduzierte Rückfragen, automatisierte Erinnerungen, Einführungsaufzeichnungen und Stichprobenprüfung
 * Rollenverwaltung: definierte Nutzerberechtigungen und eine angemessene Informationsfülle
@@ -1207,7 +1207,7 @@ names[underscorestart] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
-filename[characters] = "[,]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden, wie mit IIS erlebt (NICHT apache)
+filename[characters] = "[,\/\\]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
 
 [lifespan]
 idle = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt
