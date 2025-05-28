@@ -51,7 +51,7 @@ export class Masonry {
 	 * performance is not that great at above 300 children of different heights:
 	 * * at 300 orders stresstest render time is above 10 seconds
 	 * -> limit masonry reordering to this.timeout as maximum added time to interface rendering since as of today only orders may be affected by this and shifting is not that crucial here
-	 * 
+	 *
 	 * breakpoints can be applied or revoked if necessary
 	 */
 
@@ -2158,9 +2158,9 @@ export class Assemble {
 			imagealigned = true;
 			this.currentElement.attributes.class = this.currentElement.attributes.class.replace(/imagealigned/, "");
 		}
-		
-		if ('onkeydown' in this.currentElement.attributes) this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') event.preventDefault(); " + this.currentElement.attributes.onkeydown;
-		else this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') event.preventDefault();"
+
+		if ("onkeydown" in this.currentElement.attributes) this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') event.preventDefault(); " + this.currentElement.attributes.onkeydown;
+		else this.currentElement.attributes.onkeydown = "if (event.key === 'Enter') event.preventDefault();";
 		input = this.apply_attributes(this.currentElement.attributes, input);
 
 		if (this.currentElement.datalist !== undefined && this.currentElement.datalist.length) {
@@ -3176,7 +3176,8 @@ export class Assemble {
 	textarea() {
 		let textarea = document.createElement("textarea"),
 			label = document.createElement("label"),
-			span = document.createElement("span");
+			span = document.createElement("span"),
+			autocompletebuttons = null;
 
 		textarea.id = getNextElementID();
 		textarea.autocomplete = "off";
@@ -3217,9 +3218,48 @@ export class Assemble {
 			 * use Alt and AltGr to navigate within results for being the most unintrusive key
 			 * has to be provided with unique entries!
 			 */
-			let autocomplete = this.currentElement.autocomplete;
-			const forthKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_forth ? api._settings.user.app_settings.autocomplete_forth : "Alt",
+			const autocompleteoptions = this.currentElement.autocomplete,
+				element = textarea,
+				forthKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_forth ? api._settings.user.app_settings.autocomplete_forth : "Alt",
 				backKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_back ? api._settings.user.app_settings.autocomplete_back : "AltGraph";
+			const autocomplete = (elementNode, direction) => {
+				if (elementNode.constructor === String) elementNode = document.getElementById(elementNode);
+
+				let cursorPosition = elementNode.selectionStart,
+					matches = [],
+					start = elementNode.value.substring(0, elementNode.selectionStart),
+					end = elementNode.value.substring(elementNode.selectionEnd),
+					words,
+					tail;
+				// gather possible matches
+				// to handle adding at the end the content is rewinded from the back
+				words = start.split(" ");
+				for (let i = 0; i < words.length; i++) {
+					tail = words.slice(i * -1).join(" ");
+					if (!tail.length) continue;
+					for (const option of autocompleteoptions) {
+						if (option.startsWith(tail)) {
+							matches.push(option.substring(tail.length));
+						}
+					}
+				}
+				if (matches.length) {
+					// navigate through matches with alt key
+					if (TEXTAREA_AUTOCOMPLETE_INDEX === null) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
+					if (TEXTAREA_AUTOCOMPLETE_INDEX > -1) {
+						if (direction === "forth") TEXTAREA_AUTOCOMPLETE_INDEX++;
+						if (direction === "back") TEXTAREA_AUTOCOMPLETE_INDEX--;
+						// out of bound
+						if (TEXTAREA_AUTOCOMPLETE_INDEX > matches.length - 1) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
+						if (TEXTAREA_AUTOCOMPLETE_INDEX < 0) TEXTAREA_AUTOCOMPLETE_INDEX = matches.length - 1;
+					} else TEXTAREA_AUTOCOMPLETE_INDEX = 0; // fallback
+					elementNode.value = start + matches[TEXTAREA_AUTOCOMPLETE_INDEX] + end;
+					elementNode.selectionEnd = (start + matches[TEXTAREA_AUTOCOMPLETE_INDEX]).length;
+				} else TEXTAREA_AUTOCOMPLETE_INDEX = null;
+				elementNode.selectionStart = cursorPosition;
+				elementNode.focus();
+			};
+
 			textarea.addEventListener("keydown", (event) => {
 				if ([forthKey, backKey].includes(event.key)) {
 					event.preventDefault();
@@ -3230,49 +3270,47 @@ export class Assemble {
 				if ([forthKey, backKey].includes(event.key)) {
 					event.preventDefault();
 				}
-				let cursorPosition = event.target.selectionStart,
-					matches = [],
-					start = event.target.value.substring(0, event.target.selectionStart),
-					end = event.target.value.substring(event.target.selectionEnd),
-					words,
-					tail;
-				// gather possible matches
-				// to handle adding at the end the content is rewinded from the back
-				words = start.split(" ");
-				for (let i = 0; i < words.length; i++) {
-					tail = words.slice(i * -1).join(" ");
-					if (!tail.length) continue;
-					for (const option of autocomplete) {
-						if (option.startsWith(tail)) {
-							matches.push(option.substring(tail.length));
-						}
-					}
-				}
-				if (matches.length) {
-					// navigate through matches with alt key
-					if (TEXTAREA_AUTOCOMPLETE_INDEX === null) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
-					if (TEXTAREA_AUTOCOMPLETE_INDEX > -1 && [forthKey, backKey].includes(event.key)) {
-						if (event.key === forthKey) TEXTAREA_AUTOCOMPLETE_INDEX++;
-						if (event.key === backKey) TEXTAREA_AUTOCOMPLETE_INDEX--;
-						// out of bound
-						if (TEXTAREA_AUTOCOMPLETE_INDEX > matches.length - 1) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
-						if (TEXTAREA_AUTOCOMPLETE_INDEX < 0) TEXTAREA_AUTOCOMPLETE_INDEX = matches.length - 1;
-					} else TEXTAREA_AUTOCOMPLETE_INDEX = 0; // fallback
-					event.target.value = start + matches[TEXTAREA_AUTOCOMPLETE_INDEX] + end;
-					event.target.selectionEnd = (start + matches[TEXTAREA_AUTOCOMPLETE_INDEX]).length;
-				} else TEXTAREA_AUTOCOMPLETE_INDEX = null;
-				event.target.selectionStart = cursorPosition;
+				autocomplete(element, event.key === forthKey ? "forth" : "back");
 			});
 			this.currentElement.hint = this.currentElement.hint
 				? this.currentElement.hint + " " + api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey })
 				: api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey });
+
+			const back = document.createElement("button"),
+				forth = document.createElement("button");
+			// navigate back button
+			back.addEventListener("click", (e) => {
+				autocomplete(element, "back");
+			});
+			back.dataset.type = "toleft";
+			back.classList.add("inlinebutton", "tabletonly");
+			back.type = "button";
+			back.title = api._lang.GET("assemble.render.aria.previous");
+			back.tabIndex = -1;
+
+			// navigate forth button
+			forth.addEventListener("click", (e) => {
+				autocomplete(element, "forth");
+			});
+			forth.dataset.type = "toright";
+			forth.classList.add("inlinebutton", "tabletonly");
+			forth.type = "button";
+			forth.title = api._lang.GET("assemble.render.aria.next");
+			forth.tabIndex = -1;
+
+			autocompletebuttons = [forth, back, ...this.br()];
 		}
 
 		label.dataset.type = this.currentElement.type;
 		label.append(span, textarea);
 
-		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) return [label, ...this.hint(), ...this.button(), ...this.br()];
-		return [label, ...this.hint()];
+		let nodelist = [];
+
+		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) nodelist = [label, ...this.hint(), ...this.button(), ...this.br()];
+		else nodelist = [label, ...this.hint()];
+		if (autocompletebuttons) nodelist.push(...autocompletebuttons);
+
+		return nodelist;
 	}
 
 	/**
