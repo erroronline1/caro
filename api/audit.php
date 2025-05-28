@@ -3254,40 +3254,6 @@ class AUDIT extends API {
 	 * batch insert and plan trainings
 	 */
 	private function userskills(){
-		if ($_SERVER['REQUEST_METHOD']==='POST' && (count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions']))){
-			$training = $users = $requested = [];
-
-			if ($name = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.userskills_bulk_user'))) if ($name !== '...' ) $requested[] = $name;
-			for ($i = 1; $i < count((array) $this->_payload); $i++){
-				if ($name = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.userskills_bulk_user') . '(' . $i . ')')) if ($name !== '...' ) $requested[] = $name;
-			}
-			$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-				'replacements' => [
-					':id' => 0,
-					':name' => implode(',', $requested)
-				]
-			]);
-			if ($users && $training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_training'))){
-
-				$date = new DateTime('now');
-				$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_date')) ? : $date->format('Y-m-d');
-				$training[':expires'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_expires')) ? : '2079-06-06';
-				$training[':experience_points'] = 0;
-				$training[':file_path'] = '';
-				$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation')) ? UTILITY::json_encode([
-					'user' => $_SESSION['user']['name'],
-					'date' => $this->_date['servertime']->format('Y-m-d H:i'),
-					'content' => [$this->_lang->PROPERTY('user.training.add_evaluation', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation'))]
-				]): null;
-
-				foreach ($users as $user){
-					$training[':user_id'] = $user['id'];
-					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
-						'values' => $training
-					]);
-				}
-			}
-		}
 		$content = [];
 		// add export button
 		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
@@ -3421,56 +3387,13 @@ class AUDIT extends API {
 			}
 		}
 		if (count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			// also see user.php
-			$skillmatrix = [
-				[
-					[
-						'type' => 'text',
-						'attributes' => [
-							'name' => $this->_lang->GET('user.training.add_training')
-						],
-					], [
-						'type' => 'date',
-						'attributes' => [
-							'name' => $this->_lang->GET('user.training.add_date')
-						],
-					], [
-						'type' => 'date',
-						'attributes' => [
-							'name' => $this->_lang->GET('user.training.add_expires')
-						],
-					], [
-						'type' => 'select',
-						'attributes' => [
-							'multiple' => true,
-							'name' => $this->_lang->GET('audit.userskills_bulk_user'),
-							'id' => '_bulkskillupdate'
-						],
-						'content' => $bulkselection
-					], [
-						'type' => 'checkbox',
-						'attributes' => [
-							'name' => $this->_lang->GET("user.training.add_evaluation")
-						],
-						'content' => [
-							$this->_lang->GET('user.training.add_evaluation_unreasonable') => []
-						]
-					]
-				]
-			];
-
 			array_splice($content, 1, 0, [[
 				[
 					'type' => 'button',
 					'attributes' => [
 						'type' => 'button',
 						'value' => $this->_lang->GET('audit.userskills_bulk_training'),
-						'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.userskills_bulk_training') . "', render: JSON.parse('" . UTILITY::json_encode(
-							$skillmatrix
-						) . "'), options:{".
-						"'" . $this->_lang->GET('general.cancel_button') . "': false,".
-						"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-						"}}).then(response => {if (response) api.audit('post', 'checks', 'userskills', _client.application.dialogToFormdata())})"
+						'onclick' => "api.user('get', 'training')"
 					]
 				]
 			]]);
