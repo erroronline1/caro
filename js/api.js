@@ -1794,23 +1794,6 @@ export const api = {
 					payload = request[3]; // form data object passed by utility.js
 					delete request[3];
 				} else payload = _.getInputs("[data-usecase=record]", true);
-				successFn = function (data) {
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-					if (data.render !== undefined) {
-						const options = {};
-						options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
-						options[api._lang.GET("general.cancel_button")] = false;
-						new Dialog({
-							type: "input",
-							render: data.render,
-							options: options,
-						}).then((response) => {
-							console.log(response);
-							alert("yet to be implemented");
-						});
-					}
-				};
-
 				break;
 			case "put":
 				break;
@@ -2014,7 +1997,8 @@ export const api = {
 	 *
 	 * displays 2d code form and result passed by get query
 	 * displays a generic 2d scanner
-	 * displays stl viewer for files managed by filemanager and open sharepoint
+	 * displays a form for zipping an unzipping files
+	 * displays some common calculation options
 	 *
 	 * @param {string} method get
 	 * @param  {array} request api method, occasionally passed values for 2d codes
@@ -2134,7 +2118,13 @@ export const api = {
 									render: data.render,
 									options: options,
 								}).then((response) => {
-									console.log(response);
+									// https://stackoverflow.com/questions/12989442/uploading-multiple-files-using-formdata
+									let submission = _client.application.dialogToFormdata();
+									console.log(submission, response);
+									for (const value of submission.values()) {
+										console.log(value);
+									  }
+									//api.user((2 in request && request[2] !== "null" ? "PUT" : POST), "training", "null", submission);
 									alert("yet to be implemented");
 								});
 							}
@@ -2153,10 +2143,11 @@ export const api = {
 				}
 				break;
 			case "post":
-				payload = _.getInputs("[data-usecase=user]", true);
-				break;
 			case "put":
-				payload = _.getInputs("[data-usecase=user]", true);
+				if (3 in request && request[3] && request[3] instanceof FormData) { // training
+					payload = request[3]; // form data object passed by utility.js
+					delete request[3];
+				} else payload = _.getInputs("[data-usecase=user]", true);
 				break;
 			case "delete":
 				break;
