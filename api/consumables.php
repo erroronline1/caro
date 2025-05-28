@@ -337,6 +337,24 @@ class CONSUMABLES extends API {
 					}
 				}
 
+				// upload files for requested product if part of the documents
+				if ($_FILES) {
+					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
+					foreach($_FILES as $input => $files){
+						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':name' => $currentproduct['vendor_immutable_fileserver']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
+					}
+					// set protected
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						'values' => [
+							':value' => 1,
+						],
+						'replacements' => [
+							':ids' => intval($this->_requestedID),
+							':field' => 'protected',
+						]
+					]);
+				}
+
 				// update incorporation state for selected products
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
 					'replacements' => [
@@ -584,6 +602,24 @@ class CONSUMABLES extends API {
 				// append to products sample checks
 				$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
 				$product['sample_checks'][] = ['date' => $this->_date['servertime']->format('Y-m-d H:i'), 'author' => $_SESSION['user']['name'], 'content' => $checkcontent];
+
+				// upload files for requested product if part of the documents
+				if ($_FILES) {
+					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
+					foreach($_FILES as $input => $files){
+						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':name' => $currentproduct['vendor_immutable_fileserver']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
+					}
+					// set protected
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						'values' => [
+							':value' => 1,
+						],
+						'replacements' => [
+							':ids' => intval($this->_requestedID),
+							':field' => 'protected',
+						]
+					]);
+				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_sample_check', [
 					'values' => [
@@ -1707,10 +1743,12 @@ class CONSUMABLES extends API {
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]);
 				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
 				}
 
 				// unset all beckend defined payload variables leaving vendor evaluation inputs
@@ -1757,6 +1795,12 @@ class CONSUMABLES extends API {
 					$evaluation['_author'] = $_SESSION['user']['name'];
 					$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
 					$vendor['evaluation'][] = $evaluation;
+					// upload files  if part of the evaluation document
+					if ($_FILES) {
+						foreach($_FILES as $input => $files){
+							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+						}
+					}
 				}
 				else $vendor['evaluation'] = null;
 
@@ -1826,10 +1870,12 @@ class CONSUMABLES extends API {
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]);
 				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
 					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
 				}
 				// update pricelist
 				$pricelistImportError = '';
@@ -1905,6 +1951,12 @@ class CONSUMABLES extends API {
 						$evaluation['_author'] = $_SESSION['user']['name'];
 						$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
 						$vendor['evaluation'][] = $evaluation;
+						// upload files  if part of the evaluation document
+						if ($_FILES) {
+							foreach($_FILES as $input => $files){
+								UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+							}
+						}
 					}
 				}
 			

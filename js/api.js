@@ -1488,7 +1488,7 @@ export const api = {
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {
-									let submission = _client.application.dialogToFormdata(response);
+									let submission = _client.application.dialogToFormdata();
 									if (submission) api.purchase("post", "incorporation", data.render.productid, submission);
 									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
@@ -1505,7 +1505,7 @@ export const api = {
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {
-									let submission = _client.application.dialogToFormdata(response);
+									let submission = _client.application.dialogToFormdata();
 									if (submission) api.purchase("post", "mdrsamplecheck", data.render.productid, submission);
 									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
@@ -2120,7 +2120,6 @@ export const api = {
 								}).then((response) => {
 									if (!response) return;
 									let submission = _client.application.dialogToFormdata();
-									console.log(submission, response);
 									api.user((2 in request && request[2] !== "null" ? "put" : "post"), "training", (2 in request && request[2] ? request[2] : "null"), submission);
 								});
 							}
