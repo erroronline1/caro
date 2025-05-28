@@ -1591,6 +1591,7 @@
 			"delete_confirmed" : "Training deleted",
 			"delete_failed" : "Training could not be deleted",
 			"display": "Training",
+			"edit": "Edit",
 			"name": "Trainee",
 			"name_hint": "multiple named trainees can be entered, separated by comma",
 			"not_found": ":names could not be found as user!",

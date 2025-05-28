@@ -1591,6 +1591,7 @@
 			"delete_confirmed" : "Schulung gelöscht",
 			"delete_failed" : "Schulung konnte nicht gelöscht werden",
 			"display": "Schulung",
+			"edit": "Bearbeiten",
 			"name": "Mitarbeiter",
 			"name_hint": "es können mehrere Namen durch Kommata getrennt eingegeben werden",
 			"not_found": ":names konnte(n) als Nutzer nicht gefunden werden!",

@@ -27,10 +27,6 @@ graph LR;
 * responsibilities
     * handle hidden attribute?
 * user trainings endpoint
-    * planned json author, date, scheduled time
-    * convert scheduled training to fulfilled, add date, expiry, experience points (user training put)
-    * review file upload options from dialog form
-    * consider file uploads within training evaluation form by default to append certificates
     * scheduled trainings for own unit on dashboard
     * user endpoint training to add scheduled or actual trainings, [api request](#statement-on-technical-guidelines-on-data-security)
     * review training for multiple users
