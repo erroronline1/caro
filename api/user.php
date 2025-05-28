@@ -1301,7 +1301,7 @@ class USER extends API {
 			case 'POST':
 				$usernames = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.name'));
 
-				if (!($usernames && $usernames = preg_split('/[^\w\s]+/', $usernames))) $this->response([], 406);
+				if (!($usernames && $usernames = preg_split('/([,;]\s{0,})/', $usernames))) $this->response([], 406);
 
 				$training = [
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_training')),
