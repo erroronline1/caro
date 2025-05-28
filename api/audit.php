@@ -3370,7 +3370,7 @@ class AUDIT extends API {
 						'attributes' => [
 							'type' => 'button',
 							'value' => $this->_lang->GET('user.training.add_training'),
-							'onclick' => "api.user('get', 'training', " . $user['id'] . ")"
+							'onclick' => "api.user('get', 'training', 'null', " . $user['id'] . ")"
 						]
 					];
 			}

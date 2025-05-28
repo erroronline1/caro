@@ -33,6 +33,7 @@ graph LR;
     * consider file uploads within training evaluation form by default to append certificates
     * scheduled trainings for own unit on dashboard
     * user endpoint training to add scheduled or actual trainings, [api request](#statement-on-technical-guidelines-on-data-security)
+    * review training for multiple users
 * file uploads from modals
     * consider incorporation and sample check too
 
@@ -4622,22 +4623,23 @@ Sample response
 ```
 ```
 
-> GET ./api/api.php/user/training/{id}
+> GET ./api/api.php/user/training/{training_id}/{user_id}
 
-Retrieves the dialog form to add a training.
+Retrieves the dialog form to add or modify a training.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | user id to prefill the trainee field |
+| {training_id} | path parameter | optional | training id to modify |
+| {user_id} | path parameter | optional | user id to prefill the trainee field |
 
 Sample response
 ```
 ```
 
-> POST ./api/api.php/user/training
+> POST ./api/api.php/user/training/null
 
-Stores a new or scheduled training.
+Stores a new or scheduled training. null is ignored.
 
 Parameters
 | Name | Data Type | Required | Description |

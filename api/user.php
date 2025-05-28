@@ -24,12 +24,14 @@ class USER extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];
 	private $_requestedID = null;
+	private $_prefilledTrainingUser = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_prefilledTrainingUser = isset(REQUEST[3]) ? REQUEST[3] : null;
 	}
 
 	/**
@@ -957,7 +959,7 @@ class USER extends API {
 							'attributes' => [
 								'type' => 'button',
 								'value' => $this->_lang->GET('user.training.add_training'),
-								'onclick' => "api.user('get', 'training', " . $user['id'] . ")"
+								'onclick' => "api.user('get', 'training', 'null', " . $user['id'] . ")"
 							]
 						]
 					]
@@ -1321,7 +1323,11 @@ class USER extends API {
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $row) {
 					if ($row['id'] > 1 ) $datalist[] = $row['name'];
-					if ($this->_requestedID && $row['id'] == $this->_requestedID) $preseletedUser = $row['name'];
+					if ($this->_prefilledTrainingUser && $row['id'] == $this->_prefilledTrainingUser) $preseletedUser = $row['name'];
+				}
+
+				if ($this->_requestedID && $this->_requestedID !== 'null'){
+					//get training to populate
 				}
 
 				$result = ['render' => ['content' => [
