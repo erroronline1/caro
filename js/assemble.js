@@ -25,7 +25,8 @@ import Icons from "./icons.json" with { type: "json" };
 
 var ELEMENT_ID = 0,
 	SIGNATURE_CANVAS = null,
-	TEXTAREA_AUTOCOMPLETE_INDEX = null;
+	TEXTAREA_AUTOCOMPLETE_INDEX = null,
+	TEXTAREA_AUTOCOMPLETE_SWIPE = null;
 
 export function getNextElementID() {
 	return "elementID" + ++ELEMENT_ID;
@@ -3219,16 +3220,15 @@ export class Assemble {
 			 * has to be provided with unique entries!
 			 */
 			const autocompleteoptions = this.currentElement.autocomplete,
-				element = textarea,
 				forthKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_forth ? api._settings.user.app_settings.autocomplete_forth : "Alt",
-				backKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_back ? api._settings.user.app_settings.autocomplete_back : "AltGraph";
-			const autocomplete = (elementNode, direction) => {
-				if (elementNode.constructor === String) elementNode = document.getElementById(elementNode);
+				backKey = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_back ? api._settings.user.app_settings.autocomplete_back : "AltGraph",
+				swipe = api._settings.user.app_settings && api._settings.user.app_settings.autocomplete_swipe;
 
-				let cursorPosition = elementNode.selectionStart,
+			const autocomplete = (direction) => {
+				let cursorPosition = textarea.selectionStart,
 					matches = [],
-					start = elementNode.value.substring(0, elementNode.selectionStart),
-					end = elementNode.value.substring(elementNode.selectionEnd),
+					start = textarea.value.substring(0, textarea.selectionStart),
+					end = textarea.value.substring(textarea.selectionEnd),
 					words,
 					tail;
 				// gather possible matches
@@ -3253,13 +3253,14 @@ export class Assemble {
 						if (TEXTAREA_AUTOCOMPLETE_INDEX > matches.length - 1) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
 						if (TEXTAREA_AUTOCOMPLETE_INDEX < 0) TEXTAREA_AUTOCOMPLETE_INDEX = matches.length - 1;
 					} else TEXTAREA_AUTOCOMPLETE_INDEX = 0; // fallback
-					elementNode.value = start + matches[TEXTAREA_AUTOCOMPLETE_INDEX] + end;
-					elementNode.selectionEnd = (start + matches[TEXTAREA_AUTOCOMPLETE_INDEX]).length;
+					textarea.value = start + matches[TEXTAREA_AUTOCOMPLETE_INDEX] + end;
+					textarea.selectionEnd = (start + matches[TEXTAREA_AUTOCOMPLETE_INDEX]).length;
 				} else TEXTAREA_AUTOCOMPLETE_INDEX = null;
-				elementNode.selectionStart = cursorPosition;
-				elementNode.focus();
+				textarea.selectionStart = cursorPosition;
+				textarea.focus();
 			};
 
+			// toggle by user set back- and forth-keys
 			textarea.addEventListener("keydown", (event) => {
 				if ([forthKey, backKey].includes(event.key)) {
 					event.preventDefault();
@@ -3270,35 +3271,26 @@ export class Assemble {
 				if ([forthKey, backKey].includes(event.key)) {
 					event.preventDefault();
 				}
-				autocomplete(element, event.key === forthKey ? "forth" : "back");
+				autocomplete(event.key === forthKey ? "forth" : "back");
 			});
-			this.currentElement.hint = this.currentElement.hint
-				? this.currentElement.hint + " " + api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey })
-				: api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey });
 
-			const back = document.createElement("button"),
-				forth = document.createElement("button");
-			// navigate back button
-			back.addEventListener("click", (e) => {
-				autocomplete(element, "back");
-			});
-			back.dataset.type = "toleft";
-			back.classList.add("inlinebutton", "tabletonly");
-			back.type = "button";
-			back.title = api._lang.GET("assemble.render.aria.previous");
-			back.tabIndex = -1;
+			if (swipe) {
+				// toggle by swipe especially for tablets as buttons appeared to occupying
+				textarea.addEventListener("pointerdown", (event) => {
+					TEXTAREA_AUTOCOMPLETE_SWIPE = [event.clientX, event.clientY];
+				});
+				textarea.addEventListener("pointerup", (event) => {
+					const travel = [TEXTAREA_AUTOCOMPLETE_SWIPE[0] - event.clientX, TEXTAREA_AUTOCOMPLETE_SWIPE[1] - event.clientY];
+					// filter for mostly horizontal swipes
+					if (Math.abs(travel[0]) - Math.abs(travel[1]) > 0) {
+						event.preventDefault();
+						autocomplete(travel[0] > 0 ? "forth" : "back");
+					}
+				});
+			}
 
-			// navigate forth button
-			forth.addEventListener("click", (e) => {
-				autocomplete(element, "forth");
-			});
-			forth.dataset.type = "toright";
-			forth.classList.add("inlinebutton", "tabletonly");
-			forth.type = "button";
-			forth.title = api._lang.GET("assemble.render.aria.next");
-			forth.tabIndex = -1;
-
-			autocompletebuttons = [forth, back, ...this.br()];
+			let autocomplete_hint = api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey, ":swipe": swipe ? api._lang.GET("assemble.render.textarea_autocomplete_swipe_active") : "" });
+			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + autocomplete_hint : autocomplete_hint;
 		}
 
 		label.dataset.type = this.currentElement.type;

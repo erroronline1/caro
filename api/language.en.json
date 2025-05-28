@@ -474,7 +474,8 @@
 			"filereference_decline": "I changed my mind",
 			"filereference_results": "Results",
 			"filereference_select": "this is fine",
-			"textarea_autocomplete": "Press the :forth- or :back-key to toggle through available options."
+			"textarea_autocomplete": "Press the :forth- or :back-key to toggle through available options:swipe.",
+			"textarea_autocomplete_swipe_active": " or swipe left or right within the field"
 		}
 	},
 	"audit": {
@@ -1547,9 +1548,10 @@
 		"settings_annual_vacation_hint": "YYYY-MM-DD days within every new line\nFirst entry recommended with start date of tracking and left days on this date, earlier entries will be ignored",
 		"settings_autocomplete_back": "Key for former option on multiline text inputs (if available)",
 		"settings_autocomplete_forth": "Key for next option on multiline text inputs (if available)",
+		"settings_autocomplete_swipe": "Swipe to toggle options on multiline text inputs",
 		"settings_force_desktop": "Force desktop mode",
 		"settings_dateformat": "Date format",
-		"settings_hint": "Some settings require a reload. Use the browsers button, Ctrl + F5 or Ctrl + r for this.",
+		"settings_hint": "Some settings require a reload. Use the browsers button, Ctrl + F5 or Ctrl + r for this, on mobile drag the screen downwards.",
 		"settings_homeoffice": "Homeoffice",
 		"settings_idle": "Idle time before reauthentification",
 		"settings_idle_hint": "Prolonging the default minimum value of :idle seconds may be required for accessibility reasons or for purchase on complex pricelist imports.",

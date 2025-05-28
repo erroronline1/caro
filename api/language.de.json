@@ -474,7 +474,8 @@
 			"filereference_decline": "doch nicht",
 			"filereference_results": "Ergebnisse",
 			"filereference_select": "das ist es",
-			"textarea_autocomplete": "Drücke die :forth- oder :back-Taste um durch die verfügbaren Optionen zu schalten."
+			"textarea_autocomplete": "Drücke die :forth- oder :back-Taste um durch die verfügbaren Optionen zu schalten:swipe.",
+			"textarea_autocomplete_swipe_active": " oder wische im Feld nach links oder rechts"
 		}
 	},
 	"audit": {
@@ -1547,9 +1548,10 @@
 		"settings_annual_vacation_hint": "YYYY-MM-DD; Tage in jeweils einer neuen Zeile\nFür den ersten Eintrag wird das Startdatum der Zeiterfassung und der Resturlaub zu diesem Datum empfohlen. Frühere Kalendereinträge werden nicht mit berechnet.",
 		"settings_autocomplete_back": "Taste für vorherige Option bei mehrzeiligen Textfeldern (falls verfügbar)",
 		"settings_autocomplete_forth": "Taste für nächste Option bei mehrzeiligen Textfeldern (falls verfügbar)",
+		"settings_autocomplete_swipe": "Wischen um Optionen bei mehrzeiligen Textfeldern zu wechseln",
 		"settings_dateformat": "Datumformat",
 		"settings_force_desktop": "Desktop-Modus erzwingen",
-		"settings_hint": "Manche Einstellungen erfordern ein erneutes Laden der Oberfläche. Nutze dazu die Schaltfläche, Strg + F5 oder Strg + r.",
+		"settings_hint": "Manche Einstellungen erfordern ein erneutes Laden der Oberfläche. Nutze dazu die Schaltfläche, Strg + F5 oder Strg + r, oder ziehe auf einem mobilen Gerät den Bildschirm nach unten.",
 		"settings_homeoffice": "Homeoffice",
 		"settings_idle": "Zeit nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt",
 		"settings_idle_hint": "Die Verlängerung des Standardmindestwerts von :idle Sekunden kann im Sinne der Barrierefreiheit erforderlich sein, oder für den Einkauf bei komplexen Preislistenimports.",

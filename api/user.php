@@ -113,6 +113,7 @@ class USER extends API {
 				$user['app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_masonry'));
 				$user['app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_forth'));
 				$user['app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_back'));
+				$user['app_settings']['autocomplete_swipe'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_swipe'));
 				$user['app_settings']['dateformat'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_dateformat'));
 				$user['app_settings']['location'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_location'));
 				$user['app_settings']['timezone'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_timezone'));
@@ -412,6 +413,8 @@ class USER extends API {
 
 				array_push($applicationSettings, ...[
 					[
+						'type' => 'hr'
+					], [
 						'type' => 'checkbox',
 						'attributes' => [
 							'name' => $this->_lang->GET('user.settings')
@@ -427,7 +430,9 @@ class USER extends API {
 							'name' => $this->_lang->GET('user.settings_theme')
 						],
 						'content' => $theme
-					],[
+					], [
+						'type' => 'hr'
+					], [
 						'type' => 'text',
 						'attributes' => [
 							'name' => $this->_lang->GET('user.settings_autocomplete_forth'),
@@ -435,7 +440,7 @@ class USER extends API {
 							'onkeydown' => 'event.preventDefault(); this.value = event.key',
 							'onkeyup' => 'event.preventDefault()'
 						]
-					],[
+					], [
 						'type' => 'text',
 						'attributes' => [
 							'name' => $this->_lang->GET('user.settings_autocomplete_back'),
@@ -443,6 +448,13 @@ class USER extends API {
 							'onkeydown' => 'event.preventDefault(); this.value = event.key',
 							'onkeyup' => 'event.preventDefault()'
 						]
+					], [
+						'type' => 'checkbox',
+						'content' => [
+							$this->_lang->GET('user.settings_autocomplete_swipe') =>  isset($user['app_settings']['autocomplete_swipe']) ? ['checked' => true] : [],
+						]
+					], [
+						'type' => 'hr'
 					], [
 						'type' => 'select',
 						'attributes' => [

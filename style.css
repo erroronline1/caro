@@ -1297,20 +1297,12 @@ input:invalid + label.input_required_alert,
 [data-type="toright"].inlinebutton {
 	display: inline-block;
 }
-.tabletonly {
-	float:right;
-	display: none !important;
-}
 
 /* tablets */
 @media only screen and (max-width: 64rem) {
 	[data-type="toleft"].inlinebutton,
 	[data-type="toright"].inlinebutton {
 		display: none;
-	}
-	.tabletonly {
-		float:right;
-		display: block !important;
 	}
 }
 
