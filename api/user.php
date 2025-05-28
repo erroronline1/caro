@@ -261,7 +261,7 @@ class USER extends API {
 				]);
 				$usertrainings = [];
 				foreach ($alltrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
@@ -931,7 +931,7 @@ class USER extends API {
 					]
 				]);
 				foreach ($trainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';

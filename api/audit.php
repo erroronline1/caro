@@ -3057,7 +3057,7 @@ class AUDIT extends API {
 					if (!$this->_requestedOption && $row['evaluation']) continue;
 					if ($this->_requestedOption === 'closed' && !$row['evaluation']) continue;
 
-					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
@@ -3352,7 +3352,7 @@ class AUDIT extends API {
 				return $row['user_id'] === $user_id;
 			})){
 				foreach ($usertrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';

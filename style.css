@@ -1793,6 +1793,12 @@ button[data-type="search"]::before {
 	mask-image: url("./media/signature.svg");
 }
 
+[data-type="skill"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/lightbulb-on.svg");
+	mask-image: url("./media/lightbulb-on.svg");
+}
+
 [data-type="stl"]::before {
 	background-color: var(--cta_darker);
 	-webkit-mask-image: url("./media/cube.svg");
