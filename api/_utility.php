@@ -592,8 +592,10 @@ class UTILITY {
 		$targets = [];
 		for ($i = 0; $i < count($name); $i++) {
 			if (gettype($_FILES[$name[$i]]['name']) !== 'array') {
-				if ($_FILES[$name[$i]]['tmp_name']) $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $_FILES[$name[$i]]['name'], $i, $prefix, $folder, $replace);
-			}
+				$file = pathinfo($_FILES[$name[$i]]['name']);
+				if ($rename && isset($rename[$i])) $file['filename'] = $rename[$i];
+				if ($_FILES[$name[$i]]['tmp_name']) $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $file['filename'] . '.' . $file['extension'], $i, $prefix, $folder, $replace);
+		}
 			else {
 				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
 					if (!$_FILES[$name[$i]]['tmp_name'][$j]) continue;
