@@ -704,6 +704,32 @@ class APPLICATION extends API {
 				]
 			];
 		}
+
+		// scheduled trainings
+		$complaints = $notifications->scheduledtrainings();
+		if ($complaints){
+			$tiles[] = [
+				'type' => 'tile',
+				'content' => [
+					[
+						'type' => 'textsection',
+						'content' => $this->_lang->GET('application.dashboard.scheduledtrainings', [':number' => $complaints]),
+						'attributes' => [
+							'data-type' => 'skill',
+							'name' => $this->_lang->GET('audit.checks_type.userskills')
+						]
+					]
+				]
+			];
+			if (PERMISSION::permissionFor('regulatory')){
+				$tiles[count($tiles) - 1]['attributes'] = [
+					'onclick' => "api.audit('get', 'checks', 'userskills')",
+					'onkeydown' => "if (event.key==='Enter') api.audit('get', 'checks', 'userskills')",
+					'role' => 'link',
+					'tabindex' => '0'
+				];
+			}
+		}
 		if (count($tiles)) $result['render']['content'][] = $tiles;
 
 		// append search function to landing page

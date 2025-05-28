@@ -188,6 +188,7 @@
 			"orders": ":number Bestellungen zur Bearbeitung",
 			"pendingincorporations": ":number laufende Einführungsverfahren",
 			"preparedorders": ":number vorbereitete Bestellungen zur Freigabe",
+			"scheduledtrainings": ":number geplante Schulungen für deine Bereiche",
 			"unapproveddocuments": ":number Komponenten/Dokumente benötigen eine Freigabe"
 		},
 		"error_response": {

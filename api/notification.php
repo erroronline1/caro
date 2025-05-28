@@ -147,7 +147,7 @@ class NOTIFICATION extends API {
 			]
 		]);
 		foreach($trainings as $training){
-			if ($training['evaluation']) continue;
+			if ($training['evaluation'] || !$training['date']) continue;
 			$trainingdate = new DateTime($training['date']);
 			if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
 				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) {// no deleted users
@@ -572,6 +572,25 @@ class NOTIFICATION extends API {
 			if (isset($row['proxy_users'][$_SESSION['user']['id']]) && !$row['proxy_users'][$_SESSION['user']['id']]) {
 				$number++;
 			}
+		}
+		return $number;
+	}
+
+	public function scheduledtrainings(){
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$unitusers = [];
+		$number = 0;
+		// find all users within current users units
+		foreach($users as $user){
+			if (array_intersect($_SESSION['user']['units'], explode(',', $user['units']))) $unitusers[] = $user['id'];
+		}
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			'replacements' => [
+				':ids' => implode(',', $unitusers)
+			]
+		]);
+		foreach($trainings as $training){
+			if ($training['planned']) $number++;
 		}
 		return $number;
 	}

@@ -188,6 +188,7 @@
 			"orders": "There are :number orders awaiting processing",
 			"pendingincorporations": ":number incomplete incorporations",
 			"preparedorders": ":number prepared orders awaiting authorization",
+			"scheduledtrainings": ":number scheduled trainings for your units",
 			"unapproveddocuments": ":number documents/components require approval"
 		},
 		"error_response": {
