@@ -3346,10 +3346,19 @@ class AUDIT extends API {
 							':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
 						]);
 					} else $evaluation = $this->_lang->GET('audit.userskills_training_evaluation_pending');
+					
+					if ($row['planned']){
+						$row['planned'] = json_decode($row['planned'], true);
+						$evaluation = $this->_lang->GET('audit.userskills_training_scheduled', [
+							':user' => $row['planned']['user'],
+							':date' => $this->convertFromServerTime($row['planned']['date'], true),
+							':scheduled' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['planned']['content']), $row['planned']['content']))
+						]);
+					} else $evaluation = $this->_lang->GET('audit.userskills_training_evaluation_pending');
 
 					$content[count($content) - 1][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires'], true) . " \n" . $evaluation,
+						'content' => $row['expires'] ? $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires'], true) . " \n" . $evaluation : '',
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $content[count($content) - 1][] = [

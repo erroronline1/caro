@@ -863,8 +863,8 @@ class SQLQUERY {
 
 
 		'user_training_post' => [
-			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path, evaluation) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file_path, :evaluation)",
-			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file_path, evaluation) VALUES ( :user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path, :evaluation)"
+			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path, evaluation, planned) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file_path, :evaluation, :planned)",
+			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file_path, evaluation, planned) VALUES ( :user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path, :evaluation, :planned)"
 		],
 		'user_training_put' => [
 			'mysql' => "UPDATE caro_user_training SET evaluation = :evaluation WHERE id = :id",

@@ -2118,14 +2118,10 @@ export const api = {
 									render: data.render,
 									options: options,
 								}).then((response) => {
-									// https://stackoverflow.com/questions/12989442/uploading-multiple-files-using-formdata
+									if (!response) return;
 									let submission = _client.application.dialogToFormdata();
 									console.log(submission, response);
-									for (const value of submission.values()) {
-										console.log(value);
-									  }
-									//api.user((2 in request && request[2] !== "null" ? "PUT" : POST), "training", "null", submission);
-									alert("yet to be implemented");
+									api.user(2 in request && request[2] !== "null" ? "put" : "post", "training", "null", submission);
 								});
 							}
 						};
@@ -2144,7 +2140,8 @@ export const api = {
 				break;
 			case "post":
 			case "put":
-				if (3 in request && request[3] && request[3] instanceof FormData) { // training
+				if (3 in request && request[3] && request[3] instanceof FormData) {
+					// training
 					payload = request[3]; // form data object passed by utility.js
 					delete request[3];
 				} else payload = _.getInputs("[data-usecase=user]", true);

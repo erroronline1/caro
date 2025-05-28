@@ -662,6 +662,7 @@
 		"userskills_training_evaluation_closed": "Closed",
 		"userskills_training_evaluation_display": "Display",
 		"userskills_training_evaluation_pending": "Evaluation pending",
+		"userskills_training_scheduled": ":user scheduled this training on :date \n:scheduled",
 		"userskills_warning_description": "Some defined skills are not matched!"
 	},
 	"calendar": {
@@ -1584,9 +1585,16 @@
 			"add_expires": "Date of expiry",
 			"add_hint": "Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional.",
 			"delete": "Delete training",
+			"delete_confirm_cancel" : "No, thank you!",
+			"delete_confirm_header" : "Permanently delete training and possible attached file?",
+			"delete_confirm_ok" : "Yes delete everything",
+			"delete_confirmed" : "Training deleted",
+			"delete_failed" : "Training could not be deleted",
 			"display": "Training",
 			"name": "Trainee",
 			"name_hint": "multiple named trainees can be entered, separated by comma",
+			"not_found": ":names could not be found as user!",
+			"save success": "Training has been saved.",
 			"schedule_header": "Schedule a training",
 			"schedule_timespan": "Time of scheduled training",
 			"schedule_timespan_hint": "e.g. a date, month or calendar quarter"

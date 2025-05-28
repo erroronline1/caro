@@ -662,6 +662,7 @@
 		"userskills_training_evaluation_closed": "abgeschlossen",
 		"userskills_training_evaluation_display": "Anzeige",
 		"userskills_training_evaluation_pending": "Bewertung ausstehend",
+		"userskills_training_scheduled": ":user hat diese Schulung am :date geplant \n:scheduled",
 		"userskills_warning_description": "Manche gewünschten Fähigkeiten haben keine Zuordnung!"
 	},
 	"calendar": {
@@ -1584,9 +1585,16 @@
 			"add_expires": "Gültig bis",
 			"add_hint": "Ohne einen Titel werden alle anderen Eingaben ignoriert. Ohne Angabe eines Datums wird das heutige verwendet. Ablaufdatum und Erfahrungspunkte sind optional.",
 			"delete": "Schulung löschen",
+			"delete_confirm_cancel" : "Nein danke!",
+			"delete_confirm_header" : "Schulung und ggf. anhängige Dateie unwiderruflich löschen?",
+			"delete_confirm_ok" : "Ja, alles löschen",
+			"delete_confirmed" : "Schulung gelöscht",
+			"delete_failed" : "Schulung konnte nicht gelöscht werden",
 			"display": "Schulung",
 			"name": "Mitarbeiter",
 			"name_hint": "es können mehrere Namen durch Kommata getrennt eingegeben werden",
+			"not_found": ":names konnte(n) als Nutzer nicht gefunden werden!",
+			"save_success": "Schulung gespeichert.",
 			"schedule_header": "Plane eine Schulung",
 			"schedule_timespan": "Zeitraum der geplanten Schulung",
 			"schedule_timespan_hint": "z.B. ein Datum, Monat oder Quartal"

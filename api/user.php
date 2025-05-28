@@ -261,7 +261,7 @@ class USER extends API {
 				]);
 				$usertrainings = [];
 				foreach ($alltrainings as $row){
-					$attributes = ['name' => $this->_lang->GET('user.display_training') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
+					$attributes = ['name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
 						$expire = new DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
@@ -270,9 +270,19 @@ class USER extends API {
 							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
+					if ($row['planned']){
+						$row['planned'] = json_decode($row['planned'], true);
+						$planned = $this->_lang->GET('audit.userskills_training_scheduled', [
+							':user' => $row['planned']['user'],
+							':date' => $this->convertFromServerTime($row['planned']['date'], true),
+							':scheduled' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['planned']['content']), $row['planned']['content']))
+						]);
+					} else $planned = '';
+
 					$usertrainings[] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.add_training_expires') . ' ' . $this->convertFromServerTime($row['expires']),
+						'content' => ($row['expires'] ? $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires']) : '')
+							. ($planned ? ($row['expires'] ? " \n" : '') . $planned : ''),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $usertrainings[] = [
@@ -627,28 +637,6 @@ class USER extends API {
 				UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
 				$user['image'] = substr($user['image'], 3);
 
-				// add user training if provided
-				$training = [];
-				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
-					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
-					$training[':date'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d'));
-					$training[':expires'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06');
-					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
-					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
-						'user' => $_SESSION['user']['name'],
-						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
-						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
-					]): null;
-						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
-						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
-					}
-					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
-						'values' => $training
-					]);
-				}
-
 				// insert user into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
 					'values' => [
@@ -841,47 +829,6 @@ class USER extends API {
 					$user['image'] = substr($user['image'], 3);
 				}
 
-				// add user training
-				$training = [];
-				if ($training[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training'))){
-					$training[':user_id'] = $user['id'];
-					$date = new DateTime('now', new DateTimeZone($this->_date['timezone']));
-					$training[':date'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_date')) ? : $date->format('Y-m-d');
-					$training[':expires'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_expires')) ? : '2079-06-06');
-					$training[':experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_experience_points')) ? : 0;
-					$training[':file_path'] = '';
-					$training[':evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation')) ? UTILITY::json_encode([
-						'user' => $_SESSION['user']['name'],
-						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
-						'content' => [$this->_lang->PROPERTY('user.add_training_evaluation') => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.add_training_evaluation'))]
-					]): null;
-						if (isset($_FILES[$this->_lang->PROPERTY('user.add_training_document')]) && $_FILES[$this->_lang->PROPERTY('user.add_training_document')]['tmp_name']) {
-						$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.add_training_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
-					}
-					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
-						'values' => $training
-					]);
-				}
-
-				// delete checked user trainings
-				if ($delete_training = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.delete_training'))){
-					$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-						'replacements' => [
-							':ids' => $user['id'] ? : 0
-						]
-					]);
-					foreach ($trainings as $row){
-						if (in_array($row['id'], $delete_training)){
-							if ($row['file_path']) UTILITY::delete(['.' . $row['file_path']]);
-							SQLQUERY::EXECUTE($this->_pdo, 'user_training_delete', [
-								'values' => [
-									':id' => $row['id']
-								]
-							]);
-						}
-					}
-				}
-
 				// update user
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
 					'values' => [
@@ -993,9 +940,19 @@ class USER extends API {
 							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
+					if ($row['planned']){
+						$row['planned'] = json_decode($row['planned'], true);
+						$planned = $this->_lang->GET('audit.userskills_training_scheduled', [
+							':user' => $row['planned']['user'],
+							':date' => $this->convertFromServerTime($row['planned']['date'], true),
+							':scheduled' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['planned']['content']), $row['planned']['content']))
+						]);
+					} else $planned = '';
+
 					$skillmatrix[0][] = [
 						'type' => 'textsection',
-						'content' => $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires']),
+						'content' => ($row['expires'] ? $this->_lang->GET('user.training.add_expires') . ' ' . $this->convertFromServerTime($row['expires']) : '')
+							. ($planned ? ($row['expires'] ? " \n" : '') . $planned : ''),
 						'attributes' => $attributes
 					];
 					if ($row['file_path']) $skillmatrix[0][] = [
@@ -1005,9 +962,14 @@ class USER extends API {
 						]
 					];
 					$skillmatrix[0][] = [
-						'type' => 'checkbox',
-						'content' => [
-							$this->_lang->GET('user.training.delete') . '[]' => ['value' => $row['id']]
+						'type' => 'deletebutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('user.training.delete'),
+							'type' => 'button',
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.training.delete_confirm_header', [':name' => $row['name']]) ."', options:{".
+								"'".$this->_lang->GET('user.training.delete_confirm_cancel')."': false,".
+								"'".$this->_lang->GET('user.training.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.user('delete', 'training', ". $row['id'] . ");}})"
 						]
 					];
 				}
@@ -1323,10 +1285,72 @@ class USER extends API {
 	}
 
 	public function training(){
+		if (!PERMISSION::permissionFor('regulatory')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+				$usernames = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.name'));
+
+				if (!($usernames && $usernames = preg_split('/[^\w\s]+/', $usernames))) $this->response([], 406);
+
+				$training = [
+					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_training')),
+					':user_id' => null,
+					':date' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_date'))) ? : null,
+					':expires' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_expires'))) ? : null,
+					':experience_points' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_experience_points')) ? : 0,
+					':file_path' => null,
+					':evaluation' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation')) ? UTILITY::json_encode([
+						'user' => $_SESSION['user']['name'],
+						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
+						'content' => [$this->_lang->GET('user.training.add_evaluation', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation'))]
+					]): null,
+					':planned' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.schedule_timespan')) ? UTILITY::json_encode([
+						'user' => $_SESSION['user']['name'],
+						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
+						'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.schedule_timespan'))]
+					]): null
+				];
+				// must have name and either date or planned
+				if (!$training[':name'] || !($training[':date'] || $training[':planned'])) $this->response([], 406);
+				// if date is set it can not be planned
+				if ($training[':date']) {
+					$training[':planned'] = null;
+				}
+
+				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
+				$notfound = [];
+				foreach($usernames as $username){
+					if (!$username) continue;
+					if ($user = array_search($username, array_column($users, 'name'))){
+						$user = $users[$user];
+						$training[':user_id'] = $user['id'];
+						// upload files only if date is set
+						if ($training[':date'] && isset($_FILES[$this->_lang->PROPERTY('user.training.add_document')]) && $_FILES[$this->_lang->PROPERTY('user.training.add_document')]['tmp_name']) {
+							$training[':file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.training.add_document')], UTILITY::directory('users'), [$user['id'] . '_' . $user['name']], [$training[':name'] . '_' . $training[':date'] . '_' . $training[':expires']], false)[0], 1);
+						}
+						SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+							'values' => $training
+						]);
+
+					}
+					else $notfound[] = $username;
+				}
+				if (count($notfound) !== count($usernames)) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('user.training.save_success') . (count($notfound) ? ' ' . $this->_lang->GET('user.training.not_found', [':names' => implode(', ', $notfound)]) :''),
+						'type' => count($notfound) ? 'info' : 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('user.training.not_found', [':names' => implode(', ', $notfound)]),
+						'type' => 'error'
+					]]);
 				break;
 			case 'PUT':
+
+
+
 				break;
 			case 'GET':
 				$preseletedUser = '';
@@ -1339,7 +1363,7 @@ class USER extends API {
 				}
 
 				if ($this->_requestedID && $this->_requestedID !== 'null'){
-					//get training to populate
+					// get training to populate
 				}
 
 				$result = ['render' => ['content' => [
@@ -1397,11 +1421,37 @@ class USER extends API {
 						]
 					]
 				]]];
+				$this->response($result);
 				break;
 			case 'DELETE':
+				$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				]);
+
+				if ($training = $training ? $training[0] : null){
+					if ($training['file_path']) UTILITY::delete(['.' . $training['file_path']]);
+					SQLQUERY::EXECUTE($this->_pdo, 'user_training_delete', [
+						'values' => [
+							':id' => $training['id']
+						]
+					]);
+
+					$this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('user.training.delete_confirmed'),
+						'type' => 'deleted'
+					]]);
+				}
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('user.training.delete_failed'),
+						'type' => 'error'
+					]]);
+
 				break;
 		}
-		$this->response($result);
 	}
 }
 ?>
