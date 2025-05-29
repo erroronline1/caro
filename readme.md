@@ -1985,7 +1985,7 @@ Evidences of conformity according to the documents described above:
 * Technical and Organizational Measures: [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
 * UDI Label: **not applicable**
 * Usability Evaluation Report: [Stakeholder requirements](#stakeholder-requirements)
-* User Manual: [this document](#caro---cloud-assisted-records-and-operations), templates/manual.en.json / templates/manual.de.json
+* User Manual: [this document](#caro---cloud-assisted-records-and-operations), templates/default.manual.en.json / templates/default.manual.de.json
 
 [Content](#content)
 
@@ -2043,7 +2043,7 @@ Development
 Verification and Validation
 * Software Test Results
 * List of Known Anomalies: [Useage notes and caveats](#useage-notes-and-caveats)
-* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), templates/manual.en.json / templates/manual.de.json
+* Instructions For Use: [this document](#caro---cloud-assisted-records-and-operations), templates/default.manual.en.json / templates/default.manual.de.json
 * Usability Test Protocol: [Usability test](#usability-tests)
 * Usability Test Report: [Stakeholder requirements](#stakeholder-requirements)
 * Clinical Evaluation Report: **not applicable**
@@ -2302,7 +2302,7 @@ During development following outcomes could be noted:
 
 Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script must be removed from the production server once being tested, before going public.**
 
-Same applies to vendors. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.***
+Same applies to vendors. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.**
 
 Variables for _stresstest.php can be adjusted within the top class variables in the sourcecode.
 
