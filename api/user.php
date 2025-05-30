@@ -1422,13 +1422,25 @@ class USER extends API {
 					'training' => '',
 					'timespan' => '',
 				];
-				$datalist = [];
+				$datalist = ['user' => [], 'training' => []];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $row) {
-					if ($row['id'] > 1 ) $datalist[] = $row['name'];
+					if ($row['id'] > 1 ) $datalist['user'][] = $row['name'];
 					if ($this->_prefilledTrainingUser && $row['id'] == $this->_prefilledTrainingUser) $prefill['user'] = $row['name'];
 				}
+
+				$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+					'replacements' => [
+						':ids' => implode(',', array_column($user, 'id'))
+					]
+				]);
+				foreach($trainings as $training){
+					$datalist['training'][] = $training['name'];
+				}
+				$datalist['training'] = array_unique($datalist['training']);
+				sort($datalist['training']);
+
 
 				// prefill scheduled training if id is submitted
 				if ($this->_requestedID && $this->_requestedID !== 'null'){
@@ -1457,13 +1469,14 @@ class USER extends API {
 								'value' => $prefill['user']
 							],
 							'hint' => $this->_lang->GET('user.training.name_hint'),
-							'datalist' => $datalist
+							'datalist' => $datalist['user']
 						], [
 							'type' => 'text',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.training.add_training'),
 								'value' => $prefill['training']
 							],
+							'datalist' => $datalist['training']
 						], [
 							'type' => 'text',
 							'attributes' => [
