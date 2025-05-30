@@ -3275,11 +3275,11 @@ export class Assemble {
 			});
 
 			if (swipe) {
-				// toggle by swipe especially for tablets as buttons appeared to occupying
-				textarea.addEventListener("pointerdown", (event) => {
+				// toggle by swipe especially for tablets as buttons appeared too occupying
+				textarea.addEventListener("touchstart", (event) => {
 					TEXTAREA_AUTOCOMPLETE_SWIPE = [event.clientX, event.clientY];
 				});
-				textarea.addEventListener("pointerup", (event) => {
+				textarea.addEventListener("touchend", (event) => {
 					const travel = [TEXTAREA_AUTOCOMPLETE_SWIPE[0] - event.clientX, TEXTAREA_AUTOCOMPLETE_SWIPE[1] - event.clientY];
 					// filter for mostly horizontal swipes
 					if (Math.abs(travel[0]) - Math.abs(travel[1]) > 0) {
