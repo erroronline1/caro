@@ -28,6 +28,13 @@ graph LR;
     * handle hidden attribute?
 * audit training
     * filter by unit (my, all, ...available)
+    * [soon expiring trainings as planned by default](#rejected-requirements)
+    * training name datalist
+    * reversed view trainings with userlist
+* complaint analysis
+    * -> record export by timespan, checkboxes of available record types
+* reused file link method ?
+    * img, stl, ... handling
 
 ## Content
 * [Aims](#aims)
@@ -2110,7 +2117,8 @@ Stakeholder identification:
 | Unintrusive scroll indicator navigation | User | 2025-04-16 | Reviewed; 2025-04-16 |
 | Stock article flag | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
 | Printable list of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
-| Import ERP article ids | Purchase | 2025-05-16 | Implemented; 2025-05-17|
+| Import ERP article ids | Purchase | 2025-05-16 | Implemented; 2025-05-17 |
+| Add soon expiring trainings as planned by default | QMO | 2025-05-30 | |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
