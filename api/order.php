@@ -538,7 +538,7 @@ class ORDER extends API {
 					// order attachments
 					if (isset($decoded_order_data['attachments'])){
 						foreach(explode(',', $decoded_order_data['attachments']) as $file){
-							$data['attachments'][pathinfo($file)['basename']] = ['href' => './api/api.php/file/stream/' . $file];
+							$data['attachments'][pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
 						}
 					}
 
@@ -985,7 +985,7 @@ class ORDER extends API {
 				// append existing attachments
 				if (isset($order['attachments'])){
 					foreach(explode(',', $order['attachments']) as $file){
-						$files[pathinfo($file)['basename']] = ['href' => './api/api.php/file/stream/' . $file, 'target' => '_blank'];
+						$files[pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
 					}
 					array_splice($result['render']['content'], 3, 0, [
 						[
@@ -1447,7 +1447,7 @@ class ORDER extends API {
 						if (isset($processedOrderData['attachments'])){
 							$files = [];
 							foreach(explode(',', $processedOrderData['attachments']) as $file){
-								$files[pathinfo($file)['basename']] = ['href' => './api/api.php/file/stream/' . $file, 'target' => '_blank'];
+								$files[pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
 							}
 							array_splice($result['render']['content'][count($result['render']['content']) - 1], 2, 0, [
 								[

@@ -986,9 +986,6 @@ export const _client = {
 
 				// append attachments
 				if (element.attachments) {
-					Object.keys(element.attachments).forEach((key) => {
-						element.attachments[key].target = "_blank";
-					});
 					collapsible.push({
 						type: "links",
 						content: element.attachments,

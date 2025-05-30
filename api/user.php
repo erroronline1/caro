@@ -288,7 +288,7 @@ class USER extends API {
 					if ($row['file_path']) $usertrainings[] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => ['href' => './api/api.php/file/stream/' . $row['file_path']]
+							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path']])
 						]
 					];
 				}
@@ -958,7 +958,7 @@ class USER extends API {
 					if ($row['file_path']) $skillmatrix[0][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => ['href' => './api/api.php/file/stream/' . $row['file_path']]
+							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path']])
 						]
 					];
 					$skillmatrix[0][] = [
@@ -979,7 +979,7 @@ class USER extends API {
 								'type' => 'button',
 								'value' => $this->_lang->GET('user.training.edit'),
 								'class' => 'inlinebutton',
-								'onclick' => "api.user('get', 'training', " . $row['id'] . ")"
+								'onclick' => "this.disabled = true; api.user('get', 'training', " . $row['id'] . ");"
 							]
 						];
 					}
@@ -1321,12 +1321,12 @@ class USER extends API {
 						'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.schedule_timespan'))]
 					]): null
 				];
-				// must have name and either date or planned
-				if (!$training[':name'] || !($training[':date'] || $training[':planned'])) $this->response([], 406);
 				// if date is set it can not be planned
 				if ($training[':date']) {
 					$training[':planned'] = null;
 				}
+				// must have name and either date or planned
+				if (!$training[':name'] || !($training[':date'] || $training[':planned'])) $this->response([], 406);
 
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
@@ -1380,12 +1380,12 @@ class USER extends API {
 									'date' => $this->_date['servertime']->format('Y-m-d H:i'),
 									'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.schedule_timespan'))]
 								]): null;
-							// must have name and either date or planned
-							if (!$training['name'] || !($training['date'] || $training['planned'])) $this->response([], 406);
 							// if date is set it can not be planned
 							if ($training['date']) {
 								$training['planned'] = null;
 							}
+							// must have name and either date or planned
+							if (!$training['name'] || !($training['date'] || $training['planned'])) $this->response([], 406);
 
 							// upload files only if date is set
 							if ($training['date'] && isset($_FILES[$this->_lang->PROPERTY('user.training.add_document')]) && $_FILES[$this->_lang->PROPERTY('user.training.add_document')]['tmp_name']) {

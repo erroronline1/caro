@@ -336,6 +336,34 @@ class UTILITY {
 	}
 
 	/**
+	 *   _ _     _   
+	 *  | |_|___| |_ 
+	 *  | | |   | '_|
+	 *  |_|_|_|_|_,_|
+	 *
+	 * unified link modifier, creating previews where applicable
+	 * 
+	 * @param array $attributes anchor attributes
+	 * @return array modified attributes
+	 */
+	public static function link($attributes){
+		if ($attributes['href']){
+			$file = pathinfo($attributes['href']);
+			if (in_array(strtolower($file['extension']), ['stl'])){
+				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'stl', name: '" . $file['basename'] . "', url: '" . $attributes['href'] . "'}})";
+				$attributes['data-type'] = 'stl';
+			}
+			elseif (in_array(strtolower($file['extension']), ['png','jpg', 'jpeg', 'gif'])){
+				$attributes['href'] = "javascript:new _client.Dialog({type: 'preview', header: '" . $file['basename'] . "', render:{type: 'image', name: '" . $file['basename'] . "', content: '" . $attributes['href'] . "'}})";
+				$attributes['data-type'] = 'imagelink';
+			}
+			else {
+				$attributes['target'] = '_blank';
+			}
+		}
+		return $attributes;
+	}
+	/**
 	 *   _ _     _     _ _             _           _
 	 *  | |_|___| |_ _| |_|___ ___ ___| |_ ___ ___|_|___ ___
 	 *  | | |_ -|  _| . | |  _| -_|  _|  _| . |  _| | -_|_ -|

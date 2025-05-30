@@ -82,10 +82,7 @@ class FILE extends API {
 				if (stristr($path, CONFIG['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
 				$file = substr_replace($file, '.', strrpos($file, '_'), 1);
 
-				$fileinfo = pathinfo($file);
-				if (in_array($fileinfo['extension'], ['stl'])) $list[$file] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file . "', render:{type: 'stl', name: '" . $file . "', url: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'stl'];
-				elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $list[$file] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file . "', render:{type: 'image', name: '" . $file . "', content: '" . $path . "'}})", 'data-filtered' => 'breakline', 'data-type' => 'imagelink'];
-				else $list[$file]= ['href' => $path, 'target' => '_blank', 'data-filtered' => 'breakline'];
+				$list[$file] = UTILITY::link(['href' => $path, 'data-filtered' => 'breakline']);
 			}
 			// append bundle
 			$result['render']['content'][] = [
@@ -516,9 +513,7 @@ class FILE extends API {
 							}
 
 							$link = [];
-							if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
-							elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
-							else $link[$file['name']]= ['href' => $file['path'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+							$link[$file['name']] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
 			
 							// append file, link and options
 							array_push($result['render']['content'][1],
@@ -732,9 +727,7 @@ class FILE extends API {
 								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone($this->_date['timezone']));
 
 								$link = [];
-								if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
-								elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
-								else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+								$link[$file['name']] = UTILITY::link(['href' => $file['link'], 'data-filtered' => $file['path']]);
 	
 								// append file options
 								array_push($result['render']['content'][1],
@@ -860,9 +853,8 @@ class FILE extends API {
 					$fileinfo = pathinfo($file);
 					if (preg_match('/^\.\.\//', $file))	$file = ['name' => $fileinfo['basename'], 'path' => './api/api.php/file/stream/' . substr($file, 1)];
 					else $file = ['name' => $file, 'path' => $file];
-					if (in_array($fileinfo['extension'], ['stl'])) $matches[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
-					elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $matches[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['path'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
-					else $matches[$file['name']] = ['href' => $file['path'], 'data-filtered' => $file['path'], 'target' => '_blank'];
+
+					$matches[$file['name']] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
 				}
 
 				// reassign displayed folder name
@@ -984,10 +976,8 @@ class FILE extends API {
 						else {
 							$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
-							$fileinfo = pathinfo($file['path']);
-							if (in_array($fileinfo['extension'], ['stl'])) $display[$name] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . substr($file['path'], 1) . "'}})", 'data-filtered' => substr($file['path'], 1), 'data-type' => 'stl'];
-							elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $display[$name] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . substr($file['path'], 1) . "'}})", 'data-filtered' => substr($file['path'], 1), 'data-type' => 'imagelink'];
-							else $display[$name] = ['href' => substr($file['path'], 1), 'data-filtered' => substr($file['path'], 1), 'target' => '_blank'];
+
+							$display[$name] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
 						}
 					}
 				}
@@ -1047,7 +1037,6 @@ class FILE extends API {
 				echo $this->_lang->GET('file.external_file.retired_success');
 				die();
 			}
-			$pathinfo = pathinfo($file);
 			header('Content-Type: '.mime_content_type($file));
 			header('Content-Disposition: inline; filename=' . pathinfo($file)['basename']);
 			header('Expires: 0');
