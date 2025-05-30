@@ -286,6 +286,10 @@ class ImageHandler {
 		if (this.images.qrCodes.length) {
 			for (let i = 0; i < this.images.qrCodes.length; i++) {
 				if (!(content = this.images.qrCodes[i])) continue;
+				if (!document.getElementById(content.id)) {
+					delete this.images.qrCodes[i];
+					continue; // idk why, but sometimes this is erroneous
+				}
 				var rect = document.getElementById(content.id).getBoundingClientRect();
 				if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
 					this.qrcode(content);
@@ -297,6 +301,10 @@ class ImageHandler {
 		if (this.images.barCodes.length) {
 			for (let i = 0; i < this.images.barCodes.length; i++) {
 				if (!(content = this.images.barCodes[i])) continue;
+				if (!document.getElementById(content.id)) {
+					delete this.images.qrCodes[i];
+					continue; // idk why, but sometimes this is erroneous
+				}
 				var rect = document.getElementById(content.id).getBoundingClientRect();
 				if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
 					this.barcode(content);
@@ -308,7 +316,10 @@ class ImageHandler {
 		if (this.images.images.length) {
 			for (let i = 0; i < this.images.images.length; i++) {
 				if (!(content = this.images.images[i])) continue;
-				if (!document.getElementById(content.id)) continue; // idk why, but sometimes this is erroneous
+				if (!document.getElementById(content.id)) {
+					delete this.images.qrCodes[i];
+					continue; // idk why, but sometimes this is erroneous
+				}
 				var rect = document.getElementById(content.id).getBoundingClientRect();
 				if (rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
 					this.image(content);
