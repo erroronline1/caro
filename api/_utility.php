@@ -609,7 +609,7 @@ class UTILITY {
 	}
 	private static function handle($tmpname, $name, $i, $prefix, $folder, $replace = false){
 		$_prefix = $prefix ? $prefix[(key_exists($i, $prefix) ? $i : count($prefix) - 1)] : null;
-		$filename = preg_replace(CONFIG['forbidden']['names']['characters'], '', ($_prefix ? $_prefix . '_' : '') . $name);
+		$filename = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', ($_prefix ? $_prefix . '_' : '') . $name);
 		$target = $folder . '/' . $filename;
 		if (!$replace){
 			$extension = '.' . pathinfo($target)['extension'];
