@@ -1731,7 +1731,7 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-			'date' => $this->convertFromServerTime($this->_date['usertime']->format('y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 
 		$documents = $this->incorporation();
@@ -2245,7 +2245,7 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.' . $this->_requestedType),
-			'date' => $this->convertFromServerTime($this->_date['usertime']->format('y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 
 		$checks = $this->mdrsamplecheck();
@@ -2839,7 +2839,7 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.risks'),
-			'date' => $this->convertFromServerTime($this->_date['usertime']->format('y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 		$downloadfiles = [];
 		$requestedTimestamp = $this->convertToServerTime($this->_requestedDate . ' ' . $this->_requestedTime);
@@ -3166,6 +3166,7 @@ class AUDIT extends API {
 			})){
 				$years = [];
 				foreach ($usertrainings as $row){
+					if (!$row['date']) continue;
 					$year = substr($row['date'], 0, 4);
 					if ($row['experience_points']){
 						if (!isset($years[$year])) $years[$year] = ['xp' => 0, 'paths' => []];
@@ -3209,7 +3210,7 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.userexperience'),
-			'date' => $this->convertFromServerTime($this->_date['usertime']->format('y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 
 		$experience = $this->userexperience();
@@ -3255,19 +3256,38 @@ class AUDIT extends API {
 	 */
 	private function userskills(){
 		$content = [];
+
+		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
+		$organizational_units = [];
+		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.audit('get', 'checks', 'userskills')"];
+		foreach($this->_lang->_USER['units'] as $unit => $description){
+			$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.audit('get', 'checks', 'userskills', '" . $unit . "')"];
+		}
+		if (!$this->_requestedOption) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
+		else $organizational_units[$this->_lang->GET('units.' . $this->_requestedOption)]['checked'] = true;
+		$content[] = [
+			[
+				'type' => 'radio',
+				'attributes' => [
+					'name' => $this->_lang->GET('order.organizational_unit')
+				],
+				'content' => $organizational_units
+			]
+		];
+
 		// add export button
 		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.record_export'),
-					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
+					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', '" . $this->_requestedOption . "')",
 					'data-type' => 'download'
 				]
 			]
 		];
 		$unfulfilledskills = [];
-		$bulkselection = ['...' => ['value' => '']];
 		foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 			if ($duty === '_LEVEL') continue;
 			foreach ($skills as $skill => $skilldescription){
@@ -3275,7 +3295,6 @@ class AUDIT extends API {
 				$unfulfilledskills[] = $this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription;
 			}
 		}
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 			'replacements' => [
 				':ids' => implode(',', array_column($users, 'id'))
@@ -3284,8 +3303,7 @@ class AUDIT extends API {
 		$trainings = $trainings ? array_values($trainings) : [];
 		foreach ($users as $user){
 			if ($user['id'] < 2) continue;
-
-			$bulkselection[$user['name']] = [];
+			$user['units'] = explode(',', $user['units'] ? : '');
 
 			// construct fulfilled skills
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
@@ -3302,6 +3320,12 @@ class AUDIT extends API {
 					}
 				}
 			}
+
+			if (!(
+				in_array($this->_requestedOption, $user['units']) ||
+				((!$this->_requestedOption || $this->_requestedOption == 'null') && array_intersect($_SESSION['user']['units'], $user['units']))
+			)) continue;
+
 			$content[] = [
 				[
 					'type' => 'textsection',
@@ -3368,12 +3392,11 @@ class AUDIT extends API {
 							'onclick' => "api.user('get', 'training', " . $row['id'] . ")"
 						]
 					];
-
 				}	
 			}
 
 			if ((array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true)) === ['supervisor']
-				&& array_intersect($_SESSION['user']['units'], explode(',', $user['units'])))
+				&& array_intersect($_SESSION['user']['units'], $user['units']))
 				|| count(array_intersect($_SESSION['user']['permissions'], PERMISSION::permissionFor('regulatory', true))) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])
 				){
 					$content[count($content) - 1][] = [
@@ -3460,10 +3483,12 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.userskills'),
-			'date' => $this->convertFromServerTime($this->_date['usertime']->format('y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 
 		$skills = $this->userskills();
+
+		$summary['content'][''] = (!$this->_requestedOption || $this->_requestedOption == 'null') ? implode(', ', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], $_SESSION['user']['units'])) : $this->_lang->_DEFAULT['units'][$this->_requestedOption];
 
 		for($i = 1; $i < count($skills); $i++){
 			foreach($skills[$i] as $item){
@@ -3584,7 +3609,7 @@ class AUDIT extends API {
 			'files' => [],
 			'images' => [],
 			'title' => $this->_lang->GET('audit.checks_type.vendors'),
-			'date' => $this->convertFromServerTime($this->_date['usertime']->format('y-m-d H:i'), true)
+			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), true)
 		];
 
 		$incorporations = $this->vendors();
