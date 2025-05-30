@@ -3457,14 +3457,36 @@ class AUDIT extends API {
 				$allskills[substr($skill, 0, strrpos($skill, '.'))][] = $user['name'] . ($level ? ' ' . $this->_lang->_USER['skills']['_LEVEL'][$level] : '');
 			}
 		}
-		foreach ($allskills as $skill => $users){
+		foreach ($allskills as $skill => $skilledusers){
 			if (!$skill) continue;
 			$skill = explode('.', $skill);
 			$content[] = [
 				[
 					'type' => 'textsection',
-					'content' => $users ? implode(', ', $users) : $this->_lang->GET('audit.skillfulfilment_warning'),
-					'attributes' => $users ? ['name' => $this->_lang->GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . $this->_lang->GET('skills.' . $skill[0] . '.' . $skill[1])] : ['class' => 'red', 'name' => $this->_lang->GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . $this->_lang->GET('skills.' . $skill[0] . '.' . $skill[1])]
+					'content' => $skilledusers ? implode(', ', $skilledusers) : $this->_lang->GET('audit.skillfulfilment_warning'),
+					'attributes' => $skilledusers ? ['name' => $this->_lang->GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . $this->_lang->GET('skills.' . $skill[0] . '.' . $skill[1])] : ['class' => 'red', 'name' => $this->_lang->GET('skills.' . $skill[0] . '._DESCRIPTION') . ' ' . $this->_lang->GET('skills.' . $skill[0] . '.' . $skill[1])]
+				]
+			];
+		}
+
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [ 
+			'replacements' => [
+				':ids' => implode(',', array_column($users, 'id'))
+			]
+		]);
+		$trainings = $trainings ? array_values($trainings) : [];
+		$allskills = [];
+		foreach($trainings as $training){
+			if (!isset($allskills[$training['name']])) $allskills[$training['name']] = [];
+			if (!$training['date'] || ($training['expires'] && $training['expires'] < $this->_date['servertime']->format('Y-m-d'))) continue;
+			if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) $allskills[$training['name']][] = $users[$user]['name'];
+		}
+		foreach($allskills as $skill => $skilledusers){
+			$content[] = [
+				[
+					'type' => 'textsection',
+					'content' => $skilledusers ? implode(', ', $skilledusers) : $this->_lang->GET('audit.skillfulfilment_warning'),
+					'attributes' => $skilledusers ? ['name' => $skill] : ['class' => 'red', 'name' => $skill]
 				]
 			];
 		}
