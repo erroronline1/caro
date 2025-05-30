@@ -350,8 +350,6 @@ Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporte
 
 #### *Caveat:*
 Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
-* Datei-,
-* Foto-Uploads,
 * Produktauswahlfelder,
 * Unterschriftenfelder und
 * Kalenderschaltflächen
