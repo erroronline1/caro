@@ -871,12 +871,12 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_user_training SET name = :name, date = CONVERT(DATE, :date, 23), expires = CONVERT(DATE, :expires, 23), experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned WHERE id = :id"
 		],
 		'user_training_get' => [
-			'mysql' => "SELECT caro_user_training.*, caro_user.name AS user_name FROM caro_user_training LEFT JOIN caro_user ON caro_user_training.user_id = caro_user.id  WHERE caro_user_training.id = :id",
-			'sqlsrv' => "SELECT caro_user_training.*, caro_user.name AS user_name FROM caro_user_training LEFT JOIN caro_user ON caro_user_training.user_id = caro_user.id  WHERE caro_user_training.id = :id"
+			'mysql' => "SELECT caro_user_training.*, caro_user.name AS user_name FROM caro_user_training LEFT JOIN caro_user ON caro_user_training.user_id = caro_user.id WHERE caro_user_training.id = :id",
+			'sqlsrv' => "SELECT caro_user_training.*, caro_user.name AS user_name FROM caro_user_training LEFT JOIN caro_user ON caro_user_training.user_id = caro_user.id WHERE caro_user_training.id = :id"
 		],
 		'user_training_get_user' => [
-			'mysql' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids) ORDER BY date, user_id ASC",
-			'sqlsrv' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids) ORDER BY date, user_id ASC"
+			'mysql' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids) ORDER BY date, id, user_id ASC",
+			'sqlsrv' => "SELECT * FROM caro_user_training WHERE user_id IN (:ids) ORDER BY date, id, user_id ASC"
 		],
 		'user_training_delete' => [
 			'mysql' => "DELETE FROM caro_user_training WHERE id = :id",

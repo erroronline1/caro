@@ -1585,6 +1585,8 @@
 			"add_experience_points": "Erfahrungspunkte",
 			"add_expires": "Gültig bis",
 			"add_hint": "Ohne einen Titel werden alle anderen Eingaben ignoriert. Ohne Angabe eines Datums wird das heutige verwendet. Ablaufdatum und Erfahrungspunkte sind optional.",
+			"auto_schedule": "vor Ablauf der Gültigkeit am :expires",
+			"auto_schedule_alert_message": ":users Schulung :training vom :date läuft am :expires ab. Plant die Nachschulung!",
 			"delete": "Schulung löschen",
 			"delete_confirm_cancel" : "Nein danke!",
 			"delete_confirm_header" : "Schulung und ggf. anhängige Dateie unwiderruflich löschen?",

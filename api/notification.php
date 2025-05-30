@@ -117,7 +117,7 @@ class NOTIFICATION extends API {
 			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity']);
 			else continue;
 			if ($validity > $today) continue;
-			// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
+			// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
 			$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
 			$open = false;
 			foreach($reminders as $reminder){
@@ -150,8 +150,8 @@ class NOTIFICATION extends API {
 			if ($training['evaluation'] || !$training['date']) continue;
 			$trainingdate = new DateTime($training['date']);
 			if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
-				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) {// no deleted users
-					// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
+				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
+					// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
 					$subject = $this->_lang->GET('audit.userskills_notification_message', [
 						':user' => $users[$user]['name'],
 						':training' => $training['name'],
@@ -217,6 +217,7 @@ class NOTIFICATION extends API {
 
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
+			// alert current events including workmates pto if alert is set
 			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '')], $this->_lang->GET('calendar.schedule.alert_message', [':content' => (isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
 		}
 
@@ -541,7 +542,7 @@ class NOTIFICATION extends API {
 		foreach($responsibilities as $row){
 			if ($row['hidden']) continue;
 			if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
-				// check for open reminders. if none add a new. dependent on language setting, may set multiple on language change.
+				// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
 				$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'])))], true));
 				$open = false;
 				foreach($reminders as $reminder){
@@ -589,9 +590,64 @@ class NOTIFICATION extends API {
 				':ids' => implode(',', $unitusers)
 			]
 		]);
+		$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
 		foreach($trainings as $training){
-			if ($training['planned']) $number++;
+			if ($training['planned']) {
+				$number++;
+				continue;
+			}
+			if (!$training['expires']) continue;
+			$trainingdate = new DateTime($training['expires']);
+			if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) < CONFIG['lifespan']['training_renewal']){
+				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
+					$user = $users[$user];
+					// check for scheduled trainings. if none add a new.
+					$none = true;
+					foreach($reversetrainings as $scheduled){
+						// must be of same name for this user
+						if ($scheduled['user_id'] !== $user['id'] || $scheduled['name'] != $training['name']) continue;
+						// date has been set and is newer than expiry, obviously a follow up training or already planned
+						if ($scheduled['date'] && $scheduled['date'] > $training['expires'] || $scheduled['planned']) {
+							$none = false;
+							break;
+						}
+					}
+					if ($none) {
+						// insert scheduled training and message user and supervisor
+						SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+							'values' => [
+								':name' => $training['name'],
+								':user_id' => $user['id'],
+								':date' => null,
+								':expires' => null,
+								':experience_points' => 0,
+								':file_path' => null,
+								':evaluation' => null,
+								':planned' => UTILITY::json_encode([
+									'user' => $users[0]['name'], // system user
+									'date' => $this->_date['servertime']->format('Y-m-d H:i'),
+									'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => $this->_lang->GET('user.training.auto_schedule', [':expires' => $this->convertFromServerTime($training['expires'], true)], true)]
+								])
+							]
+						]);
+						$this->alertUserGroup([
+								'permission' => ['supervisor'],
+								'group' => explode(',', $user['units'] ? : ''),
+								'user' => [$user['name']]
+							],
+							$this->_lang->GET('user.training.auto_schedule_alert_message', [
+								':user' => $user['name'],
+								':training' => $training['name'],
+								':date' =>$this->convertFromServerTime($training['date'], true),
+								':expires' => $this->convertFromServerTime($training['expires'], true)
+							], true)
+						);
+						$number++;
+					}
+				}
+			}
 		}
+		$this->alertUserGroupSubmit();
 		return $number;
 	}
 }

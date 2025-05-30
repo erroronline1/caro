@@ -1585,6 +1585,8 @@
 			"add_experience_points": "Experience points",
 			"add_expires": "Date of expiry",
 			"add_hint": "Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional.",
+			"auto_schedule": "before expiration on :expires",
+			"auto_schedule_alert_message": ":users training :training from :date is about to expire on :expires. Plan ahead for a follow-up training.",
 			"delete": "Delete training",
 			"delete_confirm_cancel" : "No, thank you!",
 			"delete_confirm_header" : "Permanently delete training and possible attached file?",

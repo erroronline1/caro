@@ -215,8 +215,9 @@ class API {
 	 * posts system messages according to $this->_messages
 	 * this avoids multiple messages e.g. to supervisors of a certain unit, that are also ceo, prrc or qmo
 	 * recipient ids will be used uniquely for each message content
+	 * public if imported as object (e.g. notification)
 	 */
-	private function alertUserGroupSubmit(){
+	public function alertUserGroupSubmit(){
 		if (!$this->_messages) return;
 		$sqlchunks = [];
 		foreach($this->_messages as $message => $recipients) {
