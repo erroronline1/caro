@@ -972,7 +972,7 @@ export class Composer {
 
 		const draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
 			originParent = draggedElement.parentNode;
-		//console.log('dragged', draggedElement, 'dropped on', droppedUpon, 'target', evnt.target);
+		//_client.application.debug('dragged', draggedElement, 'dropped on', droppedUpon, 'target', evnt.target);
 		if (!draggedElement || this.stopParentDropEvent || draggedElement.id === droppedUpon.id) return;
 
 		// dragging single widget

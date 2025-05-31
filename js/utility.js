@@ -253,6 +253,15 @@ export const _client = {
 		},
 
 		/**
+		 * output for debugging purpose if not forbidden
+		 */
+		debug: (...$vars)=>{
+			if (api._settings.config.application && api._settings.config.application.debugging)
+				console.trace(...$vars);
+			else console.log("there may have been an error, however debug mode has been turned off.");
+		},
+
+		/**
 		 * converts an object to formdata
 		 * @requires _
 		 * @param {object} dialogData

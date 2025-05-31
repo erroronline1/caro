@@ -798,7 +798,7 @@ class CALENDAR extends API {
 					$dayinfo = [];
 					if (isset($day['subject']) && $day['subject']) $dayinfo[] = $day['subject'];
 					foreach($this->_lang->_DEFAULT['calendar']['timesheet']['export']['sheet_daily'] as $key => $value){
-						//var_dump($key, $value, $day);
+						//UTILITY::debug($key, $value, $day);
 						if (isset($day[$key]) && $day[$key] && !in_array($day[$key], [0, '00:00'])) $dayinfo[] = $value . ' ' . $day[$key];
 					}
 					if (isset($day['note']) && $day['note']) $dayinfo[] = $day['note'];

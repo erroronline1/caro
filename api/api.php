@@ -28,10 +28,13 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 require_once('_config.php');
 define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
+require_once('_utility.php'); // general utilities
 require_once('_sqlinterface.php');
 require_once('_language.php');
-require_once('_utility.php'); // general unities
 
+if (!CONFIG['application']['debugging']) {
+	ini_set('display_errors', 0); error_reporting(0);
+}
 
 class API {
 	/**
@@ -298,7 +301,8 @@ class API {
 				'config' => [
 					'application' => [
 						'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
-						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode']
+						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode'],
+						'debugging' => CONFIG['application']['debugging'],
 					],
 					'lifespan' => [
 						'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
@@ -494,8 +498,9 @@ class API {
 	 */
 	public function noContentAvailable($type){
 		return [[
-			['type' => 'nocontent',
-			'content' => $this->_lang->GET('general.no_content_available', [':content' => $type])]
+			[
+				'type' => 'nocontent',
+				'content' => $this->_lang->GET('general.no_content_available', [':content' => $type])]
 		]];
 	}
 

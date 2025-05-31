@@ -78,8 +78,7 @@ class SQLQUERY {
 			if (!$statement->execute($parameters['values'])) return false;
 		}
 		catch (Exception $e) {
-			// remove in production
-			var_dump($e, $statement->queryString, $statement->debugDumpParams());
+			UTILITY::debug($e, $statement->queryString, $statement->debugDumpParams());
 			die();
 		}
 		if (str_starts_with($query, 'SELECT')) {

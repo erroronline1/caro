@@ -236,7 +236,7 @@ export class Masonry {
 									children.splice(index, 0, injectedNode);
 								})
 								.catch((error) => {
-									//console.log(error);
+									//_client.application.debug(error);
 								});
 						}
 						// update current child for being a possible injected element
@@ -1103,7 +1103,7 @@ export class Assemble {
 					},
 				};
 				content = content.concat(this.textsection());
-				console.trace(e);
+				_client.application.debug(e);
 			}
 		}
 		return content;
@@ -1412,7 +1412,7 @@ export class Assemble {
 						node[key] = new Function(attribute);
 					} catch (e) {
 						new Toast(e, "error", 10000);
-						console.trace(attribute, e);
+						_client.application.debug(attribute, e);
 					}
 				}
 			} else {

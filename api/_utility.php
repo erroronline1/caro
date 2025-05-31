@@ -206,6 +206,19 @@ class UTILITY {
 	}
 
 	/**
+	 *     _     _           
+	 *   _| |___| |_ _ _ ___ 
+	 *  | . | -_| . | | | . |
+	 *  |___|___|___|___|_  |
+	 *                  |___|
+	 * displays error reports by var_dumping id debug mode is on per config
+	 */
+	public static function debug(...$vars){
+		if (CONFIG['application']['debugging'])	var_dump(...$vars);
+		else echo "there may have been an error, however debug mode has been turned off." . PHP_EOL;
+	}
+
+	/**
 	 *     _     _     _
 	 *   _| |___| |___| |_ ___
 	 *  | . | -_| | -_|  _| -_|

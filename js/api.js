@@ -131,7 +131,7 @@ export const api = {
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
-			//console.log(payload, sanitizedpayload, b.size);
+			//_client.application.debug(payload, sanitizedpayload, b.size);
 			payload.append("_user_post_validation", await _.sha256(api._settings.user.fingerprint + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, ["post", "put"].includes(method.toLowerCase()))
@@ -173,7 +173,7 @@ export const api = {
 				// translate errorcode with languagefile translations
 				// no altering library
 				const date = new Date();
-				console.trace(request, date.toUTCString(), error);
+				_client.application.debug(request, date.toUTCString(), error);
 				const errorcode = error.message.match(/\d+/g);
 				if (api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
 
@@ -471,7 +471,7 @@ export const api = {
 									}
 								}
 							} catch (error) {
-								console.trace(error, api._unauthorizedRequest);
+								_client.application.debug(error, api._unauthorizedRequest);
 							}
 						};
 						payload = request.pop();
