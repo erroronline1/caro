@@ -36,6 +36,9 @@
         * [Bestellung](#bestellung)
     * [Werkzeuge](#werkzeuge)
     * [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen)
+* [In der Anwendung verteilte Integrationen](#in-der-anwendung-verteilte-integrationen)
+    * [Schulungen](#schulungen)
+    * [CSV Prozessor](#csv-prozessor)
 * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
 * [Voraussetzungen](#voraussetzungen)
     * [Installation](#installation)
@@ -45,7 +48,6 @@
     * [Anpassung](#anpassung)
     * [Erwägungen zur Nutzerakzeptanz](#erwägungen-zur-nutzerakzeptanz)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
-* [CSV Prozessor](#csv-prozessor)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
     * [Risikoanalyse](#risikoanalyse)
     * [Erklärung zur Barrierefreiheit](#erklärung-zur-barrierefreiheit)
@@ -948,6 +950,285 @@ Ferner hoffentlich hilfreiche Informationen zu
 
 [Übersicht](#übersicht)
 
+# In der Anwendung verteilte Integrationen
+
+## Schulungen
+Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulunngen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
+
+Schulungen können geplant werden, wenn kein konkretes Datum eingetragen wurde und später in die tatsächlich stattgefundene Schulung umgewandelt und durch Angaben eines Ablaufdatums, Erfahrungspunkten und einer Datei, z.B. des Zertifikats ergänzt werden.
+
+Es wird automatisch an die Bewertung von Schulungen erinnert. Ablaufende Schulungen werden durch das System selbstständig für eine Folgeschulung geplant.
+
+Schulungen sind keine dauerhaften Aufzeichnungen und können von berechtigten Nutzern gelöscht werden. Es ist zu beachten, dass fehlende Daten keinen Nachweis aus der Anwendung heraus erbringen können. Es kann jedoch passieren, dass eingestellte Zertifizierungen für ausgelaufene Produkte unerfüllbar geplante Folgeschulungen erzeugen. Da die Bearbeitung abgeschlossener Schulungen nicht möglich ist, wäre die Löschung und Neuanlage der Schulung ohne Ablaufdatum eine mögliche Lösung.
+
+Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
+
+[Übersicht](#übersicht)
+
+## CSV Prozessor
+Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) und [regulärer Ausdrücke](https://regex101.com/).
+
+Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änderungen werden zugunsten einer Leistungsoptimierung erst in der gefilterten Liste durchgeführt. Vergleichslisten können genauso gefiltert und geändert werden. Aufgrund einer rekursiven Implementierung kann die ursprüngliche Liste auch als Filterkriterium genutzt werden.
+
+Beschreibung der Optionen:
+
+	"postProcessing": optionale Zeichenkette als Hinweis, was mit der Ergebnisdatei passieren soll
+	"filesetting":
+		"source": Datei zur Verarbeitung, "SELF" oder ein assoziatives Array (hier spielen die anderen Einstellungen keine Rolle)
+		"headerrowindex": Offset für die Titelzeile
+		"dialect": Einstellungen gemäß php fgetcsv
+		"columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
+		"encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
+
+	"filter": Liste von Objekten
+		"apply": "filter_by_expression"
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"match":
+			"all": Alle Ausdrücke müssen gefunden werden, Objekt mit Spaltenname als Schlüssel und Muster als Wert,
+			"any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nur "all" oder "any" genutzt werden
+
+		"apply": "filter_by_monthdiff"
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"date": Filtert nach identifier und Unterschied zweier Daten in Monaten
+			"identifier": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer,
+			"column": Spaltenname mit einem zu vergleichenden Datum,
+			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
+			"threshold": Ganzzahl für Monate,
+			"bias": < kleiner als, > größer als threshold
+
+		"apply": "filter_by_duplicates",
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"duplicates": Behalte Anzahl an Duplikaten eines Spaltenwerts, sortiert nach den Werten anderer verketteter Spalten (auf- oder absteigend)
+			"orderby": Liste von Spaltennamen deren Werte als Vergleich verkettet werden sollen
+			"descending": Boolescher Wert,
+			"column": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer, von denen X gleiche Zeilen erlaubt sein sollen
+			"amount": Ganzzahl > 0
+
+		"apply": "filter_by_comparison_file",
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen, nicht gesetzt oder null um nur Werte von Treffern zu übertragen
+		"compare": Behalte oder lösche z.B. bestimmte Werte gemäß Vergleichsdatei, basierend auf dem selben Identifikator
+			"filesetting": die gleiche Struktur wie allgmein. Wenn source = "SELF" wird die Ursprungsdatei verarbeitet
+			"filter": die gleiche Struktur wie allgemein
+			"modify": die gleiche Struktur wie allgemein
+			"match":
+				"all": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, alle Vergleiche müssen zutreffen
+				"any": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, mindestens ein Vergleich muss zutreffen
+		"transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der passenden (all) oder ersten gefundenen (any) Zeile der Vergleichsdatei hinzu
+
+		"apply": "filter_by_monthinterval",
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"interval": Behalte oder lösche Zeilen bei denen ein Monats-Interval nicht zutrifft, mit optionaler Verschiebung vom ursprünglichen Spaltenwert
+			"column": Spaltenname mit einem zu vergleichenden Datum,
+			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
+			"interval": Ganzzahl für Monate,
+			"offset": optionale Verschiebung in Monaten (Ganzzahl)
+
+		"apply": "filter_by_rand",
+		"comment": Beschreibung, wird angezeigt
+		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
+		"data": Wähle eine Anzahl zufälliger Zeilen aus, deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
+			"columns": Objekt mit Spalten-Muster-Paaren für die Eingrenzung,
+			"amount": Ganzzahl > 0
+
+	"modify": Ändert das Ergebnis
+		"add": Fügt eine Spalte mit dem angegebenen Wert hinzu. Existiert der Spaltenname bereits wird die Spalte überschrieben!
+			   Ist der Wert eine Liste mit Zahlen und mathematischen Operatoren wird versucht dies als Formel zu berechnen
+			   Kommas werden in diesem Fall mit einem Dezimalpunkt ersetzt.
+		"replace": Ersetzt Ergebnisse regulärer Ausdrücke mit dem angegebenen Wert entweder in einer angebenen Spalte oder an allen
+				   abhängig davon ob das erste Listenelement ein Spaltenname oder null ist
+				   Falls mehr als eine Ersetzung angegeben wird werden neue Zeilen mit geänderten Zellwerten zum Ergebnis ergänzt
+				   Ersetzungen an einer bestimmten Position müssen die zweite Treffergruppe sein (full match, group 1 (^ if necessary), group 2, ...rest)
+		"remove": Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung erforderlich waren
+		"rewrite": Fügt neue Spalten hinzu welche aus Verkettungen der Originalwerte der angegebenen Spalten und anderen Zeichen bestehen
+				   Die Originalspalten werden entfernt.
+		"translate": Werte die gemäß eines speziellen Übersetzungsobjekts ersetzt werden
+		"conditional_and": ändert den Wert einer Spalte wenn alle Ausdrücke zutreffen, fügt ggf. eine leere Spalte ein
+		"conditional_or": ändert den Wert einer Spalte wenn einer der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
+
+	"split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
+
+	"evaluate": Object mit Spalten-Ausdruck-Paaren, die eine Warnung erzeugen (z.B. Verifizierung eines eMail-Formats)
+
+	"translations" : können z.B. numerische Werte mit lesbaren Informationen ersetzen.
+					 Auf die Schlüssel dieses Objekts können die o.g. modifier verweisen.
+					 Die Schlüssel werden als Ausdruck verarbeitet um eine vielseitige Verwendung zu ermöglichen.
+
+Ein beliebiges Beispiel:
+
+```javascript
+{
+    "postProcessing": "some message, e.g. do not forget to check and archive",
+    "filesetting": {
+        "source": "Export.+?\\.csv",
+        "headerrowindex": 0,
+        "columns": [
+            "ORIGININDEX",
+            "SOMEDATE",
+            "CUSTOMERID",
+            "NAME",
+            "DEATH",
+            "AID",
+            "PRICE",
+            "DELIVERED",
+            "DEPARTMENT",
+            "SOMEFILTERCOLUMN"
+        ]
+    },
+    "filter": [
+        {
+            "apply": "filter_by_expression",
+            "comment": "keep if all general patterns match",
+            "keep": true,
+            "match": {
+                "all": {
+                    "DELIVERED": "delivered",
+                    "NAME": ".+?"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if any general exclusions match",
+            "keep": false,
+            "match": {
+                "any": {
+                    "DEATH": ".+?",
+                    "NAME": "company|special someone",
+                    "AID": "repair|cancelling|special.*?names"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if value is below 400 unless pattern matches",
+            "keep": false,
+            "match": {
+                "all": {
+                    "PRICE": "^[2-9]\\d\\D|^[1-3]\\d{2,2}\\D",
+                    "AID": "^(?!(?!.*(not|those)).*(but|these|surely)).*"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_monthdiff",
+            "comment": "discard by date diff in months, do not contact if last event within x months",
+            "keep": false,
+            "date": {
+                "column": "SOMEDATE",
+                "format": ["dd", "mm", "yyyy"],
+                "threshold": 6,
+                "bias": "<"
+            }
+        },
+        {
+            "apply": "filter_by_duplicates",
+            "comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
+            "keep": true,
+            "duplicates": {
+                "orderby": ["ORIGININDEX"],
+                "descending": false,
+                "column": "CUSTOMERID",
+                "amount": 1
+            }
+        },
+        {
+            "apply": "filter_by_comparison_file",
+            "comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
+            "keep": false,
+            "filesetting": {
+                "source": "excemptions.*?.csv",
+                "headerrowindex": 0,
+                "columns": [
+                    "VORGANG"
+                ]
+            },
+            "filter": [],
+            "match": {
+                "all":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                },
+                "any":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                }
+            },
+            "transfer":{
+                "NEWPARENTCOLUMN": "COMPARECOLUMN"
+            }
+        },
+        {
+            "apply": "filter_by_monthinterval",
+            "comment": "discard by not matching interval in months, optional offset from initial column value",
+            "keep": false,
+            "interval": {
+                "column": "SOMEDATE",
+                "format": ["dd", "mm", "yyyy"],
+                "interval": 6,
+                "offset": 0
+            }
+        },
+        {
+            "apply": "filter_by_rand",
+            "comment": "keep some random rows",
+            "keep": true,
+            "data": {
+                "columns": {
+                    "SOMEFILTERCOLUMN", "hasvalue"
+                },
+                "amount": 10
+            }
+        }
+    ],
+    "modify":{
+        "add":{
+            "NEWCOLUMNNAME": "string",
+            "ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
+        },
+        "replace":[
+            ["NAME", "regex", "replacement"],
+            [null, ";", ","]
+        ],
+        "remove": ["SOMEFILTERCOLUMN", "DEATH"],
+        "rewrite":[
+            {"Customer": ["CUSTOMERID", " separator ", "NAME"]}
+        ],
+        "translate":{
+            "DEPARTMENT": "departments"
+        },
+        "conditional_and":[
+            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+        ],
+        "conditional_or":[
+            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+        ]
+
+    },
+    "split":{
+        "DEPARTMENT": "(.*)",
+        "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
+    },
+    "evaluate": {
+        "EMAIL": "^((?!@).)*$"
+    }
+	"translations":{
+		"departments":{
+			"1": "Central",
+			"2": "Department 1",
+			"3": "Department 2",
+			"4": "Office"
+		}
+	}
+}
+```
+
+RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es ist jedoch zu beachten, dass dies nur für a-z gilt. Wenn nach `verlängerung` gesucht wird, muss das Muster `verl(?:ä|Ä)ngerung` lauten. Die Zeichencodierung löst dies zu `verl(?:Ã¤|Ã„)ngerung` auf und verfehlt daher die Gruppierung `[äÄ]` die zu `[Ã¤Ã„]` aufgelöst wird.
+
+[Übersicht](#übersicht)
+
 # Vorgesehene regulatorische Zielsetzungen
 Abgesehen von der Anwendungsarchitektur muss das Qualitätsmanagementsystem selbst aufgestellt werden. Die meisten regulatorischen Anforderungen werden durch Dokumente erfüllt. Auf diese Weise wird eine zuverlässige Versionskontrolle und Freigabe, sowie eine Prüfung der Erfüllung der Anforderungen innerhalb des [Regulatorische Auswertungen und Zusammenfassungen-Moduls](#regulatorische-auswertungen-und-zusammenfassungen) sichergestellt.
 
@@ -981,7 +1262,7 @@ Anwendungsunterstützung Legende:
 | ISO 13485 5.6.2 Eingaben für die Bewertung | ja | &bull; Alle erforderlichen Themen werden angezeigt und können / sollten kommentiert werden | [Laufzeitvariablen](#laufzeitvariablen) |
 | ISO 13485 5.6.3 Ergebnisse der Bewertung | ja | &bull; Alle erforderlichen Themen werden angezeigt und können / sollten kommentiert werden | [Laufzeitvariablen](#laufzeitvariablen) |
 | ISO 13485 6.1 Bereitstellung von Ressourcen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
-| ISO 13485 6.2 Personelle Ressourcen | ja, strukturell | &bull; Der Liste der gewünschten Fähigkeiten sollen die für das Unternehmen angemessenen Punkte [hinzugefügt](#anpassung) werden um eine zielführende Übersicht über die Erfüllung zu ermöglichen.<br/>&bull; innerhalb der Nutzerverwaltung können Schulungen geplant, deren Ablaufdaten, Erfahrungspunkte und anhängende Dokumente hinzugefügt werden.<br/>&bull; Nutzern können Fähigkeiten und deren Niveau gemäß der bestimmten für das Unternehmen [erforderlichen Fähigkeiten](#anpassung) (Aufgabenmatrix) zugeordnet werden.<br/>&bull; Eine Übersicht über die Schulungen und Fähigkeiten ist einsehbar.<br/>&bull; Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Eine Übersicht kann exportiert werden.<br/>&bull; Schulungen können durch berechtigte Nutzer durch ein eigenes Dokument bewertet werden. Fällige Bewertungen werden in den Kalender eingetragen.<br/>&bull ablaufende Schulungen werden automatisch als Folgeschulungen geplant, Nutzer und Bereichsleiter zusätzlich per Nachricht informiert<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Nutzer](#nutzer), [Anpassung](#anpassung), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
+| ISO 13485 6.2 Personelle Ressourcen | ja, strukturell | &bull; Der Liste der gewünschten Fähigkeiten sollen die für das Unternehmen angemessenen Punkte [hinzugefügt](#anpassung) werden um eine zielführende Übersicht über die Erfüllung zu ermöglichen.<br/>&bull; innerhalb der Nutzerverwaltung können Schulungen geplant, deren Ablaufdaten, Erfahrungspunkte und anhängende Dokumente hinzugefügt werden.<br/>&bull; Nutzern können Fähigkeiten und deren Niveau gemäß der bestimmten für das Unternehmen [erforderlichen Fähigkeiten](#anpassung) (Aufgabenmatrix) zugeordnet werden.<br/>&bull; Eine Übersicht über die Schulungen und Fähigkeiten ist einsehbar.<br/>&bull; Fähigkeiten und Schulungen können von berechtigen Nutzern gelöscht werden. Eine Übersicht kann exportiert werden.<br/>&bull; Schulungen können durch berechtigte Nutzer durch ein eigenes Dokument bewertet werden. Fällige Bewertungen werden in den Kalender eingetragen.<br/>&bull ablaufende Schulungen werden automatisch als Folgeschulungen geplant, Nutzer und Bereichsleiter zusätzlich per Nachricht informiert<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Nutzer](#nutzer), [Anpassung](#anpassung), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen), [Schulungen](#schulungen) |
 | ISO 13485 6.3 Infrastruktur | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Überwachung von Arbeitsmitteln"-Kontext* | |
 | ISO 13485 6.4.1 Arbeitsumgebung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 6.4.2 Lenkung der Kontamination | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
@@ -1587,270 +1868,6 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
     }
 }
 ```
-
-[Übersicht](#übersicht)
-
-# CSV Prozessor
-Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) und [regulärer Ausdrücke](https://regex101.com/).
-
-Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änderungen werden zugunsten einer Leistungsoptimierung erst in der gefilterten Liste durchgeführt. Vergleichslisten können genauso gefiltert und geändert werden. Aufgrund einer rekursiven Implementierung kann die ursprüngliche Liste auch als Filterkriterium genutzt werden.
-
-Beschreibung der Optionen:
-
-	"postProcessing": optionale Zeichenkette als Hinweis, was mit der Ergebnisdatei passieren soll
-	"filesetting":
-		"source": Datei zur Verarbeitung, "SELF" oder ein assoziatives Array (hier spielen die anderen Einstellungen keine Rolle)
-		"headerrowindex": Offset für die Titelzeile
-		"dialect": Einstellungen gemäß php fgetcsv
-		"columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
-		"encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
-
-	"filter": Liste von Objekten
-		"apply": "filter_by_expression"
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"match":
-			"all": Alle Ausdrücke müssen gefunden werden, Objekt mit Spaltenname als Schlüssel und Muster als Wert,
-			"any": Wenigstens ein Ausdruck muss gefunden werden. Es kann nur "all" oder "any" genutzt werden
-
-		"apply": "filter_by_monthdiff"
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"date": Filtert nach identifier und Unterschied zweier Daten in Monaten
-			"identifier": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer,
-			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
-			"threshold": Ganzzahl für Monate,
-			"bias": < kleiner als, > größer als threshold
-
-		"apply": "filter_by_duplicates",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"duplicates": Behalte Anzahl an Duplikaten eines Spaltenwerts, sortiert nach den Werten anderer verketteter Spalten (auf- oder absteigend)
-			"orderby": Liste von Spaltennamen deren Werte als Vergleich verkettet werden sollen
-			"descending": Boolescher Wert,
-			"column": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer, von denen X gleiche Zeilen erlaubt sein sollen
-			"amount": Ganzzahl > 0
-
-		"apply": "filter_by_comparison_file",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen, nicht gesetzt oder null um nur Werte von Treffern zu übertragen
-		"compare": Behalte oder lösche z.B. bestimmte Werte gemäß Vergleichsdatei, basierend auf dem selben Identifikator
-			"filesetting": die gleiche Struktur wie allgmein. Wenn source = "SELF" wird die Ursprungsdatei verarbeitet
-			"filter": die gleiche Struktur wie allgemein
-			"modify": die gleiche Struktur wie allgemein
-			"match":
-				"all": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, alle Vergleiche müssen zutreffen
-				"any": Object mit ein oder mehreren "ORIGINCOLUMN": "COMPAREFILECOLUMN" - Paaren, mindestens ein Vergleich muss zutreffen
-		"transfer": Füge zur Ursprungsdatei eine Spalte mit Werten der passenden (all) oder ersten gefundenen (any) Zeile der Vergleichsdatei hinzu
-
-		"apply": "filter_by_monthinterval",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"interval": Behalte oder lösche Zeilen bei denen ein Monats-Interval nicht zutrifft, mit optionaler Verschiebung vom ursprünglichen Spaltenwert
-			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
-			"interval": Ganzzahl für Monate,
-			"offset": optionale Verschiebung in Monaten (Ganzzahl)
-
-		"apply": "filter_by_rand",
-		"comment": Beschreibung, wird angezeigt
-		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
-		"data": Wähle eine Anzahl zufälliger Zeilen aus, deren Spaltenwerte mit dem Suchmuster übereinstimmen (bei mehreren müssen alle zutreffen)
-			"columns": Objekt mit Spalten-Muster-Paaren für die Eingrenzung,
-			"amount": Ganzzahl > 0
-
-	"modify": Ändert das Ergebnis
-		"add": Fügt eine Spalte mit dem angegebenen Wert hinzu. Existiert der Spaltenname bereits wird die Spalte überschrieben!
-			   Ist der Wert eine Liste mit Zahlen und mathematischen Operatoren wird versucht dies als Formel zu berechnen
-			   Kommas werden in diesem Fall mit einem Dezimalpunkt ersetzt.
-		"replace": Ersetzt Ergebnisse regulärer Ausdrücke mit dem angegebenen Wert entweder in einer angebenen Spalte oder an allen
-				   abhängig davon ob das erste Listenelement ein Spaltenname oder null ist
-				   Falls mehr als eine Ersetzung angegeben wird werden neue Zeilen mit geänderten Zellwerten zum Ergebnis ergänzt
-				   Ersetzungen an einer bestimmten Position müssen die zweite Treffergruppe sein (full match, group 1 (^ if necessary), group 2, ...rest)
-		"remove": Entfernt Spalten aus dem Ergebnis, die möglicherweise nur für die Filterung erforderlich waren
-		"rewrite": Fügt neue Spalten hinzu welche aus Verkettungen der Originalwerte der angegebenen Spalten und anderen Zeichen bestehen
-				   Die Originalspalten werden entfernt.
-		"translate": Werte die gemäß eines speziellen Übersetzungsobjekts ersetzt werden
-		"conditional_and": ändert den Wert einer Spalte wenn alle Ausdrücke zutreffen, fügt ggf. eine leere Spalte ein
-		"conditional_or": ändert den Wert einer Spalte wenn einer der Ausdrücke zutrifft, fügt ggf. eine leere Spalte ein
-
-	"split": Teilt das Ergebnis gemäß eines Ausdrucks in mehrere Gruppen auf, die in mehrere CSV-Dateien oder auf mehrere Tabellenblätter (XLSX) verteilt werden können
-
-	"evaluate": Object mit Spalten-Ausdruck-Paaren, die eine Warnung erzeugen (z.B. Verifizierung eines eMail-Formats)
-
-	"translations" : können z.B. numerische Werte mit lesbaren Informationen ersetzen.
-					 Auf die Schlüssel dieses Objekts können die o.g. modifier verweisen.
-					 Die Schlüssel werden als Ausdruck verarbeitet um eine vielseitige Verwendung zu ermöglichen.
-
-Ein beliebiges Beispiel:
-
-```javascript
-{
-    "postProcessing": "some message, e.g. do not forget to check and archive",
-    "filesetting": {
-        "source": "Export.+?\\.csv",
-        "headerrowindex": 0,
-        "columns": [
-            "ORIGININDEX",
-            "SOMEDATE",
-            "CUSTOMERID",
-            "NAME",
-            "DEATH",
-            "AID",
-            "PRICE",
-            "DELIVERED",
-            "DEPARTMENT",
-            "SOMEFILTERCOLUMN"
-        ]
-    },
-    "filter": [
-        {
-            "apply": "filter_by_expression",
-            "comment": "keep if all general patterns match",
-            "keep": true,
-            "match": {
-                "all": {
-                    "DELIVERED": "delivered",
-                    "NAME": ".+?"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_expression",
-            "comment": "discard if any general exclusions match",
-            "keep": false,
-            "match": {
-                "any": {
-                    "DEATH": ".+?",
-                    "NAME": "company|special someone",
-                    "AID": "repair|cancelling|special.*?names"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_expression",
-            "comment": "discard if value is below 400 unless pattern matches",
-            "keep": false,
-            "match": {
-                "all": {
-                    "PRICE": "^[2-9]\\d\\D|^[1-3]\\d{2,2}\\D",
-                    "AID": "^(?!(?!.*(not|those)).*(but|these|surely)).*"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_monthdiff",
-            "comment": "discard by date diff in months, do not contact if last event within x months",
-            "keep": false,
-            "date": {
-                "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
-                "threshold": 6,
-                "bias": "<"
-            }
-        },
-        {
-            "apply": "filter_by_duplicates",
-            "comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
-            "keep": true,
-            "duplicates": {
-                "orderby": ["ORIGININDEX"],
-                "descending": false,
-                "column": "CUSTOMERID",
-                "amount": 1
-            }
-        },
-        {
-            "apply": "filter_by_comparison_file",
-            "comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
-            "keep": false,
-            "filesetting": {
-                "source": "excemptions.*?.csv",
-                "headerrowindex": 0,
-                "columns": [
-                    "VORGANG"
-                ]
-            },
-            "filter": [],
-            "match": {
-                "all":{
-                    "ORIGININDEX": "COMPAREFILEINDEX"
-                },
-                "any":{
-                    "ORIGININDEX": "COMPAREFILEINDEX"
-                }
-            },
-            "transfer":{
-                "NEWPARENTCOLUMN": "COMPARECOLUMN"
-            }
-        },
-        {
-            "apply": "filter_by_monthinterval",
-            "comment": "discard by not matching interval in months, optional offset from initial column value",
-            "keep": false,
-            "interval": {
-                "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
-                "interval": 6,
-                "offset": 0
-            }
-        },
-        {
-            "apply": "filter_by_rand",
-            "comment": "keep some random rows",
-            "keep": true,
-            "data": {
-                "columns": {
-                    "SOMEFILTERCOLUMN", "hasvalue"
-                },
-                "amount": 10
-            }
-        }
-    ],
-    "modify":{
-        "add":{
-            "NEWCOLUMNNAME": "string",
-            "ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
-        },
-        "replace":[
-            ["NAME", "regex", "replacement"],
-            [null, ";", ","]
-        ],
-        "remove": ["SOMEFILTERCOLUMN", "DEATH"],
-        "rewrite":[
-            {"Customer": ["CUSTOMERID", " separator ", "NAME"]}
-        ],
-        "translate":{
-            "DEPARTMENT": "departments"
-        },
-        "conditional_and":[
-            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
-        ],
-        "conditional_or":[
-            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
-        ]
-
-    },
-    "split":{
-        "DEPARTMENT": "(.*)",
-        "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
-    },
-    "evaluate": {
-        "EMAIL": "^((?!@).)*$"
-    }
-	"translations":{
-		"departments":{
-			"1": "Central",
-			"2": "Department 1",
-			"3": "Department 2",
-			"4": "Office"
-		}
-	}
-}
-```
-
-RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es ist jedoch zu beachten, dass dies nur für a-z gilt. Wenn nach `verlängerung` gesucht wird, muss das Muster `verl(?:ä|Ä)ngerung` lauten. Die Zeichencodierung löst dies zu `verl(?:Ã¤|Ã„)ngerung` auf und verfehlt daher die Gruppierung `[äÄ]` die zu `[Ã¤Ã„]` aufgelöst wird.
 
 [Übersicht](#übersicht)
 

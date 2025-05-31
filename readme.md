@@ -19,7 +19,7 @@ graph LR;
 ```
 Things are still in motion. Images my be outdated.
 
-## nice to have but still lacking ideas how to reasonably implement
+## nice to have but still lacking reasonable ideas how to implement
 * recall option
 * post-market surveillance
 * post-market evaluation
@@ -66,6 +66,9 @@ Things are still in motion. Images my be outdated.
         * [Order](#order)
     * [Tools](#tools)
     * [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)
+* [Cross application integrations](#cross-application-integrations)
+    * [User trainings](#user-trainings)
+    * [CSV processor](#csv-processor)
 * [Intended regulatory goals](#intended-regulatory-goals)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -75,7 +78,6 @@ Things are still in motion. Images my be outdated.
     * [Customisation](#customisation)
     * [User acceptance considerations](#user-acceptance-considerations)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
-* [CSV processor](#csv-processor)
 * [Regulatory software requirements](#regulatory-software-requirements)
     * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
     * [Data protection](#data-protection)
@@ -548,7 +550,7 @@ On display of any record appear recommendations to complete records according to
 Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.
 Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
 
-Case documentations allow a setting of the current case state (like reimbursement granted, production tasked, etc.). Records within the overview can be filtered according to case states. Users changing the state habe the option to inform other users, units or respective supervisors via message. There is also an option to message an inquiry to anybody with a direct link embedded for quick access.
+Case documentations allow a setting of the current case state (like reimbursement granted, production tasked, etc.). Records within the overview can be filtered according to case states. Users changing the state have the option to inform other users, units or respective supervisors via message. There is also an option to message an inquiry to anybody with a direct link embedded for quick access.
 
 If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.
 Records can be assigned a new identifier, e.g. on typing errors or accidentally duplicate creation. In the latter case if the new identifier is already in use all records will be merged with the existing one. This action as well as assigning a new identifier will be recorded as well.
@@ -1038,6 +1040,285 @@ Furthermore hopefully beneficial information on
 
 [Content](#content)
 
+# Cross application integrations
+
+## User trainings
+User trainings can be added in the [user manager](#users) but also from the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries). In terms of ISO 13485 8.5.1 General Improvement and ISO 13485 8.5.2 Corrective measures trainings can also be added in case of a treatment record marked as complaint.
+
+Trainings can be planned without providing a final date and later converted into the actual occured training providing additional information about expiration, experience points and a file, e.g. a certificate.
+
+Trainings will be reminded of to evaluate. Expiring trainings will be planned by the system for re-training.
+
+Trainings are not persistent and can be deleted by authorized users, thus not having a record character. Remember a lack of data does not provide any proof from within the application. However discontinued certifications for phased out products could trigger unfulfillable scheduled trainings. Since editing completed trainings is not possible a possible solution would be to delete and re-add the training without expiration date.
+
+Trainings are matched by their name.
+
+[Content](#content)
+
+## CSV processor
+The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
+
+Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
+
+Description of options:
+
+	"postProcessing": Optional string as hint what to do with the result file
+	"filesetting":
+		"source": File to process, SELF or a named array (the other filesettings don't matter then)
+		"headerrowindex": Offset for title row
+		"dialect": Settings according to php fgetcsv
+		"columns": list/array of column names to process and export to destination
+		"encoding": Comma separated string of possible character encoding of sourcefile
+
+	"filter": List/array of objects/dicts
+		"apply": "filter_by_expression"
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"match":
+			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
+			"any": At least one expression has to be matched, it's either "all" or "any"
+
+		"apply": "filter_by_monthdiff"
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"date": Filter by identifier and date diff in months
+			"identifier": Column name with recurring values, e.g. customer id
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
+			"threshold": Integer for months,
+			"bias": < less than, > greater than threshold
+
+		"apply": "filter_by_duplicates",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
+			"orderby": List/array of column names whose values concatenate for comparison
+			"descending": Boolean,
+			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
+			"amount": Integer > 0
+
+		"apply": "filter_by_comparison_file",
+		"comment": description, will be displayed
+		"keep": boolean if matches are kept or omitted, not set or null to only transfer matching 
+		"compare": keep or discard explicit excemptions as stated in excemption file, based on same identifier
+			"filesetting": same structure as base. if source == "SELF" the origin file will be processed
+			"filter": same structure as base
+			"modify": same structure as base
+			"match":
+				"all": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if all match
+				"any": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if at least one matches
+		"transfer": add a new column with comparison value of all kept matching rows or first match of any
+
+		"apply": "filter_by_monthinterval",
+		"comment": Description, will be displayed
+		"keep": Boolean if matches are kept or omitted
+		"interval": Discard by not matching interval in months, optional offset from initial column value
+			"column": Column name with date to process,
+			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
+			"interval": Integer for months,
+			"offset": Optional offset in months
+
+		"apply": "filter_by_rand",
+		"comment": Description, will be displayed
+		"keep": boolean if matches are kept or omitted
+		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
+			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
+			"amount": Integer > 0
+
+	"modify": Modifies the result
+		"add": Adds a column with the set value. if the name is already in use this will be replaced!
+			   If property is an array with number values and arithmetic operators it will try to calculate
+			   Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
+		"replace": Replaces regex matches with the given value either at a specified field or in all
+				   according to index 0 being a column name or none/null
+				   If more than one replacement are provided new lines with altered column values will be added to the result
+				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if necessary), group 2, ...rest)
+		"remove": Remove columns from result, may have been used solely for filtering
+		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
+				   Original columns will be omitted, nested within a list to make sure to order as given
+		"translate": Column values to be translated according to specified translation object
+		"conditional_and": changes a columns value if all regex matches on other columns, adds column by default with empty value
+		"conditional_or": changes a columns value if any regex matches on other columns, adds column by default with empty value
+
+	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
+
+	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
+
+	"translations" : Can replace e.g. numerical values with legible translations.
+					 This is an object/dict whose keys can be refered to from the modifier. 
+					 The dict keys are processed as regex for a possible broader use.
+
+A generic sample:
+
+```javascript
+{
+    "postProcessing": "some message, e.g. do not forget to check and archive",
+    "filesetting": {
+        "source": "Export.+?\\.csv",
+        "headerrowindex": 0,
+        "columns": [
+            "ORIGININDEX",
+            "SOMEDATE",
+            "CUSTOMERID",
+            "NAME",
+            "DEATH",
+            "AID",
+            "PRICE",
+            "DELIVERED",
+            "DEPARTMENT",
+            "SOMEFILTERCOLUMN"
+        ]
+    },
+    "filter": [
+        {
+            "apply": "filter_by_expression",
+            "comment": "keep if all general patterns match",
+            "keep": true,
+            "match": {
+                "all": {
+                    "DELIVERED": "delivered",
+                    "NAME": ".+?"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if any general exclusions match",
+            "keep": false,
+            "match": {
+                "any": {
+                    "DEATH": ".+?",
+                    "NAME": "company|special someone",
+                    "AID": "repair|cancelling|special.*?names"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_expression",
+            "comment": "discard if value is below 400 unless pattern matches",
+            "keep": false,
+            "match": {
+                "all": {
+                    "PRICE": "^[2-9]\\d\\D|^[1-3]\\d{2,2}\\D",
+                    "AID": "^(?!(?!.*(not|those)).*(but|these|surely)).*"
+                }
+            }
+        },
+        {
+            "apply": "filter_by_monthdiff",
+            "comment": "discard by date diff in months, do not contact if last event within x months",
+            "keep": false,
+            "date": {
+                "column": "SOMEDATE",
+                "format": ["dd", "mm", "yyyy"],
+                "threshold": 6,
+                "bias": "<"
+            }
+        },
+        {
+            "apply": "filter_by_duplicates",
+            "comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
+            "keep": true,
+            "duplicates": {
+                "orderby": ["ORIGININDEX"],
+                "descending": false,
+                "column": "CUSTOMERID",
+                "amount": 1
+            }
+        },
+        {
+            "apply": "filter_by_comparison_file",
+            "comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
+            "keep": false,
+            "filesetting": {
+                "source": "excemptions.*?.csv",
+                "headerrowindex": 0,
+                "columns": [
+                    "VORGANG"
+                ]
+            },
+            "filter": [],
+            "match": {
+                "all":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                },
+                "any":{
+                    "ORIGININDEX": "COMPAREFILEINDEX"
+                }
+            },
+            "transfer":{
+                "NEWPARENTCOLUMN": "COMPARECOLUMN"
+            }
+        },
+        {
+            "apply": "filter_by_monthinterval",
+            "comment": "discard by not matching interval in months, optional offset from initial column value",
+            "keep": false,
+            "interval": {
+                "column": "SOMEDATE",
+                "format": ["dd", "mm", "yyyy"],
+                "interval": 6,
+                "offset": 0
+            }
+        },
+        {
+            "apply": "filter_by_rand",
+            "comment": "keep some random rows",
+            "keep": true,
+            "data": {
+                "columns": {
+                    "SOMEFILTERCOLUMN", "hasvalue"
+                },
+                "amount": 10
+            }
+        }
+    ],
+    "modify":{
+        "add":{
+            "NEWCOLUMNNAME": "string",
+            "ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
+        },
+        "replace":[
+            ["NAME", "regex", "replacement"],
+            [null, ";", ","]
+        ],
+        "remove": ["SOMEFILTERCOLUMN", "DEATH"],
+        "rewrite":[
+            {"Customer": ["CUSTOMERID", " separator ", "NAME"]}
+        ],
+        "translate":{
+            "DEPARTMENT": "departments"
+        },
+        "conditional_and":[
+            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+        ],
+        "conditional_or":[
+            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
+        ]
+
+    },
+    "split":{
+        "DEPARTMENT": "(.*)",
+        "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
+    },
+    "evaluate": {
+        "EMAIL": "^((?!@).)*$"
+    }
+	"translations":{
+		"departments":{
+			"1": "Central",
+			"2": "Department 1",
+			"3": "Department 2",
+			"4": "Office"
+		}
+	}
+}
+```
+
+RegEx-patterns are processed case insensitive, however note this only applies to a-z not taking specialchars into account. If you trying to match `verlängerung` your pattern needs to look for `verl(?:ä|Ä)ngerung`. Character encoding resolves this to `verl(?:Ã¤|Ã„)ngerung`, thus failing if just using `[äÄ]` grouping being resolved to `[Ã¤Ã„]`.
+
+[Content](#content)
+
 # Intended regulatory goals
 Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by documents. This way you ensure a proper version control and approval as well as a fulfillment check within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
@@ -1071,7 +1352,7 @@ Application support legend:
 | ISO 13485 5.6.2 Rating input | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 5.6.3 Rating results | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 6.1 Provision of resources | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be scheduled or added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br/>&bull Expiring trainings will be scheduled for follow-up trainings, users and supervisors get an additional message<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be scheduled or added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br/>&bull Expiring trainings will be scheduled for follow-up trainings, users and supervisors get an additional message<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries), [User trainings](#user-trainings) |
 | ISO 13485 6.3 Infrastructure | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context*<br/>&bull; *record with documents with the "Equipment surveillance"-context* | |
 | ISO 13485 6.4.1 Working environment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 6.4.2 Contamination control | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
@@ -1676,270 +1957,6 @@ If not provided a simple import filter will be generated on export of pricelists
     }
 }
 ```
-
-[Content](#content)
-
-# CSV processor
-The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
-
-Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
-
-Description of options:
-
-	"postProcessing": Optional string as hint what to do with the result file
-	"filesetting":
-		"source": File to process, SELF or a named array (the other filesettings don't matter then)
-		"headerrowindex": Offset for title row
-		"dialect": Settings according to php fgetcsv
-		"columns": list/array of column names to process and export to destination
-		"encoding": Comma separated string of possible character encoding of sourcefile
-
-	"filter": List/array of objects/dicts
-		"apply": "filter_by_expression"
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"match":
-			"all": All expressions have to be matched, object/dict with column-name-key, and pattern as value
-			"any": At least one expression has to be matched, it's either "all" or "any"
-
-		"apply": "filter_by_monthdiff"
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"date": Filter by identifier and date diff in months
-			"identifier": Column name with recurring values, e.g. customer id
-			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
-			"threshold": Integer for months,
-			"bias": < less than, > greater than threshold
-
-		"apply": "filter_by_duplicates",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"duplicates": Keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)
-			"orderby": List/array of column names whose values concatenate for comparison
-			"descending": Boolean,
-			"column": Column name with recurring values, e.g. customer id of which duplicates are allowed
-			"amount": Integer > 0
-
-		"apply": "filter_by_comparison_file",
-		"comment": description, will be displayed
-		"keep": boolean if matches are kept or omitted, not set or null to only transfer matching 
-		"compare": keep or discard explicit excemptions as stated in excemption file, based on same identifier
-			"filesetting": same structure as base. if source == "SELF" the origin file will be processed
-			"filter": same structure as base
-			"modify": same structure as base
-			"match":
-				"all": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if all match
-				"any": dict with one or multiple "ORIGINCOLUMN": "COMPAREFILECOLUMN", kept if at least one matches
-		"transfer": add a new column with comparison value of all kept matching rows or first match of any
-
-		"apply": "filter_by_monthinterval",
-		"comment": Description, will be displayed
-		"keep": Boolean if matches are kept or omitted
-		"interval": Discard by not matching interval in months, optional offset from initial column value
-			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
-			"interval": Integer for months,
-			"offset": Optional offset in months
-
-		"apply": "filter_by_rand",
-		"comment": Description, will be displayed
-		"keep": boolean if matches are kept or omitted
-		"data": Select amount of random rows that match given content of asserted column (if multiple, all must be found)
-			"columns": Object/dict of COLUMN-REGEX-pairs to select from,
-			"amount": Integer > 0
-
-	"modify": Modifies the result
-		"add": Adds a column with the set value. if the name is already in use this will be replaced!
-			   If property is an array with number values and arithmetic operators it will try to calculate
-			   Comma will be replaced with a decimal point in the latter case. hope for a proper number format.
-		"replace": Replaces regex matches with the given value either at a specified field or in all
-				   according to index 0 being a column name or none/null
-				   If more than one replacement are provided new lines with altered column values will be added to the result
-				   Replacements on a peculiar position have to be match[2] (full match, group 1 (^ if necessary), group 2, ...rest)
-		"remove": Remove columns from result, may have been used solely for filtering
-		"rewrite": Adds newly named columns consisting of concatenated origin column values and separators.
-				   Original columns will be omitted, nested within a list to make sure to order as given
-		"translate": Column values to be translated according to specified translation object
-		"conditional_and": changes a columns value if all regex matches on other columns, adds column by default with empty value
-		"conditional_or": changes a columns value if any regex matches on other columns, adds column by default with empty value
-
-	"split": Split output by matched patterns of column values into multiple files (csv) or sheets (xlsx)
-
-	"evaluate": Object/dict with colum-name keys and patterns as values that just create a warning, e.g. email verification
-
-	"translations" : Can replace e.g. numerical values with legible translations.
-					 This is an object/dict whose keys can be refered to from the modifier. 
-					 The dict keys are processed as regex for a possible broader use.
-
-A generic sample:
-
-```javascript
-{
-    "postProcessing": "some message, e.g. do not forget to check and archive",
-    "filesetting": {
-        "source": "Export.+?\\.csv",
-        "headerrowindex": 0,
-        "columns": [
-            "ORIGININDEX",
-            "SOMEDATE",
-            "CUSTOMERID",
-            "NAME",
-            "DEATH",
-            "AID",
-            "PRICE",
-            "DELIVERED",
-            "DEPARTMENT",
-            "SOMEFILTERCOLUMN"
-        ]
-    },
-    "filter": [
-        {
-            "apply": "filter_by_expression",
-            "comment": "keep if all general patterns match",
-            "keep": true,
-            "match": {
-                "all": {
-                    "DELIVERED": "delivered",
-                    "NAME": ".+?"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_expression",
-            "comment": "discard if any general exclusions match",
-            "keep": false,
-            "match": {
-                "any": {
-                    "DEATH": ".+?",
-                    "NAME": "company|special someone",
-                    "AID": "repair|cancelling|special.*?names"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_expression",
-            "comment": "discard if value is below 400 unless pattern matches",
-            "keep": false,
-            "match": {
-                "all": {
-                    "PRICE": "^[2-9]\\d\\D|^[1-3]\\d{2,2}\\D",
-                    "AID": "^(?!(?!.*(not|those)).*(but|these|surely)).*"
-                }
-            }
-        },
-        {
-            "apply": "filter_by_monthdiff",
-            "comment": "discard by date diff in months, do not contact if last event within x months",
-            "keep": false,
-            "date": {
-                "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
-                "threshold": 6,
-                "bias": "<"
-            }
-        },
-        {
-            "apply": "filter_by_duplicates",
-            "comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
-            "keep": true,
-            "duplicates": {
-                "orderby": ["ORIGININDEX"],
-                "descending": false,
-                "column": "CUSTOMERID",
-                "amount": 1
-            }
-        },
-        {
-            "apply": "filter_by_comparison_file",
-            "comment": "discard or keep explicit excemptions as stated in excemption file, based on same identifier. source with absolute path or in the same working directory",
-            "keep": false,
-            "filesetting": {
-                "source": "excemptions.*?.csv",
-                "headerrowindex": 0,
-                "columns": [
-                    "VORGANG"
-                ]
-            },
-            "filter": [],
-            "match": {
-                "all":{
-                    "ORIGININDEX": "COMPAREFILEINDEX"
-                },
-                "any":{
-                    "ORIGININDEX": "COMPAREFILEINDEX"
-                }
-            },
-            "transfer":{
-                "NEWPARENTCOLUMN": "COMPARECOLUMN"
-            }
-        },
-        {
-            "apply": "filter_by_monthinterval",
-            "comment": "discard by not matching interval in months, optional offset from initial column value",
-            "keep": false,
-            "interval": {
-                "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
-                "interval": 6,
-                "offset": 0
-            }
-        },
-        {
-            "apply": "filter_by_rand",
-            "comment": "keep some random rows",
-            "keep": true,
-            "data": {
-                "columns": {
-                    "SOMEFILTERCOLUMN", "hasvalue"
-                },
-                "amount": 10
-            }
-        }
-    ],
-    "modify":{
-        "add":{
-            "NEWCOLUMNNAME": "string",
-            "ANOTHERCOLUMNNAME" : ["PRICE", "*1.5"]
-        },
-        "replace":[
-            ["NAME", "regex", "replacement"],
-            [null, ";", ","]
-        ],
-        "remove": ["SOMEFILTERCOLUMN", "DEATH"],
-        "rewrite":[
-            {"Customer": ["CUSTOMERID", " separator ", "NAME"]}
-        ],
-        "translate":{
-            "DEPARTMENT": "departments"
-        },
-        "conditional_and":[
-            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
-        ],
-        "conditional_or":[
-            ["NEWCOLUMNNAME", "anotherstring", ["SOMECOLUMN", "regex"], ["SOMEOTHERCOLUMN", "regex"]]
-        ]
-
-    },
-    "split":{
-        "DEPARTMENT": "(.*)",
-        "DELIVERED": "(?:\\d\\d\\.\\d\\d.)(\\d+)"
-    },
-    "evaluate": {
-        "EMAIL": "^((?!@).)*$"
-    }
-	"translations":{
-		"departments":{
-			"1": "Central",
-			"2": "Department 1",
-			"3": "Department 2",
-			"4": "Office"
-		}
-	}
-}
-```
-
-RegEx-patterns are processed case insensitive, however note this only applies to a-z not taking specialchars into account. If you trying to match `verlängerung` your pattern needs to look for `verl(?:ä|Ä)ngerung`. Character encoding resolves this to `verl(?:Ã¤|Ã„)ngerung`, thus failing if just using `[äÄ]` grouping being resolved to `[Ã¤Ã„]`.
 
 [Content](#content)
 
@@ -3263,7 +3280,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Approval saved.<br/>This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
+{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
 ```
 
 > POST ./api/api.php/document/bundle
