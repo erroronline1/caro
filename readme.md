@@ -1,7 +1,9 @@
 ![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
 # CARO - Cloud Assisted Records and Operations
 
-# CURRENT PRE-RELEASE STATE
+# ...work in progress
+
+## CURRENT PRE-RELEASE STATE
 see also [Usability test plan](#usability-test-plan) and [Usability test](#usability-tests)
 ```mermaid
 graph LR;
@@ -15,10 +17,12 @@ graph LR;
     beta-.->union{{Union approval}};
     union-.->release{{Full release}}
 ```
-## discussion
-* recall option (how?)
-* post-market surveillance (how?)
-* post-market evaluation (how?)
+Things are still in motion. Images my be outdated.
+
+## nice to have but still lacking ideas how to reasonably implement
+* recall option
+* post-market surveillance
+* post-market evaluation
 
 ## to do
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
@@ -147,6 +151,7 @@ This software aims to support you with your ISO 13485 quality management system 
 Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App for custom-made aids in small- and medium-sized companies. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
 ## Key aspects
+* Transparency: instant access to data
 * Document management: full version control, reusable components, with access to former versions
 * Easy form creation: simplified form assembly and seamless integration into the application
 * Risk management: with alignment check of risks and medical device characteristics
@@ -1066,7 +1071,7 @@ Application support legend:
 | ISO 13485 5.6.2 Rating input | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 5.6.3 Rating results | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 6.1 Provision of resources | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be scheduled or added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br />&bull Expiring trainings will be scheduled for follow-up trainings, users and supervisors get an additional message<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 6.2 Human resources | yes, structural | &bull; Add desired skills and certifications to the [skill list](#customisation) to have a meaningful overview of saturation.<br/>&bull; Within user management trainings, expiry dates, experience points and documents can be scheduled or added.<br/>&bull; Users can be assigned skills and applicable levels according to the intended [skill list](#customisation).<br/>&bull; An overview of trainings and skill settings can be viewed.<br/>&bull; Skills and trainings can be deleted by authorized users though. A list can be exported in advance if desired.<br/>&bull; Trainings can be evaluated by defined users with a dedicated document. Due evaluations will be added to schedules.<br/>&bull Expiring trainings will be scheduled for follow-up trainings, users and supervisors get an additional message<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Users](#users), [Customization](#customisation), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 6.3 Infrastructure | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context*<br/>&bull; *record with documents with the "Equipment surveillance"-context* | |
 | ISO 13485 6.4.1 Working environment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 6.4.2 Contamination control | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
@@ -1101,20 +1106,20 @@ Application support legend:
 | ISO 13485 7.6 Surveillance and measuring equipment control | structural | &bull; Dedicated documents make use of an identifier, like production documents. Measuring equipment may each have assigned their distinct identifier.<br/>&bull; Adding a document component to address scheduling helps with future events that will show up and alert user groups where reasonable.<br/>&bull; *record with documents with the "Equipment Surveillance"-context* | [Documents](#documents), [Records](#records), [Calendar](#calendar) |
 | ISO 13485 8.1 General assessment, analysis and improvement processes | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.2.1 Feedback | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 8.2.2 Complaint handling | partial | &bull; Records may require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed.<br/>&bull; Closing records containing a complaint requires action from all defined roles.<br />&bull; Complaints have the option to schedule trainings by default. | [Records](#records), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 8.2.2 Complaint handling | partial | &bull; Records may require a statement if it happens in context with a complaint. Affected records are marked within the overview and the timestamp of submission of respective items is complemented with a statement. An overview can be displayed.<br/>&bull; Closing records containing a complaint requires action from all defined roles.<br/>&bull; Complaints have the option to schedule trainings by default. | [Records](#records), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.2.3 Regulatory authorities coverage | structural | &bull; Add a link to the [IMDRF Adverse Event Terminology Web Browsers](https://www.imdrf.org/working-groups/adverse-event-terminology) within incident documents to access the terminology codes for report documents to the authorities<br/>&bull; *record with documents with the "Incident"-context*| |
-| ISO 13485 8.2.4 Internal audit | partial | Internal audits can be prepared, planned and executed.<br />Application data can be gathered and exported, e.g.<br/>&bull; records of product incorporation. If currently ordered products miss an incorporation there will be a note.<br/>&bull; records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.<br/>&bull; a list of current documents in use (documents and their components).<br/>&bull; user skills and trainings (with expiries highlighted).<br/>&bull; vendor lists with last article update, last MDR sample check and details for certificates (if provided).<br/>&bull; order statistics.<br/>&bull; complaints.<br/>&bull; fulfilment of regulatory issues considered by documents.<br/>&bull; risk analyses. | [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 8.2.4 Internal audit | partial | Internal audits can be prepared, planned and executed.<br/>Application data can be gathered and exported, e.g.<br/>&bull; records of product incorporation. If currently ordered products miss an incorporation there will be a note.<br/>&bull; records of MDR §14 sample checks. If currently vendors are overdue for a check there will be a note.<br/>&bull; a list of current documents in use (documents and their components).<br/>&bull; user skills and trainings (with expiries highlighted).<br/>&bull; vendor lists with last article update, last MDR sample check and details for certificates (if provided).<br/>&bull; order statistics.<br/>&bull; complaints.<br/>&bull; fulfilment of regulatory issues considered by documents.<br/>&bull; risk analyses. | [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.2.5 Process surveillance and assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.2.6 Product surveillance and assessment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Records](#records) |
 | ISO 13485 8.3.1 General non-compliant products control | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.2 Measures on identified non-compliant products in advance of delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.3 Measures on identified non-compliant products after delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.4 Rework | yes, structural | &bull; Records require a statement if it happens in context with a rework. Documents do not differ though, so recording measures follows the same processes than a general treatment process. | [Records](#records) |
-| ISO 13485 8.4 Data analysis | partial | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.<br />&bull; Vendor evaluations and internal audits are available | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 8.4 Data analysis | partial | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.<br/>&bull; Vendor evaluations and internal audits are available | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 14971 4.5 Risk management file | partial | &bull; The application has a risk management module to consider, evaluate, control and evaluate residual risks.<br />&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default.<br />&bull; Risks are not deletable but applicability can be revoked.<br />&bull; Edits can be done by authorized users only, but read by all users.<br />&bull; Characteristics of medical devices and risks can be exported with any available version. | [Risk management](#risk-management), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 14971 4.5 Risk management file | partial | &bull; The application has a risk management module to consider, evaluate, control and evaluate residual risks.<br/>&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default.<br/>&bull; Risks are not deletable but applicability can be revoked.<br/>&bull; Edits can be done by authorized users only, but read by all users.<br/>&bull; Characteristics of medical devices and risks can be exported with any available version. | [Risk management](#risk-management), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 14971 5 Risk analysis | yes | &bull; Templates of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default. | [Risk management](#risk-management), [languagefile](#customisation), [templates](#application-setup) |
 | ISO 14971 6 Risk evaluation | yes | &bull; Requirements are satisfied structural and with the provided templates. | [Risk management](#risk-management), [templates](#application-setup) |
 | ISO 14971 7 Risk control | yes | &bull; Requirements are satisfied structural and with the provided templates. | [Risk management](#risk-management), [templates](#application-setup) |
@@ -1125,7 +1130,7 @@ Application support legend:
 | ISO 19011 5.5.7 Managing and maintaining audit programme records | yes | &bull; Audits contain all data from the programme and remain read-only once finished. | [Audit](#audit), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 19011 5.7 Reviewing and improving audit programme | partial | &bull; On adding or editing audit programmes previous summaries can be imported to be taken into consideration during planning. | [Audit](#audit) |
 | ISO 19011 6.4 Conducting audit activites | partial | &bull; Editing and finalizing is possible anytime as long as the audit is not marked as finished. | [Audit](#audit) |
-| ISO 19011 6.5 Preparing and distributing audit report | partial | &bull; The audit report is a fixed input and supposed to be filled out at the end and in advance to finishing the audit.<br />&bull; Distributing the report is done via messenger on finishing the audit toward all users with the `regulatory`-permission and all members of the audited unit. | [Audit](#audit), [Runtime variables](#runtime-variables), [Conversations](#conversations) |
+| ISO 19011 6.5 Preparing and distributing audit report | partial | &bull; The audit report is a fixed input and supposed to be filled out at the end and in advance to finishing the audit.<br/>&bull; Distributing the report is done via messenger on finishing the audit toward all users with the `regulatory`-permission and all members of the audited unit. | [Audit](#audit), [Runtime variables](#runtime-variables), [Conversations](#conversations) |
 | ISO 19011 6.6 Completing audit | partial | &bull; Editing and finalizing is possible anytime as long as the audit is not marked as finished. | [Audit](#audit) |
 | MPDG §83 Medical device consultants| yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register. | [Users](#users) |
 | SGB 5 §33 Additional Costs | structural | &bull; *describe within documents with the "Case documentation"-context* | |
@@ -1137,7 +1142,7 @@ Application support legend:
 | MDR annex 13 Procedure for custom-made devices | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR annex 14 Clinical evaluation and post-market clinical follow-up| structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MPBetreibV | structural | &bull; *record within documents with the "Equipment surveillance"-context* | |
-| ArbSchG §3 / BAG Az. 1 ABR 22/21 | yes | &bull; Registered users can contribute their working hours, vacations, sick leaves, etc.<br />&bull; These inputs can be exported for documentation regarding labour laws | [Calendar](#calendar) |
+| ArbSchG §3 / BAG Az. 1 ABR 22/21 | yes | &bull; Registered users can contribute their working hours, vacations, sick leaves, etc.<br/>&bull; These inputs can be exported for documentation regarding labour laws | [Calendar](#calendar) |
 | Directive (EU) 2019/882 European Accessibility Act | yes | &bull; The application has been designed to be accessible according to [WCAG 2.1 Level AA](https://www.w3.org/TR/WCAG21/) | [Accessibility statement](#accessibility-statement) |
 
 [Content](#content)
@@ -1249,8 +1254,9 @@ Using the config.env-file you can also append labels, forbidden names, hide_offd
 ```
 ; general application settings
 [application]
+debugging = no ; yes, no; enables or disables error messages
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
-issue_mail = "dev@erroronline.one" ; address for application and security issues
+issue_mail = "issues@companymail.tld" ; address for application and security issues
 order_auth = "token, sigNature" ; available options: token, signature; pin is default, because it represents authorization
 order_gtin_barcode = no ; yes, no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
 require_record_type_selection = yes ; yes, no; require selection on records e.g. if this is related to a complaint 
@@ -1945,7 +1951,7 @@ This software is not a medical device. But as this software is intended to being
 ## Clinical evaluation, clinical evaluation plan, clinical evaluation report
 according to [OpenRegulatory clinical evaluation requirements](https://github.com/openregulatory/templates/tree/master/templates/clinical_evaluation)
 
-Not applicable without clinical use on patients
+Not applicable without clinical use on patients.
 
 [Content](#content)
 
@@ -1976,7 +1982,7 @@ Evidences of conformity according to the documents described above:
 * SOP Certification and Product Registration: **not applicable**
 * SOP Change Management: [Deployment process](#deployment-process)
 * SOP Integrated Software Development: **not applicable**
-* Software Development and Maintenance Plan
+* Software Development and Maintenance Plan: **not applicable**
 * Software Requirements List: [Intended regulatory goals](#intended-regulatory-goals), [Extras](#extras)
 * Stakeholder Requirements: [Stakeholder requirements](#stakeholder-requirements)
 * System Test Report: [Stress test and performance](#stress-test-and-performance)
@@ -1992,7 +1998,8 @@ Evidences of conformity according to the documents described above:
 | ----- | ------- | ---------------- | --------------- |
 | Development | Regular meetings to match requirements | Gain required functionality | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible |
 | Development | Arrange meetings with specific users, particularly less tech savvy, supervisors, ceo and qmo | Gain required functionality, assess frontend usability | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
-| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; audit | Assess frontend usability | Adapt structure, styling and assemble-framework |
+| Development | Early access alpha testing | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
+| Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; zip<br/>&bull; regulatory evaluations and summaries | Assess frontend usability | Adapt structure, styling and assemble-framework |
 | Full deployment | Enable all modules, register personal accounts | Assess frontend usability | Adapt structure, styling and assemble-framework |
 
 [Content](#content)
@@ -2123,7 +2130,7 @@ Stakeholder identification:
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; stock article flag, printable list of unprocessed stock articles<br />&bull; import erp article ids |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids |
 
 [Content](#content)
 
@@ -2135,7 +2142,7 @@ Stakeholder identification:
 | Developer unavailable | Low | High (currently single developer) | Tech stack with vanilla JS and PHP can be handled by any web agency | Getting used to foreign structure is hard, but still |
 | IDE unavailable | Low | Low | Programming can be done with any text editor | none |
 | Version control unavailable | Low | High (recording changes is crucial) | Git is an established version control running locally | It is *really* unlikely Git will vanish in the near future |
-| Lacking user input | High | High (user requirements not satisfied, lack of compliance) | Regular meetings to match [requirements](#discussed-stakeholder-requirements) | I do the best I can |
+| Lacking user input | High | High (user requirements not satisfied, lack of compliance) | Regular meetings to match [requirements](#discussed-stakeholder-requirements), request feedback | I do the best I can |
 | Insufficient testing | High (currently single developer) | High (application unstable) | Reduce errors by implementing globally reusable methods and a simplified framework, modularize endpoints | none | 
 | Database issues on future updates | High | High (data loss, application not usable) | Establish a reliable update routine that can be tested before going into production, create database backups | At best compensating skipped updates |
 
@@ -2233,6 +2240,8 @@ Dialog-, Toast- and Assemble-classes parse accordingly prepared responses to the
 
 _client-object handles module specific recurring tasks of form preparations (./js/utility.js)
 
+Special note: use _client.application.debug(...) to write to console. This method handles the main configuration for enabled debugging.
+
 ## Backend design
 There is a UTILITY class handling
 * parsing of requests
@@ -2241,6 +2250,8 @@ There is a UTILITY class handling
 
 Using these methods for fitting usecases is mandatory. (./api/_utility.php)
 Directory handling creates a .htaccess- / web.config-file preventing direct access to files; these are available through the file/stream-endpoint only. Linking files requires ./api/api.php/file/stream/ as a prefix to otherwise native processed paths.
+
+Special note: use UTILITY::debug(...) to var_dump errors. This method handles the main configuration for enabled debugging.
 
 There is a PERMISSION class handling
 * permissions as set within config.ini
@@ -2315,7 +2326,7 @@ Variables for _stresstest.php can be adjusted within the top class variables in 
 [Content](#content)
 
 # API documentation
-All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions, returning 401 Unauthorized if not logged in.
+All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions, returning 511 Network Authentication Required or 401 Unauthorized if not logged in.
 Response properties are
 * *render* (for assemble or toast)
 * *title* (dynamic page title updates)
@@ -3252,7 +3263,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Approval saved.<br />This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
+{"response":{"msg":"Approval saved.<br/>This element can now be used.","type":"success","reload":"approval"},"data":{"form_approval":4}}
 ```
 
 > POST ./api/api.php/document/bundle
@@ -4708,7 +4719,9 @@ I welcome any constructive input on this topic.
 [Content](#content)
 
 ## Web Application
-[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03161/TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
+[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03161/TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications.
+
+This application can be considered using a monolithic architecture. Yet a separation of frontend and backend may technically be possible.
 
 ### 3.1.1 Objective (1): Intended use
 * O.Purp_1 The developer MUST disclose the lawful purposes of the web application and the processing of personal data (e.g. in the terms and condition of use) and inform the user of this at least when the application is first used.
@@ -4735,13 +4748,13 @@ I welcome any constructive input on this topic.
 ### 3.1.2 Objective (2): Architecture
 * O.Arch_1 Security MUST be an integral part of the software development and life cycle for the entire web application and backend system.
     > User login and permissions have been mandatory from the early stages on.
-* O.Arch_2 Already in the design phase of the web application and the background system, it MUST be taken into account that the application will process sensitive data in the production phase. The architecture of the application MUSST ensures the secure collection, processing, storage and deletion of the sensitive data in a data life cycle.
+* O.Arch_2 Already in the design phase of the web application and the background system, it MUST be taken into account that the application will process sensitive data in the production phase. The architecture of the application MUST ensure the secure collection, processing, storage and deletion of the sensitive data in a data life cycle.
     > User login and permissions have been mandatory from the early stages on.
 * O.Arch_3 The life cycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057].
     > [Encryption statement](#encryption-statement)
 * O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art. This includes the persistence of sensitive data by the browser, for example in its cache.
     > [Encryption statement](#encryption-statement)
-* O.Arch_5 If the web application uses third-party software, the developer MUST ensure that only such third-party software is used whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The developer MUST also ensure5 that unused functions cannot be activated by third parties
+* O.Arch_5 If the web application uses third-party software, the developer MUST ensure that only such third-party software is used whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The developer MUST also ensure that unused functions cannot be activated by third parties
     > [List of third party software](#ressources)
 * O.Arch_6 The architecture of the web application SHOULD follow a minimalist approach and be realized with a server-side localized processing logic, i.e. no complex active content (Java applets, ActiveX plugin, etc.) SHOULD be used.
     > Used languages and are solely limited to HTML, CSS, JavaScript and PHP. Contents are delivered by the backend only.
@@ -4760,19 +4773,19 @@ I welcome any constructive input on this topic.
 * O.Source_2 The application MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
     > Outputs on the front end are parsed as text nodes or unexecuted input values.
 * O.Source_3 Error messages and log files MUST NOT contain sensitive data (e.g. user identifiers or session IDs).
-    > This is not the case.
+    > Default error messages do not contain this data.
 * O.Source_4 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
-    > This is not the case.
+    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
 * O.Source_5 In the event of exceptions during program execution, the web application SHOULD cancel access to sensitive data and securely delete it from memory.
-    > Sensitive data is passed to callbacks only and is not available after occuring exceptions.
+    > Sensitive data is passed to callbacks only and is not available after occuring exceptions, the programming languages garbage collector clears the memory by default.
 * O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
-    > Debugging is removed.
+    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
 * O.Source_7 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the application.
-    > This is not reasonable for the application used within a closed environment.
+    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway.
 * O.Source_8 Tools for static code analysis SHOULD be used for the development of the application.
     > [Code design patterns](#code-design-patterns)
 * O.Source_9 If the web application uses URL redirects, this MUST be done in a controlled manner.
-    > Redirects are not used
+    > Redirects are not used.
 * O.Source_10 The web application MUST provide mechanisms to prevent functionalities that are not within the manufacturer's development sovereignty from being injected into the web application and executed.
     > Inputs are sanitized and masked by default.
 * O.Source_11 Sensitive data MUST NOT be included in the URL. The web application MUST process such data in HTTP request headers or POST parameters.
@@ -4788,7 +4801,7 @@ I welcome any constructive input on this topic.
 * O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
     > [List of third party software](#ressources)
 * O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the web application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the web application MUST NOT be offered for use.
-    > [List of third party software](#ressources)
+    > The operator of the infrastructure is responsible for fulfilling os, browser and driver requirements.
 * O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
     > [List of third party software](#ressources)
 * O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
@@ -4822,7 +4835,7 @@ I welcome any constructive input on this topic.
 * O.Auth_2 The application SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
     > Every request matches the session and user permissions.
 * O.Auth_3 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
-    > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials.
+    > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device. 
 * O.Auth_4 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
     > This is not applicable.
 * O.Auth_5 Additional information (e.g. the end device used, the IP address or the time of access) SHOULD be included in the evaluation of an authentication process.
@@ -4860,7 +4873,7 @@ I welcome any constructive input on this topic.
 * O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
     > Login tokens are always generated by the system on request of an authorized administrative user.
 * O.Pass_3 The user MUST have the option to change their password.
-    > Login tokens can be renewed by authorized administrative users.
+    > Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
 * O.Pass_4 The changing and resetting of passwords MUST be logged.
     > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
 * O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
@@ -4870,7 +4883,7 @@ I welcome any constructive input on this topic.
 
 ### 3.1.7 Objective (7): Data security
 * O.Data_1 The factory setting of the web application MUST provide maximum security.
-    > The application has no prefilled sensitive data on installation. New users have to be assigned roles actively.
+    > The application has no prefilled sensitive data on installation. New users have to be assigned roles actively. There is no data on opening the application without bein logged in.
 * O.Data_2 If the user exports sensitive data without encryption, the web application MUST inform the user that the user is responsible for the data security of this exported data.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. On any export there is a additional reminder by default.
 * O.Data_3 The web application MUST NOT make resources that allow access to sensitive data available to third parties.
@@ -4888,7 +4901,7 @@ I welcome any constructive input on this topic.
 * O.Data_9 When entering sensitive data via the keyboard, the application SHOULD prevent recordings from becoming recognizable to third parties.
     > The operator of the infrastructure is responsible to prevent malware on terminal devices.
 * O.Data_10 When entering sensitive data, the export to the clipboard SHOULD be prevented. Alternatively, the application MAY implement its own clipboard, which is protected from access by other applications.
-    > Content is not selectable by default. Clipboard activites are implemented on insensitive data only.
+    > Dedicated clipboard activites are implemented on insensitive data only.
 * O.Data_11 Sensitive data such as biometric data or private keys MUST NOT be exported from the component on which they were generated.
     > Data exports happen in other modules than inputs. Data is always sanitized and processed before exports.
 * O.Data_12 The web application cannot prevent third parties from accessing and saving the screen (e.g. screenshots and views for app switching). The user MUST be informed via the terms of use that sensitive data can be compromised via screenshots or views for app switching.
@@ -4896,7 +4909,7 @@ I welcome any constructive input on this topic.
 * O.Data_13 The terms of use of the web application MUST inform the user of the risk associated with the fact that the connection to the background system is still open when the end device is locked if the user has not explicitly logged out.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Data_14 The web application SHOULD ensure that all sensitive data and application-specific login information is no longer accessible in the web browser when it is terminated. This includes cookies and web storage in particular.
-    > The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss. [Network connection handling](#network-connection-handling)
+    > The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss. [Network connection handling](#network-connection-handling). However this is an issue of the operator of the infrastructure.
 * O.Data_15 The web application MUST give the user the option to have all sensitive data and application-specific login information completely deleted or made inaccessible upon final termination.
     > Authorized users can delete users permanently.
 * O.Data_16 The HTTP-only flag MUST be used for all cookies that are not accessed via JavaScript.
@@ -4904,7 +4917,7 @@ I welcome any constructive input on this topic.
 * O.Data_17 The secure flag MUST be set for all cookies that contain sensitive data
     > [Installation](#installation)
 * O.Data_18 The autocomplete function MUST be switched off for all form fields with sensitive input data.
-    > All inputs are rendered without autocomplete by default. Datalists may be provided with former inputs to ensure a consistent documentation. Datalists are provided by the backend and relate only fields namewise. The browser will not store single and collections of inputs.
+    > All inputs are rendered without native autocomplete by default. Datalists may be provided with former inputs to ensure a consistent documentation. Datalists are provided by the backend and relate only fields namewise. The browser is instructed to not store single and collections of inputs.
 * O.Data_19 Data persisted in the browser SHOULD be unreadable for other hosts of a domain (i.e. avoidance of domain cookies).
     > Only a session cookie is created, IndexedDB has same-origin principle by default.
 
@@ -4930,7 +4943,7 @@ I welcome any constructive input on this topic.
 * O.Plat_5 The web application MAY offer the option of displaying messages and notifications the user, including those containing sensitive content. This MUST be deactivated by default.
     > This is not applicable. Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
 * O.Plat_6 The web application MUST restrict the reloading of content to sources that are under the manufacturer's control or have been authorized by the manufacturer.
-    > Lazyloading is not implemented, all contents are delivered by the backend only.
+    > All contents are delivered by the backend only.
 * O.Plat_7 The web application MUST inform the user of the risk that user-specific data may remain in the RAM after the web application is closed.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 * O.Plat_8 The user MUST be informed about security measures, as long as they can be realized by the user.
@@ -4947,7 +4960,9 @@ I welcome any constructive input on this topic.
 [Content](#content)
 
 ## Backend
-[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03161/TR-03161-3.pdf?__blob=publicationFile&v=10) for backends
+[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03161/TR-03161-3.pdf?__blob=publicationFile&v=10) for backends.
+
+This application can be considered using a monolithic architecture. Yet a separation of frontend and backend may technically be possible.
 
 ### 3.1.1 Objective (1): Intended use
 * O.Purp_1 The backend system MUST NOT collect and process data that does not serve the legitimate purpose of the application.
@@ -4959,7 +4974,7 @@ I welcome any constructive input on this topic.
 * O.Purp_4 The backend system MUST allow the user to withdraw consent that has already been given. The user MUST be informed about the possibility of withdrawal and the resulting changes in the behavior of the application before consent is given.
     > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. The backend does not request special user consent.
 * O.Purp_5 The provider MUST maintain a directory that shows which user consents have been given. The user-specific part of the directory MUST be automatically accessible to the user. It SHOULD be possible to request a history of this directory.
-    > All user settings are displayed within the profile. Selectable options are disabled by default.
+    > All user settings are displayed within the profile.
 * O.Purp_6 If the backend system uses third-party software, all functions used SHOULD be necessary for the legitimate purposes of the application. The backend system SHOULD safely disable other functions. If only a single or very few functions of the third-party software are required, it MUST be balanced whether the inclusion of all the third-party software is proportionate to the increase in the attack surface caused by the third-party software used.
     > [List of third party software](#ressources)
 * O.Purp_7 Unless it is necessary for the primary or legitimate purpose of an application, sensitive data MUST NOT be shared with third parties. This includes storing data in parts of the file system to which other applications have access. The application MUST fully inform the user of the consequences of any sharing of application data that serves the primary or legitimate purpose and obtain the user's consent (OPT-IN).
@@ -4978,7 +4993,7 @@ I welcome any constructive input on this topic.
     > [Encryption statement](#encryption-statement), if the operator of the infrastructure is able to encrypt backups, they are responsible.
 * O.Arch_5 Security functions MUST always be implemented on all external interfaces and API endpoints.
     > User matching and permission handling happens with every api request.
-* O.Arch_6 If the backend system uses third-party software, the manufacturer MUST ensure that only such third-party software is used, whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The manufacturer MUST also ensure5 that unused functions cannot be activated by third parties.
+* O.Arch_6 If the backend system uses third-party software, the manufacturer MUST ensure that only such third-party software is used, whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The manufacturer MUST also ensure that unused functions cannot be activated by third parties.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
 * O.Arch_7 The backend system MUST receive any requests made by the application via a fully documented API. It MUST NOT contain any undocumented access options.
     > [Api documentation](#api-documentation)
@@ -5001,21 +5016,21 @@ I welcome any constructive input on this topic.
 * O.Source_2 The backend system MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
     > Outputs on the front end are parsed as text nodes or unexecuted input values.
 * O.Source_3 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
-    > This is not the case.
+    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
 * O.Source_4 In the event of exceptions during program execution, the backend system SHOULD cancel access to sensitive data and instruct the application to securely delete it from memory.
     > Exceptions exit the code execution, the programming languages garbage collector clears the memory by default.
 * O.Source_5 In program environments with manual memory management (i.e. the application itself can specify exactly when and where memory is read and written), the backend system MUST use secure function alternatives (e.g. printf_s instead of printf) for read and write access to memory segments.
     > Storage is handled by the backend exclusively.
 * O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
-    > Debugging is removed. Also see [Stress test and performance](#stress-test-and-performance) note
+    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file. Also see [Stress test and performance](#stress-test-and-performance) note
 * O.Source_7 The backend system MUST ensure that all sensitive data is securely deleted immediately after its processing purpose has been fulfilled.
-    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received as of 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
+    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received ever since 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
 * O.Source_8 The manufacturer MUST establish a deployment process for the deployment, updating and shutdown of the backend system, so in any given time, the sensitive data is protected at any time regarding publication or manipulation.
     > [Deployment process](#deployment-process)
 * O.Source_9 The manufacturer SHOULD use automatic tools to identify program errors and best practice violations in the build process. Any warnings MUST be mitigated by the manufacturer prior to deployment.
-    > [Code design patterns](#code-design-patterns)
+    > [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint vor VSC, PHPIntelephense for VSC
 * O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
-    > This is not reasonable for the application used within a closed environment.
+    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway.
 * O.Source_11 Tools for static code analysis SHOULD be used for the development of the application.
     > [Code design patterns](#code-design-patterns)
 
@@ -5029,7 +5044,7 @@ I welcome any constructive input on this topic.
 * O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
     > [List of third party software](#ressources)
 * O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the application MUST refuse operation.
-    > The operator of the infrastructure is responsible for fulfilling os and driver requirements.
+    > The operator of the infrastructure is responsible for fulfilling os, browser and driver requirements.
 * O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
     > [List of third party software](#ressources)
 * O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
@@ -5061,7 +5076,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 ### 3.1.5.1 Random numbers
 * O.Rand_1 All random values MUST be generated by a strong cryptographic random number generator which has been seeded with sufficient entropy (cf. [TR02102-1]).
-    > Random values for tokens are created by PHPs random_int() and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
+    > Random values for tokens are created by PHPs [random_int()](#https://www.php.net/manual/en/function.random-int.php) and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
 
 [Content](#content)
 
@@ -5073,7 +5088,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * O.Auth_3 The backend system SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
     > Every request matches the session and user permissions.
 * O.Auth_4 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
-    > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials.
+    > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device.
 * O.Auth_5 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
     > This is not applicable.
 * O.Auth_6 Additional information (e.g. the end device used, the WiFi access node used or the time of access) SHOULD be included in the evaluation of an authentication process.
@@ -5117,7 +5132,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
     > Login tokens are always generated by the system on request of an authorized administrative user.
 * O.Pass_3 The user MUST have the option to change their password.
-    > Login tokens can be renewed by authorized administrative users.
+    > Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
 * O.Pass_4 Changing and resetting passwords MUST be logged without logging the password itself.
     > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
 * O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
@@ -5129,10 +5144,10 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * O.Data_1 The application MUST store sensitive data in encrypted form. The backend system SHOULD store sensitive data, encrypted in a way, so that it can only be decrypted by the user itself.
     > [Encryption statement](#encryption-statement)
 * O.Data_2 All sensitive data collected MUST NOT be kept in the backend system beyond the duration of their respective processing.
-    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received as of 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
+    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received ever since 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
 * O.Data_3 The backend system MUST take into account the principles of data minimization and limitation due to the purpose.
     > Only active and intentional user input is processed and stored.
-* O.Data_4 The backend system MUSS remove all metadata with data protection relevance, such the GPS coordinates of the location, used hardware, etc., whenever these data is not needed for the legitimate purpose of the application.
+* O.Data_4 The backend system MUST remove all metadata with data protection relevance, such the GPS coordinates of the location, used hardware, etc., whenever these data is not needed for the legitimate purpose of the application.
     > All photos are processed and resized. Meta data is lost during this process.
 * O.Data_5 Unless necessary for the legitimate purpose of the application, sensitive data like private keys MUST BE exported from the component they were generated from (see Table15).
     > Login tokens are to be exported as a qr-code, for scanning login credentials. There are no other keys to be exported.
@@ -5141,7 +5156,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * O.Data_7 The backend system MUST provide the user with the option to delete or make all sensitive data and application-specific credentials completely non accessible from the backend system, whenever the application is uninstalled by the user. If the user does not use this option, the backend system MUST define a maximum and for the application purpose appropriate duration, in which the data remains stored in the backend system. The Backend system MUST inform the user about the duration, in which the sensitive data remains stored in the backend system. After the maximum length of time, the backend system MUST delete or make all sensitive data and application-specific credentials non accessible. Additionally, the backend system MUST provide the user with an option to delete these information within the defined duration, in which the data may remain stored in the backend system.
     > The operator of the infrastructure is responsible for fulfilling this requirement.
 * O.Data_8 To counteract the misuse of sensitive data after a device loss, the application MAY implement a kill switch, i.e. a deliberate, secure overwriting of user data in the device at application level, triggered by the backend system. The manufacturer MUST protect the triggering of the kill switch by the user via the backend system against misuse by means of strong authentication mechanisms.
-    > This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access.
+    > This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access. However new login credentials can be generated by authorized users at any time.
 
 [Content](#content)
 
