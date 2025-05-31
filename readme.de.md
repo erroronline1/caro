@@ -103,7 +103,7 @@ Bestellungen können von berechtigen Nutzern und Mitgliedern der bestellenden Be
 * CSV-Filterung
     * Die Anwendung ist in der Lage CSV-Dateien auf vielfältige Weise zu [filtern und zu verarbeiten](#csv-prozessor).
 * Zeitzonen und Bundesländer
-    * Die Anwendung kann unterschiedliche Zeitzonen und Bundesländer in bezug auf Feiertage verarbeiten, je nach Standortverteilung.
+    * Die Anwendung kann unterschiedliche Zeitzonen und Bundesländer in Bezug auf Feiertage verarbeiten, je nach Standortverteilung.
 
 
 [Übersicht](#übersicht)
@@ -1307,7 +1307,7 @@ Anwendungsunterstützung Legende:
 | ISO 13485 8.3.3 Maßnahmen als Reaktion auf nach der Auslieferung festgestellte nichtkonforme Produkte | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 8.3.4 Nacharbeit | ja | &bull; Aufzeichnungen erfordern eine Stellungnahme ob sie in Zusammenhang mit einer Nacharbeit erfolgen. Dokumente unterscheiden sich jedoch primär nicht, daher folgt die Dokumentation von Maßnahmen den selben Aufzeichnungsprozessen wie eine übliche Versorgungsdokumentation. | [Aufzeichnungen](#aufzeichnungen-1) |
 | ISO 13485 8.4 Datenanalyse | teilweise | &bull; Eine Lieferantenbewertung wird durch die Bereitstellung von reduzierten Daten der Bestellungen in Bezug auf Lieferzeiten, Stornos und Rücksendungen unterstützt. Es besteht jedoch ein individueller Interpretationsspielraum der bereitgestellten Daten.<br/>&bull; Lieferantenbewertungen und interne Audits sind verfügbar | [Bestellung](#bestellung), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
-| ISO 13485 8.5.1 Verbesserung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
+| ISO 13485 8.5.1 Verbesserung | teilweise, strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Verbesserungsvorschläge](#verbesserungsvorschläge), [Schulungen](#schulungen) |
 | ISO 13485 8.5.2 Korrekturmaßnahmen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 13485 8.5.3 Vorbeugungsmaßnahmen | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | |
 | ISO 14971 4.5 Risikomanagementakte | teilweise | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten, Maßnahmen und Restrisiken zu beschreiben .<br/>&bull; Beispiele von Ereignissen und Umständen gemäß Anhang C und den Empfehlungen der [DGIHV](https://www.dgihv.org) ist für die Nutzung standardmäßig verbereitet. <br/>&bull; Risiken können nicht gelöscht aber die Anwendbarkeit entzogen werden.<br/>&bull; Änderungen können nur von autorisierten Nutzern vorgenommen, aber von allen Nutzern eingesehen werden.<br/>&bull; Eigenschaften von Medizinprodukten und Risiken können in jeder verfügbaren Fassung exportiert werden. | [Risikomanagement](#risikomanagement), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |

@@ -30,6 +30,9 @@ Things are still in motion. Images my be outdated.
 * improve screenreader accessibility
 * responsibilities
     * handle hidden attribute?
+* filereference
+    * safe storage path
+    * records preview
 
 ## Content
 * [Aims](#aims)
@@ -1397,7 +1400,7 @@ Application support legend:
 | ISO 13485 8.3.3 Measures on identified non-compliant products after delivery | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.3.4 Rework | yes, structural | &bull; Records require a statement if it happens in context with a rework. Documents do not differ though, so recording measures follows the same processes than a general treatment process. | [Records](#records) |
 | ISO 13485 8.4 Data analysis | partial | &bull; Vendor evaluation is partially supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns. This doesn't define how the provided data is to be interpreted though.<br/>&bull; Vendor evaluations and internal audits are available | [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
-| ISO 13485 8.5.1 General Improvement | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
+| ISO 13485 8.5.1 General Improvement | partial, structural | &bull; *describe within documents with the "Process or work instruction"-context* | [Improvement suggestions](#improvement-suggestions), [User trainings](#user-trainings) |
 | ISO 13485 8.5.2 Corrective measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 8.5.3 Preventive measures | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 14971 4.5 Risk management file | partial | &bull; The application has a risk management module to consider, evaluate, control and evaluate residual risks.<br/>&bull; Examples of events and circumstances of appedix C and in accordance to [DGIHV](https://www.dgihv.org) proposals are prepared for use by default.<br/>&bull; Risks are not deletable but applicability can be revoked.<br/>&bull; Edits can be done by authorized users only, but read by all users.<br/>&bull; Characteristics of medical devices and risks can be exported with any available version. | [Risk management](#risk-management), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
@@ -1730,7 +1733,7 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 ## Useage notes and caveats
 
 ### General
-This software has been developed with good intend. It is supposed to make managing regulatory requirements a little less exhausting. However the usecase is tailored to the [teams](#the-team) personal experiences working in a medical aid providing facility, hopefully scalable to your basic demands.
+This software has been developed with good intent. It is supposed to make managing regulatory requirements a little less exhausting. However the usecase is tailored to the [teams](#the-team) personal experiences working in a medical aid providing facility, hopefully scalable to your basic demands.
 
 Life, the medical field and regulatory requirements are complicated, agile and unpredictable. Behind each corner another new directive possibly lurkes. So the CARO App tries to be agile as well to quickly match the auditors next idea. This can (possibly due to the teams incapacity) hardly be implemented completely within an easy comprehensible user interface. By personal experience less than 1 percent of staff can comprehend regular expressions and the sheer amount of settings this kind of software requires to handle the intended tasks. Therefore after some fruitless attempts finally the decision has been made to leave these dials as they are. Especially dataprocessing of inhomogenuous tables with the [CSV Processor](#csv-processor) and defining [runtime variables](#runtime-variables) may need a somewhat advanced computer enthusiast to set up.
 
@@ -5201,6 +5204,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
     * creates PDF-files on the server side
     * Justification: this library enables consistent and correct creation of the widely accessible PDF-format for data transfers from the application.
+    * v6.6.5
     * \> 4k stars
     * \> 1k forks
 * [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
@@ -5236,7 +5240,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [Font Awesome 5](https://fontawesome.com/)
     * SVG ui-icon files, not executable
     * Justification: "Der Mensch ist doch ein Augentier, schöne Dinge wünsch ich mir!"
-    * author has professional license
+    * original author has professional license
 
 All libraries are embedded locally to avoid external, probably prohibited web requests and ensure availability of tested and approved functionality, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries are reviewed to adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
 
