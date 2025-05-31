@@ -961,7 +961,6 @@ export class Assemble {
 					type: "submitbutton",
 					attributes: {
 						value: api._lang.GET("general.submit_button"),
-						type: "submit",
 					},
 				},
 			]);
