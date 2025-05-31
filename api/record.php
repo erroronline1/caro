@@ -399,7 +399,6 @@ class RECORD extends API {
 				$export = [
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('assemble.render.export'),
 						'onclick' => "const formdata = new FormData(); "
 							. "formdata.append('_document_id', " . $document['id'] . "); "
@@ -564,7 +563,6 @@ class RECORD extends API {
 					$result['render']['content'][] = [
 						'type' => 'button',
 						'attributes' => [
-							'type' => 'button',
 							'onclick' => "_client.application.postLabelSheet(document.getElementById('_identifier').value, 'appendDate', {_type:'" . $type . "'});",
 							'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 						]
@@ -989,7 +987,6 @@ class RECORD extends API {
 					$body[count($body) -1][] = [
 						'type' => 'button',
 						'attributes' => [
-							'type' => 'button',
 							'onclick' => "_client.application.postLabelSheet('" . $this->_requestedID . "', null, {_type:'" . $type . "'});",
 							'value' => $this->_lang->GET('record.create_identifier_type', [':format' => $setting['format']])
 						]
@@ -1052,7 +1049,6 @@ class RECORD extends API {
 				$body[count($body) - 1][] = [
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('record.inquiry'),
 						'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.inquiry') . "', render: JSON.parse('"
 							. UTILITY::json_encode([
@@ -1234,7 +1230,6 @@ class RECORD extends API {
 						$return['render']['content'][count($return['render']['content']) - 1][] = [
 							'type' => 'button',
 							'attributes' => [
-								'type' => 'button',
 								'value' => $this->_lang->GET('user.training.add_training'),
 								'onclick' => "api.user('get', 'training')"
 							]

@@ -278,7 +278,6 @@ class DOCUMENT extends API {
 								'type' => 'button',
 								'attributes' => [
 									'value' => $this->_lang->GET('assemble.compose.edit_existing'),
-									'type' => 'button',
 									'onclick' => "api.document('get', '" . ($approve['context'] === 'component' ? 'component' : 'document') . "_editor', " . $approve['id'] . ")"
 								]
 							]
@@ -644,7 +643,6 @@ class DOCUMENT extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('menu.records.documents_manage_bundles'),
 						'onclick' => "api.document('get', 'bundle')"
 					]
@@ -2063,7 +2061,6 @@ class DOCUMENT extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('menu.records.documents_manage_components'),
 						'onclick' => "api.document('get', 'component_editor')"
 					]
@@ -2073,7 +2070,6 @@ class DOCUMENT extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('menu.records.documents_manage_documents'),
 						'onclick' => "api.document('get', 'document_editor')"
 					]

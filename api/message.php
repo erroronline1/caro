@@ -93,7 +93,6 @@ class MESSAGE extends API {
 							'type' => 'deletebutton',
 							'attributes' => [
 								'value' => $this->_lang->GET('message.delete'),
-								'type' => 'button',
 								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
 									"'".$this->_lang->GET('message.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
@@ -140,7 +139,6 @@ class MESSAGE extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('message.new'),
-								'type' => 'button',
 								'onclick' => "_client.message.newMessage('". $this->_lang->GET('message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
 							]
 						]

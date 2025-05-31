@@ -903,7 +903,6 @@ export const _client = {
 						type: "button",
 						attributes: {
 							value: api._lang.GET("order.add_information"),
-							type: "button",
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({
@@ -1195,7 +1194,6 @@ export const _client = {
 						type: "deletebutton",
 						hint: element.autodelete ? element.autodelete : null,
 						attributes: {
-							type: "button",
 							value: api._lang.GET("order.delete_prepared_order"),
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
@@ -1230,7 +1228,6 @@ export const _client = {
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.incorporation.incorporation"),
-								type: "button",
 								onclick: "if (!this.disabled) api.purchase('get', 'incorporation', " + element.incorporation.item + "); this.disabled = true",
 							},
 						});
@@ -1249,7 +1246,6 @@ export const _client = {
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.sample_check.sample_check"),
-								type: "button",
 								onclick: "if (!this.disabled) api.purchase('get', 'mdrsamplecheck', " + element.samplecheck.item + "); this.disabled = true",
 							},
 						});
@@ -1267,7 +1263,6 @@ export const _client = {
 						type: "button",
 						attributes: {
 							value: api._lang.GET("consumables.product.add_new"),
-							type: "button",
 							onclick:
 								"api.purchase('get', 'product', '" +
 								JSON.stringify({
@@ -1286,7 +1281,6 @@ export const _client = {
 						type: "button",
 						attributes: {
 							value: api._lang.GET("consumables.product.edit_product"),
-							type: "button",
 							onclick: "api.purchase('get', 'product', " + element.editproduct + ");",
 						},
 					});

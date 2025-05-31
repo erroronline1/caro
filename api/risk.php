@@ -272,7 +272,6 @@ class RISK extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('risk.new'),
-								'type' => 'button',
 								'onclick' => "api.risk('get', 'risk', '" . $type . "')"
 							]
 						]

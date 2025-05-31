@@ -485,7 +485,6 @@ class CALENDAR extends API {
 								'type' => 'deletebutton',
 								'attributes' => [
 									'value' => $this->_lang->GET('calendar.longtermplanning.delete'),
-									'type' => 'button',
 									'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.longtermplanning.delete') . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('general.ok_button') . "': {'value': true, class: 'reducedCTA'}}})" .
 										".then(confirmation => {if (confirmation) api.calendar('delete', 'longtermplanning', " . $planning['id'] . "); this.disabled = Boolean(confirmation);});"
 								]
@@ -1048,7 +1047,6 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_previous'),
-							'type' => 'button',
 							'onclick' => "api.calendar('get', 'schedule', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
@@ -1057,7 +1055,6 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_next') . ' ',
-							'type' => 'button',
 							'onclick' => "api.calendar('get', 'schedule', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
@@ -1233,7 +1230,6 @@ class CALENDAR extends API {
 				$events[count($events)-1]['content'][] = [
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('calendar.schedule.edit'),
 						'onclick' => $calendar->dialog($columns)
 					],
@@ -1430,7 +1426,6 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_previous'),
-							'type' => 'button',
 							'onclick' => "api.calendar('get', 'timesheet', '" . $previousmonth->format('Y-m-d') . "', '" . $previousmonth->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
@@ -1439,7 +1434,6 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.month_next') . ' ',
-							'type' => 'button',
 							'onclick' => "api.calendar('get', 'timesheet', '" . $nextmonth->format('Y-m-d') . "', '" . $nextmonth->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
@@ -1692,7 +1686,6 @@ class CALENDAR extends API {
 				$events[count($events)-1]['content'][] = [
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('calendar.schedule.edit'),
 						'onclick' => $calendar->dialog($columns)
 					]

@@ -391,7 +391,6 @@ class SHARED {
 								'type' => 'button',
 								'attributes' => [
 									'value' => $this->_lang->GET('consumables.product.add_new'),
-									'type' => 'button',
 									'onclick' => "api.purchase('get', 'product')",
 								]
 							]
@@ -441,7 +440,6 @@ class SHARED {
 								'type' => 'button',
 								'attributes' => [
 									'value' => $this->_lang->GET('order.add_manually'),
-									'type' => 'button',
 									'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
 									UTILITY::json_encode([
 										[

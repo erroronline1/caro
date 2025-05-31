@@ -102,7 +102,6 @@ class FILE extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('menu.files.bundle_manager'),
 						'onclick' => "api.file('get', 'bundlemanager')"
 					]
@@ -527,7 +526,6 @@ class FILE extends API {
 									'type' => 'button',
 									'attributes' => [
 										'value' => $this->_lang->GET('file.manager.copy_path'),
-										'type' => 'button',
 										'onclick' => "_client.application.toClipboard('" . $file['path'] . "')",
 										'class' => 'inlinebutton',
 										'data-filtered' => $file['path'],
@@ -663,7 +661,6 @@ class FILE extends API {
 									'type' => 'deletebutton',
 									'attributes' => [
 										'value' => $this->_lang->GET('file.manager.delete_folder'),
-										'type' => 'button',
 										'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $foldername]) ."', options:{".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
 											"'".$this->_lang->GET('file.manager.delete_file_confirmation_ok')."': {value: true, class: 'reducedCTA'},".
@@ -741,7 +738,6 @@ class FILE extends API {
 										'type' => 'button',
 										'attributes' => [
 											'value' => $this->_lang->GET('file.manager.copy_path'),
-											'type' => 'button',
 											'onclick' => "_client.application.toClipboard('" . $file['link'] . "')",
 											'class' => 'inlinebutton',
 											'data-type' => 'copy',
@@ -752,7 +748,6 @@ class FILE extends API {
 										'type' => 'deletebutton',
 										'attributes' => [
 											'value' => $this->_lang->GET('file.manager.delete_file'),
-											'type' => 'button',
 											'data-filtered' => $file['path'],
 											'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('file.manager.delete_file_confirmation_header', [':file' => $file['name']]) ."', options:{".
 												"'".$this->_lang->GET('file.manager.delete_file_confirmation_cancel')."': false,".
@@ -877,7 +872,6 @@ class FILE extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('menu.files.file_manager'),
 						'onclick' => "api.file('get', 'filemanager')"
 					]
@@ -889,7 +883,6 @@ class FILE extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('menu.files.external_file_manager'),
 						'onclick' => "api.file('get', 'externalfilemanager')"
 					]

@@ -147,7 +147,6 @@ class MEASURE extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('measure.new'),
-							'type' => 'button',
 							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.new') ."', render: JSON.parse('".
 								UTILITY::json_encode([
 									[
@@ -239,7 +238,6 @@ class MEASURE extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('measure.measure'),
-								'type' => 'button',
 								'onclick' => "if (!this.disabled) new _client.Dialog({type: 'input', header: '". $this->_lang->GET('measure.measure') ."', render: JSON.parse('".
 									UTILITY::json_encode([
 										[

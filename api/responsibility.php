@@ -196,7 +196,6 @@ class RESPONSIBILITY extends API {
 						if (PERMISSION::permissionFor('responsibilities')) $content[] = [
 							'type' => 'button',
 							'attributes' => [
-								'type' => 'button',
 								'value' => $this->_lang->GET('responsibility.edit'),
 								'onclick' => "api.responsibility('get', 'responsibility', " . $row['id'] . ")"
 							]
@@ -210,7 +209,6 @@ class RESPONSIBILITY extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
-								'type' => 'button',
 								'value' => $this->_lang->GET('responsibility.new'),
 								'onclick' => "api.responsibility('get', 'responsibility', 'null')"
 							]
@@ -460,7 +458,6 @@ class RESPONSIBILITY extends API {
 					$result['render']['content'][count($result['render']['content']) - 1][] = [
 						'type' => 'deletebutton',
 						'attributes' => [
-							'type' => 'button',
 							'value' => $this->_lang->GET('responsibility.delete'),
 							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('responsibility.delete_confirm') ."', options:{".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".

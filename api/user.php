@@ -916,7 +916,6 @@ class USER extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
-								'type' => 'button',
 								'value' => $this->_lang->GET('user.training.add_training'),
 								'onclick' => "api.user('get', 'training', 'null', " . $user['id'] . ")"
 							]
@@ -965,7 +964,6 @@ class USER extends API {
 						'type' => 'deletebutton',
 						'attributes' => [
 							'value' => $this->_lang->GET('user.training.delete'),
-							'type' => 'button',
 							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.training.delete_confirm_header', [':name' => $row['name']]) ."', options:{".
 								"'" . $this->_lang->GET('user.training.delete_confirm_cancel') . "': false,".
 								"'" . $this->_lang->GET('user.training.delete_confirm_ok') . "': {value: true, class: 'reducedCTA'},".
@@ -976,7 +974,6 @@ class USER extends API {
 						$skillmatrix[0][] = [
 							'type' => 'button',
 							'attributes' => [
-								'type' => 'button',
 								'value' => $this->_lang->GET('user.training.edit'),
 								'class' => 'inlinebutton',
 								'onclick' => "this.disabled = true; api.user('get', 'training', " . $row['id'] . ");"
@@ -1134,7 +1131,6 @@ class USER extends API {
 							'type' => 'deletebutton',
 							'attributes' => [
 								'value' => $this->_lang->GET('user.delete_button'),
-								'type' => 'button', // apparently defaults to submit otherwise
 								'onclick' => $user['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('user.delete_confirm_header', [':name' => $user['name']]) ."', options:{".
 									"'".$this->_lang->GET('user.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('user.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".

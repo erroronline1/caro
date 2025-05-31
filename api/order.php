@@ -1094,7 +1094,6 @@ class ORDER extends API {
 					['type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('order.delete_prepared_order'),
-						'type' => 'button', // apparently defaults to submit otherwise
 						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('order.delete_prepared_order_confirm_header') ."', options:{".
 							"'".$this->_lang->GET('order.delete_prepared_order_confirm_cancel')."': false,".
 							"'".$this->_lang->GET('order.delete_prepared_order_confirm_ok')."': {value: true, class: 'reducedCTA'},".
@@ -1437,7 +1436,6 @@ class ORDER extends API {
 								'type' => 'button',
 								'attributes' =>[
 									'value' => $this->_lang->GET('order.edit_prepared_order'),
-									'type' => 'button',
 									'onclick' => "api.purchase('get', 'order', " . $order['id']. ")"
 								]
 							]

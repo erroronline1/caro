@@ -338,7 +338,6 @@ class APPLICATION extends API {
 							'type' => 'deletebutton',
 							'attributes' => [
 								'value' => $this->_lang->GET('application.manual.delete'),
-								'type' => 'button',
 								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('application.manual.delete_confirm') ."', options: {".
 								"'".$this->_lang->GET('general.cancel_button')."': false,".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".

@@ -435,7 +435,6 @@ class CONSUMABLES extends API {
 										'type' => 'button',
 										'attributes' => [
 											'value' => $this->_lang->GET('order.incorporation.adopt'),
-											'type' => 'button',
 											'onclick' => "document.getElementById('incorporationmatchingprevious').value = '" . preg_replace('/\n|\r|\t/', ' ', implode(' ', $check)) . "'"
 										]
 									]
@@ -450,7 +449,6 @@ class CONSUMABLES extends API {
 						'type' => 'button',
 						'content' => $similarproducts,
 						'attributes' => [
-							'type' => 'button',
 							'value' => $this->_lang->GET('order.incorporation.batch'),
 							'onclick' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input2')
 						]
@@ -1441,7 +1439,6 @@ class CONSUMABLES extends API {
 								'type' => 'deletebutton',
 								'attributes' => [
 									'value' => $this->_lang->GET('consumables.product.delete'),
-									'type' => 'button', // apparently defaults to submit otherwise
 									'onclick' => $product['id'] ? "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('consumables.product.delete_confirm_header', [':name' => $product['article_name']]) ."', options:{".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_cancel')."': false,".
 										"'".$this->_lang->GET('consumables.product.delete_confirm_ok')."': {value: true, class: 'reducedCTA'}".
@@ -2394,7 +2391,6 @@ class CONSUMABLES extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('consumables.vendor.pricelist_export'),
-								'type' => 'button',
 								'onclick' => "api.purchase('get', 'exportpricelist', " . $vendor['id']. ")"
 							],
 							'hint' => $this->_lang->GET('consumables.vendor.pricelist_export_hint')
@@ -2433,7 +2429,6 @@ class CONSUMABLES extends API {
 						$texttemplate[] = [
 							'type' => 'button',
 							'attributes' => [
-								'type' => 'button',
 								'value' => $this->_lang->GET('menu.communication.texttemplate_texts'),
 								'onclick' => "api.texttemplate('get', 'text', 'false', 'modal', '" . UTILITY::json_encode([
 									':PRD' => 'select_special_attention_products',

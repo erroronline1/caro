@@ -551,7 +551,6 @@ class TEXTTEMPLATE extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('texttemplate.template.save'),
-								'type' => 'button',
 								'data-type' => 'submitbutton',
 								'onclick' => "new _client.Dialog({type: 'confirm', header: '" .
 									$this->_lang->GET("texttemplate.template.save") .
@@ -746,7 +745,6 @@ class TEXTTEMPLATE extends API {
 				if ($clientimport) $inputs[] = [
 					'type' => 'button',
 					'attributes' => [
-						'type' => 'button',
 						'value' => $this->_lang->GET('texttemplate.use.import', [':placeholders' => implode(', ', array_keys($clientimport))]),
 						'onclick' => "_client.texttemplate.import('" . $this->_clientimport . "');"
 					],
@@ -773,7 +771,6 @@ class TEXTTEMPLATE extends API {
 			$inputs[] = [
 				'type' => 'button',
 				'attributes' => [
-					'type' => 'button',
 					'value' => $this->_lang->GET('texttemplate.use.refresh'),
 					'onclick' => '_client.texttemplate.update();',
 					'data-type' => 'generateupdate'
@@ -805,7 +802,6 @@ class TEXTTEMPLATE extends API {
 			$return['render']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
-					'type' => 'button',
 					'value' => $this->_lang->GET('menu.communication.texttemplate_chunks'),
 					'onclick' => "api.texttemplate('get', 'chunk')"
 				]
@@ -813,7 +809,6 @@ class TEXTTEMPLATE extends API {
 			$return['render']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
-					'type' => 'button',
 					'value' => $this->_lang->GET('menu.communication.texttemplate_templates'),
 					'onclick' => "api.texttemplate('get', 'template'" . ($template['id'] ? ", " . $template['id'] : "") . ")"
 				]

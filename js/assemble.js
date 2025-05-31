@@ -1492,7 +1492,7 @@ export class Assemble {
 	}
 
 	/**
-	 * creates a button
+	 * creates a button of type button if not stated otherwise
 	 * @returns {domNodes} button, hint if applicable, encapsulated if applicable
 	 * @example this.currentElement
 	 * ```json
@@ -1518,6 +1518,7 @@ export class Assemble {
 		}
 
 		// apply attributes
+		button.type = "button"; // default type, overrun by attributes if provided
 		if (this.currentElement.attributes !== undefined) {
 			if (this.currentElement.attributes.class && this.currentElement.attributes.class.match(/imagealigned/)) {
 				imagealigned = true;
@@ -1602,7 +1603,6 @@ export class Assemble {
 	calendarbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "calendarbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
 		return [...this.br(), ...this.button()];
 	}
 
@@ -1920,7 +1920,6 @@ export class Assemble {
 	documentbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "documentbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
 		return [...this.br(), ...this.button()];
 	}
 
@@ -2706,7 +2705,8 @@ export class Assemble {
 			label,
 			span,
 			multiple,
-			originaltype = this.currentElement.type;
+			originaltype = this.currentElement.type,
+			button = document.createElement("button");
 		const scannerElementClone = structuredClone(this.currentElement);
 		if (this.currentElement.attributes && this.currentElement.attributes.multiple) {
 			multiple = true;
@@ -2758,7 +2758,6 @@ export class Assemble {
 
 		if (multiple) this.currentElement.attributes.multiple = true;
 
-		let button = document.createElement("button");
 		button.appendChild(
 			document.createTextNode(
 				this.currentElement.description
@@ -2984,7 +2983,6 @@ export class Assemble {
 		result.push(input);
 		this.currentElement.attributes = {
 			value: api._lang.GET("assemble.render.clear_signature"),
-			type: "button",
 			onclick: "signaturePad.clear()",
 		};
 		result = result.concat(this.hint());
@@ -3107,7 +3105,6 @@ export class Assemble {
 	submitbutton() {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "submitbutton";
-		this.currentElement.attributes.type = "button"; // avoid submitting twice
 		return this.button();
 	}
 
@@ -3201,7 +3198,6 @@ export class Assemble {
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			this.currentElement.attributes = {
 				value: api._lang.GET("menu.communication.texttemplate_texts"),
-				type: "button",
 				onclick: "api.texttemplate('get', 'text', 'false', 'modal')",
 				class: "floatright",
 			};
