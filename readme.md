@@ -111,31 +111,31 @@ graph LR;
 * [Statement on technical guidelines on data security](#statement-on-technical-guidelines-on-data-security)
     * [Terms of service for using the application](#terms-of-service-for-using-the-application)
     * [Web Application](#web-application)
-        * [3.1.1 Prüfaspekt (1): Anwendungszweck](#311-prüfaspekt-1-anwendungszweck)
-        * [3.1.2 Prüfaspekt (2): Architektur](#312-prüfaspekt-2-architektur)
-        * [3.1.3 Prüfaspekt (3): Quellcode](#313-prüfaspekt-3-quellcode)
-        * [3.1.4 Prüfaspekt (4): Drittanbieter-Software](#314-prüfaspekt-4-drittanbieter-software)
-        * [3.1.5 Prüfaspekt (5): Kryptographische Umsetzung](#315-prüfaspekt-5-kryptographische-umsetzung)
-        * [3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung](#315-prüfaspekt-5-kryptographische-umsetzung)
-        * [3.1.6.1 Authentifizierung über Passwort](#3161-authentifizierung-über-passwort)
-        * [3.1.7 Prüfaspekt (7): Datensicherheit](#317-prüfaspekt-7-datensicherheit)
-        * [3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen](#318-prüfaspekt-8-kostenpflichtige-ressourcen)
-        * [3.1.9 Prüfaspekt (9): Netzwerkkommunikation](#319-prüfaspekt-9-netzwerkkommunikation)
-        * [3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen](#3110-prüfaspekt-10-plattformspezifische-interaktionen)
-        * [3.1.11 Prüfaspekt (11): Resilienz](#3111-prüfaspekt-11-resilienz)
+        * [3.1.1 Objective (1): Intended use](#311-objective-1-intended-use)
+        * [3.1.2 Objective (2): Architecture](#312-objective-2-architecture)
+        * [3.1.3 Objective (3): Source code](#313-objective-3-source-code)
+        * [3.1.4 Objective (4): Third-party software](#314-objective-4-third-party-software)
+        * [3.1.5 Objective (5): Cryptography](#315-objective-5-cryptography)
+        * [3.1.6 Objective (6): Authentication](#316-objective-6-authentication)
+        * [3.1.6.1 Passwords](#3161-passwords)
+        * [3.1.7 Objective (7): Data security](#317-objective-7-data-security)
+        * [3.1.8 Objective (8): Paid resources](#318-objective-8-paid-resources)
+        * [3.1.9 Objective (9): Network communication](#319-objective-9-network-communication)
+        * [3.1.10 Objective (10): Platform-specific interactions](#3110-objective-10-platform-specific-interactions)
+        * [3.1.11 Objective (11): Resilience](#3111-objective-11-resilience)
     * [Backend](#backend)
-        * [3.1.1 Prüfaspekt (1): Anwendungszweck](#311-prüfaspekt-1-anwendungszweck-1)
-        * [3.1.2 Prüfaspekt (2): Architektur](#312-prüfaspekt-2-architektur-1)
-        * [3.1.3 Prüfaspekt (3): Quellcode](#313-prüfaspekt-3-quellcode-1)
-        * [3.1.4 Prüfaspekt (4): Drittanbieter-Software](#314-prüfaspekt-4-drittanbieter-software-1)
-        * [3.1.5 Prüfaspekt (5): Kryptographische Umsetzung](#315-prüfaspekt-5-kryptographische-umsetzung-1)
-        * [3.1.5.1 Zufallszahlen](#3151-zufallszahlen)
-        * [3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung](#316-prüfaspekt-6-authentisierung-und-authentifizierung-1)
-        * [3.1.6.1 Authentifizierung über Passwort](#3161-authentifizierung-über-passwort-1)
-        * [3.1.7 Prüfaspekt (7): Datensicherheit](#317-prüfaspekt-7-datensicherheit-1)
-        * [3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen](#318-prüfaspekt-8-kostenpflichtige-ressourcen-1)
-        * [3.1.9 Prüfaspekt (9): Netzwerkkommunikation](#319-prüfaspekt-9-netzwerkkommunikation-1)
-        * [3.1.10 Prüfaspekt (10): Organisatorische Sicherheit](#3110-prüfaspekt-10-organisatorische-sicherheit)
+        * [3.1.1 Objective (1): Intended use](#311-objective-1-intended-use-1)
+        * [3.1.2 Objective (2): Architecture](#312-objective-2-architecture-1)
+        * [3.1.3 Objective (3): Source code](#313-objective-3-source-code-1)
+        * [3.1.4 Objective (4): Third-party software](#314-objective-4-third-party-software-1)
+        * [3.1.5 Objective (5): Cryptography](#315-objective-5-cryptography-1)
+        * [3.1.5.1 Random numbers](#3151-random-numbers)
+        * [3.1.6 Objective (6): Authentication](#316-objective-6-authentication-1)
+        * [3.1.6.1 Passwords](#3161-passwords-1)
+        * [3.1.7 Objective (7): Data security](#317-objective-7-data-security-1)
+        * [3.1.8 Objective (8): Paid resources](#318-objective-8-paid-resources-1)
+        * [3.1.9 Objective (9): Network communication](#319-objective-9-network-communication-1)
+        * [3.1.10 Objective (10): Organizational security](#3110-objective-10-organizational-security)
 * [Ressources](#ressources)
 * [License](#license)
 
@@ -4708,450 +4708,450 @@ I welcome any constructive input on this topic.
 [Content](#content)
 
 ## Web Application
-[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
+[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03161/TR-03161-2.pdf?__blob=publicationFile&v=10) for web applications
 
-### 3.1.1 Prüfaspekt (1): Anwendungszweck
-* O.Purp_1 Der Hersteller MUSS die rechtmäßigen Zwecke der Web-Anwendung und die Verarbeitung von personenbezogenen Daten offenlegen (etwa in der Beschreibung der Nutzungsbedingungen der Web-Anwendung) und den Nutzer spätestens bei der erstmaligen Nutzung der Anwendung darüber informieren.
+### 3.1.1 Objective (1): Intended use
+* O.Purp_1 The developer MUST disclose the lawful purposes of the web application and the processing of personal data (e.g. in the terms and condition of use) and inform the user of this at least when the application is first used.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Purp_2 Die Web-Anwendung DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
+* O.Purp_2 The web application MUST NOT collect and process data that does not serve the legitimate purpose of the application.
     > Only active and intentional user input is processed and stored.
-* O.Purp_3 Die Web-Anwendung MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
+* O.Purp_3 The web application MUST obtain an active and unambiguous declaration of consent from the user prior to any collection or processing of personal data.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Purp_4 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von der Web-Anwendung oder dem Hintergrundsystem erfasst, erhalten oder genutzt werden.
+* O.Purp_4 Data that the user has not expressly consented to be processed MUST NOT be collected, received or used by the web application or the backend system.
     > Only active and intentional user input is processed and stored.
-* O.Purp_5 Die Web-Anwendung MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden.
+* O.Purp_5 The web application MUST allow the user to withdraw consent that has already been given. The user MUST be informed about the possibility of withdrawal and the resulting changes in the behavior of the application before consent is given.
     > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login.
-* O.Purp_6 Der Hersteller MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
+* O.Purp_6 The developer MUST maintain a directory that shows which user consents have been given. The user-specific part of the directory MUST be automatically accessible to the user. It SHOULD be possible to request a history of this directory.
     > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login. All individual system information can be accessed through the profile.
-* O.Purp_7 Setzt die Web-Anwendung Drittanbieter-Software ein, MÜSSEN alle verwendeten Funktionen für die rechtmäßigen Zwecke der Anwendung erforderlich sein. Die Anwendung SOLL anderweitige Funktionen sicher deaktivieren. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, MUSS abgewogen werden, ob die Einbindung des gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
+* O.Purp_7 If the web application uses third-party software, all functions used MUST be necessary for the legitimate purposes of the web application. The web application SHOULD safely disable other functions. If only a single or very few functions of the third-party software are required, it MUST be balanced whether the inclusion of all the third-party software is proportionate to the increase in the attack surface caused by the third-party software used.
     > [List of third party software](#ressources)
-* O.Purp_8 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer WebAnwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten vollumfänglich infrandormieren und sein Einverständnis einholen (OPT-IN).
+* O.Purp_8 Unless it is necessary for the primary or legitimate purpose of a web application, sensitive data MUST NOT be shared with third parties. The web application MUST fully inform the user of the consequences of any sharing of web application data that serves the primary or legitimate purpose and obtain the user's consent (OPT-IN)
     > [List of third party software](#ressources)
-* O.Purp_9 Die Web-Anwendung DARF sensible Daten NICHT auf dem Bildschirm darstellen, außer dies ist für den primären Zweck der Anwendung erforderlich.
+* O.Purp_9 The web application MUST NOT display sensitive data on the screen unless this is necessary for the primary purpose of the application.
     > Sensitive data is displayed only on intended and active user request.
 
 [Content](#content)
 
-### 3.1.2 Prüfaspekt (2): Architektur
-* O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus‘ für die gesamte Web-Anwendung und das Hintergrundsystem sein.
+### 3.1.2 Objective (2): Architecture
+* O.Arch_1 Security MUST be an integral part of the software development and life cycle for the entire web application and backend system.
     > User login and permissions have been mandatory from the early stages on.
-* O.Arch_2 Bereits in der Designphase von Web-Anwendung und Hintergrundsystem MUSS berücksichtigt werden, dass die Anwendung in der Produktivphase sensible Daten verarbeiten wird. Die Architektur der Anwendung MUSS dafür die sichere Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem Datenlebenszyklus gewährleisten.
+* O.Arch_2 Already in the design phase of the web application and the background system, it MUST be taken into account that the application will process sensitive data in the production phase. The architecture of the application MUSST ensures the secure collection, processing, storage and deletion of the sensitive data in a data life cycle.
     > User login and permissions have been mandatory from the early stages on.
-* O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren.
+* O.Arch_3 The life cycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057].
     > [Encryption statement](#encryption-statement)
-* O.Arch_4 In Backups gespeicherte sensiblen Daten MÜSSEN gemäß dem aktuellen Stand der Technik verschlüsselt sein. Dies schließt das Persistieren sensibler Daten durch den Browser, etwa in dessen Cache, mit ein.
+* O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art. This includes the persistence of sensitive data by the browser, for example in its cache.
     > [Encryption statement](#encryption-statement)
-* O.Arch_5 Nutzt die Web-Anwendung Drittanbieter-Software, MUSS der Hersteller sicherstellen, dass nur solche Drittanbieter-Software zum Einsatz kommen, deren zu nutzenden Funktionen sicher genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellen. Die Anwendung MUSS diese Funktionen sicher nutzen. Der Hersteller MUSS darüber hinaus sicherstellen, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
+* O.Arch_5 If the web application uses third-party software, the developer MUST ensure that only such third-party software is used whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The developer MUST also ensure5 that unused functions cannot be activated by third parties
     > [List of third party software](#ressources)
-* O.Arch_6 Die Architektur der Web-Anwendung SOLL einem minimalistischen Ansatz folgen und mit einer serverseitig lokalisierten Verarbeitungslogik realisiert sein, d.h. es SOLLEN keine komplexen aktiven Inhalte (Java Applets, ActiveX-Plugin, o.ä.) verwendet werden.
+* O.Arch_6 The architecture of the web application SHOULD follow a minimalist approach and be realized with a server-side localized processing logic, i.e. no complex active content (Java applets, ActiveX plugin, etc.) SHOULD be used.
     > Used languages and are solely limited to HTML, CSS, JavaScript and PHP. Contents are delivered by the backend only.
-* O.Arch_7 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
+* O.Arch_7 The manufacturer MUST provide the user with a low-barrier way to report security issues. Communication SHOULD take place via an encrypted channel.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These contain an eMail address.
-* O.Arch_8 Die Web-Anwendung MUSS beim Start die Aktualität des genutzten Web-Browsers prüfen. Wenn die Installation eines sicherheitsrelevanten Updates noch nicht erfolgt ist, DARF die Web-Anwendung KEINEN Zugriff auf sensible Daten ermöglichen.
+* O.Arch_8 The web application MUST check that the web browser used is up-to-date when it is started. If a security-relevant update has not yet been installed, the web application MUST NOT allow access to sensitive data.
     > The operator of the infrastructure is responsible for browser actuality. How is that supposed to work anyway?
-* O.Arch_9 Die Web-Anwendung SOLL HTTP-Server-Header nutzen, die dem aktuellen Stand der Technik entsprechen und die Sicherheit der Anwendung erhöhen. Dazu gehören unter anderem HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) und X-Frame-Options.
+* O.Arch_9 The web application SHOULD use HTTP server headers that correspond to the current state of the art and increase the security of the application. These include HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) and X Frame Options.
     > [Prerequisites](#prerequisites)
 
 [Content](#content)
 
-### 3.1.3 Prüfaspekt (3): Quellcode
-* O.Source_1 Die Anwendung MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
+### 3.1.3 Objective (3): Source code
+* O.Source_1 The application MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
     > Inputs are masked as strings by the backend by default.
-* O.Source_2 Die Anwendung MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen.
+* O.Source_2 The application MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
     > Outputs on the front end are parsed as text nodes or unexecuted input values.
-* O.Source_3 Fehlermeldungen und Log-Dateien DÜRFEN KEINE sensiblen Daten (z. B. User Identifier oder Session-IDs) enthalten.
+* O.Source_3 Error messages and log files MUST NOT contain sensitive data (e.g. user identifiers or session IDs).
     > This is not the case.
-* O.Source_4 Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen (z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden.
+* O.Source_4 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
     > This is not the case.
-* O.Source_5 Bei Ausnahmen im Programmablauf (Exceptions) SOLL die Web-Anwendung Zugriffe auf sensible Daten abbrechen und diese im Speicher sicher löschen.
+* O.Source_5 In the event of exceptions during program execution, the web application SHOULD cancel access to sensitive data and securely delete it from memory.
     > Sensitive data is passed to callbacks only and is not available after occuring exceptions.
-* O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein.
+* O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
     > Debugging is removed.
-* O.Source_7 Vor der produktiven Bereitstellung der Anwendung SOLLEN moderne Sicherheitsmechanismen, wie beispielsweise Obfuskation und Bundler, verwendet werden.
+* O.Source_7 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the application.
     > This is not reasonable for the application used within a closed environment.
-* O.Source_8 Für die Entwicklung der Anwendung SOLLEN Werkzeuge zur statischen Codeanalyse eingesetzt werden.
+* O.Source_8 Tools for static code analysis SHOULD be used for the development of the application.
     > [Code design patterns](#code-design-patterns)
-* O.Source_9 Nutzt die Web-Anwendung URL-Weiterleitungen (URL-Redirects), MUSS diese kontrolliert erfolgen.
+* O.Source_9 If the web application uses URL redirects, this MUST be done in a controlled manner.
     > Redirects are not used
-* O.Source_10 Die Web-Anwendung MUSS Maßnahmen vorsehen, die verhindern, dass Funktionalitäten, die nicht in der Entwicklungshoheit des Herstellers liegen, in die WebAnwendung eingeschleust und zur Ausführung gebracht werden.
+* O.Source_10 The web application MUST provide mechanisms to prevent functionalities that are not within the manufacturer's development sovereignty from being injected into the web application and executed.
     > Inputs are sanitized and masked by default.
-* O.Source_11 Sensible Daten DÜRFEN NICHT in der URL vorkommen. Die Web-Anwendung MUSS solche Daten in HTTP Request Headern oder POST-Parametern verarbeiten.
+* O.Source_11 Sensitive data MUST NOT be included in the URL. The web application MUST process such data in HTTP request headers or POST parameters.
     > Sensitive data is always handled as PUT or POST. [API documentation](#api-documentation)
 
 [Content](#content)
 
-### 3.1.4 Prüfaspekt (4): Drittanbieter-Software
-* O.TrdP_1 Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen.
+### 3.1.4 Objective (4): Third-party software
+* O.TrdP_1 The provider MUST maintain a centralized and complete list of dependencies on third-party software.
     > [List of third party software](#ressources)
-* O.TrdP_2 Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die Veröffentlichung vorgesehenen Version verwendet werden. 
+* O.TrdP_2 Third-party software MUST be used in the latest version or the previous version intended for publication.
     > [List of third party software](#ressources)
-* O.TrdP_3 Drittanbieter-Software MUSS durch den Hersteller regelmäßig (durch Auswertung öffentlich verfügbarer Informationen oder durch statische/dynamische Testmethoden) auf Schwachstellen überprüft werden. Überreste von Optionen zur Unterstützung der Entwicklung (vgl.O.Source_6) sind hierbei als Schwachstelle zu werten. Der Hersteller MUSS für alle öffentlich bekannten Schwachstellen analysieren, inwieweit die Schwachstelle die Sicherheit des Gesamtsystems beeinträchtigt. Software, bzw. Funktionen aus Drittanbieter-Software DÜRFEN bei bekannten Schwachstellen, die die Sicherheit des Gesamtsystems betreffen NICHT eingesetzt werden. 
+* O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
     > [List of third party software](#ressources)
-* O.TrdP_4 Sicherheitsupdates für Drittanbieter-Software MUSS zeitnah integriert und per Update dem Nutzer zur Verfügung gestellt werden. Der Hersteller MUSS ein Sicherheitskonzept vorlegen, das anhand der Kritikalität ausnutzbarer Schwachstellen die geduldete Weiternutzung für die Web-Anwendung, bzw. das Hintergrundsystem festlegt. Nachdem die Übergangsfrist (Grace Period) abgelaufen ist, DARF die Web-Anwendung NICHT mehr zur Benutzung angeboten werden.
+* O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the web application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the web application MUST NOT be offered for use.
     > [List of third party software](#ressources)
-* O.TrdP_5 Vor der Verwendung von Drittanbieter-Software MUSS deren Quelle auf Vertrauenswürdigkeit geprüft werden.
+* O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
     > [List of third party software](#ressources)
-* O.TrdP_6 Die Anwendung SOLL sensible Daten nicht an Drittanbieter-Software weitergeben.
+* O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
     > [List of third party software](#ressources)
-* O.TrdP_7 Über Drittanbieter-Software eingehende Daten MÜSSEN validiert werden.
+* O.TrdP_7 Data received via third party software MUST be validated.
     > Third party libraries but *html5-code* do not deliver data. The result of scanned qr-codes are displayed to the user and masked by default on processing database queries.
-* O.TrdP_8 Drittanbieter-Software, die nicht mehr gewartet wird, DARF NICHT verwendet werden. 
+* O.TrdP_8 Third party software that is no longer maintained, MUST NOT be used.
     > [List of third party software](#ressources)
 
 [Content](#content)
 
-### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung
+### 3.1.5 Objective (5): Cryptography
 > [Encryption statement](#encryption-statement)
 
-* O.Cryp_1 Beim Einsatz von Verschlüsselung in der Web-Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden.
+* O.Cryp_1 When using encryption in the web application, permanently programmed secret or private keys MUST NOT be used.
     > Encrypted data uses a server-side SHA-encrypted key for user validation.
-* O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
+* O.Cryp_2 The application MUST rely on proven implementations for the realization of cryptographic primitives and protocols (cf. [TR02102-2]).
     > Encryption, where applicable, uses SHA-256 algorithm for encryption.
-* O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen.
+* O.Cryp_3 The choice of cryptographic primitives MUST be appropriate to the use case and reflect the current state of the art (see [TR02102-1]).
     > Encrypted data uses a server-side SHA-encrypted key for user validation.
-* O.Cryp_4 Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt werden. 
+* O.Cryp_4 Cryptographic keys MUST NOT be used for more than exactly one purpose.
     > Encrypted data uses a server-side SHA-encrypted key for user validation.
-* O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik entsprechen (siehe [TR02102-1]).
+* O.Cryp_5 The strength of the cryptographic keys MUST correspond to the current state of the art (see [TR02102-1]).
     > Encryption, where applicable, uses SHA-256 algorithm for encryption.
 
 [Content](#content)
 
-### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
-* O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau [TR03107-1], zur Autorisierung (Rollenkonzept) und zum Beenden einer Anwendungssitzung dokumentieren.
+### 3.1.6 Objective (6): Authentication
+* O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session.
     > User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
-* O.Auth_2 Die Anwendung SOLL Authentisierungsmechanismen und Autorisierungsfunktionen separat realisieren. Sind für die Anwendung verschiedene Rollen notwendig, MUSS eine Autorisierung bei jedem Datenzugriff separat realisiert werden. 
+* O.Auth_2 The application SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
     > Every request matches the session and user permissions.
-* O.Auth_3 Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei-FaktorAuthentifizierung umgesetzt werden.
+* O.Auth_3 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
     > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials.
-* O.Auth_4 Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 Abs. 8 SGB V mit ein.
+* O.Auth_4 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
     > This is not applicable.
-* O.Auth_5 Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen (z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit einbezogen werden.
+* O.Auth_5 Additional information (e.g. the end device used, the IP address or the time of access) SHOULD be included in the evaluation of an authentication process.
     > This is not reasonable for the application used within a closed environment.
-* O.Auth_6 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche Anmeldevorgänge informieren zu lassen.
+* O.Auth_6 The user SHOULD be given the option of being informed about unusual login processes.
     > This is not reasonable for the application used within a closed environment. Users can see their logins for the past (customizable) days though.
-* O.Auth_7 Die Anwendung MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren.
+* O.Auth_7 The application MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
     > This is not reasonable for the application used within a closed environment and on shared devices.
-* O.Auth_8 Wurde die Anwendung unterbrochen (in den Hintergrundbetrieb versetzt), MUSS nach Ablauf einer angemessenen Frist (Grace Period) eine erneute Authentisierung durchgeführt werden.
+* O.Auth_8 If the application was interrupted (put into backend operation), a new authentication MUST be carried out after an appropriate period (grace period) has expired.
     > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_9 Die Anwendung MUSS nach einer angemessenen Zeit in der sie nicht aktiv verwendet wurde (idle time) eine erneute Authentisierung fordern. 
+* O.Auth_9 The application MUST request re-authentication after an appropriate period of inactivity (idle time).
     > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_10 Die Anwendung MUSS nach einer angemessenen Zeit in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung zur Reaktivierung der Serversitzung fordern. 
+* O.Auth_10 The application MUST request re-authentication to reactivate the server session after an appropriate period of active use (active time).
     > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_11 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
+* O.Auth_11 The authentication data MUST NOT be changed without re-authenticating the user.
     > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
-* O.Auth_12 Die Anwendung MUSS für die Anbindung eines Hintergrundsystems eine dem Stand der Technik entsprechende Authentifizierung verwenden.
+* O.Auth_12 The application MUST use state-of-the-art authentication for the connection of a backend system.
     > This is not reasonable for the application used within a closed environment.
-* O.Auth_13 Authentisierungsdaten, wie bspw. Session-Identifier bzw. Authentisierungstoken, MÜSSEN als sensible Daten geschützt werden.
+* O.Auth_13 Authentication data, such as session identifiers or authentication tokens, MUST be protected as sensitive data.
     > [Installation](#installation)
-* O.Auth_14 Die Anwendung MUSS es dem Nutzer ermöglichen einen oder alle zuvor ausgestellten Session-Identifier bzw. Authentisierungstoken zu invalidieren.
+* O.Auth_14 The application MUST allow the user to invalidate one or all previously issued session identifiers or authentication tokens.
     > Sessions will allways be destroyed on logout.
-* O.Auth_15 Wird eine Anwendungssitzung ordnungsgemäß beendet, MUSS die Anwendung das Hintergrundsystem darüber informieren, sodass Session-Identifier bzw. Authentisierungstoken sicher gelöscht werden. Dies gilt sowohl für das aktive Beenden durch den Benutzer (log-out), als auch für das automatische Beenden durch die Anwendung (vgl. O.Auth_9 und O.Auth_10).
+* O.Auth_15 If an application session is properly terminated, the application MUST inform the backend system so that session identifiers or authentication tokens are securely deleted. This applies to active termination by the user (log-out) as well as to automatic termination by the application (cf. O.Auth_9 and O.Auth_10).
     > Sessions will allways be destroyed on logout.
-* O.Auth_16 Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
+* O.Auth_16 If the login credentials are changed, the user SHOULD be informed of the change via the last valid contact details stored. In this way, the user SHOULD be offered the option of blocking the reported change and setting new login credentials after authentication.
     > Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
-* O.Auth_17 Der Nutzer MUSS in den Nutzungsbedingungen der Web-Anwendung auf das Restrisiko hingewiesen werden, welches mit der Speicherung der Login-Credentials im WebBrowser oder auch einem anderen externen Programm für einen komfortableren Anmeldevorgang verbunden ist.
+* O.Auth_17 The user MUST be made aware of the residual risk associated with the storage of login credentials in the web browser or another external application for a more comfortable login process in the terms of use of the web application.
     > The input form for the login token is set to one-time-code and can not be stored.
 
 [Content](#content)
 
-### 3.1.6.1 Authentifizierung über Passwort
-* O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger „BestPractices“ orientieren. 
+### 3.1.6.1 Passwords
+* O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
     > Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters.
-* O.Pass_2 Für die Einrichtung der Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
+* O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
     > Login tokens are always generated by the system on request of an authorized administrative user.
-* O.Pass_3 Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern.
+* O.Pass_3 The user MUST have the option to change their password.
     > Login tokens can be renewed by authorized administrative users.
-* O.Pass_4 Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden.
+* O.Pass_4 The changing and resetting of passwords MUST be logged.
     > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
-* O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
+* O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
     > The frontend does not store passwords.
 
 [Content](#content)
 
-### 3.1.7 Prüfaspekt (7): Datensicherheit
-* O.Data_1 Die Werkseinstellung der Web-Anwendung MUSS die maximale Sicherheit bieten.
+### 3.1.7 Objective (7): Data security
+* O.Data_1 The factory setting of the web application MUST provide maximum security.
     > The application has no prefilled sensitive data on installation. New users have to be assigned roles actively.
-* O.Data_2 Exportiert der Nutzer sensible Daten unverschlüsselt MUSS der Nutzer durch die WebAnwendung darauf aufmerksam gemacht werden, dass der Nutzer selbst die Verantwortung für die Datensicherheit dieser exportierten Daten übernimmt.
+* O.Data_2 If the user exports sensitive data without encryption, the web application MUST inform the user that the user is responsible for the data security of this exported data.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. On any export there is a additional reminder by default.
-* O.Data_3 Die Web-Anwendung DARF Ressourcen, die einen Zugriff auf sensible Daten ermöglichen, gegenüber Dritten NICHT verfügbar machen.
+* O.Data_3 The web application MUST NOT make resources that allow access to sensitive data available to third parties.
     > There are no interfaces outside of the closed environment.
-* O.Data_4 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus in der Web-Anwendung gehalten werden.
+* O.Data_4 All sensitive data collected MUST NOT be kept in the application beyond the duration of their respective processing.
     > Sensitive data is passed to callbacks only, rendered on request and not available on every next GET request.
-* O.Data_5 Die Web-Anwendung MUSS die Grundsätze der Datensparsamkeit und Zweckbindung berücksichtigen.
+* O.Data_5 The application MUST comply with the principles of data minimization and purpose limitation.
     > Only active and intentional user input is processed and stored.
-* O.Data_6 Die Speicherung und Verarbeitung von sensiblen Daten SOLL im Hintergrundsystem erfolgen.
+* O.Data_6 Sensitive data SHOULD be stored and processed in the backend system.
     > This is the case, storing sensitive data within the frontend occurs only as offline fallback within same-origin IndexedDB, the storage is cleared as soon as the cached requests have been submitted.
-* O.Data_7 Bei der Verwendung von Aufnahmegeräten (z. B. Kamera) MÜSSEN sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf die GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernt werden.
+* O.Data_7 When using recording devices (e.g. camera), all metadata with data protection relevance, such as GPS coordinates of the recording location, hardware used, etc. MUST be removed.
     > All photos are processed and resized. Meta data is lost during this process.
-* O.Data_8 Bei der Erhebung von sensiblen Daten durch die Verwendung von Aufnahmegeräten (z.B. Kamera), MUSS vorgebeugt werden, dass andere Anwendungen darauf Zugriff erlangen könnten, etwa über eine Mediengalerie.
+* O.Data_8 When collecting sensitive data through the use of recording devices (e.g. camera), it MUST be prevented that other applications gain access to it.
     > Camera pictures are not stored in shared folders and exist only as form data before submission.
-* O.Data_9 Bei der Eingabe sensibler Daten über die Tastatur SOLL die Web-Anwendung unterbinden, dass Aufzeichnungen für Dritte erkennbar werden. 
+* O.Data_9 When entering sensitive data via the keyboard, the application SHOULD prevent recordings from becoming recognizable to third parties.
     > The operator of the infrastructure is responsible to prevent malware on terminal devices.
-* O.Data_10 Bei der Eingabe sensibler Daten SOLL der Export in die Zwischenablage unterbunden werden. Die Anwendung KANN alternativ eine eigene Zwischenablage implementieren, welche vor dem Zugriff durch andere Anwendungen geschützt ist.
+* O.Data_10 When entering sensitive data, the export to the clipboard SHOULD be prevented. Alternatively, the application MAY implement its own clipboard, which is protected from access by other applications.
     > Content is not selectable by default. Clipboard activites are implemented on insensitive data only.
-* O.Data_11 Sensible Daten DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, exportiert werden.
+* O.Data_11 Sensitive data such as biometric data or private keys MUST NOT be exported from the component on which they were generated.
     > Data exports happen in other modules than inputs. Data is always sanitized and processed before exports.
-* O.Data_12 Durch die Web-Anwendung kann der Zugriff für Dritte und die Speicherung des Bildschirms (z. B. Screenshots und Anzeigen für das App-Switching) nicht unterbunden werden. Über die Nutzungsbedingungen MUSS der Nutzer darüber informiert werden, dass sensible Daten über Screenshots oder Anzeigen für das App-Switching kompromittiert werden können.
+* O.Data_12 The web application cannot prevent third parties from accessing and saving the screen (e.g. screenshots and views for app switching). The user MUST be informed via the terms of use that sensitive data can be compromised via screenshots or views for app switching.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Data_13 Über die Nutzungsbedingungen der Web-Anwendung MUSS der Nutzer über das Risiko informiert werden, welches damit verbunden ist, dass im gesperrten Zustand des Endgeräts die Verbindung zum Hintergrundsystem weiter geöffnet bleibt, wenn der Nutzer sich nicht explizit ausgeloggt hat.
+* O.Data_13 The terms of use of the web application MUST inform the user of the risk associated with the fact that the connection to the background system is still open when the end device is locked if the user has not explicitly logged out.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Data_14 Die Web-Anwendung SOLL sicherstellen, dass bei ihrer Beendigung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen im Web-Browser nicht mehr zugreifbar sind. Dies schließt insbesondere Cookies und Webstorage mit ein.
+* O.Data_14 The web application SHOULD ensure that all sensitive data and application-specific login information is no longer accessible in the web browser when it is terminated. This includes cookies and web storage in particular.
     > The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss. [Network connection handling](#network-connection-handling)
-* O.Data_15 Die Web-Anwendung MUSS dem Nutzer die Möglichkeit geben, dass bei endgültiger Beendigung der Nutzung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig gelöscht bzw. unzugänglich gemacht werden.
+* O.Data_15 The web application MUST give the user the option to have all sensitive data and application-specific login information completely deleted or made inaccessible upon final termination.
     > Authorized users can delete users permanently.
-* O.Data_16 Für alle Cookies, auf die nicht mittels JavaScript zugegriffen wird, MUSS das HTTP-OnlyFlag verwendet werden. 
+* O.Data_16 The HTTP-only flag MUST be used for all cookies that are not accessed via JavaScript.
     > Only a session cookie is created. Respective flags are set.
-* O.Data_17 Für alle Cookies, die sensible Daten enthalten, MUSS das Secure-Flag gesetzt sein.
+* O.Data_17 The secure flag MUST be set for all cookies that contain sensitive data
     > [Installation](#installation)
-* O.Data_18 Für alle Formularfelder mit sensiblen Eingabedaten MUSS die Autocomplete-Funktion abgeschaltet sein.
+* O.Data_18 The autocomplete function MUST be switched off for all form fields with sensitive input data.
     > All inputs are rendered without autocomplete by default. Datalists may be provided with former inputs to ensure a consistent documentation. Datalists are provided by the backend and relate only fields namewise. The browser will not store single and collections of inputs.
-* O.Data_19 Im Browser persistierte Daten SOLLEN für weitere Hosts einer Domain unlesbar sein (d.h. Vermeidung von Domain-Cookies).
+* O.Data_19 Data persisted in the browser SHOULD be unreadable for other hosts of a domain (i.e. avoidance of domain cookies).
     > Only a session cookie is created, IndexedDB has same-origin principle by default.
 
 [Content](#content)
 
-### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
+### 3.1.8 Objective (8): Paid resources
 > Not applicable, as there are no paid ressources.
 
-### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation 
+### 3.1.9 Objective (9): Network communication
 > The operator of the infrastructure is responsible for fulfilling these requirements. Caro App [requires SSL](#prerequisites) consistently though.
 
 [Content](#content)
 
-### 3.1.10 Prüfaspekt (10): Plattformspezifische Interaktionen
-* O.Plat_1 Für die Nutzung der Web-Anwendung SOLL das Endgerät über einen aktivierten Geräteschutz (Passwort, Mustersperre, o. ä.) verfügen. Im Fall eines nicht aktivierten Geräteschutzes MUSS der Hersteller den Nutzer über die damit verbundenen Risiken aufklären.
+### 3.1.10 Objective (10): Platform-specific interactions
+* O.Plat_1 To use the web application, the end device SHOULD have activated device protection (password, pattern lock, etc.). If device protection is not activated, the manufacturer MUST inform the user of the associated risks.
     > The operator of the infrastructure is responsible for fulfilling this requirement.
-* O.Plat_2 Die Web-Anwendung DARF Berechtigungen, die für die Erfüllung ihres primären Zwecks nicht notwendig sind, NICHT einfordern.
+* O.Plat_2 The web application MUST NOT request permissions that are not necessary for the fulfillment of its primary purpose.
     > Requested permissions involve camera access for scanning qr-codes and occasionally adding pictures for medical device documentation, as well as notifications to alert on new messages within the application.
-* O.Plat_3 Die Web-Anwendung MUSS den Nutzer auf den rechtmäßigen Zweck der anzufragenden Berechtigungen und auf die Auswirkungen hinweisen, die eintreten, falls der Nutzer diese nicht gewährt.
+* O.Plat_3 The web application MUST NOT request permissions that are not necessary for the fulfillment of its primary purpose.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Plat_4 Die Web-Anwendung DARF KEINE sensiblen Daten in erweiterten Meldungen oder Benachrichtigungen, die nicht vom Nutzer explizit eingeschaltet wurden (siehe O.Plat_5), anzeigen.
+* O.Plat_4 The web application MUST NOT include sensitive data in messages or notifications that have not been explicitly enabled by the user (see O.Plat_5).
     > Notifications only alert on a number of new messages and contain no further data.
-* O.Plat_5 Die Web-Anwendung KANN dem Nutzer die Optionen bieten, erweiterte Meldungen und Benachrichtigungen, ggf. auch mit sensiblen Inhalten, anzuzeigen. Bei Werkseinstellung MUSS diese deaktiviert sein.
+* O.Plat_5 The web application MAY offer the option of displaying messages and notifications the user, including those containing sensitive content. This MUST be deactivated by default.
     > This is not applicable. Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
-* O.Plat_6 Die Web-Anwendung MUSS das Nachladen von Inhalten auf Quellen beschränken, die unter der Kontrolle des Herstellers sind oder durch den Hersteller autorisiert wurden.
+* O.Plat_6 The web application MUST restrict the reloading of content to sources that are under the manufacturer's control or have been authorized by the manufacturer.
     > Lazyloading is not implemented, all contents are delivered by the backend only.
-* O.Plat_7 Die Web-Anwendung MUSS den Nutzer über das Risiko informieren, dass ggf. nach Beendigung der Web-Anwendung nutzerspezifischen Daten im Arbeitsspeicher verbleiben können.
+* O.Plat_7 The web application MUST inform the user of the risk that user-specific data may remain in the RAM after the web application is closed.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Plat_8 Der Nutzer MUSS über Sicherheitsmaßnahmen informiert werden, sofern diese durch den Nutzer umsetzbar sind. 
+* O.Plat_8 The user MUST be informed about security measures, as long as they can be realized by the user.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 
 [Content](#content)
 
-### 3.1.11 Prüfaspekt (11): Resilienz
-* O.Resi_1 Die Web-Anwendung MUSS dem Nutzer barrierearme Best-Practice-Empfehlungen zum sicheren Umgang mit der Anwendung und ihrer Konfiguration bereitstellen.
+### 3.1.11 Objective (11): Resilience
+* O.Resi_1 The web application MUST provide the user with accessible best practice recommendations for the safe use of the application and its configuration.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Resi_2 Die Web-Anwendung MUSS über die Nutzungsbedingungen dem Nutzer darstellen, welche Risiken für die Daten des Nutzers bei einer Benutzung von Geräten, deren Betriebssystem in keinem vom Betriebssystemhersteller vorgesehenen Betriebszustand ist, bestehen. 
+* O.Resi_2 The web application MUST inform the user via the terms of use of the risks that exist for the user's data when using devices whose operating system is not in an operating state intended by the operating system manufacturer.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 
 [Content](#content)
 
 ## Backend
-[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/DE/BSI/Publikationen/TechnischeRichtlinien/TR03161/BSI-TR-03161-3.pdf?__blob=publicationFile&v=9) for backends
+[according to BSI](https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/TechGuidelines/TR03161/TR-03161-3.pdf?__blob=publicationFile&v=10) for backends
 
-### 3.1.1 Prüfaspekt (1): Anwendungszweck 
-* O.Purp_1 Das Hintergrundsystem DARF KEINE Daten erheben und verarbeiten, die nicht dem rechtmäßigen Zweck der Anwendung dienen.
+### 3.1.1 Objective (1): Intended use
+* O.Purp_1 The backend system MUST NOT collect and process data that does not serve the legitimate purpose of the application.
     > Only active and intentional user input is processed and stored.
-* O.Purp_2 Das Hintergrundsystem MUSS vor jeglicher Erfassung oder Verarbeitung personenbezogener Daten eine aktive und eindeutige Einwilligungserklärung des Nutzers einholen.
+* O.Purp_2 The backend system MUST obtain an active and unambiguous declaration of consent from the user prior to any collection or processing of personal data.
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Purp_3 Daten, deren Verarbeitung der Nutzer nicht ausdrücklich zugestimmt hat, DÜRFEN NICHT von dem Hintergrundsystem verarbeitet werden.
+* O.Purp_3 Data that the user has not expressly consented to be processed MUST NOT be collected, received or used by the backend system.
     > Only active and intentional user input is processed and stored.
-* O.Purp_4 Das Hintergrundsystem MUSS ermöglichen, dass der Nutzer eine bereits erteilte Einwilligung wieder entziehen kann. Der Nutzer MUSS vor der Einwilligung über die Möglichkeit des Widerrufs und die sich daraus ergebenden Veränderungen im Verhalten der Anwendung informiert werden.
+* O.Purp_4 The backend system MUST allow the user to withdraw consent that has already been given. The user MUST be informed about the possibility of withdrawal and the resulting changes in the behavior of the application before consent is given.
     > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. The backend does not request special user consent.
-* O.Purp_5 Der Anbieter MUSS ein Verzeichnis führen, welches erkennen lässt, welche Nutzereinwilligungen vorliegen. Der nutzerspezifische Teil des Verzeichnisses MUSS für den Nutzer automatisiert einsehbar sein. Es SOLL eine Historie dieses Verzeichnisses angefordert werden können.
+* O.Purp_5 The provider MUST maintain a directory that shows which user consents have been given. The user-specific part of the directory MUST be automatically accessible to the user. It SHOULD be possible to request a history of this directory.
     > All user settings are displayed within the profile. Selectable options are disabled by default.
-* O.Purp_6 Setzt das Hintergrundsystem Drittanbieter-Software ein, SOLLEN alle verwendeten Funktionen für den rechtmäßigen Zweck des Gesamtsystems erforderlich sein. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.Anderweitige Funktionen SOLLEN sicher deaktiviert sein. Wird nur eine einzige oder sehr wenige Funktionen der Drittanbieter-Software benötigt, SOLL abgewogen werden, ob die Einbindung der gesamten Drittanbieter-Software im Verhältnis zur Vergrößerung der Angriffsoberfläche durch die verwendete Drittanbieter-Software steht.
+* O.Purp_6 If the backend system uses third-party software, all functions used SHOULD be necessary for the legitimate purposes of the application. The backend system SHOULD safely disable other functions. If only a single or very few functions of the third-party software are required, it MUST be balanced whether the inclusion of all the third-party software is proportionate to the increase in the attack surface caused by the third-party software used.
     > [List of third party software](#ressources)
-* O.Purp_7 Sofern es nicht für den vorgesehenen primären oder rechtmäßigen Zweck einer Anwendung erforderlich ist, DÜRFEN sensible Daten NICHT mit Dritten geteilt werden. Dies betrifft auch die Ablage dieser Daten in Teilen des Dateisystems, auf die auch andere Anwendungen Zugriff haben. Die Anwendung MUSS den Nutzer über die Konsequenzen einer eventuellen Weitergabe von Anwendungsdaten, die dem primären oder rechtmäßigen Zweck dienen, vollumfänglich informieren und sein Einverständnis einholen (OPT-IN).
+* O.Purp_7 Unless it is necessary for the primary or legitimate purpose of an application, sensitive data MUST NOT be shared with third parties. This includes storing data in parts of the file system to which other applications have access. The application MUST fully inform the user of the consequences of any sharing of application data that serves the primary or legitimate purpose and obtain the user's consent (OPT-IN).
     > [List of third party software](#ressources)
 
 [Content](#content)
 
-### 3.1.2 Prüfaspekt (2): Architektur 
-* O.Arch_1 „Security“ MUSS ein fester Bestandteil des Softwareentwicklungs- und Lebenszyklus für die gesamte Anwendung sein.
+### 3.1.2 Objective (2): Architecture
+* O.Arch_1 Security MUST be an integral part of the software development and life cycle for the entire application.
     > User login and permissions have been mandatory from the early stages on.
-* O.Arch_2 Bereits in der Designphase des Hintergrundsystems MUSS berücksichtigt werden, dass das Hintergrundsystem der Anwendung in der Produktivphase sensible Daten verarbeiten wird. Die Architektur des Hintergrundsystems MUSS dafür die sichere Erhebung, Verarbeitung, Speicherung und Löschung der sensiblen Daten in einem Datenlebenszyklus gewährleisten. 
+* O.Arch_2 Already in the design phase of the backend system, it MUST be taken into account that the backend system will process sensitive data in the production phase. The architecture of the backend system MUST ensure the secure collection, processing, storage and deletion of sensitive data in a data lifecycle.
     > User login and permissions have been mandatory from the early stages on.
-* O.Arch_3 Der Lebenszyklus von kryptographischem Schlüsselmaterial MUSS einer ausgearbeiteten Richtlinie folgen, die Eigenschaften wie die Zufallszahlenquelle, detaillierte Angaben zur Aufgabentrennung von Schlüsseln, Ablauf von Schlüsselzertifikaten, Integritätssicherung durch Hash-Algorithmen etc., umfasst. Die Richtlinie SOLL auf anerkannten Standards wie [TR02102-2] und [NIST80057] basieren. 
+* O.Arch_3 The lifecycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057] should be used.
     > [Encryption statement](#encryption-statement)
-* O.Arch_4 In Backups gespeicherte sensible Daten MÜSSEN gemäß dem Stand der Technik verschlüsselt sein.
+* O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art.
     > [Encryption statement](#encryption-statement), if the operator of the infrastructure is able to encrypt backups, they are responsible.
-* O.Arch_5 Sicherheitsfunktionen MÜSSEN immer auf allen Außenschnittstellen und APIEndpunkten implementiert werden.
+* O.Arch_5 Security functions MUST always be implemented on all external interfaces and API endpoints.
     > User matching and permission handling happens with every api request.
-* O.Arch_6 Nutzt das Hintergrundsystem Drittanbieter-Software (etwa für Datenbanken, Authentifizierung oder Logging), MUSS der Hersteller sicherstellen, dass nur solche Drittanbieter-Software zum Einsatz kommt, deren zu nutzende Funktionen sicher genutzt werden können und dem Nutzer Informationen über den Nutzungsumfang und die eingesetzten Sicherheitsmechanismen klar darstellt. Das Hintergrundsystem MUSS diese Funktionen sicher nutzen. Der Hersteller MUSS darüber hinaus sicherstellen, dass ungenutzte Funktionen durch Dritte nicht aktiviert werden können.
+* O.Arch_6 If the backend system uses third-party software, the manufacturer MUST ensure that only such third-party software is used, whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The manufacturer MUST also ensure5 that unused functions cannot be activated by third parties.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
-* O.Arch_7 Das Hintergrundsystem MUSS alle Anfragen der Anwendung über eine vollständig dokumentierte API entgegennehmen. Es DARF KEINE nicht dokumentierten Zugriffsmöglichkeiten enthalten.
+* O.Arch_7 The backend system MUST receive any requests made by the application via a fully documented API. It MUST NOT contain any undocumented access options.
     > [Api documentation](#api-documentation)
-* O.Arch_8 Der Hersteller MUSS dem Nutzer eine barrierearme Möglichkeit bereitstellen, um Sicherheitsprobleme zu melden. Die Kommunikation SOLL über einen verschlüsselten Kanal stattfinden.
+* O.Arch_8 The manufacturer MUST provide the user with a low-barrier way to report security issues. Communication SHOULD take place via an encrypted channel
     > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These contain an eMail address.
-* O.Arch_9 Das Hintergrundsystem MUSS so implementiert sein, dass ungewollte Zugriffe über eventuelle Management-Schnittstellen effektiv unterbunden werden. Insbesondere bei externem Hosting (s. Kapitel 2.3.2) und Cloud-Diensten (s. Kapitel 2.3.3) MUSS sichergestellt werden, dass der Betreiber Zugriffsmöglichkeiten zwischen verschiedenen Kunden unterbindet.
+* O.Arch_9 The backend system MUST be implemented in such a way, that unwanted access through management interfaces is effectively prevented. In particular, external hosting (see chapter 2.3.2) and cloud services (see chapter 2.3.3) MUST ensure that the operator eliminates access possibilities between different customers.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
-* O.Arch_10 Dienste, die das Hintergrundsystem zur Verfügung stellt, SOLLEN nur mit den notwendigen Rechten ausgeführt werden. Dienste, die von außen erreichbar sind, DÜRFEN NICHT mit Administrator-, System- bzw. Root-Rechten laufen.
+* O.Arch_10 Any service the backend system provides SHOULD run only with privileges necessary. Services reachable from the outside MUST NOT run with administrative, system or root privileges.
     > The application does not provide services.
-* O.Arch_11 Das Hintergrundsystem MUSS über ein zentrales Protokollierungssystem verfügen, in dem alle Log-Nachrichten der verschiedenen Dienste zusammenlaufen. Protokolle SOLLEN auf einem dedizierten System (sog. Logserver) gesammelt werden, um einem Löschen und Manipulieren auf den Quellsystemen entgegenzuwirken.
+* O.Arch_11 The backend system MUST have a central logging system, collecting all log-messages from any service. Protocols/logs SHOULD be collected on a dedicated system (so-called log server) to counteract any deletion or manipulation on source systems.
     > The operator of the infrastructure is responsible for fulfilling these requirements.
-* O.Arch_12 Das Hintergrundsystem MUSS die Anwendung über sicherheitsrelevante Updates informieren und nach einer Übergangsfrist (Grace Period) die Benutzung einer veralteten Anwendung unterbinden. 
+* O.Arch_12 The backend system MUST inform the application of safety-related updates and prohibits the use of an outdated application after a transitional period (Grace Period).
     > The operator of the infrastructure is responsible for fulfilling these requirements.
 
 [Content](#content)
 
-### 3.1.3 Prüfaspekt (3): Quellcode 
-* O.Source_1 Das Hintergrundsystem MUSS alle Eingaben vor deren Verarbeitung prüfen, um potenziell bösartige Werte vor der Verarbeitung herauszufiltern.
+### 3.1.3 Objective (3): Source code
+* O.Source_1 The backend system MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
     > Inputs are masked as strings by the backend by default.
-* O.Source_2 Das Hintergrundsystem MUSS eingehende und ausgehende Daten maskieren beziehungsweise von potenziell schadhaften Zeichen bereinigen oder deren Verarbeitung ablehnen. 
+* O.Source_2 The backend system MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
     > Outputs on the front end are parsed as text nodes or unexecuted input values.
-* O.Source_3 Potenzielle Ausnahmen im Programmablauf (Exceptions) MÜSSEN abgefangen, kontrolliert behandelt und dokumentiert werden. Technische Fehlerbeschreibungen (z.B. Stack Traces) DÜRFEN dem Nutzer NICHT angezeigt werden.
+* O.Source_3 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
     > This is not the case.
-* O.Source_4 Bei Ausnahmen im Programmablauf (Exceptions) SOLL das Hintergrundsystem Zugriffe auf sensible Daten abbrechen und die Anwendung anweisen, diese im Speicher sicher zu löschen.
+* O.Source_4 In the event of exceptions during program execution, the backend system SHOULD cancel access to sensitive data and instruct the application to securely delete it from memory.
     > Exceptions exit the code execution, the programming languages garbage collector clears the memory by default.
-* O.Source_5 Sofern das Hintergrundsystem oder Teile davon über eine manuelle Speicherverwaltung verfügen (d.h., das entsprechende Programm kann selbst exakt festlegen, wann und wo Speicher gelesen und beschrieben wird), MUSS für lesende und schreibende Zugriffe auf Speichersegmente auf sichere Funktionsalternativen (z. B. sprintf_s statt printf) zurückgegriffen werden.
+* O.Source_5 In program environments with manual memory management (i.e. the application itself can specify exactly when and where memory is read and written), the backend system MUST use secure function alternatives (e.g. printf_s instead of printf) for read and write access to memory segments.
     > Storage is handled by the backend exclusively.
-* O.Source_6 Alle Optionen zur Unterstützung der Entwicklung (z. B. Entwickler-URLs, Testmethoden, Überreste von Debugmechanismen etc.) MÜSSEN in der ProduktivVersion vollständig entfernt sein.
-    > Debugging is removed.
-* O.Source_7 Das Hintergrundsystem MUSS sicherstellen, dass alle sensiblen Daten unverzüglich nach der Erfüllung ihres Verarbeitungszwecks sicher gelöscht werden.
+* O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
+    > Debugging is removed. Also see [Stress test and performance](#stress-test-and-performance) note
+* O.Source_7 The backend system MUST ensure that all sensitive data is securely deleted immediately after its processing purpose has been fulfilled.
     > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received as of 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
-* O.Source_8 Der Hersteller MUSS einen Deployment-Prozess für die Inbetriebnahme, Aktualisierungen und Abschaltung des Hintergrundsystems etablieren, der sicherstellt, dass zu keinem Zeitpunkt die Veröffentlichung oder das Kompromittieren sensibler Daten möglich ist.
+* O.Source_8 The manufacturer MUST establish a deployment process for the deployment, updating and shutdown of the backend system, so in any given time, the sensitive data is protected at any time regarding publication or manipulation.
     > [Deployment process](#deployment-process)
-* O.Source_9 Der Hersteller SOLL automatische Tools zur Identifikation von Programmfehlern und Best-Practice Violations im Build Process verwenden. Jegliche Warnungen MÜSSEN von dem Hersteller vor dem Produktivbetrieb mitigiert werden.
+* O.Source_9 The manufacturer SHOULD use automatic tools to identify program errors and best practice violations in the build process. Any warnings MUST be mitigated by the manufacturer prior to deployment.
     > [Code design patterns](#code-design-patterns)
-* O.Source_10 Für den Bau des Hintergrundsystem SOLLEN moderne Sicherheitsmechanismen, wie beispielsweise Obfuskation und Stack-Protection aktiviert werden.
+* O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
     > This is not reasonable for the application used within a closed environment.
-* O.Source_11 Für die Entwicklung des Hintergrundsystems SOLLEN Werkzeuge zur statischen Codeanalyse eingesetzt werden.
+* O.Source_11 Tools for static code analysis SHOULD be used for the development of the application.
     > [Code design patterns](#code-design-patterns)
 
 [Content](#content)
 
-### 3.1.4 Prüfaspekt (4): Drittanbieter-Software 
-* O.TrdP_1 Der Anbieter MUSS eine zentrale und vollständige Liste von Abhängigkeiten durch Drittanbieter-Software führen. 
+### 3.1.4 Objective (4): Third-party software
+* O.TrdP_1 The manufacturer MUST maintain centralized and complete list of dependencies on third-party software.
     > [List of third party software](#ressources)
-* O.TrdP_2 Drittanbieter-Software MUSS in der neusten oder der ihr vorhergehenden, für die Veröffentlichung vorgesehenen Version verwendet werden.
+* O.TrdP_2 Third-party software MUST be used in the latest version or the previous version intended for publication.
     > [List of third party software](#ressources)
-* O.TrdP_3 Drittanbieter-Software MUSS durch den Hersteller regelmäßig (durch Auswertung öffentlich verfügbarer Informationen oder durch statische/dynamische Testmethoden) auf Schwachstellen überprüft werden. Überreste von Optionen zur Unterstützung der Entwicklung (vgl. O.Source_6) sind hierbei als Schwachstelle zu werten. Der Hersteller MUSS für alle öffentlich bekannten Schwachstellen analysieren, inwieweit die Schwachstelle die Sicherheit des Gesamtsystems beeinträchtigt. Software, bzw. Funktionen aus Drittanbieter-Software DÜRFEN bei bekannten Schwachstellen, die die Sicherheit des Gesamtsystems betreffen NICHT eingesetzt werden.
+* O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
     > [List of third party software](#ressources)
-* O.TrdP_4 Sicherheitsupdates für Drittanbieter-Software sowie Betriebssysteme MÜSSEN zeitnah eingespielt werden. Der Hersteller MUSS ein Sicherheitskonzept vorlegen, das anhand der Kritikalität ausnutzbarer Schwachstellen die geduldete Weiternutzung für das Hintergrundsystem festlegt. Nachdem die Übergangsfrist (Grace Period) abgelaufen ist, MUSS das Hintergrundsystem bis zur Behebung der Schwachstelle deaktiviert werden.
+* O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the application MUST refuse operation.
     > The operator of the infrastructure is responsible for fulfilling os and driver requirements.
-* O.TrdP_5 Vor der Verwendung von Drittanbieter-Software MUSS deren Quelle auf Vertrauenswürdigkeit geprüft werden.
+* O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
     > [List of third party software](#ressources)
-* O.TrdP_6 Die Anwendung SOLL sensible Daten NICHT an Drittanbieter-Software weitergeben. 
+* O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
     > [List of third party software](#ressources)
-* O.TrdP_7 Über Drittanbieter-Software eingehende Daten MÜSSEN validiert werden.
+* O.TrdP_7 Data received via third third-party software MUST be validated.
     > Third party libraries for the backend do not deliver data
-* O.TrdP_8 Drittanbieter-Software die nicht mehr gewartet wird, DARF NICHT verwendet werden.
+* O.TrdP_8 Third party software that is no longer maintained, MUST NOT be used.
     > [List of third party software](#ressources)
-* O.TrdP_9 Wenn das Hintergrundsystem externe Dienste verwendet, die nicht unter der Kontrolle des Herstellers stehen MUSS der Nutzer über die mit den Diensten geteilten Daten informiert werden. Dies gilt auch, wenn das Hintergrundsystem oder Teile davon als Cloud-Lösung realisiert sind.
+* O.TrdP_9 If the backend system uses external services that are not controlled by the manufacturer, the user MUST be informed about the data shared with these services. This also applies if the backend system or parts thereof are realized as a cloud solution.
     > Data sharing does not occur.
-* O.TrdP_10 Schnittstellen zwischen Hintergrundsystemen des Herstellers und externen Diensten müssen gemäß O.Arch_5 geschützt werden. 
+* O.TrdP_10 Any interface between the manufacturer’s backend systems and an external service MUST be protected according to O.Arch_5.
     > Data sharing does not occur.
 
 [Content](#content)
 
-### 3.1.5 Prüfaspekt (5): Kryptographische Umsetzung 
+### 3.1.5 Objective (5): Cryptography
 > [Encryption statement](#encryption-statement), also see [cryptographic measures for frontend](#315-prüfaspekt-5-kryptographische-umsetzung)
 
-* O.Cryp_1 Beim Einsatz von Verschlüsselung in der Anwendung DÜRFEN KEINE fest einprogrammierten geheimen, bzw. privaten Schlüssel eingesetzt werden. 
-* O.Cryp_2 Die Anwendung MUSS auf bewährte Implementierungen zur Umsetzung kryptographischer Primitive und Protokolle zurückgreifen (vgl. [TR02102-2]).
-* O.Cryp_3 Die Wahl kryptographischer Primitive MUSS passend zum Anwendungsfall sein und dem aktuellen Stand der Technik (siehe [TR02102-1]) entsprechen. Anbieter beschreibt die für die Inhalte des Produktes verantwortliche juristische Person. Hosting-Anbieter bei extern gehosteten Systemen oder Cloud-Lösungen sind hier explizit nicht gemeint.
-* O.Cryp_4 Kryptographische Schlüssel DÜRFEN NICHT für mehr als genau einen Zweck eingesetzt werden. Der Hersteller des Hintergrundsystems MUSS ein Verschlüsselungskonzept vorlegen, aus dem alle verwendeten Schlüssel und deren Hierarchien hervorgehen. 
-* O.Cryp_5 Die Stärke der kryptographischen Schlüssel MUSS dem aktuellen Stand der Technik entsprechen (siehe [TR02102-1]).
-* O.Cryp_6 Alle kryptographischen Schlüssel SOLLEN in einer vor Manipulation und Offenlegung geschützten Umgebung liegen.
-* O.Cryp_7 Alle kryptographischen Operationen SOLLEN in einer vor Manipulation und Offenlegung geschützten Umgebung stattfinden.
-* O.Cryp_8 Bei TLS-Verbindungen MUSS eine der in [TR02102-2], Kapitel 3.3.1 empfohlenen CipherSuiten verwendet werden. Verbindungen, die diese Cipher-Suiten nicht unterstützen DÜRFEN NICHT aufgebaut werden.
+O.Cryp_1 When using encryption in the application, permanently programmed secret or private keys MUST NOT be used.
+O.Cryp_2 The application MUST rely on proven implementations for the realization of cryptographic primitives and protocols (cf. [TR02102-2]).
+O.Cryp_3 The choice of cryptographic primitives MUST be appropriate to the use case and reflect the current state of the art (see [TR02102-1]).
+O.Cryp_4 Cryptographic keys MUST NOT be used for more than exactly one purpose. The manufacturer of the backend system MUST provide an encryption concept showing all the keys used and their hierarchies.
+O.Cryp_5 The strength of the cryptographic keys MUST correspond to the current state of the art (see [TR02102-1]).
+O.Cryp_6 All cryptographic keys SHOULD be stored in an environment protected against manipulation and disclosure.
+O.Cryp_7 All cryptographic operations SHOULD take place in an environment protected from manipulation and disclosure.
+O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3.1 has to be used. Any connection not using one of these suits, MUS NOT be established
 
 [Content](#content)
 
-### 3.1.5.1 Zufallszahlen
-* O.Rand_1 Alle Zufallswerte MÜSSEN über einen starken kryptographischen Zufallszahlengenerator erzeugt werden, welcher mit ausreichend Entropie geseedet wurde (vgl. [TR02102-1]).
+### 3.1.5.1 Random numbers
+* O.Rand_1 All random values MUST be generated by a strong cryptographic random number generator which has been seeded with sufficient entropy (cf. [TR02102-1]).
     > Random values for tokens are created by PHPs random_int() and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
 
 [Content](#content)
 
-### 3.1.6 Prüfaspekt (6): Authentisierung und Authentifizierung 
-* O.Auth_1 Der Hersteller MUSS ein Konzept zur Authentisierung auf angemessenem Vertrauensniveau (vgl. [TR03107-1]), zur Autorisierung (Rollenkonzept) und zum Beenden von Sitzungen dokumentieren. Das Konzept MUSS hierbei auch Kommunikationsverbindungen innerhalb eines Hintergrundsystem-Netzwerkes berücksichtigen.
+### 3.1.6 Objective (6): Authentication
+* O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session. This concept MUST consider internal network connections within the backend system as well.
     > User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
-* O.Auth_2 Das Hintergrundsystem MUSS für die Anbindung einer Anwendung eine geeignete Authentisierung unterstützen.
+* O.Auth_2 The backend system MUST support an appropriate authentication for linking the application.
     > This is not reasonable for the application used within a closed environment.
-* O.Auth_3 Das Hintergrundsystem SOLL Authentisierungsmechanismen und Autorisierungsfunktionen separat realisieren. Sind für den Zugriff auf das Hintergrundsystem verschiedene Rollen notwendig, MUSS eine Autorisierung bei jedem Datenzugriff separat realisiert werden.
+* O.Auth_3 The backend system SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
     > Every request matches the session and user permissions.
-* O.Auth_4 Jeder Authentifizierungsvorgang des Nutzers MUSS in Form einer Zwei Faktor Authentisierung umgesetzt werden.
+* O.Auth_4 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
     > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials.
-* O.Auth_5 Zusätzlich zu der in O.Auth_1 definierten Authentisierung auf einem angemessenen Vertrauensniveau, KANN der Hersteller dem Nutzer gemäß § 139e Abs. 10 SGB V, nach umfassender Information und Einwilligung, eine Authentisierungsmöglichkeit auf einem niedrigeren Vertrauensniveau anbieten. Dies schließt das Anbieten zusätzlicher Verfahren basierend auf den digitalen Identitäten im Gesundheitswesen gemäß § 291 Abs. 8 SGB V mit ein. 
+* O.Auth_5 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
     > This is not applicable.
-* O.Auth_6 Für die Bewertung eines Authentisierungsvorgangs SOLLEN zusätzliche Informationen (z. B. das verwendete Endgerät, die verwendete IP-Adresse oder die Zeit des Zugriffs) mit einbezogen werden.
+* O.Auth_6 Additional information (e.g. the end device used, the WiFi access node used or the time of access) SHOULD be included in the evaluation of an authentication process.
     > This is not reasonable for the application used within a closed environment.
-* O.Auth_7 Das Hintergrundsystem MUSS jede Anfrage gemäß des Rechte- und Rollenkonzeptes (vgl.O.Auth_1) authentifizieren und autorisieren.
+* O.Auth_7 The backend system MUST authenticates and authorizes each request according to the rights and privileges according the role concept (cf. O.Auth_1).
     > Every request matches the session and user permissions.
-* O.Auth_8 Dem Nutzer SOLL eine Möglichkeit gegeben werden, sich über ungewöhnliche Anmeldevorgänge informieren zu lassen.
+* O.Auth_8 The user SHOULD be given the option of being informed about unusual login processes
     > The user can view their login history e.g. to spot deviations from work schedule.
-* O.Auth_9 Das Hintergrundsystem MUSS Maßnahmen umsetzen, die ein Ausprobieren von LoginParametern (z. B. Passwörter) erschweren.
+* O.Auth_9 The backend system MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
     > This is not reasonable for the application used within a closed environment and on shared devices.
-* O.Auth_10 Das Hintergrundsystem MUSS die Anwendungssitzung nach einer angemessenen Zeit, in der sie nicht aktiv verwendet wurde (idle time) beenden und eine erneute Authentisierung fordern.
+* O.Auth_10 The backend system MUST request re-authentication after an appropriate period of inactivity (idle time).
     > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_11 Das Hintergrundsystem MUSS für die Anwendungssitzung nach einer angemessenen Zeit, in der sie aktiv verwendet wurde (active time) eine erneute Authentisierung fordern. 
+* O.Auth_11 The backend system MUST request re-authentication to reactivate the server session after an appropriate period of active use (active time).
     > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_12 Die Authentisierungsdaten DÜRFEN NICHT ohne eine erneute Authentifizierung des Nutzers geändert werden.
+* O.Auth_12 The authentication data MUST NOT be changed without re-authenticating the user.
     > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
-* O.Auth_13 Bei Änderung der Zugangsparameter SOLL der Nutzer über die zuletzt hinterlegten, gültigen Kontaktdaten über die Änderung informiert werden. Dem Nutzer SOLL über diesem Weg eine Möglichkeit geboten werden, die gemeldete Änderung zu sperren und nach entsprechender Authentifizierung neue Zugangsparameter zu setzen.
+* O.Auth_13 Whenever changing access parameters, the backend system SHOULD inform the user via last known valid contact details Therefore the user SHOULD get the opportunity to block the change and reset access parameters after successful authentication.
     > Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
-* O.Auth_14 Der Hersteller MUSS ein Konzept zur Rechteverwaltung (z.B. Benutzerrollen) vorlegen.
+* O.Auth_14 The manufacturer MUST submit a concept concerning privilege management (e.g. user roles).
     > Permission settings are an integral part of the application.
-* O.Auth_15 Alle einem Nutzer oder einer Sitzung zugeordneten Identifier MÜSSEN mit einem Zufallszahlengenerator gemäß O.Rand_1 erzeugt werden und eine geeignete Länge aufweisen.
+* O.Auth_15 All identifiers associated with a user or a session MUST be generated by a number generator according to O.Rand_1 have an appropriate length.
     > This is not reasonable for the application used within a closed environment and on shared devices. PHPs session_start() is considered suitable enough. Libraries contributing to randomness would bloat third party software without a sensible benefit.
-* O.Auth_16 Das Hintergrundsystem MUSS es dem Nutzer ermöglichen ein oder alle zuvor ausgestellten Authentifizierungstoken bzw. Session-Identifier ungültig zu machen.
+* O.Auth_16 The backend system MUST allow the user to invalidate one or all previously issued session identifiers or authentication tokens.
     > Sessions will allways be destroyed on logout or invalid login tokens (due to updates).
-* O.Auth_17 Wird eine Anwendungssitzung beendet, MUSS das Hintergrundsystem den Authentifizierungstoken bzw. Session-Identifier sicher löschen. Dies gilt sowohl für das aktive Beenden durch den Benutzer (log-out), als auch für das automatische Beenden durch die Anwendung (vgl. O.Auth_9 und O.Auth_10).
+* O.Auth_17 If any session is terminated, the backend system MUST securely delete authentication token and session identifier. This applies both to active termination by the user (log-out) and to automatic termination through the application (cf. O.Auth_9 and O.Auth_10).
     > Sessions will allways be destroyed on logout.
-* O.Auth_18 Session-Identifier MÜSSEN als sensible Daten geschützt werden.
+* O.Auth_18 Session identifiers MUST be protected as sensitive data.
     > [Installation](#installation)
-* O.Auth_19 Es DÜRFEN KEINE sensiblen Daten in ein Authentisierungstoken eingebettet werden.
+* O.Auth_19 Sensitive data MUST NOT be embedded in any authentication token.
     > Login tokens only include a generated partially random hash.
-* O.Auth_20 Ein Authentisierungstoken MUSS ausschließlich die erwarteten Felder enthalten.
+* O.Auth_20 Any authentication token MUST contain only the expected fields.
     > Login tokens consist of a 64 byte string only. PHPSESSID-cookies are default.
-* O.Auth_21 Authentisierungstoken MÜSSEN mit einem geeigneten Verfahren signiert werden (vgl. [TR02102-1]). Das Hintergrundsystem MUSS die Signatur des Authentisierungstokens prüfen. Dabei ist darauf zu achten, dass der Signaturtyp nicht none sein darf und das Hintergrundsystem Anfragen mit einem ungültigen oder abgelaufenen Authentifizierungstoken ablehnt.
+* O.Auth_21 Authentication token MUST be signed using an appropriate procedure (see [TR02102-1]). The backend system MUST check the authentication token’s signature. The type of signature MUST NOT be none and the backend system MUST reject requests using invalid or expired authentication token.
     > This is not reasonable for the application used within a closed environment.
 
 [Content](#content)
 
-### 3.1.6.1 Authentifizierung über Passwort
-* O.Pass_1 Bei einer Authentifizierung mittels Benutzername und Passwort MÜSSEN starke Passwortrichtlinien existieren. Diese SOLLEN sich am aktuellen Stand gängiger BestPractices orientieren.
+### 3.1.6.1 Passwords
+* O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
     > Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
-* O.Pass_2 Für die Einrichtung einer Authentisierung mittels Benutzername und Passwort KANN die Stärke des verwendeten Passworts dem Nutzer angezeigt werden. Informationen über die Stärke des gewählten Passworts DÜRFEN NICHT gespeichert werden.
+* O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
     > Login tokens are always generated by the system on request of an authorized administrative user.
-* O.Pass_3 Der Nutzer MUSS die Möglichkeit haben, sein Passwort zu ändern.
+* O.Pass_3 The user MUST have the option to change their password.
     > Login tokens can be renewed by authorized administrative users.
-* O.Pass_4 Das Ändern und Zurücksetzen von Passwörtern MUSS protokolliert werden ohne das Passwort selbst zu protokollieren. 
+* O.Pass_4 Changing and resetting passwords MUST be logged without logging the password itself.
     > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
-* O.Pass_5 Werden Passwörter gespeichert, MÜSSEN diese mit einer den aktuellen Sicherheitsstandards entsprechenden Hash-Funktion und unter Verwendung geeigneter Salts gehasht werden.
+* O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
     > As per the [encryption statement](#encryption-statement), sensitive data is not suitable for encryption in the described use case. It is not sensible to apply this to passwords for the risk of data breaches remains the same.
 
 [Content](#content)
 
-### 3.1.7 Prüfaspekt (7): Datensicherheit 
-* O.Data_1 Sensible Daten MÜSSEN verschlüsselt gespeichert werden. Das Hintergrundsystem SOLL sensible Daten, verschlüsselt speichern, so dass sie nur von dem Nutzer selber wieder entschlüsselt werden können.
+### 3.1.7 Objective (7): Data security
+* O.Data_1 The application MUST store sensitive data in encrypted form. The backend system SHOULD store sensitive data, encrypted in a way, so that it can only be decrypted by the user itself.
     > [Encryption statement](#encryption-statement)
-* O.Data_2 Alle erhobenen sensiblen Daten DÜRFEN NICHT über die Dauer ihrer jeweiligen Verarbeitung hinaus im Hintergrundsystem gehalten werden.
+* O.Data_2 All sensitive data collected MUST NOT be kept in the backend system beyond the duration of their respective processing.
     > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received as of 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
-* O.Data_3 Das Hintergrundsystem MUSS die Grundsätze der Datensparsamkeit und Zweckbindung berücksichtigen.
+* O.Data_3 The backend system MUST take into account the principles of data minimization and limitation due to the purpose.
     > Only active and intentional user input is processed and stored.
-* O.Data_4 Das Hintergrundsystem MUSS sämtliche Metadaten mit Datenschutz-Relevanz, wie etwa Rückschlüsse auf den GPS-Koordinaten des Aufnahmeorts, eingesetzte Hardware etc., entfernen, wenn diese Daten nicht für den rechtmäßigen Zweck der Anwendung benötigt werden.
+* O.Data_4 The backend system MUSS remove all metadata with data protection relevance, such the GPS coordinates of the location, used hardware, etc., whenever these data is not needed for the legitimate purpose of the application.
     > All photos are processed and resized. Meta data is lost during this process.
-* O.Data_5 Sensible Daten wie private Schlüssel DÜRFEN NICHT aus der Komponente, auf der sie erzeugt wurden, exportiert werden, außer es ist für den rechtmäßigen Zweck der Anwendung notwendig (s. Tabelle 15).
+* O.Data_5 Unless necessary for the legitimate purpose of the application, sensitive data like private keys MUST BE exported from the component they were generated from (see Table15).
     > Login tokens are to be exported as a qr-code, for scanning login credentials. There are no other keys to be exported.
-* O.Data_6 Das Hintergrundsystem DARF KEINE sensiblen Daten in Meldungen oder Benachrichtigungen, die nicht vom Benutzer explizit eingeschaltet wurden, schreiben.
+* O.Data_6 The backend system MUST NOT write sensitive data in messages or notifications the user did not explicitly gave permission for.
     > Notifications only return integers, no sensitive data.
-* O.Data_7 Das Hintergrundsystem MUSS dem Nutzer die Möglichkeit geben, dass bei Deinstallation der Anwendung alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig vom Hintergrundsystem gelöscht bzw. unzugänglich gemacht werden. Entscheidet sich der Nutzer, die Daten im Hintergrundsystem nicht zu löschen, MUSS eine für den Zweck angemessene maximale Verweildauer definiert sein. Der Nutzer MUSS über die Verweildauer informiert werden. Nach Ablauf der maximalen Verweildauer MÜSSEN alle sensiblen Daten und anwendungsspezifischen Anmeldeinformationen vollständig gelöscht werden. Dem Nutzer MUSS die Möglichkeit gegeben werden alle Daten auch vor Ablauf der Verweildauer vollständig zu löschen oder unzugänglich zu machen.
+* O.Data_7 The backend system MUST provide the user with the option to delete or make all sensitive data and application-specific credentials completely non accessible from the backend system, whenever the application is uninstalled by the user. If the user does not use this option, the backend system MUST define a maximum and for the application purpose appropriate duration, in which the data remains stored in the backend system. The Backend system MUST inform the user about the duration, in which the sensitive data remains stored in the backend system. After the maximum length of time, the backend system MUST delete or make all sensitive data and application-specific credentials non accessible. Additionally, the backend system MUST provide the user with an option to delete these information within the defined duration, in which the data may remain stored in the backend system.
     > The operator of the infrastructure is responsible for fulfilling this requirement.
-* O.Data_8 Um dem Missbrauch von sensiblen Daten nach einem Geräteverlust entgegenzuwirken, KANN die Anwendung einen Kill-Switch realisieren, d.h. ein absichtliches, sicheres Überschreiben von Nutzerdaten im Gerät auf Applikationsebene, ausgelöst durch das Hintergrundsystem. Der Hersteller MUSS die Auslösung des Kill-Switches durch den Anwender über das Hintergrundsystem durch erneute Authentifizierung vor missbräuchlicher Nutzung schützen.
+* O.Data_8 To counteract the misuse of sensitive data after a device loss, the application MAY implement a kill switch, i.e. a deliberate, secure overwriting of user data in the device at application level, triggered by the backend system. The manufacturer MUST protect the triggering of the kill switch by the user via the backend system against misuse by means of strong authentication mechanisms.
     > This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access.
 
 [Content](#content)
 
-### 3.1.8 Prüfaspekt (8): Kostenpflichtige Ressourcen 
+### 3.1.8 Objective (8): Paid resources
 > Not applicable, as there are no paid ressources.
 
-### 3.1.9 Prüfaspekt (9): Netzwerkkommunikation
+### 3.1.9 Objective (9): Network communication
 > The operator of the infrastructure is responsible for fulfilling these requirements.
 
-### 3.1.10 Prüfaspekt (10): Organisatorische Sicherheit 
+### 3.1.10 Objective (10): Organizational security
 > The operator of the infrastructure is responsible for fulfilling these requirements.
 
 [Content](#content)
