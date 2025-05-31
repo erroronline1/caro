@@ -64,6 +64,7 @@ Diese Anwendung möchte bei der Umsetzung eines Qualitätsmanagements nach ISO 1
 Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papierbasierte Dokumentationen ablösen. Es mag andere Anwendungen mit dem gleichen Ziel geben, diese verfolgen jedoch einen anderen Grundgedanken - die Verwaltung von Reha-Hilfsmitteln, einem Fokus auf orthopädische Schuhversorgungen oder einer primären Produktivitätsüberwachung - anstelle des primären Dokumentationsgedankens der CARO App für Hilfsmittel als Sonderanfertigungen in kleinen und mittelständigen Unternehmen. Ganz zu schweigen von unübersichtlichen Nutzeroberflächen, die ebenfalls das Ziel einer leicht verständlichen und einfachen Oberfläche steckten.
 
 ## Wesentliche Aspekte
+* Transparenz: direkter Zugriff auf Daten
 * Dokumentenverwaltung: volle Versionskontrolle, wiederverwendbare Komponenten, Zugriff auf frühere Versionen
 * einfache Formularerstellung: Formulare einfach zusammenstellen und nahtlose Integration in die Anwendung
 * Risikomanagment: mit Abgleich zwischen Risiken und Eigenschaften von Medizinprodukten
@@ -1163,8 +1164,9 @@ In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty
 ```
 ; general application settings
 [application]
+debugging = no ; yes: ja, no: nein; erlaubt oder unterbindet Fehlerbenachrichtigungen
 defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.XX.json-Dateien; Nutzer können im Profil individuell wählen
-issue_mail = "dev@erroronline.one" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
+issue_mail = "issues@companymail.tld" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
 order_auth = "token, signature" ; Optionen: token, signature; pin ist Standard, da dieser die Bestellberechtigung repräsentiert
 order_gtin_barcode = no ; yes: ja, no: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
 require_complaint_selection = yes ; yes: ja, no: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
