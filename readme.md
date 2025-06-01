@@ -28,11 +28,16 @@ Things are still in motion. Images my be outdated.
 * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * improve screenreader accessibility
+* templates
 * responsibilities
     * handle hidden attribute?
 * filereference
     * safe storage path
     * records preview
+* calculator
+    * price with taxes and surcharge
+* records
+    * review unit filter on caro app contributions lacking units - there's something off
 
 ## Content
 * [Aims](#aims)
