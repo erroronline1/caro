@@ -111,6 +111,7 @@ class RECORD extends API {
 				$checked = json_decode($checked ? : '', true);
 				if ($type === 'radio'){
 					$content[$this->_lang->GET('record.casestate_filter_all')] = ['onchange' => "_client.record.casestatefilter(undefined)"];
+					if (!$checked) $content[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
 				}
 				foreach($this->_lang->_USER['casestate'][$context] as $state => $translation){
 					$content[$translation] = $action;
