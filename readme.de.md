@@ -1241,7 +1241,7 @@ Anwendungsunterstützung Legende:
 | ---- | ---- | ---- | ---- |
 | ISO 13485 4.1.1 Allgemeine Anforderungen an das Qualitäts-managementsystem | teilweise, strukturell | &bull; Die Erfüllung regulatorischer Anforderungen kann gegengeprüft werden, sofern Dokumenten die regulatorischen Zusammenhänge zugeordnet wurden.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Dokumente](#dokumente), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) |
 | ISO 13485 4.1.2 Prozessfestlegung | teilweise, strukturell | &bull; Die Anwendung hat ein Modul für die Risikoanalyse um Risken zu erfassen, zu bewerten und Maßnahmen zu beschreiben.<br/>&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext* | [Risikomanagement](#risikomanagement) |
-| ISO 13485 4.1.3 Prozessüberwachung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
+| ISO 13485 4.1.3 Prozessüberwachung | teilweise, strukturell | &bull; Nutzerrollen und Schulungen<br/>&bull; Verantwortlichkeiten<br/>&bull; Verbesserungsvorschläge<br/>&bull; Aufzeichnungen<br/>&bull; Dokumentenlenkung<br/>&bull; Interne Audits<br/>&bull; Managementbewertung<br/>&bull; Beschaffung<br/>&bull; Lieferantenbewertung<br/>&bull; Checkliste über regulatorische Erfüllung<br/>&bull; Bestellstatistiken&bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | [Nutzer](#nutzer), [Verantwortlichkeiten](#verantwortlichkeiten), [Verbesserungsvorschläge](#verbesserungsvorschläge), [Aufzeichnungen](#aufzeichnungen-1), [Dokumente](#dokumente), [Audit](#audit), [Managementbericht](#managementbericht), [Bestellung](#bestellung), [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung), [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) | 
 | ISO 13485 4.1.4 Prozesslenkung | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
 | ISO 13485 4.1.5 Ausgegliederte Prozesse | strukturell | &bull; *Beschreibung über Dokumente mit "Verfahrens- oder Arbeitsanweisung"-Kontext*<br/>&bull; *Aufzeichnung über Dokumente mit "Allgemeine Dokumentation"-Kontext* | |
 | ISO 13485 4.1.6 Validierung der Anwendung von Computersoftware | strukturell | &bull; Entsprechende Dokumente erfordern einen Identifikator, ähnlich Versorgungsdokumentationen. Software kann ebenfalls einen individuellen Identifikator zugeteilt bekommen.<br/>&bull; Computersoftware und deren Versionsaufzeichnungen können ebenfalls als Arbeitsmittel (7.6) betrachtet werden.<br/>&bull; *Aufzeichnung über Dokumente mit "Überwachung von Arbeitsmitteln"-Kontext* | |
@@ -1441,6 +1441,24 @@ Manche Variablen können während der Laufzeit angepasst werden. Dies betrifft a
 Es kann eine **config.env**-Datei als strukturelle Kopie der config.ini-Datei angelegt werden. Einstellungen innerhalb der config.env überschreiben Einstellungen der config.ini. Auf diesem Weg können unterschiedliche Umgebungen eingerichtet werden, z.B. verschiedene Entwicklungsumgebungen sowie die Produktivumgebung. Bei Entwicklungsänderungen ist es selbsterklärend diese Dateien jeweils manuell auf Stand zu halten. Jede Erwähnung der config.ini-Datei betrifft immer auch die config.env-Datei.
 
 In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty_reasons, Ostern-bezogene Feiertage und SQL-Einstellungen umgebungsbezogen ergänzt werden. Nicht alle Einstellungen müssen vorhanden sein, fehlende Parameter werden mit den Standardeinstellungen der INI-Datei vervollständigt. Standardmäßig unterliegen ENV-Dateien nicht der Versionskontrolle; wenn der Produktions-Server als Upstream konfiguriert ist müssen diese Dateien manuell bereitgestellt werden (siehe auch [Anpassung](#anpassung)).
+
+Standardmäßig sind folgende Berechtigungen/Rollen in der language.XX.json-Datei definiert:
+```
+{
+    "user": "Mitarbeiter",
+    "group": "Gruppe",
+    "medicaldeviceconsultant": "Medizinprodukteberater",
+    "supervisor": "Bereichsleiter",
+    "office": "Verwaltung",
+    "human_ressources": "Personalverwaltung",
+    "purchase": "Einkauf",
+    "purchase_assistant": "Einkaufsassistent",
+    "qmo": "Qualitätsmanagementbeauftragter",
+    "prrc": "Verantwortliche Person nach MDR",
+    "ceo": "Leiter",
+    "admin": "Programmadministrator"
+}
+```
 
 ```
 ; general application settings

@@ -1334,7 +1334,7 @@ Application support legend:
 | ---- | ---- | ---- | ---- |
 | ISO 13485 4.1.1 General quality management requirements | partial, structural | &bull; Fulfilment of regulatory issues can be verified, given documents are assigned proper regulatory contexts.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Documents](#documents), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)|
 | ISO 13485 4.1.2 Process regulation | partial, structural | &bull; The application has a risk management module to consider, evaluate and handle risks.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Risk management](#risk-management) |
-| ISO 13485 4.1.3 Process monitoring | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
+| ISO 13485 4.1.3 Process monitoring | partial, structural | &bull; User roles and trainings<br/>&bull; Responsibilities<br/>&bull; Improvement Suggestions<br/>&bull; Records<br/>&bull; Document distribution<br/>&bull; Internal audits<br/>&bull; Management reviews<br/>&bull; Procurement<br/>&bull; Vendor evaluation<br/>&bull; Regulatory fulfilment checklist<br/>&bull; Order statistics<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | [Users](#users), [Responsibilities](#responsibilities), [Improvement suggestions](#improvement-suggestions), [Records](#records-1), [Documents](#documents), [Audit](#audit), [Management review](#management-review), [Order](#order), [Vendor and product management](#vendor-and-product-management), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 4.1.4 Process control | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
 | ISO 13485 4.1.5 Process outsourcing | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "General company record"-context* | |
 | ISO 13485 4.1.6 Validating use of software | structural | &bull; Dedicated documents make use of an identifier, like production documents. Software may each have assigned their distinct identifier.<br/>&bull; computer software and their version tracking on terminal devices may be seen as equipment (7.6) as well.<br/>&bull; *record with documents with the "Equipment Surveillance"-context* | |
@@ -1534,6 +1534,24 @@ Some variables can be edited during runtime. This applies for all *values* of la
 You can add a **config.env**-file being a structural clone of config.ini. Settings within config.env will override config.ini settings. This way you can set up different environments, e.g several development environments and production. On development changes it is self explanatory to keep all files up to date manually. All mentions of the config.ini-file always refer to the config.env-file as well.
 
 Using the config.env-file you can also append labels, forbidden names, hide_offduty_reasons, easter-related holidays and SQL-settings related to your environment. Not all settings have to be present, on missing parameters within the environment settings the default ini-settings will take place. By default ENV-files are ignored in version control; if you set the production-server as upstream you'll have to provide the file manually (also see [Customization](#customisation)).
+
+By default following permissions/roles are defined within the language.XX.json-file:
+```
+{
+    "user": "User",
+    "group": "Group",
+    "medicaldeviceconsultant": "Medical device consultant",
+    "supervisor": "Supervisor",
+    "office": "Office",
+    "human_ressources": "Human ressources",
+    "purchase": "Purchase",
+    "purchase_assistant": "Purchase assistant",
+    "qmo": "Quality management officer",
+    "prrc": "Person responsible for regulatory compliance",
+    "ceo": "CEO",
+    "admin": "Application admin"
+}
+```
 
 ```
 ; general application settings
