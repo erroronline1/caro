@@ -30,8 +30,8 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 require_once('_config.php');
 @define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
+require_once('_utility.php'); // general utilities
 require_once('_sqlinterface.php');
-require_once('_utility.php');
 require_once('_language.php');
 
 define('DEFAULTSQL', [
@@ -657,7 +657,7 @@ class INSTALL {
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
-		$this->_currentdate = new DateTime('now', new DateTimeZone(CONFIG['calendar']['timezones'][array_key_first(CONFIG['calendar']['timezones'])]));
+		$this->_currentdate = new DateTime('now');
 
 		$this->_lang = new LANG();
 	}
