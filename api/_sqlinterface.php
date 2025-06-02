@@ -82,7 +82,7 @@ class SQLQUERY {
 			die();
 		}
 		if (str_starts_with($query, 'SELECT')) {
-			//var_dump($statement->debugDumpParams());
+			//UTILITY::debug($statement->debugDumpParams());
 			$result = $statement->fetchAll();
 			$statement = null;
 			return $result;

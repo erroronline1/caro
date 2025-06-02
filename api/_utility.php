@@ -774,7 +774,7 @@ class PERMISSION {
 			}
 			return preg_split('/\W+/', CONFIG['permissions'][$function]);
 		}
-		var_dump('permission ' . $function . ' not found in config.ini file');
+		UTILITY::debug('permission ' . $function . ' not found in config.ini file');
 	}
 
 	/**
