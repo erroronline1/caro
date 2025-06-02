@@ -38,6 +38,7 @@ Things are still in motion. Images my be outdated.
     * price with taxes and surcharge
 * records
     * review unit filter on caro app contributions lacking units - there's something off
+* erroronline1.js return errors instead of tracing, handle debug message within api.js
 
 ## Content
 * [Aims](#aims)
