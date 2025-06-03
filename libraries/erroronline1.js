@@ -116,7 +116,7 @@ const _ = {
 				};
 			else throw new Error("server responded " + response.status + ": " + httpResponse[response.status]);
 		}).catch(e => {
-			console.trace(e);
+			return {error:e};
 		});
 		return response;
 		/* use like 
@@ -299,8 +299,7 @@ const _ = {
 				}
 				const objectStoreRequest = objectStore.add(entry);
 				objectStoreRequest.onerror = (event) => {
-					console.log("error storing ", contents, event);
-					reject(event.target);
+					reject({"event": event, contents: contents});
 				};
 				objectStoreRequest.onsuccess = (event) => {
 					resolve(event.target.result); // key
