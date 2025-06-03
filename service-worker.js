@@ -120,7 +120,7 @@ self.addEventListener("fetch", (event) => {
 								if (response.status === 200) successfullyRequested.push(parseInt(key, 10));
 							})
 							.catch((error) => {
-								console.log(error);
+								console.trace(error);
 							});
 					}
 					if (successfullyRequested.length) await database.delete(successfullyRequested);
@@ -174,7 +174,7 @@ self.addEventListener("fetch", (event) => {
 							return cacheResponse;
 						},
 						(error) => {
-							console.log(error);
+							console.trace(error);
 							return cacheResponse;
 						}
 					);
