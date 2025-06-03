@@ -225,7 +225,7 @@ class NOTIFICATION extends API {
 		$uncompleted = 0;
 		foreach ($events as $row){
 			if (!$row['organizational_unit']) continue; 
-			if (array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']) && $row['type'] !== 'timesheet' && !$row['closed']) $uncompleted++;
+			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] !== 'timesheet' && !$row['closed']) $uncompleted++;
 		}
 		return $uncompleted;
 	}
@@ -480,6 +480,10 @@ class NOTIFICATION extends API {
 	 *  |_| |___|___|___|_| |___|___|
 	 *
 	 * number of unclosed records for assigned units
+	 * alert message to units interval wise excluding
+	 * * common
+	 * * admin
+	 * * office
 	 */
 	public function records(){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
@@ -490,7 +494,7 @@ class NOTIFICATION extends API {
 			if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
 				|| ($row['record_type'] !== 'complaint' && !$row['closed'])){
 				// rise counter for unit member
-				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units']), $_SESSION['user']['units'])) $number++;
+				if ($row['units'] && in_array($row['context'], ['casedocumentation', 'incident']) && array_intersect(explode(',', $row['units'] ? : ''), $_SESSION['user']['units'])) $number++;
 				// alert if applicable
 				$last = new DateTime($row['last_touch']);
 				$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['open_record_reminder']));
@@ -499,7 +503,7 @@ class NOTIFICATION extends API {
 					$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)];
 
 					$this->alertUserGroup(
-						['unit' => explode(',', $row['units'])],
+						['unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))],
 						$this->_lang->GET('record.reminder_message', [
 							':days' => $last->diff($this->_date['servertime'])->days,
 							':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
@@ -543,7 +547,7 @@ class NOTIFICATION extends API {
 			if ($row['hidden']) continue;
 			if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 				// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-				$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'])))], true));
+				$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true));
 				$open = false;
 				foreach($reminders as $reminder){
 					if (!$reminder['closed']) $open = true;
@@ -556,7 +560,7 @@ class NOTIFICATION extends API {
 						':author_id' => 1,
 						':affected_user_id' => null,
 						':organizational_unit' => 'admin',
-						':subject' => $this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'])))], true),
+						':subject' => $this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true),
 						':misc' => null,
 						':closed' => null,
 						':alert' => 1
@@ -577,13 +581,24 @@ class NOTIFICATION extends API {
 		return $number;
 	}
 
+	/**
+	 *           _         _     _       _ _           _     _
+	 *   ___ ___| |_ ___ _| |_ _| |___ _| | |_ ___ ___|_|___|_|___ ___ ___
+	 *  |_ -|  _|   | -_| . | | | | -_| . |  _|  _| .'| |   | |   | . |_ -|
+	 *  |___|___|_|_|___|___|___|_|___|___|_| |_| |__,|_|_|_|_|_|_|_  |___|
+	 *                                                            |___|
+	 * alert message to units interval wise excluding
+	 * * common
+	 * * admin
+	 * * office
+	 */
 	public function scheduledtrainings(){
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$unitusers = [];
 		$number = 0;
 		// find all users within current users units
 		foreach($users as $user){
-			if (array_intersect($_SESSION['user']['units'], explode(',', $user['units']))) $unitusers[] = $user['id'];
+			if (array_intersect($_SESSION['user']['units'], explode(',', $user['units'] ? : ''))) $unitusers[] = $user['id'];
 		}
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
 			'replacements' => [
@@ -632,7 +647,7 @@ class NOTIFICATION extends API {
 						]);
 						$this->alertUserGroup([
 								'permission' => ['supervisor'],
-								'group' => explode(',', $user['units'] ? : ''),
+								'group' => array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])),
 								'user' => [$user['name']]
 							],
 							$this->_lang->GET('user.training.auto_schedule_alert_message', [
