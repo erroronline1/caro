@@ -136,6 +136,11 @@ export const api = {
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, ["post", "put"].includes(method.toLowerCase()))
 			.then(async (data) => {
+				if (data.error) {
+					_client.application.debug(data.error);
+					return;
+				}
+
 				document.querySelector("header>div:nth-of-type(2)").style.display = [200, 511].includes(data.status) ? "none" : "block";
 				if (data.status === 203) new Toast(api._lang.GET("general.service_worker_get_cache_fallback"), "info");
 				if (data.status === 207) {
