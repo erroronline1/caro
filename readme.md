@@ -34,8 +34,6 @@ Things are still in motion. Images my be outdated.
 * filereference
     * safe storage path
     * records preview
-* calculator
-    * price with taxes and surcharge
 * records
     * review unit filter on caro app contributions lacking units - there's something off
 
@@ -2105,6 +2103,8 @@ Product Release
 * Declaration of Conformity: **not applicable**
 
 ### Stakeholder requirements
+This application is developed for the public service P&O-Department of the University Hospital Heidelberg.
+
 Stakeholder identification:
 * User (regular employees)
 * CEO (Chief executive officer)

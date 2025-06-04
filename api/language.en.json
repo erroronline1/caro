@@ -1489,6 +1489,11 @@
 			"pow_hint": "e.g. resin mixing 70/30, decimal point is allowed",
 			"pow_parts": "Parts",
 			"pow_weight": "Target weight",
+			"price": "Price calculation",			
+			"price_hint": "Calculate gross price with taxes and surcharge",
+			"price_net": "Net price",
+			"price_surcharge": "Surcharge in %",
+			"price_tax": "Tax in %",
 			"result": "Result",
 			"select_type": "Calculate"
 		},

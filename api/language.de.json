@@ -1489,6 +1489,11 @@
 			"pow_hint": "z.B. Harzmischungen 70/30, Dezimalpunkt ist erlaubt",
 			"pow_parts": "Teile",
 			"pow_weight": "Zielgewicht",
+			"price": "Preisberechnung",
+			"price_hint": "Berechne einen Endpreis mit Steuern und Aufschlag",
+			"price_net": "Nettopreis",
+			"price_surcharge": "Aufschlag in %",
+			"price_tax": "Steuer in %",
 			"result": "Ergebnis",
 			"select_type": "Berechne"
 		},

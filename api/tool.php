@@ -123,6 +123,19 @@ class TOOL extends API {
 			return implode("\n", $result);
 		}
 
+		/**
+		 * price with taxes and surcharge
+		 * @param float $price
+		 * @param float $tax
+		 * @param float $surcharge
+		 * @return float
+		 */
+		function price($price = 0, $tax = 0, $surcharge = 0){
+			$price = floatval(str_replace(',', '.', $price));
+			$tax = floatval(str_replace(',', '.', $tax));
+			$surcharge = floatval(str_replace(',', '.', $surcharge));
+			return strval(round($price + $price * $tax / 100 + $price * $surcharge / 100, 2));
+		}
 
 		$types = [
 			'pow' => [
@@ -201,7 +214,29 @@ class TOOL extends API {
 						'multiple' => true
 					]
 				]
-			]
+			],
+			'price' => [
+				[
+					'type' => 'number',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.price_net'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_net')) ? : ''
+					],
+					'hint' => $this->_lang->GET('tool.calculator.price_hint')
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.price_tax'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_tax')) ? : ''
+					]
+				], [
+					'type' => 'number',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.price_surcharge'),
+						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_surcharge')) ? : ''
+					]
+				]
+			],
 		];
 
 		$result['render'] = ['form' => [
@@ -221,6 +256,7 @@ class TOOL extends API {
 						$this->_lang->GET('tool.calculator.poa') => $this->_requestedType === 'poa' ? ['value' => 'poa', 'selected' => true] : ['value' => 'poa'],
 						$this->_lang->GET('tool.calculator.cd') => $this->_requestedType === 'cd' ? ['value' => 'cd', 'selected' => true] : ['value' => 'cd'],
 						$this->_lang->GET('tool.calculator.ma') => $this->_requestedType === 'ma' ? ['value' => 'ma', 'selected' => true] : ['value' => 'ma'],
+						$this->_lang->GET('tool.calculator.price') => $this->_requestedType === 'price' ? ['value' => 'price', 'selected' => true] : ['value' => 'price'],
 					]
 				],
 				$types[isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow'],
@@ -259,6 +295,9 @@ class TOOL extends API {
 							}
 						}
 						$calculation = measure_adjustment($measures, UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_start')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_end')));
+						break;
+					case 'price':
+						$calculation = price(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_net')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_tax')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_surcharge')));
 						break;
 				}
 				$result['render']['content'][] = [
