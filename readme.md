@@ -36,6 +36,9 @@ Things are still in motion. Images my be outdated.
     * records preview
 * records
     * review unit filter on caro app contributions lacking units - there's something off
+* audit, managementreview
+    * import previous statements for similar topics for reference
+
 
 ## Content
 * [Aims](#aims)
@@ -216,6 +219,7 @@ Timestamps are not qualified. A reduced validity than manual or stamped dates on
 ## Tips
 * Use a calendar-button within surveillance documents to immediately set the next due date while handling the current documentation.
 * Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
+* Include the flowcharts from this description in your process instructions to depict your processes where defined by the application.
 
 ![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements.png)
 
@@ -1606,8 +1610,8 @@ filename[characters] = "[,\/\\\]" ; replace matched characters to avoid link err
 
 [lifespan]
 idle = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
-mdr14_sample_interval = 365 ; DAYS until a new sample check is required as default value
-mdr14_sample_reusable = 1825 ; DAYS until a new sample check on the same product is allowed as default value
+mdr14_sample_interval = 93 ; DAYS until a new sample check is required as default value
+mdr14_sample_reusable = 1095 ; DAYS until a new sample check on the same product is allowed as default value
 open_record_reminder = 30 ; DAYS after unclosed records are reminded of via messenger
 order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
 order_undelivered = 3 ; DAYS, after these unit members will be reminded to mark as delivered or enquire delivery

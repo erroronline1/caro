@@ -2249,7 +2249,7 @@
 		"unit": "prosthetics2",
 		"author": "Caro App",
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
-		"permitted_export": null,
+		"permitted_export": true,
 		"restricted_access": null,
 		"content": "identifikator,konformitätserklärung,gebrauchsanweisung allgemein,gebrauchsanweisung warnungen einsatzbereich prothetik ii,gebrauchsanweisung handhabung,gebrauchsanweisung beschreibung komponenten prothetik ii,gebrauchsanweisung medizinische aspekte prothetik ii,gebrauchsanweisung körperpflege,gebrauchsanweisung reinigung,gebrauchsanweisung instandhaltung,gebrauchsanweisung entsorgung,gebrauchsanweisung therapeuteninformation"
 	},

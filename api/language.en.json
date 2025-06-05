@@ -1586,7 +1586,7 @@
 			"add_date": "Date of training",
 			"add_document": "Add document",
 			"add_evaluation": "Evaluation",
-			"add_evaluation_unreasonable": "Evaluation is unreasonable, this is a mandatory training.",
+			"add_evaluation_unreasonable": "Evaluation is unreasonable, this training has no impact on product safety.",
 			"add_experience_points": "Experience points",
 			"add_expires": "Date of expiry",
 			"add_hint": "Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional.",

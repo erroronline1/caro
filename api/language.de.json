@@ -1586,7 +1586,7 @@
 			"add_date": "Datum der Schulung",
 			"add_document": "Datei hinzufügen",
 			"add_evaluation": "Bewertung",
-			"add_evaluation_unreasonable": "Eine Schulungsbewertung ist nicht angemessen, da es sich um eine verpflichtende Schulung handelt.",
+			"add_evaluation_unreasonable": "Eine Schulungsbewertung ist nicht angemessen, da sich diese Schulung nicht auf die Produktsicherheit auswirkt.",
 			"add_experience_points": "Erfahrungspunkte",
 			"add_expires": "Gültig bis",
 			"add_hint": "Ohne einen Titel werden alle anderen Eingaben ignoriert. Ohne Angabe eines Datums wird das heutige verwendet. Ablaufdatum und Erfahrungspunkte sind optional.",

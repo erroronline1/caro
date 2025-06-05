@@ -124,6 +124,7 @@ Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftli
 ## Tips
 * Ein Kalender-Element kann in die Überwachungs-Dokumente eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
 * Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden.
+* Die Flussdiagramme dieser Beschreibung können als Darstellung innerhalb der Proszessbeschreibungen / Verfahrensanweisungen zur Darstellung genutzt werden, sofern die Abläufe durch die Anwendung festgelegt sind.
 
 ![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de.png)
 
@@ -1510,8 +1511,8 @@ filename[characters] = "[,\/\\\]" ; ersetze gefundene Zeichen um Verweisfehler z
 
 [lifespan]
 idle = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt
-mdr14_sample_interval = 365 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
-mdr14_sample_reusable = 1825 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
+mdr14_sample_interval = 93 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
+mdr14_sample_reusable = 1095 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
 open_record_reminder = 30 ; Tage nach denen per Nachricht and nicht abgeschlossene Aufzeichnungen erinnert wird
 order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
 order_undelivered = 3 ; Tage, nach denen Bereiche daran erinnert werden Auslieferungen zu merkieren oder sich nach dem Sachstand zu erkundigen
