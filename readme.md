@@ -39,7 +39,6 @@ Things are still in motion. Images my be outdated.
 * audit, managementreview
     * import previous statements for similar topics for reference
 
-
 ## Content
 * [Aims](#aims)
     * [Key aspects](#key-aspects)
@@ -91,6 +90,7 @@ Things are still in motion. Images my be outdated.
     * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
     * [Data protection](#data-protection)
     * [General](#general)
+        [User training recommendations](#user-training-recommendations)
     * [Information security](#information-security)
     * [Performance evaluation](#performance-evaluation)
     * [Tech doc](#tech-doc)
@@ -2046,6 +2046,14 @@ Evidences of conformity according to the documents described above:
 | Development | Early access alpha testing | Document requirements within [stakeholder requirements](#stakeholder-requirements), integrate if possible, adapt structure, styling and assemble-framework |
 | Initial deployment | Limit modules to<br/>&bull; orders and depending vendor and product management<br/>&bull; conversations<br/>&bull; sharepoint<br/>&bull; contextual documents<br/>limit user database to a few personal accounts and group accounts per unit<br/>limit tools to<br/>&bull; codes<br/>&bull; scanner<br/>&bull; calculator<br/>&bull; image handling<br/>&bull; zip<br/>&bull; regulatory evaluations and summaries | Assess frontend usability | Adapt structure, styling and assemble-framework |
 | Full deployment | Enable all modules, register personal accounts | Assess frontend usability | Adapt structure, styling and assemble-framework |
+
+### User training recommendations
+according to [default permissions](#environment-settings)
+| Permissions | Topics |
+| User | &bull; Orders, incorporation, sample check<br/>&bull; Records, import, export<br/>&bull; Calendar, planning, appointment notice<br/>&bull; Trainings, schedule, evaluation |
+| Supervisor, PRRC | &bull; Documents, approval<br/>&bull; Pending incorporations<br/>&bull;Sample checks, revoke |
+| QMO | &bull; Responsibilities<br/>&bull; Documents, creation<br/>&bull; Audit<br/>&bull; Management review<br/>&bull; User management<br/>&bull; Regulatory evaluations and summaries |
+| QMO, Purchase | &bull; Vendors, add, edit, evaluate, pricelist import<br/>&bull; Products, add, edit, deactivate<br/>&bull; Orders |
 
 [Content](#content)
 

@@ -49,6 +49,7 @@
     * [Erwägungen zur Nutzerakzeptanz](#erwägungen-zur-nutzerakzeptanz)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
+    * [Empfehlungen zur Nutzerunterweisung](#empfehlungen-zur-nutzerunterweisung)
     * [Risikoanalyse](#risikoanalyse)
     * [Erklärung zur Barrierefreiheit](#erklärung-zur-barrierefreiheit)
 * [Code Design Vorlagen](#code-design-vorlagen)
@@ -1892,6 +1893,14 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
 
 # Regulatorische Anforderungen an die Software
 Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [OpenRegulatory](https://github.com/openregulatory/templates) liegen in der englischsprachigen Beschreibung vor.
+
+### Empfehlungen zur Nutzerunterweisung
+unter Berücksichtigung der [Standard-Berechtigungen](#umgebungseinstellungen)
+| Berechtigungen | Themen |
+| Nutzer | &bull; Bestellungen, Produkteinführung, Stichprobenprüfung<br/>&bull; Aufzeichnungen, Import, Export<br/>&bull; Kalender, Planung, Terminvereinbarung<br/>&bull; Schulungen, Planung, Bewertung |
+| Bereichsleiter, PRRC | &bull; Dokumente, Freigaben<br/>&bull; Laufende Produkteinführungen<br/>&bull;Stichprobenprüfung, Widerruf |
+| QMB | &bull; Verantwortlichkeiten<br/>&bull; Dokumente, Erstellung<br/>&bull; Audit<br/>&bull; Managementbewertung<br/>&bull; Nutzerverwaltung<br/>&bull; Regulatorische Regulatory Auswertungen und Zusammenfassungen |
+| QMB, Einkauf | &bull; Lieferanten, hinzufügen, bearbeiten, bewerten, Preislistenimport<br/>&bull; Produkte, hinzufügen, bearbeiten, deaktivieren<br/>&bull; Bestellungen |
 
 ### Risikoanalyse
 Eine Risikoanalyse liegt in der englischsprachigen Beschreibung vor.
