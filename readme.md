@@ -38,6 +38,8 @@ Things are still in motion. Images my be outdated.
     * review unit filter on caro app contributions lacking units - there's something off
 * audit, managementreview
     * import previous statements for similar topics for reference
+* order, products
+    * message to purchase to edit product if not authorized
 
 ## Content
 * [Aims](#aims)
@@ -90,7 +92,7 @@ Things are still in motion. Images my be outdated.
     * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
     * [Data protection](#data-protection)
     * [General](#general)
-        [User training recommendations](#user-training-recommendations)
+        * [User training recommendations](#user-training-recommendations)
     * [Information security](#information-security)
     * [Performance evaluation](#performance-evaluation)
     * [Tech doc](#tech-doc)
@@ -2049,9 +2051,11 @@ Evidences of conformity according to the documents described above:
 
 ### User training recommendations
 according to [default permissions](#environment-settings)
+
 | Permissions | Topics |
+| ----------- | ------ |
 | User | &bull; Orders, incorporation, sample check<br/>&bull; Records, import, export<br/>&bull; Calendar, planning, appointment notice<br/>&bull; Trainings, schedule, evaluation |
-| Supervisor, PRRC | &bull; Documents, approval<br/>&bull; Pending incorporations<br/>&bull;Sample checks, revoke |
+| Supervisor, PRRC | &bull; Documents, approval<br/>&bull; Pending incorporations<br/>&bull; Sample checks, revoke |
 | QMO | &bull; Responsibilities<br/>&bull; Documents, creation<br/>&bull; Audit<br/>&bull; Management review<br/>&bull; User management<br/>&bull; Regulatory evaluations and summaries |
 | QMO, Purchase | &bull; Vendors, add, edit, evaluate, pricelist import<br/>&bull; Products, add, edit, deactivate<br/>&bull; Orders |
 

@@ -1896,9 +1896,11 @@ Stellungnahmen zu regulatorischen Anforderungen an die Software gemäß [OpenReg
 
 ### Empfehlungen zur Nutzerunterweisung
 unter Berücksichtigung der [Standard-Berechtigungen](#umgebungseinstellungen)
+
 | Berechtigungen | Themen |
+| -------------- | ------ |
 | Nutzer | &bull; Bestellungen, Produkteinführung, Stichprobenprüfung<br/>&bull; Aufzeichnungen, Import, Export<br/>&bull; Kalender, Planung, Terminvereinbarung<br/>&bull; Schulungen, Planung, Bewertung |
-| Bereichsleiter, PRRC | &bull; Dokumente, Freigaben<br/>&bull; Laufende Produkteinführungen<br/>&bull;Stichprobenprüfung, Widerruf |
+| Bereichsleiter, PRRC | &bull; Dokumente, Freigaben<br/>&bull; Laufende Produkteinführungen<br/>&bull; Stichprobenprüfung, Widerruf |
 | QMB | &bull; Verantwortlichkeiten<br/>&bull; Dokumente, Erstellung<br/>&bull; Audit<br/>&bull; Managementbewertung<br/>&bull; Nutzerverwaltung<br/>&bull; Regulatorische Regulatory Auswertungen und Zusammenfassungen |
 | QMB, Einkauf | &bull; Lieferanten, hinzufügen, bearbeiten, bewerten, Preislistenimport<br/>&bull; Produkte, hinzufügen, bearbeiten, deaktivieren<br/>&bull; Bestellungen |
 
