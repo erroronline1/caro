@@ -595,9 +595,11 @@
 			"delete_success": "Managementbericht gelöscht",
 			"edit": "Bearbeiten",
 			"last_edit": "Letzte Bearbeitung am :date von :user",
+			"last_version": "Mit den Eingaben vom letzten Mal neu starten",
 			"not_found": "Managementbericht nicht gefunden",
 			"not_saved": "Managementbericht konnte nicht gespeichert werden.",
 			"required": {
+				"introducion": "Einleitung",
 				"feedback": "Rückmeldungen",
 				"complaint_handling": "Reklamationsbearbeitung",
 				"reporting": "Berichterstattung an Regulierungsbehörden",

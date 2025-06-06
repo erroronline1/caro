@@ -595,9 +595,11 @@
 			"delete_success": "Management review deleted",
 			"edit": "Edit",
 			"last_edit": "Last edit on :date by :user",
+			"last_version": "Start anew with the last reviews data.",
 			"not_found": "Management review not found",
 			"not_saved": "Management review could not be saved.",
 			"required": {
+				"introducion": "Introducion",
 				"feedback": "Feedback",
 				"complaint_handling": "Complaint handling",
 				"reporting": "Reporting to regulatory authorities",

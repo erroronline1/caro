@@ -32,14 +32,7 @@ Things are still in motion. Images my be outdated.
 * responsibilities
     * handle hidden attribute?
 * filereference
-    * safe storage path
-    * records preview
-* records
-    * review unit filter on caro app contributions lacking units - there's something off
-* audit, managementreview
-    * import previous statements for similar topics for reference
-* order, products
-    * message to purchase to edit product if not authorized
+    * save storage path (recheck test environment!)
 
 ## Content
 * [Aims](#aims)
@@ -661,14 +654,14 @@ Audits can be added to the calendar from the form as well, informing selected un
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template.png)
 
-Executing an audit starts by selecting one of the prepared templates. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. On finishing an audit the report is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables) and all members of the audited unit. Closed audits can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
+Executing an audit starts by selecting one of the prepared templates. Answers and statements will be initially imported from the last audit for the selected unit. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. On finishing an audit the report is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables) and all members of the audited unit. Closed audits can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit.png)
 
 [Content](#content)
 
 ### Management review
-Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. The default language-files contain all required issues, so no topic is forgotten. Currently reviews are text only, so no imgages, attachments or tables. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
+Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. A new review always starts with the input of the last saved one to begin with. The default language-files contain all required issues, so no topic is forgotten. Currently reviews are text only, so no images, attachments or tables. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
 [Content](#content)
 

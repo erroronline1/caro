@@ -269,7 +269,7 @@ class AUDIT extends API {
 				break;
 			case 'GET':
 				$result = [];
-				$audit = $template = null;
+				$audit = $template = $recent = null;
 				$select = [
 					'edit' => [
 						'...' => ['value' => '0']
@@ -293,25 +293,38 @@ class AUDIT extends API {
 				foreach($templates as $row){
 					$select['templates'][$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $this->convertFromServerTime($row['date'])] = ['value' => $row['id']];
 				}
-
-				// audit selections
-				foreach($audits as $row){
-					if (!$row['closed']){
-						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $this->convertFromServerTime($row['last_touch'])] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
-					}
-				}
-
 				if ($this->_requestedTemplate && $this->_requestedTemplate !== 'null' && !$audit){
 					$template = $templates[array_search($this->_requestedTemplate, array_column($templates, 'id'))];
 				}
 				elseif ($audit){
 					$template = $templates[array_search($audit['template'], array_column($templates, 'id'))];
 				}
+
+				// audit selections
+				foreach($audits as $row){
+					if (!$row['closed']){
+						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $this->convertFromServerTime($row['last_touch'])] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
+					}
+					elseif (!$recent && !$audit && $template && $row['unit'] === $template['unit']){
+						$recent = $row;
+					}
+				}
+
+				// sanitize $recent preset to only questions and statement
+				if ($recent){
+					$recent['content'] =  json_decode($recent['content'], true);
+					foreach($recent['content']['questions'] as $i => $set){
+						foreach($set as $key => $value)
+						if (in_array($key, array_keys($this->_lang->_USER['audit']['audit']['execute'])) && !in_array($key, ['statement'])) unset($recent['content']['questions'][$i][$key]);
+					}
+					$recent['content'] =  UTILITY::json_encode(['questions' => $recent['content']['questions']]);
+				}
+
 				if (!$audit){
 					$audit = [
 						'id' => null,
 						'template'=> isset($template['id']) ? $template['id'] : null,
-						'content' => '',
+						'content' => $recent ? $recent['content'] : '',
 						'unit' => isset($template['unit']) ? $template['unit'] : null,
 						'last_touch' => null,
 					];
@@ -401,29 +414,27 @@ class AUDIT extends API {
 								]
 							];
 						if (isset($preset['files'])){
+							$link = [];
 							foreach($preset['files'] as $file){
-								$link = [];
-								foreach($preset['files'] as $file){
-									$fileinfo = pathinfo($file);
-									$file = [
-										'path' => substr($file, 1),
-										'name' => $fileinfo['basename'],
-										'link' => './api/api.php/file/stream/' . substr($file, 1)
-									];
-									if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
-									elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
-									else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
-								}
-								if ($link) {
-									$proof[] = [
-										'type' => 'links',
-										'description' => $this->_lang->GET('audit.audit.execute.files'),
-										'content' => $link
-									];
-									$proof[] = [
-										'type' => 'br'
-									];
-								}
+								$fileinfo = pathinfo($file);
+								$file = [
+									'path' => substr($file, 1),
+									'name' => $fileinfo['basename'],
+									'link' => './api/api.php/file/stream/' . substr($file, 1)
+								];
+								if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
+								elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
+								else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+							}
+							if ($link) {
+								$proof[] = [
+									'type' => 'links',
+									'description' => $this->_lang->GET('audit.audit.execute.files'),
+									'content' => $link
+								];
+								$proof[] = [
+									'type' => 'br'
+								];
 							}
 						}
 						$proof[] = [
@@ -1850,7 +1861,7 @@ class AUDIT extends API {
 				break;
 			case 'GET':
 				$result = $datalist = [];
-				$managementreview = null;
+				$managementreview = $recent = null;
 				$select = [
 					'edit' => [
 						'...' => ['value' => '0']
@@ -1866,7 +1877,10 @@ class AUDIT extends API {
 						if (!isset($datalist[$key])) $datalist[$key] = [];
 						$datalist[$key][] = $value;
 					}
-					if ($row['closed']) continue;
+					if ($row['closed']) {
+						if (!$recent) $recent = $row;
+						continue;
+					}
 					$select['edit'][$this->convertFromServerTime($row['last_touch'])] = $row['id'] == $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 				// sanitize datalists
@@ -1879,7 +1893,7 @@ class AUDIT extends API {
 					$managementreview = [
 						'id' => null,
 						'template'=> null,
-						'content' => '',
+						'content' => $recent ? $recent['content'] : '',
 						'unit' => null,
 						'last_touch' => null,
 					];
@@ -1906,14 +1920,12 @@ class AUDIT extends API {
 					];
 				}
 				// display last edit
-				if ($managementreview['id']){
 					$result['render']['content'][] = [
 						[
 							'type' => 'textsection',
-							'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->convertFromServerTime($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : '')
+							'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->convertFromServerTime($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : $this->_lang->GET('audit.managementreview.last_version'))
 						]
 					];
-				}
 				// display issue inputs
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $issue){
 					$result['render']['content'][] = [
