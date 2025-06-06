@@ -1414,8 +1414,12 @@ class RECORD extends API {
 				if ($record['units']) array_push($available_units, ...$record['units']);
 				else $available_units[] = null;
 
-				// filter by unit
-				if (!$this->_unit && !array_intersect($record['units'], $_SESSION['user']['units']) && !$this->_requestedID) continue;
+				// filter results by selected unit
+				if (!$this->_requestedID && (
+					(!$this->_unit && !array_intersect($record['units'], $_SESSION['user']['units']))
+					|| ($this->_unit === '_unassigned' && $record['units'])
+					|| ($this->_unit !== '_unassigned' && (!in_array($this->_unit, $record['units']) || !$record['units']))
+				)) continue;
 
 				// add to result
 				$linkdisplay = $this->_lang->GET('record.list_touched', [
