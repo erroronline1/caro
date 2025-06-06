@@ -192,12 +192,7 @@ class SHARED {
 				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
 			) continue;
 
-			$row['units'] = $row['units'] ? explode(',', $row['units']) : [];
-			// continue if record does not match selected (or blank) unit
-			if ($row['units']){
-				if (isset($parameter['unit']) && $parameter['unit'] && !in_array($parameter['unit'], $row['units'])) continue;
-			}
-			elseif (isset($parameter['unit']) && $parameter['unit'] !== '_unassigned') continue;
+			$row['units'] = $row['units'] ? explode(',', $row['units'] ? : '') : [];
 
 			foreach($this->_lang->_USER['documentcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
