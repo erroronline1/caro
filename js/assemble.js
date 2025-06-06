@@ -3049,6 +3049,7 @@ export class Assemble {
 
 		button.classList.add("productselection");
 		button.dataset.type = "search";
+		button.type = "button";
 		button.title = api._lang.GET("assemble.render.aria.search");
 		button.onclick = function () {
 			const options = {};
