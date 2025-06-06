@@ -157,7 +157,7 @@ export const _serviceWorker = {
 				data.message_unnotified > 1
 					? api._lang.GET("message.new_messages", {
 							":amount": data.message_unnotified,
-						})
+					  })
 					: api._lang.GET("message.new_message");
 			this.showLocalNotification(api._lang.GET("menu.communication.header"), body);
 		}
@@ -255,9 +255,8 @@ export const _client = {
 		/**
 		 * output for debugging purpose if not forbidden
 		 */
-		debug: (...$vars)=>{
-			if (api._settings.config.application && api._settings.config.application.debugging)
-				console.trace(...$vars);
+		debug: (...$vars) => {
+			if (api._settings.config.application && api._settings.config.application.debugging) console.trace(...$vars);
 			else console.log("there may have been an error, however debug mode has been turned off.");
 		},
 
@@ -1210,6 +1209,74 @@ export const _client = {
 					});
 				}
 
+				// append options to add product to database
+				if (element.addproduct) {
+					collapsible.push({
+						type: "button",
+						attributes: {
+							value: api._lang.GET("consumables.product.add_new"),
+							onclick:
+								"api.purchase('get', 'product', '" +
+								JSON.stringify({
+									article_no: element.ordernumber ? element.ordernumber : "",
+									article_name: element.name ? element.name : "",
+									article_unit: element.unit ? element.unit : "",
+									vendor_name: element.vendor ? element.vendor : "",
+								}) +
+								"');",
+						},
+					});
+				}
+
+				// append options to request edit of product
+				if (element.editproductrequest instanceof Array) {
+					buttons = {};
+					buttons[api._lang.GET("order.add_information_cancel")] = false;
+					buttons[api._lang.GET("order.message_to_orderer")] = { value: true, class: "reducedCTA" };
+					collapsible.push({
+						type: "button",
+						attributes: {
+							class: "inlinebutton",
+							value: api._lang.GET("consumables.product.edit_product_request"),
+							onclick: function () {
+								_client.message.newMessage(
+									api._lang.GET("consumables.product.edit_product_request"),
+									"purchasemembers",
+									api._lang
+										.GET("order.edit_product_request_message", {
+											":number": "element.ordernumber",
+											":name": "element.name",
+											":vendor": "element.vendor",
+										})
+										.replace("\\n", "\n"),
+									buttons
+								);
+							}
+								.toString()
+								._replaceArray(
+									["purchasemembers", "element.ordernumber", "element.name", "element.vendor", "buttons"],
+									[
+										element.editproductrequest.join(", "),
+										element.ordernumber ? element.ordernumber.replaceAll('"', '\\"') : "",
+										element.name ? element.name.replaceAll('"', '\\"') : "",
+										element.vendor ? element.vendor.replaceAll('"', '\\"') : "",
+										JSON.stringify(buttons),
+									]
+								),
+						},
+					});
+				}
+				if (element.productid) {
+					collapsible.push({
+						type: "button",
+						attributes: {
+							class: "inlinebutton",
+							value: api._lang.GET("order.productlink"),
+							onclick: "api.purchase('get', 'product', " + element.productid + ");",
+						},
+					});
+				}
+
 				// create order container
 				order = [
 					{
@@ -1256,34 +1323,6 @@ export const _client = {
 								name: element.samplecheck.state,
 							},
 						});
-				}
-				// append options to add product to database
-				if (element.addproduct) {
-					order.push({
-						type: "button",
-						attributes: {
-							value: api._lang.GET("consumables.product.add_new"),
-							onclick:
-								"api.purchase('get', 'product', '" +
-								JSON.stringify({
-									article_no: element.ordernumber ? element.ordernumber : "",
-									article_name: element.name ? element.name : "",
-									article_unit: element.unit ? element.unit : "",
-									vendor_name: element.vendor ? element.vendor : "",
-								}) +
-								"');",
-						},
-					});
-				}
-				// append options to add product to database
-				if (element.editproduct) {
-					order.push({
-						type: "button",
-						attributes: {
-							value: api._lang.GET("consumables.product.edit_product"),
-							onclick: "api.purchase('get', 'product', " + element.editproduct + ");",
-						},
-					});
 				}
 				content.push(order);
 			}
