@@ -413,12 +413,20 @@ class ORDER extends API {
 				$permission = [
 					'orderaddinfo' => PERMISSION::permissionFor('orderaddinfo'),
 					'ordercancel' => PERMISSION::permissionFor('ordercancel') && !in_array('group', $_SESSION['user']['permissions']),
-					'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
+					'orderprocessing' => PERMISSION::permissionFor('orderprocessing'),
+					'purchasemembers' => []
 				];
 				$result['data']['export'] = $permission['orderprocessing'];
 
 				// userlist to decode orderer
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
+				// get purchase member names passed to data['editproductrequest'] as array type for message initialization
+				// while possible to intersect with products-permission, ceo, prrc and qmo by default may not have time to handle this
+				foreach($users as $user){
+					$user['permissions'] = explode(',', $user['permissions'] ? : '');
+					if (array_intersect(['purchase', 'admin'], $user['permissions'])) $permission['purchasemembers'][] = $user['name'];
+				}
 
 				// create array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
 				foreach($order as $row){
@@ -471,7 +479,8 @@ class ORDER extends API {
 						'specialattention' => $product ? array_search($product['id'], $special_attention) !== false : null,
 						'collapsed' => !$permission['orderprocessing'],
 						'addproduct' => null,
-						'editproduct' => null,
+						'editproductrequest' => null,
+						'productid' => $product ? $product['id'] : null,
 					];
 
 					// add identified group user
@@ -568,10 +577,12 @@ class ORDER extends API {
 						}
 					}
 
-					// request adding unknown product
-					if (PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')){
+					// request adding unknown product or editing of product
+					if (PERMISSION::permissionFor('products')){
 						if (!$product) $data['addproduct'] = true;
-						else $data['editproduct'] = $product ? $product['id'] : null;
+					}
+					else {
+						$data['editproductrequest'] = $product ? $permission['purchasemembers'] : null;
 					}
 
 					array_push($result['data']['order'], array_filter($data, fn($property)=> $property || $property === 0));

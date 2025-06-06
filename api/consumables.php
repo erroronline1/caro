@@ -1183,6 +1183,31 @@ class CONSUMABLES extends API {
 								'content' => $documents
 							];
 						}
+						// userlist
+						$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+						// get purchase member names
+						// while possible to intersect with products-permission, ceo, prrc and qmo by default may not have time to handle this
+						$purchasemembers = [];
+						foreach($users as $user){
+							$user['permissions'] = explode(',', $user['permissions'] ? : '');
+							if (array_intersect(['purchase', 'admin'], $user['permissions'])) $purchasemembers[] = $user['name'];
+						}
+						$result['render']['content'][] = [[
+								'type' => 'button',
+								'attributes' => [
+									'value' => $this->_lang->GET('consumables.product.edit_product_request'),
+									'onclick' => "_client.message.newMessage('" . $this->_lang->GET('consumables.product.edit_product_request') . "', '" . implode(', ', $purchasemembers) . "', '" . str_replace("\n", '\\n', $this->_lang->GET('consumables.product.edit_product_request_message', [
+											":number" => $product['article_no'],
+											":name" => $product['article_name'],
+											":vendor" => $product['vendor_name'],
+									], true)) . "'," . json_encode(
+										[
+											$this->_lang->GET('order.add_information_cancel') => false,
+											$this->_lang->GET('order.message_to_orderer') => ['value' => true, 'class' => "reducedCTA"]
+										]
+									) . ")"
+								],
+							]];
 					}
 				}
 				else {
