@@ -1158,7 +1158,7 @@ class CONSUMABLES extends API {
 			
 							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 							foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
-								if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+								if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date']);
 							}
 							$result['render']['content'][1][] = [
 								'type' => 'textsection',
@@ -1414,7 +1414,7 @@ class CONSUMABLES extends API {
 						$incorporationInfo .= " \n";
 						$pendingIncorporationCheck = "";
 						foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
-							if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $product['incorporated'][$permission]['date'];
+							if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date']);
 							else $pendingIncorporationCheck .= "\n" . $this->_lang->GET('consumables.product.incorporation_pending', [':permission' =>$this->_lang->_USER['permissions'][$permission]]);
 						}
 						if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
