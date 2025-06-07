@@ -837,7 +837,7 @@
 			"incorporated_not": "Product not incorporated",
 			"incorporated_revoke": "Revoke state",
 			"incorporation_no_approvals": "products with pending incorporations",
-			"incorporation_pending": "Freigabe von :permission steht noch aus",
+			"incorporation_pending": "Incorporation by :permission pending",
 			"information_products_available": ":available available products in database",
 			"information_products_ordered": "of which :ordered products ordered",
 			"information_vendor": "Vendors",
