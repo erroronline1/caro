@@ -739,6 +739,7 @@
 			"not_found": "Das Ereignis wurde vermutlich gelöscht.",
 			"organizational_unit": "Bereiche",
 			"organizational_unit_hint": "Es muss mindestens ein Bereich ausgewählt werden",
+			"product_document_evaluation": "Dokumente für :number :name von :vendor wurden zuletzt vor etwa :days Tagen bereitgestellt. Bitte Prüfe diese auf Aktualität oder stelle neue Bereit.",
 			"search": "Suchen",
 			"search_hint": "Thema oder betroffener Nutzer",
 			"submit": "Speichern",

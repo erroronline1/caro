@@ -191,6 +191,58 @@ class NOTIFICATION extends API {
 			}
 		}
 
+		// schedule products document evaluation or update
+
+		// gather documents per product by vendor, reducing loops later on
+		// keeping only the most recent upload per article number
+		$documents = [];
+		foreach ($vendors as $vendor){
+			if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]))) {
+				if (!isset($documents[$vendor['id']])) $documents[$vendor['id']] = [];
+				foreach($docfiles as $path){
+					$file = pathinfo($path);
+					$article_no = explode('_', $file['filename'])[2];
+					$date = date('Y-m-d', filemtime($path));
+					if (!isset($documents[$vendor['id']][$article_no]) || $documents[$vendor['id']][$article_no] < $date) $documents[$vendor['id']][$article_no] = $date;
+				}
+			}
+		}
+
+		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+		$alerts = [];
+		foreach($products as $product){
+			$article_no = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $product['article_no'] ? : '');
+			if (isset($documents[$product['vendor_id']]) && isset($documents[$product['vendor_id']][$article_no])){
+				$upload = new DateTime($documents[$product['vendor_id']][$article_no]);
+				$diff = intval(abs($upload->diff($this->_date['servertime'])->days / CONFIG['lifespan']['product_documents']));
+				if ($product['document_reminder'] < $diff){
+					$calendar->post([
+						':type' => 'schedule',
+						':span_start' => $today->format('Y-m-d H:i:s'),
+						':span_end' => $today->format('Y-m-d H:i:s'),
+						':author_id' => 1,
+						':affected_user_id' => null,
+						':organizational_unit' => 'office',
+						':subject' => $this->_lang->GET('calendar.schedule.product_document_evaluation', [':number' => $product['article_no'], ':name' => $product['article_name'], ':vendor' => $product['vendor_name'], ':days' => CONFIG['lifespan']['product_documents']], true),
+						':misc' => null,
+						':closed' => null,
+						':alert' => 1
+						]);
+					// prepare alert flags
+					$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('consumables_put_last_document_evaluation'),
+						[
+							':notified' => $diff,
+							':id' => $product['id']
+						]) . '; ');
+				}
+			}
+		}
+		// set alert flags
+		foreach ($alerts as $alert){
+			SQLQUERY::EXECUTE($this->_pdo, $alert);
+		}
+
+		// get pending incorporations
 		$unapproved = 0;
 		if (PERMISSION::permissionFor('incorporation')){
 			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');

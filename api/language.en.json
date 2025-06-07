@@ -739,6 +739,7 @@
 			"not_found": "Event has probably been deleted.",
 			"organizational_unit": "Units",
 			"organizational_unit_hint": "Selecting at least one unit is mandatory",
+			"product_document_evaluation": "Documents for :number :name by :vendor have been provided lastly about :days days ago. Please check for currency or update these.",
 			"search": "Search",
 			"search_hint": "Subject or affected user",
 			"submit": "Submit",

@@ -343,8 +343,8 @@ class SQLQUERY {
 		],
 
 		'consumables_post_product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :protected, :trading_good, NULL, NULL, NULL, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :protected, :trading_good, NULL, NULL, NULL, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :protected, :trading_good, NULL, NULL, NULL, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :protected, :trading_good, NULL, NULL, NULL, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)"
 		],
 		'consumables_put_product' => [
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id",
@@ -369,6 +369,10 @@ class SQLQUERY {
 		'consumables_put_last_order' => [
 			'mysql' => "UPDATE caro_consumables_products SET last_order = CURRENT_TIMESTAMP WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET last_order = CURRENT_TIMESTAMP WHERE id  = :id"
+		],
+		'consumables_put_last_document_evaluation' => [
+			'mysql' => "UPDATE caro_consumables_products SET document_reminder = :notified WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET document_reminder = :notified WHERE id  = :id"
 		],
 		'consumables_get_product' => [ // preprocess via strtr
 			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.id IN (:ids)",
