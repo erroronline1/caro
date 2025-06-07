@@ -70,6 +70,7 @@ Things are still in motion. Images my be outdated.
     * [Tools](#tools)
     * [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)
 * [Cross application integrations](#cross-application-integrations)
+    * [Reminders and automated schedules](#reminders-and-automated-schedules)
     * [User trainings](#user-trainings)
     * [CSV processor](#csv-processor)
 * [Intended regulatory goals](#intended-regulatory-goals)
@@ -161,12 +162,13 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Document management: full version control, reusable components, with access to former versions
 * Easy form creation: simplified form assembly and seamless integration into the application
 * Risk management: with alignment check of risks and medical device characteristics
-* Trainings and skills management: planning, quick overview with evaluation reminder and highlighted expiries
+* Trainings and skills management: planning, evaluation, quick overview with highlighted expiries
 * Task and absence schedules: plan tasks while having an overview on personnel ressources
 * Structured procurement: reduced inquiries, automated reminders, incorporation records and sample checks
 * Role management: defined user permissions and appropriate information load
 * Audit support: prepare, schedule and execute internal audits, summarizing application data to tidy overviews
 * Improvement suggestions: everyone can suggest improvements, express their opinion and look at resulting measures
+* Automated schedules, reminders and notifications
 * Device agnostic: web-application accessible by any suitable device
 * No artificial intelligence: you have absolute data authority
 
@@ -831,6 +833,8 @@ While editing products, one can edit the
 
 On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)).
 
+Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. After a [defined timespan](#runtime-variables) after the last upload a reevaluation will be reminded of. 
+
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
 ![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager.png)
@@ -1046,6 +1050,21 @@ Furthermore hopefully beneficial information on
 [Content](#content)
 
 # Cross application integrations
+
+## Reminders and automated schedules
+The application handles some automated reminders and schedules
+
+* expired responsibilites trigger a message to plan anew
+* unclosed records trigger a message to proceed or close
+* new orders trigger a message to process
+* unreceived orders trigger a message to ask the vendor about estimated delivery
+* received but not delivered orders trigger a message to ask procurement to deliver or mark as delivered
+* trainings will be scheduled for evaluation
+* expiring trainings will be scheduled for re-training
+* expired vendor certificates will be scheduled for renewal
+* product documents will be scheduled for reevaluation or update
+
+Beside these the dashboard and the menu notify about open topics and tasks. Timespans for notifications and schedules can be set within the [configuration](#runtime-variables).
 
 ## User trainings
 User trainings can be added in the [user manager](#users) but also from the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries). In terms of ISO 13485 8.5.1 General Improvement and ISO 13485 8.5.2 Corrective measures trainings can also be added in case of a treatment record marked as complaint.

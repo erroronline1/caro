@@ -37,6 +37,7 @@
     * [Werkzeuge](#werkzeuge)
     * [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen)
 * [In der Anwendung verteilte Integrationen](#in-der-anwendung-verteilte-integrationen)
+    * [Erinnerungen und automatische Aufgabenplanung](#erinnerungen-und-automatische-aufgabenplanung)
     * [Schulungen](#schulungen)
     * [CSV Prozessor](#csv-prozessor)
 * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
@@ -71,12 +72,13 @@ Datenerfassung soll dabei weitestgehend digital erfolgen und letztendlich papier
 * Dokumentenverwaltung: volle Versionskontrolle, wiederverwendbare Komponenten, Zugriff auf frühere Versionen
 * einfache Formularerstellung: Formulare einfach zusammenstellen und nahtlose Integration in die Anwendung
 * Risikomanagment: mit Abgleich zwischen Risiken und Eigenschaften von Medizinprodukten
-* Schulungs- und Qualifikationsverwaltung: Planung, schnelle Übersicht mit Beurteilungserinnerung und hervorgehobenen Ablaufdaten
+* Schulungs- und Qualifikationsverwaltung: Planung, schnelle Übersicht mit Beurteilung und hervorgehobenen Ablaufdaten
 * Aufgaben- und Abwesenheitsplaner: Arbeiten planen mit gleichzeitiger Übersicht über Abwesenheiten
 * strukturierte Beschaffung: reduzierte Rückfragen, automatisierte Erinnerungen, Einführungsaufzeichnungen und Stichprobenprüfung
 * Rollenverwaltung: definierte Nutzerberechtigungen und eine angemessene Informationsfülle
 * Auditunterstützung: interne Audits vorbereiten, planen und durchführen, Zusammenfassungen der Anwendungsdaten in aufgeräumten Übersichten
 * Verbesserungsvorschläge: jeder kann Verbesserungsvorschläge äußern und bewerten, sowie die Maßnahmen einsehen
+* Automatische Planungen, Erinnerungen und Benachrichtigungen
 * Geräteunabhängig: Web-Anwendung mit jedem geeigneten Gerät nutzbar
 * keine künstliche Intelligenz: volle Datenhoheit behalten
 
@@ -732,6 +734,8 @@ Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bear
 
 Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [config.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
 
+Artikel können ebenfalls mit Dateien bereichert werden, z.B. Konformitätserklärungen oder Biokompatibilitätsnachweise. Nach einer [definierten Zeitspanne](#laufzeitvariablen) nach dem letzten Upload wird an eine Überprüfung erinnert.
+
 Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschützt markiert sind. Lieferanten können nicht gelöscht werden.
 
 ![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20de.png)
@@ -953,6 +957,21 @@ Ferner hoffentlich hilfreiche Informationen zu
 [Übersicht](#übersicht)
 
 # In der Anwendung verteilte Integrationen
+
+## Erinnerungen und automatische Aufgabenplanung
+Die Anwendung vearbeitet einige automatische Erinnerungen und Aufgabenplanungen
+
+* ausgelaufene Verantwortlichkeiten erzeugen eine Mitteilung für die Neuvergabe
+* offene Vorgänge erzeugen eine Mitteilung fortzufahren oder abzuschließen
+* neue Bestellungen erzeugen eine Mitteilungg für die Bearbeitung
+* nicht erhaltene Bestellungen erzeugen eine Mitteilung sich beim Lieferanten nach dem Lieferzeitpunkt zu erkundigen
+* erhaltene aber nicht ausgelieferte Bestellungen erbitten die Nachfrage bei der Warenwirtschaft oder die Markierung als ausgeliefert
+* Schulungsbewertungen werden in den Kalender eingetragen
+* ablaufende Schulungen werden für die Folgeschulung geplant
+* abgelaufene Lieferantenzertifikate werden für eine Erneuerung in den Kalender eingetragen
+* es wird an eine Reevaluierung oder Erneuerung der Dateien in der Artikelverwaltung erinnert 
+
+Daneben informiert die Startseite und das Menü über offene Themen und Aufgaben. Zeiträume für Benachrichtigungen und Aufgabenplanung können in der [Konfiguration](#laufzeitvariablen) angepasst werden.
 
 ## Schulungen
 Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulunngen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
