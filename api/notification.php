@@ -42,16 +42,17 @@ class NOTIFICATION extends API {
 	public function notifs(){
 		$result = [
 			'audit_closing' => $this->audits(),
-			'calendar_uncompletedevents' => $this->calendar(),
 			'consumables_pendingincorporation' => $this->consumables(),
 			'document_approval' => $this->documents(),
 			'order_unprocessed' => $this->order(),
 			'order_prepared' => $this->preparedorders(),
 			'managementreview' => $this->managementreview(),
 			'measure_unclosed' => $this->measures(),
+			'responsibilities' => $this->responsibilities(),
+			// make the following calls last no matter what to include all possible previous calendar entries and messages
+			'calendar_uncompletedevents' => $this->calendar(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen(),
-			'responsibilities' => $this->responsibilities()
 		];
 		$this->response($result);
 	}
@@ -110,111 +111,6 @@ class NOTIFICATION extends API {
 		$today = new DateTime('now');
 		$today->setTime(0, 0);
 
-		// schedule certificate request
-		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-		foreach ($vendors as $vendor){
-			$certificate = json_decode($vendor['certificate'] ? : '', true);
-			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity']);
-			else continue;
-			if ($validity > $today) continue;
-			// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-			$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
-			$open = false;
-			foreach($reminders as $reminder){
-				if (!$reminder['closed']) $open = true;
-			}
-			if (!$open){
-				$calendar->post([
-					':type' => 'schedule',
-					':span_start' => $today->format('Y-m-d H:i:s'),
-					':span_end' => $today->format('Y-m-d H:i:s'),
-					':author_id' => 1,
-					':affected_user_id' => null,
-					':organizational_unit' => 'admin,office',
-					':subject' => $this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
-					':misc' => null,
-					':closed' => null,
-					':alert' => 1
-					]);		   
-			}
-		}
-
-		// schedule training evaluation
-		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
-			'replacements' => [
-				':ids' => implode(',', array_column($users, 'id'))
-			]
-		]);
-		foreach($trainings as $training){
-			if ($training['evaluation'] || !$training['date']) continue;
-			$trainingdate = new DateTime($training['date']);
-			if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
-				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
-					// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-					$subject = $this->_lang->GET('audit.userskills_notification_message', [
-						':user' => $users[$user]['name'],
-						':training' => $training['name'],
-						':module' => $this->_lang->GET('menu.tools.regulatory', [], true),
-						':date' => $this->convertFromServerTime($training['date'], true)
-					], true);
-					$reminders = $calendar->search($subject);
-					$open = false;
-					foreach($reminders as $reminder){
-						if (!$reminder['closed']) $open = true;
-					}
-					if (!$open){
-							$calendar->post([
-							':type' => 'schedule',
-							':span_start' => $today->format('Y-m-d H:i:s'),
-							':span_end' => $today->format('Y-m-d H:i:s'),
-							':author_id' => 1,
-							':affected_user_id' => null,
-							':organizational_unit' => 'admin',
-							':subject' => $subject,
-							':misc' => null,
-							':closed' => null,
-							':alert' => 1
-							]);		   		
-					}
-				}
-			}
-		}
-
-		// schedule archived approved orders review
-		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_archived');
-		$units = [];
-		foreach ($orders as $order){
-			if (!isset($units[$order['organizational_unit']])) $units[$order['organizational_unit']] = 0;
-			$units[$order['organizational_unit']]++;
-		}
-		foreach ($units as $unit => $num){
-			if ($num > CONFIG['limits']['order_approved_archived']) {
-				$subject = $this->_lang->GET('order.alert_archived_limit', [
-					':max' => CONFIG['limits']['order_approved_archived']
-				], true);
-				$reminders = $calendar->search($subject);
-				$open = false;
-				foreach($reminders as $reminder){
-					if (!$reminder['closed']) $open = true;
-				}
-				if (!$open){
-					$calendar->post([
-						':type' => 'schedule',
-						':span_start' => $today->format('Y-m-d H:i:s'),
-						':span_end' => $today->format('Y-m-d H:i:s'),
-						':author_id' => 1,
-						':affected_user_id' => null,
-						':organizational_unit' => $unit,
-						':subject' => $subject,
-						':misc' => null,
-						':closed' => null,
-						':alert' => 1
-						]);		   		
-				}
-			}
-		}
-
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
 			// alert current events including workmates pto if alert is set
@@ -259,8 +155,42 @@ class NOTIFICATION extends API {
 	 *  |___|___|_|_|___|___|_|_|_|__,|___|_|___|___|
 	 *
 	 * notify on pending incorporations
+	 * process reminders for vendor- and product-topics
 	 */
 	public function consumables(){
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new DateTime('now');
+		$today->setTime(0, 0);
+
+		// schedule vendor certificate request
+		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+		foreach ($vendors as $vendor){
+			$certificate = json_decode($vendor['certificate'] ? : '', true);
+			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity']);
+			else continue;
+			if ($validity > $today) continue;
+			// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
+			$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
+			$open = false;
+			foreach($reminders as $reminder){
+				if (!$reminder['closed']) $open = true;
+			}
+			if (!$open){
+				$calendar->post([
+					':type' => 'schedule',
+					':span_start' => $today->format('Y-m-d H:i:s'),
+					':span_end' => $today->format('Y-m-d H:i:s'),
+					':author_id' => 1,
+					':affected_user_id' => null,
+					':organizational_unit' => 'admin,office',
+					':subject' => $this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
+					':misc' => null,
+					':closed' => null,
+					':alert' => 1
+					]);		   
+			}
+		}
+
 		$unapproved = 0;
 		if (PERMISSION::permissionFor('incorporation')){
 			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
@@ -381,6 +311,44 @@ class NOTIFICATION extends API {
 	 * number of unprocessed orders
 	 */
 	public function order(){
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new DateTime('now');
+		$today->setTime(0, 0);
+
+		// schedule archived approved orders review
+		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_archived');
+		$units = [];
+		foreach ($orders as $order){
+			if (!isset($units[$order['organizational_unit']])) $units[$order['organizational_unit']] = 0;
+			$units[$order['organizational_unit']]++;
+		}
+		foreach ($units as $unit => $num){
+			if ($num > CONFIG['limits']['order_approved_archived']) {
+				$subject = $this->_lang->GET('order.alert_archived_limit', [
+					':max' => CONFIG['limits']['order_approved_archived']
+				], true);
+				$reminders = $calendar->search($subject);
+				$open = false;
+				foreach($reminders as $reminder){
+					if (!$reminder['closed']) $open = true;
+				}
+				if (!$open){
+					$calendar->post([
+						':type' => 'schedule',
+						':span_start' => $today->format('Y-m-d H:i:s'),
+						':span_end' => $today->format('Y-m-d H:i:s'),
+						':author_id' => 1,
+						':affected_user_id' => null,
+						':organizational_unit' => $unit,
+						':subject' => $subject,
+						':misc' => null,
+						':closed' => null,
+						':alert' => 1
+						]);		   		
+				}
+			}
+		}
+
 		$unprocessed = 0;
 		$alerts = [];
 		if (PERMISSION::permissionFor('orderprocessing')){
@@ -587,13 +555,61 @@ class NOTIFICATION extends API {
 	 *  |_ -|  _|   | -_| . | | | | -_| . |  _|  _| .'| |   | |   | . |_ -|
 	 *  |___|___|_|_|___|___|___|_|___|___|_| |_| |__,|_|_|_|_|_|_|_  |___|
 	 *                                                            |___|
+	 * schedule training evaluation and insert schedules re-trainings on expiring ones
 	 * alert message to units interval wise excluding
 	 * * common
 	 * * admin
 	 * * office
+	 * 
+	 * currently called from landing page only
 	 */
 	public function scheduledtrainings(){
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new DateTime('now');
+		$today->setTime(0, 0);
+
+		// schedule training evaluation
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+			'replacements' => [
+				':ids' => implode(',', array_column($users, 'id'))
+			]
+		]);
+		foreach($trainings as $training){
+			if ($training['evaluation'] || !$training['date']) continue;
+			$trainingdate = new DateTime($training['date']);
+			if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
+				if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
+					// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
+					$subject = $this->_lang->GET('audit.userskills_notification_message', [
+						':user' => $users[$user]['name'],
+						':training' => $training['name'],
+						':module' => $this->_lang->GET('menu.tools.regulatory', [], true),
+						':date' => $this->convertFromServerTime($training['date'], true)
+					], true);
+					$reminders = $calendar->search($subject);
+					$open = false;
+					foreach($reminders as $reminder){
+						if (!$reminder['closed']) $open = true;
+					}
+					if (!$open){
+							$calendar->post([
+							':type' => 'schedule',
+							':span_start' => $today->format('Y-m-d H:i:s'),
+							':span_end' => $today->format('Y-m-d H:i:s'),
+							':author_id' => 1,
+							':affected_user_id' => null,
+							':organizational_unit' => 'admin',
+							':subject' => $subject,
+							':misc' => null,
+							':closed' => null,
+							':alert' => 1
+							]);		   		
+					}
+				}
+			}
+		}
+
 		$unitusers = [];
 		$number = 0;
 		// find all users within current users units
