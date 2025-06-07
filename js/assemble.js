@@ -1835,8 +1835,8 @@ export class Assemble {
 		if (this.currentElement.attributes.multiple) {
 			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
 		}
-		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
-		else hint = [...this.hint()];
+		this.currentElement.hint = (this.currentElement.hint ? this.currentElement.hint + " " : "") + api._lang.GET('assemble.render.files_hint');
+		hint = [...this.hint()];
 
 		input.setAttribute("aria-label", this.currentElement.description);
 		input = this.apply_attributes(this.currentElement.attributes, input);

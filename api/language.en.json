@@ -461,6 +461,7 @@
 			"file_choose": "choose a file...",
 			"file_rechoose": "or rechoose file...",
 			"files_choose": "choose files...",
+			"files_hint": "Please consider meaningful filenames where possible.",
 			"files_rechoose": "or rechoose files...",
 			"merge": "Import data",
 			"mine": "My units",

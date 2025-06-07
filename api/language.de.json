@@ -461,6 +461,7 @@
 			"file_choose": "Datei wählen...",
 			"file_rechoose": "oder eine andere Datei wählen...",
 			"files_choose": "Dateien wählen...",
+			"files_hint": "Bitte achte, sofern möglich, auf aussagekräftige Dateinamen.",
 			"files_rechoose": "oder noch einmal neu wählen...",
 			"merge": "Daten importieren",
 			"mine": "Meine Bereiche",
