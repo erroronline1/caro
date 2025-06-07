@@ -165,6 +165,7 @@ class NOTIFICATION extends API {
 		// schedule vendor certificate request
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach ($vendors as $vendor){
+			if ($vendor['hidden']) continue;
 			$certificate = json_decode($vendor['certificate'] ? : '', true);
 			if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity']);
 			else continue;
@@ -197,6 +198,7 @@ class NOTIFICATION extends API {
 		// keeping only the most recent upload per article number
 		$documents = [];
 		foreach ($vendors as $vendor){
+			if ($vendor['hidden']) continue;
 			if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]))) {
 				if (!isset($documents[$vendor['id']])) $documents[$vendor['id']] = [];
 				foreach($docfiles as $path){
@@ -211,6 +213,7 @@ class NOTIFICATION extends API {
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 		$alerts = [];
 		foreach($products as $product){
+			if ($product['hidden']) continue;
 			$article_no = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $product['article_no'] ? : '');
 			if (isset($documents[$product['vendor_id']]) && isset($documents[$product['vendor_id']][$article_no])){
 				$upload = new DateTime($documents[$product['vendor_id']][$article_no]);
