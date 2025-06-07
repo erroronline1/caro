@@ -435,14 +435,14 @@ class RESPONSIBILITY extends API {
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.applicability_start'),
-							'value' => $this->convertFromServerTime(substr($responsibility['span_start'], 0, 10)),
+							'value' => substr($responsibility['span_start'], 0, 10),
 							'required' => true
 						]
 					], [
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.applicability_end'),
-							'value' => $this->convertFromServerTime(substr($responsibility['span_end'], 0, 10)),
+							'value' => substr($responsibility['span_end'], 0, 10),
 							'required' => true
 						]
 					]
