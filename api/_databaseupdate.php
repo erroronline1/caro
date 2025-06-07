@@ -40,7 +40,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach(['_2025_05_25'] as $update){
+		foreach(['_2025_06_07'] as $update){
 			foreach($this->{$update}() as $query){
 				echo $query . '<br />';
 				if (SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[0]) !== false)	SQLQUERY::EXECUTE($this->_pdo, $query);
@@ -91,41 +91,22 @@ class UPDATE{
 			]
 		][$this->driver];
 	}
-	private function _2024_09_07(){
+
+	private function _2025_06_07(){
 		return [
 			'mysql' => [
-				"ALTER TABLE caro_consumables_products ADD COLUMN IF NOT EXISTS last_order datetime NULL DEFAULT NULL;"
+				"ALTER TABLE caro_consumables_products ADD COLUMN IF NOT EXISTS document_reminder int NULL DEFAULT NULL;"
 			],
 			'sqlsrv' => [
-				"IF COL_LENGTH('caro_consumables_products', 'last_order') IS NULL" .
+				"IF COL_LENGTH('caro_consumables_products', 'document_reminder') IS NULL" .
 				" BEGIN" .
 				"    ALTER TABLE caro_consumables_products" .
-				"    ADD last_order smalldatetime NULL DEFAULT NULL" .
-				" END"
-			]
-		][$this->driver];
-	}
-	private function _2025_05_25(){
-		return [
-			'mysql' => [
-				"ALTER TABLE caro_audit_templates ADD COLUMN IF NOT EXISTS method tinytext NULL DEFAULT NULL;"
-				. "ALTER TABLE caro_user_training ADD COLUMN IF NOT EXISTS planned text NULL DEFAULT NULL;"
-			],
-			'sqlsrv' => [
-				"IF COL_LENGTH('caro_audit_templates', 'method') IS NULL" .
-				" BEGIN" .
-				"    ALTER TABLE caro_audit_templates" .
-				"    ADD method VARCHAR(255) NULL DEFAULT NULL" .
-				" END;".
-				"IF COL_LENGTH('caro_user_training', 'planned') IS NULL" .
-				" BEGIN" .
-				"    ALTER TABLE caro_user_training" .
-				"    ADD planned VARCHAR(MAX) NULL DEFAULT NULL" .
+				"    ADD document_reminder INT NULL DEFAULT NULL" .
 				" END;"
 			]
 		][$this->driver];
 	}
-
+	
 }
 $db = new UPDATE();
 $db->update();
