@@ -226,7 +226,7 @@ class NOTIFICATION extends API {
 						':author_id' => 1,
 						':affected_user_id' => null,
 						':organizational_unit' => 'office',
-						':subject' => $this->_lang->GET('calendar.schedule.product_document_evaluation', [':number' => $product['article_no'], ':name' => $product['article_name'], ':vendor' => $product['vendor_name'], ':days' => CONFIG['lifespan']['product_documents']], true),
+						':subject' => $this->_lang->GET('calendar.schedule.product_document_evaluation', [':number' => $product['article_no'], ':name' => $product['article_name'], ':vendor' => $product['vendor_name'], ':days' => abs($upload->diff($this->_date['servertime'])->days)], true),
 						':misc' => null,
 						':closed' => null,
 						':alert' => 1
