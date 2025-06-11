@@ -99,10 +99,11 @@ class API {
 		$this->_lang = new LANG();
 
 		// (re)authentify session user
-		if (REQUEST[0] === 'application' && (
+		if (REQUEST[0] === 'cron' ||
+			(REQUEST[0] === 'application' && (
 			in_array(REQUEST[1], ['language', 'info', 'menu'])
 			|| (REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'DELETE')
-		)){ // these requests do not need authentification or handle it on their own
+		))){ // these requests do not need authentification or handle it on their own
 			$this->_auth = true;
 		}
 		else {
@@ -158,7 +159,6 @@ class API {
 
 		// set date settings according to defaults or session user settings
 		$this->_date = $this->date();
-
 	}
 	
 	/**
@@ -603,6 +603,7 @@ if (in_array(REQUEST[0], [
 	'audit',
 	'calendar',
 	'consumables',
+	'cron',
 	'csvfilter',
 	'file',
 	'document',
