@@ -32,7 +32,14 @@ Things are still in motion. Images my be outdated.
 * responsibilities
     * handle hidden attribute?
 * filereference
-    * save storage path (recheck test environment!)
+    * stl preview type error?
+* [cron](#application-setup) DRAFT, YET TO IMPLEMENT PROPERLY
+    * iis can not find pdo driver calling from cli no matter what so schtasks is unlikely an option (and neither cron for consistency)
+    * first user triggering somehow
+    * log response
+    * [endpoint](#csv-filter-endpoints)
+    * delete methods from notification once running
+    * include UTILITY:tidydir and remove from endpoints
 
 ## Content
 * [Aims](#aims)
