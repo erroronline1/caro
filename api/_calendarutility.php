@@ -55,6 +55,7 @@ class CALENDARUTILITY {
 	private $_holidays = [];
 	private $_easter_holidays = [];
 	public $_workdays = [];
+	private $_breaks = [];
 
 	public function __construct($pdo, $date){
 		$this->_pdo = $pdo;
@@ -64,6 +65,7 @@ class CALENDARUTILITY {
 		$this->_holidays = array_filter(preg_split('/[^\d-]+/', $this->_date['locations']['holidays']), fn($v) => boolval($v)); // mm-dd, mm-dd, ...
 		$this->_easter_holidays = array_filter(preg_split('/[^\d-]+/', $this->_date['locations']['easter']), fn($v) => boolval($v)); // offsets from easter sunday
 		$this->_workdays = array_filter(preg_split('/[^\d-]+/', $this->_date['locations']['workdays']), fn($v) => boolval($v)); // 1-7 starting on monday
+		$this->_breaks = array_filter(preg_split('/[^\d-]+/', $this->_date['locations']['breaks']), fn($v) => boolval($v)); // hours-minbreak
 	}
 
 	/**
@@ -394,6 +396,19 @@ class CALENDARUTILITY {
 					$this->_lang->GET('calendar.timesheet.homeoffice') => true,
 					$this->_lang->GET('calendar.timesheet.pto.workinghourscorrection') => false,
 				];
+
+				// break recommendation according to config
+				$breakrecommendation = '';
+				if(isset($this->_date['locations']['breaks'])){
+					$breakrecommendation = "let start = document.getElementById('_starttime').value, end = this.value, time, breaktime; ".
+						"start = parseInt(start) + parseInt(start.split(':')[1]) / 60; end = parseInt(end) + parseInt(end.split(':')[1]) / 60; ".
+						"time = end - start; ";
+					foreach($this->_breaks as $break){
+						$break = explode('-', $break);
+						$breakrecommendation .= "if (time > " . $break[0]. ") breaktime = '" . (strlen(intval($break[1] / 60)) < 2 ? '0'. intval($break[1] / 60) : intval($break[1] / 60)) . ":" . intval((floatval($break[1]) / 60 - intval($break[1] / 60)) * 60) . "'; ";
+					}
+					$breakrecommendation .= "if (breaktime) document.getElementById('_break').value = breaktime;";
+				}
 				// add inputs
 				array_push($inputs, ...[
 					[
@@ -415,7 +430,8 @@ class CALENDARUTILITY {
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.start_time'),
 							'value' => $span_start->format('H:i'),
-							'required' => true
+							'required' => true,
+							'id' => '_starttime'
 						]
 					],[
 						'type' => 'date',
@@ -429,14 +445,16 @@ class CALENDARUTILITY {
 							'attributes' => [
 								'name' => $this->_lang->GET('calendar.timesheet.end_time'),
 								'value' => $span_end->format('H:i'),
-								'required' => true
+								'required' => true,
+								'onchange' => $breakrecommendation
 							]
 						],[
 							'type' => 'time',
 							'attributes' => [
 								'name' => $this->_lang->GET('calendar.timesheet.break_time'),
 								'value' => isset($misc['break']) ? $misc['break'] : '',
-								'required' => true
+								'required' => true,
+								'id' => '_break'
 							]
 						],[
 							'type' => 'number',

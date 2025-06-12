@@ -1606,6 +1606,7 @@ hide_offduty_reasons[] = "" ; since this array is implemented anyway this empty 
 D-BW[workdays] = "1, 2, 3, 4, 5" ; monday=1 to sunday=7, drop which have the same marking as holidays, e.g. weekends
 D-BW[holidays] = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"; fixed holidays, month-day
 D-BW[easter] = "-2, 1, 39, 50, 60" ; applicable offsets to easter sunday, maundy thursday -3, good friday -2, holy saturday -1, easter monday 1, ascension 39, pentecost 50, corpus christi 60
+D-BW[breaks] = "6-30, 9-45" ; law related break times, rising [hours of work]-[minutes of break], e.g. above 6 hours: 30 minutes break, above 9 hours: 45 minutes break
 
 ; default values for csv processing if left out of filter rules
 [csv]
@@ -2195,6 +2196,7 @@ Stakeholder identification:
 | Printable list of unprocessed stock articles, for collecting and preparing deliveries | Purchase | 2025-05-15 | Implemented; 2025-05-15 |
 | Import ERP article ids | Purchase | 2025-05-16 | Implemented; 2025-05-17 |
 | Add soon expiring trainings as planned by default | QMO | 2025-05-30 | Implemented; 2025-05-30 |
+| Break time recommendation on time tracking | User | 2025-06-10 | Implemented; 2025-06-12 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -2208,7 +2210,7 @@ Stakeholder identification:
 | Goals | Stakeholder | Time | Outcome |
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
-| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids |
+| Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation |
 
 [Content](#content)
 

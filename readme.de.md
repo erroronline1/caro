@@ -1510,6 +1510,7 @@ hide_offduty_reasons[] = "" ; bitte nicht ändern
 D-BW[workdays] = "1, 2, 3, 4, 5" ; Montag=1 bis Sonntag=7, Tage wie z.B. Wochenenden mit der gleichen Markierung wie Feiertage auslassen
 D-BW[holidays] = "01-01, 01-06, 05-01, 10-03, 11-01, 12-24, 12-25, 12-26, 12-31"; feste Feiertage, Monat-Tag
 D-BW[easter] = "-2, 1, 39, 50, 60" ; anwendbare Abstände zu Ostersonntag, Gründonnerstag -3, Karfreitag -2, Karsamstag -1, Ostermontag 1, Himmelfahrt 39, Pfingsten 50, Frohnleichnahm 60
+D-BW[breaks] = "6-30, 9-45" ; gesetzliche Pausenzeiten, aufsteigend [Arbeitsstunden]-[Pausenzeit], z.B. mehr als 6 Stunden: 30 Minuten Pause, mehr als 9 Stunden: 45 Minuten Pause
 
 ; Standardeinstellungen für CSV-Verarbeitung falls nicht im Filter definiert
 [csv]
