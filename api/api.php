@@ -603,7 +603,6 @@ if (in_array(REQUEST[0], [
 	'audit',
 	'calendar',
 	'consumables',
-	'cron',
 	'csvfilter',
 	'file',
 	'document',

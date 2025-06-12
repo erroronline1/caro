@@ -33,11 +33,7 @@ Things are still in motion. Images my be outdated.
     * handle hidden attribute?
 * filereference
     * stl preview type error?
-* [cron](#application-setup) DRAFT, YET TO IMPLEMENT PROPERLY
-    * iis can not find pdo driver calling from cli no matter what so schtasks is unlikely an option (and neither cron for consistency)
-    * first user triggering somehow
-    * log response
-    * [endpoint](#csv-filter-endpoints)
+* cron
     * delete methods from notification once running
     * include UTILITY:tidydir and remove from endpoints
 
@@ -1073,6 +1069,8 @@ The application handles some automated reminders and schedules
 
 Beside these the dashboard and the menu notify about open topics and tasks. Timespans for notifications and schedules can be set within the [configuration](#runtime-variables).
 
+Automated reminders and schedules are processed once on the first login on the day.
+
 ## User trainings
 User trainings can be added in the [user manager](#users) but also from the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries). In terms of ISO 13485 8.5.1 General Improvement and ISO 13485 8.5.2 Corrective measures trainings can also be added in case of a treatment record marked as complaint.
 
@@ -1863,6 +1861,7 @@ If you ever fiddle around with the sourcecode:
 * Settings to access a local server on the development machine: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 * The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results. Options best have a value independent on their label.
+* The landing page triggers the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks. This is executed once per day. Admins get the latest entry of the logfile `cron.log` within the api directory. This includes error messages as well. The logfile can be deleted to retrigger the updates.
 
 [Content](#content)
 

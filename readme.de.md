@@ -973,6 +973,8 @@ Die Anwendung vearbeitet einige automatische Erinnerungen und Aufgabenplanungen
 
 Daneben informiert die Startseite und das Menü über offene Themen und Aufgaben. Zeiträume für Benachrichtigungen und Aufgabenplanung können in der [Konfiguration](#laufzeitvariablen) angepasst werden.
 
+Automatische Erinnerungen und Aufgabenplanungen werden einmal bei der ersten Anmeldung des Tages ausgeführt.
+
 ## Schulungen
 Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulunngen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
 
@@ -1764,6 +1766,7 @@ Im Falle einer Anpassung des Quelltexts:
 * Einstellungen um einen lokalen Server der Entwicklungsumgebung zu erreichen: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 * Das checkbox2text-Widget verkettet die gewählten Optionen mit `, ` (Komma und ein Leerzeichen). Optionen dürfen diese Zeichen daher nicht enthalten (z.B. regulatorische Anforderungen für Audit-Vorlagen) oder das Verarbeiten der Optionen benätigt einen eigenen Handler (Produktverwaltung). Anderfalls kann eine erneute Auswahl zu unerwarteten Ergebnissen führen. Falls möglich sollten die gewählten Optionen einen Wert zugewiesen bekommen, unabhängig von der Bezeichnung.
+* Die Startseite löst den 'cron job' für die Bereinigung abgelaufener Dateien und die Erstellung automatischer Benachrichtigungen und Aufgabenplanungen aus. Die Durchführung findet einmal täglich statt. Administratoren wird der letzte Eintrag der Log-Datei `cron.log` innerhalb des API-Verzeichnisses angezeigt. Dies beinhaltet auch Fehlermeldungen. Die Log-Datei kann gelöscht werden um das Update erneut durchzuführen.
 
 [Übersicht](#übersicht)
 
