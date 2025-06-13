@@ -295,3 +295,5 @@
 31.05.25,7,"documentation, code maintenance"
 06.06.25,4,"order-api, consumables-api, audit-api"
 07.06.25,5,"notification-api, documentation"
+10.06.25,1,cron
+13.06.25,7,"notification-api, application-api, calendar-api, code maintenance"
