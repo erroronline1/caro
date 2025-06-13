@@ -86,8 +86,6 @@ class PDF{
 		// move pointer to last page
 		$this->_pdf->lastPage();
 
-		//Close and output PDF document
-		UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 		$this->_pdf->Output(__DIR__ . '/' . UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 'F');
 		return substr(UTILITY::directory('tmp') . '/' .$content['filename'] . '.pdf', 1);
 	}

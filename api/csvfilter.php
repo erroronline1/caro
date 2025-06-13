@@ -98,9 +98,6 @@ class CSVFILTER extends API {
 					'processedYear' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.use.filter_year'))
 				]);
 
-				// clear up tmp folder
-				UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
-
 				//create and write to file
 				$downloadfiles=[];
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
