@@ -938,7 +938,7 @@ class APPLICATION extends API {
 				'content' => $cron['last']
 			];
 			$result['render']['content'][count($result['render']['content']) - 1][] = [
-				'type' => 'button',
+				'type' => 'deletebutton',
 				'attributes' => [
 					'value' => $this->_lang->GET('application.delete_cron_log', [':count' => $cron['count']]),
 					'onclick' => "api.application('delete', 'cron_log')"
