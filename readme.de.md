@@ -1407,12 +1407,12 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
     * [CSV Verarbeitung](#importierung-von-lieferantenpreislisten) @ 100MB beansprucht etwa 2.3GB Speicher
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config für IIS entsprechend der erwarteten Dateigrößen für z.B. Sharepoint und CSV-Dateien ~350MB. Für IIS sollte die [uploadReadAheadSize](#https://techcommunity.microsoft.com/blog/iis-support-blog/solution-for-%E2%80%9Crequest-entity-too-large%E2%80%9D-error/501134) entsprechend konfiguriert werden.
 * php.ini max_input_time -1 für das Teilen großer Uploads mit max_execution_time, abhängig von der erwarteten Verbindungsgeschwindigkeit.
-* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) da die [CSV-Verarbeitung](#csv-prozessor) in Abhängigkeit des Datenaufkommens und jeweiliger Filter eine Weile dauern kann. Möglicherweise muss auch eine Anpassung des Prozessor-Timeouts im Anwendungspool von IIS und des [idle-limits](#laufzeitvariablen) vorgenommen werden.
+* php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) da die [CSV-Verarbeitung](#csv-prozessor) in Abhängigkeit des Datenaufkommens und jeweiliger Filter eine Weile dauern kann. Möglicherweise muss auch eine Anpassung des Prozessor-Timeouts im Anwendungspool von IIS und der [Session-Dauer](#laufzeitvariablen) vorgenommen werden.
     * Preislistenimport @ 220k Zeilen benötigt etwa 1 Minute mit Uniform Server, 1 Minute mit SQL Server
     * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
     * der Preislistenimport benötigt mehr Zeit für die [Aktualisierung von Artikeln](#importierung-von-lieferantenpreislisten) als für das Löschen und Wiedereinfügen
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[limits][idle_logout]](#laufzeitvariablen)
+* optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[lifespan][idle]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
     * fileinfo
     * gd
