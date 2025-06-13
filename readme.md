@@ -36,6 +36,9 @@ Things are still in motion. Images my be outdated.
 * cron
     * delete methods from notification once running
     * include UTILITY:tidydir and remove from endpoints
+    * autodelete calendar entries of type schedule x days after closing date
+    * delete cron-log from frontend for admins
+* messages delete or keep selected?
 
 ## Content
 * [Aims](#aims)
@@ -1472,7 +1475,7 @@ Application support legend:
 * Occasionally FTP-access to the server for updates of [runtime variables](#runtime-variables) and [language files](#customisation)
 
 Tested server environments:
-* Apache [Uniform Server Zero XV](https://unidocumentserver.com) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
+* Apache [Uniform Server Zero XV](https://uniformserver.com/) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
 * Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
 * Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
 
@@ -1508,7 +1511,7 @@ It is strongly recommended to create an additional development environment to te
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
     * pricelist import does take a lot longer on [updating products](#importing-vendor-pricelists) than deleting and reinserting
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* optional php.ini session.gc_maxlifetime in relation to [CONFIG[limits][idle_logout]](#runtime-variables)
+* optional php.ini session.gc_maxlifetime in relation to [CONFIG[lifespan][idle]](#runtime-variables)
 * php.ini enable extensions:
     * fileinfo
     * gd
