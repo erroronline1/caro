@@ -31,14 +31,13 @@ Things are still in motion. Images my be outdated.
 * templates
 * responsibilities
     * handle hidden attribute?
-* filereference
-    * stl preview type error?
 * cron
     * delete methods from notification once running
     * include UTILITY:tidydir and remove from endpoints
     * autodelete calendar entries of type schedule x days after closing date
     * delete cron-log from frontend for admins
 * messages delete or keep selected?
+* radio type icon alignment (e.g. filereference on filepicker)
 
 ## Content
 * [Aims](#aims)

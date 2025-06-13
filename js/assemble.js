@@ -843,6 +843,17 @@ export class Dialog {
 			if (["png", "jpg", "jpeg", "gif"].includes(filetype[filetype.length - 1].toLowerCase()) || this.render.content.startsWith("data:image")) {
 				result.push(canvas);
 				this.previewElements.canvas = canvas;
+
+				if (this.render.transfer) {
+					return [canvas, ...this.confirm()];
+				} else {
+					a.href = this.render.url;
+					a.target = "_blank";
+					a.download = this.render.name || this.render.url;
+					a.dataset.type = "downloadlink";
+					a.append(document.createTextNode(this.render.name || this.render.url));
+					return [canvas, a];
+				}
 			} else {
 				// not supported; currently no need for fallback as preview is prepared by backend with filtered file types as well
 			}

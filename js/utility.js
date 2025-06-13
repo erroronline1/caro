@@ -1353,11 +1353,11 @@ export const _client = {
 		 */
 		filereference: (files) => {
 			const content = {},
-				stloptions = {};
+				previewoptions = {};
 			let path, filename;
 
-			stloptions[api._lang.GET("assemble.render.filereference_decline")] = false;
-			stloptions[api._lang.GET("assemble.render.filereference_select")] = { value: true, class: "reducedCTA" };
+			previewoptions[api._lang.GET("assemble.render.filereference_decline")] = false;
+			previewoptions[api._lang.GET("assemble.render.filereference_select")] = { value: true, class: "reducedCTA" };
 
 			for (const url of files) {
 				path = url.split("documents/");
@@ -1374,14 +1374,15 @@ export const _client = {
 					content[path]["data-type"] = "stl";
 					content[path].onclick = function () {
 						new _client.Dialog({
-							type: "stl",
+							type: "preview",
 							header: "filename",
 							render: {
+								type: "stl",
 								name: "stlpath",
 								url: "stlurl",
 								transfer: true,
 							},
-							options: stloptions,
+							options: previewoptions,
 						}).then((response) => {
 							if (!response) {
 								this.checked = false;
@@ -1390,7 +1391,30 @@ export const _client = {
 						});
 					}
 						.toString()
-						._replaceArray(["filename", "stlpath", "stlurl", "stloptions"], [filename[filename.length - 1], path, url, JSON.stringify(stloptions)]);
+						._replaceArray(["filename", "stlpath", "stlurl", "previewoptions"], [filename[filename.length - 1], path, url, JSON.stringify(previewoptions)]);
+				}
+				if (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif")) {
+					content[path]["data-type"] = "imagelink";
+					content[path].onclick = function () {
+						new _client.Dialog({
+							type: "preview",
+							header: "filename",
+							render: {
+								type: "image",
+								name: "imgpath",
+								content: "imgurl",
+								transfer: true,
+							},
+							options: previewoptions,
+						}).then((response) => {
+							if (!response) {
+								this.checked = false;
+								document.getElementById("_selectedfile").value = "";
+							}
+						});
+					}
+						.toString()
+						._replaceArray(["filename", "imgpath", "imgurl", "previewoptions"], [filename[filename.length - 1], path, url, JSON.stringify(previewoptions)]);
 				}
 			}
 			return {
