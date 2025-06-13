@@ -17,7 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
- // audit overview and export
+namespace CARO\API;
+
+// audit overview and export
 require_once('./_pdf.php');
 require_once("../libraries/xlsxwriter.class.php");
 require_once('./_calendarutility.php');
@@ -2120,7 +2122,7 @@ class AUDIT extends API {
 				continue;
 			}
 			$vendor = $vendors[array_search($product['vendor_name'], array_column($vendors, 'name'))];
-			$check = new DateTime($product['checked']);
+			$check = new \DateTime($product['checked']);
 			if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
 				$checkable[$product['vendor_name']][] = $product['id'];
 			}
@@ -2128,7 +2130,7 @@ class AUDIT extends API {
 		// drop vendors that have been checked within their sample check interval
 		foreach($products as $product){
 			if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_name']])) continue;
-			$check = new DateTime($product['checked']);
+			$check = new \DateTime($product['checked']);
 			if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['servertime'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
 				unset($checkable[$product['vendor_name']]);
 			}
@@ -2358,8 +2360,8 @@ class AUDIT extends API {
 			$order['order_data'] = json_decode($order['order_data'], true);
 			$deliverytime = '';
 			if ($order['received']){
-				$ordered = $order['ordered'] ? new DateTime($order['ordered']) : '-';
-				$received = $order['received'] ? new DateTime($order['received']) : '-';
+				$ordered = $order['ordered'] ? new \DateTime($order['ordered']) : '-';
+				$received = $order['received'] ? new \DateTime($order['received']) : '-';
 				$deliverytime = ($order['ordered'] && $order['received']) ? intval($ordered->diff($received)->format('%a')) : '-';
 			}
 
@@ -2381,7 +2383,7 @@ class AUDIT extends API {
 			];
 		}
 		$tempFile = UTILITY::directory('tmp') . '/' . preg_replace('/[^\w\d]/', '', $this->_lang->GET('audit.checks_type.orderstatistics') . '_' . $this->_date['usertime']->format('Y-m-d H:i')) . '.xlsx';
-		$writer = new XLSXWriter();
+		$writer = new \XLSXWriter();
 		$writer->setAuthor($_SESSION['user']['name']); 
 
 		foreach($vendor_orders as $vendor => $orders){
@@ -2916,7 +2918,7 @@ class AUDIT extends API {
 		}
 		if ($entries){
 			$tempFile = UTILITY::directory('tmp') . '/' . $summary['filename'] . '_' . time() . '.xlsx';
-			$writer = new XLSXWriter();
+			$writer = new \XLSXWriter();
 			$writer->setAuthor($_SESSION['user']['name']); 
 			foreach($entries as $process => $types){
 				foreach ($types as $type => $lines){
@@ -3063,7 +3065,7 @@ class AUDIT extends API {
 
 					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires']);
+						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
@@ -3346,7 +3348,7 @@ class AUDIT extends API {
 				foreach ($usertrainings as $row){
 					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires']);
+						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');

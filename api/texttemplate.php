@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // add and edit text recommendations
 class TEXTTEMPLATE extends API {
     // processed parameters for readability

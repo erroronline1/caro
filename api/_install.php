@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // actions require an application user with admin permission to be logged in onve the database has been installed
 session_set_cookie_params([
 	'domain' => $_SERVER['HTTP_HOST'],
@@ -657,11 +659,11 @@ class INSTALL {
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
 		];
-		$this->_pdo = new PDO( CONFIG['sql'][$this->_pdoDriver]['driver'] . ':' . CONFIG['sql'][$this->_pdoDriver]['host'] . ';' . CONFIG['sql'][$this->_pdoDriver]['database']. ';' . CONFIG['sql'][$this->_pdoDriver]['charset'], CONFIG['sql'][$this->_pdoDriver]['user'], CONFIG['sql'][$this->_pdoDriver]['password'], $options);
+		$this->_pdo = new \PDO( CONFIG['sql'][$this->_pdoDriver]['driver'] . ':' . CONFIG['sql'][$this->_pdoDriver]['host'] . ';' . CONFIG['sql'][$this->_pdoDriver]['database']. ';' . CONFIG['sql'][$this->_pdoDriver]['charset'], CONFIG['sql'][$this->_pdoDriver]['user'], CONFIG['sql'][$this->_pdoDriver]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
-		$this->_currentdate = new DateTime('now');
+		$this->_currentdate = new \DateTime('now');
 
 		$this->_lang = new LANG();
 	}
@@ -773,7 +775,7 @@ class INSTALL {
 					$counter++;
 				}
 			}
-			catch (Exception $e) {
+			catch (\Exception $e) {
 				$this->printError($e, $chunk);
 				die();
 			}
@@ -849,7 +851,7 @@ class INSTALL {
 			]);
 			$this->printWarning('Databases already installed.');
 		}
-		catch (Exception $e){
+		catch (\Exception $e){
 			if (!$statement = $this->_pdo->query(DEFAULTSQL['install_tables'][$this->_pdoDriver])){
 				$this->printError('There has been an error installing the databases!');
 				die();
@@ -1463,7 +1465,7 @@ class INSTALL {
 					try {
 						SQLQUERY::EXECUTE($this->_pdo, $chunk);
 					}
-					catch (Exception $e) {
+					catch (\Exception $e) {
 						$this->printWarning('there has been an issue', [$e, $chunk]);
 						die();
 					}

@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 require_once('_install.php');
 
 class STRESSTEST extends INSTALL{
@@ -259,7 +261,7 @@ class STRESSTEST extends INSTALL{
 			try {
 				if (SQLQUERY::EXECUTE($this->_pdo, $chunk));
 			}
-			catch (Exception $e) {
+			catch (\Exception $e) {
 				echo $e, $chunk;
 				die();
 			}

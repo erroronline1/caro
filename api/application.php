@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // authentify endpoint handling, menu and landing page methods
 require_once('_calendarutility.php');
 require_once('notification.php');
@@ -171,7 +173,7 @@ class APPLICATION extends API {
 		try {
 			//throw new ErrorException("test error");
 			$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-			$today = new DateTime('now');
+			$today = new \DateTime('now');
 			$today->setTime(0, 0);
 	
 			// clear up folders with limited files lifespan
@@ -186,7 +188,7 @@ class APPLICATION extends API {
 			foreach ($data as $row){
 				if ($row['closed']) continue;
 				// alert if applicable
-				$last = new DateTime($row['last_touch']);
+				$last = new \DateTime($row['last_touch']);
 				$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['open_record_reminder']));
 				$row['notified'] = $row['notified'] || 0;
 				if ($row['notified'] < $diff){
@@ -213,7 +215,7 @@ class APPLICATION extends API {
 			foreach ($vendors as $vendor){
 				if ($vendor['hidden']) continue;
 				$certificate = json_decode($vendor['certificate'] ? : '', true);
-				if (isset($certificate['validity']) && $certificate['validity']) $validity = new DateTime($certificate['validity']);
+				if (isset($certificate['validity']) && $certificate['validity']) $validity = new \DateTime($certificate['validity']);
 				else continue;
 				if ($validity > $today) continue;
 				// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
@@ -263,7 +265,7 @@ class APPLICATION extends API {
 				if ($product['hidden']) continue;
 				$article_no = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $product['article_no'] ? : '');
 				if (isset($documents[$product['vendor_id']]) && isset($documents[$product['vendor_id']][$article_no])){
-					$upload = new DateTime($documents[$product['vendor_id']][$article_no]);
+					$upload = new \DateTime($documents[$product['vendor_id']][$article_no]);
 					$diff = intval(abs($upload->diff($this->_date['servertime'])->days / CONFIG['lifespan']['product_documents']));
 					if ($product['document_reminder'] < $diff){
 						$calendar->post([
@@ -334,7 +336,7 @@ class APPLICATION extends API {
 			foreach($undelivered as $order){
 				$update = false;
 				$decoded_order_data = null;
-				$ordered = new DateTime($order['ordered'] ? : '');
+				$ordered = new \DateTime($order['ordered'] ? : '');
 				$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order_unreceived']));
 				if ($order['ordered'] && $order['notified_received'] < $receive_interval){
 					$decoded_order_data = json_decode($order['order_data'], true);
@@ -355,7 +357,7 @@ class APPLICATION extends API {
 					$update = true;
 				} else $receive_interval = $order['notified_received'];
 
-				$received = new DateTime($order['received'] ? : '');
+				$received = new \DateTime($order['received'] ? : '');
 				$delivery_interval = intval(abs($received->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order_undelivered']));
 				if ($order['received'] && $order['notified_delivered'] < $delivery_interval){
 					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
@@ -399,7 +401,7 @@ class APPLICATION extends API {
 					|| ($row['record_type'] !== 'complaint' && !$row['closed'])){
 	
 					// alert if applicable
-					$last = new DateTime($row['last_touch']);
+					$last = new \DateTime($row['last_touch']);
 					$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['open_record_reminder']));
 					if ($row['notified'] < $diff){
 						// get last considered document
@@ -466,7 +468,7 @@ class APPLICATION extends API {
 			]);
 			foreach($trainings as $training){
 				if ($training['evaluation'] || !$training['date']) continue;
-				$trainingdate = new DateTime($training['date']);
+				$trainingdate = new \DateTime($training['date']);
 				if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
 					if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
 						// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
@@ -507,7 +509,7 @@ class APPLICATION extends API {
 					continue;
 				}
 				if (!$training['expires']) continue;
-				$trainingdate = new DateTime($training['expires']);
+				$trainingdate = new \DateTime($training['expires']);
 				if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) < CONFIG['lifespan']['training_renewal']){
 					if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
 						$user = $users[$user];
@@ -559,7 +561,7 @@ class APPLICATION extends API {
 
 			$log = $this->_date['servertime']->format('Y-m-d H:i:s') . ' OK';
 		}
-		catch (Exception $e){
+		catch (\Exception $e){
 			$log = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . str_replace("\n", ' ' , $e);
 		}
 
@@ -1269,7 +1271,7 @@ class APPLICATION extends API {
 		];
 
 		$displayevents = $displayabsentmates = '';
-		$today = new DateTime('now');
+		$today = new \DateTime('now');
 		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 		// sort events
 		foreach ($thisDaysEvents as $row){

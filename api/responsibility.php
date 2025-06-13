@@ -17,8 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// add, edit and delete responsibilities
+namespace CARO\API;
 
+ // add, edit and delete responsibilities
 class RESPONSIBILITY extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];

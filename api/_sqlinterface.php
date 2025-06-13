@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 class SQLQUERY {
 	/**
 	 * return query for driver
@@ -77,7 +79,7 @@ class SQLQUERY {
 			$statement = $_pdo->prepare($query);
 			if (!$statement->execute($parameters['values'])) return false;
 		}
-		catch (Exception $e) {
+		catch (\Exception $e) {
 			UTILITY::debug($e, $statement->queryString, $statement->debugDumpParams());
 			die();
 		}

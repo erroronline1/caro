@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+namespace CARO\API;
 
 require_once('../libraries/TCPDF/tcpdf_import.php');
 
@@ -350,7 +351,7 @@ class PDF{
 	}
 }
 
-class RECORDTCPDF extends TCPDF {
+class RECORDTCPDF extends \TCPDF {
 	// custom pdf header and footer
 	public $qrcodesize = null;
 	public $qrcodecontent = null;

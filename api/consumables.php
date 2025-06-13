@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // add, edit and delete vendors and products
 require_once('./_csvprocessor.php');
 
@@ -1589,7 +1591,7 @@ class CONSUMABLES extends API {
 					'type' => 'error'
 				]]);
 		}
-		catch(Error $e){
+		catch(\Error $e){
 			$this->response([
 				'response' => [
 					'msg' => implode("\n", $pricelist->_log),
@@ -1691,7 +1693,7 @@ class CONSUMABLES extends API {
 				try {
 					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_date['servertime']->format("Y-m-d");
 				}
-				catch (Exception $e) {
+				catch (\Exception $e) {
 					echo $e, $chunk;
 					die();
 				}

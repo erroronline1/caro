@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // add, edit and delete users
 require_once('./_calendarutility.php');
 
@@ -263,7 +265,7 @@ class USER extends API {
 				foreach ($alltrainings as $row){
 					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires']);
+						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
@@ -932,7 +934,7 @@ class USER extends API {
 				foreach ($trainings as $row){
 					$attributes = ['data-type' => 'skill', 'name' => $this->_lang->GET('user.training.display') . ' ' . $row['name'] . ' ' . $this->convertFromServerTime($row['date'])];
 					if ($row['expires']){
-						$expire = new DateTime($row['expires']);
+						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
 							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
@@ -1261,7 +1263,7 @@ class USER extends API {
 
 		require_once('../libraries/TCPDF/tcpdf_barcodes_2d.php');
 		require_once('../libraries/TCPDF/include/barcodes/qrcode.php');
-		$qrcode = new TCPDF2DBarcode($CODE, 'QRCODE,' . CONFIG['limits']['qr_errorlevel']);
+		$qrcode = new \TCPDF2DBarcode($CODE, 'QRCODE,' . CONFIG['limits']['qr_errorlevel']);
 		$pngcode = imagecreatefromstring($qrcode->getBarcodePngData());
 
 		$card = [85.6, 53.9];

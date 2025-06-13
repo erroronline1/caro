@@ -115,6 +115,8 @@ filters and returns a named array according to setup.
 	the dict keys are processed as regex for a possible broader use.
 */
 
+namespace CARO\API;
+
 class Listprocessor {
 	/**
 	 * define setup
@@ -181,9 +183,9 @@ class Listprocessor {
 		if (!isset($this->_argument['processedYear'])) $this->_argument['processedYear'] = date('Y');
 
 		if (gettype($this->_setting['filesetting']['source']) === 'string' && is_file($this->_setting['filesetting']['source'])) $this->importFile();
-		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = SplFixedArray::fromArray($this->_setting['filesetting']['source'], true);
-		elseif (gettype($this->_setting['filesetting']['source']) === 'object') $this->_list = SplFixedArray::fromArray($this->_setting['filesetting']['source']->toArray(), true);
-		$this->_originallist = SplFixedArray::fromArray($this->_list->toArray(), true);
+		elseif (gettype($this->_setting['filesetting']['source']) === 'array') $this->_list = \SplFixedArray::fromArray($this->_setting['filesetting']['source'], true);
+		elseif (gettype($this->_setting['filesetting']['source']) === 'object') $this->_list = \SplFixedArray::fromArray($this->_setting['filesetting']['source']->toArray(), true);
+		$this->_originallist = \SplFixedArray::fromArray($this->_list->toArray(), true);
 		if ($this->_list) $this->filter();
 	}
 
@@ -770,7 +772,7 @@ class Listprocessor {
 			]
 		}		
 		*/
-		$this->_list = new SplFixedArray(0);
+		$this->_list = new \SplFixedArray(0);
 		$i = 0;
 		$csvfile = fopen($this->_setting['filesetting']['source'], 'r');
 		if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
@@ -973,7 +975,7 @@ class Listprocessor {
 
 		$date = implode('-', $date);
 		$dateformat = implode('-', $dateformat);
-		$offset_date = new DateTime(DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
+		$offset_date = new \DateTime(\DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
 		$day = $offset_date->format('j');
 		$offset_date->modify('first day of ' . ($delta === 0 ? 'this' : ($delta > 1 ? '+' . $delta : '-' . $delta)) . ' month' . ($delta !==0 ? 's': ''));
 		return explode('-', $offset_date->format($dateformat));
@@ -1003,8 +1005,8 @@ class Listprocessor {
 		$first = implode('-', $first);
 		$last = implode('-', $last);
 		$dateformat = implode('-', $dateformat);
-		$backthen = new DateTime(DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
-		$processedmonth = new DateTime(DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
+		$backthen = new \DateTime(\DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
+		$processedmonth = new \DateTime(\DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
 		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 0);
 	}
 

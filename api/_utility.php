@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 define("UTILITY_IMAGE_REPLACE", 0x1);
 define("UTILITY_IMAGE_STREAM", 0x2);
 define("UTILITY_IMAGE_RESOURCE", 0x4);

@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // write and read user messages
 class MESSAGE extends API {
 	// processed parameters for readability

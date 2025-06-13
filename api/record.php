@@ -17,11 +17,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
- // add and export records
+namespace CARO\API;
+
+// add and export records
 // Y U NO DELETE? because of audit safety, that's why!
 require_once('./_pdf.php');
 require_once('./_calendarutility.php');
-
 
 class RECORD extends API {
 	// processed parameters for readability
@@ -504,9 +505,9 @@ class RECORD extends API {
 				if ($content = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.create_identifier'))) {
 					$possibledate = substr($content, -16);
 					try {
-						new DateTime($possibledate, new DateTimeZone($this->_date['timezone']));
+						new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
 					}
-					catch (Exception $e){
+					catch (\Exception $e){
 						if ($this->_appendDate) $content .= ' ' . $this->_date['usertime']->format('Y-m-d H:i');
 					}
 				}
@@ -771,9 +772,9 @@ class RECORD extends API {
 						unset ($this->_payload->$key);
 						$possibledate = substr($identifier, -16);
 						try {
-							new DateTime($possibledate, new DateTimeZone($this->_date['timezone']));
+							new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
 						}
-						catch (Exception $e){
+						catch (\Exception $e){
 							$identifier .= ' ' . $entry_timestamp;
 						}
 					}
@@ -1529,9 +1530,9 @@ class RECORD extends API {
 		// append timestamp to new id if applicable
 		$possibledate = substr($new_id, -16);
 		try {
-			new DateTime($possibledate, new DateTimeZone($this->_date['timezone']));
+			new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
 		}
-		catch (Exception $e){
+		catch (\Exception $e){
 			$new_id .= ' ' . $this->_date['usertime']->format('Y-m-d H:i');
 		}
 
@@ -1540,10 +1541,10 @@ class RECORD extends API {
 		$similar_new_id = substr($new_id, 0, -16);
 		$possibledate = substr($entry_id, -16);
 		try {
-			new DateTime($possibledate, new DateTimeZone($this->_date['timezone']));
+			new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
 			$similar_entry_id = substr($entry_id, 0, -16);
 		}
-		catch (Exception $e){
+		catch (\Exception $e){
 			$similar_entry_id = $entry_id;
 		}
 		similar_text($similar_new_id, $similar_entry_id, $percent);

@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // scheduling, contributing to calendar
 require_once('./_calendarutility.php');
 require_once('./_pdf.php');
@@ -270,9 +272,9 @@ class CALENDAR extends API {
 
 				// new planning
 				if (isset($this->_payload->{$this->_lang->PROPERTY('calendar.longtermplanning.select')})){
-					$start = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')));
+					$start = new \DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.start')));
 					$start->modify('first day of this month');
-					$end = new DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')));
+					$end = new \DateTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.longtermplanning.end')));
 					$end->modify('last day of this month');
 					$span = $start->diff($end)->format('%m') * 2; // half months
 					if ($span < 2) $this->response([], 406);
@@ -616,7 +618,7 @@ class CALENDAR extends API {
 
 		$timesheets = [];
 		// prepare interval for daily hours display
-		$minuteInterval = new DateInterval('PT1M');
+		$minuteInterval = new \DateInterval('PT1M');
 
 		//iterate over all days of the selected month
 		foreach ($days as $day){
@@ -657,8 +659,8 @@ class CALENDAR extends API {
 					];
 				}
 				
-				$span_start = new DateTime($entry['span_start']);
-				$span_end = new DateTime($entry['span_end']);
+				$span_start = new \DateTime($entry['span_start']);
+				$span_end = new \DateTime($entry['span_end']);
 				if (($span_start <= $day || $span_start->format('Y-m-d') === $day->format('Y-m-d'))
 					&& ($day <= $span_end || $span_end->format('Y-m-d') === $day->format('Y-m-d'))
 					&& !isset($timesheets[$entry['affected_user_id']]['days'][$day->format('Y-m-d')])){
@@ -668,7 +670,7 @@ class CALENDAR extends API {
 					if (!$entry['subject'] || !strlen($entry['subject'])) {
 						$firstday = $days[0]; // copy object for down below method usage
 						$lastday = $days[count($days) - 1];  // copy object for down below method usage
-						$periods = new DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);
+						$periods = new \DatePeriod($span_start < $firstday ? $firstday : $span_start, $minuteInterval, $span_end > $lastday ? $lastday : $span_end);
 						$dailyhours = iterator_count($periods) / 60;
 						if (isset($misc['homeoffice'])) $dailyhours += timeStrToFloat($misc['homeoffice']);
 						if (isset($misc['break'])) $dailyhours -= timeStrToFloat($misc['break']);
@@ -936,7 +938,7 @@ class CALENDAR extends API {
 
 				// default end if not provided
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start']);
+					$due = new \DateTime($event[':span_start']);
 					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
@@ -979,7 +981,7 @@ class CALENDAR extends API {
 
 				// default end if not provided
 				if (!$event[':span_end']){
-					$due = new DateTime($event[':span_start']);
+					$due = new \DateTime($event[':span_start']);
 					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
@@ -1110,7 +1112,7 @@ class CALENDAR extends API {
 				$result['render']['content'][] = $events;
 
 				// add past unclosed events for user units
-				$today = new DateTime($this->_requestedDate);
+				$today = new \DateTime($this->_requestedDate);
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
 					$uncompleted = [];
@@ -1169,8 +1171,8 @@ class CALENDAR extends API {
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'); // to eventually match affected_user_id
 
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start']);
-			$due = new DateTime($row['span_end']);
+			$date = new \DateTime($row['span_start']);
+			$due = new \DateTime($row['span_end']);
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			if ((!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !in_array($_SESSION['user']['id'], [$row['author_id'], $row['affected_user_id']])) || $row['type'] !== 'schedule' ) continue; // skip not schedule and not user unit affecting
 
@@ -1522,7 +1524,7 @@ class CALENDAR extends API {
 				}
 
 				// display current scheduled events to raise awareness
-				$today = new DateTime($this->_requestedDate);
+				$today = new \DateTime($this->_requestedDate);
 				if ($thisMonthsEvents = $calendar->getWithinDateRange($today->modify('first day of this month')->format('Y-m-d'), $today->modify('last day of this month')->format('Y-m-d'))) {
 					$timesheetentries = false;
 					foreach($thisMonthsEvents as $evt) if ($evt['type']==='timesheet') $timesheetentries = true;
@@ -1538,7 +1540,7 @@ class CALENDAR extends API {
 				$result['render']['content'][] = $events;
 
 				// display past unclosed scheduled events to raise awareness
-				$today = new DateTime($this->_requestedDate);
+				$today = new \DateTime($this->_requestedDate);
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
 					foreach ($pastEvents as $id => $row){
@@ -1602,8 +1604,8 @@ class CALENDAR extends API {
 	 private function timesheetEntries($dbevents, $calendar){
 		$events = [];
 		foreach($dbevents as $row){
-			$date = new DateTime($row['span_start']);
-			$due = new DateTime($row['span_end']);
+			$date = new \DateTime($row['span_start']);
+			$due = new \DateTime($row['span_end']);
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 			$row['organizational_unit'] = explode(',', $row['organizational_unit']);
 			if ($row['type'] !== 'timesheet'

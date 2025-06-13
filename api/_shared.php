@@ -20,6 +20,8 @@
 // unlike other helper modules that are supposed to work anonymously this module handles module specific tasks that are similar but not identical over different modules
 // import when needed, initialize with pdo and call methods with required parameters
 
+namespace CARO\API;
+
 class SHARED {
     private $_pdo = null;
 	public $_lang = null;

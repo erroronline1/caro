@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // add filters and filter csv-files
 require_once('./_csvprocessor.php');
 require_once("../libraries/xlsxwriter.class.php");
@@ -131,7 +133,7 @@ class CSVFILTER extends API {
 					case 'xls': // do nothing, let xlsx catch
 					case 'xlsx':
 						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . '.xlsx';
-						$writer = new XLSXWriter();
+						$writer = new \XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']); 
 						foreach($datalist->_list as $subsetname => $subset){
 							// datalist may contain multiple subsets based on split setting

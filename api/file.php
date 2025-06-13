@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 // add, edit and delete files
 class FILE extends API {
 	// processed parameters for readability
@@ -410,7 +412,7 @@ class FILE extends API {
 						try {
 							if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $success = true;
 						}
-						catch (Exception $e) {
+						catch (\Exception $e) {
 							echo $e, $chunk;
 							die();
 						}
@@ -647,7 +649,7 @@ class FILE extends API {
 						foreach ($folders as $folder){
 							// prepare each folders properties
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
-							$filedate = new DateTime('@' . filemtime($folder), new DateTimeZone($this->_date['timezone']));
+							$filedate = new \DateTime('@' . filemtime($folder), new \DateTimeZone($this->_date['timezone']));
 							// append folder link and delete button
 							array_push($result['render']['content'][0],
 								[
@@ -721,7 +723,7 @@ class FILE extends API {
 									'name' => $fileinfo['basename'],
 									'link' => './api/api.php/file/stream/' . substr($file, 1)
 								];
-								$filedate = new DateTime('@' . filemtime('.' . $file['path']), new DateTimeZone($this->_date['timezone']));
+								$filedate = new \DateTime('@' . filemtime('.' . $file['path']), new \DateTimeZone($this->_date['timezone']));
 
 								$link = [];
 								$link[$file['name']] = UTILITY::link(['href' => $file['link'], 'data-filtered' => $file['path']]);

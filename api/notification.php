@@ -17,6 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
 require_once('./_calendarutility.php');
 
 // handle all notification within one call
@@ -86,7 +88,7 @@ class NOTIFICATION extends API {
 	 */
 	public function calendar(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$today = new DateTime('now');
+		$today = new \DateTime('now');
 		$today->setTime(0, 0);
 
 		// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day

@@ -17,6 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace CARO\API;
+
+
 // diverse tools
 class TOOL extends API {
 	/**
@@ -588,7 +591,7 @@ class TOOL extends API {
 					&& $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'] && str_ends_with($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'], 'zip')) {
 					$file = $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name'];
 					//unpack an archive
-					$zip = new ZipArchive;
+					$zip = new \ZipArchive;
 					if ($zip->open($file)){
 						for($i = 0; $i < $zip->numFiles; $i++) {
 							$filename = $zip->getNameIndex($i);
@@ -610,8 +613,8 @@ class TOOL extends API {
 						$zipname .= preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $filename);
 					}
 					// create zip
-					$zip = new ZipArchive();
-					$zip->open(UTILITY::directory('tmp') . '/' . $zipname .'.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+					$zip = new \ZipArchive();
+					$zip->open(UTILITY::directory('tmp') . '/' . $zipname .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['tmp_name'] as $index => $file){
 						$zip->addFile($file, $_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'][$index]);
 					}

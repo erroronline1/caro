@@ -16,6 +16,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
+namespace CARO\API;
+
 session_set_cookie_params([
 	'domain' => $_SERVER['HTTP_HOST'],
 	'secure' => true,
@@ -92,7 +95,7 @@ class API {
 			\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
 			//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
 		];
-		$this->_pdo = new PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
+		$this->_pdo = new \PDO( CONFIG['sql'][CONFIG['sql']['use']]['driver'] . ':' . CONFIG['sql'][CONFIG['sql']['use']]['host'] . ';' . CONFIG['sql'][CONFIG['sql']['use']]['database']. ';' . CONFIG['sql'][CONFIG['sql']['use']]['charset'], CONFIG['sql'][CONFIG['sql']['use']]['user'], CONFIG['sql'][CONFIG['sql']['use']]['password'], $options);
 		$dbsetup = SQLQUERY::PREPARE('DYNAMICDBSETUP');
 		if ($dbsetup) $this->_pdo->exec($dbsetup);
 
@@ -379,14 +382,14 @@ class API {
 		if (strlen($input) === 16) $parse .= ':00'; // append seconds to get a valid datetime format
 		// create a datetime from input
 		try {
-			$date = new DateTime($parse);
+			$date = new \DateTime($parse);
 		}
-		catch (Exception $e) {
+		catch (\Exception $e) {
 			return $input;
 		} 
 		// convert timezone if user setting exists and differs from server setting
 		if ($this->_date['timezone'] !== date_default_timezone_get() && $timezoneConversion){
-			$date->setTimezone(new DateTimeZone($this->_date['timezone']));
+			$date->setTimezone(new \DateTimeZone($this->_date['timezone']));
 		}
 
 		// return formatted datetime string, abbreviated if applicable
@@ -402,14 +405,14 @@ class API {
 		if (!$input) return '';
 		// create a datetime from input
 		try {
-			$date = new DateTime($input, new DateTimeZone($this->_date['timezone']));
+			$date = new \DateTime($input, new \DateTimeZone($this->_date['timezone']));
 		}
-		catch (Exception $e) {
+		catch (\Exception $e) {
 			return $input;
 		}
 		// convert timezone if user setting exists and differs from server setting
 		if ($this->_date['timezone'] !== date_default_timezone_get()){
-			$date->setTimezone(new DateTimeZone(date_default_timezone_get()));
+			$date->setTimezone(new \DateTimeZone(date_default_timezone_get()));
 		}
 
 		// return formatted datetime string, abbreviated if applicable
@@ -432,8 +435,8 @@ class API {
 		if (isset($_SESSION['user']['app_settings']['dateformat']) && array_key_exists($_SESSION['user']['app_settings']['dateformat'], CONFIG['calendar']['dateformats'])) $return['dateformat'] = CONFIG['calendar']['dateformats'][$_SESSION['user']['app_settings']['dateformat']];
 		if (isset($_SESSION['user']['app_settings']['location']) && array_key_exists($_SESSION['user']['app_settings']['location'], CONFIG['locations'])) $return['locations'] = CONFIG['locations'][$_SESSION['user']['app_settings']['location']];
 
-		$return['servertime'] = new DateTime('now');
-		$return['usertime'] = new DateTime('now', new DateTimeZone($return['timezone']));
+		$return['servertime'] = new \DateTime('now');
+		$return['usertime'] = new \DateTime('now', new \DateTimeZone($return['timezone']));
 		return $return;
 	}
 	
@@ -617,7 +620,7 @@ if (in_array(REQUEST[0], [
 	'tool',
 	'user'])) require_once(REQUEST[0] . '.php');
 
-$call = strtoupper(REQUEST[0]);
+$call = "CARO\\API\\" . strtoupper(REQUEST[0]);
 $api = new $call();
 $api->processApi();
 
