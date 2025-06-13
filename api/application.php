@@ -173,21 +173,34 @@ class APPLICATION extends API {
 			$today = new DateTime('now');
 			$today->setTime(0, 0);
 	
-			// clear up tmp folder
+			// clear up folders with limited files lifespan
 			UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
+			UTILITY::tidydir('sharepoint', CONFIG['lifespan']['sharepoint']);
 
-			// gather sharepoint files and delete expired
-			$files = UTILITY::listFiles(UTILITY::directory('sharepoint'), 'asc');
-			if ($files){
-				foreach ($files as $file){
-					// prepare file properies and calculate remaining lifespan
-					$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
-					$filetime = filemtime($file['path']);
-
-					// delete expired files
-					if ((time() - $filetime) / 3600 > CONFIG['lifespan']['sharepoint']) {
-						UTILITY::delete($file['path']);
-					}
+			// notify on unclosed audits
+			$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+			foreach ($data as $row){
+				if ($row['closed']) continue;
+				// alert if applicable
+				$last = new DateTime($row['last_touch']);
+				$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['open_record_reminder']));
+				$row['notified'] = $row['notified'] || 0;
+				if ($row['notified'] < $diff){
+					$this->alertUserGroup(
+						['permission' => [...PERMISSION::permissionFor('audit', true)]],
+						$this->_lang->GET('audit.audit.reminder_message', [
+							':days' => $last->diff($this->_date['servertime'])->days,
+							':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
+							':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
+						], true)
+					);
+					SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_notified',
+						[
+						'values' => [
+							':notified' => $diff,
+							':id' => $row['id']]
+						]
+					);
 				}
 			}
 
