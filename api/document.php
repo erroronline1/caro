@@ -1183,7 +1183,7 @@ class DOCUMENT extends API {
 	 *  | -_|_'_| . | . |  _|  _|
 	 *  |___|_,_|  _|___|_| |_| 
 	 *          |_|
-	 * export a document as pdf, if earlier than requested maxDocumentTimestmp, with data if provided
+	 * export a document as pdf, if earlier than requested maxDocumentTimestamp, with data if provided
 	 */
 	public function export(){
 		$document_id = $identifier = null;
