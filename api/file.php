@@ -962,7 +962,8 @@ class FILE extends API {
 						$filetime = filemtime($file['path']);
 
 						// delete expired files
-						if ((time()-$filetime)/3600 > CONFIG['lifespan']['sharepoint']) {
+						// tidied up in cron job as well, but duplicate to avoid a faulty lifespan display
+						if ((time() - $filetime) / 3600 > CONFIG['lifespan']['sharepoint']) {
 							UTILITY::delete($file['path']);
 						}
 						// add remaining files
