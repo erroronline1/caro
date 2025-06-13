@@ -32,7 +32,6 @@ Things are still in motion. Images my be outdated.
 * responsibilities
     * handle hidden attribute?
 * messages delete or keep selected?
-* radio type icon alignment (e.g. filereference on filepicker)
 
 ## Content
 * [Aims](#aims)

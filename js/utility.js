@@ -1371,7 +1371,6 @@ export const _client = {
 					},
 				};
 				if (path.endsWith(".stl")) {
-					content[path]["data-type"] = "stl";
 					content[path].onclick = function () {
 						new _client.Dialog({
 							type: "preview",
@@ -1394,7 +1393,6 @@ export const _client = {
 						._replaceArray(["filename", "stlpath", "stlurl", "previewoptions"], [filename[filename.length - 1], path, url, JSON.stringify(previewoptions)]);
 				}
 				if (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif")) {
-					content[path]["data-type"] = "imagelink";
 					content[path].onclick = function () {
 						new _client.Dialog({
 							type: "preview",
