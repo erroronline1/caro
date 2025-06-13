@@ -472,7 +472,8 @@ export const api = {
 
 									if (api._unauthorizedRequest.request.length && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
 										// resend last request
-										api[api._unauthorizedRequest.request.shift()](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
+										const call = api._unauthorizedRequest.request.shift();
+										if (api.hasOwnProperty(call)) api[call](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
 									}
 								}
 							} catch (error) {
