@@ -89,6 +89,7 @@ class NOTIFICATION extends API {
 		$today = new DateTime('now');
 		$today->setTime(0, 0);
 
+		// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day
 		$alerts = $calendar->alert($today->format('Y-m-d'));
 		foreach($alerts as $event){
 			// alert current events including workmates pto if alert is set
