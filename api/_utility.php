@@ -691,12 +691,9 @@ class UTILITY {
 		$success = !file_exists(self::directory($dir)) ? self::createDirectory(self::directory($dir)) : true;
 		if ($lifespan && file_exists(self::directory($dir))){
 			$files = self::listFiles(self::directory($dir), 'asc');
-			if ($files){
-				foreach ($files as $file){
-					$file = ['path' => $file, 'name' => pathinfo($file)['basename']];
-					if ((time() - filemtime($file['path'])) / 3600 > $lifespan) {
-						UTILITY::delete($file['path']);
-					}
+			foreach ($files as $file){
+				if ((time() - filemtime($file)) / 3600 > $lifespan) {
+					UTILITY::delete($file);
 				}
 			}
 		}
