@@ -72,6 +72,7 @@ define('DEFAULTSQL', [
 				"	`misc` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`alert` tinyint NULL," .
+				"	`autodelete` tinyint NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -364,7 +365,8 @@ define('DEFAULTSQL', [
 				"	subject varchar(MAX) NULL DEFAULT NULL," .
 				"	misc varchar(MAX) NULL DEFAULT NULL," .
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
-				"	alert tinyint NULL" .
+				"	alert tinyint NULL," .
+				"	autodelete tinyint NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_approved_orders', N'U') IS NULL " .

@@ -177,6 +177,9 @@ class APPLICATION extends API {
 			UTILITY::tidydir('tmp', CONFIG['lifespan']['tmp']);
 			UTILITY::tidydir('sharepoint', CONFIG['lifespan']['sharepoint']);
 
+			// clear up calendar entries marked as closed and for autodeletion
+			$calendar->delete(null);
+
 			// notify on unclosed audits
 			$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
 			foreach ($data as $row){
@@ -229,7 +232,8 @@ class APPLICATION extends API {
 						':subject' => $this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true),
 						':misc' => null,
 						':closed' => null,
-						':alert' => 1
+						':alert' => 1,
+						':autodelete' => 1
 						]);		   
 				}
 			}
@@ -271,8 +275,9 @@ class APPLICATION extends API {
 							':subject' => $this->_lang->GET('calendar.schedule.product_document_evaluation', [':number' => $product['article_no'], ':name' => $product['article_name'], ':vendor' => $product['vendor_name'], ':days' => abs($upload->diff($this->_date['servertime'])->days)], true),
 							':misc' => null,
 							':closed' => null,
-							':alert' => 1
-							]);
+							':alert' => 1,
+							':autodelete' => 1
+						]);
 						// prepare alert flags
 						$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('consumables_put_last_document_evaluation'),
 							[
@@ -315,8 +320,9 @@ class APPLICATION extends API {
 							':subject' => $subject,
 							':misc' => null,
 							':closed' => null,
-							':alert' => 1
-							]);		   		
+							':alert' => 1,
+							':autodelete' => 1
+						]);		   		
 					}
 				}
 			}
@@ -443,8 +449,9 @@ class APPLICATION extends API {
 							':subject' => $this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true),
 							':misc' => null,
 							':closed' => null,
-							':alert' => 1
-							]);		   
+							':alert' => 1,
+							':autodelete' => 1
+						]);		   
 					}
 				}
 			}
@@ -484,8 +491,9 @@ class APPLICATION extends API {
 								':subject' => $subject,
 								':misc' => null,
 								':closed' => null,
-								':alert' => 1
-								]);		   		
+								':alert' => 1,
+								':autodelete' => 1
+							]);		   		
 						}
 					}
 				}

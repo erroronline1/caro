@@ -32,9 +32,6 @@ Things are still in motion. Images my be outdated.
 * responsibilities
     * handle hidden attribute?
 * cron
-    * delete methods from notification once running
-    * include UTILITY:tidydir and remove from endpoints
-    * autodelete calendar entries of type schedule x days after closing date
     * delete cron-log from frontend for admins
 * messages delete or keep selected?
 * radio type icon alignment (e.g. filereference on filepicker)
@@ -683,16 +680,15 @@ Create an appointment notice for customers. Setting relevant data you can decide
 [Content](#content)
 
 ### Scheduling
-Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance. Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
+Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance if provided within the [timesheets](#timesheet). Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
-As scheduling is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place you get only to select dates. This unclutters the input form too.
+As scheduling is supposed to help you with operational planning (e.g. daily assigned tasks for a unit) and reminders in conjunction with records in the first place, you get only to select dates. This unclutters the input form too.
 
 Displayed calendars do include weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then, to not being overlooked.
 
-Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records).
-
+Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records). Events are deleted after a [configurable timespan](#runtime-variables) after the event has been as closed if not specified otherwise.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
 
@@ -1631,6 +1627,7 @@ names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users
 filename[characters] = "[,\/\\\]" ; replace matched characters to avoid link error
 
 [lifespan]
+calendar_completed = 365 ; DAYS after compleded calendar entries are deleted if not specified otherwise
 idle = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
 mdr14_sample_interval = 93 ; DAYS until a new sample check is required as default value
 mdr14_sample_reusable = 1095 ; DAYS until a new sample check on the same product is allowed as default value

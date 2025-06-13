@@ -123,7 +123,8 @@ class STRESSTEST extends INSTALL{
 					':subject' => $this->_prefix . random_int(0, 1000000),
 					':misc' => 'str (e.g. UTILITY::json_encoded whatnot)',
 					':closed' => '',
-					':alert' => 0
+					':alert' => 0,
+					':autodelete' => 0
 				]
 			]);
 		}
@@ -211,7 +212,7 @@ class STRESSTEST extends INSTALL{
 	}
 
 	/**
-	 * deletes all calendar events with prefix
+	 * deletes all records with prefix
 	 */
 	public function removeRecords(){
 		$deletion = [
@@ -267,7 +268,7 @@ class STRESSTEST extends INSTALL{
 	}
 
 	/**
-	 * deletes all calendar events with prefix
+	 * deletes all orders with prefix
 	 */
 	public function removeOrders(){
 		$deletion = [

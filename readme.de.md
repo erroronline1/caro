@@ -579,7 +579,7 @@ Es kann eine Terminerinnerung für Kunden erstellt werden. Nach der Eingabe der 
 [Übersicht](#übersicht)
 
 ### Kalender
-Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
+Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst, sofern in der [Zeiterfassung](#zeiterfassung) eingetragen. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
 
 Ereignisse können eine [Benachrichtigung](#unterhaltungen) an Nutzergruppen auslösen, wenn diese Einstellung vorgenommen wurde.
 
@@ -587,7 +587,7 @@ Da die Terminplanung primär die Arbeitsplanung (beispielweise die Festlegung vo
 
 Angezeigte Kalender stellen auch Wochenenden und sonstige arbeitsfreie Tage dar, um sicherzustellen, dass versehentlich an einem solchen Tag geplante Ereignisse nicht übersehen werden.
 
-Die Planung von Terminen ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht.
+Die Planung von Terminen ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht. Ereignisse werden nach einer [einstellbaren Zeit](#laufzeitvariablen) nach Erledigung gelöscht sofern nicht anders angegeben.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar%20de.png)
 
@@ -1533,6 +1533,7 @@ names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users
 filename[characters] = "[,\/\\\]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
 
 [lifespan]
+calendar_completed = 365 ; Tage nach denen abgeschlossene Kalendereinträge gelöscht werden sofern nicht anderweitig angegeben
 idle = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt
 mdr14_sample_interval = 93 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
 mdr14_sample_reusable = 1095 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf

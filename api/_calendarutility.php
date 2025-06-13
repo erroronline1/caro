@@ -201,11 +201,23 @@ class CALENDARUTILITY {
 	 * @return int affected rows
 	 */
 	public function delete($id = 0){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+		if ($id !== null) return SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
 			'values' => [
 				':id' => $id
 			]
 		]);
+		$num = 0;
+		foreach($this->getWithinDateRange() as $entry){
+			if (!$entry['closed']) continue;
+			$entry['closed'] = json_decode($entry['closed'], true);
+			$closed = new DateTime($entry['closed']['date']);
+			if (intval(abs($closed->diff($this->_date['servertime'])->days > CONFIG['lifespan']['calendar_completed'])) && SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+				'values' => [
+					':id' => $entry['id']
+				]
+			])) $num++;
+		}
+		return $num;
 	}
 	
 	/**
@@ -228,7 +240,8 @@ class CALENDARUTILITY {
 	 * 	':subject' => str | null,
 	 * 	':misc' => str (e.g. UTILITY::json_encoded whatnot) | null,
 	 * 	':closed' => str (e.g. UTILITY::json_encoded when, by whom) | null,
-	 * 	':alert' => int 1 | null
+	 * 	':alert' => int 1 | null,
+	 * 	':autodelete' => int 1 | null
 	 * 	]
 	 * @return string dialog script
 	 */
@@ -237,7 +250,7 @@ class CALENDARUTILITY {
 
 		// fill up default values
 		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!isset($columns[$str])) $columns[$str] = '';
-		foreach([':id', ':alert'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
+		foreach([':id', ':alert', ':autodelete'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
 		foreach([':author_id'] as $user) if (!isset($columns[$user])) $columns[$user] = $_SESSION['user']['id'];
 		$columns[':affected_user_id'] = isset($columns[':affected_user_id']) ? $columns[':affected_user_id'] : null; 
 
@@ -263,8 +276,9 @@ class CALENDARUTILITY {
 		}
 
 		// set up defaults
-		$alert = $span_start = $span_end = null; 
+		$alert = $autodelete = $span_start = $span_end = null; 
 		$alert = [$this->_lang->GET('calendar.schedule.alert') => $columns[':alert'] ? ['checked' => true] : []];		
+		$autodelete = [$this->_lang->GET('calendar.schedule.autodelete', [':days' => CONFIG['lifespan']['calendar_completed']]) => $columns[':id'] === 0 || $columns[':autodelete'] ? ['checked' => true] : []];		
 		$span_start = new DateTime($columns[':span_start'] ? : 'now');
 
 		// assemble by type
@@ -320,9 +334,9 @@ class CALENDARUTILITY {
 					[
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.alert_description')
+							'name' => $this->_lang->GET('calendar.schedule.options')
 						],
-						'content' => $alert
+						'content' => array_merge($alert, $autodelete)
 					],
 					[
 						'type' => 'hidden',
@@ -471,7 +485,7 @@ class CALENDARUTILITY {
 						],[
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('calendar.schedule.alert_description')
+								'name' => $this->_lang->GET('calendar.schedule.options')
 							],
 							'content' => $alert
 						],[

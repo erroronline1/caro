@@ -362,7 +362,8 @@ class CALENDAR extends API {
 							':subject' => $this->_payload->name,
 							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
 							':closed' => $closed,
-							':alert' => null
+							':alert' => null,
+							':autodelete' => null
 						];
 						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
 							'values' => $columns
@@ -383,7 +384,8 @@ class CALENDAR extends API {
 							':subject' => $this->_payload->name,
 							':misc' => UTILITY::json_encode(['content' => $content, 'preset' => $preset]),
 							':closed' => $closed,
-							':alert' => null
+							':alert' => null,
+							':autodelete' => null
 						];
 						if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 							'values' => $columns
@@ -927,7 +929,8 @@ class CALENDAR extends API {
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.content')),
 					':misc' => null,
 					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null,
+					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.autodelete')) ? 1 : null
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.schedule.error_missing'), 'type' => 'error']]);
 
@@ -969,7 +972,8 @@ class CALENDAR extends API {
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.content')),
 					':misc' => null,
 					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null,
+					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.autodelete')) ? 1 : null
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.schedule.error_missing'), 'type' => 'error']]);
 
@@ -1223,7 +1227,8 @@ class CALENDAR extends API {
 					':subject' => $row['subject'],
 					':misc' => '',
 					':closed' => '',
-					':alert' => $row['alert']
+					':alert' => $row['alert'],
+					':autodelete' => $row['autodelete']
 				];
 
 				// add edit button
@@ -1290,7 +1295,8 @@ class CALENDAR extends API {
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_exemption')) ? : null,
 					':misc' => null,
 					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null,
+					':autodelete' => null
 				];
 				if ($event[':subject'] === 'regular') $event[':subject'] = null;
 
@@ -1358,7 +1364,8 @@ class CALENDAR extends API {
 					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_exemption')) ? : null,
 					':misc' => null,
 					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null
+					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.schedule.alert')) ? 1 : null,
+					':autodelete' => null
 				];
 				if ($event[':subject'] === 'regular') $event[':subject'] = '';
 
