@@ -191,6 +191,7 @@
 			"scheduledtrainings": ":number scheduled trainings for your units",
 			"unapproveddocuments": ":number documents/components require approval"
 		},
+		"delete_cron_log": "Delete cron.log with :count entries",
 		"error_response": {
 			"400": "Bad Request",
 			"401": "Unauthorized",

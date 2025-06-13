@@ -191,6 +191,7 @@
 			"scheduledtrainings": ":number geplante Schulungen für deine Bereiche",
 			"unapproveddocuments": ":number Komponenten/Dokumente benötigen eine Freigabe"
 		},
+		"delete_cron_log": "cron.log mit :count Einträgen löschen",
 		"error_response": {
 			"400": "Fehlerhafte Anfrage",
 			"401": "Nicht authorisiert",

@@ -137,7 +137,14 @@ export const api = {
 		await _.api(method, "api/api.php/" + request.join("/"), payload, ["post", "put"].includes(method.toLowerCase()))
 			.then(async (data) => {
 				if (data.error) {
-					_client.application.debug(data.error);
+					const date = new Date();
+					let error;
+					_client.application.debug(request, date.toUTCString(), data.error);
+					const errorcode = data.error.message.match(/\d+/g);
+					if (api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
+
+					if (errorFn != null) errorFn(data.error);
+					new Toast(error, "error");
 					return;
 				}
 
@@ -733,6 +740,8 @@ export const api = {
 						payload = _.getInputs("[data-usecase=manual]", true);
 						break;
 				}
+				break;
+			case "cron_log":
 				break;
 			default:
 				return;

@@ -164,8 +164,8 @@ class APPLICATION extends API {
 		$logfile = 'cron.log';
 		// return last entry if last touch has been today
 		if (file_exists($logfile) && date('Y-m-d', filemtime($logfile)) === $this->_date['servertime']->format('Y-m-d')) {
-			$cron = file('cron.log');
-			return $cron[count($cron) -1];
+			$cron = file($logfile);
+			return ['last' => $cron[count($cron) - 1], 'count' => count($cron) - 1];
 		}
 
 		try {
@@ -564,9 +564,15 @@ class APPLICATION extends API {
 		}
 
 		file_put_contents($logfile, "\n" . $log, FILE_APPEND);
-		return $log;
+		$cron = file($logfile);
+		return ['last' => $cron[count($cron) - 1], 'count' => count($cron) - 1];
 	}
-
+	public function cron_log(){
+		$logfile = 'cron.log';
+		if (!array_intersect(['admin'], $_SESSION['user']['permissions']) || $_SERVER['REQUEST_METHOD'] !== 'DELETE') $this->response([], 403);
+		if (unlink($logfile)) $this->response([], 410);
+		$this->response([], 404);
+	}
 
 	/**
 	 *   _
@@ -922,14 +928,21 @@ class APPLICATION extends API {
 		}
 
 		// cron job
-		$cronmsg = $this->cron();
+		$cron = $this->cron();
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
 			$result['render']['content'][count($result['render']['content']) - 1][] = [
 				'type' => 'textsection',
 				'attributes' => [
 					'name' => 'CRON'
 				],
-				'content' => $cronmsg
+				'content' => $cron['last']
+			];
+			$result['render']['content'][count($result['render']['content']) - 1][] = [
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('application.delete_cron_log', [':count' => $cron['count']]),
+					'onclick' => "api.application('delete', 'cron_log')"
+				]
 			];
 		}
 		

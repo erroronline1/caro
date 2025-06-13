@@ -31,8 +31,6 @@ Things are still in motion. Images my be outdated.
 * templates
 * responsibilities
     * handle hidden attribute?
-* cron
-    * delete cron-log from frontend for admins
 * messages delete or keep selected?
 * radio type icon alignment (e.g. filereference on filepicker)
 
@@ -2530,6 +2528,18 @@ Sample response
 ```
 {"user":[],"config":{"application":{"defaultlanguage":"en"}}}
 ```
+
+> DELETE ./api/api.php/application/cron_log
+
+Deletes the cron.log file. Available only to users with admin permission, triggers new cron job execution.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+HTTP response codes 403, 404 or 410
 
 > GET ./api/api.php/application/info
 
