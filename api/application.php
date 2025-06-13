@@ -169,6 +169,7 @@ class APPLICATION extends API {
 		}
 
 		try {
+			//throw new ErrorException("test error");
 			$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 			$today = new DateTime('now');
 			$today->setTime(0, 0);
@@ -559,7 +560,7 @@ class APPLICATION extends API {
 			$log = $this->_date['servertime']->format('Y-m-d H:i:s') . ' OK';
 		}
 		catch (Exception $e){
-			$log = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . $e;
+			$log = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . str_replace("\n", ' ' , $e);
 		}
 
 		file_put_contents($logfile, "\n" . $log, FILE_APPEND);
