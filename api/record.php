@@ -1418,7 +1418,7 @@ class RECORD extends API {
 				if (!$this->_requestedID && (
 					(!$this->_unit && !array_intersect($record['units'], $_SESSION['user']['units']))
 					|| ($this->_unit === '_unassigned' && $record['units'])
-					|| ($this->_unit !== '_unassigned' && (!in_array($this->_unit, $record['units']) || !$record['units']))
+					|| ($this->_unit && $this->_unit !== '_unassigned' && (!$record['units'] || !in_array($this->_unit, $record['units'])))
 				)) continue;
 
 				// add to result
