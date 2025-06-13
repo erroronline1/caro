@@ -18,7 +18,7 @@
  */
 namespace CARO\API;
 
-require_once('../libraries/TCPDF/tcpdf_import.php');
+require_once('../libraries/TCPDF/tcpdf.php');
 
 class PDF{
 	private $_setup = [];

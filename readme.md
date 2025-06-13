@@ -1505,6 +1505,7 @@ It is strongly recommended to create an additional development environment to te
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * optional php.ini session.gc_maxlifetime in relation to [CONFIG[lifespan][idle]](#runtime-variables)
 * php.ini enable extensions:
+    * curl
     * fileinfo
     * gd
     * gettext
@@ -5272,7 +5273,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
     * creates PDF-files on the server side
     * Justification: this library enables consistent and correct creation of the widely accessible PDF-format for data transfers from the application.
-    * v6.6.5
+    * v6.10.0
     * \> 4k stars
     * \> 1k forks
 * [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)

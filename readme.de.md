@@ -1414,6 +1414,7 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[lifespan][idle]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
+    * curl
     * fileinfo
     * gd
     * gettext
