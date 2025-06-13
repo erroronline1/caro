@@ -541,7 +541,7 @@ class APPLICATION extends API {
 			$log = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . $e;
 		}
 
-		file_put_contents($logfile, $log, FILE_APPEND);
+		file_put_contents($logfile, "\n" . $log, FILE_APPEND);
 		return $log;
 	}
 
