@@ -552,7 +552,7 @@ class CALENDARUTILITY {
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_within_date_range', [
 			'values' => [
 				':earlier' => $earlier ? : '1970-01-01 00:00:01',
-				':later' => $later ? : '2079-06-06 23:59:59'	
+				':later' => $later ? : '2079-06-05 23:59:59'	
 			]
 		]);
 	}
