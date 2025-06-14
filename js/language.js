@@ -59,8 +59,7 @@ export class Lang {
 				if (!chain) return false;
 				return this.find(chain, lang[key]);
 			} else return lang[key];
-		}
-		else return false;
+		} else return false;
 	}
 
 	/**

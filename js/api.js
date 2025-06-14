@@ -2092,7 +2092,7 @@ export const api = {
 	 */
 	user: (method, ...request) => {
 		request = [...request];
-		if (method === "get" && !(["training"].includes(request[0]))) api.history.write(["user", ...request]);
+		if (method === "get" && !["training"].includes(request[0])) api.history.write(["user", ...request]);
 
 		request.splice(0, 0, "user");
 		let payload,
@@ -2135,7 +2135,7 @@ export const api = {
 								}).then((response) => {
 									if (!response) return;
 									let submission = _client.application.dialogToFormdata();
-									api.user((2 in request && request[2] !== "null" ? "put" : "post"), "training", (2 in request && request[2] ? request[2] : "null"), submission);
+									api.user(2 in request && request[2] !== "null" ? "put" : "post", "training", 2 in request && request[2] ? request[2] : "null", submission);
 								});
 							}
 						};

@@ -1846,7 +1846,7 @@ export class Assemble {
 		if (this.currentElement.attributes.multiple) {
 			if (!this.currentElement.attributes.name.endsWith("[]")) this.currentElement.attributes.name += "[]";
 		}
-		this.currentElement.hint = (this.currentElement.hint ? this.currentElement.hint + " " : "") + api._lang.GET('assemble.render.files_hint');
+		this.currentElement.hint = (this.currentElement.hint ? this.currentElement.hint + " " : "") + api._lang.GET("assemble.render.files_hint");
 		hint = [...this.hint()];
 
 		input.setAttribute("aria-label", this.currentElement.description);
@@ -2287,7 +2287,7 @@ export class Assemble {
 	 */
 	message() {
 		let radio, message, icon, p, date, unseen, onclick_forward, mark_deletion;
-		
+
 		message = document.createElement("div");
 
 		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.ICON_onclick !== undefined) {
@@ -2300,7 +2300,7 @@ export class Assemble {
 			radio = document.createElement("input");
 			radio.type = "radio";
 			radio.id = radio.name = "_msg" + this.currentElement.attributes.id;
-			mark_deletion = function(){
+			mark_deletion = function () {
 				radio.checked = !radio.checked;
 				console.log(radio.name, radio.checked, message);
 			};

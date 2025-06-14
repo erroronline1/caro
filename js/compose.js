@@ -964,10 +964,10 @@ export class Composer {
 	drop_insert(evnt, droppedUpon, allowSections) {
 		evnt.preventDefault();
 		let draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
- 		// determine target:
+		// determine target:
 		// target is element
 
-		if (draggedElement.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode; // convert dragged label to draggable element container content 
+		if (draggedElement.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode; // convert dragged label to draggable element container content
 		else if (draggedElement.parentNode.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode.parentNode; // convert dragged input to draggable element container content
 
 		const draggedElementClone = draggedElement.cloneNode(true), // cloned for most likely descendant issues
@@ -1341,7 +1341,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.calendarbutton"),
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -1740,7 +1740,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.link_document"),
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -1770,7 +1770,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.hr"),
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -1808,7 +1808,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.image"),
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -1869,7 +1869,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: type.description,
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -1978,7 +1978,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: type.description,
 				"data-type": "addblock",
-				type: "submit"				
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -2118,7 +2118,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.range"),
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -2293,7 +2293,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: type.description,
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
@@ -2406,7 +2406,7 @@ export class Compose extends Assemble {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.textsection"),
 				"data-type": "addblock",
-				type: "submit"
+				type: "submit",
 			},
 		};
 		result = result.concat(...this.button());
