@@ -2286,13 +2286,25 @@ export class Assemble {
 	 * 	}
 	 */
 	message() {
-		let message, icon, p, date, unseen, onclick_forward;
+		let radio, message, icon, p, date, unseen, onclick_forward, mark_deletion;
+		
 		message = document.createElement("div");
 
 		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.ICON_onclick !== undefined) {
 			// ugly but effective
 			onclick_forward = this.currentElement.attributes.ICON_onclick;
 			delete this.currentElement.attributes.ICON_onclick;
+		}
+		if (this.currentElement.attributes !== undefined && this.currentElement.attributes.id !== undefined) {
+			// mark message for deletion
+			radio = document.createElement("input");
+			radio.type = "radio";
+			radio.id = radio.name = "_msg" + this.currentElement.attributes.id;
+			mark_deletion = function(){
+				radio.checked = !radio.checked;
+				console.log(radio.name, radio.checked, message);
+			};
+			delete this.currentElement.attributes.id;
 		}
 
 		if (this.currentElement.content.img != undefined) {
@@ -2309,10 +2321,12 @@ export class Assemble {
 			message.append(icon);
 		}
 		p = document.createElement("p");
+		if (mark_deletion) p.onclick = mark_deletion;
 		p.append(document.createTextNode(this.currentElement.content.user));
 		message.append(p);
 
 		p = document.createElement("p");
+		if (mark_deletion) p.onclick = mark_deletion;
 		date = document.createElement("small");
 		date.append(document.createTextNode(this.currentElement.content.date));
 		p.append(date);
@@ -2321,6 +2335,7 @@ export class Assemble {
 		let display = this.currentElement.content.text.split(/\r|\n/);
 		for (const line of display) {
 			p = document.createElement("p");
+			if (mark_deletion) p.onclick = mark_deletion;
 			// extract and convert links
 			// this assumes links are always preceded by some text!!!!
 			let textbetween = line.split(/<a.+?\/a>/),
@@ -2354,11 +2369,13 @@ export class Assemble {
 			message.append(p);
 		}
 
+		// display notif of unread messages in overview mode
 		if (this.currentElement.content.unseen != undefined && this.currentElement.content.unseen) {
 			unseen = document.createElement("div");
 			unseen.append(document.createTextNode(this.currentElement.content.unseen));
 			message.append(unseen);
 		}
+
 		if (this.currentElement.attributes !== undefined) {
 			message = this.apply_attributes(this.currentElement.attributes, message);
 			if ("onclick" in this.currentElement.attributes) {
@@ -2371,7 +2388,7 @@ export class Assemble {
 		message.classList.add("message");
 		if (this.currentElement.dirright != undefined && this.currentElement.dirright) message.classList.add("right");
 
-		return [message];
+		return radio ? [radio, message] : [message];
 	}
 
 	/**

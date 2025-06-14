@@ -85,11 +85,23 @@ class MESSAGE extends API {
 								//inline system links won't work otherwise, therefore this property exists for conversation threads
 								'ICON_onclick' => "_client.message.newMessage('". $this->_lang->GET('message.forward', [':user' => $conversation['conversation_user_name']]) ."', '', '" . 
 									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
-									"', {}, '" . implode(',', $datalist). "')"
+									"', {}, '" . implode(',', $datalist). "')",
+								'id' => $conversation['id']
 							]
 						];
 					}
-					// render delete button for conversation thread
+					// render mark/unmark all messages button
+					$result['render']['content'][] = [
+						[
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('message.delete_mark'),
+								'data-checked' => 0,
+								'onclick' => "this.dataset.checked = + !Boolean(parseInt(this.dataset.checked)); document.querySelectorAll('article>input[type=\"radio\"]').forEach(radio => {radio.checked = Boolean(parseInt(this.dataset.checked));})"
+							]
+						]
+					];
+					// render delete button for marked messages
 					$result['render']['content'][] = [
 						[
 							'type' => 'deletebutton',
@@ -98,7 +110,11 @@ class MESSAGE extends API {
 								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
 									"'".$this->_lang->GET('message.delete_confirm_cancel')."': false,".
 									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(confirmation => {if (confirmation) api.message('delete', 'conversation', " . $conversation['conversation_user'] . ")})"
+									"}}).then(confirmation => { if (confirmation) {" .
+										"let ids = [];" .
+										"document.querySelectorAll('article>input[type=\"radio\"]').forEach(radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
+										"api.message('delete', 'conversation', ids.join('_'));" .
+									"} })"
 							]
 						]
 					];
@@ -185,10 +201,12 @@ class MESSAGE extends API {
 				}
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'message_delete_conversation', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
 					'values' => [
-						':conversation' => $this->_conversation,
 						':user' => $_SESSION['user']['id']
+					],
+					'replacements' => [
+						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_conversation)))
 					]
 				])) $this->response([
 					'response' => [

@@ -31,7 +31,6 @@ Things are still in motion. Images my be outdated.
 * templates
 * responsibilities
     * handle hidden attribute?
-* messages delete or keep selected?
 
 ## Content
 * [Aims](#aims)
@@ -3784,14 +3783,14 @@ Sample response
 
 ### Message endpoints
 
-> DELETE ./api/api.php/message/conversation/{user id}
+> DELETE ./api/api.php/message/conversation/{message ids}
 
-Delete all messages of the conversation with the passed user id.
+Delete all messages of the conversation with the passed message ids.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {user id} | path parameter | required | int id of the opposite user of the conversation |
+| {message ids} | path parameter | required | int ids chained with _ |
 
 Sample response
 ```
