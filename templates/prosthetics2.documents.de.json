@@ -1209,7 +1209,7 @@
 				],
 				[
 					{
-						"type": "radio",
+						"type": "checkbox",
 						"attributes": {
 							"name": "elektrische Steuerung"
 						},
@@ -1247,7 +1247,7 @@
 				],
 				[
 					{
-						"type": "radio",
+						"type": "checkbox",
 						"attributes": {
 							"name": "Akkusystem"
 						},
@@ -1278,7 +1278,7 @@
 				],
 				[
 					{
-						"type": "radio",
+						"type": "checkbox",
 						"attributes": {
 							"name": "Controller"
 						},
@@ -1870,7 +1870,7 @@
 							"unterwiesen und geprüft": [],
 							"entfällt": []
 						},
-						"hint": "Steuerung des Prothesenfußes, Rotationsadapter, Kniegelenksfunktion, Hüftfunktion, Umschaltvorgänge"
+						"hint": "Steuerung der Prothesenhand, Rotationsadapter, Ellenbogen, Schulter, Umschaltvorgänge"
 					},
 					{
 						"type": "radio",
@@ -2256,7 +2256,7 @@
 		"content": "Identifikator,Abgabeprotokoll Prothetik II"
 	},
 	{
-		"name": "Gebrauchsanweisung Prothetik II",
+		"name": "Gebrauchsanweisung Armprothesen",
 		"alias": "",
 		"context": "casedocumentation",
 		"unit": "prosthetics2",
@@ -2289,6 +2289,6 @@
 		"regulatory_context": "",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik II,Maßblatt Prothetik II,Versorgungsplanung Prothetik II,Kunststofffertigungsauftrag Prothetik II,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik II,Abgabeprotokoll Prothetik II,Gebrauchsanweisung Prothetik II,Empfangsbestätigung"
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Prothetik II,Maßblatt Prothetik II,Versorgungsplanung Prothetik II,Kunststofffertigungsauftrag Prothetik II,Silikonfertigungsauftrag,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Prothetik II,Abgabeprotokoll Prothetik II,Gebrauchsanweisung Armprothesen,Empfangsbestätigung"
 	}
 ]
