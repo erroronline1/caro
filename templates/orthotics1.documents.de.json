@@ -103,51 +103,51 @@
 						"attributes": {
 							"name": "Versorgung"
 						},
-						"content":{
-							"Erstversorgung":[],
-							"Folgeversorgung":[],
-							"Zweit-/Wechselversorgung":[]
+						"content": {
+							"Erstversorgung": [],
+							"Folgeversorgung": [],
+							"Zweit-/Wechselversorgung": []
 						}
 					},
 					{
-						"type":"radio",
-						"attributes":{
-							"name":"Bewegungsumfang im Alltag (Aktivitätsgrad)"
-						},
-						"content":{
-							"Transfer":[],
-							"Innenbereich":[],
-							"Außenbereich mit Einschränkung":[],
-							"Außenbereich":[],
-							"Außenbereich hoher Anspruch":[]
-						}
-					},
-					{
-						"type":"checkbox",
-						"attributes":{
-							"name": "Wohnumfeld"
-						},
-						"content":{
-							"Selbstständig":[],
-							"Eltern":[],
-							"Einrichtung":[],
-							"Kita/Schule":[],
-							"Ebenen":[],
-							"Treppen":[],
-							"Rampen":[]
-						}
-					},
-					{
-						"type":"radio",
+						"type": "radio",
 						"attributes": {
-							"name":"GMFCS"
+							"name": "Bewegungsumfang im Alltag (Aktivitätsgrad)"
 						},
 						"content": {
-							"Stufe 1: geht ohne Einschränkung":[],
-							"Stufe 2: geht mit Einschränkung":[],
-							"Stufe 3: geht mit Gehhilfe":[],
-							"Stufe 4: selbstständige Fortbewegung eingeschränkt":[],
-							"Stufe 5: wird im Rollstuhl gefahren":[]
+							"Transfer": [],
+							"Innenbereich": [],
+							"Außenbereich mit Einschränkung": [],
+							"Außenbereich": [],
+							"Außenbereich hoher Anspruch": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Wohnumfeld"
+						},
+						"content": {
+							"Selbstständig": [],
+							"Eltern": [],
+							"Einrichtung": [],
+							"Kita/Schule": [],
+							"Ebenen": [],
+							"Treppen": [],
+							"Rampen": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "GMFCS"
+						},
+						"content": {
+							"Stufe 1: geht ohne Einschränkung": [],
+							"Stufe 2: geht mit Einschränkung": [],
+							"Stufe 3: geht mit Gehhilfe": [],
+							"Stufe 4: selbstständige Fortbewegung eingeschränkt": [],
+							"Stufe 5: wird im Rollstuhl gefahren": []
 						}
 					}
 				]
@@ -285,369 +285,369 @@
 				[
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Schulter links Ab/Add"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Schulter rechts Ab/Add"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Schulter links Ante/Retro"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Schulter rechts Ante/Retro"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Schulter links Iro/Aro"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Schulter rechts Iro/Aro"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Ellenbogen links Ex/Flex"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Ellenbogen rechts Ex/Flex"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Handgelenk links Pro/Sup"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Handgelenk rechts Pro/Sup"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Handgelenk links DE/PF"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Handgelenk rechts DE/PF"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Daumen links"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Daumen rechts"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda D2-D5 links"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda D2-D5 rechts"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
-						"type":"textarea",
-						"attributes":{
+						"type": "textarea",
+						"attributes": {
 							"name": "Anmerkungen zum Muskelstatus"
 						}
 					},
 					{
 						"type": "checkbox",
 						"attributes": {
-							"name":"Spastizität"
+							"name": "Spastizität"
 						},
-						"content":{
-							"Klonus auslösbar":[]
+						"content": {
+							"Klonus auslösbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Schulter links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Schulter rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Ellenbogen links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Ellenbogen rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Handgelenk links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Handgelenk rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Finger links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Finger rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					}
 				],
 				[
 					{
 						"type": "checkbox",
-						"attributes":{
+						"attributes": {
 							"name": "Versorgungsziel"
 						},
 						"content": {
-							"Funktionssicherung":[],
-							"Sicherung PostOP-Ergebnis":[],
-							"Kontrakturbehandlung":[],
+							"Funktionssicherung": [],
+							"Sicherung PostOP-Ergebnis": [],
+							"Kontrakturbehandlung": [],
 							"Korrektur / Bettung": [],
 							"Tonusregulation": [],
 							"Stabilisierung": []
@@ -655,15 +655,15 @@
 					},
 					{
 						"type": "text",
-						"attributes":{
-							"name":"Sonstiges Versorgungsziel"
+						"attributes": {
+							"name": "Sonstiges Versorgungsziel"
 						}
 					}
 				],
 				[
 					{
-						"type":"textarea",
-						"attributes":{
+						"type": "textarea",
+						"attributes": {
 							"name": "Sonstige Anmerkungen zur Anamnese"
 						}
 					}
@@ -671,7 +671,7 @@
 			]
 		}
 	},
-		{
+	{
 		"name": "Anamnese Bein Orthetik I",
 		"alias": "",
 		"context": "component",
@@ -690,8 +690,8 @@
 						},
 						"content": {
 							"grün": [],
-							"orange":[],
-							"rot":[]
+							"orange": [],
+							"rot": []
 						}
 					},
 					{
@@ -701,8 +701,8 @@
 						},
 						"content": {
 							"grün": [],
-							"orange":[],
-							"rot":[]
+							"orange": [],
+							"rot": []
 						}
 					},
 					{
@@ -728,31 +728,31 @@
 							"Hüfte rechts": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
-						"type":"select",
-						"attributes":{
+						"type": "select",
+						"attributes": {
 							"name": "Kniefehlstellung links"
 						},
-						"content":{
-							"keine":[],
-							"varus":[],
-							"valgus":[],
-							"Recurvatum":[],
-							"Beugekontraktur":[]
+						"content": {
+							"keine": [],
+							"varus": [],
+							"valgus": [],
+							"Recurvatum": [],
+							"Beugekontraktur": []
 						}
 					},
 					{
-						"type":"select",
-						"attributes":{
+						"type": "select",
+						"attributes": {
 							"name": "Kniefehlstellung rechts"
 						},
-						"content":{
-							"keine":[],
-							"varus":[],
-							"valgus":[],
-							"Recurvatum":[],
-							"Beugekontraktur":[]
+						"content": {
+							"keine": [],
+							"varus": [],
+							"valgus": [],
+							"Recurvatum": [],
+							"Beugekontraktur": []
 						}
 					},
 					{
@@ -778,39 +778,39 @@
 							"Knie rechts": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
-						"type":"select",
-						"attributes":{
+						"type": "select",
+						"attributes": {
 							"name": "Fußfehlstellung rechts"
 						},
-						"content":{
-							"keine":[],
-							"Spitzfuß":[],
-							"Sichelfuß":[],
-							"Knick- / Senkfuß":[],
-							"Hackenfuß":[],
-							"Klumpfuß":[],
-							"Talus Verticalis":[],
-							"Ballenhohlfuß":[],
-							"Serpentinenfuß":[]
+						"content": {
+							"keine": [],
+							"Spitzfuß": [],
+							"Sichelfuß": [],
+							"Knick- / Senkfuß": [],
+							"Hackenfuß": [],
+							"Klumpfuß": [],
+							"Talus Verticalis": [],
+							"Ballenhohlfuß": [],
+							"Serpentinenfuß": []
 						}
 					},
 					{
-						"type":"select",
-						"attributes":{
+						"type": "select",
+						"attributes": {
 							"name": "Fußfehlstellung links"
 						},
-						"content":{
-							"keine":[],
-							"Spitzfuß":[],
-							"Sichelfuß":[],
-							"Knick- / Senkfuß":[],
-							"Hackenfuß":[],
-							"Klumpfuß":[],
-							"Talus Verticalis":[],
-							"Ballenhohlfuß":[],
-							"Serpentinenfuß":[]
+						"content": {
+							"keine": [],
+							"Spitzfuß": [],
+							"Sichelfuß": [],
+							"Knick- / Senkfuß": [],
+							"Hackenfuß": [],
+							"Klumpfuß": [],
+							"Talus Verticalis": [],
+							"Ballenhohlfuß": [],
+							"Serpentinenfuß": []
 						}
 					},
 					{
@@ -862,305 +862,305 @@
 				[
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Hüfte links Ab/Add"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Hüfte rechts Ab/Add"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Hüfte links Flexion"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Hüfte rechts Flexion"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Hüfte links Extension Bauchlage / Thomastest"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Hüfte rechts Extension Bauchlage / Thomastest"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Knie links Ex/Flex"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda Knie rechts Ex/Flex"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda OSG links DE/PF"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Muskelstatus nach Janda OSG rechts DE/PF"
 						},
 						"content": {
-							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich":[],
-							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich":[],
-							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich":[],
-							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich":[],
-							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag":[],
-							"0: komplette Lähmung, keine Muskelaktivität erkennbar":[]
+							"5: normale Kraft, Bewegung und Gegenhalt gegen Widerstand möglich": [],
+							"4: leichte Lähmung, Bewegung und Gegenhalt gegen leichten Widerstand möglich": [],
+							"3: deutliche Lähmung, Bewegung ohne Widerstand möglich": [],
+							"2: schwere Lähmung, Bewegung unter Aufhebung der Schwerkraft möglich": [],
+							"1: sehr schwere Lähmung, Muskelaktivität erkennbar ohne Bewegungsausschlag": [],
+							"0: komplette Lähmung, keine Muskelaktivität erkennbar": []
 						}
 					},
 					{
-						"type":"textarea",
-						"attributes":{
+						"type": "textarea",
+						"attributes": {
 							"name": "Anmerkungen zum Muskelstatus"
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "checkbox",
 						"attributes": {
-							"name":"Spastizität"
+							"name": "Spastizität"
 						},
-						"content":{
-							"Klonus auslösbar":[]
+						"content": {
+							"Klonus auslösbar": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Adduktoren links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Adduktoren rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Ischiocrurale links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Ischiocrurale rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Rectus links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Rectus rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Triceps surae 0 Grad/90 Grad links"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Spastizität Asworth Scale Triceps surae 0 Grad/90 Grad rechts"
 						},
 						"content": {
-							"0: keine Tonuserhöhung":[],
-							"1: leichte erhöhung Ende ROM":[],
-							"1+: leichte Erhöhung Mitte ROM":[],
-							"2: Erhöhung, noch beweglich":[],
-							"3: erschwerte passive Bewegung":[],
-							"4: keine passive Bewegung möglich":[]
+							"0: keine Tonuserhöhung": [],
+							"1: leichte erhöhung Ende ROM": [],
+							"1+: leichte Erhöhung Mitte ROM": [],
+							"2: Erhöhung, noch beweglich": [],
+							"3: erschwerte passive Bewegung": [],
+							"4: keine passive Bewegung möglich": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Gangtyp Amsterdam Gait Classification"
 						},
 						"content": {
-							"Typ 1: Knie normal, Fußkontakt vollständig":[],
-							"Typ 2: Knie überstreckt, Fußkontakt vollständig":[],
-							"Typ 3: Knie überstreckt, Fußkontakt unvollständig":[],
-							"Typ 4: Knie gebeugt, Fußkontakt unvollständig":[],
-							"Typ 5: Knie gebeugt, Fußkontakt vollständig":[]
+							"Typ 1: Knie normal, Fußkontakt vollständig": [],
+							"Typ 2: Knie überstreckt, Fußkontakt vollständig": [],
+							"Typ 3: Knie überstreckt, Fußkontakt unvollständig": [],
+							"Typ 4: Knie gebeugt, Fußkontakt unvollständig": [],
+							"Typ 5: Knie gebeugt, Fußkontakt vollständig": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
+						"attributes": {
 							"name": "Gangtyp N.A.P. Gait Classification"
 						},
 						"content": {
-							"Typ 1a: Hyperextension, Inversion":[],
-							"Typ 1b: Hyperextension, Eversion":[],
-							"Typ 2a: Hyperflexion, Inversion":[],
-							"Typ 2b: Hyperflexion, Eversion":[]
+							"Typ 1a: Hyperextension, Inversion": [],
+							"Typ 1b: Hyperextension, Eversion": [],
+							"Typ 2a: Hyperflexion, Inversion": [],
+							"Typ 2b: Hyperflexion, Eversion": []
 						}
 					}
 				],
 				[
 					{
 						"type": "checkbox",
-						"attributes":{
+						"attributes": {
 							"name": "Versorgungsziel"
 						},
 						"content": {
@@ -1169,40 +1169,331 @@
 							"Korrektur": [],
 							"Entlastung": [],
 							"Stehen": [],
-							"Gehen":[],
-							"Sitzen":[],
+							"Gehen": [],
+							"Sitzen": [],
 							"Korrektur / Bettung": [],
-							"Sicherung PostOP-Ergebnis":[]
+							"Sicherung PostOP-Ergebnis": []
 						}
 					},
 					{
 						"type": "text",
-						"attributes":{
-							"name":"Sonstiges Versorgungsziel"
+						"attributes": {
+							"name": "Sonstiges Versorgungsziel"
 						}
 					},
 					{
-						"type":"number",
+						"type": "number",
 						"attributes": {
 							"name": "Schuhgröße"
 						}
 					},
 					{
 						"type": "checkbox",
-						"attributes":{
+						"attributes": {
 							"name": "Orthesenschuhe"
 						},
 						"content": {
-							"ja":[],
-							"Verordnung vorhanden":[],
-							"Verordnung steht aus":[]
+							"ja": [],
+							"Verordnung vorhanden": [],
+							"Verordnung steht aus": []
 						}
 					}
 				],
 				[
 					{
-						"type":"textarea",
-						"attributes":{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Anmerkungen zur Anamnese"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Anamnese Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Geschlecht"
+						},
+						"content": {
+							"weiblich": [],
+							"männlich": [],
+							"divers": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Diagnose"
+						},
+						"autocomplete": true
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ursache"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Datum"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "versorgungsrelevante Einschränkungen"
+						},
+						"hint": "Begleiterkrankungen, funktionelle Einschränkungen anderer Bereiche, Medikamente, Therapien, Infektionen"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Allergien"
+						},
+						"hint": "Materialien, Lebensmittel"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Sensibilität"
+						},
+						"content": {
+							"unauffällig": [],
+							"vemehrt": [],
+							"vermindert": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "vorhandene oder weitere Hilfsmittel"
+						},
+						"hint": "intern / extern"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Versorgung"
+						},
+						"content": {
+							"Erstversorgung": [],
+							"Folgeversorgung": [],
+							"wachstumsbedingt": [],
+							"verschleißbedingt": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Änderung des Versorgungskonzepts"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "GMFCS"
+						},
+						"content": {
+							"Stufe 1: geht ohne Einschränkung": [],
+							"Stufe 2: geht mit Einschränkung": [],
+							"Stufe 3: geht mit Gehhilfe": [],
+							"Stufe 4: selbstständige Fortbewegung eingeschränkt": [],
+							"Stufe 5: wird im Rollstuhl gefahren": []
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Röntgenbilder"
+						},
+						"content": {
+							"ja": [],
+							"nein": [],
+							"intern": [],
+							"extern": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Wirbelsäulenflexibilität"
+						},
+						"content": {
+							"vorhanden": [],
+							"mäßig vorhanden": [],
+							"nicht vorhanden": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Scheitel thorakal"
+						},
+						"content": {
+							"rechts": [],
+							"links": [],
+							"TH10": [],
+							"TH9": [],
+							"TH8": [],
+							"TH7": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Thorakal Cobb-Winkel in Grad"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Scheitel thorakolumbal (C-förmig)"
+						},
+						"content": {
+							"rechts": [],
+							"links": [],
+							"L1": [],
+							"TH12": [],
+							"TH11": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Thorakolumbal Cobb-Winkel in Grad"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Scheitel lumbal"
+						},
+						"content": {
+							"rechts": [],
+							"links": [],
+							"L3": [],
+							"L2": [],
+							"L1": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Lumbal Cobb-Winkel in Grad"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Skoliometerwert thorakal in Grad"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Skoliometerwert (thorako-)lumbal in Grad"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "PatientIn im Lot"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Kyphose"
+						},
+						"content": {
+							"physiologisch": [],
+							"Hyperkyphose": [],
+							"Dekyphose": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "ggf. Kyphosewinkel in Grad"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Lordose"
+						},
+						"content": {
+							"physiologisch": [],
+							"Hyperlordose": [],
+							"Delordose": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "ggf. Lordosewinkel in Grad"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Körperform"
+						},
+						"content": {
+							"Gesäß flach": [],
+							"Gesäß gewölbt": [],
+							"starker Abdomen": [],
+							"knöchern ausgeprägt": []
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Beginn Menarche"
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Risserzeichen"
+						},
+						"content": {
+							"0": [],
+							"1": [],
+							"2": [],
+							"3": [],
+							"4": [],
+							"5": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
 							"name": "Sonstige Anmerkungen zur Anamnese"
 						}
 					}
@@ -1735,6 +2026,251 @@
 		}
 	},
 	{
+		"name": "Maßblatt Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula AP"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Axilla-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid AP"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Taille ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Taille Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Taille AP"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Spinen ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Spinen Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Spinen AP"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Spinen-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Trochanter ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Trochanter Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Trochanter AP"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Trochanter-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergewicht"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergröße"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Schuherhöhung"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Modellerstellung"
+						},
+						"content": {
+							"Scan": [],
+							"Gipsadbruck": [],
+							"stehend": [],
+							"liegend": [],
+							"sitzend": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Modellqualität"
+						},
+						"content": {
+							"gut": [],
+							"schlecht": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "modellieren"
+						},
+						"content": {
+							"überkorrigierend": [],
+							"symmetrisch": [],
+							"glätten": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Reomodell (Bibliothek oder King"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Beckenfassung"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Beckenschiefstand"
+						},
+						"content": {
+							"korrigierbar": [],
+							"fixiert": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Beckenkippung"
+						},
+						"content": {
+							"lordosieren": [],
+							"entlordosieren": [],
+							"belassen": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Deko, Motiv"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Parameter"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Kunststofffertigungsauftrag Orthetik I",
 		"alias": "",
 		"context": "component",
@@ -1897,10 +2433,10 @@
 							"...": [],
 							"Thermoplastische Fingerorthese 25.0100 KA": [],
 							"Thermoplastische Mittelhand-Daumenorthese 25.0200 KA": [],
-							"Thermoplastische Hand-Finger-Orthese 25.0300 KA":[],
-							"Thermoplastische Unterarm-Hand-Finger-Orthese, volare Lagerung 25.0400 KA":[],
-							"Thermoplastische Unterarm-Hand-Orthese, volare Lagerung 25.0500 KA":[],
-							"Thermoplastische Ellenbogen-Hand-Orthese ohne Gelenk 25.0600 KA":[]
+							"Thermoplastische Hand-Finger-Orthese 25.0300 KA": [],
+							"Thermoplastische Unterarm-Hand-Finger-Orthese, volare Lagerung 25.0400 KA": [],
+							"Thermoplastische Unterarm-Hand-Orthese, volare Lagerung 25.0500 KA": [],
+							"Thermoplastische Ellenbogen-Hand-Orthese ohne Gelenk 25.0600 KA": []
 						}
 					},
 					{
@@ -1912,10 +2448,10 @@
 							"...": [],
 							"Faserverbund Fingerorthese zur Funktionssicherung 25.0122 KA": [],
 							"Faserverbund Unterarm-Hand-Orthese zur Funktionssicherung 25.0522 KA": [],
-							"Spiraldynamische Faserverbund Handgelenksorthese incl. Testorthese 25.0512 KA":[],
-							"Leder Unterarm-Hand-Orthese zur Funktionssicherung 25.0523 KA":[],
-							"Faserverbund Oberm-Hand-Orthese zur Funktionssicherung 25.0622 KA":[],
-							"Faserverbund Ellenbogenorthese zur Funktionssicherung 25.0822 KA":[]
+							"Spiraldynamische Faserverbund Handgelenksorthese incl. Testorthese 25.0512 KA": [],
+							"Leder Unterarm-Hand-Orthese zur Funktionssicherung 25.0523 KA": [],
+							"Faserverbund Oberm-Hand-Orthese zur Funktionssicherung 25.0622 KA": [],
+							"Faserverbund Ellenbogenorthese zur Funktionssicherung 25.0822 KA": []
 						}
 					},
 					{
@@ -1927,10 +2463,10 @@
 							"...": [],
 							"Silikon Mittelhand-Daumenorthese zur dynamischen Redression 25.0311 KA": [],
 							"Neoprene Mittelhand-Daumenorthese zur dynamischen Redression 25.0314 KA": [],
-							"Thermoplastische Unterarm-Hand-Fingerorthese zur dynamischen Redression 25.0410 KA":[],
-							"Silikon Unterarm-Hand-Orthese zur dynamischen Redression 25.0511 KA":[],
-							"Neoprene Unterarm-Hand-Orthese zur dynamischen Redression 25.0514 KA":[],
-							"Thermoplastische Oberarm-Hand-Orthese zur dynamischen Redression 25.0610 KA":[]
+							"Thermoplastische Unterarm-Hand-Fingerorthese zur dynamischen Redression 25.0410 KA": [],
+							"Silikon Unterarm-Hand-Orthese zur dynamischen Redression 25.0511 KA": [],
+							"Neoprene Unterarm-Hand-Orthese zur dynamischen Redression 25.0514 KA": [],
+							"Thermoplastische Oberarm-Hand-Orthese zur dynamischen Redression 25.0610 KA": []
 						}
 					},
 					{
@@ -1948,7 +2484,8 @@
 							"name": "Zusatzinformationen zum Mehraufwand"
 						}
 					}
-				],[
+				],
+				[
 					{
 						"type": "select",
 						"attributes": {
@@ -1983,7 +2520,7 @@
 						},
 						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					},
-										{
+					{
 						"type": "checkbox",
 						"attributes": {
 							"name": "Mehraufwand für Gelenke"
@@ -2043,8 +2580,8 @@
 						"content": {
 							"Acrylharz-Guss": [],
 							"Epoxid-Guss": [],
-							"PrePreg":[],
-							"Thermoplast":[]
+							"PrePreg": [],
+							"Thermoplast": []
 						}
 					},
 					{
@@ -2055,7 +2592,7 @@
 						"content": {
 							"Leibteil": [],
 							"zirkulär": [],
-							"abnehmbar":[]
+							"abnehmbar": []
 						}
 					},
 					{
@@ -2067,9 +2604,9 @@
 							"dorsale Anlage": [],
 							"ventrale Anlage": [],
 							"zirkulär": [],
-							"bilaterale Gelenkführung":[],
-							"unilaterale Gelenkführung medial":[],
-							"unilaterale Gelenkführung lateral":[]
+							"bilaterale Gelenkführung": [],
+							"unilaterale Gelenkführung medial": [],
+							"unilaterale Gelenkführung lateral": []
 						}
 					},
 					{
@@ -2081,11 +2618,11 @@
 							"dorsale Anlage": [],
 							"ventrale Anlage": [],
 							"zirkulär": [],
-							"Ansatz Strebe medial":[],
-							"Ansatz Strebe lateral":[],
-							"Ferrari":[],
-							"Dyneema Verschluss US":[],
-							"Unterschenkel PP":[]
+							"Ansatz Strebe medial": [],
+							"Ansatz Strebe lateral": [],
+							"Ferrari": [],
+							"Dyneema Verschluss US": [],
+							"Unterschenkel PP": []
 						}
 					},
 					{
@@ -2094,21 +2631,21 @@
 							"name": "Konstruktionsmerkmale Fußteil"
 						},
 						"content": {
-							"bilaterale Gelenkführung":[],
-							"unilaterale Gelenkführung medial":[],
-							"unilaterale Gelenkführung lateral":[],
-							"Ansatz Strebe medial":[],
-							"Ansatz Strebe lateral":[],
-							"Dorsale Strebe":[],
-							"Dyneema Verschluss Fußteil":[],
-							"DAFO":[],
-							"1/2 Spirale":[],
-							"einfache Spirale":[],
-							"Fußteil als Platte" :[],
-							"Fußteil als Halbschale":[],
-							"Fußteil geschlossen (hart/weich)":[],
-							"Fußteil als Ringfassung":[],
-							"Verschluss Fersenspange":[]
+							"bilaterale Gelenkführung": [],
+							"unilaterale Gelenkführung medial": [],
+							"unilaterale Gelenkführung lateral": [],
+							"Ansatz Strebe medial": [],
+							"Ansatz Strebe lateral": [],
+							"Dorsale Strebe": [],
+							"Dyneema Verschluss Fußteil": [],
+							"DAFO": [],
+							"1/2 Spirale": [],
+							"einfache Spirale": [],
+							"Fußteil als Platte": [],
+							"Fußteil als Halbschale": [],
+							"Fußteil geschlossen (hart/weich)": [],
+							"Fußteil als Ringfassung": [],
+							"Verschluss Fersenspange": []
 						}
 					},
 					{
@@ -2117,16 +2654,16 @@
 							"name": "Integration"
 						},
 						"content": {
-							"Senso/Einlage":[],
-							"DFO 2D":[],
-							"DFO 3D":[],
-							"DAFO":[],
-							"lösbar":[],
-							"vernietet":[],
-							"verklebt":[],
-							"Klettverschluss":[],
-							"Boaverschluss":[],
-							"Scharnier":[]
+							"Senso/Einlage": [],
+							"DFO 2D": [],
+							"DFO 3D": [],
+							"DAFO": [],
+							"lösbar": [],
+							"vernietet": [],
+							"verklebt": [],
+							"Klettverschluss": [],
+							"Boaverschluss": [],
+							"Scharnier": []
 						}
 					},
 
@@ -2136,7 +2673,8 @@
 							"name": "Zusatzinformationen zu Konstruktionsmerkmalen"
 						}
 					}
-				],[
+				],
+				[
 					{
 						"type": "textsection",
 						"attributes": {
@@ -2153,13 +2691,13 @@
 							"Einlage in Sonderanfertigung 40.01 KA": [],
 							"Sondereinlage für schwerk korrigierbaren Senk-Knick-Klump-Spreizfuß in Sandwichbauweise 40.02 KA": [],
 							"Fußorthese nach Gipsabdruck 40.03 KA": [],
-							"US-PP-Orthese knöchelhoch (DAFO) 40.04.KA":[],
-							"US-PP-Orthese wadenhoch ohne Gelenk 40.05 KA":[],
-							"US-PP-Orthese wadenhoch mit Gelenk 40.06 KA":[],
-							"Innenschuh mit PP-Kern 40.07 KA":[],
-							"Innenschuh mit FVW-Kern 40.08 KA":[],
-							"US-PP-Orthese wadenhoch Ferrari-System 40.09 KA":[],
-							"TR-Ringorthese 40.10 KA":[]
+							"US-PP-Orthese knöchelhoch (DAFO) 40.04.KA": [],
+							"US-PP-Orthese wadenhoch ohne Gelenk 40.05 KA": [],
+							"US-PP-Orthese wadenhoch mit Gelenk 40.06 KA": [],
+							"Innenschuh mit PP-Kern 40.07 KA": [],
+							"Innenschuh mit FVW-Kern 40.08 KA": [],
+							"US-PP-Orthese wadenhoch Ferrari-System 40.09 KA": [],
+							"TR-Ringorthese 40.10 KA": []
 						}
 					},
 					{
@@ -2169,10 +2707,10 @@
 						},
 						"content": {
 							"...": [],
-							"US-Carbonorthese ohne Gelenk 40.11 KA":[],
-							"US-Carbonorthese ohne Kelenk (Klappe) 40.12 KA":[],
-							"US-Carbonorthese mit Carbonfeder (Gottinger) 40.13 KA":[],
-							"US-Carbonorthese mit limitierbaren Gelenk 40.14 KA":[]
+							"US-Carbonorthese ohne Gelenk 40.11 KA": [],
+							"US-Carbonorthese ohne Kelenk (Klappe) 40.12 KA": [],
+							"US-Carbonorthese mit Carbonfeder (Gottinger) 40.13 KA": [],
+							"US-Carbonorthese mit limitierbaren Gelenk 40.14 KA": []
 						},
 						"hint": "USCO ohne Gelenk: mit ventraler Anlage, langem regiden Vorfuß und flexiblen Hülsenrand am Fußteil oder halbelastisches Gussverfahren\nUSCO ohne Gelenk (Klappe): mit ventraler Klappe, langem rigiden Vorfuß und diabetesadaptierter Fußbettung\nUSCO mit Carbonfeder: mit langem rigiden Vorfuß und flexiblen Hülsenrand am Fußteil oder halbelastisches Gussverfahren\nUSCO mit limitierbaren Gelenk: mit ventraler Anlage, mit langem rigiden Vorfuß und flexiblen Hülsenrand am Fußteil oder halbelastisches Gussverfahren"
 					},
@@ -2183,23 +2721,23 @@
 						},
 						"content": {
 							"...": [],
-							"US-PP-Orthese wadenhoch mit integrierter DAFO 40.15 KA":[],
-							"US-Carbonorthese mit integrierter DAFO 40.16 KA":[],
-							"US-PP-Orthese wadenhoch mit integrierter DAFO und Gelenk 40.17 KA":[],
-							"US-Carbonorthese mit integrierter DAFO und Gelenk 40.18 KA":[],
-							"US-Carbonorthese (PrePreg) mit integrierter DAFO 40.19 KA":[],
+							"US-PP-Orthese wadenhoch mit integrierter DAFO 40.15 KA": [],
+							"US-Carbonorthese mit integrierter DAFO 40.16 KA": [],
+							"US-PP-Orthese wadenhoch mit integrierter DAFO und Gelenk 40.17 KA": [],
+							"US-Carbonorthese mit integrierter DAFO und Gelenk 40.18 KA": [],
+							"US-Carbonorthese (PrePreg) mit integrierter DAFO 40.19 KA": [],
 							"US-Carbonorthese (PrePreg) kniestreckend 40.20 KA": []
 						}
 					},
 					{
-						"type":"productselection",
-						"attributes":{
+						"type": "productselection",
+						"attributes": {
 							"name": "Halbfertigprodukt in Kombination",
 							"multiple": true
 						},
 						"hint": "z.B. Basko ToeOff in Kombination mit Fußorthese, Softkit"
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
 						"attributes": {
@@ -2228,7 +2766,7 @@
 						"content": {
 							"...": [],
 							"Bein-Hüftgelenkorthese aus PP (HKAFO) mit Gelenk 40.32 KA": [],
-							"Bein-Hüftgelenkorthese aus FVK (HKAFO) mit Gelenk 40.33 KA":[]
+							"Bein-Hüftgelenkorthese aus FVK (HKAFO) mit Gelenk 40.33 KA": []
 						}
 					},
 					{
@@ -2239,57 +2777,58 @@
 						"content": {
 							"...": [],
 							"OS-PP-Orthese mit Gelenk und integrierter DAFO oder USPP 40.34 KA": [],
-							"OS-Carbonorthese mit Gelenk und integrierter DAFO oder USPP 40.35 KA":[],
-							"Bein-Hüftgelenksorthese aus PP mit Gelenk und intergrierter DAFO oder USPP 40.36 KA":[],
-							"Bein-Hüftgelenksorthese aus FVK mit Gelenk und integrierter DAFO oder USPP 40.37 KA":[],
-							"BBF-Schale bzw. Hirschfeld-Orthese mit integrierter DAFO oder USPP 40.38 KA":[]
+							"OS-Carbonorthese mit Gelenk und integrierter DAFO oder USPP 40.35 KA": [],
+							"Bein-Hüftgelenksorthese aus PP mit Gelenk und intergrierter DAFO oder USPP 40.36 KA": [],
+							"Bein-Hüftgelenksorthese aus FVK mit Gelenk und integrierter DAFO oder USPP 40.37 KA": [],
+							"BBF-Schale bzw. Hirschfeld-Orthese mit integrierter DAFO oder USPP 40.38 KA": []
 						}
 					},
 					{
-						"type":"checkbox",
-						"attributes":{
+						"type": "checkbox",
+						"attributes": {
 							"name": "Stehbrett"
 						},
 						"content": {
-							"OrthoSystems Stehbrett-HG":[],
-							"2h AZ Orthesenintegration":[],
-							"OrthoSystems Kippschutz-KS":[],
-							"klein":[],
-							"mittel":[],
-							"groß":[],
-							"groß/breit":[]
+							"OrthoSystems Stehbrett-HG": [],
+							"2h AZ Orthesenintegration": [],
+							"OrthoSystems Kippschutz-KS": [],
+							"klein": [],
+							"mittel": [],
+							"groß": [],
+							"groß/breit": []
 						}
 					},
 					{
-						"type":"select",
-						"attributes":{
+						"type": "select",
+						"attributes": {
 							"name": "Hüftderotationsbandagen"
 						},
 						"content": {
 							"...": [],
-							"Hüftderotationsbandage in Sonderanfertigung 40.40 KA":[],
-							"Hüftderotationsbandage teilkonfektioniert 40.39 KA":[]
+							"Hüftderotationsbandage in Sonderanfertigung 40.40 KA": [],
+							"Hüftderotationsbandage teilkonfektioniert 40.39 KA": []
 						}
 					},
 					{
-						"type":"productselection",
-						"attributes":{
+						"type": "productselection",
+						"attributes": {
 							"name": "Hüftderotationsbandage teilkonfektioniert"
 						},
 						"hint": "z.B. S.E.R.F. Strap"
 					},
 					{
-						"type":"checkbox",
-						"attributes":{
+						"type": "checkbox",
+						"attributes": {
 							"name": "Probeorthese"
 						},
 						"content": {
-							"US-Probeorthese PETG mit Gelenk 40.21 KA":[],
-							"US-Probeorthese PETG ohne Gelenk 40.21 KA":[],
-							"OS-Probeorthese mit Gelenk 40.41 KA":[]
+							"US-Probeorthese PETG mit Gelenk 40.21 KA": [],
+							"US-Probeorthese PETG ohne Gelenk 40.21 KA": [],
+							"OS-Probeorthese mit Gelenk 40.41 KA": []
 						}
 					}
-				],[
+				],
+				[
 					{
 						"type": "textsection",
 						"attributes": {
@@ -2327,21 +2866,21 @@
 						},
 						"content": {
 							"ohne": [],
-							"monolateral":[],
-							"bilateral":[],
-							"Ferrari":[]
+							"monolateral": [],
+							"bilateral": [],
+							"Ferrari": []
 						}
 					},
 					{
 						"type": "select",
-						"attributes":{
-							"name":"Knöchelgelenke"
+						"attributes": {
+							"name": "Knöchelgelenke"
 						},
-						"content":{
-							"Otto Bock Fußschiene für Kinder 17F53=5":[],
-							"Otto Bock Fußschiene Edelstahl 17F24=4 oder 5":[],
-							"Otto Bock Systemknöchelgelenk 17B66 + 17B113 + 651P4=16":[],
-							"Otto Bock unilaterales Knöchelgelenk 17LA3N=___-T + 17LF3N=___ + 17LS3":[]
+						"content": {
+							"Otto Bock Fußschiene für Kinder 17F53=5": [],
+							"Otto Bock Fußschiene Edelstahl 17F24=4 oder 5": [],
+							"Otto Bock Systemknöchelgelenk 17B66 + 17B113 + 651P4=16": [],
+							"Otto Bock unilaterales Knöchelgelenk 17LA3N=___-T + 17LF3N=___ + 17LS3": []
 						}
 					},
 					{
@@ -2365,20 +2904,20 @@
 							"name": "Knie"
 						},
 						"content": {
-							"monolateral":[],
-							"bilateral":[],
-							"Ferrari":[]
+							"monolateral": [],
+							"bilateral": [],
+							"Ferrari": []
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "select",
-						"attributes":{
-							"name":"Kniegelenke"
+						"attributes": {
+							"name": "Kniegelenke"
 						},
-						"content":{
-							"Otto Bock Kniegelenk mit verdeckter Sperre 17B23 + 17B85":[],
-							"Otto Bock Kniegelenk mit verdeckter Schweizer Sperre 17KL20=13-A":[]
+						"content": {
+							"Otto Bock Kniegelenk mit verdeckter Sperre 17B23 + 17B85": [],
+							"Otto Bock Kniegelenk mit verdeckter Schweizer Sperre 17KL20=13-A": []
 						}
 					},
 					{
@@ -2410,22 +2949,23 @@
 						},
 						"hint": "Sonstige Optionen, ggf Anzahl der o.g. sofern nicht bei Artikel direkt angepasst"
 					}
-				],[
+				],
+				[
 					{
-						"type":"checkbox",
-						"attributes":{
-							"name":"Zusätze"
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zusätze"
 						},
 						"content": {
-							"Ausgleichseinlage für die Gegenseite":[],
-							"Antirutschsohle + VKA als Ersatz für Orthesenschuhe 40.22 KA":[],
-							"Kontralateraler Schuhausgleich":[],
-							"Verkürzungsausgleich bis 3cm (GWQ bis 5cm)":[],
-							"Verkürzungsausgleich je weiterer cm":[],
-							"Flexibler Hülsenrand an der US-Hülse":[],
-							"Flexibler Hülsenrand an der OS-Hülse":[],
-							"Walkschuh aus Leder in Orthesen":[],
-							"Tuberaufsitz (Sitzbeinumgreifung)":[]
+							"Ausgleichseinlage für die Gegenseite": [],
+							"Antirutschsohle + VKA als Ersatz für Orthesenschuhe 40.22 KA": [],
+							"Kontralateraler Schuhausgleich": [],
+							"Verkürzungsausgleich bis 3cm (GWQ bis 5cm)": [],
+							"Verkürzungsausgleich je weiterer cm": [],
+							"Flexibler Hülsenrand an der US-Hülse": [],
+							"Flexibler Hülsenrand an der OS-Hülse": [],
+							"Walkschuh aus Leder in Orthesen": [],
+							"Tuberaufsitz (Sitzbeinumgreifung)": []
 						}
 					},
 					{
@@ -2463,11 +3003,11 @@
 						},
 						"content": {
 							"...": [],
-							"Unterschenkel-NLSO Spitzfuß / Klumpfuß 65.01 KA":[],
-							"Unterschenkel-NLSO Spitzfuß / Klumpfuß mit Gelenk 65.08 KA":[],
-							"Unterschenkel-Klumpfußorthese mit zirkulärem Fußteil 65.09 KA":[],
-							"Unterschenkel-Klumpfußorthese mit zirkulärem Fußteil und Gelenk 65.10 KA":[],
-							"Fußkorrekturorthese mit dreidimensionaler Einstellung KLF 3D 65.23 KA":[]
+							"Unterschenkel-NLSO Spitzfuß / Klumpfuß 65.01 KA": [],
+							"Unterschenkel-NLSO Spitzfuß / Klumpfuß mit Gelenk 65.08 KA": [],
+							"Unterschenkel-Klumpfußorthese mit zirkulärem Fußteil 65.09 KA": [],
+							"Unterschenkel-Klumpfußorthese mit zirkulärem Fußteil und Gelenk 65.10 KA": [],
+							"Fußkorrekturorthese mit dreidimensionaler Einstellung KLF 3D 65.23 KA": []
 						},
 						"hint": "KLF 3D für Alpha- und Betaflex zzgl. Schuhe und Schiene"
 					},
@@ -2478,22 +3018,23 @@
 						},
 						"content": {
 							"...": [],
-							"Oberschenkel-NLSO Spitzfuß / Klumpfuß 65.07 KA":[],
-							"Oberschenkel-NLSO Spitzfuß / Klumpfuß mit Gelenk 65.11 KA":[],
-							"Oberschenkel-NLSO KLF mit zirkulärem Fußteil 65.20 KA":[]
+							"Oberschenkel-NLSO Spitzfuß / Klumpfuß 65.07 KA": [],
+							"Oberschenkel-NLSO Spitzfuß / Klumpfuß mit Gelenk 65.11 KA": [],
+							"Oberschenkel-NLSO KLF mit zirkulärem Fußteil 65.20 KA": []
 						}
 					},
 					{
-						"type":"checkbox",
-						"attributes":{
-							"name":"Begründung für KLF"
+						"type": "checkbox",
+						"attributes": {
+							"name": "Begründung für KLF"
 						},
-						"content":{
-							"aufgrund hoher Spastik":[],
-							"aufgrund starker Fußfehlstellung":[]
+						"content": {
+							"aufgrund hoher Spastik": [],
+							"aufgrund starker Fußfehlstellung": []
 						}
 					}
-				], [
+				],
+				[
 					{
 						"type": "select",
 						"attributes": {
@@ -2503,8 +3044,8 @@
 						"content": {
 							"...": [],
 							"Verbindungsstäbe Oberschenkel 65.07 KA": [],
-							"Verbindungsstäbe verstärkt 65.11 KA":[],
-							"Weiterverwendung Verbindungsstäbe 65.20 KA":[]
+							"Verbindungsstäbe verstärkt 65.11 KA": [],
+							"Weiterverwendung Verbindungsstäbe 65.20 KA": []
 						}
 					},
 					{
@@ -2529,20 +3070,20 @@
 						},
 						"content": {
 							"Fußteil zirkulär Trolen als Zusatz 65.22 KA": [],
-							"Antirutschsohle 65.03 KA":[],
-							"NLO mit Leder auskleiden":[]
+							"Antirutschsohle 65.03 KA": [],
+							"NLO mit Leder auskleiden": []
 						}
 					},
-										{
-						"type":"checkbox",
-						"attributes":{
-							"name":"Begründung für Fußteil oder Sohle"
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Begründung für Fußteil oder Sohle"
 						},
-						"content":{
-							"aufgrund hoher Spastik":[],
-							"aufgrund starker Fußfehlstellung":[],
-							"für nächtlichen Toilettengang":[],
-							"für Nutzung als Stehorthese":[]
+						"content": {
+							"aufgrund hoher Spastik": [],
+							"aufgrund starker Fußfehlstellung": [],
+							"für nächtlichen Toilettengang": [],
+							"für Nutzung als Stehorthese": []
 						}
 					},
 					{
@@ -2551,11 +3092,176 @@
 							"name": "Sonstige Zusätze"
 						},
 						"hint": "oder ggf. Anzahl, Begründungen"
-					}					
+					}
 				]
 			]
 		}
-	},	{
+	},
+	{
+		"name": "Versorgungsplanung Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Grundposition"
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Skoliosekorrekturkorsett nach Cheneau (23.15.31.1004)"
+						},
+						"content": {
+							"...": [],
+							"PE 45.01 KA": [],
+							"Streifylast 45.02 KA": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Skoliosekorrekturkorsett (23.15.31.xxxx)"
+						},
+						"content": {
+							"...": [],
+							"Streifylast 45.03 KA": [],
+							"Streifylast mit PE-Rahmen 45.04 KA": [],
+							"PE in Zwei-Schalen-Technik 45.05 KA": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Nachtkorsett, CBB (23.15.31.1003)"
+						},
+						"content": {
+							"...": [],
+							"PE mit Plastazote 45.06 KA": [],
+							"Streifylast mit Plastazote 45.07 KA": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Cobb-Winkel"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Reklinationskorsett"
+						},
+						"content": {
+							"...": [],
+							"PE 45.06 KA (23.15.31.0001 ohne Sternalpelotte)": [],
+							"PE 45.06 KA (23.15.31.0002 mit Sternalpelotte)": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Fixations- oder Stützkorsett (23.15.30.4003)"
+						},
+						"content": {
+							"...": [],
+							"PE in Zwei-Schalen-Technik 45.09 KA": [],
+							"Strefyliast 45.10 KA": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Boston-Overlap-Brace (23.15.01.0003)"
+						},
+						"content": {
+							"...": [],
+							"Standard 45.11 KA": [],
+							"mit Leibteil 45.12": []
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "BOB-Halbfertigprodukt"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Rumpf-Softorthese"
+						},
+						"content": {
+							"...": [],
+							"Lycra / Neoprene 45.13 KA": [],
+							"Sensodynamische Orthese SDO 45.14 KA": []
+						}
+					},
+					{
+						"type": "productselection",
+						"attributes": {
+							"name": "SDO Hose, Weste, Anzug"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Softorthese Zusätze"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "select",
+						"attributes": {
+							"name": "individuell gefertigte Schiefhalsorthese"
+						},
+						"content": {
+							"...": [],
+							"individuell gefertigte Schiefhalsorthese 60.40 KA": []
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"Leibteil 45.15 KA": [],
+							"Komplette Belederung 45.16 KA": [],
+							"Korsett-Anziehhilfe 45.17 KA": [],
+							"Korsett-Hemd": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Korsetthemd Größe oder Anzahl"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Zusätze"
+						},
+						"hint": "oder ggf. Anzahl"
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Checkliste Orthetik I",
 		"alias": "",
 		"context": "component",
@@ -2763,6 +3469,145 @@
 		}
 	},
 	{
+		"name": "Checkliste Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Ausgangsprüfung Checkliste"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Ränder"
+						},
+						"content": {
+							"sauber entgratet, verschliffen ausgelegt": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Oberfläche"
+						},
+						"content": {
+							"gereinigt": [],
+							"entfällt": []
+						},
+						"hint": "Anzeichnungen, Klebereste, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Klebungen"
+						},
+						"content": {
+							"sicher": [],
+							"entfällt": []
+						},
+						"hint": "Randvulkanisation, Haftband, Abdeckungen, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Pelotten"
+						},
+						"content": {
+							"befestigt": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Verschlüsse"
+						},
+						"content": {
+							"sicher befestigt und gepolstert": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Thorakalbügel"
+						},
+						"content": {
+							"befestigt": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Schraub- und Nietverbindungen"
+						},
+						"content": {
+							"sauber, gesichert": [],
+							"entfällt": []
+						},
+						"hint": "Schraubensicherung, Drehmoment, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "interne Abnahme"
+						},
+						"content": {
+							"durchgeführt": [],
+							"entfällt": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Lieferumfang"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Orthese"
+						},
+						"content": {
+							"abgabebereit": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Korsetthemden"
+						},
+						"content": {
+							"abgabebereit": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige abgabebereiten Komponenten"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Abgabeprotokoll Orthetik I",
 		"alias": "",
 		"context": "component",
@@ -2845,13 +3690,14 @@
 							"mangelhaft": []
 						}
 					}
-				],[
+				],
+				[
 					{
-						"type":"textsection",
-						"attributes":{
-							"name":"Erreichung des Versorgungsziels"
+						"type": "textsection",
+						"attributes": {
+							"name": "Erreichung des Versorgungsziels"
 						}
-					},	
+					},
 					{
 						"type": "radio",
 						"attributes": {
@@ -2877,7 +3723,7 @@
 						"attributes": {
 							"name": "Entlastend - Schmerzen ohne Versorgung",
 							"min": 1,
-							"max":10
+							"max": 10
 						}
 					},
 					{
@@ -2885,10 +3731,10 @@
 						"attributes": {
 							"name": "Entlastend - Schmerzen mit Versorgung nach Eingewöhnung",
 							"min": 1,
-							"max":10
+							"max": 10
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "radio",
 						"attributes": {
@@ -2911,7 +3757,7 @@
 							"name": "Immobilisierend - ROM mit Versorgung"
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "radio",
 						"attributes": {
@@ -2934,7 +3780,7 @@
 							"name": "Korrektur - Fehlstellung mit Versorgung in  Grad"
 						}
 					},
-					{"type":"hr"},
+					{ "type": "hr" },
 					{
 						"type": "radio",
 						"attributes": {
@@ -2959,6 +3805,82 @@
 						"type": "textarea",
 						"attributes": {
 							"name": "Sonstige Parameter"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Abgabeprotokoll Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Abgabeprotokoll"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Anziehtechnik"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Nutzung von Anziehhilfe, Verschlusssystem, Weichteilverteilung, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Bedienung"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Therapiekonzept, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Hygienemaßnahmen"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Reinigung der Orthesenkomponenten, Hautpflege"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "allgemeine Hinweise"
+						},
+						"content": {
+							"unterwiesen": [],
+							"entfällt": []
+						},
+						"hint": "Einsatzlimitierungen, Anwenderinformationen, tägliche Kontrolle, Wartungshinweise und -intervalle, Warnhinweise"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Passform und Funktion"
+						},
+						"content": {
+							"gegeben": [],
+							"mangelhaft": []
 						}
 					}
 				]
@@ -3062,7 +3984,7 @@
 						"content": {
 							"dynamische Gelenke: Dynamische Gelenke haben einen Federmechanismus, welcher das betroffene Gelenk in eine Bewegungsrichtung unterstützt oder aktiv führt. Die Festigkeit der Federeinstellung wurde individuell auf Ihre Bedürfnisse angepasst. Bei notwendigen Änderungen wenden Sie sich an Ihren Orthopädietechniker.": [],
 							"Quengelgelenke: Quengelgelenke lassen keine Bewegung zu, sind aber mit dem mitgelieferten Schlüssel im Winkel verstellbar. Sie können an den Therapieerfolg angepasst werden und diesen unterstützen.": [],
-							"Mitläufergelenke: Mitläufergelenke stabilisieren den Bewegungsablauf ohne diesen zu limitieren. Einstellarbeiten sind nicht erforderlich.":[]
+							"Mitläufergelenke: Mitläufergelenke stabilisieren den Bewegungsablauf ohne diesen zu limitieren. Einstellarbeiten sind nicht erforderlich.": []
 						}
 					},
 					{
@@ -3196,13 +4118,13 @@
 							"Ringorthese: Die Ringorthese besteht aus einem Weichwandliner, verbunden mit einem Fibulakeil und einer Orthese in Gießharztechnik mit einer abnehmbaren Fersenspange. Die Ringorthese hält den Fuß in maximal möglicher Korrekturstellung. Eine Verschlechterung der Fehlstellung soll verhindert werden. Durch die ringförmige Fußfassung wird die Korrektur des Fußes in der Orthese gesichert. Die Ringorthese wurde primär zur Korrektur des reversiblen Knickplattfußes oder Klumpfußes entwickelt. Material in Hautkontakt: Acryl oder EVA.": [],
 							"Innenschuh: Ein Innenschuh ist eine sprunggelenksübergreifende Orthese, die den Fuß in maximal möglicher Korrekturstellung hält. Eine Verschlechterung der Fehlstellung soll verhindert werden bzw. ein operierter Fuß stabilisiert werden. Durch die zirkuläre halb harte Fassung können die erforderlichen Korrekturkräfte auf eine große Fläche verteilt werden. Material in Hautkontakt: PE, PP, EVA, Acryl Leder, Metall oder Silikon.": [],
 							"DAFO: Eine DAFO (Dynamic Ancle Foot Orthosis) ist eine sprunggelenksübergreifende Orthese aus Polypropylen, die den Fuß stabilisieren und korrigieren soll. Trotzdem ist über die Gestaltung des Randverlaufs und die Teilflexibilität des Materials eine kontrollierte leichte Bewegung im Sprunggelenk möglich. Durch möglichst großflächigen Kontakt und besondere Anordnung der Korrekturflächen wird versucht den Muskeltonus zu beeinflussen. Material in Hautkontakt: PE, PP, EVA, Leder oder Silikon.": [],
-							"Unterschenkel-PP-Orthese: Die Unterschenkel-PP-Orthese ist eine wadenhohe Orthese aus Polypropylen, die den Fuß stabilisieren und korrigieren soll. Über die Gestaltung des Randverlaufs, der Verschlüsse und die Teilflexibilität des Materials ist eine Fixierung aber auch eine kontrollierte leichte Bewegung im Sprunggelenk möglich. Dieses ist abhängig von patientenspezifischen Vorgaben. Durch möglichst großflächigen Kontakt und besondere Anordnung der Korrekturflächen wird versucht den Muskeltonus zu beeinflussen. Material in Hautkontakt: PE, PP, EVA oder Leder.":[],
-							"Unterschenkel-PP-Orthese mit Gelenk: Die Unterschenkel-PP-Orthese mit Gelenk ist eine wadenhohe Orthese aus Polypropylen, die den Fuß stabilisieren und korrigieren soll und über ein Gelenk eine limitierbare Bewegung im oberen Sprunggelenk ermöglichen soll. Über das eingebaute Orthesengelenk bzw. die Gelenkkonstruktionen ist eine Fixierung aber auch eine kontrollierte leichte Bewegung im Sprunggelenk möglich. Dieses ist abhängig von patientenspezifischen Vorgaben. Durch möglichst großflächigen Kontakt und besondere Anordnung der Korrekturflächen wird versucht den Muskeltonus zu beeinflussen. Diese Orthese kann als Fußheberorthese eingesetzt werden. Dabei soll sie den Fuß in der Schwungphase anheben und die zu schwache fußhebende Muskulatur unterstützen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.":[],
-							"Unterschenkel-Orthese (FVK): Die Unterschenkelorthese besteht aus einem Fußteil, in das ein Längenausgleich integriert sein kann, einem Unterschenkelteil und einem Gelenk oder einer direkten Verbindung.\nBei entlastenden Orthesen wird das Körpergewicht unterhalb des Kniegelenkes durch starre Umfassung abgefangen. Das Gewicht wird dann über die Orthesenkonstruktion auf den Boden übertragen. Der Fuß darf nicht belastet werden. Dadurch verlängert sich das versorgte Bein zwangsläufig, und eine Schuherhöhung auf der Gegenseite ist notwendig. Material in Hautkontakt: PE, PP, EVA, Acryl, Leder oder Metall.":[],
-							"Knie-Orthese (FVK): Die Knieorthese besteht aus einem Unterschenkelteil und einem Oberschenkelteil sowie einem Gelenk.\nBei stabilisierenden Orthesen sind die einzelnen Anteile entweder starr oder gelenkig miteinander verbunden. Gelenkkonstruktionen können frei beweglich, oder teilgesperrt sein. Die Gelenkfunktion kann durch Federmechanismen oder elastische Züge unterstützt werden. Material in Hautkontakt: PE, PP, EVA, Acryl , Chloropren-Kautschuk (Neoprene) oder Metall.":[],
-							"Oberschenkel-Orthese (FVK): Die Oberschenkelorthese besteht aus einem Fußteil, in das ein Längenausgleich integriert sein kann, einem Unterschenkelteil und einem Oberschenkelteil.\nBei stabilisierenden Orthesen sind die einzelnen Anteile entweder starr oder gelenkig miteinander verbunden. Gelenkkonstruktionen können frei beweglich, teilgesperrt oder gesperrt - aber entriegelbar - sein oder eine mechanisch / computergesteuerte Standphasensteuerung haben. Die Gelenkfunktion kann durch Federmechanismen oder elastische Züge unterstützt werden.\nBei längenausgleichenden Orthesen sind die einzelnen Anteile gelenkig miteinander verbunden. Erst bei höheren Verkürzungen wird auf ein Knöchelgelenk verzichtet. Bei hohen Verkürzungen wird ein Kunstfuß unter der Orthesenkonstruktion eingebaut.\nBei entlastenden Orthesen wird das Körpergewicht über den Sitzbeinknochen auf die Orthese übertragen und an den Boden weitergeleitet. Diese Sitzbeinunterstützung oder -umgreifung ist zunächst ungewohnt, bisweilen sogar schmerzhaft. Nach Möglichkeit sollte die Gewöhnung durch schrittweise Erhöhung der täglichen Tragzeit erfolgen. Kommt es zu Hautirritationen am Aufsitz oder durch Weichteilwülste am Orthesenrand, bedarf es einer Passformkontrolle durch den Orthopädie-Techniker. Ebenso muss Ihr Orthopädie-Techniker hinzugezogen werden, wenn Sie trotz der Sitzbeinunterstützung Druck unter der Ferse des Fußes spüren.\nLängenausgleichende Orthesen beeinflussen die Gesamtstatik des Körpers. Trotz einer objektiven Statikverbesserung kann es im Einzelfall zu Beschwerden im Wirbelsäulenbereich kommen.\nVergewissern Sie sich nach jedem Aufstehen, dass die Kniegelenksperre bzw. der Sperrmechanismus -falls vorhanden - eingerastet oder funktionstüchtig ist, bevor Sie die Orthese voll belasten. Zum Hinsetzen mit Orthese müssen Sie die Kniegelenksperre im unbelasteten Zustand entriegeln. Bei Erstversorgung mit einer Oberschenkelorthese übt der Orthopädie-Techniker die ersten Grundlagen des Gehens und Stehens mit Ihnen ein. Den optimalen Umgang mit Ihrer Orthese können Sie aber nur durch weiterführendes Gehtraining mit Ihrem/Ihrer Krankengymnastiker/in erlernen. Material in Hautkontakt: PE, PP, EVA, Acryl, Silikon, Chloropren-Kautschuk (Neoprene), Leder oder Metall.":[],
-							"Hüftübergreifende Orthese oder Stehorthese: Die hüftübergreifende Orthese besteht aus einem Fußteil, in das ein Längenausgleich integriert sein kann, einem Unterschenkelteil, einem Oberschenkelteil und einem Rumpfteil. Diese Teile sind gelenkig oder starr miteinander verbunden. Gelenkkonstruktionen können frei beweglich, teilgesperrt oder gesperrt – aber entriegelbar – sein. Die Gelenkfunktion kann durch Federmechanismen, elastische Züge oder, bei zwangsgesteuerten (reziproken) Orthesen, über eine Kopplung unterstützt werden.\nVergewissern Sie sich nach jedem Aufstehen, dass die Kniegelenksperre bzw. der Sperrmechanismus -falls vorhanden – eingerastet oder funktionstüchtig ist, bevor Sie die Orthese voll belasten. Zum Hinsetzen mit Orthese müssen Sie die Kniegelenksperre und Hüftgelenksperre im unbelasteten Zustand entriegeln. Bei Erstversorgung mit einer Oberschenkelorthese übt der Orthopädie-Techniker die ersten Grundlagen des Gehens und Stehens mit Ihnen ein.\nDen optimalen Umgang mit Ihrer Orthese können Sie aber nur durch weiterführendes Gehtraining mit Ihrem/Ihrer Krankengymnastiker/in erlernen. Diese Orthese darf aus Sicherheitsgründen nur mit einem Posterior-Walker, Stützen oder einem Stehbrett und stets unter Aufsicht genutzt werden. Material in Hautkontakt: PE, PP, EVA, Acryl, Silikon, Chloropren-Kautschuk (Neoprene), Leder oder Metall.":[],
-							"Stehbrett: Das Stehbrett wurde zur Therapie von Patienten entwickelt, die an das Stehen gewöhnt werden sollen. Das Stehbrett ist sowohl im klinischen als auch im häuslichen Bereich einsetzbar und wurde für das oben genannte Körpergewicht ausgelegt. Achten Sie auf eine ebene Standfläche bei der Auswahl des Standortes für das Stehbrett. Zur optimalen Standfestigkeit müssen alle vier Rollen gebremst werden. Beim Transport von Patienten muss auf evtl. Stolperkanten und Vertiefungen geachtet werden um ein Kippen zu verhindern.\nBeim Stehen muss der Patient mit der hüftübergreifenden Orthese auf das Stehbrett gestellt werden Am Thoraxbügel, der zur Hälfte um den Brustkorb führt, befindet sich ein Haltegurt der fest verschlossen werden muss.\n \nStändige Sichtkontrolle:\nBei der ständigen Sichtkontrolle sind folgende Punkte besonders zu beachten:\n• fester Sitz aller Verschraubungen\n• Fester Verschluss der Gurte\nBei der Funktionsprüfung, alle 6 Monate, sind folgende Punkte besonders zu beachten:\n• Funktionstüchtigkeit Laufräder und der Bremsen\n \nWartung und Pflege:\nFür die Reinigung des Stehbrettes sind alle Haushaltsreiniger ohne Salmiakzusatz und Scheuermittel zulässig. Lösungsmittel (z.B. Nitro oder Alkohol) zerstören die Beschichtung der Metallteile und der Polsterplatten! Eine Wischdesinfektion mit den üblichen Desinfektionsmitteln ist möglich. Bitte testen Sie diese vor der Anwendung an einer nicht oder wenig sichtbaren Stelle. Mechanische Reinigung (z.B. Schaben, Schmirgeln) oder Strahlreinigung des Stehbretts ist nicht zulässig.":[]
+							"Unterschenkel-PP-Orthese: Die Unterschenkel-PP-Orthese ist eine wadenhohe Orthese aus Polypropylen, die den Fuß stabilisieren und korrigieren soll. Über die Gestaltung des Randverlaufs, der Verschlüsse und die Teilflexibilität des Materials ist eine Fixierung aber auch eine kontrollierte leichte Bewegung im Sprunggelenk möglich. Dieses ist abhängig von patientenspezifischen Vorgaben. Durch möglichst großflächigen Kontakt und besondere Anordnung der Korrekturflächen wird versucht den Muskeltonus zu beeinflussen. Material in Hautkontakt: PE, PP, EVA oder Leder.": [],
+							"Unterschenkel-PP-Orthese mit Gelenk: Die Unterschenkel-PP-Orthese mit Gelenk ist eine wadenhohe Orthese aus Polypropylen, die den Fuß stabilisieren und korrigieren soll und über ein Gelenk eine limitierbare Bewegung im oberen Sprunggelenk ermöglichen soll. Über das eingebaute Orthesengelenk bzw. die Gelenkkonstruktionen ist eine Fixierung aber auch eine kontrollierte leichte Bewegung im Sprunggelenk möglich. Dieses ist abhängig von patientenspezifischen Vorgaben. Durch möglichst großflächigen Kontakt und besondere Anordnung der Korrekturflächen wird versucht den Muskeltonus zu beeinflussen. Diese Orthese kann als Fußheberorthese eingesetzt werden. Dabei soll sie den Fuß in der Schwungphase anheben und die zu schwache fußhebende Muskulatur unterstützen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.": [],
+							"Unterschenkel-Orthese (FVK): Die Unterschenkelorthese besteht aus einem Fußteil, in das ein Längenausgleich integriert sein kann, einem Unterschenkelteil und einem Gelenk oder einer direkten Verbindung.\nBei entlastenden Orthesen wird das Körpergewicht unterhalb des Kniegelenkes durch starre Umfassung abgefangen. Das Gewicht wird dann über die Orthesenkonstruktion auf den Boden übertragen. Der Fuß darf nicht belastet werden. Dadurch verlängert sich das versorgte Bein zwangsläufig, und eine Schuherhöhung auf der Gegenseite ist notwendig. Material in Hautkontakt: PE, PP, EVA, Acryl, Leder oder Metall.": [],
+							"Knie-Orthese (FVK): Die Knieorthese besteht aus einem Unterschenkelteil und einem Oberschenkelteil sowie einem Gelenk.\nBei stabilisierenden Orthesen sind die einzelnen Anteile entweder starr oder gelenkig miteinander verbunden. Gelenkkonstruktionen können frei beweglich, oder teilgesperrt sein. Die Gelenkfunktion kann durch Federmechanismen oder elastische Züge unterstützt werden. Material in Hautkontakt: PE, PP, EVA, Acryl , Chloropren-Kautschuk (Neoprene) oder Metall.": [],
+							"Oberschenkel-Orthese (FVK): Die Oberschenkelorthese besteht aus einem Fußteil, in das ein Längenausgleich integriert sein kann, einem Unterschenkelteil und einem Oberschenkelteil.\nBei stabilisierenden Orthesen sind die einzelnen Anteile entweder starr oder gelenkig miteinander verbunden. Gelenkkonstruktionen können frei beweglich, teilgesperrt oder gesperrt - aber entriegelbar - sein oder eine mechanisch / computergesteuerte Standphasensteuerung haben. Die Gelenkfunktion kann durch Federmechanismen oder elastische Züge unterstützt werden.\nBei längenausgleichenden Orthesen sind die einzelnen Anteile gelenkig miteinander verbunden. Erst bei höheren Verkürzungen wird auf ein Knöchelgelenk verzichtet. Bei hohen Verkürzungen wird ein Kunstfuß unter der Orthesenkonstruktion eingebaut.\nBei entlastenden Orthesen wird das Körpergewicht über den Sitzbeinknochen auf die Orthese übertragen und an den Boden weitergeleitet. Diese Sitzbeinunterstützung oder -umgreifung ist zunächst ungewohnt, bisweilen sogar schmerzhaft. Nach Möglichkeit sollte die Gewöhnung durch schrittweise Erhöhung der täglichen Tragzeit erfolgen. Kommt es zu Hautirritationen am Aufsitz oder durch Weichteilwülste am Orthesenrand, bedarf es einer Passformkontrolle durch den Orthopädie-Techniker. Ebenso muss Ihr Orthopädie-Techniker hinzugezogen werden, wenn Sie trotz der Sitzbeinunterstützung Druck unter der Ferse des Fußes spüren.\nLängenausgleichende Orthesen beeinflussen die Gesamtstatik des Körpers. Trotz einer objektiven Statikverbesserung kann es im Einzelfall zu Beschwerden im Wirbelsäulenbereich kommen.\nVergewissern Sie sich nach jedem Aufstehen, dass die Kniegelenksperre bzw. der Sperrmechanismus -falls vorhanden - eingerastet oder funktionstüchtig ist, bevor Sie die Orthese voll belasten. Zum Hinsetzen mit Orthese müssen Sie die Kniegelenksperre im unbelasteten Zustand entriegeln. Bei Erstversorgung mit einer Oberschenkelorthese übt der Orthopädie-Techniker die ersten Grundlagen des Gehens und Stehens mit Ihnen ein. Den optimalen Umgang mit Ihrer Orthese können Sie aber nur durch weiterführendes Gehtraining mit Ihrem/Ihrer Krankengymnastiker/in erlernen. Material in Hautkontakt: PE, PP, EVA, Acryl, Silikon, Chloropren-Kautschuk (Neoprene), Leder oder Metall.": [],
+							"Hüftübergreifende Orthese oder Stehorthese: Die hüftübergreifende Orthese besteht aus einem Fußteil, in das ein Längenausgleich integriert sein kann, einem Unterschenkelteil, einem Oberschenkelteil und einem Rumpfteil. Diese Teile sind gelenkig oder starr miteinander verbunden. Gelenkkonstruktionen können frei beweglich, teilgesperrt oder gesperrt – aber entriegelbar – sein. Die Gelenkfunktion kann durch Federmechanismen, elastische Züge oder, bei zwangsgesteuerten (reziproken) Orthesen, über eine Kopplung unterstützt werden.\nVergewissern Sie sich nach jedem Aufstehen, dass die Kniegelenksperre bzw. der Sperrmechanismus -falls vorhanden – eingerastet oder funktionstüchtig ist, bevor Sie die Orthese voll belasten. Zum Hinsetzen mit Orthese müssen Sie die Kniegelenksperre und Hüftgelenksperre im unbelasteten Zustand entriegeln. Bei Erstversorgung mit einer Oberschenkelorthese übt der Orthopädie-Techniker die ersten Grundlagen des Gehens und Stehens mit Ihnen ein.\nDen optimalen Umgang mit Ihrer Orthese können Sie aber nur durch weiterführendes Gehtraining mit Ihrem/Ihrer Krankengymnastiker/in erlernen. Diese Orthese darf aus Sicherheitsgründen nur mit einem Posterior-Walker, Stützen oder einem Stehbrett und stets unter Aufsicht genutzt werden. Material in Hautkontakt: PE, PP, EVA, Acryl, Silikon, Chloropren-Kautschuk (Neoprene), Leder oder Metall.": [],
+							"Stehbrett: Das Stehbrett wurde zur Therapie von Patienten entwickelt, die an das Stehen gewöhnt werden sollen. Das Stehbrett ist sowohl im klinischen als auch im häuslichen Bereich einsetzbar und wurde für das oben genannte Körpergewicht ausgelegt. Achten Sie auf eine ebene Standfläche bei der Auswahl des Standortes für das Stehbrett. Zur optimalen Standfestigkeit müssen alle vier Rollen gebremst werden. Beim Transport von Patienten muss auf evtl. Stolperkanten und Vertiefungen geachtet werden um ein Kippen zu verhindern.\nBeim Stehen muss der Patient mit der hüftübergreifenden Orthese auf das Stehbrett gestellt werden Am Thoraxbügel, der zur Hälfte um den Brustkorb führt, befindet sich ein Haltegurt der fest verschlossen werden muss.\n \nStändige Sichtkontrolle:\nBei der ständigen Sichtkontrolle sind folgende Punkte besonders zu beachten:\n• fester Sitz aller Verschraubungen\n• Fester Verschluss der Gurte\nBei der Funktionsprüfung, alle 6 Monate, sind folgende Punkte besonders zu beachten:\n• Funktionstüchtigkeit Laufräder und der Bremsen\n \nWartung und Pflege:\nFür die Reinigung des Stehbrettes sind alle Haushaltsreiniger ohne Salmiakzusatz und Scheuermittel zulässig. Lösungsmittel (z.B. Nitro oder Alkohol) zerstören die Beschichtung der Metallteile und der Polsterplatten! Eine Wischdesinfektion mit den üblichen Desinfektionsmitteln ist möglich. Bitte testen Sie diese vor der Anwendung an einer nicht oder wenig sichtbaren Stelle. Mechanische Reinigung (z.B. Schaben, Schmirgeln) oder Strahlreinigung des Stehbretts ist nicht zulässig.": []
 						}
 					},
 					{
@@ -3213,9 +4135,9 @@
 						"content": {
 							"frei bewegliches Orthesenknie: Ihr Orthopädie-Techniker hat entsprechend Ihrer medizinischen Notwendigkeit ein geeignetes frei bewegliches Orthesenkniegelenk eingesetzt. Die Standsicherheit wird durch die Belastungslinie, kniestreckende Muskelaktivität und/oder Vorfußhebel erzielt. Die Nutzung dieses Gelenks erfordert Übung. Ihr Orthopädietechniker oder Therapeut hat sie unterwiesen. Gegebenenfalls ist Gehschule erforderlich.": [],
 							"gesperrtes Orthesenknie: Ihre Orthese ist mit einem sperrbaren Kniegelenk ausgestattet worden. Die Sperre rastet sofort hörbar ein, wenn Sie aufstehen und das Orthesenknie vollständig strecken. Ein unbeabsichtigtes Einknicken ist so ausgeschlossen. Allerdings bleibt die Orthese auch beim Gehen steif. Zum Hinsetzen muss der Entriegelungshebel an der oberen Außenseite betätigt werden. Prüfen Sie, bevor Sie Ihre Orthese anziehen, ob die Sperre im Kniegelenk eingerastet ist und ob es sich entriegeln lässt, und ziehen Sie erst dann Ihre Orthese an.": [],
-							"Orthesenknie mit mechanischer oder elektronischer Schwungphasensteuerung / Standphasensicherung: Ihre Orthese ist mit einem schwungphasengesteuerten/ standphasengesicherten Kniegelenk ausgestattet worden. Die Sperre rastet ein, sobald bei vollständig gestrecktem Bein die Lastübernahme im Schrittzyklus beginnt und löst sich zu Beginn der Schwungphase. Die Nutzung dieses Gelenks erfordert Übung. Ihr Orthopädietechniker oder Therapeut hat sie unterwiesen. Gegebenenfalls ist Gehschule erforderlich. Prüfen Sie, bevor Sie Ihre Orthese anziehen, ob die Sperre im Kniegelenk bei Fersenlast einrastet und bei Zehenablösung entriegelt, und ziehen Sie erst dann Ihre Orthese an. Das Gelenk ist ggf. mit einem Auslöser versehen, der die Sperrfunktion außer Kraft setzt. Vergewissern Sie sich vor der Nutzung, dass die Sperrfunktion aktiviert ist.":[],
-							"Orthesenknie mit elektronischer Schwung- und Standphasensteuerung: Ihre Orthese ist mit einem elektronisch gesteuerten Kniegelenk ausgestattet worden. Der Standphasenwiderstand erhöht sich, sobald bei vollständig gestrecktem Bein die Lastübernahme im Schrittzyklus beginnt und verringert sich zu Beginn der Schwungphase. Die Nutzung dieses Gelenks erfordert Übung. Ihr Orthopädietechniker oder Therapeut hat sie unterwiesen. Gegebenenfalls ist Gehschule erforderlich. Prüfen Sie, bevor Sie Ihre Orthese anziehen, ob der Widerstand im Kniegelenk bei Fersenlast hoch und bei Zehenablösung niedrig ist, und ziehen Sie erst dann Ihre Orthese an. Das Gelenk verfügt über unterschiedliche Funktionsmodi, welche den Widerstand beeinflussen (z.B. hoch/gesperrt für Stehmodus oder niedrig/entsperrt zum Radfahren). Vergewissern Sie sich vor der Nutzung bzw. beim Wechsel zwischen verschiedenen Betriebszuständen (Modus), dass der Widerstand im richtigen Modus aktiviert ist.":[],
-							"gesperrte Orthesenhüfte: Ihre Hüft-Orthese hat ein sperrbares Hüftgelenk, das sofort einrastet, wenn Sie aufstehen. Beckenschaft und Orthesenpassteile bilden eine feste Einheit. Zum Hinsetzen muss der Entriegelungshebel an der oberen Außenseite betätigt werden. Prüfen Sie, bevor Sie Ihre Orthese nutzen, ob die Sperre im Hüftgelenk eingerastet ist.":[]
+							"Orthesenknie mit mechanischer oder elektronischer Schwungphasensteuerung / Standphasensicherung: Ihre Orthese ist mit einem schwungphasengesteuerten/ standphasengesicherten Kniegelenk ausgestattet worden. Die Sperre rastet ein, sobald bei vollständig gestrecktem Bein die Lastübernahme im Schrittzyklus beginnt und löst sich zu Beginn der Schwungphase. Die Nutzung dieses Gelenks erfordert Übung. Ihr Orthopädietechniker oder Therapeut hat sie unterwiesen. Gegebenenfalls ist Gehschule erforderlich. Prüfen Sie, bevor Sie Ihre Orthese anziehen, ob die Sperre im Kniegelenk bei Fersenlast einrastet und bei Zehenablösung entriegelt, und ziehen Sie erst dann Ihre Orthese an. Das Gelenk ist ggf. mit einem Auslöser versehen, der die Sperrfunktion außer Kraft setzt. Vergewissern Sie sich vor der Nutzung, dass die Sperrfunktion aktiviert ist.": [],
+							"Orthesenknie mit elektronischer Schwung- und Standphasensteuerung: Ihre Orthese ist mit einem elektronisch gesteuerten Kniegelenk ausgestattet worden. Der Standphasenwiderstand erhöht sich, sobald bei vollständig gestrecktem Bein die Lastübernahme im Schrittzyklus beginnt und verringert sich zu Beginn der Schwungphase. Die Nutzung dieses Gelenks erfordert Übung. Ihr Orthopädietechniker oder Therapeut hat sie unterwiesen. Gegebenenfalls ist Gehschule erforderlich. Prüfen Sie, bevor Sie Ihre Orthese anziehen, ob der Widerstand im Kniegelenk bei Fersenlast hoch und bei Zehenablösung niedrig ist, und ziehen Sie erst dann Ihre Orthese an. Das Gelenk verfügt über unterschiedliche Funktionsmodi, welche den Widerstand beeinflussen (z.B. hoch/gesperrt für Stehmodus oder niedrig/entsperrt zum Radfahren). Vergewissern Sie sich vor der Nutzung bzw. beim Wechsel zwischen verschiedenen Betriebszuständen (Modus), dass der Widerstand im richtigen Modus aktiviert ist.": [],
+							"gesperrte Orthesenhüfte: Ihre Hüft-Orthese hat ein sperrbares Hüftgelenk, das sofort einrastet, wenn Sie aufstehen. Beckenschaft und Orthesenpassteile bilden eine feste Einheit. Zum Hinsetzen muss der Entriegelungshebel an der oberen Außenseite betätigt werden. Prüfen Sie, bevor Sie Ihre Orthese nutzen, ob die Sperre im Hüftgelenk eingerastet ist.": []
 						}
 					},
 					{
@@ -3339,9 +4261,9 @@
 							"Oberschenkelhoch geführte Klumpfußkorrekturorthese mit integrierter knöchelhoher Fußorthese: Die oberschenkelhoch geführte Klumpfußkorrekturorthese mit integrierter knöchelhoher Fußorthese ist zweiteilig. Die Korrektur des Klumpfußes erfolgt in zwei Schritten. Zuerst wird die Fußfehlstellung über das knöchelhohe Fußteil korrigiert, anschließend erfolgt die weitere Korrektur über die oberschenkelhohe Orthese.\nAnlegen der Orthese:\nNehmen sie die Fußorthese in beide Hände. Dehnen Sie die Öffnung so weit, dass es möglich ist den Fuß in dieser zu fixieren. Legen Sie die weiche Lasche am Fußrücken an und drücken anschließend den Fuß in Richtung der Ferse fest in die Orthese, sodass dieser genau in der Orthese umschlossen ist. Schließen Sie nun zuerst den mittleren Verschluss, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse. Wichtig ist dass der Fuß genau in die Orthese eingebettet wird, zur Kontrolle befindet sich an der Orthesenunterseite ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst der Fuß herausrutschen kann und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann. Nachdem Sie die Fußorthese abschließend angezogen haben, nehmen Sie das Bein und legen es in die Oberschenkelorthese. Bitte gehen Sie beim Anlegen der Orthesen sowie der Klettverschlüsse nach folgender Reihenfolge vor.\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss über den Fußrücken\n3. Verschluss oberhalb der Kniescheibe\n4. Verschluss am Oberschenkel\nMaterial in Hautkontakt: PE, PP oder EVA.": [],
 							"Unterschenkelhoch geführte Klumpfußkorrekturorthese mit integrierter knöchelhoher Fußorthese: Die unterschenkelhoch geführte Klumpfußkorrekturorthese mit integrierter knöchelhoher Fußorthese ist zweiteilig. Die Korrektur des Klumpfußes erfolgt in zwei Schritten. Zuerst wird die Fußfehlstellung über das knöchelhohe Fußteil korrigiert, anschließend erfolgt die weitere Korrektur über die oberschenkelhohe Orthese.\nAnlegen der Orthese:\nNehmen sie die Fußorthese in beide Hände. Dehnen Sie die Öffnung so weit, dass es möglich ist den Fuß in dieser zu fixieren. Legen Sie die weiche Lasche am Fußrücken an und drücken anschließend den Fuß in Richtung der Ferse fest in die Orthese, sodass dieser genau in der Orthese umschlossen ist. Beugen Sie dazu das Knie in einem Winkel von 90 Grad. Schließen Sie nun zuerst den mittleren Verschluss, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse. Wichtig ist dass der Fuß genau in die Orthese eingebettet wird, zur Kontrolle befindet sich an der Orthesenunterseite ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst der Fuß herausrutschen kann und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann. Nachdem Sie die Fußorthese abschließend angezogen haben, nehmen Sie das Bein und legen es in die Unterschenkelorthese. Bitte gehen Sie beim Anlegen der Orthesen sowie der Klettverschlüsse nach folgender Reihenfolge vor.\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss unterhalb der Kniescheibe\nMaterial in Hautkontakt: PE, PP oder EVA.": [],
 							"Knöchelhohe Fußorthesen adaptiert auf eine Verbindungsschiene (Ponseti-Prinzip): Die knöchelhohe Fußorthesen adaptiert auf eine Verbindungsschiene ist drei-teilig. Sie besteht aus zwei knöchelhohen Fußorthesen die sich auf eine Verbindungsschiene adaptieren lassen. Anschließend kann die vom behandeln-den Arzt vorgegebene Außenstellung der Orthese eingestellt werden.\nAnlegen der Orthese:\nNehmen sie die Fußorthese in beide Hände. Dehnen Sie die Öffnung so weit, dass es möglich ist den Fuß in dieser zu fixieren. Legen Sie die weiche Lasche am Fußrücken an und drücken anschließend den Fuß in Richtung der Ferse fest in die Orthese, sodass dieser genau in der Orthese umschlossen ist. Schließen Sie nun zuerst den mittleren Verschluss, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse. Wichtig ist, dass der Fuß genau in die Orthese eingebettet wird, zur Kontrolle befindet sich an der Orthesenunterseite ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst der Fuß herausrutschen kann und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es aber trotzdem die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann. \nNachdem Sie die beiden Fußorthesen abschließend angezogen haben, fixieren Sie diese nacheinander an den Verbindungsstab. Schieben Sie dazu die fest mit den Orthesen vernieteten Adapter auf die entsprechende Aufnahme des Verbindungsstabes. Die Orthesen sind fest fixiert, wenn ein „Klickgeräusch“ wahrzunehmen ist. Das Lösen der Fußorthesen von der Verbindungsschiene erfolgt, indem Sie die rot markierten Metallköpfe eindrücken und die Adapter durch ein Verschieben gegeneinander trennen. Material in Hautkontakt: PE, PP oder EVA.": [],
-							"Unterschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen: Die Unterschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen ist einteilig den Unterschenkel führend. Diese Orthese kommt zum Einsatz damit die Neutralstellung im unteren Sprunggelenk, d.h. das Gelenk zwischen Unterschenkel und Fuß, nachhaltig in neutraler Stellung (90 Grad) geführt und gehalten wird. Dies kann vorbeugend oder postoperativ verordnet sein.\nAnlegen der Orthese:\nLegen Sie den Unterschenkel in die Orthese. Legen Sie die weiche Lasche am Fußrücken an und drücken anschließend den Fuß in Richtung der Ferse fest in die Orthese. Schließen Sie nun zuerst den mittleren Verschluss, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse. Wichtig ist, dass der Fuß genau in die Orthese eingebettet wird, zur Kontrolle befindet sich an der Orthesenunterseite, im Bereich der Ferse, ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst der Fuß herausrutschen kann und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es aber trotzdem die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann. Bitte gehen Sie beim Anlegen der Klettverschlüsse nach folgender Reihenfolge vor.\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss über dem Fußrücken\n3. Wadenverschluss\nIn manchen Fällen ist es möglich, dass im Bereich des oberen Sprunggelenkes Quengelschienen angebracht sind. Diese kommen insbesondere dann zum Einsatz, wenn die Neutralstellung im unteren Sprunggelenk nicht sofort passiv zu erreichen ist. In den Gebrauch der Quengelgelenke und deren Einstellmöglichkeiten wurden Sie eingewiesen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.":[],
-							"Oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen: Die oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen kommt in der Regel nach Operationen das ganze Bein betreffend zum Einsatz. Zum einen soll die Neutralstellung im unteren Sprunggelenk, d.h. das Gelenk zwischen Unterschenkel und Fuß, nachhaltig in neutraler Stellung (90 Grad) geführt und gehalten werden. Zusätzlich wird das Bein in gestreckter Stellung im Kniegelenk (178 Grad) gelagert. \nAnlegen der Orthese:\nLegen Sie das Bein in die Orthese. Legen Sie die weiche Lasche am Fußrücken an und drücken anschließend den Fuß in Richtung der Ferse fest in die Orthese. Schließen Sie nun zuerst den Verschluss im Bereich der Ferse, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse am Unter- und Oberschenkel. Wichtig ist, dass der Fuß genau in die Orthese eingebettet wird, zur Kontrolle befindet sich an der Orthesenunterseite ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst der Fuß herausrutschen kann und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann. Bitte gehen Sie beim Anlegen der Orthesen sowie der Klettverschlüsse nach folgender Reihenfolge vor.\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss über dem Fußrücken\n3. Verschluss in Wadenhöhe\n4. Verschluss oberhalb der Kniescheibe\n5. Verschluss am Oberschenkel\nIn manchen Fällen ist es möglich, dass im Bereich des oberen Sprunggelenkes Quengelschienen angebracht sind. Diese kommen insbesondere dann zum Einsatz, wenn die Neutralstellung im unteren Sprunggelenk oder Kniegelenk nicht sofort passiv zu erreichen ist. In den Gebrauch der Quengelgelenke und deren Einstellmöglichkeiten wurden Sie eingewiesen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.":[],
-							"Oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen und Verbindungsstäben: Die oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen kommt in der Regel nach Operationen das ganze Bein betreffend bzw. nach Operationen im Bereich des Hüftgelenkes zum Einsatz. Zum einen soll die Neutralstellung im unteren Sprunggelenk, d.h. das Gelenk zwischen Unterschenkel und Fuß, nachhaltig in neutraler Stellung (90 Grad) geführt und gehalten werden. Zusätzlich wird das Bein in gestreckter Stellung im Kniegelenk (ca. 178 Grad) gelagert. Nach Operation des Hüftgelenkes sind die Lagerungsorthesen mit Abspreitzschienen versehen, damit die Hüftköpfe nachhaltig in den Hüftpfannen positioniert bleiben.\nAnlegen der Orthese:\nLegen Sie die Beine in die Orthese. Legen Sie die weichen Laschen am Fuß-rücken an und drücken anschließend die Füße in Richtung der Ferse fest in die Orthese. Schließen Sie nun zuerst die Verschlüsse im Bereich der Ferse, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse am Unter- und Oberschenkel an beiden Orthesen. Wichtig ist, dass die Füße genau in die Orthese eingebettet werden. Zur Kontrolle befindet sich an der jeweiligen Orthesenunterseite ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst die Füße herausrutschen können und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann.\nBitte gehen Sie beim Anlegen der Orthesen sowie der Klettverschlüsse nach folgender Reihenfolge vor:\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss über dem Fußrücken\n3. Verschluss in Wadenhöhe\n4. Verschluss oberhalb der Kniescheibe\n5. Verschluss am Oberschenkel\nIn manchen Fällen ist es möglich, dass im Bereich des oberen Sprunggelenkes Quengelschienen angebracht sind. Diese kommen insbesondere dann zum Einsatz, wenn die Neutralstellung im unteren Sprunggelenk oder Kniegelenk nicht sofort passiv zu erreichen ist. In den Gebrauch der Quengelgelenke und deren Einstellmöglichkeiten wurden Sie eingewiesen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.":[]
+							"Unterschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen: Die Unterschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen ist einteilig den Unterschenkel führend. Diese Orthese kommt zum Einsatz damit die Neutralstellung im unteren Sprunggelenk, d.h. das Gelenk zwischen Unterschenkel und Fuß, nachhaltig in neutraler Stellung (90 Grad) geführt und gehalten wird. Dies kann vorbeugend oder postoperativ verordnet sein.\nAnlegen der Orthese:\nLegen Sie den Unterschenkel in die Orthese. Legen Sie die weiche Lasche am Fußrücken an und drücken anschließend den Fuß in Richtung der Ferse fest in die Orthese. Schließen Sie nun zuerst den mittleren Verschluss, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse. Wichtig ist, dass der Fuß genau in die Orthese eingebettet wird, zur Kontrolle befindet sich an der Orthesenunterseite, im Bereich der Ferse, ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst der Fuß herausrutschen kann und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es aber trotzdem die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann. Bitte gehen Sie beim Anlegen der Klettverschlüsse nach folgender Reihenfolge vor.\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss über dem Fußrücken\n3. Wadenverschluss\nIn manchen Fällen ist es möglich, dass im Bereich des oberen Sprunggelenkes Quengelschienen angebracht sind. Diese kommen insbesondere dann zum Einsatz, wenn die Neutralstellung im unteren Sprunggelenk nicht sofort passiv zu erreichen ist. In den Gebrauch der Quengelgelenke und deren Einstellmöglichkeiten wurden Sie eingewiesen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.": [],
+							"Oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen: Die oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen kommt in der Regel nach Operationen das ganze Bein betreffend zum Einsatz. Zum einen soll die Neutralstellung im unteren Sprunggelenk, d.h. das Gelenk zwischen Unterschenkel und Fuß, nachhaltig in neutraler Stellung (90 Grad) geführt und gehalten werden. Zusätzlich wird das Bein in gestreckter Stellung im Kniegelenk (178 Grad) gelagert. \nAnlegen der Orthese:\nLegen Sie das Bein in die Orthese. Legen Sie die weiche Lasche am Fußrücken an und drücken anschließend den Fuß in Richtung der Ferse fest in die Orthese. Schließen Sie nun zuerst den Verschluss im Bereich der Ferse, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse am Unter- und Oberschenkel. Wichtig ist, dass der Fuß genau in die Orthese eingebettet wird, zur Kontrolle befindet sich an der Orthesenunterseite ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst der Fuß herausrutschen kann und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann. Bitte gehen Sie beim Anlegen der Orthesen sowie der Klettverschlüsse nach folgender Reihenfolge vor.\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss über dem Fußrücken\n3. Verschluss in Wadenhöhe\n4. Verschluss oberhalb der Kniescheibe\n5. Verschluss am Oberschenkel\nIn manchen Fällen ist es möglich, dass im Bereich des oberen Sprunggelenkes Quengelschienen angebracht sind. Diese kommen insbesondere dann zum Einsatz, wenn die Neutralstellung im unteren Sprunggelenk oder Kniegelenk nicht sofort passiv zu erreichen ist. In den Gebrauch der Quengelgelenke und deren Einstellmöglichkeiten wurden Sie eingewiesen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.": [],
+							"Oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen und Verbindungsstäben: Die oberschenkelhoch geführte Nachtlagerungsorthese mit Klettverschlüssen kommt in der Regel nach Operationen das ganze Bein betreffend bzw. nach Operationen im Bereich des Hüftgelenkes zum Einsatz. Zum einen soll die Neutralstellung im unteren Sprunggelenk, d.h. das Gelenk zwischen Unterschenkel und Fuß, nachhaltig in neutraler Stellung (90 Grad) geführt und gehalten werden. Zusätzlich wird das Bein in gestreckter Stellung im Kniegelenk (ca. 178 Grad) gelagert. Nach Operation des Hüftgelenkes sind die Lagerungsorthesen mit Abspreitzschienen versehen, damit die Hüftköpfe nachhaltig in den Hüftpfannen positioniert bleiben.\nAnlegen der Orthese:\nLegen Sie die Beine in die Orthese. Legen Sie die weichen Laschen am Fuß-rücken an und drücken anschließend die Füße in Richtung der Ferse fest in die Orthese. Schließen Sie nun zuerst die Verschlüsse im Bereich der Ferse, sodass ein nachhaltiges Herausrutschen ausgeschlossen ist. Schließen Sie dann die beiden anderen Verschlüsse am Unter- und Oberschenkel an beiden Orthesen. Wichtig ist, dass die Füße genau in die Orthese eingebettet werden. Zur Kontrolle befindet sich an der jeweiligen Orthesenunterseite ein Kontrollloch. Damit können Sie den Sitz der Orthese überprüfen. Machen Sie die Verschlüsse nicht zu locker zu da sonst die Füße herausrutschen können und es somit durch die Bewegungsfreiheit in der Orthese zu Reibungen und somit wiederum zu Druckstellen führen kann. Vermeiden Sie es die Orthese zu fest zu schließen, da es sonst zu Durchblutungsstörungen kommen kann.\nBitte gehen Sie beim Anlegen der Orthesen sowie der Klettverschlüsse nach folgender Reihenfolge vor:\n1. Verschluss: Rückfußfixierung (Ferse)\n2. Verschluss über dem Fußrücken\n3. Verschluss in Wadenhöhe\n4. Verschluss oberhalb der Kniescheibe\n5. Verschluss am Oberschenkel\nIn manchen Fällen ist es möglich, dass im Bereich des oberen Sprunggelenkes Quengelschienen angebracht sind. Diese kommen insbesondere dann zum Einsatz, wenn die Neutralstellung im unteren Sprunggelenk oder Kniegelenk nicht sofort passiv zu erreichen ist. In den Gebrauch der Quengelgelenke und deren Einstellmöglichkeiten wurden Sie eingewiesen. Material in Hautkontakt: PE, PP, EVA, Leder oder Metall.": []
 						}
 					},
 
@@ -3378,7 +4300,150 @@
 				]
 			]
 		}
-	},	{
+	},
+	{
+		"name": "Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hinweise und Warnungen für die rumpforthetische Versorgung"
+						},
+						"content": "• Die Einhaltung der täglichen Tragezeit, die physiotherapeutischen Übungen unter Aufsicht und das tägliche therapeutische Turnen zu Hause sind Bausteine der Therapie, die zum Erfolg beitragen.\n• Ihre Orthese wird nicht direkt auf der Haut getragen, sondern auf einem Unterhemd oder ähnlichen Kleidungsstücken. So wird ein übermäßiges Durchschwitzen der Stoffteile vermieden und die sich bildende Feuchtigkeit unter dem Kunststoff besser gebunden bzw. abgeleitet. Achten Sie darauf, dass das Unterhemd faltenfrei unter der Orthese anliegt, um unnötige Druckstellen zu vermeiden. Noch besser geeignet sind spezielle Korsetthemden ohne Naht, die mit oder ohne Ärmel angeboten werden.\n• Nach dem Duschen oder Baden muss die Haut komplett trocken und nicht aufgeweicht sein, bevor Sie Ihre Rumpforthese wieder anziehen. Körperlotionen oder -cremes müssen ebenfalls vor dem Anlegen der Rumpforthese vollständig eingezogen sein. Benutzen sie kein Körperpuder, denn Puder reibt die Haut unter den Druckzonen auf und trocknet sie zusätzlich aus.\n• Versichern Sie sich nach jedem Anlegen der Orthese, dass diese stabil anliegt. Das Versorgungsziel ist gefährdet sollte es zum Verrutschen kommen."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bestimmungsgemäßer Gebrauch"
+						},
+						"content": "Orthese zur äußerlichen Anwendung: Halten des Rumpfes/Teilen des Rumpfes, ggf. incl. des Kopfes, in einer medizinisch-therapeutisch notwendigen Position bei Funktionsstörungen im Bereich des Rumpfes."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Kontakt mit Feuchtigkeit zulässig",
+							"required": true
+						},
+						"content": { "nein": [], "feuchtes Milieu": [], "Wasser": [], "Salzwasser": [] }
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen, Sonderanwendung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Verwendete Komponenten (ggf. gelten zusätzlich die Gebrauchsanweisungen der Hersteller)"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": { "name": "Testorthese", "required": true },
+						"content": {
+							"nicht zutreffend": [],
+							"Ihre Rumpforthese befindet sich gegenwärtig in einem Probezustand um Passform und Funktionalität sicherzustellen. Wir weisen daher ausdrücklich darauf hin die Rumpforthese gemäß der Sonderfreigabe zur Probe nur im definierten Zeitraum zu nutzen bzw. zu probieren und bei Veränderungen die Nutzung der Rumpforthese unmittelbar einzustellen und sich mit uns in Verbindung zu setzen. Verschlüsse und Polster befinden sich nicht in einem definitiven Zustand und können unter Umständen noch nicht abschließend befestigt sein. Aus diesem Grund ist die endgültige Belastbarkeit gemäß Ihres individuellen Versorgungskonzepts noch nicht langfristig sichergestellt. Die verwendeten Verschlüsse und Polster können sich lösen wodurch die in den Anproben ermittelte Passform beeinträchtigt oder Schaden an Haut und Rumpforthese entstehen könnten.": []
+						}
+					},
+					{ "type": "date", "attributes": { "name": "Nutzung im Probezustand bis" } }
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Beschreibung Komponenten Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Beschreibung der Komponenten, Handhabe und Funktionsweise"
+						},
+						"content": "Die Konstruktion ist individuell auf Ihre Bedürfnisse abgestimmt. Aufgrund der großen Variationsbreite kann Ihre Rumpforthese optisch und funktionell von anderen Versorgungen abweichen. Je nach Höhe des betroffenen Wirbelsäulenabschnittes reicht die Rumpforthese vom Becken bis unter die Brust, schließt evtl. die Schulterblätter mit ein oder umfasst sogar die Halswirbelsäule. Dadurch werden Sie in der Rumpforthese mehr oder weniger in Ihren Bewegungen eingeschränkt. Das ist allerdings notwendig, um die benötigten Korrekturkräfte aufzubringen. Je nach Bauart befinden sich gegenüber den eingearbeiteten Druckzonen Freiräume, in die Sie ausweichen müssen."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Orthesentyp"
+						},
+						"content": {
+							"Fixationsorthese: Ihre Rumpforthese dient als funktionelle Unterstützung für den Rumpf. Es soll Ihnen ein möglichst schmerzfreies Bewegen ermöglichen. Mit Ihrer Rumpforthese soll eine möglichst selbständige, Ihren persönlichen Bedürfnissen und eine Ihrer Leistungsfähigkeit entsprechende Lebensführung erreicht werden. Welche Leistungsfähigkeit Sie mit der Rumpforthese erreichen, hängt vom individuellen Krankheitsbild ab. Die tägliche Nutzungsdauer, ob begleitende Maßnahmen (z.B. Krankengymnastik) Ihre Leistungsfähigkeit unterstützen können, sowie erforderliche Anpassungen, falls sich Ihre körperlichen Voraussetzungen verändern, besprechen Sie bitte mit Ihrem behandelten Arzt, ebenso die tägliche Tragezeit.": [],
+							"Reklinationsorthese: Ihre Reklinationsorthese dient zur Aufrichtung Ihrer verstärkten Brustkyphose (Rundrücken) oder des lumbalen Scheuermanns. Sie übt an Korrekturpunkten Druck aus, dem in die gegenüberliegenden Freiräume ausgewichen werden muss. Zusammen mit Ihren physiotherapeutischen Übungen soll mit Ihrem Korsett die verstärkte Brustkyphose aufgerichtet oder die Lendenlordose verstärkt und die gesamte Rumpfhaltung verbessert werden. Der Tragekomfort und die Tragedauer Ihrer Reklinationsorthese hängen ganz wesentlich von Form und Stärke Ihrer Kyphose oder des lumbalen Scheuermanns, aber auch vor allem von Ihrer Mitarbeit ab. Bedenken Sie, dass Ihre Reklinationsorthese im Rahmen eines therapeutischen Gesamtkonzeptes entstanden ist. Ziehen Sie deshalb im Bedarfsfall auch den Rat Ihres Arztes, Physiotherapeuten, Psychotherapeuten, Ergotherapeuten etc. mit hinzu.": [],
+							"Skoliosekorrekturorthese: Ihre Skoliosenkorrekturorthese dient zur Korrektur Ihrer skoliotisch (dreidimensional) veränderten Wirbelsäule. Sie übt an Korrekturpunkten Druck aus. Zusammen mit Ihren physiotherapeutischen Übungen soll Ihr Korsett die Krümmung der Wirbelsäule aufrichten und die Rumpfstatik verbessern. Der Tragekomfort und die Tragedauer Ihrer Skoliosenkorrekturorthese hängen ganz wesentlich von der Stärke, Form und Lage Ihrer Skoliose, aber auch vor allem von Ihrer Mitarbeit ab. Welches Therapieergebnis Sie mit der Skoliosenkorrekturorthese erreichen, hängt vom individuellen Krankheitsbild und der Gesamtkonstitution ab. Ob begleitende therapeutische Maßnahmen (z.B. Krankengymnastik) Ihre Leistungsfähigkeit unterstützen können, besprechen Sie bitte mit Ihrem behandelnden Arzt, ebenso die tägliche Tragezeit. Sportliche Aktivität ist durchaus erwünscht, die Sportart und die Kombination mit der Skoliosenkorrekturorthese soll jedoch nur nach Rücksprache mit Ihrem Arzt und Orthopädietechniker erfolgen, da Ihre Skoliosenkorrekturorthese nicht für alle Sportarten geeignet ist.": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Konstruktionstyp"
+						},
+						"content": {
+							"Rahmenstützkorsett in Schalenbauweise mit/ohne Leibteil oder BOB (Boston Overlap Brace): Diese Rumpforthese besteht aus: einer kompletten Kunststoffschale mit oder ohne Thorakalbügeln, oder einer Kunststoffschale mit Stoffleibteil und Thorakalbügel. Durch die zirkuläre Umfassung des Rumpfes wird die Wirbelsäule ruhiggestellt, entlastet und aufgerichtet. Die Gestaltung des hinteren oberen Randverlaufes hängt von der Höhenlage des betroffenen Wirbelsäulenabschnittes ab. Die aufliegenden Thorakalbügel unterstützen die Oberkörperaufrichtung. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Fixationsorthese in Zwei-Schalen-Technik: Diese Konstruktion weist eine Rücken- und eine vordere Kunststoffschale auf, die seitlich mit Klettbändern verschlossen werden. Durch die großflächige starre Umfassung des Rumpfes wird ein großer Abschnitt der Wirbelsäule ruhiggestellt und entlastet. Die Thorakalbügel verlaufen quer oberhalb der Brust und unterstützen die Oberkörperaufrichtung. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Postoperatives Fixationskorsett / Fixationskorsett: Um nach Wirbelsäulenoperationen die Wirbelsäule von außen so lange zu stabilisieren, bis das Operationsgebiet knöchern stabil durchbaut ist, wird diese Konstruktion meist als eine zeitlich begrenzte Versorgung verwendet. Die Orthese besteht aus einer kompletten Kunststoffschale, die mit Nylonriemen vorne verschlossen wird. Der Zuschnitt richtet sich nach dem operierten Wirbelsäulenabschnitt. Meistens reicht das Korsett vorne und hinten so hoch wie möglich, um einen möglichst guten Halt für die Wirbelsäule zu bieten. Eine Fixationsorthese weist die gleiche Bauart auf und wird zur Stabilisierung einer instabilen Wirbelsäule verwendet. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Flexionsorthese: Diese Orthese besteht aus einer hinteren und einer vorderen Schale, die seitlich durch Klettbänder oder ähnliches verschlossen werden. Die Flexionsorthese hat eine starke Bauchpresse und bringt zusammen mit dem Freiraum auf der Rückseite das Becken und die Wirbelsäule im Lendenbereich nach hinten in die sogenannte Entlordosierung. Gleichzeitig durch den Druck auf die Bauchblase richtet sich der Rumpf auf. Der Rumpf wird in einer bestimmten Stellung (Entlordosierung) gehalten. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Hyperextensionsorthese, 3-Punkt-System: Diese Orthese besteht aus einem Stabsystem, an dem die entsprechenden Pelotten befestigt sind. Die Symphysenpelotte (vorne unten) und die Sternalpelotte (vorne oben) bringen zusammen mit der hinter liegenden Lendenpelotte die Wirbelsäule in ein starkes Hohlkreuz. Außer der Bewegung nach vorne sind alle anderen Rumpfbewegungen möglich. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Reklinationsorthese: Die Reklinationsorthese besteht aus einem starren Material, das den Rumpf umfasst und vorne oder seitlich zu öffnen ist. Im vorderen Bereich befindet sich im Falle einer Brustkyphose eine Bauchpresse, der auf der Rückseite ein großer Freiraum gegenübersteht. Unterhalb der Schultern befinden sich auf der vorderen Seite Reklinationspelotten, die die Brustkyphose aufrichten. Auf der Rückseite steht diesen Pelotten eine Anstützung bis unter den höchsten Punkt der Kyphose entgegen. Im Falle eines lumbalen Scheuermanns befinden sich in der Lendenregion eine Anlage und ein Freiraum auf der Bauchseite. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Chêneau-Korsett: Diese Skoliosenkorrekturorthese besteht aus einer zirkulären Kunststoffschale, die vorne verschlossen wird. Die Orthese ist asymmetrisch, und meist ist nur eine leichte Bauchanlage zu erkennen. Die Korrekturpelotten reichen nicht bis in den Schulterbereich hinauf. Die den Pelotten gegenüberliegenden Freiräume sind sehr großzügig gestaltet. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Wilmington-Korsett: Die Orthese besteht aus einer kompletten Kunststoffschale mit vorderem Verschluss. Der Zuschnitt richtet sich nach der Form und der Lage der seitlich verkrümmten Wirbelsäule. Das Becken wird zirkulär gefasst. Die Taille wird stark ausmodelliert, um eine gute Aufrichtung und Streckung des Rumpfes zu erreichen. Das Korsett ist in der Regel symmetrisch modelliert, um den durch die Skoliose asymmetrischen Körper zu korrigieren. Bei sehr starken Verkrümmungen mit markanten Knochenvorsprüngen wird zur Vermeidung von Druckstellen ein zusätzliches Schaumstoffpolster angefertigt. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Wimington-Korsett mit Halsanstützung: Die Orthese besteht aus einer kompletten Kunststoffschale mit vorderem Verschluss. Der Zuschnitt richtet sich nach der Form und der Lage der seitlich verkrümmten Wirbelsäule. Das Becken wird zirkulär gefasst. Die Taille wird stark ausmodelliert, um eine gute Aufrichtung und Streckung des Rumpfes zu erreichen. Das Korsett ist in der Regel symmetrisch modelliert, um den durch die Skoliose asymmetrischen Körper zu korrigieren. Bei sehr starken Verkrümmungen mit markanten Knochenvorsprüngen wird zur Vermeidung von Druckstellen ein zusätzliches Schaumstoffpolster angefertigt. An diesem Korsett ist zusätzlich eine einseitige Hals/Kopfanstützung vorhanden. Hier liegt die obere Krümmung so hoch, dass die Fassung unter der Achsel zur Korrektur nicht ausreicht. Um ein Abweichen des Kopfes und der Halswirbelsäule zu verhindern, wird hier nochmals abgestützt. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": [],
+							"Nachtkorsett (Charlston-Bending-Brace oder Modifikation): Diese Skoliosenkorrekturorthese besteht aus einer zirkulären Kunststoffschale, die vorne verschlossen wird. Die Orthese ist asymmetrisch aufgebaut und wird mit einem dicken Schaumstoffpolster ausgekleidet um einen zusätzlichen Komfort für die Nacht zu bieten. Das Korsett ist an die liegende Form des Körpers angepasst und kann in der Regel nur im Liegen getragen werden. Durch die liegende Position ist ein lotgerechter Aufbau nicht notwendig. Dies ermöglicht uns längere Hebelwege zu nutzen und auch höherliegende Krümmungen zu versorgen. Die Skoliose wird maximal möglich aufgebogen wobei der Korrekturdruck klassisch von der Seite auf den Körper einwirkt. Material in Hautkontakt: PE, PP, EVA, Metall, Leder oder Baumwolle.": []
+						}
+					},
+
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Allgemein"
+						},
+						"content": "Insbesondere bei einer Neuversorgung muss der Umgang mit der Rumpforthese erlernt werden. Das An- und Ausziehen muss trainiert werden. Es ist ratsam, die Rumpforthese in Rückenlage mit leicht angewinkelten Beinen zu verschließen. In dieser Position ist es für Sie einfacher, die Rumpforthese optimal zu verschließen. Öffnen Sie die Verschlüsse der Thorakalpelotten (sofern vorhanden) und der Kunststoffschale, ziehen Sie die Rumpforthese auseinander, und schieben Sie sie seitlich über Taille und Rücken um den Körper. Dann überprüfen Sie, ob die Rumpforthese in der richtigen Höhe sitzt und die Beckenkammprofilierung oberhalb der Beckenkämme liegt. In Rückenlage mit leicht angewinkelten Beinen ziehen Sie nun die Verschlüsse im Bauchbereich nach und nach von unten nach oben zu. Erst dann schließen Sie die Bügel der Thorakalpelotten (sofern vorhanden). Zum Aufsetzen rollen Sie sich auf die Seite und stützen sich mit den Armen in die aufrechte Sitzposition. Zum Schluss strecken Sie sich im Stand mit auf den Beckenkamm abgestützten Händen nach oben aus der Rumpforthese heraus.\nPostoperative Rumpforthesenversorgungen müssen immer im Liegen angezogen werden da Sie bis zur Abschulung ohne Ihre Fixationsorthese nicht stehen oder sitzen dürfen, um das Operationsergebnis nicht zu gefährden.\nIhre Orthese wird nicht direkt auf der Haut getragen, sondern auf einem engen T-Shirt oder einem Korsetthemd. So wird die sich bildende Feuchtigkeit unter der Rumpforthese besser gebunden bzw. abgeleitet. Achten Sie darauf, dass das Unterhemd faltenfrei unter der Orthese anliegt, um unnötige Druckstellen zu vermeiden. Noch besser geeignet sind spezielle Korsetthemden ohne Naht, die mit / ohne Ärmel angeboten werden. Fragen Sie im Bedarfsfall Ihren Orthopädie-Techniker.\nBei stützenden Rumpforthesen ist es wichtig, die Weichteile gleichmäßig in die Orthese zu bringen, um eine gleichmäßige stützende Wirkung zu erreichen. Wenn die Rumpforthese Aussparungen enthält, ist auf die richtige Platzierung zu achten, um eventuelle Abschnürungen zu vermeiden.\nIhr Rumpfkorsett kann aus thermoplastischen Kunststoffen, Faserverbundwerkstoffen, Leder, Metall, Schaumstoffen, Silikon, Textilien, Verschlüssen oder zu verwendeten Passteile bestehen.\nAußerdem können Pelotten verwendet werden, die stützend, entlastend oder korrigierend wirken können.\nIhre Rumpforthese kann auch mit anderen Hilfsmitteln kombiniert werden.\nDie Klettverschlüsse gewährleisten eine Stabilisierung der Korrektur in der Rumpforthese und ermöglichen Ihnen das Anziehen des Hilfsmittels. Sie haben dank der Klettverschlüsse zusätzlich die Möglichkeit geringe Gewichts- und Volumenschwankungen auszugleichen.\nBei größeren Veränderungen Ihres Körpers sind eine individuelle Nachpassung oder gegebenenfalls Neuanfertigung erforderlich. Kontaktieren Sie bitte in diesem Fall unverzüglich Ihren Orthopädietechniker."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Medizinische Aspekte Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Medizinisch-therapeutische Aspekte"
+						},
+						"content": "Die Sonderanfertigungsprodukte der Rumpforthesen sind Medizinprodukte, die in erster Linie in der konservativen Therapie und Behandlung eingesetzt werden. Sie können rein konservativ, präventiv oder begleitend zu anderen auch therapeutischen Maßnahmen vor oder nach einer operativ chirurgischen Intervention eingesetzt werden und kommen gegebenenfalls auch im Anschluss im Rahmen der weiteren Nachbehandlung zum Einsatz. Ihre Nutzung kann je nach Indikation temporär oder dauerhaft notwendig sein. Sie dienen der Entlastung, Immobilisierung, Korrektur oder Stabilisierung eines oder mehrerer anatomischer Segmente und/ oder Strukturen. Die Anwendung erfolgt am Becken-, Rumpf- und Halsbereich und ggf. mit Anlagen am Kopf. Die Orthesen werden von außen an den Körper angelegt und erreichen ihre Funktion durch primär biomechanische Wirkprinzipien.\nAbhängig von Ihrer Indikation können im Einzelfall einige Komplikationen mit der Rumpforthesen-Versorgung auftreten. Durch die nicht zu vermeidende teilweise Ruhigstellung der Muskulatur während des Tragens Ihrer Rumpforthese kann es langfristig zu einer Abschwächung der Rumpfmuskeln kommen. Um dies zu verhindern, ist regelmäßige Krankengymnastik oder isometrisches Training notwendig. Ihr Arzt kann Ihnen weitergehende Hinweise zum Muskeltraining geben.\n \nIndikationen\nÜbergeordnet betrachtete Indikationen für den Einsatz von Rumpforthesen sind Krankheitsbilder oder Fehlstellungen, die hauptsächlich eines oder mehrere anatomische Segmente und/ oder Strukturen des Rumpfes betreffen und die einer Entlastung, Immobilisierung, Korrektur oder Stabilisierung bedürfen. Diese pathologischen Zustände können auftreten durch\n• Krankheitsbedingte Veränderungen\n• Erworbene oder angeborene Fehlstellungen\n• Erworbene oder angeborene Funktionsstörungen\n• Operative Eingriffe\n• Traumata, Verletzungen\nDer Einsatz einer Orthese kann durch eine einzeln auftretende Indikation, eine Kombination aus mehreren Indikationen oder aufgrund der Spätfolge einer Erkrankung begründet sein.\n \nKontraindikationen\nAllgemein geltende Kontraindikationen, welche die Anwendung einer Orthese ausschließen sind:\n• Fehlende Compliance des Patienten\n• Unverträglichkeiten gegenüber den verwendeten Materialien (Allergien) oder Eigenschweißreaktionen\n• Kognitive Einschränkungen, die eine sichere Handhabung der Orthese verhindern.\nZudem können Kontraindikationen vorliegen, die eine Versorgung in speziellen Bereichen verhindern:\n• Nicht belastbare Knochen- oder Weichteilstrukturen\n• Verminderte Belastbarkeit der Haut oder innerer Organe\n• Ateminsuffizienz\n• Adipositas\n• Je nach Versorgungsziel: Entzündungen, Hernien, Paresen, Stomata, Fehlbildungen, Frakturen, Instabilitäten"
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Armierungsplan Orthetik I",
 		"alias": "",
 		"context": "component",
@@ -3466,6 +4531,17 @@
 		"content": "Identifikator,Anamnese Allgemein Orthetik I, Anamnese Bein Orthetik I"
 	},
 	{
+		"name": "Anamnese Rumpf Korsett Orthetik I",
+		"alias": "Profilerhebung",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Anamnese Rumpf Korsett Orthetik I"
+	},
+	{
 		"name": "Maßblatt Arm Orthetik I",
 		"alias": "",
 		"context": "casedocumentation",
@@ -3486,6 +4562,17 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Identifikator,Maßblatt Bein Orthetik I"
+	},
+	{
+		"name": "Maßblatt Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Rumpf Korsett Orthetik I"
 	},
 	{
 		"name": "Kunststofffertigungsauftrag Orthetik I",
@@ -3532,6 +4619,17 @@
 		"content": "Identifikator,Versorgungsplanung NLO Orthetik I"
 	},
 	{
+		"name": "Versorgungsplanung Rumpf Korsett Orthetik I",
+		"alias": "Kostenvoranschlag",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung Rumpf Korsett Orthetik I"
+	},
+	{
 		"name": "Checkliste Orthetik I",
 		"alias": "",
 		"context": "casedocumentation",
@@ -3543,6 +4641,17 @@
 		"content": "Identifikator,Checkliste Orthetik I"
 	},
 	{
+		"name": "Checkliste Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Checkliste Rumpf Korsett Orthetik I"
+	},
+	{
 		"name": "Abgabeprotokoll Orthetik I",
 		"alias": "Lieferung, Lieferprotokoll",
 		"context": "casedocumentation",
@@ -3551,7 +4660,18 @@
 		"regulatory_context": "iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "Identifikator,abgabeprotokoll Orthetik I"
+		"content": "Identifikator,Abgabeprotokoll Orthetik I"
+	},
+	{
+		"name": "Abgabeprotokoll Rumpf Korsett Orthetik I",
+		"alias": "Lieferung, Lieferprotokoll",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Abgabeprotokoll Rumpf Korsett Orthetik I"
 	},
 	{
 		"name": "Gebrauchsanweisung Armorthesen",
@@ -3585,6 +4705,17 @@
 		"permitted_export": true,
 		"restricted_access": null,
 		"content": "Identifikator,konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich NLO Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten NLO Orthetik I,Gebrauchsanweisung Medizinische Aspekte NLO Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+	},
+	{
+		"name": "Gebrauchsanweisung Rumpforthesen",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
+		"permitted_export": true,
+		"restricted_access": null,
+		"content": "Identifikator,konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Korsett Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Rumpf Korsett Orthetik I,Gebrauchsanweisung Medizinische Aspekte Rumpf Korsett Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
 	},
 	{
 		"name": "Armierungsplan Orthetik I",
@@ -3632,5 +4763,16 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Bein Orthetik I,Maßblatt Bein Orthetik I,Versorgungsplanung NLO Orthetik I,Kunststofffertigungsauftrag Orthetik I,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Orthetik I,Abgabeprotokoll Orthetik I,Gebrauchsanweisung Redressions- und Nachtlagerungsorthesen,Empfangsbestätigung"
+	},
+	{
+		"name": "Versorgungsdokumentation Rumpf Korsett Orthetik I",
+		"alias": "",
+		"context": "bundle",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Rumpf Korsett Orthetik I,Maßblatt Rumpf Korsett Orthetik I,Versorgungsplanung Rumpf Korsett Orthetik I,Kunststofffertigungsauftrag Orthetik I,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Rumpf Korsett Orthetik I,Abgabeprotokoll Rumpf Korsett Orthetik I,Gebrauchsanweisung Rumpforthesen,Empfangsbestätigung"
 	}
 ]
