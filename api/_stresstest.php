@@ -372,7 +372,7 @@ class STRESSTEST extends INSTALL{
 
 
 	/**
-	 * deletes all documents, components and bundles according to template file
+	 * deletes all documents, components and bundles according to template file if not already in use by sample records
 	 */
 	public function removeDocuments(){
 		$json = $this->importJSON('../templates/', 'documents');
@@ -399,6 +399,7 @@ class STRESSTEST extends INSTALL{
 		foreach($DBall as $dbentry){
 			foreach($json as $entry){
 				//ensure proper formatting
+				if (!isset($entry['name'])) continue;
 				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context'] ? : ''));
 				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
