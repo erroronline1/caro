@@ -382,6 +382,19 @@ class STRESSTEST extends INSTALL{
 			...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist'),
 			...SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist')
 		];
+
+		// check if any of the documents have been in use, also see audit.php documentusage()
+		$records = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+		$usedid = [];
+		foreach ($records as $record){
+			$record['content'] = json_decode($record['content'], true);
+			foreach($record['content'] as $rc){
+				if (!isset($rc['document'])) continue;
+				if (!isset($usedid[$rc['document']])) $usedid[$rc['document']] = 0;
+				$usedid[$rc['document']]++;
+			}
+		}
+
 		$matches = 0;
 		foreach($DBall as $dbentry){
 			foreach($json as $entry){
@@ -398,7 +411,8 @@ class STRESSTEST extends INSTALL{
 					$dbentry['author'] === $entry['author'] &&
 					!array_diff(explode(',', $dbentry['regulatory_context'] ? : ''), explode(',', $entry['regulatory_context'] ? : '')) &&
 					$dbentry['permitted_export'] == $entry['permitted_export'] &&
-					!array_diff(explode(',', $dbentry['restricted_access'] ? : ''), explode(',', $entry['restricted_access'] ? : ''))
+					!array_diff(explode(',', $dbentry['restricted_access'] ? : ''), explode(',', $entry['restricted_access'] ? : '')) &&
+					!in_array($dbentry['id'], array_keys($usedid)) // no deletion if documents are part of sample records
 					// no checking if $dbdocument['content'] === $entry['content'] for db-specific character encoding
 				){
 					SQLQUERY::EXECUTE($this->_pdo, 'document_delete', [
@@ -410,7 +424,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' components and documents according to template file deleted';
+		echo '[*] ' . $matches . ' components and documents according to template file deleted, not used within sample records';
 	}
 
 	/**
