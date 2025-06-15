@@ -1030,7 +1030,7 @@ class INSTALL {
 					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
-				if (in_array($entry['name'], $names)) {
+				if (isset($names[$entry['context']]) && in_array($entry['name'], $names[$entry['context']])) {
 					$this->printError('Multiple occurences of the name are not allowed' . '. This item will be skipped:', $entry);
 					continue;
 				}
@@ -1045,7 +1045,8 @@ class INSTALL {
 				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context'] ? : ''));
 				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
-				$names[] = $entry['name'];
+				if (!isset($names[$entry['context']]))$names[$entry['context']] = [];
+				$names[$entry['context']][] = $entry['name'];
 				$insertions[] = [
 					':name' => $entry['name'],
 					':alias' => isset($entry['alias']) ? $entry['alias'] : '',
