@@ -307,7 +307,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,Digitale Modellerstellung"
+		"content": "Identifikator,Digitale Modellerstellung"
 	},
 	{
 		"name": "Digitale Fertigung Patientenversorgung",
@@ -318,7 +318,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_3_1,iso13485_7_3_2,iso13485_7_3_3,iso13485_7_3_4,iso13485_7_3_5,iso13485_7_3_8,iso13485_7_3_9,iso13485_7_3_10,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,Digitale Fertigung"
+		"content": "Identifikator,Digitale Fertigung"
 	},
 	{
 		"name": "Digitale Fertigung Produktionsbedarf",
@@ -329,6 +329,6 @@
 		"regulatory_context": "iso13485_5_5_3,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,Digitale Fertigung"
+		"content": "Identifikator,Digitale Fertigung"
 	}
 ]

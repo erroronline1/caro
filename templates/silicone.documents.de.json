@@ -182,6 +182,6 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,silikonfertigungsauftrag"
+		"content": "Identifikator,Silikonfertigungsauftrag"
 	}
 ]

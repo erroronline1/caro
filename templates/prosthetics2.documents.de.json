@@ -662,6 +662,19 @@
 				],
 				[
 					{
+						"type": "scanner",
+						"attributes": {
+							"name": "verwendetes Material",
+							"multiple": true
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen zur Fertigung"
+						}
+					},
+					{
 						"type": "checkbox",
 						"attributes": {
 							"name": "Kunststofffertigung erledigt"
@@ -2185,7 +2198,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,anamnese prothetik ii"
+		"content": "Identifikator,Anamnese Prothetik II"
 	},
 	{
 		"name": "Maßblatt Prothetik II",
@@ -2196,7 +2209,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,maßblatt prothetik ii"
+		"content": "Identifikator,Maßblatt Prothetik II"
 	},
 	{
 		"name": "Kunststofffertigungsauftrag Prothetik II",
@@ -2207,7 +2220,7 @@
 		"regulatory_context": "iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,kunststofffertigungsauftrag prothetik ii"
+		"content": "Identifikator,Kunststofffertigungsauftrag Prothetik II"
 	},
 	{
 		"name": "Versorgungsplanung Prothetik II",
@@ -2218,7 +2231,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,versorgungsplanung prothetik ii"
+		"content": "Identifikator,Versorgungsplanung Prothetik II"
 	},
 	{
 		"name": "Checkliste Prothetik II",
@@ -2229,7 +2242,7 @@
 		"regulatory_context": "iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,checkliste prothetik ii"
+		"content": "Identifikator,Checkliste Prothetik II"
 	},
 	{
 		"name": "Abgabeprotokoll Prothetik II",
@@ -2240,7 +2253,7 @@
 		"regulatory_context": "iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,abgabeprotokoll prothetik ii"
+		"content": "Identifikator,Abgabeprotokoll Prothetik II"
 	},
 	{
 		"name": "Gebrauchsanweisung Prothetik II",
@@ -2251,7 +2264,7 @@
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": true,
 		"restricted_access": null,
-		"content": "identifikator,konformitätserklärung,gebrauchsanweisung allgemein,gebrauchsanweisung warnungen einsatzbereich prothetik ii,gebrauchsanweisung handhabung,gebrauchsanweisung beschreibung komponenten prothetik ii,gebrauchsanweisung medizinische aspekte prothetik ii,gebrauchsanweisung körperpflege,gebrauchsanweisung reinigung,gebrauchsanweisung instandhaltung,gebrauchsanweisung entsorgung,gebrauchsanweisung therapeuteninformation"
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Prothetik II,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Prothetik II,Gebrauchsanweisung Medizinische Aspekte Prothetik II,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
 	},
 	{
 		"name": "Armierungsplan Prothetik II",
@@ -2262,7 +2275,7 @@
 		"regulatory_context": "",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "armierungsplan prothetik ii"
+		"content": "Armierungsplan Prothetik II"
 	},
 	{
 		"comment": "following are prosthetics ii bundles #################################################################################################"

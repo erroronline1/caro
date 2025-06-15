@@ -1317,7 +1317,7 @@
 		"regulatory_context": "iso13485_7_2_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,basisdaten"
+		"content": "Identifikator,Basisdaten"
 	},
 	{
 		"name": "Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung",
@@ -1328,7 +1328,7 @@
 		"regulatory_context": "iso13485_7_2_3,sgb5_33",
 		"permitted_export": 1,
 		"restricted_access": null,
-		"content": "identifikator,datenverarbeitung auftragserteilung schweigepflichtentbindung"
+		"content": "Identifikator,Datenverarbeitung Auftragserteilung Schweigepflichtentbindung"
 	},
 	{
 		"name": "Empfangsbestätigung",
@@ -1339,10 +1339,10 @@
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": 1,
 		"restricted_access": null,
-		"content": "identifikator,empfangsbestätigung"
+		"content": "Identifikator,Empfangsbestätigung"
 	},
 	{
-		"name": "Erlaubnis zur Ausstellung und Veröffentlichung",
+		"name": "erlaubnis zur ausstellung und veröffentlichung",
 		"alias": "",
 		"context": "casedocumentation",
 		"unit": "common",
@@ -1350,7 +1350,7 @@
 		"regulatory_context": "iso13485_7_2_3",
 		"permitted_export": 1,
 		"restricted_access": null,
-		"content": "identifikator,erlaubnis zur ausstellung und veröffentlichung"
+		"content": "Identifikator,erlaubnis zur ausstellung und veröffentlichung"
 	},
 	{
 		"name": "Versorgungsmaßnahme",
@@ -1361,7 +1361,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,versorgungsmaßnahme"
+		"content": "Identifikator,Versorgungsmaßnahme"
 	},
 	{
 		"name": "Versorgungsausführung",
@@ -1372,7 +1372,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,versorgungsausführung"
+		"content": "Identifikator,Versorgungsausführung"
 	},
 	{
 		"name": "Vorgangsprotokoll",
@@ -1383,7 +1383,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "identifikator,vorgangsprotokoll"
+		"content": "Identifikator,Vorgangsprotokoll"
 	},
 	{
 		"name": "Konfektionsversorgung",
@@ -1394,7 +1394,7 @@
 		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
 		"permitted_export": 1,
 		"restricted_access": null,
-		"content": "identifikator,datenverarbeitung auftragserteilung schweigepflichtentbindung,konfektionsversorgung"
+		"content": "Identifikator,Datenverarbeitung Auftragserteilung Schweigepflichtentbindung,Konfektionsversorgung"
 	},
 	{
 		"name": "Produkteinführung",
@@ -1405,7 +1405,7 @@
 		"regulatory_context": "iso13485_7_4_1,iso13485_7_4_2,iso13485_7_4_3",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "produkteinführung"
+		"content": "Produkteinführung"
 	},
 	{
 		"name": "Stichprobenprüfung",
@@ -1416,7 +1416,7 @@
 		"regulatory_context": "iso13485_7_4_3,mdr14",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "stichprobenprüfung"
+		"content": "Stichprobenprüfung"
 	},
 	{
 		"name": "Schulungsbewertung",
@@ -1427,7 +1427,7 @@
 		"regulatory_context": "iso13485_6_2",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "schulungsbewertung"
+		"content": "Schulungsbewertung"
 	},
 	{
 		"name": "Lieferantenbewertung",
@@ -1438,7 +1438,7 @@
 		"regulatory_context": "iso13485_7_4_1,iso13485_4_1_3,iso13485_5_6_1,iso13485_5_6_2",
 		"permitted_export": null,
 		"restricted_access": null,
-		"content": "lieferantenbewertung"
+		"content": "Lieferantenbewertung"
 	},
 	{
 		"name": "Vorkommnismeldung",
@@ -1449,7 +1449,7 @@
 		"regulatory_context": "iso13485_8_2_2,iso13485_8_2_3",
 		"permitted_export": null,
 		"restricted_access": "prrc,qmo,ceo",
-		"content": "identifikator,vorkommnismeldung"
+		"content": "Identifikator,Vorkommnismeldung"
 	},
 		{
 		"comment": "following are prosthetics ii bundles #################################################################################################"
