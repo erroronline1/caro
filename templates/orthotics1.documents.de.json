@@ -1502,6 +1502,256 @@
 		}
 	},
 	{
+		"name": "Anamnese Rumpf Cranio Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Geschlecht"
+						},
+						"content": {
+							"weiblich": [],
+							"männlich": [],
+							"divers": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Diagnose"
+						},
+						"autocomplete": true
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ursache"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Datum"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "versorgungsrelevante Einschränkungen"
+						},
+						"hint": "Begleiterkrankungen, funktionelle Einschränkungen anderer Bereiche, Medikamente, Therapien, Infektionen"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Allergien"
+						},
+						"hint": "Materialien, Lebensmittel"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Sensibilität"
+						},
+						"content": {
+							"unauffällig": [],
+							"vemehrt": [],
+							"vermindert": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "vorhandene oder weitere Hilfsmittel"
+						},
+						"hint": "intern / extern"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Versorgung"
+						},
+						"content": {
+							"Erstversorgung": [],
+							"Folgeversorgung": [],
+							"wachstumsbedingt": [],
+							"verschleißbedingt": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Änderung des Versorgungskonzepts"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Röntgenbilder"
+						},
+						"content": {
+							"ja": [],
+							"nein": [],
+							"intern": [],
+							"extern": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Wirbelsäulenflexibilität"
+						},
+						"content": {
+							"vorhanden": [],
+							"mäßig vorhanden": [],
+							"nicht vorhanden": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Anmerkungen zur Anamnese"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Anamnese Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Geschlecht"
+						},
+						"content": {
+							"weiblich": [],
+							"männlich": [],
+							"divers": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Diagnose"
+						},
+						"autocomplete": true
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ursache"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Datum"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "versorgungsrelevante Einschränkungen"
+						},
+						"hint": "Begleiterkrankungen, funktionelle Einschränkungen anderer Bereiche, Medikamente, Therapien, Infektionen"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Allergien"
+						},
+						"hint": "Materialien, Lebensmittel"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Sensibilität"
+						},
+						"content": {
+							"unauffällig": [],
+							"vemehrt": [],
+							"vermindert": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "vorhandene oder weitere Hilfsmittel"
+						},
+						"hint": "intern / extern"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Versorgung"
+						},
+						"content": {
+							"Erstversorgung": [],
+							"Folgeversorgung": [],
+							"wachstumsbedingt": [],
+							"verschleißbedingt": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Änderung des Versorgungskonzepts"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Versorgungsziel"
+						},
+						"content": {
+							"Korrektur / Bettung": [],
+							"PostOP-Ergebnis": [],
+							"Funktionssicherung": [],
+							"Stabilisierung": [],
+							"Tonusregulation": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstiges Versorgungsziel"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Anmerkungen zur Anamnese"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Maßblatt Arm Orthetik I",
 		"alias": "",
 		"context": "component",
@@ -2258,6 +2508,465 @@
 						"type": "text",
 						"attributes": {
 							"name": "Deko, Motiv"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Parameter"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Maßblatt Rumpf Cranio Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula AP"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Clavicula-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Axilla-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid AP"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Xyphoid-Taille"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Taille ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Taille Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Taille AP"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Spinen ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kinn-Fossa jugularis Höhe"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kinn-Fossa jugularis Oberfläche"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kopf ML"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kopf Umfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Kopf AP"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Stirn-Os occipitale über Kopf"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Ohr-Ohr über Kopf"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Ohr-Ohr unter Kinn"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Halsumfang"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergewicht"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Körpergröße"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Modellerstellung"
+						},
+						"content": {
+							"Scan": [],
+							"Gipsadbruck": [],
+							"stehend": [],
+							"liegend": [],
+							"sitzend": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Modellqualität"
+						},
+						"content": {
+							"gut": [],
+							"schlecht": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "modellieren"
+						},
+						"content": {
+							"überkorrigierend": [],
+							"symmetrisch": [],
+							"glätten": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Korrekturwinkel seitlich"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Korrekturwinkel Rotation"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Deko, Motiv"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Parameter"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Maßblatt Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Umfang oberer Abschluss"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Oberer Abschluss-Taille frontal"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Umfang Taille"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Umfang Gesäß"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gesäß-Taille"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Vordere Höhe (Sternum - Os pubis)"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Hintere Höhe (Scapula - 2 Finger breit über Sitzfläche)"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "vorderer Spinenabstand"
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Stoma"
+						},
+						"content": {
+							"rechts": [],
+							"links": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Bauchnabel-Stomamitte"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Leistenbeuge-Stomamitte"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Stomadurchmesser"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Bauchform"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Gesäßform"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Rückenform"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Skoliose"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Besonderheiten"
+						},
+						"content": {
+							"prominente Spinen": [],
+							"prominenter Rippenbogen": [],
+							"prominente Dornfortsätze": [],
+							"starker Muskelansatz Arm": []
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Verstärkung"
+						},
+						"content": {
+							"leicht": [],
+							"stark": [],
+							"rechts": [],
+							"links": [],
+							"Aluminium rechts": [],
+							"Aluminium links": [],
+							"Aluminium kurz 25": [],
+							"Aluminium lang 50": []
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Anzahl Verstärkungen"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Anzahl Aluminium-Verstärkungen"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Sonstiges"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Unterarmpolster"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Schrittgurt"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Magenlasche"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Plastazotestreifen"
+						}
+					},
+					{ "type": "hr" },
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Ausführung"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Stoff"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Motiv"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Verschlüsse"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Thermoplast"
 						}
 					},
 					{
@@ -3248,6 +3957,59 @@
 						"type": "text",
 						"attributes": {
 							"name": "Korsetthemd Größe oder Anzahl"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Zusätze"
+						},
+						"hint": "oder ggf. Anzahl"
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Versorgungsplanung Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition"
+						},
+						"content": {
+							"...": [],
+							"Stützmieder nach Lindemann 60.01 KA": [],
+							"Plastazotemieder 60.02 KA": [],
+							"PlastazoteMieder (Gips vorhanden) 60.03 KA": [],
+							"Tetraleibgurt nach Maß 60.12 KA": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"...": [],
+							"Plastazotestreifen mit Einarbeitung 60.04 KA": [],
+							"Unterarmpolster / Unterbrustpolster 60.05 KA": [],
+							"Aussparung für Stomaträger 60.06 KA": [],
+							"Zusätzliche Verstärkung (Blanchet) 60.07 KA": [],
+							"Zusätzliche Verstärkung (Aluminium) 60.08 KA": [],
+							"Schrittgurt 60.09 KA": [],
+							"Innenbinde 60.19 KA": [],
+							"Nässeschutz, Wäscheschutz für Plastazotemieder 60.11 KA": []
 						}
 					},
 					{
@@ -4444,6 +5206,276 @@
 		}
 	},
 	{
+		"name": "Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Cranio Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hinweise und Warnungen für die cranioorthetische Versorgung"
+						},
+						"content": "• Die Cranioorthese / der Schutzhelm darf nicht bei Fieber und/oder allergischen Reaktionen getragen werden.\n• Die Einhaltung der täglichen Tragezeit, die physiotherapeutischen Übungen unter Aufsicht und das tägliche therapeutische Turnen zu Hause sind Bausteine der Therapie, die zum Erfolg beitragen.\n• Ein eventuell vorhandener Kinnriemen muss sicher sitzen, darf nicht zu eng oder zu weit sein um eine adäquate Passform und Funktion zu sichern. Es besteht grundsätzlich Strangulationsgefahr, weshalb die Orthese / der Helm nur unter Aufsicht verwendet werden darf.\n• Nach dem Duschen oder Baden muss die Haut komplett trocken und nicht aufgeweicht sein, bevor Sie Ihre Rumpforthese wieder anziehen. Körperlotionen oder -cremes müssen ebenfalls vor dem Anlegen der Rumpforthese vollständig eingezogen sein. Benutzen sie kein Körperpuder, denn Puder reibt die Haut unter den Druckzonen auf und trocknet sie zusätzlich aus.\n• Regelmäßige Kontrollen der Passform sind insbesondere im Wachstum wichtig um das Therapieziel sicherstellen zu können.\n• Sollte die Orthese gerissen oder gebrochen sein oder Verschlüsse und Bügel nicht mehr einwandfrei funktionieren oder locker sein, dürfen sie das Hilfsmittel nicht mehr tragen, um eine Verletzung zu vermeiden.\n• Versichern Sie sich nach jedem Anlegen der Orthese, dass diese stabil anliegt. Das Versorgungsziel ist gefährdet sollte es zum Verrutschen kommen."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bestimmungsgemäßer Gebrauch"
+						},
+						"content": "Orthese zur äußerlichen Anwendung: Stabilisieren oder Korrektur von Fehlhaltungen oder Schutz der knöchernen Strukturen am Kopf."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Kontakt mit Feuchtigkeit zulässig",
+							"required": true
+						},
+						"content": { "nein": [], "feuchtes Milieu": [], "Wasser": [], "Salzwasser": [] }
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen, Sonderanwendung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Verwendete Komponenten (ggf. gelten zusätzlich die Gebrauchsanweisungen der Hersteller)"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": { "name": "Testorthese", "required": true },
+						"content": {
+							"nicht zutreffend": [],
+							"Ihre Orthese befindet sich gegenwärtig in einem Probezustand um Passform und Funktionalität sicherzustellen. Wir weisen daher ausdrücklich darauf hin die Orthese gemäß der Sonderfreigabe zur Probe nur im definierten Zeitraum zu nutzen bzw. zu probieren und bei Veränderungen die Nutzung der Orthese unmittelbar einzustellen und sich mit uns in Verbindung zu setzen. Verschlüsse und Polster befinden sich nicht in einem definitiven Zustand und können unter Umständen noch nicht abschließend befestigt sein. Aus diesem Grund ist die endgültige Belastbarkeit gemäß Ihres individuellen Versorgungskonzepts noch nicht langfristig sichergestellt. Die verwendeten Verschlüsse und Polster können sich lösen wodurch die in den Anproben ermittelte Passform beeinträchtigt oder Schaden an Haut und Orthese entstehen könnten.": []
+						}
+					},
+					{ "type": "date", "attributes": { "name": "Nutzung im Probezustand bis" } }
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Beschreibung Komponenten Rumpf Cranio Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Beschreibung der Komponenten, Handhabe und Funktionsweise"
+						},
+						"content": "Die Konstruktion ist individuell auf Ihre Bedürfnisse abgestimmt. Aufgrund der großen Variationsbreite kann Ihre Rumpforthese optisch und funktionell von anderen Versorgungen abweichen. Je nach Höhe des betroffenen Wirbelsäulenabschnittes reicht die Rumpforthese vom Becken bis unter die Brust, schließt evtl. die Schulterblätter mit ein oder umfasst sogar die Halswirbelsäule. Dadurch werden Sie in der Rumpforthese mehr oder weniger in Ihren Bewegungen eingeschränkt. Das ist allerdings notwendig, um die benötigten Korrekturkräfte aufzubringen. Je nach Bauart befinden sich gegenüber den eingearbeiteten Druckzonen Freiräume, in die Sie ausweichen müssen."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Orthesentyp"
+						},
+						"content": {
+							"Cranioorthese: Die Cranioorthese soll die vorhandene Fehlform des Kopfes korrigieren. Hierbei soll kein Druck aufgebaut, sondern wachstumslenkend unterstützt werden. Ziel der Versorgung ist es, die Orthese 23 Stunden täglich zu tragen. Die tägliche Nutzungsdauer, ob begleitende Maßnahmen (z.B. Krankengymnastik) Ihre Leistungsfähigkeit unterstützen können, sowie erforderliche Anpassungen, falls sich Ihre körperlichen Voraussetzungen verändern, besprechen Sie bitte mit Ihrem behandelten Arzt, ebenso die tägliche Tragezeit. Folgende Zeiten sind zur Eingewöhnung einzuhalten:\n• 1. Tag: 1 Stunde\n• 2. Tag 2 Stunden\n• 3. Tag 4 Stunden\n• 4. Tag 8 Stunden\n• 5. Tag 16 Stunden\n• 6. Tag 20 Stunden\n• 7. Tag 23 Stunden": [],
+							"Kopfschutzhelm: Der Kopfschutzhelm soll die knöchernen Strukturen schützen und ist primär zur Anwendung tagsüber konzipiert. Die tägliche Nutzungsdauer, ob begleitende Maßnahmen Ihre Leistungsfähigkeit unterstützen können, sowie erforderliche Anpassungen, falls sich Ihre körperlichen Voraussetzungen verändern, besprechen Sie bitte mit Ihrem behandelten Arzt, ebenso die tägliche Tragezeit.": [],
+							"Schiefhalsorthese: Schiefhalsorthesen finden Anwendung zur konservativen bzw. postoperativen Versorgung eines Schiefhalses. Dabei wird der Kopf zur gesunden Seite geneigt und zur erkrankten Seite gedreht. Anlagepunkte sind hierbei Schulter und Kopf auf der betroffenen Seite und Kinn auf der gesunden Seite. Das Ausmaß der Korrektur wird durch den behandelnden Orthopäden mittels Winkelangaben vorgegeben. Tragezeit und Dauer werden durch den Arzt bestimmt. Im postoperativen Setting wird die Orthese typischerweise die ersten 6 Woche Tag und Nacht getragen. Im Anschluss nach Freigabe durch den Arzt für weitere 6 Wochen nur nachts. Grundsätzlich empfehlen wir das Behandlungsschema individuell mit dem betreuenden Arzt abzustimmen, da hierbei auf die individuellen Gegebenheiten des einzelnen Patienten Rücksicht genommen werden muss und eine allgemeingültige Aussage nicht getroffen werden kann.": []
+						}
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Allgemein"
+						},
+						"content": "Die Konstruktion ist individuell auf Ihre Bedürfnisse abgestimmt. Aufgrund der großen Variationsbreite kann Ihre Orthese optisch und funktionell von anderen Versorgungen abweichen.\nBei Klettverschlüssen ist darauf zu achten, dass diese exakt übereinander positioniert werden, um ein „Verkleben“ des Klettbandes mit der Kleidung oder der Haare zu vermeiden. Die Orthese soll grundsätzlich beschwerdefrei sitzen. Übermäßiger Druck bzw. Druckstellen, Reizungen, Wundreibungen der Haut oder gar Ödeme führen zu Komplikationen und sind nicht zu akzeptieren! Sitz, Form und Funktion wurden durch Ihren Orthopädietechniker kontrolliert.\nLegen Sie die Kopforthese in einer für Sie entspannten Haltung an und schließen Sie die Verschlüsse.  Kontrollieren sie nach jedem Anziehen den Sitz der Orthese wie sie es mit ihrem Orthopädietechniker erarbeitet haben. Nur so ist die Funktion und Passform gewährleistet. Achten Sie darauf, dass die Aussparungen der Ohren an der richtigen Position sind und ihre Ohren keinem Druck ausgesetzt sind. Bei Gesichtsmasken ist darauf zu achten, dass die individuelle Passform der Gesichtsorthese auf ihrem Gesicht gut sitzt. Zur Orientierung können sie die Aussparung der Nase nutzen. Generell müssen Sie sich immer vor dem Anziehen vom einwandfreien Zustand der der Orthese vergewissern.\nIhre Kopforthese kann aus thermoplastischen Kunststoffen, Verbundwerkstoffen und Bezugstoffen bestehen.\nDie Klettverschlüsse gewährleisten eine Stabilisierung der Korrektur der Kopforthese und ermöglichen Ihnen das Anziehen des Hilfsmittels. Sie haben zusätzlich die Möglichkeit geringe Volumenschwankungen auszugleichen.\nBei größeren Veränderungen Ihres Körpers sind eine individuelle Nachpassung oder gegebenenfalls Neuanfertigung erforderlich. Kontaktieren Sie bitte in diesem Fall unverzüglich Ihren Orthopädietechniker."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Medizinische Aspekte Rumpf Cranio Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Medizinisch-therapeutische Aspekte"
+						},
+						"content": "Die Sonderanfertigungsprodukte der Kopforthesen sind Medizinprodukte, die in erster Linie in der konservativen Therapie und Behandlung eingesetzt werden. Sie können rein konservativ, präventiv oder begleitend zu anderen auch therapeutischen Maßnahmen vor oder nach einer operativ chirurgischen Intervention eingesetzt werden und kommen gegebenenfalls auch im Anschluss im Rahmen der weiteren Nachbehandlung zum Einsatz. Ihre Nutzung kann je nach Indikation temporär oder dauerhaft notwendig sein. Sie dienen der Korrektur oder der Stabilisierung insbesondere dem Schutz bestimmter Regionen des Kopfes. Die Anwendung erfolgt in Bereich des Kopfes und/ oder Gesichts.\nÜbergeordnet betrachtete Indikationen für den Einsatz von Orthesen für den Kopf sind Krankheitsbilder oder Verletzungen, die den Kopf- oder Gesichtsbereich betreffen und die einer Korrektur oder Stabilisierung bzw. Schutz bedürfen. Diese pathologischen Zustände können auftreten durch krankheitsbedingte Zustände, erworbene oder angeborene Fehlstellungen, operative Eingriffe oder Traumata und Verletzungen.\nDie Orthesen werden von außen an den Körper angelegt und erreichen ihre Funktion durch primär biomechanische Wirkprinzipien.\nAbhängig von Ihrer Indikation können im Einzelfall einige Komplikationen mit der Orthesenversorgung auftreten. Zur Funktionserhaltung und -verbesserung des betroffenen Körperteils sind in der Regel bewegungsfreundliche Freizeitaktivitäten und Gymnastik geeignete Maßnahmen.\n \nIndikationen\nÜbergeordnet betrachtete Indikationen für den Einsatz von Orthesen für den Kopf sind Krankheitsbilder oder Verletzungen, die den Kopf- oder Gesichtsbereich betreffen und die einer Korrektur oder Stabilisierung bzw. Schutz bedürfen. Diese pathologischen Zustände können auftreten durch:\n• Krankheitsbedingte Zustände\n• Erworbene oder angeborene Fehlstellungen\n• Operative Eingriffe\n• Traumata, Verletzungen\n \nKontraindikationen\nAllgemein geltende Kontraindikationen, welche die Anwendung einer Orthese ausschließen sind:\n• Fehlende Compliance des Patienten\n• Unverträglichkeiten gegenüber den verwendeten Materialien (Allergien) oder Eigenschweißreaktionen \n• Kognitive Einschränkungen, die eine sichere Handhabung der Orthese verhindern.\nZudem können Kontraindikationen vorliegen, die speziell den Versorgungsbereich betreffen:\n• Nicht belastbare Knochen- oder Weichteilstrukturen\n• Verminderte Belastbarkeit der Haut."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hinweise und Warnungen für Mieder und Softorthesen"
+						},
+						"content": "• Die Einhaltung der täglichen Tragezeit, die physiotherapeutischen Übungen unter Aufsicht und das tägliche therapeutische Turnen zu Hause sind Bausteine der Therapie, die zum Erfolg beitragen.\n• Ihr Mieder wird nicht direkt auf der Haut getragen, sondern auf einem Unterhemd oder ähnlichen Kleidungsstücken. So wird ein übermäßiges Durchschwitzen der Stoffteile vermieden und die sich bildende Feuchtigkeit unter dem Kunststoff besser gebunden bzw. abgeleitet. Achten Sie darauf, dass das Unterhemd faltenfrei unter dem Mieder anliegt, um unnötige Druckstellen zu vermeiden. Noch besser geeignet sind spezielle Korsetthemden ohne Naht, die mit oder ohne Ärmel angeboten werden.\n• Versichern Sie sich nach jedem Anlegen des Mieders, dass dieses stabil anliegt. Das Versorgungsziel ist gefährdet sollte es zum Verrutschen kommen.\n• Sofern nicht anders angeordnet, sollten Sie das Mieder gleich nach der morgendlichen Toilette anlegen und den ganzen Tag tragen. Das Mieder darf jedoch nur auf ausdrückliche Anweisung des Arztes im Liegen oder Schlafen getragen werden."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bestimmungsgemäßer Gebrauch"
+						},
+						"content": "Orthese zur äußerlichen Anwendung: Halten des Rumpfes/Teilen des Rumpfes in einer medizinisch-therapeutisch notwendigen Position bei Funktionsstörungen im Bereich des Rumpfes."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Kontakt mit Feuchtigkeit zulässig",
+							"required": true
+						},
+						"content": { "nein": [], "feuchtes Milieu": [], "Wasser": [], "Salzwasser": [] }
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen, Sonderanwendung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Verwendete Komponenten (ggf. gelten zusätzlich die Gebrauchsanweisungen der Hersteller)"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": { "name": "Testorthese", "required": true },
+						"content": {
+							"nicht zutreffend": [],
+							"Ihr Hilfsmittel befindet sich gegenwärtig in einem Probezustand um Passform und Funktionalität sicherzustellen. Wir weisen daher ausdrücklich darauf hin das Hilfsmittel gemäß der Sonderfreigabe zur Probe nur im definierten Zeitraum zu nutzen bzw. zu probieren und bei Veränderungen die Nutzung des Mieders unmittelbar einzustellen und sich mit uns in Verbindung zu setzen. Verschlüsse, Nähte, Säume und Polster befinden sich nicht in einem definitiven Zustand und können unter Umständen noch nicht abschließend befestigt sein. Aus diesem Grund ist die endgültige Belastbarkeit gemäß Ihres individuellen Versorgungskonzepts noch nicht langfristig sichergestellt. Die verwendeten Verschlüsse und Polster können sich lösen wodurch die in den Anproben ermittelte Passform beeinträchtigt oder Schaden an Haut und Hilfsmittel entstehen könnten.": []
+						}
+					},
+					{ "type": "date", "attributes": { "name": "Nutzung im Probezustand bis" } }
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Beschreibung Komponenten Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Beschreibung der Komponenten, Handhabe und Funktionsweise"
+						},
+						"content": "Das Grundmodell eines Mieders besteht aus zwei Lagen Baumwollstoff, der an den Nähten mit leichten Stäben und im Rückenteil zusätzlich mit festen Stäben verstärkt ist. Eine noch größere Unterstützung der Wirbelsäule wird durch 2-3 Aluminiumstäbe im Rücken erreicht. Die Konstruktion ist individuell auf Ihre Bedürfnisse abgestimmt, unter anderem auch der Anteil an elastischen Materialien und die Lage und Art der Verschlüsse. Geringe Körpergewichtschwankungen können Sie mit Ihrem Mieder durch die Verschlüsse ausgleichen. Die Unterstützungslasche hat eine einfache bzw. doppelte Gurtverbindung zum Rückenteil Bei allen Stoffmiedern sind mindestens zwei feste Stäbe im Rückenteil eingesetzt."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Orthesentyp"
+						},
+						"content": {
+							"Mieder: Ihr Mieder dient als funktionelle Unterstützung für den Rumpf. Es soll Ihnen ein möglichst schmerzfreies Bewegen ermöglichen. Mit Ihrem Mieder soll eine möglichst selbständige, Ihren persönlichen Bedürfnissen und eine Ihrer Leistungsfähigkeit entsprechende Lebensführung erreicht werden. Welche Leistungsfähigkeit Sie mit dem Mieder erreichen, hängt vom individuellen Krankheitsbild ab. Die tägliche Nutzungsdauer, ob begleitende Maßnahmen (z.B. Krankengymnastik) Ihre Leistungsfähigkeit unterstützen können, sowie erforderliche Anpassungen, falls sich Ihre körperlichen Voraussetzungen verändern, besprechen Sie bitte mit Ihrem behandelten Arzt, ebenso die tägliche Tragezeit.": [],
+							"Softorthese: Ihre Softorthese dient als funktionelle Unterstützung für den Rumpf. Es soll Ihnen eine Unterstützung im Sitzen und beim Bewegen ermöglichen. Mit Ihrer Softorthese soll eine möglichst selbständige, Ihren persönlichen Bedürfnissen und eine Ihrer Leistungsfähigkeit entsprechende Lebensführung erreicht werden. Welche Leistungsfähigkeit Sie mit der Softorthese erreichen, hängt vom individuellen Krankheitsbild ab. Die tägliche Nutzungsdauer, ob begleitende Maßnahmen (z.B. Krankengymnastik) Ihre Leistungsfähigkeit unterstützen können, sowie erforderliche Anpassungen, falls sich Ihre körperlichen Voraussetzungen verändern, besprechen Sie bitte mit Ihrem behandelten Arzt, ebenso die tägliche Tragezeit.": [],
+							"Tetraleibgurt: Der Tetraleibgurt nach Maß komprimiert den Bauchbereich zirkulär um zu verhindern, dass bei querschnittgelähmten Patienten mit hohem Lähmungsniveau das Blut in den Bauchraum absackt und es damit zu Kreislaufproblemen kommt. Die Bandage muss aus einem festen unelastischen Material gearbeitet sein um die fehlende Bauchmuskulatur zu kompensieren. Sie muss in der Weite regulierbar und von einem Tetraplegiker mit eingeschränkter motorischer Funktion der Hände leicht zu bedienen sein. Die Nutzung findet primär während eines Transfers statt.": [],
+							"Beckenringorthese: Die individuell hergestellte Beckenringorthese wird zur Versorgung bei Symphysenlockerungen, Lockerungen im Kreuz-Darmbeingelenk sowie bei Symphysenrupturen eingesetzt. Als medizinische Hilfsmittel in einer akuten Phase getragen dient es als eine Maßnahme zur schnellen Schmerzlinderung und Entlastung, andererseits lässt sich die Orthese auch als präventive Langzeitmaßnahme dauerhaft tragen. Die Orthese übt eine Kompressionswirkung auf die Symphyse und das ISG-Gelenk (Kreuz-Darmbeingelenk) aus, dadurch wird ein weiteres Auseinandergleiten und Verschieben verhindert und der knöcherne Ring weitgehend geschlossen und stabilisiert.": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Konstruktionstyp"
+						},
+						"content": {
+							"Stoffmieder / Tetraleibgurt: Über das Maß der allgemeinen Körperpflege hinaus besteht bei Stoffkonstruktionen nicht die Notwendigkeit besonderer Hygienemaßnahmen. Ihr Mieder / Tetraleibgurt wird nicht direkt auf der Haut getragen, sondern auf einem Unterhemd oder ähnlichen Kleidungsstücken. So wird ein übermäßiges Durchschwitzen des Mieders verhindert. Achten Sie bitte auf faltenfreies Anliegen des Hemdes unter dem Mieder / Tetraleibgurt, um unnötigen Faltendruck zu verhindern. Material in Hautkontakt: Baumwolle.": [],
+							"Plastazotemieder: Über das Maß der allgemeinen Körperpflege hinaus besteht bei Miederkonstruktionen mit Plastazoteschale die Notwendigkeit, die Haut im Bereich der festen Schale gut zu beobachten. Da es sich hier um ein starres Material handelt, kann es eher zu Druckstellen kommen.\nKörperlotionen und -cremes müssen vor dem Anlegen des Überbrückungsmieders vollständig eingezogen sein. Ihr Mieder wird nicht direkt auf der Haut getragen, sondern auf einem Unterhemd oder ähnlichen Kleidungsstücken. So wird ein übermäßiges Durchschwitzen der Stoffteile vermieden und die sich bildende Feuchtigkeit unter dem Plastazote besser abgeleitet. Achten Sie bitte auf faltenfreies Anliegen des Hemdes unter dem Mieder, um unnötigen Faltendruck zu verhindern. Material in Hautkontakt: PE, Baumwolle.": [],
+							"Softorthese: Das Grundmodell einer Softorthese besteht aus zwei Lagen Lycra und Neoprene. Die Konstruktion ist individuell auf Ihre Bedürfnisse abgestimmt, unter anderem auch die Stärke der Kompression, mögliche Korrekturzügel und die Lage und Art der Verschlüsse. Geringe Körpergewichtschwankungen können Sie mit Ihrer Softorthese durch die Verschlüsse ausgleichen. Material in Hautkontakt: Elastan, Polyamid, Chloropren-Kautschuk (Neoprene)": [],
+							"Beckenringorthese: In der Regel bestehen Beckenringorthesen aus einem 8-10 cm breiten unelastischen Material, welches das Becken zirkulär umschließt. Verwendete Materialien: Leder oder EVA. Die Orthese wird über der Unterbekleidung getragen.": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "An- und Ausziehen"
+						},
+						"content": {
+							"Stoffmieder / Tetraleibgurt: Die evtl. vorhandene Rückenpelotte muss sich vor dem Anziehen an der dafür vorgesehenen Stelle im Mieder befinden. Die Unterkante der Rückenpartie sollte typischerweise zwei Finger breit über der Sitzfläche stehen.\nBitte tragen Sie das Mieder / den Tetraleibgurt immer auf einem eng anliegenden T-Shirt oder Unterhemd, um somit den Tragekomfort zu erhöhen. Das Mieder / der Tetraleibgurt wird an der Vorderseite des Körpers in der Mitte geschlossen und die Vorgehensweise ist immer von unten nach oben. Der untere Rand mit den Gummiecken befindet sich bei angewinkelten Beinen in der Beuge. Zunächst einmal sollten die Klettverschlüsse alle nur leicht zugemacht werden. Verschließen Sie anschließend die Klettverschlüsse bis auf einen Abstand von ca. 2-3 cm.\nBettlägerige Patienten müssen auf die Seite gedreht werden. Das Mieder / der Tetraleibgurt wird einseitig zur Außenseite hin bis zur Mittelnaht zusammengerollt. D.h. wenn der Patient auf der rechten Seite liegt, muss diese Seite eingeschlagen werden. Die mittlere hintere Naht muss genau entlang der Wirbelsäule verlaufen. Der Patient wird nun über die gefaltete Rolle zurück auf den Rücken gedreht. Der Patient wird nun leicht auf die Gegenseite gedreht, damit der rechte zusammengerollte Teil wieder ausgerollt werden kann. Bitte ziehen Sie das Mieder / den Tetraleibgurt glatt. Die Beine des Patienten müssen angewinkelt werden. Erst in dieser Position lässt sich das Mieder leicht schließen. Vorgehensweise wie bereits oben beschrieben.": [],
+							"Softorthese: Bitte tragen Sie die Softorthese immer auf einem eng anliegenden T-Shirt oder Unterhemd, um somit den Tragekomfort zu erhöhen. Die Softorthese wird an der Vorderseite bzw. Hinterseite des Körpers in der Mitte geschlossen und die Vorgehensweise ist immer von unten nach oben. Die Schultergurte und der Zwickel dienen der Verhinderung des Rutschens und sollen nicht eng geschlossen werden um die Patienten nicht in ihrer Bewegung einzuschränken.": [],
+							"Beckenringorthese: Der Verschluss erfolgt über ein variabel einstellbares Verschlusssystem. Die Beckenringorthese wird unterhalb der Beckenkämme und oberhalb der Rollhügel (Trochanter) der Oberschenkelknochen getragen. Grundsätzlich ist die richtige Positionierung am Körper und das feste Verschließen der Orthese zu gewährleisten um das gewünschte Resultat zu erreichen.": []
+						}
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Allgemein"
+						},
+						"content": "Insbesondere bei einer Neuversorgung muss der Umgang mit dem Mieder / der Softorthese / dem Tetraleibgurt erlernt werden. Das An- und Ausziehen muss trainiert werden. Das Mieder / die Softorthese ist grundsätzlich im Stehen oder im Liegen, nicht aber im Sitzen anzuziehen. Bitte überprüfen Sie erste nach dem Anlegen im Sitzen auf einer harten Oberfläche den einwandfreien Sitz Ihres Mieders / Ihrer Softorthese.\nBei Klettverschlüssen ist darauf zu achten, dass diese exakt übereinander positioniert werden, um ein Haftenbleiben des Klettbandes mit der Kleidung zu vermeiden. Das Mieder / die Softorthese / der Tetraleibgurt soll grundsätzlich beschwerdefrei sitzen. Übermäßiger Druck bzw. Druckstellen, Reizungen, Wundreibungen der Haut oder gar Ödeme führen zu Komplikationen und sind nicht zu akzeptieren! Sitz, Form und Funktion wurden durch Ihren Orthopädietechniker kontrolliert."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Medizinische Aspekte Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Medizinisch-therapeutische Aspekte"
+						},
+						"content": "Mieder/Softorthesen wie Ihre Ausführung sind Sonderanfertigungen und fallen unter die Gruppe der Medizinprodukte, die in erster Linie in der konservativen Therapie und Behandlung eingesetzt werden. Sie können rein konservativ, präventiv oder begleitend zu anderen auch therapeutischen Maßnahmen vor oder nach einer operativ chirurgischen Intervention eingesetzt werden und kommen gegebenenfalls auch im Anschluss im Rahmen der weiteren Nachbehandlung zum Einsatz. Ihre Nutzung kann je nach Indikation temporär oder dauerhaft notwendig sein. Sie dienen der Entlastung, Immobilisierung, Korrektur oder Stabilisierung eines oder mehrerer anatomischer Segmente und/ oder Strukturen. Die Anwendung erfolgt am Becken- und Rumpfbereich. Die Hilfsmittel werden von außen an den Körper angelegt und erreichen ihre Funktion durch primär biomechanische Wirkprinzipien.\nAbhängig von Ihrer Indikation können im Einzelfall einige Komplikationen mit der Rumpforthesen-Versorgung auftreten. Durch die nicht zu vermeidende teilweise Ruhigstellung der Muskulatur während des Tragens Ihrer Rumpforthese kann es langfristig zu einer Abschwächung der Rumpfmuskeln kommen. Um dies zu verhindern, ist regelmäßige Krankengymnastik oder isometrisches Training notwendig. Ihr Arzt kann Ihnen weitergehende Hinweise zum Muskeltraining geben.\n \nIndikationen\nÜbergeordnet betrachtete Indikationen für den Einsatz von Rumpforthesen sind Krankheitsbilder oder Fehlstellungen, die hauptsächlich eines oder mehrere anatomische Segmente und/ oder Strukturen des Rumpfes betreffen und die einer Entlastung, Immobilisierung, Korrektur oder Stabilisierung bedürfen. Diese pathologischen Zustände können auftreten durch\n• Krankheitsbedingte Veränderungen\n• Erworbene oder angeborene Fehlstellungen\n• Erworbene oder angeborene Funktionsstörungen\n• Operative Eingriffe\n• Traumata, Verletzungen\nDer Einsatz einer Orthese kann durch eine einzeln auftretende Indikation, eine Kombination aus mehreren Indikationen oder aufgrund der Spätfolge einer Erkrankung begründet sein.\n \nKontraindikationen\nAllgemein geltende Kontraindikationen, welche die Anwendung einer Orthese ausschließen sind:\n• Fehlende Compliance des Patienten\n• Unverträglichkeiten gegenüber den verwendeten Materialien (Allergien) oder Eigenschweißreaktionen\n• Kognitive Einschränkungen, die eine sichere Handhabung der Orthese verhindern.\nZudem können Kontraindikationen vorliegen, die eine Versorgung in speziellen Bereichen verhindern:\n• Nicht belastbare Knochen- oder Weichteilstrukturen\n• Verminderte Belastbarkeit der Haut oder innerer Organe\n• Ateminsuffizienz\n• Adipositas\n• Je nach Versorgungsziel: Entzündungen, Hernien, Paresen, Stomata, Fehlbildungen, Frakturen, Instabilitäten"
+					}
+				]
+			]
+		}
+	},
+	{
 		"name": "Armierungsplan Orthetik I",
 		"alias": "",
 		"context": "component",
@@ -4542,6 +5574,28 @@
 		"content": "Identifikator,Anamnese Rumpf Korsett Orthetik I"
 	},
 	{
+		"name": "Anamnese Rumpf Cranio Orthetik I",
+		"alias": "Profilerhebung",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Anamnese Rumpf Cranio Orthetik I"
+	},
+	{
+		"name": "Anamnese Rumpf Mieder Orthetik I",
+		"alias": "Profilerhebung",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Anamnese Rumpf Mieder Orthetik I"
+	},
+	{
 		"name": "Maßblatt Arm Orthetik I",
 		"alias": "",
 		"context": "casedocumentation",
@@ -4573,6 +5627,28 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Identifikator,Maßblatt Rumpf Korsett Orthetik I"
+	},
+	{
+		"name": "Maßblatt Rumpf Cranio Orthetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Rumpf Cranio Orthetik I"
+	},
+	{
+		"name": "Maßblatt Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Rumpf Mieder Orthetik I"
 	},
 	{
 		"name": "Kunststofffertigungsauftrag Orthetik I",
@@ -4630,6 +5706,17 @@
 		"content": "Identifikator,Versorgungsplanung Rumpf Korsett Orthetik I"
 	},
 	{
+		"name": "Versorgungsplanung Rumpf Mieder Orthetik I",
+		"alias": "Kostenvoranschlag",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung Rumpf Mieder Orthetik I"
+	},
+	{
 		"name": "Checkliste Orthetik I",
 		"alias": "",
 		"context": "casedocumentation",
@@ -4682,7 +5769,7 @@
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": true,
 		"restricted_access": null,
-		"content": "Identifikator,konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Arm Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Arm Orthetik I,Gebrauchsanweisung Medizinische Aspekte Arm Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Arm Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Arm Orthetik I,Gebrauchsanweisung Medizinische Aspekte Arm Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
 	},
 	{
 		"name": "Gebrauchsanweisung Beinorthesen",
@@ -4693,7 +5780,7 @@
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": true,
 		"restricted_access": null,
-		"content": "Identifikator,konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Bein Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Bein Orthetik I,Gebrauchsanweisung Medizinische Aspekte Bein Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Bein Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Bein Orthetik I,Gebrauchsanweisung Medizinische Aspekte Bein Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
 	},
 	{
 		"name": "Gebrauchsanweisung Redressions- und Nachtlagerungsorthesen",
@@ -4704,7 +5791,7 @@
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": true,
 		"restricted_access": null,
-		"content": "Identifikator,konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich NLO Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten NLO Orthetik I,Gebrauchsanweisung Medizinische Aspekte NLO Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich NLO Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten NLO Orthetik I,Gebrauchsanweisung Medizinische Aspekte NLO Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
 	},
 	{
 		"name": "Gebrauchsanweisung Rumpforthesen",
@@ -4715,7 +5802,29 @@
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": true,
 		"restricted_access": null,
-		"content": "Identifikator,konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Korsett Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Rumpf Korsett Orthetik I,Gebrauchsanweisung Medizinische Aspekte Rumpf Korsett Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Korsett Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Rumpf Korsett Orthetik I,Gebrauchsanweisung Medizinische Aspekte Rumpf Korsett Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+	},
+	{
+		"name": "Gebrauchsanweisung Cranioorthesen",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
+		"permitted_export": true,
+		"restricted_access": null,
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Cranio Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Rumpf Cranio Orthetik I,Gebrauchsanweisung Medizinische Aspekte Rumpf Cranio Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+	},
+	{
+		"name": "Gebrauchsanweisung Mieder und Softorthesen",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
+		"permitted_export": true,
+		"restricted_access": null,
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Rumpf Mieder Orthetik I,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Rumpf Mieder Orthetik I,Gebrauchsanweisung Medizinische Aspekte Rumpf Mieder Orthetik I,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
 	},
 	{
 		"name": "Armierungsplan Orthetik I",
@@ -4774,5 +5883,27 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Rumpf Korsett Orthetik I,Maßblatt Rumpf Korsett Orthetik I,Versorgungsplanung Rumpf Korsett Orthetik I,Kunststofffertigungsauftrag Orthetik I,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Rumpf Korsett Orthetik I,Abgabeprotokoll Rumpf Korsett Orthetik I,Gebrauchsanweisung Rumpforthesen,Empfangsbestätigung"
+	},
+	{
+		"name": "Versorgungsdokumentation Rumpf Cranio Orthetik I",
+		"alias": "",
+		"context": "bundle",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Rumpf Cranio Orthetik I,Maßblatt Rumpf Cranio Orthetik I,Versorgungsplanung Rumpf Korsett Orthetik I,Kunststofffertigungsauftrag Orthetik I,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Rumpf Korsett Orthetik I,Abgabeprotokoll Rumpf Korsett Orthetik I,Gebrauchsanweisung Cranioorthesen,Empfangsbestätigung"
+	},
+	{
+		"name": "Versorgungsdokumentation Rumpf Mieder Orthetik I",
+		"alias": "",
+		"context": "bundle",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Rumpf Mieder Orthetik I,Maßblatt Rumpf Mieder Orthetik I,Versorgungsplanung Rumpf Mieder Orthetik I,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Rumpf Mieder Orthetik I,Abgabeprotokoll Rumpf Korsett Orthetik I,Gebrauchsanweisung Mieder und Softorthesen,Empfangsbestätigung"
 	}
 ]

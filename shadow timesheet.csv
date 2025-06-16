@@ -297,3 +297,5 @@
 07.06.25,5,"notification-api, documentation"
 10.06.25,1,cron
 13.06.25,7,"notification-api, application-api, calendar-api, code maintenance"
+14.06.25,5,"message-api, templates"
+15.06.25,7,"templates, install routine, stress-test"
