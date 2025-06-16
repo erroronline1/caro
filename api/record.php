@@ -429,7 +429,7 @@ class RECORD extends API {
 				]
 			];
 		}
-		if (isset($return['render']['content'][0][0]['type'])) array_push($return['render']['content'][0], ...$context);
+		if (isset($return['render']['content'][0][0]['type'])) array_push($return['render']['content'][0], ...$context); // append to first article within a section
 		else array_push($return['render']['content'][0][0], ...$context);
 		$this->response($return);
 	}
