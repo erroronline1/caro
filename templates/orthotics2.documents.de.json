@@ -1,0 +1,1699 @@
+[
+	{
+		"comment": "following are orthotics ii components #################################################################################################"
+	},
+	{
+		"name": "Konfektionsversorgung Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Name",
+							"required": true
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Geburtsdatum"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Adresse"
+						}
+					},
+					{
+						"type": "tel",
+						"attributes": {
+							"name": "Telefonnummer"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Kostenträger"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Info"
+						},
+						"hint": "Kontaktperson, Adressbesonderheiten"
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Leistung, Produkt oder Verordnungstext"
+						},
+						"autocomplete": true
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Verordner"
+						},
+						"hint": "namentlich",
+						"autocomplete": true
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Maße, Einstellungen"
+						}
+					},
+					{
+						"type": "scanner",
+						"attributes": {
+							"name": "UDI, LOT"
+						},
+						"hint": "sofern zutreffend"
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Arbeitszeit, Material"
+						},
+						"hint": "sofern zutreffend",
+						"autocomplete": true
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Anamnese Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Geschlecht"
+						},
+						"content": {
+							"weiblich": [],
+							"männlich": [],
+							"divers": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Diagnose"
+						},
+						"autocomplete": true
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ursache"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Datum"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "versorgungsrelevante Einschränkungen"
+						},
+						"hint": "Begleiterkrankungen, funktionelle Einschränkungen anderer Bereiche, Medikamente, Therapien, Infektionen"
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gewicht"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Größe"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Allergien"
+						},
+						"hint": "Materialien, Lebensmittel"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Sensibilität"
+						},
+						"content": {
+							"unauffällig": [],
+							"vemehrt": [],
+							"vermindert": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Bevorzugte Schlafposition"
+						},
+						"content": {
+							"Bauchlage": [],
+							"Rückenlage": [],
+							"Seitenlage links": [],
+							"Seitenlage rechts": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Inkontinenzbezug"
+						},
+						"content": {
+							"nicht erforderlich": [],
+							"erforderlich": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Dekubitusprophylaxe"
+						},
+						"content": {
+							"nicht erforderlich": [],
+							"erforderlich": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "vorhandene oder weitere Hilfsmittel"
+						},
+						"hint": "intern / extern"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Versorgung"
+						},
+						"content": {
+							"Erstversorgung": [],
+							"Folgeversorgung": [],
+							"Zweit-/Wechselversorgung": []
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Versorgungsziel"
+						},
+						"content": {
+							"Funktionssicherung": [],
+							"Sicherung PostOP-Ergebnis": [],
+							"Kontrakturbehandlung": [],
+							"Korrektur / Bettung": [],
+							"Tonusregulation": [],
+							"Stabilisierung": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstiges Versorgungsziel"
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Anmerkungen zur Anamnese"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Anamnese Kompressionstherapie Flachstrick Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Geschlecht"
+						},
+						"content": {
+							"weiblich": [],
+							"männlich": [],
+							"divers": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Diagnose"
+						},
+						"autocomplete": true
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ursache"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Datum"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Begleiterkrankungen"
+						},
+						"content": {
+							"Ulcus Cruris akut": [],
+							"Ulcus Cruris verheilt": [],
+							"rechts": [],
+							"links": [],
+							"Lähmung": [],
+							"Atemwegserkrankungen": [],
+							"Hämatomneigung": [],
+							"Erysipel": [],
+							"Hauterkrankungen / Allergien": [],
+							"Hauttransplantation": [],
+							"Herz-/Kreislauferkrankungen": [],
+							"Schwangerschaft": [],
+							"pAVK": [],
+							"Tumor": [],
+							"Verbrennung": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "sonstige versorgungsrelevante Einschränkungen"
+						},
+						"hint": "Begleiterkrankungen, funktionelle Einschränkungen anderer Bereiche, Medikamente, Therapien, Infektionen"
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gewicht"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Größe"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Allergien"
+						},
+						"hint": "Materialien, Lebensmittel"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Versorgung"
+						},
+						"content": {
+							"Erstversorgung": [],
+							"Folgeversorgung": [],
+							"Zweit-/Wechselversorgung": []
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Vorversorgung Datum"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Vorversorgung Hersteller"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Regelmäßig tägliche Anwendung"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Begründung für unregelmäßige Anwendung"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "selbstständiges An- und Ausziehen"
+						},
+						"content": {
+							"ja": [],
+							"nein": [],
+							"mit Anziehhilfe": []
+						}
+					},
+					{
+						"type": "range",
+						"attributes": {
+							"name": "bisherige Compliance (0 unbekannt, 1 sehr gut, 4 schlecht)",
+							"min": "0",
+							"max": "4",
+							"value": "0"
+						}
+					},
+					{
+						"type": "photo",
+						"attributes": {
+							"name": "Fotodokumentation",
+							"multiple": true
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Versorgungsziel"
+						},
+						"content": {
+							"Volumenreduktion": [],
+							"Schmerzreduktion": [],
+							"Funktionserhalt": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstiges Versorgungsziel"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bei Erstversorgung oder Konzeptänderung"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Ödematöse Schwellung Bein"
+						},
+						"content": {
+							"Zehen links": [],
+							"Zehen rechts": [],
+							"Vorfuß links": [],
+							"Vorfuß rechts": [],
+							"Knöchel links": [],
+							"Knöchel rechts": [],
+							"Unterschenkel links": [],
+							"Unterschenkel rechts": [],
+							"Oberschenkel links": [],
+							"Oberschenkel rechts": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Ödematöse Schwellung Arm"
+						},
+						"content": {
+							"Finger links": [],
+							"Finger rechts": [],
+							"Hand links": [],
+							"Hand rechts": [],
+							"Unterarm links": [],
+							"Unterarm rechts": [],
+							"Oberarm links": [],
+							"Oberarm rechts": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Ödematöse Schwellung Rumpf"
+						},
+						"content": {
+							"Unterbauch links": [],
+							"Unterbauch rechts": [],
+							"Oberbauch links": [],
+							"Oberbauch rechts": [],
+							"Kopf links": [],
+							"Kopf rechts": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Schwellung verschwindet beim Hochlagern"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Ödemkonsistenz"
+						},
+						"content": {
+							"eindrückbar": [],
+							"verhärtet": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Hautoberfläche"
+						},
+						"content": {
+							"glatt": [],
+							"uneben, wellen-, knotenartig": [],
+							"überhängende Gewebeanteile": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Weichteilzustand"
+						},
+						"content": {
+							"normal": [],
+							"sehr weich": [],
+							"verhärtet, fibrotisch": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Druckschmerz"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Stemmerzeichen"
+						},
+						"content": {
+							"negativ": [],
+							"positiv": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Puls Fußrücken tastbar"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "KPE"
+						},
+						"content": {
+							"Akutbehandlung stationär": [],
+							"Akutbehandlung teilstationär": [],
+							"Phase I (Entstauung)": [],
+							"Phase IIa (Optimierung)": [],
+							"Phase IIb (Konservierung)": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Datum für KPE"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Lymphdrainage"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Häufigkeit der Lymphdrainage oder Begründung warum nicht"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Besonderheiten"
+						},
+						"content": {
+							"einteilig": [],
+							"mehrteilig": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Begründung für mehrteilige Ausführung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Begründung für Zusätze"
+						}
+					}
+				],
+				[
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Anmerkungen zur Anamnese"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Maßblatt Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Versorgungstyp"
+						},
+						"content": {
+							"Rückenlage komplett": [],
+							"Rückenlage einseitig": [],
+							"Bauchlage": [],
+							"Seitenlage rechts": [],
+							"Seitenlage links": [],
+							"Stufenaufbau zur Rücken- und Bauchlagerung": [],
+							"Sitzversorgung": [],
+							"Grundplatte": [],
+							"Grundplatte teilbar": [],
+							"Abduktionskeil": [],
+							"Prothesenkissen": [],
+							"sonstiges Sitzkissen": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "ggf. Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Lagerung"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Breite"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Gesamtlänge"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Stärke Lagerung"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Länge Stufenaufbau"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Stärke Stufenaufbau"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Abduktionskeil"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "proximale Weite"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Länge"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "distale Weite"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Stärke Keil"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Abduktion links in Grad"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Abduktion rechts in Grad"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Sitzkissen"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Sitzbreite"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Sitztiefe"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Stärke Kissen"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Winkel links in Grad"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Winkel rechts in Grad"
+						}
+					}
+				],
+				[
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Deko, Motiv"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Parameter"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Versorgungsplanung Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition"
+						},
+						"content": {
+							"...": [],
+							"Individuelle Ganzkörper-Schaumstofflagerung in Rückenlage nach Maß 70.01 KA": [],
+							"Individuelle Schaumstofflagerung in Rückenlage nach Maß 70.02 KA": [],
+							"Individuelle Ganzkörper-Schaumstofflagerung in Rückenlage nach Maß 70.03 KA": [],
+							"Individuelle Ganzkörper-Schaumstofflagerung in Bauchlage nach Maß 70.04 KA": [],
+							"Grundplatte für individuelle Ganzkörper-Schaumstofflagerung in Seitenlage 70.05 KA": [],
+							"Individuelle Ganzkörper-Schaumstofflagerung in Seitlage (Lagerungspelotten Rücken- & Beinteil) 70.06 KA": [],
+							"Individuelle Ganzkörper-Schaumstofflagerung in Seitlage (Lagerungspelotten Rücken- & Beinteil) 70.07 KA": [],
+							"Individuell gefertigter Abduktionskeil nach Maß mit eingefrästen Beinkonturen 70.08 KA": [],
+							"Individuell gefertigtes Prothesen- / Sitzkissen nach Maß 70.09 KA": [],
+							"Individuell gefertigtes Prothesen- / Sitzkissen für den Rollstuhl nach Maß 70.10 KA": [],
+							"Extensionsvorrichtung zur Traktion des Oberschenkels 70.24 KA": [],
+							"individuell angepasster Lagerungskeil zur Adaption an den Rollstuhl 70.25 KA": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"...": [],
+							"Mehraufwand für Kunstledereinsatz bei Inkontinenz 70.11 KA": [],
+							"Mehraufwand für Relaxschaumeinsatz zur Dekubitus-Prophylaxe 70.12 KA": [],
+							"Mehraufwand für Traktionseinheit bei Hüftkopfresektion 70.13 KA": [],
+							"Mehraufwand für Stufenaufbau zur Wechsellagerung 70.14 KA": [],
+							"Mehraufwand für Magnetverschlüsse 70.15 KA": [],
+							"Mehraufwand für Grundplatte teilbar 70.16 KA": [],
+							"Mehraufwand für Gipsabdruck und Modell 70.17 KA": [],
+							"Silikonsteckhülse TOH 75O80": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Zusätze"
+						},
+						"hint": "oder ggf. Anzahl"
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Versorgungsplanung Kompressionstherapie Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Seite"
+						},
+						"content": {
+							"links": [],
+							"rechts": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Habitus"
+						},
+						"content": {
+							"überwiegend sitzend": [],
+							"überwiegend stehend": [],
+							"Rollstuhlfahrer": [],
+							"amputiert": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Diagnose"
+						},
+						"autocomplete": true
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Begleiterkrankungen"
+						},
+						"content": {
+							"Ulcus Cruris akut *": [],
+							"Ulcus Cruris verheilt": [],
+							"rechts": [],
+							"links": [],
+							"Lähmung *": [],
+							"Atemwegserkrankungen *": [],
+							"Hämatomneigung": [],
+							"Erysipel *": [],
+							"Hauterkrankungen / Allergien *": [],
+							"Hauttransplantation": [],
+							"Herz-/Kreislauferkrankungen *": [],
+							"Schwangerschaft": [],
+							"pAVK *": [],
+							"Tumor": [],
+							"Verbrennung": []
+						},
+						"hint": "Bei mit * markierten Begleiterkrankungen kann es sich um eine Kontraindikation handeln, bitte beim Verordner rückversichern!"
+					}
+				],
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition A-D"
+						},
+						"content": {
+							"...": [],
+							"Serie 17.06.01.1": [],
+							"Maß 17.06.10.1": [],
+							"Flachstrick 17.06.14.1": [],
+							"Narbenkompression 17.06.06.0": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition A-G"
+						},
+						"content": {
+							"...": [],
+							"Serie 17.06.03.1": [],
+							"Maß 17.06.12.1": [],
+							"Flachstrick 17.06.16.1": [],
+							"Narbenkompression 17.06.06.0": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition A-T"
+						},
+						"content": {
+							"...": [],
+							"Serie 17.06.04.1": [],
+							"Maß 17.06.13.1": [],
+							"Flachstrick 17.06.17.1": [],
+							"Narbenkompression 17.06.06.0": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Stumpfstrumpf"
+						},
+						"content": {
+							"...": [],
+							"Unterschenkel Maß Rundstrick 17.06.05.0": [],
+							"Unterschenkel Maß Flachstrick 17.06.05.0": [],
+							"Oberschenkel Maß Rundstrick 17.06.05.1": [],
+							"Oberschenkel Maß Flachstrick 17.06.05.1": [],
+							"Narbenkompression 17.06.06.0": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zusätze"
+						},
+						"content": {
+							"Haftrand FB 17.99.99.2008": [],
+							"offene Fußspitze 17.99.99.9999": [],
+							"geschlossene Fußspitze 17.99.99.9999": [],
+							"Y-Einkehre 17.99.99.9999": [],
+							"Ellipsenform bei E 17.99.99.9999": [],
+							"Distal schräger Fußabschluss 17.99.99.9999": [],
+							"Skrotum 17.99.99.9999": [],
+							"Reißverschluss FB 17.99.99.2015": [],
+							"Stomaöffnung im Leibteil 17.99.99.2020": [],
+							"komprimierendes Leibteil 17.99.99.2003": [],
+							"Hüftbefestigung für Stumpfstrümpfe 17.99.99.2007": [],
+							"mit Ballenansatz 17.99.99.9999": [],
+							"Zwickel 17.99.99.9999": [],
+							"Eingriff für Leibteil 17.99.99.2018": []
+						}
+					}
+				],
+				[
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition Hand"
+						},
+						"content": {
+							"...": [],
+							"Handschuh zur Narbenkompression 17.07.01.0": [],
+							"Handteil mit Fingern Maß Serie 17.99.99.2012": [],
+							"Unterarm mit Handteil Maß Flachstrick 17.10.07.*": [],
+							"Arm mit Handteil Maß Flachstrick 17.10.06.*": []
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "Grundposition Arm"
+						},
+						"content": {
+							"...": [],
+							"Armsegment Serie 17.10.01.*": [],
+							"Armsegment Maß Rundstrick 17.10.03.*": [],
+							"Armegment Maß Flachstrick 17.10.04.*": [],
+							"Unterarmsegment Maß Flachstrick 17.10.05.*": [],
+							"Armsegment Narbenkompression 17.10.02.0": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Kompressionsklasse"
+						},
+						"content": {
+							"I *0": [],
+							"II *1": [],
+							"III *2": []
+						}
+					}
+				],
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Zubehör"
+						},
+						"content": {
+							"Easy+ Anziehhilfe für offene Spitze 02.40.01.3": [],
+							"Easy+ Caran anziehhilfe für geschlossene Spitze 02.40.01.3": [],
+							"Hautkleber FB 17.06.07.0900": [],
+							"Rehaforum Topigel 14X12cm Platte 02186546": [],
+							"Juzo Druckpelotte Hand 11448 AS": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige Zusätze"
+						},
+						"hint": "oder ggf. Anzahl"
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Checkliste Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Ausgangsprüfung Checkliste"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Oberfläche"
+						},
+						"content": {
+							"gereinigt": [],
+							"entfällt": []
+						},
+						"hint": "Anzeichnungen, Klebereste, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Klebungen"
+						},
+						"content": {
+							"sicher": [],
+							"entfällt": []
+						},
+						"hint": "Randvulkanisation, Haftband, Abdeckungen, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Verschlüsse"
+						},
+						"content": {
+							"sicher befestigt und gepolstert": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Nähte"
+						},
+						"content": {
+							"Sauber und verriegelt": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Schraub- und Nietverbindungen"
+						},
+						"content": {
+							"sauber, gesichert": [],
+							"entfällt": []
+						},
+						"hint": "Schraubensicherung, Drehmoment, etc."
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Lieferumfang"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Schaumstofflagerung"
+						},
+						"content": {
+							"abgabebereit": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Stecker"
+						},
+						"content": {
+							"abgabebereit": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Wechselkomponenten"
+						},
+						"content": {
+							"abgabebereit": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Sonstige abgabebereiten Komponenten"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Abgabeprotokoll Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Abgabeprotokoll"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Anziehtechnik"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Nutzung von Anziehhilfe, Verschlusssystem, Weichteilverteilung, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Bedienung"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Therapiekonzept, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Hygienemaßnahmen"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Reinigung der Lagerungskomponenten, Hautpflege"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "allgemeine Hinweise"
+						},
+						"content": {
+							"unterwiesen": [],
+							"entfällt": []
+						},
+						"hint": "Einsatzlimitierungen, Anwenderinformationen, tägliche Kontrolle, Wartungshinweise und -intervalle, Warnhinweise"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Passform und Funktion"
+						},
+						"content": {
+							"gegeben": [],
+							"mangelhaft": []
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Abgabeprotokoll Kompressionstherapie Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Abgabeprotokoll"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Anziehtechnik"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Nutzung von Anziehhilfe, Verschlusssystem, Weichteilverteilung, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Bedienung"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Zubehör, etc."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Hygienemaßnahmen"
+						},
+						"content": {
+							"unterwiesen und geprüft": [],
+							"entfällt": []
+						},
+						"hint": "Reinigung der Kompressionsware, Hautpflege"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "allgemeine Hinweise"
+						},
+						"content": {
+							"unterwiesen": [],
+							"entfällt": []
+						},
+						"hint": "Einsatzlimitierungen, Anwenderinformationen, tägliche Kontrolle, Wartungshinweise und -intervalle, Warnhinweise"
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Faltenfreier Sitz Hosenteil"
+						},
+						"content": {
+							"ja": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Faltenfreier Sitz Leistenbeuge"
+						},
+						"content": {
+							"ja": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Faltenfreier Sitz Kniekehle"
+						},
+						"content": {
+							"ja": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Faltenfreier Sitz Haftrand"
+						},
+						"content": {
+							"ja": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Faltenfreier Sitz Armbeuge"
+						},
+						"content": {
+							"ja": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Faltenfreier Sitz Sonstiges"
+						},
+						"content": {
+							"ja": [],
+							"entfällt": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Passform und Druckempfinden Patient"
+						},
+						"content": {
+							"in Ordnung": [],
+							"nicht in Ordnung": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Besonderheiten"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Warnungen Einsatzbereich Schaumstofflagerungen Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Hinweise und Warnungen für die Schaumstofflagerung"
+						},
+						"content": "• Bei Verwendung der Schaumstofflagerung in einem Bett mit Seitengittern ist zu überprüfen, ob für den Patienten Einklemm-/Einquetschrisiken oder die Gefahr des Herausfallens bestehen.\n• Achten Sie beim Einsatz der Schaumstofflagerung und der Verwendung von Seitengittern auf eine ausreichende Seitengitterhöhe. Diese muss ab der Matratzenoberseite bis zur Oberkante des Seitengitters mindestens 220 mm betragen. Verwenden Sie andernfalls eine Seitengittererhöhung.\n• Schützen Sie die Schaumstofflagerung vor offenem Feuer (z.B. Kamin, Zigarettenglut, Kerze), vor direkter Sonneneinstrahlung und vor sonstigen Hitzeeinwirkungen (z.B. durch Heizdecken). Es besteht Brandgefahr!\n• Versichern Sie sich nach jedem Anlegen der Lagerung, dass diese stabil anliegt. Das Versorgungsziel ist gefährdet sollte es zum Verrutschen kommen."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Bestimmungsgemäßer Gebrauch"
+						},
+						"content": "Hilfsmittel zur äußerlichen Anwendung: Halten des Rumpfes/Teilen des Rumpfes und der Beine, ggf. incl. des Kopfes, in einer medizinisch-therapeutisch notwendigen Position bei Funktionsstörungen im Bereich des Rumpfes und der unteren Extremitäten."
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Anmerkungen, Sonderanwendung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Verwendete Komponenten (ggf. gelten zusätzlich die Gebrauchsanweisungen der Hersteller)"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": { "name": "Testorthese", "required": true },
+						"content": {
+							"nicht zutreffend": [],
+							"Ihre Schaumstofflagerung befindet sich gegenwärtig in einem Probezustand um Passform und Funktionalität sicherzustellen. Wir weisen daher ausdrücklich darauf hin die Orthese gemäß der Sonderfreigabe zur Probe nur im definierten Zeitraum zu nutzen bzw. zu probieren und bei Veränderungen die Nutzung der Orthese unmittelbar einzustellen und sich mit uns in Verbindung zu setzen. Verschlüsse und Polster befinden sich nicht in einem definitiven Zustand und können unter Umständen noch nicht abschließend befestigt sein. Aus diesem Grund ist die endgültige Belastbarkeit gemäß Ihres individuellen Versorgungskonzepts noch nicht langfristig sichergestellt. Die verwendeten Verschlüsse und Polster können sich lösen wodurch die in den Anproben ermittelte Passform beeinträchtigt oder Schaden an Haut und Schaumstofflagerung entstehen könnten.": []
+						}
+					},
+					{ "type": "date", "attributes": { "name": "Nutzung im Probezustand bis" } }
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Beschreibung Komponenten Schaumstofflagerungen Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Beschreibung der Komponenten, Handhabe und Funktionsweise"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Lagerungstyp"
+						},
+						"content": {
+							"Schaumstofflagerungskeil: Der Schaumstofflagerungskeil besteht aus einem Schaumstoffblock, der mit Stoff oder Kunstleder bezogen ist. Schaumstofflagerungskeile lagern und betten den ganzen Körper oder einen Abschnitt des Körpers in Rücken oder Bauchlage. Dies wird erreicht, in dem die Konturen des Körpers in guter Korrekturstellung unter Berücksichtigung der individuellen Gelenksituation in den Schaumstoff eingefräst werden. Material in Hautkontakt: PE, PP, EVA, Leder, PU, Baumwolle oder Silikon.": [],
+							"Schaumstofflagerungssystem: Das Schaumstofflagerungssystem besteht aus einer Grundplatte aus Schaumstoff, auf die ein oder mehrere Schaumstoffteile (Pelotten) aufgesteckt werden können. Die Grundplatte und auch die Aufsteckpelotten sind in der Regel aus mehreren unterschiedlich festen Schaumstoffen in Sandwichbauweise gefertigt, die mit Stoff oder Kunstleder bezogen sind. Verbunden werden die Einzelteile mit Holzstäben, die in dafür vorgesehene Kunststoffbuchsen gesteckt werden. Je nach individuellem Bedürfnis kann hier nur eine Lagerungsposition in Seitenlage rechts und/oder links realisiert werden Dazu wird der Körper in möglichst reflexhemmender Position unter Berücksichtigung der individuellen Gelenksituation gestützt oder gelagert. Die Formteile sind so gestaltet, dass eine Farbe nur einer bestimmten Lagerungsposition zugeordnet ist, d.h. in der Draufsicht müssen alle „Pelotten“ die gleiche Farbe haben. Material in Hautkontakt: PE, PP, EVA, Leder, PU, Baumwolle oder Silikon.": [],
+							"Sitzkissen: Das Sitzkissen besteht aus einem Schaumstoff. Dieses Schaumstoffkissen ist auf Ihre Bedürfnisse zugearbeitet. Der Schaumstoff ist in Keilform oder in Form einer Mulde zugeschliffen. Der Schaumstoff ist mit einem Bezug aus Stoff oder Kunstleder versehen. In den meisten Fällen dient dieses Kissen dem Höhenausgleich in der sitzenden Position zwischen dem amputierten Bein und dem erhaltenen Bein. Es soll Wirbelsäulenverkrümmungen und Verspannungen der Muskulatur verhindern. Außerdem kann das Sitzkissen einen Ausgleich bei Gelenkkontrakturen bilden.": []
+						}
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Allgemein"
+						},
+						"content": "Bei Klettverschlüssen ist darauf zu achten, dass diese exakt übereinander positioniert werden, um ein Haftenbleiben des Klettbandes mit der Kleidung zu vermeiden. Die Schaumstofflagerung soll grundsätzlich beschwerdefrei sitzen. Übermäßiger Druck bzw. Druckstellen, Reizungen, Wundreibungen der Haut oder gar Ödeme führen zu Komplikationen und sind nicht zu akzeptieren! Sitz, Form und Funktion wurden durch Ihren Orthopädietechniker kontrolliert. Legen Sie die Schaumstofflagerung in einer für Sie entspannten Haltung an und schließen Sie die Verschlüsse, dass eine sichere Lagerung des Schaumstofflagerungssystems am Körper gewährleistet ist. Achten Sie darauf, dass es nicht zu Einklemmungen der Haut im Bereich der Verschlüsse kommt. Zur Vermeidung von Hautreizungen durch Schweiß oder Reibung sollte das Schaumstofflagerungssystem nicht direkt auf der Haut getragen werden. Zum Unterziehen eignen sich langärmlige T-Shirts, Leggins und dünne Strümpfe aus waschbarem, feuchtigkeitsabsorbierendem Material.  Es muss allerdings auf faltenfreien Sitz der Bekleidung geachtet werden, da es sonst zu Druckstellen kommen kann. Untersuchen Sie regelmäßig die Haut auf Druckstellen. Anfangs in 30 min. Abständen, später nach jedem Umlagern. Die zeitlichen Intervalle der Umlagerung sollte nach Absprache mit dem Arzt durchgeführt werden."
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Gebrauchsanweisung Medizinische Aspekte Schaumstofflagerungen Orthetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Medizinisch-therapeutische Aspekte"
+						},
+						"content": "Entsprechend der ärztlichen Diagnose kommen verschiedene Lagerungstypen zum Einsatz, die verschiedene Funktionen übernehmen. Die Kombination verschiedener Funktionen in einer Lagerung ist möglich. Damit Schaumstofflagerungen ihre Funktion erfüllen können, müssen Kräfte von der Schaumstofflagerung auf den Körper übertragen werden. Diese Kraftübertragung erfolgt möglichst großflächig. Durch das permanente Nutzen der Schaumstofflagerung kann sich ihr Zustand verändern, sodass eine Änderung des Hilfsmittels nötig wird. Bitte wenden sich in diesen Fällen an ihren Orthopädietechniker.\nAbhängig von Ihrer Indikation können im Einzelfall einige Komplikationen mit der Schaumstofflagerungsversorgung auftreten. Zur Funktionserhaltung und -verbesserung des betroffenen Körperteils sind in der Regel bewegungsfreundliche Freizeitaktivitäten, und Gymnastik geeignete Maßnahmen.\n \nIndikationen\nÜbergeordnet betrachtete Indikationen für den Einsatz von Schaumstofflagerungen sind Krankheitsbilder oder Fehlstellungen, die hauptsächlich eines oder mehrere anatomische Segmente und/ oder Strukturen der unteren Extremität und des Rumpfes betreffen und die einer Entlastung, Immobilisierung, Korrektur oder Stabilisierung bedürfen. Diese pathologischen Zustände können auftreten durch\n• Krankheitsbedingte Veränderungen\n• Erworbene oder angeborene Fehlstellungen\n• Erworbene oder angeborene Funktionsstörungen\n• Operative Eingriffe\n• Traumata, Verletzungen\nDer Einsatz einer Schaumstofflagerung kann durch eine einzeln auftretende Indikation, eine Kombination aus mehreren Indikationen oder aufgrund der Spätfolge einer Erkrankung begründet sein.\n \nKontraindikationen\nAllgemein geltende Kontraindikationen, welche die Anwendung einer Schaumstofflagerung ausschließen sind:\n• Fehlende Compliance des Patienten\n• Unverträglichkeiten gegenüber den verwendeten Materialien (Allergien) oder Eigenschweißreaktionen\n• Kognitive Einschränkungen, die eine sichere Handhabung der Schaumstofflagerung durch dritte verhindern.\nZudem können Kontraindikationen vorliegen, die speziell den Versorgungsbereich betreffen:\n• Nicht belastbare Knochen- oder Weichteilstrukturen\n• Verminderte Belastbarkeit der Haut"
+					}
+				]
+			]
+		}
+	},
+	{
+		"comment": "following are orthotics ii documents #################################################################################################"
+	},
+	{
+		"name": "Konfektionsversorgung",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Datenverarbeitung Auftragserteilung Schweigepflichtentbindung,Konfektionsversorgung Orthetik II"
+	},
+	{
+		"name": "Anamnese Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Anamnese Schaumstofflagerung Orthetik II"
+	},
+	{
+		"name": "Anamnese Kompressionstherapie Flachstrick Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Anamnese Kompressionstherapie Flachstrick Orthetik II"
+	},
+	{
+		"name": "Maßblatt Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Maßblatt Schaumstofflagerung Orthetik II"
+	},
+	{
+		"name": "Versorgungsplanung Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung Schaumstofflagerung Orthetik II"
+	},
+	{
+		"name": "Versorgungsplanung Kompressionstherapie Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Versorgungsplanung Kompressionstherapie Orthetik II"
+	},
+	{
+		"name": "Checkliste Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Checkliste Schaumstofflagerung Orthetik II"
+	},
+	{
+		"name": "Abgabeprotokoll Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Abgabeprotokoll Schaumstofflagerung Orthetik II"
+	},
+	{
+		"name": "Abgabeprotokoll Kompressionstherapie Orthetik II",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
+		"permitted_export": 1,
+		"restricted_access": null,
+		"content": "Identifikator,Abgabeprotokoll Kompressionstherapie Orthetik II"
+	},
+	{
+		"name": "Gebrauchsanweisung Schaumstofflagerungen",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "orthotics1",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
+		"permitted_export": true,
+		"restricted_access": null,
+		"content": "Identifikator,Konformitätserklärung,Gebrauchsanweisung Allgemein,Gebrauchsanweisung Warnungen Einsatzbereich Schaumstofflagerungen Orthetik II,Gebrauchsanweisung Handhabung,Gebrauchsanweisung Beschreibung Komponenten Schaumstofflagerungen Orthetik II,Gebrauchsanweisung Medizinische Aspekte Schaumstofflagerungen Orthetik II,Gebrauchsanweisung Körperpflege,Gebrauchsanweisung Reinigung,Gebrauchsanweisung Instandhaltung,Gebrauchsanweisung Entsorgung,Gebrauchsanweisung Therapeuteninformation"
+	},
+	{
+		"comment": "following are orthotics ii bundles #################################################################################################"
+	},
+	{
+		"name": "Konfektionsversorgung",
+		"alias": "",
+		"context": "bundle",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Konfektionsversorgung,Empfangsbestätigung"
+	},
+	{
+		"name": "Versorgungsdokumentation Schaumstofflagerung Orthetik II",
+		"alias": "",
+		"context": "bundle",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Erlaubnis zur Ausstellung und Veröffentlichung,Anamnese Schaumstofflagerung Orthetik II,Maßblatt Schaumstofflagerung Orthetik II,Versorgungsplanung Schaumstofflagerung Orthetik II,Versorgungsmaßnahme,Versorgungsausführung,Checkliste Schaumstofflagerung Orthetik II,Abgabeprotokoll Schaumstofflagerung Orthetik II,Gebrauchsanweisung Schaumstofflagerungen,Empfangsbestätigung"
+	},
+	{
+		"name": "Versorgungsdokumentation Kompressionstherapie Serie Orthetik II",
+		"alias": "",
+		"context": "bundle",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Versorgungsplanung Kompressionstherapie Orthetik II,Versorgungsmaßnahme,Abgabeprotokoll Kompressionstherapie Orthetik II,Empfangsbestätigung"
+	},
+	{
+		"name": "Versorgungsdokumentation Kompressionstherapie Flachstrick Orthetik II",
+		"alias": "",
+		"context": "bundle",
+		"unit": "orthotics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Basisdaten,Datenverarbeitung - Auftragserteilung - Schweigepflichtentbindung,Anamnese Kompressionstherapie Flachstrick Orthetik II,Versorgungsplanung Kompressionstherapie Orthetik II,Versorgungsmaßnahme,Abgabeprotokoll Kompressionstherapie Orthetik II,Empfangsbestätigung"
+	}
+]

@@ -807,224 +807,6 @@
 		}
 	},
 	{
-		"name": "Konfektionsversorgung",
-		"alias": "",
-		"context": "component",
-		"unit": "common",
-		"author": "Caro App",
-		"regulatory_context": "",
-		"permitted_export": null,
-		"restricted_access": null,
-		"content": {
-			"content": [
-				[
-					{
-						"type": "text",
-						"attributes": {
-							"name": "Name",
-							"required": true
-						}
-					},
-					{
-						"type": "date",
-						"attributes": {
-							"name": "Geburtsdatum"
-						}
-					},
-					{
-						"type": "textarea",
-						"attributes": {
-							"name": "Adresse"
-						}
-					},
-					{
-						"type": "tel",
-						"attributes": {
-							"name": "Telefonnummer"
-						}
-					},
-					{
-						"type": "text",
-						"attributes": {
-							"name": "Kostenträger"
-						}
-					},
-					{
-						"type": "textarea",
-						"attributes": {
-							"name": "Info"
-						},
-						"hint": "Kontaktperson, Adressbesonderheiten"
-					}
-				],
-				[
-					{
-						"type": "textarea",
-						"attributes": {
-							"name": "Leistung, Produkt oder Verordnungstext"
-						},
-						"autocomplete": true
-					},
-					{
-						"type": "text",
-						"attributes": {
-							"name": "Verordner"
-						},
-						"hint": "namentlich",
-						"autocomplete": true
-					}
-				],
-				[
-					{
-						"type": "textarea",
-						"attributes": {
-							"name": "Maße, Einstellungen"
-						}
-					},
-					{
-						"type": "scanner",
-						"attributes": {
-							"name": "UDI, LOT"
-						},
-						"hint": "sofern zutreffend"
-					},
-					{
-						"type": "textarea",
-						"attributes": {
-							"name": "Arbeitszeit, Material"
-						},
-						"hint": "sofern zutreffend",
-						"autocomplete": true
-					}
-				]
-			]
-		}
-	},
-	{
-		"name": "Produkteinführung",
-		"alias": "",
-		"context": "component",
-		"unit": "common",
-		"author": "Caro App",
-		"regulatory_context": "",
-		"permitted_export": null,
-		"restricted_access": null,
-		"content": {
-			"content": [
-				[
-					{
-						"type": "checkbox",
-						"attributes": {
-							"name": "Übergangsregelung"
-						},
-						"content": {
-							"Das Produkt ist bereits zuvor eingeführt worden": []
-						},
-						"hint": "Du bestätigst damit eigenverantwortlich, dass die erforderlichen Prüfungen und Unterlagen bereits vorliegen."
-					},
-					{
-						"type": "checkbox",
-						"attributes": {
-							"name": "Produkteinführung"
-						},
-						"content": {
-							"Sicherheitsdatenblatt": [],
-							"Preis/Leistung angemessen": [],
-							"Lagerplatz vorhanden": [],
-							"Lagerbedingungen erfüllbar": [],
-							"Min/Max Bestand erforderlich": [],
-							"Zertifizierung erforderlich": [],
-							"Anpassung Risikoanalyse erforderlich": [],
-							"Arbeitsanweisung erforderlich": []
-						}
-					},
-					{
-						"type": "text",
-						"attributes": {
-							"name": "Ersatz für"
-						}
-					}
-				]
-			]
-		}
-	},
-	{
-		"name": "Stichprobenprüfung",
-		"alias": "",
-		"context": "component",
-		"unit": "common",
-		"author": "Caro App",
-		"regulatory_context": "",
-		"permitted_export": null,
-		"restricted_access": null,
-		"content": {
-			"content": [
-				[
-					{
-						"type": "checkbox",
-						"attributes": {
-							"name": "Allgemein"
-						},
-						"content": {
-							"CE-Kennzeichnung mit aktueller EU-Konformitätserklärung": [],
-							"Angabe des Herstellers, Importeurs oder EU-Repräsentanten falls zutreffend": [],
-							"Sonderanfertigungskennzeichnung": [],
-							"Angabe des Handelsnamens": [],
-							"Angabe worum es sich handelt": [],
-							"Hinweis auf Medizinprodukt": [],
-							"UDI-Code vorhanden": [],
-							"Haltbarkeitsdatum oder Herstellungsdatum und Verwendungszeitraum": [],
-							"Lagerungs- und Handhabungsbedingungen": []
-						}
-					},
-					{
-						"type": "checkbox",
-						"attributes": {
-							"name": "Erforderliche Angaben der Gebrauchsanweisung"
-						},
-						"content": {
-							"Produktname": [],
-							"Hersteller und Anschrift": [],
-							"Zweckbestimmung und Indikation": [],
-							"Kontraindikationen": [],
-							"vorgesehene Anwender": [],
-							"Restrisiken und Nebenwirkungen": [],
-							"Klinischer Nutzen": [],
-							"Leistungsmerkmale": [],
-							"Schulungen oder Qualifikation zur Prüfung durch Fachpersonal": [],
-							"Nutzungshinweise für Anwender": [],
-							"Aufbereitungsverfahren sofern zum Wiedereinsatz vorgesehen": [],
-							"Lagerungs- und Handhabungshinweise": []
-						}
-					},
-					{
-						"type": "text",
-						"attributes": {
-							"name": "Ausstellungsdatum oder Version der Gebrauchsanweisung"
-						}
-					},
-					{
-						"type": "checkbox",
-						"attributes": {
-							"name": "Angaben sofern zutreffend"
-						},
-						"content": {
-							"Angaben zur Sterilität": [],
-							"Hinweis auf Einmalprodukt": [],
-							"Zusammensetzung": [],
-							"Biologische Inhaltsstoffe": [],
-							"Erforderliche Vorbehandlungen": [],
-							"Prüfung der Installation": [],
-							"Instandhaltungsmaßnahmen, Ersatz von Verbrauchskomponenten, Kalibrationsmaßnahmen": [],
-							"Wahl und Einschränkungen von kombinierbaren Produkten": [],
-							"Warnungen, Vorsichshinweise, Maßnahmenempfehlungen oder Verwendungsbeschränkungen sofern zutreffend": []
-						}
-					}
-				]
-			]
-		}
-	},
-	{
 		"name": "Schulungsbewertung",
 		"alias": "",
 		"context": "component",
@@ -1118,6 +900,12 @@
 							"keines": [],
 							"ISO 13485": [],
 							"ISO 9001": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"Besondere Risikobetrachtung": []
 						}
 					},
 					{
@@ -1386,39 +1174,6 @@
 		"content": "Identifikator,Vorgangsprotokoll"
 	},
 	{
-		"name": "Konfektionsversorgung",
-		"alias": "",
-		"context": "casedocumentation",
-		"unit": "common",
-		"author": "Caro App",
-		"regulatory_context": "iso13485_7_2_1,iso13485_7_2_2,iso13485_7_5_1",
-		"permitted_export": 1,
-		"restricted_access": null,
-		"content": "Identifikator,Datenverarbeitung Auftragserteilung Schweigepflichtentbindung,Konfektionsversorgung"
-	},
-	{
-		"name": "Produkteinführung",
-		"alias": "",
-		"context": "product_incorporation_document",
-		"unit": "common",
-		"author": "Caro App",
-		"regulatory_context": "iso13485_7_4_1,iso13485_7_4_2,iso13485_7_4_3",
-		"permitted_export": null,
-		"restricted_access": null,
-		"content": "Produkteinführung"
-	},
-	{
-		"name": "Stichprobenprüfung",
-		"alias": "",
-		"context": "mdr_sample_check_document",
-		"unit": "common",
-		"author": "Caro App",
-		"regulatory_context": "iso13485_7_4_3,mdr14",
-		"permitted_export": null,
-		"restricted_access": null,
-		"content": "Stichprobenprüfung"
-	},
-	{
 		"name": "Schulungsbewertung",
 		"alias": "",
 		"context": "training_evaluation_document",
@@ -1450,20 +1205,5 @@
 		"permitted_export": null,
 		"restricted_access": "prrc,qmo,ceo",
 		"content": "Identifikator,Vorkommnismeldung"
-	},
-		{
-		"comment": "following are prosthetics ii bundles #################################################################################################"
-	},
-	{
-		"name": "Konfektionsversorgung",
-		"alias": "",
-		"context": "bundle",
-		"unit": "common",
-		"author": "Caro App",
-		"regulatory_context": "",
-		"permitted_export": null,
-		"restricted_access": null,
-		"content": "Konfektionsversorgung,Empfangsbestätigung"
 	}
-
 ]

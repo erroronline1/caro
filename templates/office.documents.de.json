@@ -1,0 +1,271 @@
+[
+	{
+		"comment": "following are purchase components #################################################################################################"
+	},
+	{
+		"name": "Produkteinführung",
+		"alias": "",
+		"context": "component",
+		"unit": "office",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Übergangsregelung"
+						},
+						"content": {
+							"Das Produkt ist bereits zuvor eingeführt worden": []
+						},
+						"hint": "Du bestätigst damit eigenverantwortlich, dass die erforderlichen Prüfungen und Unterlagen bereits vorliegen."
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Produkteinführung"
+						},
+						"content": {
+							"Sicherheitsdatenblatt": [],
+							"Preis/Leistung angemessen": [],
+							"Lagerplatz vorhanden": [],
+							"Lagerbedingungen erfüllbar": [],
+							"Min/Max Bestand erforderlich": [],
+							"Zertifizierung erforderlich": [],
+							"Anpassung Risikoanalyse erforderlich": [],
+							"Arbeitsanweisung erforderlich": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ersatz für"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Stichprobenprüfung",
+		"alias": "",
+		"context": "component",
+		"unit": "office",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Allgemein"
+						},
+						"content": {
+							"CE-Kennzeichnung mit aktueller EU-Konformitätserklärung": [],
+							"Angabe des Herstellers, Importeurs oder EU-Repräsentanten falls zutreffend": [],
+							"Sonderanfertigungskennzeichnung": [],
+							"Angabe des Handelsnamens": [],
+							"Angabe worum es sich handelt": [],
+							"Hinweis auf Medizinprodukt": [],
+							"UDI-Code vorhanden": [],
+							"Haltbarkeitsdatum oder Herstellungsdatum und Verwendungszeitraum": [],
+							"Lagerungs- und Handhabungsbedingungen": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Erforderliche Angaben der Gebrauchsanweisung"
+						},
+						"content": {
+							"Produktname": [],
+							"Hersteller und Anschrift": [],
+							"Zweckbestimmung und Indikation": [],
+							"Kontraindikationen": [],
+							"vorgesehene Anwender": [],
+							"Restrisiken und Nebenwirkungen": [],
+							"Klinischer Nutzen": [],
+							"Leistungsmerkmale": [],
+							"Schulungen oder Qualifikation zur Prüfung durch Fachpersonal": [],
+							"Nutzungshinweise für Anwender": [],
+							"Aufbereitungsverfahren sofern zum Wiedereinsatz vorgesehen": [],
+							"Lagerungs- und Handhabungshinweise": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ausstellungsdatum oder Version der Gebrauchsanweisung"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Angaben sofern zutreffend"
+						},
+						"content": {
+							"Angaben zur Sterilität": [],
+							"Hinweis auf Einmalprodukt": [],
+							"Zusammensetzung": [],
+							"Biologische Inhaltsstoffe": [],
+							"Erforderliche Vorbehandlungen": [],
+							"Prüfung der Installation": [],
+							"Instandhaltungsmaßnahmen, Ersatz von Verbrauchskomponenten, Kalibrationsmaßnahmen": [],
+							"Wahl und Einschränkungen von kombinierbaren Produkten": [],
+							"Warnungen, Vorsichshinweise, Maßnahmenempfehlungen oder Verwendungsbeschränkungen sofern zutreffend": []
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"name": "Qualitätsvereinbarung",
+		"alias": "",
+		"context": "component",
+		"unit": "office",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "identify",
+						"attributes": {
+							"name": "Qualitätsvereinbarung"
+						},
+						"hint": "Es wird empfohlen die Aufzeichnung zuerst anzulegen und dann zu exportieren um einen adäquaten Ausdruck für die Unterzeichnung zu erhalten. Das Unterzeichnete Dokumente kann im Nachhinein zu dieser Aufzeichnung angefügt werden."
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Zweck"
+						},
+						"content": "Dieses Dokument dient der dokumentierten Qualitätsvereinbarung zwischen dem Auftraggeber und dem folgenden benannten Qualitätspartner zur Erfüllung der Qualitätskriterien im Sinne eines ausgegliederten Prozesses zur Einhaltung der regulatorischen Anforderungen nach Medical Device Regulation und ISO 13485 Absatz 4.1.5. Der Qualitätspartner verpflichtet sich zur unverzüglichen Anzeige gegenüber dem Auftraggeber im Falle von Änderungen welche das Produkt beeinflussen."
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Qualitätspartner"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Adresse"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Telefon, Fax, eMail"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Ansprechpartner"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Zertifikat"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Unbedenklichkeitsbescheinigung (sofern vorhanden)"
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Alternative Bescheinigungen"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Leistungsbeschreibung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Vereinbarte Begleitinformationen"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Qualitätsvereinbarung"
+						}
+					},
+					{
+						"type": "file",
+						"attributes": {
+							"name": "Begleitdokumente",
+							"multiple": true
+						},
+						"hint": "Bestätigung, Zertifikate, etc. können hier angehängt werden"
+					},
+					{
+						"type": "signature",
+						"attributes": {
+							"name": "Datum, Unterschrift Auftraggeber und Qualitätspartner"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
+		"comment": "following are purchase documents #################################################################################################"
+	},
+	{
+		"name": "Produkteinführung",
+		"alias": "",
+		"context": "product_incorporation_document",
+		"unit": "office",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_4_1,iso13485_7_4_2,iso13485_7_4_3",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Produkteinführung"
+	},
+	{
+		"name": "Stichprobenprüfung",
+		"alias": "",
+		"context": "mdr_sample_check_document",
+		"unit": "office",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_4_3,mdr14",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Stichprobenprüfung"
+	},
+	{
+		"name": "Qualitätsvereinbarung",
+		"alias": "",
+		"context": "generalrecords",
+		"unit": "office",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_4_1_5",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Qualitätsvereinbarung"
+	}
+]
