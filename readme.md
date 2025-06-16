@@ -31,6 +31,9 @@ Things are still in motion. Images my be outdated.
 * templates
 * responsibilities
     * handle hidden attribute?
+* complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
+    * devops folder with prepared sheets?
+* files filter by folder like units for documents - file.php 844
 
 ## Content
 * [Aims](#aims)
