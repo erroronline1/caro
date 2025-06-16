@@ -1154,15 +1154,17 @@ class RECORD extends API {
 				// process bundles
 				foreach($bundles as $bundle => $necessarydocuments){
 					$recommendation = [];
-					foreach(array_diff($necessarydocuments, $includedDocuments) as $recommended){ // possible missing documents
-						if (in_array($recommended, $validDocuments)) // document is permitted
-						$recommendation[$recommended] = ['href' => "javascript:api.record('get', 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
+					if (array_intersect($necessarydocuments, $includedDocuments)){
+						foreach(array_diff($necessarydocuments, $includedDocuments) as $recommended){ // possible missing documents
+							if (in_array($recommended, $validDocuments)) // document is permitted
+							$recommendation[$recommended] = ['href' => "javascript:api.record('get', 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
+						}
+						if ($recommendation) $body[] = [[
+							'type' => 'links',
+							'description' => $this->_lang->GET('record.append_missing_document') . ' ' . $bundle,
+							'content' => $recommendation
+						]];
 					}
-					if ($recommendation) $body[] = [[
-						'type' => 'links',
-						'description' => $this->_lang->GET('record.append_missing_document') . ' ' . $bundle,
-						'content' => $recommendation
-					]];
 				}
 
 				// append record_altering_pseudodocument
