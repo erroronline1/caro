@@ -151,9 +151,10 @@
 						}
 					},
 					{
-						"type": "textarea",
+						"type": "scanner",
 						"attributes": {
-							"name": "Verwendete Materialien im Hautkontakt"
+							"name": "Verwendete Materialien im Hautkontakt",
+							"multiple": true
 						}
 					},
 					{

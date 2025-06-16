@@ -3064,7 +3064,12 @@
 						},
 						"content": {
 							"...": [],
-							"Armierungsplan Orthetik I TBA": []
+							"Armierungsplan Orthetik I Spring-Feder (leichte Version)": [],
+							"Armierungsplan Orthetik I Spring-Feder (verstärkte Version)": [],
+							"Armierungsplan Orthetik I USCO (leichte Version": [],
+							"Armierungsplan Orthetik I USCO (verstärkte Version)": [],
+							"Armierungsplan Orthetik I OSCO (verstärkte Version) mit Fußschienen für Kinder 17F55=5/=6": [],
+							"Armierungsplan Orthetik I OSCO (verstärkte Version) mit Fußschienen für Kinder 17B65, 17B66": []
 						}
 					},
 					{
@@ -5492,7 +5497,7 @@
 						"attributes": {
 							"name": "Zweck"
 						},
-						"content": "Diese Arbeitsanweisung beschreibt die Armierung von Schäften und Verbindungssegmenten für Prothesen der oberen Extremität. Dabei definiert sie bewährte Standardarmierungen. Eine Anpassung der Armierung an die individuellen Anforderungen ist weiterhin zulässig und nach Rücksprache mit dem fachlichen Leiter durchzuführen."
+						"content": "Diese Arbeitsanweisung beschreibt die Armierung von Schäften und Verbindungssegmenten für Orthesen der unteren Extremität. Dabei definiert sie bewährte Standardarmierungen. Eine Anpassung der Armierung an die individuellen Anforderungen ist weiterhin zulässig und nach Rücksprache mit dem fachlichen Leiter durchzuführen."
 					},
 					{
 						"type": "textsection",
@@ -5504,34 +5509,41 @@
 					{
 						"type": "textsection",
 						"attributes": {
+							"name": "Begriffe"
+						},
+						"content": "uni, UD = unidirektionale Faserrichtung (====)\nbi, BD = bidirektionale Faserrichtung (####)\n-matte = Gewebematten, typischerweise bidirektional, Köperbindung, keine Gelegematten\nUS = Unterschenkel\nRF = Rückfuß\nMF = Mittelfuß\nFA = Federansatz Sohle"
+					},
+					{
+						"type": "textsection",
+						"attributes": {
 							"name": "Zuständigkeiten"
 						},
-						"content": "Zuständig für die Armierung von Prothesen der oberen Extremität sind alle hierfür qualifizierten Mitarbeiter. Jeder Mitarbeiter ist für die korrekte Ausführung seiner ihm übertragenen Tätigkeiten sowie der erforderlichen Dokumentation selbst verantwortlich."
+						"content": "Zuständig für die Armierung von Orthesen der unteren Extremität sind alle hierfür qualifizierten Mitarbeiter. Jeder Mitarbeiter ist für die korrekte Ausführung seiner ihm übertragenen Tätigkeiten sowie der erforderlichen Dokumentation selbst verantwortlich."
 					},
 					{
 						"type": "textsection",
 						"attributes": {
 							"name": "Beschreibung"
 						},
-						"content": "Die Ausführung der Armierungen legt die Lagen und Reihenfolge der Armierungsgewebe sowie möglicher einzugießender Komponenten fest. Dummies, Gießabdeckungen, Aufschneidhilfen, Drainage-Trikos, Folienschläuche oder Flüssigfolie sind gesondert und typischerweise im Vorfeld der Armierung zu berücksichtigen. Die Abbildungen dienen der Veranschaulichung unidirektionaler Verstärkungen gemäß typischer Belastungsverläufe. Eingussringe mit Nuten sind entsprechend zu berücksichtigen, hier gilt grundsätzlich, dass die belastungsrelevanten Armierungsfasern wie Carbon oder Glas in einzelnen Lagen in den Nuten abgebunden werden um eine sichere Verankerung zu gewährleisten."
+						"content": "Die Ausführung der Armierungen legt die Lagen und Reihenfolge der Armierungsgewebe sowie möglicher einzugießender Komponenten fest. Dummies, Gießabdeckungen, Aufschneidhilfen, Drainage-Trikos, Folienschläuche oder Flüssigfolie sind gesondert und typischerweise im Vorfeld der Armierung zu berücksichtigen. Gelenke und Schienen mit Nuten sind entsprechend zu berücksichtigen, hier gilt grundsätzlich, dass die belastungsrelevanten Armierungsfasern wie Carbon oder Glas in einzelnen Lagen in den Nuten abgebunden werden um eine sichere Verankerung zu gewährleisten."
 					}
 				],
 				[
 					{
 						"type": "textsection",
 						"attributes": {
-							"name": "Unterarmtestschaft"
+							"name": "Spring-Feder (leichte Version)"
 						},
-						"content": "1 Perlon\n1 Glasmatte 90 Grad komplett\n1 Perlon\n1 Glasmatte 45 Grad komplett\n1 Perlon"
+						"content": "1. PVA-Folie\n2. Stellen wie Achsen, Nähte, Nägel etc. werden mit PE-Klebeband vor dem Beschädigen der PVA-Folie geschützt.\n3. Ein Perlon-Trikotschlauch\n4. Sohle:\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in den Vorfuß\n- Carbonfaser-Gewebematten 45° Zuschnitt\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in denVorfuß\n5. Anlage:\nGlasfasermatte\nCarbonfaser-Gewebematten\n6. Perlon Trikotschlauch\n7. Feder\nproximales Federende:\n1. Aluklebeband, PE-Keil\n2. wachsen\n3. „Kasten“ aus Flauschband nähen, abfadeln\n4. Carbonmattenzuschnitt 90° über Kasten\n5. 2 x Carbonfaserschlauch doppelt über Feder\ndistale Feder:\n6. Carbonfaserschlauch 25mm doppelt über plantaren Federbereich, vernähen\n7. Feder mit Sprühkleber an Modell fixieren\n8. Anlage\nCarbonfaser-Gewebematten und Glasmatte über proximales Federende\n9. Sohle\n- Carbonfaser-Gewebematten 45° - Zuschnitt\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in den Vorfuß\n- Carbonfaser-Gewebematten 45° -Zuschnitt\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in den Vorfuß\n10. Perlon Trikotschlauch\n11. Dekostoff\n12. PVA-Folie"
 					}
 				],
 				[
 					{
 						"type": "textsection",
 						"attributes": {
-							"name": "Oberarm"
+							"name": "Spring-Feder (verstärkte Version)"
 						},
-						"content": "1 Perlon\n1 Carbonmatte komplett 90 Grad\n1 Carbon uni 50mm Mitte vordere Abstemmplatte, zirkulär unter Achselbank, Mitte hintere Abstemmplatte, lateral gekreuzt\n1 Carbon uni 25mm Verlauf wie zuvor\n2 Nylglas\n 1 Carbon uni 25mm Verlauf wie zuvor\n1 Carbon uni 50mm Verlauf wie zuvor\n1 Carbonmatte komplett 45 Grad\n1 Perlon"
+						"content": "1. PVA-Folie\n2. Stellen wie Achsen, Nähte, Nägel etc. werden mit PE-Klebeband vor dem Beschädigen der PVA-Folie geschützt.\n3. Ein Schlauch-Strumpf Art.-Nr. 99B25\n4. Sohle:\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in den Vorfuß\n- Carbonfaser-Gewebematten 45° Zuschnitt (2 St.)\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in den Vorfuß\n- Carbonfaserband unidirektional über Abrollkante, Kohleschlauch 25mm um Ferse und Abrollkante\n5. Anlage:\nCarbonfaser-Gewebematten\nCarbonfaser-Gewebematten 45° Zuschnitt\n6. Ein Schlauch-Strumpf Art.-Nr. 99B25\n7. Feder\nproximales Federende:\n1. Aluklebeband, RE-Keil\n2. Wachsen\n3. „Kasten“ aus Flauschband nähen, abfadeln\n4. Carbonmattenzuschnitt 90° über Kasten\n5. 2 x Carbonfaserschlauch doppelt über Feder\ndistale Feder:\n6. Carbonfaserschlauch 25mm doppelt über plantaren Federbereich, vernähen\n7. Feder mit Faden an Modell fixieren\n8. Anlage\nCarbonfaser-Gewebematten über proximales Federende\n9. Sohle\n- Carbonfaser-Gewebematten 45° - Zuschnitt\n- Carbonfaserband unidirektional über Abrollkante\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in den Vorfuß\n- Carbonfaser-Gewebematten 45° -Zuschnitt\n- Carbonfaserband unidirektional 45mm von den Gelenken aus als Steigbügel und entlang der Längsgewölbe bis in den Vorfuß\n10. Ein Schlauch-Strumpf Art.-Nr. 99B25\n11. PVA-Folie\n12. zuschleifen\n13. übergießen\n14. PVA-Folie\n15. 3 x Perlon / Glasmatte im Kondylenbereich\n16. Dekostoff\n17. PVA-Folie"
 					}
 				]
 			]
