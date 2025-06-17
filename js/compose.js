@@ -444,6 +444,7 @@ export class Composer {
 			restricted_access = document.getElementById("ComponentRestrictedAccess").value,
 			hidden = document.querySelector("[data-hiddenradio]") ? document.querySelector("[data-hiddenradio]").checked : false,
 			permitted_export = document.getElementById("ComponentPermittedExport") ? document.getElementById("ComponentPermittedExport").checked : false,
+			patient_access = document.getElementById("ComponentPatientAccess") ? document.getElementById("ComponentPatientAccess").checked : false,
 			data = new FormData();
 		let content = [];
 		// iterate over main node and gather data-name for components
@@ -460,6 +461,7 @@ export class Composer {
 			data.append("regulatory_context", regulatory_context);
 			data.append("permitted_export", permitted_export);
 			data.append("restricted_access", restricted_access);
+			data.append("patient_access", patient_access);
 			return data;
 		}
 		new Toast(api._lang.GET("assemble.compose.document.document_not_saved_missing"), "error");
@@ -1416,7 +1418,8 @@ export class Compose extends Assemble {
 			approve = this.currentElement.approve,
 			regulatory_context = this.currentElement.regulatory_context,
 			permitted_export = this.currentElement.permitted_export,
-			restricted_access = this.currentElement.restricted_access;
+			restricted_access = this.currentElement.restricted_access,
+			patient_access = this.currentElement.patient_access;
 
 		// input for component / document name
 		this.currentElement = {
@@ -1472,6 +1475,17 @@ export class Compose extends Assemble {
 				type: "checkbox",
 				hint: permitted_export.hint,
 				content: permitted_export.content,
+				"data-loss": "prevent",
+			};
+			result = result.concat(...this.checkbox());
+		}
+
+		// toggle for document patient access
+		if (patient_access) {
+			patient_access.content[Object.keys(patient_access.content)[0]]["id"] = "ComponentPatientAccess";
+			this.currentElement = {
+				type: "checkbox",
+				content: patient_access.content,
 				"data-loss": "prevent",
 			};
 			result = result.concat(...this.checkbox());
@@ -1667,7 +1681,13 @@ export class Compose extends Assemble {
 	 * 				"permission group c": [],
 	 * 				...
 	 * 			}
-	 * 		}
+	 * 		},
+	 * 		"patient_access": {
+	 * 			"hint": "please take into account that...",
+	 * 			"content": {
+	 * 				"patient account may access": []
+	 * 			}
+	 * 		},
 	 * 	}
 	 */
 	compose_document() {

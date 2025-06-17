@@ -792,5 +792,33 @@ class PERMISSION {
 		if (gettype($auth) === 'string') $auth = preg_split('/\W+/', $auth);
 		return array_intersect(['admin', ...$auth], $_SESSION['user']['permissions']);
 	}
+
+	/**
+	 *   ___ _ _ _                 _                 
+	 *  |  _|_| | |_ ___ ___ ___ _| |_ _ ___ ___ ___ 
+	 *  |  _| | |  _| -_|  _| -_| . | | |_ -| -_|  _|
+	 *  |_| |_|_|_| |___|_| |___|___|___|___|___|_|  
+	 *
+	 * user filter
+	 * skips system user and patients by default if not specified otherwise
+	 * @param array $user database row
+	 * @param array $filter with id, permission or unit as arrays
+	 * @return bool
+	 */
+	public static function filteredUser($user, $filter = ['id' => [1], 'permission' => ['patient']]) {
+		if (isset($filter['id']) && isset($user['id'])) {
+			if (in_array(intval($user['id']), array_map(fn($id) => intval($id), $filter['id']))) return true;
+		}
+		if (isset($filter['permission']) && isset($user['permissions'])) {
+			if (gettype($user['permissions']) !== 'array') $user['permissions'] = explode(',', $user['permissions'] ? : '');
+			if ($user['permissions'] && array_intersect($user['permissions'], $filter['permission'])) return true;
+		}
+		if (isset($filter['unit']) && isset($user['units'])) {
+			if (gettype($user['units']) !== 'array') $user['units'] = explode(',', $user['units'] ? : '');
+			if ($user['units'] && array_intersect($user['units'], $filter['unit'])) return true;
+		}
+		return false;
+	}
+
 }
 ?>

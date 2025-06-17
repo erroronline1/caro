@@ -7,6 +7,7 @@
 		"phone": "01234 567890"
 	},
 	"permissions": {
+		"patient": "Patient",
 		"user": "User",
 		"group": "Group",
 		"medicaldeviceconsultant": "Medical device consultant",
@@ -306,7 +307,7 @@
 				"component_not_saved": "Component could not been saved",
 				"component_not_saved_missing": "Component could not been saved. Please provide a name, content and unit for approval!",
 				"component_saved": "Component :name has been saved",
-				"components_info_content": "Choose available elements from this panel. Set your parameters and add fields. Be specific with input names and try to avoid repeating names within components and documents. Add a hint when in doubt.\n \nChange your order by dragging the elements. During composing indicators for containers might not be available. Dragging is available on devices with mice only. You can relocate or delete elements with right-click as well. Reordered images will disappear but still saved.\n \nTo edit an existing element you can drag it onto its creation mask to import its values. You have to delete and reinsert the element, and it doesn't work for images though.",
+				"components_info_content": "Choose available elements from this panel. Set your parameters and add fields. Be specific with input names and try to avoid repeating names within components and documents. Add a hint when in doubt.\n \nChange your order by dragging the elements. During composing indicators for containers might not be available. Dragging is available on devices with mice only. You can relocate or delete elements with right-click as well. Reordered images will disappear but still saved.\n \nTo edit an existing element you can drag it onto its creation mask to import its values. You have to delete and reinsert the element, and it doesn't work for images though.\n \nIf components are meant to be accessible by patients, autocomplete should not be used for data safety reasons.",
 				"components_info_description": "What to do",
 				"context_forbidden_names": "This context forbids following names: :names. Please revise used components!",
 				"context_identify": "Context identifier",
@@ -397,6 +398,7 @@
 				"document_not_found": "Document :name could not be found in database, please try something else.",
 				"document_not_saved": "Document could not been saved",
 				"document_not_saved_missing": "Document could not been saved, Please provide a name, context, content and unit for approval!",
+				"document_patient_access": "Patient-users are allowed to use this document",
 				"document_permitted_export": "Allow export for anyone",
 				"document_permitted_export_hint": "Otherwise this is only allowed for :permissions.",
 				"document_regulatory_context": "Regulatory context",

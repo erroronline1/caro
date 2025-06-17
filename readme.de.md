@@ -145,6 +145,9 @@ Manche Berechtigungen/Einschränkungen sind jedoch systemisch festgelegt:
 
 Die Zeiterfassung ist nur erreichbar, wenn eine Wochenarbeitszeit für den Nutzer festgelegt ist - das gilt auch für den Anwendungsadministrator.
 
+* Patienten
+    * erhalten nur Zugriff auf Dokumente die mit entsprechendem Patienenzugang markiert sind für allgemeine Dokumente und die zugewiesener Bereiche
+    * nutzbar für Assessments und Selbsteinschätzungen durch Patienten durch Nutzer mit entsprechender Patienten-Berechtigung je Bereich sofern zutreffend
 * Mitarbeiter
     * können nur Bestellungen der eigenen zugewiesenen Bereiche einsehen
     * können nur die eigenen Arbeitszeitdokumentationen exportieren
@@ -374,7 +377,7 @@ Dokument können durch die Auswahl beliebiger freigegebener Komponenten zusammen
 
 Dokumente können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
 
-Dokumente können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche).
+Dokumente können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche). Dokumente können auch als für Patienten zugänglich markiert werden. Nutzer mit `Patient`-Berechtigung können von der Starseite aus auf diese Dokumente zugreifen und mit Selbsteinschätzungen zu Aufzeichnungen beitragen.
 
 Dokumente können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Foto- und Dateiuploads sowie Bedienfelder durch Hinweise ersetzt und Identifikatoren in der Kopfzeile implementiert. Dokumente können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden und eine bessere Datensammlung innerhalb der Anwendung zu fördern. Ersteller der Dokumente können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird), wobei in diesem Fall die Durchsuchbarkeit und Übersicht leidet.
 

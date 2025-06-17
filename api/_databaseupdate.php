@@ -18,6 +18,7 @@
  */
 
 namespace CARO\API;
+
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
@@ -95,14 +96,20 @@ class UPDATE{
 	private function _2025_06_13(){
 		return [
 			'mysql' => [
-				"ALTER TABLE caro_calendar ADD COLUMN IF NOT EXISTS autodelete tinyint NULL DEFAULT NULL;"
+				"ALTER TABLE caro_calendar ADD COLUMN IF NOT EXISTS autodelete tinyint NULL DEFAULT NULL; " .
+				"ALTER TABLE caro_documents ADD COLUMN IF NOT EXISTS patient_access tinyint NULL DEFAULT NULL;"
 			],
 			'sqlsrv' => [
 				"IF COL_LENGTH('caro_calendar', 'autodelete') IS NULL" .
 				" BEGIN" .
 				"    ALTER TABLE caro_calendar" .
 				"    ADD autodelete TINYINT NULL DEFAULT NULL" .
-				" END;"
+				" END; " .
+				"IF COL_LENGTH('caro_documents', 'patient_access') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_documents" .
+				"    ADD patient_access TINYINT NULL DEFAULT NULL" .
+				" END; "
 			]
 		][$this->driver];
 	}

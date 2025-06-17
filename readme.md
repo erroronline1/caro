@@ -33,7 +33,8 @@ Things are still in motion. Images my be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* restricted patient access for questionnaires and assessments
+* sanitize
+    * ["app_settings"]=>string(62) "{"annualvacation":"","weeklyhours":"","initialovertime":false}"
 
 ## Content
 * [Aims](#aims)
@@ -235,20 +236,23 @@ Some permissions/restrictions are default set though:
 
 Timesheets are accessible only if weekly hours are defined for the user - even the application admin.
 
-* User
+* Patients
+    * can only access documents marked as patient accessible for common and assigned units
+    * is intended to make assessments and self reports by patients through dedicated user accounts for each unit if applicable 
+* Users
     * can see orders for own assigned organizational units only
     * can export own timesheet only
     * can perform the MDR§14 sample check and gather information for product incorporation
-* Group
+* Groups
     * can **NEVER** add records due to limited identification data
     * can place orders, but will be prompted to identify themself
     * can see orders for own assigned organizational units only
     * can **NEVER** incorporate and sample check due to limited identification data
     * can **NEVER** access nor contribute to timesheets
-* Supervisor
+* Supervisors
     * can export all timesheets of assigned unit members
     * can edit, delete and close scheduled events and timesheet entries of assigned units and unit members
-* Application admin
+* Application admins
     * **full access**
     * can approve as all eligible permission groups
     * can export all timesheets
@@ -460,7 +464,7 @@ Documents can be assembled by selecting any of the approved components. Componen
 
 Documents can have alternative search terms. A context must be provided to ensure a plausibility check for occasionally necessary elements. A regulatory context is optional but recommended.
 
-Documents can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals).
+Documents can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals). Documents can be marked as accessible for patients as well. Users with `Patient`-permission can access these documents from the landing page and can contribute to records with self reports.
 
 Documents can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Photo- and upload-options as well as buttons are replaced by a hint, identifiers are embedded in the header. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized document creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable document), while in the latter case any searchability and quick overviews suffer.
 

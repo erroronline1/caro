@@ -30,7 +30,7 @@ class DOCUMENT extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
@@ -323,7 +323,8 @@ class DOCUMENT extends API {
 					':content' => $content,
 					':regulatory_context' => '',
 					':permitted_export' => null,
-					':restricted_access' => null
+					':restricted_access' => null,
+					':patient_access' => null,
 				];
 
 				if (!trim($bundle[':name']) || !trim($bundle[':content'])) $this->response([], 400);
@@ -353,6 +354,7 @@ class DOCUMENT extends API {
 							':regulatory_context' => '',
 							':permitted_export' => null,
 							':restricted_access' => null,
+							':patient_access' => null,
 							':id' => $exists['id'],
 						]
 					])) $this->response([
@@ -763,6 +765,7 @@ class DOCUMENT extends API {
 								':regulatory_context' => '',
 								':permitted_export' => null,
 								':restricted_access' => null,
+								':patient_access' => null,
 								':id' => $exists['id'],
 							]
 						])) $this->response([
@@ -792,6 +795,7 @@ class DOCUMENT extends API {
 								':regulatory_context' => '',
 								':permitted_export' => null,
 								':restricted_access' => null,
+								':patient_access' => null,
 								':id' => $exists['id'],
 							]
 						])) $this->response([
@@ -827,7 +831,8 @@ class DOCUMENT extends API {
 						':content' => UTILITY::json_encode($component),
 						':regulatory_context' => '',
 						':permitted_export' => NULL,
-						':restricted_access' => NULL
+						':restricted_access' => NULL,
+						':patient_access' => NULL,
 					]
 				])) {
 					// alert userGroups for approval
@@ -1542,6 +1547,7 @@ class DOCUMENT extends API {
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
 								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
+								':patient_access' => $this->_payload->patient_access ? 1 : null,
 								':id' => $exists['id'],
 							]
 						])) $this->response([
@@ -1571,6 +1577,7 @@ class DOCUMENT extends API {
 								':regulatory_context' => implode(',', $regulatory_context),
 								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
 								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
+								':patient_access' => $this->_payload->patient_access ? 1 : null,
 								':id' => $exists['id'],
 							]
 						])) $this->response([
@@ -1602,7 +1609,8 @@ class DOCUMENT extends API {
 						':content' => implode(',', $this->_payload->content),
 						':regulatory_context' => implode(',', $regulatory_context),
 						':permitted_export' => $this->_payload->permitted_export ? 1 : null,
-						':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL
+						':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
+						':patient_access' => $this->_payload->patient_access ? 1 : null,
 					]
 				])) {
 						$document_id = $this->_pdo->lastInsertId();
@@ -1687,7 +1695,8 @@ class DOCUMENT extends API {
 			'regulatory_context' => '',
 			'permitted_export' => null,
 			'restricted_access' => null,
-			'approval' => null
+			'approval' => null,
+			'patient_access' => null,
 		];
 		if($this->_requestedID && $this->_requestedID !== 'false' && !$document['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('assemble.compose.document.document__not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -1834,6 +1843,13 @@ class DOCUMENT extends API {
 			]
 		];
 
+		// option for patient access permission
+		$patient_access = [
+			'content' => [
+				$this->_lang->GET('assemble.compose.document.document_patient_access') => $document['patient_access'] ? ['checked' => true]: []
+			]
+		];
+
 		// prepare list to restrict access to set permissions
 		$restricted_access = [
 			'description' => $this->_lang->GET('assemble.compose.document.document_restricted_access'),
@@ -1926,7 +1942,8 @@ class DOCUMENT extends API {
 						'approve' => $approve,
 						'regulatory_context' => $regulatory_context ? : ' ',
 						'permitted_export' => $permitted_export,
-						'restricted_access' => $restricted_access
+						'restricted_access' => $restricted_access,
+						'patient_access' => $patient_access
 					]
 				], [
 					[
@@ -1985,6 +2002,7 @@ class DOCUMENT extends API {
 		$search = new SHARED($this->_pdo, $this->_date);
 		$documents = $search->documentsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
 
+		// also see application.php start()
 		// prepare existing documents lists grouped by context
 		foreach($documents as $row) {
 			if (in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
