@@ -771,7 +771,7 @@ class RECORD extends API {
 						':id' => $document_id
 					]]);
 
-				if (!$useddocument || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+				if (!$useddocument || (!$useddocument['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
@@ -949,7 +949,7 @@ class RECORD extends API {
 							}
 						}
 						ksort($recommended);
-						if ($recommended)
+						if ($recommended && !array_intersect(['patient'], $_SESSION['user']['permissions']))
 							$this->response([
 								'response' => [
 									'msg' => $this->_lang->GET('record.saved'),
