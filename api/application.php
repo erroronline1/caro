@@ -813,9 +813,22 @@ class APPLICATION extends API {
 			$this->_lang->GET('menu.application.about') => ['onclick' => "api.application('get', 'about')"]
 			]]]);	// early exit
 
-		//////////////////////////////////
-		// default functions for everyone
-		//////////////////////////////////
+		//////////////////////////////////////
+		// default functions for patient users
+		//////////////////////////////////////
+		if (array_intersect(['patient'], $_SESSION['user']['permissions'])){
+			$this->response(['render' => [
+				$this->_lang->GET('menu.application.header') => [
+					$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authentify')"],
+					$this->_lang->GET('menu.application.start') => ['onclick' => "api.application('get', 'start')"],			
+					$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
+				]
+			]]);
+		}
+
+		///////////////////////////////////////////
+		// default functions for every regular user
+		///////////////////////////////////////////
 		$menu = [
 			// order here defines frontend order
 			$this->_lang->GET('menu.communication.header') => [
@@ -905,6 +918,8 @@ class APPLICATION extends API {
 	 */
 	public function start(){
 		if (!isset($_SESSION['user'])) $this->response([], 401);
+		// cron job
+		$cron = $this->cron();
 		$result = array_merge(['render' => ['content' => []]], $this->_auth);
 
 		// aria timeout information
@@ -917,157 +932,174 @@ class APPLICATION extends API {
 			]
 		];
 
-		// storage warning
-		$storage = round(disk_free_space("/") / pow(1024, 3), 3);
-		if ($storage < CONFIG['limits']['storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
-			$result['render']['content'][count($result['render']['content']) - 1][] = [
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
-					'class' => 'red'
-				]
-			];
+		//////////////////////////////////////
+		// default functions for patient users
+		//////////////////////////////////////
+		if (array_intersect(['patient'], $_SESSION['user']['permissions'])){
+			// also see document.php documents()
+			$documentdatalist = $displayeddocuments = [];
+			// get all documents or these fitting the search
+			require_once('_shared.php');
+			$search = new SHARED($this->_pdo, $this->_date);
+			$documents = $search->documentsearch(['search' => null]);
+			// prepare existing documents lists grouped by context
+			foreach($documents as $row) {
+				if (!$row['patient_access'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
+				if (!in_array($row['name'], $documentdatalist)) {
+					$documentdatalist[] = $row['name'];
+					// filter by unit
+					if (!in_array($row['unit'], ['common', ...$_SESSION['user']['units']])) continue;
+
+					// add to result
+					$displayeddocuments[$row['context']][$row['name']] = ['href' => "javascript:api.record('get', 'document', '" . $row['name'] . "')"];
+				}
+			}
+			// sort by context for easier comprehension
+			foreach ($displayeddocuments as $context => $list){
+				$contexttranslation = '';
+				foreach ($this->_lang->_USER['documentcontext'] as $documentcontext => $contexts){
+					if (isset($contexts[$context])){
+						$contexttranslation = $contexts[$context];
+						break;
+					}
+				}
+				$result['render']['content'][] = [
+					'type' => 'links',
+					'description' => $contexttranslation,
+					'content' => $list
+				];
+			}
 		}
 
-		// cron job
-		$cron = $this->cron();
-		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$result['render']['content'][count($result['render']['content']) - 1][] = [
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => 'CRON'
-				],
-				'content' => $cron['last']
-			];
-			$result['render']['content'][count($result['render']['content']) - 1][] = [
-				'type' => 'deletebutton',
-				'attributes' => [
-					'value' => $this->_lang->GET('application.delete_cron_log', [':count' => $cron['count']]),
-					'onclick' => "api.application('delete', 'cron_log')"
-				]
-			];
-		}
-		
-		// set up dashboard notifications
-		$tiles = [];
-		$notifications = new NOTIFICATION;
-
-		// messages
-		$unseen = $notifications->messageunseen();
-		if ($unseen) {
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onclick' => "api.message('get', 'conversation')",
-					'onkeydown' => "if (event.key==='Enter') api.message('get', 'conversation')",
-					'role' => 'link',
-					'tabindex' => '0'
-				],
-				'content' => [
-					[
-						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.dashboard.messages', [':number' => $unseen]),
-						'attributes' => [
-							'data-type' => 'message',
-							'name' => $this->_lang->GET('menu.communication.conversations')
-						]
+		///////////////////////////////////////////
+		// default functions for every regular user
+		///////////////////////////////////////////
+		else {
+			// storage warning
+			$storage = round(disk_free_space("/") / pow(1024, 3), 3);
+			if ($storage < CONFIG['limits']['storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
+				$result['render']['content'][count($result['render']['content']) - 1][] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
+						'class' => 'red'
 					]
-				]
-			];
-		}
+				];
+			}
 
-		// unprocessed orders
-		if (PERMISSION::permissionFor('orderprocessing')){
-			$unprocessed = $notifications->order();
-			if ($unprocessed) {
+			// cron job
+			if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
+				$result['render']['content'][count($result['render']['content']) - 1][] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => 'CRON'
+					],
+					'content' => $cron['last']
+				];
+				$result['render']['content'][count($result['render']['content']) - 1][] = [
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => $this->_lang->GET('application.delete_cron_log', [':count' => $cron['count']]),
+						'onclick' => "api.application('delete', 'cron_log')"
+					]
+				];
+			}
+			
+			// set up dashboard notifications
+			$tiles = [];
+			$notifications = new NOTIFICATION;
+
+			// messages
+			$unseen = $notifications->messageunseen();
+			if ($unseen) {
 				$tiles[] = [
 					'type' => 'tile',
 					'attributes' => [
-						'onclick' => "api.purchase('get', 'approved')",
-						'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'approved')",
+						'onclick' => "api.message('get', 'conversation')",
+						'onkeydown' => "if (event.key==='Enter') api.message('get', 'conversation')",
 						'role' => 'link',
 						'tabindex' => '0'
-						],
+					],
 					'content' => [
 						[
 							'type' => 'textsection',
-							'content' => $this->_lang->GET('application.dashboard.orders', [':number' => $unprocessed]),
+							'content' => $this->_lang->GET('application.dashboard.messages', [':number' => $unseen]),
 							'attributes' => [
-								'data-type' => 'purchase',
-								'name' => $this->_lang->GET('menu.purchase.approved_orders')
+								'data-type' => 'message',
+								'name' => $this->_lang->GET('menu.communication.conversations')
 							]
 						]
 					]
 				];
 			}
-		}
 
-		// prepared orders
-		if ($_SESSION['user']['orderauth']){
-			$prepared = $notifications->preparedorders();
-			if ($prepared) {
-				$tiles[] = [
-					'type' => 'tile',
-					'attributes' => [
-						'onclick' => "api.purchase('get', 'prepared')",
-						'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'prepared')",
-						'role' => 'link',
-						'tabindex' => '0'
-						],
-					'content' => [
-						[
-							'type' => 'textsection',
-							'content' => $this->_lang->GET('application.dashboard.preparedorders', [':number' => $prepared]),
-							'attributes' => [
-								'data-type' => 'purchase',
-								'name' => $this->_lang->GET('menu.purchase.prepared_orders')
+			// unprocessed orders
+			if (PERMISSION::permissionFor('orderprocessing')){
+				$unprocessed = $notifications->order();
+				if ($unprocessed) {
+					$tiles[] = [
+						'type' => 'tile',
+						'attributes' => [
+							'onclick' => "api.purchase('get', 'approved')",
+							'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'approved')",
+							'role' => 'link',
+							'tabindex' => '0'
+							],
+						'content' => [
+							[
+								'type' => 'textsection',
+								'content' => $this->_lang->GET('application.dashboard.orders', [':number' => $unprocessed]),
+								'attributes' => [
+									'data-type' => 'purchase',
+									'name' => $this->_lang->GET('menu.purchase.approved_orders')
+								]
 							]
 						]
-					]
-				];
+					];
+				}
 			}
-		}
 
-		// unclosed case documentation for own unit
-		$number = $notifications->records();
-		if ($number){
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onclick' => "api.record('get', 'records')",
-					'onkeydown' => "if (event.key==='Enter') api.record('get', 'records')",
-					'role' => 'link',
-					'tabindex' => '0'
-				],
-				'content' => [
-					[
-						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.dashboard.cases', [':number' => $number]),
+			// prepared orders
+			if ($_SESSION['user']['orderauth']){
+				$prepared = $notifications->preparedorders();
+				if ($prepared) {
+					$tiles[] = [
+						'type' => 'tile',
 						'attributes' => [
-							'data-type' => 'record',
-							'name' => $this->_lang->GET('menu.records.header')
+							'onclick' => "api.purchase('get', 'prepared')",
+							'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'prepared')",
+							'role' => 'link',
+							'tabindex' => '0'
+							],
+						'content' => [
+							[
+								'type' => 'textsection',
+								'content' => $this->_lang->GET('application.dashboard.preparedorders', [':number' => $prepared]),
+								'attributes' => [
+									'data-type' => 'purchase',
+									'name' => $this->_lang->GET('menu.purchase.prepared_orders')
+								]
+							]
 						]
-					]
-				]
-			];
-		}
+					];
+				}
+			}
 
-		// unclosed audits
-		if (PERMISSION::permissionFor('audit')){
-			$number = $notifications->audits();
+			// unclosed case documentation for own unit
+			$number = $notifications->records();
 			if ($number){
 				$tiles[] = [
 					'type' => 'tile',
 					'attributes' => [
-						'onclick' => "api.audit('get', 'audit')",
-						'onkeydown' => "if (event.key==='Enter') api.audit('get', 'audit')",
+						'onclick' => "api.record('get', 'records')",
+						'onkeydown' => "if (event.key==='Enter') api.record('get', 'records')",
 						'role' => 'link',
 						'tabindex' => '0'
-						],
+					],
 					'content' => [
 						[
 							'type' => 'textsection',
-							'content' => $this->_lang->GET('application.dashboard.audits', [':number' => $number]),
+							'content' => $this->_lang->GET('application.dashboard.cases', [':number' => $number]),
 							'attributes' => [
 								'data-type' => 'record',
 								'name' => $this->_lang->GET('menu.records.header')
@@ -1076,256 +1108,282 @@ class APPLICATION extends API {
 					]
 				];
 			}
-		}
 
-		// unapproved documents and components
-		$unapproved = $notifications->documents();
-		if ($unapproved){
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onclick' => "api.document('get', 'approval')",
-					'onkeydown' => "if (event.key==='Enter') api.document('get', 'approval')",
-					'role' => 'link',
-					'tabindex' => '0'
-				],
-				'content' => [
-					[
-						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.dashboard.unapproveddocuments', [':number' => $unapproved]),
+			// unclosed audits
+			if (PERMISSION::permissionFor('audit')){
+				$number = $notifications->audits();
+				if ($number){
+					$tiles[] = [
+						'type' => 'tile',
 						'attributes' => [
-							'data-type' => 'record',
-							'name' => $this->_lang->GET('menu.records.documents_manage_approval')
+							'onclick' => "api.audit('get', 'audit')",
+							'onkeydown' => "if (event.key==='Enter') api.audit('get', 'audit')",
+							'role' => 'link',
+							'tabindex' => '0'
+							],
+						'content' => [
+							[
+								'type' => 'textsection',
+								'content' => $this->_lang->GET('application.dashboard.audits', [':number' => $number]),
+								'attributes' => [
+									'data-type' => 'record',
+									'name' => $this->_lang->GET('menu.records.header')
+								]
+							]
 						]
-					]
-				]
-			];
-		}
-
-		// pending product incorporations
-		$unapproved = $notifications->consumables();
-		if ($unapproved){
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onclick' => "api.purchase('get', 'pendingincorporations')",
-					'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'pendingincorporations')",
-					'role' => 'link',
-					'tabindex' => '0'
-				],
-				'content' => [
-					[
-						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.dashboard.pendingincorporations', [':number' => $unapproved]),
-						'attributes' => [
-							'data-type' => 'purchase',
-							'name' => $this->_lang->GET('menu.purchase.incorporated_pending')
-						]
-					]
-				]
-			];
-		}
-		
-		// open complaints
-		$complaints = $notifications->complaints();
-		if ($complaints){
-			$tiles[] = [
-				'type' => 'tile',
-				'attributes' => [
-					'onclick' => "api.audit('get', 'checks', 'complaints')",
-					'onkeydown' => "if (event.key==='Enter') api.audit('get', 'checks', 'complaints')",
-					'role' => 'link',
-					'tabindex' => '0'
-				],
-				'content' => [
-					[
-						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.dashboard.complaints', [':number' => $complaints]),
-						'attributes' => [
-							'data-type' => 'record',
-							'name' => $this->_lang->GET('menu.records.header')
-						]
-					]
-				]
-			];
-		}
-
-		// scheduled trainings
-		$complaints = $notifications->scheduledtrainings();
-		if ($complaints){
-			$tiles[] = [
-				'type' => 'tile',
-				'content' => [
-					[
-						'type' => 'textsection',
-						'content' => $this->_lang->GET('application.dashboard.scheduledtrainings', [':number' => $complaints]),
-						'attributes' => [
-							'data-type' => 'skill',
-							'name' => $this->_lang->GET('audit.checks_type.userskills')
-						]
-					]
-				]
-			];
-			if (PERMISSION::permissionFor('regulatory')){
-				$tiles[count($tiles) - 1]['attributes'] = [
-					'onclick' => "api.audit('get', 'checks', 'userskills')",
-					'onkeydown' => "if (event.key==='Enter') api.audit('get', 'checks', 'userskills')",
-					'role' => 'link',
-					'tabindex' => '0'
-				];
-			}
-		}
-		if (count($tiles)) $result['render']['content'][] = $tiles;
-
-		// append search function to landing page
-		$searchelements = [
-			[
-				'type' => 'search',
-				'attributes' => [
-					'name' => $this->_lang->GET('application.search'),
-					'value' => $this->_search,
-					'onkeydown' => "if (event.key === 'Enter') {api.application('get', 'start', encodeURIComponent(this.value)); return false;}",
-				]
-			]
-		];
-
-		if ($this->_search) {
-			require_once('_shared.php');
-			$search = new SHARED($this->_pdo, $this->_date);
-
-			// search records, style like record overview
-			if ($records = $search->recordsearch(['search' => $this->_search])){
-				$matches = [];
-				foreach ($records as $contextkey => $context){
-					foreach($context as $record){
-						$display = $this->_lang->GET('record.list_touched', [
-							':identifier' => $record['identifier'],
-							':date' => $this->convertFromServerTime($record['last_touch']),
-							':document' => $record['last_document']
-						]);
-						$matches[$display] = [
-								'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
-							];
-						foreach($record['case_state'] as $case => $state){
-							$matches[$display]['data-' . $case] = $state;
-						}
-						if ($record['complaint']) $matches[$display]['class'] = 'orange';
-						if ($record['closed'])  $matches[$display]['class'] = 'green';
-					}
-					$searchelements[] = [
-						'type' => 'links',
-						'description' => $this->_lang->GET('documentcontext.' . $contextkey),
-						'content' => $matches
 					];
 				}
 			}
 
-			// search documents
-			if ($documents = $search->documentsearch(['search' => $this->_search])){
-				$matches = [];
-				foreach ($documents as $document){
-					$matches[$document['name']] = ['href' => 'javascript:void(0);', 'onclick' => "api.record('get', 'document', '" . $document['name'] . "')"];
-				}
-				$searchelements[] = [
-					'type' => 'links',
-					'description' => $this->_lang->GET('menu.records.record_record'),
-					'content' => $matches
+			// unapproved documents and components
+			$unapproved = $notifications->documents();
+			if ($unapproved){
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onclick' => "api.document('get', 'approval')",
+						'onkeydown' => "if (event.key==='Enter') api.document('get', 'approval')",
+						'role' => 'link',
+						'tabindex' => '0'
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('application.dashboard.unapproveddocuments', [':number' => $unapproved]),
+							'attributes' => [
+								'data-type' => 'record',
+								'name' => $this->_lang->GET('menu.records.documents_manage_approval')
+							]
+						]
+					]
 				];
 			}
 
-			// search files
-			if ($files = $search->filesearch(['search' => $this->_search])){
-				$matches = [];
-				foreach ($files as $file){
-					$matches[preg_replace('/.+fileserver\//', '', $file)] = UTILITY::link(['href' => $file]);
-				}
-				$searchelements[] = [
-					'type' => 'links',
-					'description' => $this->_lang->GET('menu.files.header'),
-					'content' => $matches
+			// pending product incorporations
+			$unapproved = $notifications->consumables();
+			if ($unapproved){
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onclick' => "api.purchase('get', 'pendingincorporations')",
+						'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'pendingincorporations')",
+						'role' => 'link',
+						'tabindex' => '0'
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('application.dashboard.pendingincorporations', [':number' => $unapproved]),
+							'attributes' => [
+								'data-type' => 'purchase',
+								'name' => $this->_lang->GET('menu.purchase.incorporated_pending')
+							]
+						]
+					]
+				];
+			}
+			
+			// open complaints
+			$complaints = $notifications->complaints();
+			if ($complaints){
+				$tiles[] = [
+					'type' => 'tile',
+					'attributes' => [
+						'onclick' => "api.audit('get', 'checks', 'complaints')",
+						'onkeydown' => "if (event.key==='Enter') api.audit('get', 'checks', 'complaints')",
+						'role' => 'link',
+						'tabindex' => '0'
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('application.dashboard.complaints', [':number' => $complaints]),
+							'attributes' => [
+								'data-type' => 'record',
+								'name' => $this->_lang->GET('menu.records.header')
+							]
+						]
+					]
 				];
 			}
 
-			// inform about lack of results if applicable
-			if (count($searchelements) < 2) $searchelements[] = [
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => $this->_lang->GET('application.search_empty'),
-					'class' => 'orange'
+			// scheduled trainings
+			$complaints = $notifications->scheduledtrainings();
+			if ($complaints){
+				$tiles[] = [
+					'type' => 'tile',
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('application.dashboard.scheduledtrainings', [':number' => $complaints]),
+							'attributes' => [
+								'data-type' => 'skill',
+								'name' => $this->_lang->GET('audit.checks_type.userskills')
+							]
+						]
+					]
+				];
+				if (PERMISSION::permissionFor('regulatory')){
+					$tiles[count($tiles) - 1]['attributes'] = [
+						'onclick' => "api.audit('get', 'checks', 'userskills')",
+						'onkeydown' => "if (event.key==='Enter') api.audit('get', 'checks', 'userskills')",
+						'role' => 'link',
+						'tabindex' => '0'
+					];
+				}
+			}
+			if (count($tiles)) $result['render']['content'][] = $tiles;
+
+			// append search function to landing page
+			$searchelements = [
+				[
+					'type' => 'search',
+					'attributes' => [
+						'name' => $this->_lang->GET('application.search'),
+						'value' => $this->_search,
+						'onkeydown' => "if (event.key === 'Enter') {api.application('get', 'start', encodeURIComponent(this.value)); return false;}",
+					]
 				]
 			];
-		}
-		$result['render']['content'][] = $searchelements;
 
-		// calendar scheduled events
-		$overview = [];
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$week = $calendar->render('week', 'schedule');
+			if ($this->_search) {
+				require_once('_shared.php');
+				$search = new SHARED($this->_pdo, $this->_date);
 
-		// add overview to calendar view
-		$overview[] = [
-			'type' => 'calendar',
-			'description' => $week['header'],
-			'content' => $week['content'],
-			'api' => 'schedule'
-		];
+				// search records, style like record overview
+				if ($records = $search->recordsearch(['search' => $this->_search])){
+					$matches = [];
+					foreach ($records as $contextkey => $context){
+						foreach($context as $record){
+							$display = $this->_lang->GET('record.list_touched', [
+								':identifier' => $record['identifier'],
+								':date' => $this->convertFromServerTime($record['last_touch']),
+								':document' => $record['last_document']
+							]);
+							$matches[$display] = [
+									'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
+								];
+							foreach($record['case_state'] as $case => $state){
+								$matches[$display]['data-' . $case] = $state;
+							}
+							if ($record['complaint']) $matches[$display]['class'] = 'orange';
+							if ($record['closed'])  $matches[$display]['class'] = 'green';
+						}
+						$searchelements[] = [
+							'type' => 'links',
+							'description' => $this->_lang->GET('documentcontext.' . $contextkey),
+							'content' => $matches
+						];
+					}
+				}
 
-		$displayevents = $displayabsentmates = '';
-		$today = new \DateTime('now');
-		$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
-		// sort events
-		foreach ($thisDaysEvents as $row){
-			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
-			if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || 
-				array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
-			if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . " - ". $this->convertFromServerTime(substr($row['span_end'], 0, 10)) . "\n";
-		}
-		// display todays events
-		if ($displayevents) $overview[] = [
-			'type' => 'textsection',
-			'attributes' => [
-					'name' => $this->_lang->GET('calendar.schedule.events_assigned_units')
-			],
-			'content' => $displayevents
-		];
-		// display todays absent workmates (sick, vacation, etc.)
-		if ($displayabsentmates) $overview[] = [
-			'type' => 'textsection',
-			'attributes' => [
-					'name' => $this->_lang->GET('calendar.timesheet.irregular')
-			],
-			'content' => $displayabsentmates
-		];
+				// search documents
+				if ($documents = $search->documentsearch(['search' => $this->_search])){
+					$matches = [];
+					foreach ($documents as $document){
+						$matches[$document['name']] = ['href' => 'javascript:void(0);', 'onclick' => "api.record('get', 'document', '" . $document['name'] . "')"];
+					}
+					$searchelements[] = [
+						'type' => 'links',
+						'description' => $this->_lang->GET('menu.records.record_record'),
+						'content' => $matches
+					];
+				}
 
-		// add past unclosed events
-		$today->modify('-1 day');
-		$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
-		$uncompleted = [];
-		foreach ($pastEvents as $row){
-			if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
-		}
-		if ($uncompleted) $overview[] = [
-			'type' => 'links',
-			'description' => $this->_lang->GET('calendar.schedule.events_assigned_units_uncompleted'),
-			'content' => $uncompleted
-		];
+				// search files
+				if ($files = $search->filesearch(['search' => $this->_search])){
+					$matches = [];
+					foreach ($files as $file){
+						$matches[preg_replace('/.+fileserver\//', '', $file)] = UTILITY::link(['href' => $file]);
+					}
+					$searchelements[] = [
+						'type' => 'links',
+						'description' => $this->_lang->GET('menu.files.header'),
+						'content' => $matches
+					];
+				}
 
-		if ($overview) $result['render']['content'][] = $overview;
-
-		// default add manual to landing page filteres by applicable permission
-		$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
-		$topics = [];
-		foreach ($query as $row){
-			if (PERMISSION::permissionIn($row['permissions'])) $topics[] =
-				[[
+				// inform about lack of results if applicable
+				if (count($searchelements) < 2) $searchelements[] = [
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $row['title']
-					],
-					'content' => $row['content']
-				]];
+						'name' => $this->_lang->GET('application.search_empty'),
+						'class' => 'orange'
+					]
+				];
+			}
+			$result['render']['content'][] = $searchelements;
+
+			// calendar scheduled events
+			$overview = [];
+			$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+			$week = $calendar->render('week', 'schedule');
+
+			// add overview to calendar view
+			$overview[] = [
+				'type' => 'calendar',
+				'description' => $week['header'],
+				'content' => $week['content'],
+				'api' => 'schedule'
+			];
+
+			$displayevents = $displayabsentmates = '';
+			$today = new \DateTime('now');
+			$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
+			// sort events
+			foreach ($thisDaysEvents as $row){
+				if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
+				if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || 
+					array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
+				if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . " - ". $this->convertFromServerTime(substr($row['span_end'], 0, 10)) . "\n";
+			}
+			// display todays events
+			if ($displayevents) $overview[] = [
+				'type' => 'textsection',
+				'attributes' => [
+						'name' => $this->_lang->GET('calendar.schedule.events_assigned_units')
+				],
+				'content' => $displayevents
+			];
+			// display todays absent workmates (sick, vacation, etc.)
+			if ($displayabsentmates) $overview[] = [
+				'type' => 'textsection',
+				'attributes' => [
+						'name' => $this->_lang->GET('calendar.timesheet.irregular')
+				],
+				'content' => $displayabsentmates
+			];
+
+			// add past unclosed events
+			$today->modify('-1 day');
+			$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+			$uncompleted = [];
+			foreach ($pastEvents as $row){
+				if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
+			}
+			if ($uncompleted) $overview[] = [
+				'type' => 'links',
+				'description' => $this->_lang->GET('calendar.schedule.events_assigned_units_uncompleted'),
+				'content' => $uncompleted
+			];
+
+			if ($overview) $result['render']['content'][] = $overview;
+
+			// default add manual to landing page filteres by applicable permission
+			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
+			$topics = [];
+			foreach ($query as $row){
+				if (PERMISSION::permissionIn($row['permissions'])) $topics[] =
+					[[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $row['title']
+						],
+						'content' => $row['content']
+					]];
+			}
+			if ($topics) $result['render']['content'][] = $topics;
 		}
-		if ($topics) $result['render']['content'][] = $topics;
 		$this->response($result);
 	}
 }

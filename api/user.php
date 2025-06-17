@@ -31,6 +31,9 @@ class USER extends API {
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (array_intersect(['patient'], $_SESSION['user']['permissions']) && 
+			!in_array(REQUEST[1], ['profile'])
+		) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_prefilledTrainingUser = isset(REQUEST[3]) ? REQUEST[3] : null;
@@ -294,7 +297,8 @@ class USER extends API {
 						]
 					];
 				}
-				if ($usertrainings) $user_data[] = [
+				if ($usertrainings && !array_intersect(['patient'], $_SESSION['user']['permissions'])) {
+					$user_data[] = [
 						[
 							'type' => 'collapsible',
 							'attributes' => [
@@ -303,6 +307,7 @@ class USER extends API {
 							'content' => $usertrainings
 						]
 					];
+				}
 
 				// append user sessions
 				$usersessions = SQLQUERY::EXECUTE($this->_pdo, 'application_get_user_sessions', [
@@ -314,7 +319,7 @@ class USER extends API {
 				foreach($usersessions as $session){
 					$sessions[] = $this->convertFromServerTime($session['date']);
 				}
-				if ($sessions) $user_data[] = [
+				if ($sessions && !array_intersect(['patient'], $_SESSION['user']['permissions'])) $user_data[] = [
 					[
 						'type' => 'collapsible',
 						'attributes' => [
@@ -331,10 +336,16 @@ class USER extends API {
 						]
 					]
 				];
+				$result['render'] = [
+					'content' => array_intersect(['patient'], $_SESSION['user']['permissions']) ? $user_data[0] : [$user_data],
+					'form' => [
+						'data-usecase' => 'user',
+						'action' => "javascript:api.user('put', 'profile')"
+					]
+				];
 
-				$result['render'] = ['content' => [
-						$user_data,
-						[
+				if (!array_intersect(['patient'], $_SESSION['user']['permissions'])) {
+					$result['render']['content'][] = [
 							[
 								'type' => 'photo',
 								'attributes' => [
@@ -342,36 +353,33 @@ class USER extends API {
 								],
 								'hint' => $this->_lang->GET('user.take_photo_hint')
 							],
-						]
-					],
-					'form' => [
-						'data-usecase' => 'user',
-						'action' => "javascript:api.user('put', 'profile')"
-					]
-				];
+						];
+						
 
-				// append image options
-				if ($user['image']) {
-					$result['render']['content'][1] = [
-						[
+					// append image options
+					if ($user['image']) {
+						$result['render']['content'][1] = [
 							[
-								'type' => 'image',
-								'description' => $this->_lang->GET('user.export_user_image'),
-								'attributes' => [
-									'name' => $user['name'] . '_pic',
-									'url' => './api/api.php/file/stream/' . $user['image']
+								[
+									'type' => 'image',
+									'description' => $this->_lang->GET('user.export_user_image'),
+									'attributes' => [
+										'name' => $user['name'] . '_pic',
+										'url' => './api/api.php/file/stream/' . $user['image']
+									]
 								]
+							],
+							$result['render']['content'][1]
+						];
+						$result['render']['content'][1][1][] = [
+							'type' => 'checkbox',
+							'content' => [
+								$this->_lang->GET('user.reset_photo') => []
 							]
-						],
-						$result['render']['content'][1]
-					];
-					$result['render']['content'][1][1][] = [
-						'type' => 'checkbox',
-						'content' => [
-							$this->_lang->GET('user.reset_photo') => []
-						]
-					];
+						];
+					}
 				}
+
 				// retrieve language options
 				$languages = [];
 				foreach(glob('language.*.json') as $file){
@@ -404,7 +412,7 @@ class USER extends API {
 				$applicationSettings = [];
 
 				// append primary unit selection for orders
-				if ($units) {
+				if ($units && !array_intersect(['patient'], $_SESSION['user']['permissions'])) {
 					$applicationSettings[] = [
 						'type' => 'radio',
 						'attributes' => [
@@ -413,60 +421,65 @@ class USER extends API {
 						'content' => $primary_unit
 					];
 				}
-				// append primary case state selection for records
-				$applicationSettings[] = [
-					'type' => 'radio',
-					'attributes' => [
-						'name' => $this->_lang->GET('user.settings_primary_recordstate')
-					],
-					'hint' => $this->_lang->GET('user.settings_hint'),
-					'content' => $primary_casestates
-				];
+
+				if (!array_intersect(['patient'], $_SESSION['user']['permissions'])) {
+					array_push($applicationSettings, ...[
+						[
+							// append primary case state selection for records
+							'type' => 'radio',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings_primary_recordstate')
+							],
+							'content' => $primary_casestates
+						], [
+							'type' => 'hr'
+						], [
+							// append application setting
+							'type' => 'checkbox',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings')
+							],
+							'content' => [
+								$this->_lang->GET('user.settings_force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
+							]
+						], [
+							'type' => 'hr'
+						], [
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings_autocomplete_forth'),
+								'value' => isset($user['app_settings']['autocomplete_forth']) ? $user['app_settings']['autocomplete_forth'] : 'Alt',
+								'onkeydown' => 'event.preventDefault(); this.value = event.key',
+								'onkeyup' => 'event.preventDefault()'
+							]
+						], [
+							'type' => 'text',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings_autocomplete_back'),
+								'value' => isset($user['app_settings']['autocomplete_back']) ? $user['app_settings']['autocomplete_back'] : 'AltGraph',
+								'onkeydown' => 'event.preventDefault(); this.value = event.key',
+								'onkeyup' => 'event.preventDefault()'
+							]
+						], [
+							'type' => 'checkbox',
+							'content' => [
+								$this->_lang->GET('user.settings_autocomplete_swipe') =>  isset($user['app_settings']['autocomplete_swipe']) ? ['checked' => true] : [],
+							]
+						], [
+							'type' => 'hr'
+						]
+					]);
+				}
 
 				array_push($applicationSettings, ...[
 					[
-						'type' => 'hr'
-					], [
-						'type' => 'checkbox',
-						'attributes' => [
-							'name' => $this->_lang->GET('user.settings')
-						],
-						'content' => [
-							$this->_lang->GET('user.settings_force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
-							$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
-							$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
-							]
-					], [
 						'type' => 'radio',
 						'attributes' => [
 							'name' => $this->_lang->GET('user.settings_theme')
 						],
 						'content' => $theme
-					], [
-						'type' => 'hr'
-					], [
-						'type' => 'text',
-						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_autocomplete_forth'),
-							'value' => isset($user['app_settings']['autocomplete_forth']) ? $user['app_settings']['autocomplete_forth'] : 'Alt',
-							'onkeydown' => 'event.preventDefault(); this.value = event.key',
-							'onkeyup' => 'event.preventDefault()'
-						]
-					], [
-						'type' => 'text',
-						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_autocomplete_back'),
-							'value' => isset($user['app_settings']['autocomplete_back']) ? $user['app_settings']['autocomplete_back'] : 'AltGraph',
-							'onkeydown' => 'event.preventDefault(); this.value = event.key',
-							'onkeyup' => 'event.preventDefault()'
-						]
-					], [
-						'type' => 'checkbox',
-						'content' => [
-							$this->_lang->GET('user.settings_autocomplete_swipe') =>  isset($user['app_settings']['autocomplete_swipe']) ? ['checked' => true] : [],
-						]
-					], [
-						'type' => 'hr'
 					], [
 						'type' => 'select',
 						'attributes' => [
@@ -486,7 +499,7 @@ class USER extends API {
 						'content' => $dateformats
 					];
 				}
-				if (count($locations) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions'])){
+				if (count($locations) > 1 || array_intersect(['admin'], $_SESSION['user']['permissions']) && !array_intersect(['patient'], $_SESSION['user']['permissions'])){
 					$applicationSettings[] = [
 						'type' => 'select',
 						'attributes' => [
@@ -506,6 +519,13 @@ class USER extends API {
 						'hint' => $this->_lang->GET('user.settings_timezone_hint')
 					];
 				}
+
+				$applicationSettings[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('user.settings_hint')
+					]
+				];
 
 				$result['render']['content'][] = $applicationSettings;
 
@@ -1293,6 +1313,14 @@ class USER extends API {
 		return $image;
 	}
 
+	/**
+	 *   _           _     _         
+	 *  | |_ ___ ___|_|___|_|___ ___ 
+	 *  |  _|  _| .'| |   | |   | . |
+	 *  |_| |_| |__,|_|_|_|_|_|_|_  |
+	 *                          |___|
+	 * handles user trainings
+	 */
 	public function training(){
 		if (!PERMISSION::permissionFor('regulatory')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -1424,7 +1452,8 @@ class USER extends API {
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $row) {
-					if ($row['id'] > 1 ) $datalist['user'][] = $row['name'];
+					if ($this->filteredUser($row)) continue;
+					$datalist['user'][] = $row['name'];
 					if ($this->_prefilledTrainingUser && $row['id'] == $this->_prefilledTrainingUser) $prefill['user'] = $row['name'];
 				}
 
