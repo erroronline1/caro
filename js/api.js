@@ -456,11 +456,12 @@ export const api = {
 			case "authentify":
 				switch (method) {
 					case "delete":
-						successFn = function (data) {
+						successFn = async function (data) {
 							api._settings.user = data.user || {};
 							api._settings.config = data.config || {};
 							document.querySelector("body>header>h1").innerHTML = document.getElementById("main").innerHTML = document.querySelector("body>nav").innerHTML = "";
 							api.history.reset();
+							await api.application("get", "language");
 							api.application("get", "start");
 						};
 						break;
