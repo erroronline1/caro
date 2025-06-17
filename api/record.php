@@ -1173,9 +1173,17 @@ class RECORD extends API {
 							$recommendation[$recommended] = ['href' => "javascript:api.record('get', 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
 						}
 						if ($recommendation) $body[] = [[
-							'type' => 'links',
-							'description' => $this->_lang->GET('record.append_missing_document') . ' ' . $bundle,
-							'content' => $recommendation
+							'type' => 'collapsible',
+							'attributes' => [
+								'class' => "em12"
+							],
+							'content' => [
+								[
+									'type' => 'links',
+									'description' => $this->_lang->GET('record.append_missing_document') . ' ' . $bundle,
+									'content' => $recommendation
+								]
+							]
 						]];
 					}
 				}
