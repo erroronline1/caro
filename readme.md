@@ -33,8 +33,6 @@ Things are still in motion. Images my be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* sanitize
-    * ["app_settings"]=>string(62) "{"annualvacation":"","weeklyhours":"","initialovertime":false}"
 
 ## Content
 * [Aims](#aims)

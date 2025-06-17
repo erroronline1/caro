@@ -618,6 +618,11 @@ class USER extends API {
 				}
 				else unset ($user['app_settings']['idle']);
 
+				// sanitize app settings for empty values
+				foreach($user['app_settings'] as $key => $value){
+					if (!$value) unset ($user['app_settings'][$key]);
+				}
+
 				// gather user skills
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === '_LEVEL') continue;
@@ -802,6 +807,11 @@ class USER extends API {
 					$user['app_settings']['idle'] = $idle;
 				}
 				else unset ($user['app_settings']['timeout']);
+
+				// sanitize app settings for empty values
+				foreach($user['app_settings'] as $key => $value){
+					if (!$value) unset ($user['app_settings'][$key]);
+				}
 
 				// update skills
 				$user['skills'] = [];
@@ -1452,7 +1462,7 @@ class USER extends API {
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach($user as $row) {
-					if ($this->filteredUser($row)) continue;
+					if (PERMISSION::filteredUser($row)) continue;
 					$datalist['user'][] = $row['name'];
 					if ($this->_prefilledTrainingUser && $row['id'] == $this->_prefilledTrainingUser) $prefill['user'] = $row['name'];
 				}
