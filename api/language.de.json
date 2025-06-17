@@ -961,6 +961,7 @@
 			"retired": "Eingeführt am :introduced, ausgemustert am :retired von :user",
 			"retired_success": "Diese Datei ist nicht mehr verfügbar"
 		},
+		"file_filter_folder": "Filtere Dateien nach Verzeichnis",
 		"file_filter_label": "Filtere nach Dateinamen",
 		"file_list": "Dateien im Verzeichnis :folder",
 		"manager": {

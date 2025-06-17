@@ -961,6 +961,7 @@
 			"retired": "Introduced :introduced, retired :retired by :user",
 			"retired_success": "This file is not longer accessible"
 		},
+		"file_filter_folder": "Filter by folder",
 		"file_filter_label": "Filter by file name",
 		"file_list": "Files within :folder",
 		"manager": {

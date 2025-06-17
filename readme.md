@@ -33,7 +33,7 @@ Things are still in motion. Images my be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* files filter by folder like units for documents - file.php 844
+* restricted patient access for questionnaires and assessments
 
 ## Content
 * [Aims](#aims)
@@ -1622,7 +1622,7 @@ names[length] = "^.{0,3}$" ; less than 4 characters
 names[numeric] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
 names[underscorestart] = "^_" ; names must not start with _
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
-names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; literal terms |-separated
+names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CID|PRD|ECR)$" ; literal terms |-separated
 
 filename[characters] = "[,\/\\\]" ; replace matched characters to avoid link error
 

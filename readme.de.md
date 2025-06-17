@@ -1529,7 +1529,7 @@ names[length] = "^.{0,3}$" ; weniger als 4 Zeichen
 names[numeric] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
 names[underscorestart] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
-names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
+names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 filename[characters] = "[,\/\\\]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
 

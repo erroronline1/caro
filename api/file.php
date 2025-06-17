@@ -827,20 +827,46 @@ class FILE extends API {
 				]
 			]
 		];
+		// append filter by folder option
+		$options = [
+			$this->_lang->GET('menu.files.files') => (!$this->_requestedFolder || $this->_requestedFolder == 'null') ? ['checked' => true] : ['onchange' => "api.file('get', 'files')"],
+			$this->_lang->GET('file.external_file.folder') => $this->_requestedFolder === 'external_documents' ? ['checked' => true] : ['onchange' => "api.file('get', 'files', 'external_documents')"],
+
+		];
+		foreach(UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc') as $folder){
+			$folder = pathinfo($folder)['basename'];
+			$options[$folder] = $this->_requestedFolder === $folder ? ['checked' => true] : [];
+			$options[$folder]['onchange'] = "api.file('get', 'files', '" . $folder . "')";
+		}
+		$result['render']['content'][count($result['render']['content']) - 1 ][] = [
+			'type' => 'radio',
+			'attributes' => [
+				'name' => $this->_lang->GET('file.file_filter_folder')
+			],
+			'content' => $options
+		];
+
 		// gather files by requestedFolder
 		$files = [];
-		if ($this->_requestedFolder && $this->_requestedFolder != 'null') {
-			$folder = UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]);
-			$files[$folder] = UTILITY::listFiles($folder ,'asc');
-		}
-		else {
-			// add external files by default if no folder is requested
-			if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
-			$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
-			foreach ($folders as $folder) {
+
+		switch ($this->_requestedFolder){
+			case null:
+			case 'null':
+				// add external files by default if no folder is requested
+				if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
+				$folders = UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc');
+				foreach ($folders as $folder) {
+					$files[$folder] = UTILITY::listFiles($folder ,'asc');
+				}
+				break;
+			case 'external_documents':
+				if ($external = $this->activeexternalfiles()) $files[UTILITY::directory('external_documents')] = $external;
+				break;
+			default:
+				$folder = UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]);
 				$files[$folder] = UTILITY::listFiles($folder ,'asc');
-			}
 		}
+
 		if ($files){
 			foreach ($files as $folder => $content){
 				// display files and linked ressources by folder
@@ -857,7 +883,7 @@ class FILE extends API {
 				// reassign displayed folder name
 				$folder = $folder === UTILITY::directory('external_documents') ? $this->_lang->GET('file.external_file.folder') : pathinfo($folder)['filename'];
 				// append folder
-				$result['render']['content'][]=
+				$result['render']['content'][] =
 				[
 					[
 						'type' => 'links',
