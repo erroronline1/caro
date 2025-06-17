@@ -27,7 +27,7 @@ class MESSAGE extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_conversation = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
@@ -47,8 +47,9 @@ class MESSAGE extends API {
 				$result = ['render' => ['content' => []]];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				foreach($user as $key => $row) {
-					if ($row['id'] > 1 && $row['id'] !== $_SESSION['user']['id']) $datalist[] = $row['name'];
+				foreach($user as $row) {
+					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient']])) continue;
+					$datalist[] = $row['name'];
 				}
 
 				if ($this->_conversation){
@@ -307,7 +308,7 @@ class MESSAGE extends API {
 		$result = ['render' => ['content' => []]];
 
 		foreach($users as $user){
-			if ($user['id'] == 1) continue; // skip system user
+			if (PERMISSION::filteredUser($user)) continue;
 
 			// sort to groups, units, etc.
 			$groups['name'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
@@ -326,7 +327,6 @@ class MESSAGE extends API {
 		}
 
 		foreach($groups as $group => $content){
-
 			// display name list and order auth-list as a single panel
 			if (in_array($group, ['name', 'orderauth'])){
 				$links = [];

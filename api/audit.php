@@ -45,7 +45,7 @@ class AUDIT extends API {
 	 */
 	public function __construct(){
 		parent::__construct();
-		if (!PERMISSION::permissionFor('regulatory')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('regulatory') || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedType = $this->_requestedTemplate = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_requestedDate = $this->_requestedID = $this->_requestedOption = isset(REQUEST[3]) ? REQUEST[3] : null;
@@ -285,7 +285,7 @@ class AUDIT extends API {
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				// drop system user and group accounts
 				foreach($users as $key => $row){
-					if ($row['id'] < 2 || in_array('group', explode(',', $row['permissions']))) unset($users[$key]);
+					if (PERMISSION::filteredUser($row, ['id' => [1], 'permission' => ['patient', 'group']])) unset($users[$key]);
 				}
 				$users = array_column($users, 'name');
 
@@ -3040,7 +3040,7 @@ class AUDIT extends API {
 
 		foreach ($users as $user){
 			if (
-				$user['id'] < 2 ||
+				PERMISSION::filteredUser($user) ||
 				!(PERMISSION::permissionFor('trainingevaluation') &&
 				(array_intersect(array_filter(PERMISSION::permissionFor('trainingevaluation', true), fn($permission) => $permission === 'supervisor'), $_SESSION['user']['permissions']) ||
 				(array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))))
@@ -3163,7 +3163,7 @@ class AUDIT extends API {
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 		foreach ($users as $user){ // ordered by name
-			if ($user['id'] < 2) continue;
+			if (PERMISSION::filteredUser($user)) continue;
 			$user_id = $user['id'];
 			if ($usertrainings = array_filter($trainings, function ($row) use($user_id){
 				return $row['user_id'] === $user_id;
@@ -3306,7 +3306,7 @@ class AUDIT extends API {
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 		foreach ($users as $user){
-			if ($user['id'] < 2) continue;
+			if (PERMISSION::filteredUser($user)) continue;
 			$user['units'] = explode(',', $user['units'] ? : '');
 
 			// construct fulfilled skills
@@ -3452,6 +3452,8 @@ class AUDIT extends API {
 		}
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		foreach ($users as $user){
+			if (PERMISSION::filteredUser($user)) continue;
+
 			$user['skills'] = explode(',', $user['skills'] ?  : '');
 			foreach ($user['skills'] as $skill){
 				$level = substr($skill, strrpos($skill, '.') + 1);

@@ -38,6 +38,9 @@ class RECORD extends API {
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (array_intersect(['patient'], $_SESSION['user']['permissions']) && 
+			!in_array(REQUEST[1], ['document', 'record'])
+		) $this->response([], 401);
 
 		$this->_requestedID = $this->_appendDate = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_passedIdentify = $this->_documentExport = $this->_caseState = $this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
@@ -230,7 +233,7 @@ class RECORD extends API {
 	public function document(){
 		// prepare existing documents lists
 		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
-		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access']) || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$return = ['title'=> $document['name'], 'render' => [
 			'content' => []
@@ -349,23 +352,27 @@ class RECORD extends API {
 
 		if (isset($return['render']['form'])) {
 			// add record timestamp options if this is a fillable document (and not a process instruction) 
-			$defaults = [
-				[
-					'type' => 'date',
-					'attributes' => [
-						'name' => 'DEFAULT_' . $this->_lang->GET('record.date'),
-						'value' => $this->_date['usertime']->format('Y-m-d'),
-						'required' => true
-					]
-				], [
-					'type' => 'time',
-					'attributes' => [
-						'name' => 'DEFAULT_' . $this->_lang->GET('record.time'),
-						'value' => $this->_date['usertime']->format('H:i'),
-						'required' => true
-					]
+			$record_date = [
+				'type' => 'date',
+				'attributes' => [
+					'name' => 'DEFAULT_' . $this->_lang->GET('record.date'),
+					'value' => $this->_date['usertime']->format('Y-m-d'),
+					'required' => true
 				]
 			];
+			$record_time = [
+				'type' => 'time',
+				'attributes' => [
+					'name' => 'DEFAULT_' . $this->_lang->GET('record.time'),
+					'value' => $this->_date['usertime']->format('H:i'),
+					'required' => true
+				]
+			];
+			if(array_intersect(['patient'], $_SESSION['user']['permissions'])) {
+				$record_date['attributes']['readonly'] = $record_time['attributes']['readonly'] = true;
+			}
+
+			$defaults = [$record_date, $record_time];
 			// add record types if applicable
 			if (in_array($document['context'], ['casedocumentation'])) {
 				$options = [];
@@ -384,7 +391,7 @@ class RECORD extends API {
 		}
 
 		// add export options or notifictaion
-		if (PERMISSION::permissionFor('documentexport') || $document['permitted_export']){
+		if (PERMISSION::permissionFor('documentexport') || ($document['permitted_export'] && !array_intersect(['patient'], $_SESSION['user']['permissions']))){
 			if (isset($return['render']['form'])) {
 				$export = [
 					'type' => 'button',
@@ -757,6 +764,15 @@ class RECORD extends API {
 				if ($entry_time = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.time'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.time')});
 				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
 
+				require_once('_shared.php');
+				$documentfinder = new SHARED($this->_pdo, $this->_date);
+				$useddocument = $documentfinder->recentdocument('document_get', [
+					'values' => [
+						':id' => $document_id
+					]]);
+
+				if (!$useddocument || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
 					$entry_timestamp = $this->_date['usertime']->format('Y-m-d H:i');
@@ -821,12 +837,7 @@ class RECORD extends API {
 
 				if (boolval((array) $this->_payload)){
 					// update record datalists if passed document contains issues permitting autocompletion
-					require_once('_shared.php');
-					$documentfinder = new SHARED($this->_pdo, $this->_date);
-					if ($useddocument = $documentfinder->recentdocument('document_get', [
-						'values' => [
-							':id' => $document_id
-						]])){
+					if ($useddocument){
 
 						// recursive check for names that permit autocompletion
 						function autocomplete($element){
@@ -969,6 +980,7 @@ class RECORD extends API {
 					]]);
 				break;
 			case 'GET':
+				if (array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 				$return = ['render' => []];
 				$body = [];
 				// summarize content
@@ -1003,7 +1015,8 @@ class RECORD extends API {
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				$datalist = [];
 				foreach($user as $key => $row) {
-					if ($row['id'] > 1 && $row['id'] !== $_SESSION['user']['id']) $datalist[] = $row['name'];
+					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient', 'group']])) continue;
+					$datalist[] = $row['name'];
 				}
 				$notification_recipients = [
 					[

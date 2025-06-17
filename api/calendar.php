@@ -35,7 +35,7 @@ class CALENDAR extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedTimespan = $this->_requestedId = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_requestedDate = $this->_requestedComplete = isset(REQUEST[3]) ? REQUEST[3] : null;

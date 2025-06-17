@@ -31,6 +31,9 @@ class FILE extends API {
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (array_intersect(['patient'], $_SESSION['user']['permissions']) && 
+			!in_array(REQUEST[1], ['stream'])
+		) $this->response([], 401);
 
 		$this->_requestedFolder = $this->_requestedId = isset(REQUEST[2]) && REQUEST[2] !== 'null' ? REQUEST[2] : null;
 		$this->_requestedFile = $this->_accessible = isset(REQUEST[3]) ? REQUEST[3] : null;

@@ -2812,7 +2812,7 @@ export class Assemble {
 		};
 		result.push(button);
 
-		if (originaltype === "identify") {
+		if (originaltype === "identify" && !(api._settings.user.permissions.patient)) {
 			let button = document.createElement("button");
 			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.merge")));
 			button.type = "button";

@@ -19,7 +19,6 @@
 
 namespace CARO\API;
 
-
 // diverse tools
 class TOOL extends API {
 	/**
@@ -34,7 +33,7 @@ class TOOL extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}

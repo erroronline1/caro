@@ -182,7 +182,10 @@ class API {
 						':group' => $prmssn
 					]
 				]);
-				array_push($permission, ...array_column($permissions, 'id'));
+				foreach($permissions as $userrow){
+					if (PERMISSION::filteredUser($userrow)) continue;
+					array_push($permission, $userrow['id']);
+				}
 			}
 		}
 		if (isset($group['unit'])){
@@ -192,7 +195,10 @@ class API {
 						':group' => $unt
 					]
 				]);
-				array_push($unit, ...array_column($groups, 'id'));
+				foreach($groups as $userrow){
+					if (PERMISSION::filteredUser($userrow)) continue;
+					array_push($unit, $userrow['id']);
+				}
 			}
 		}
 		if (isset($group['user']) && count($group['user'])){
@@ -202,15 +208,16 @@ class API {
 					':name' => implode(',', $group['user'])
 				]
 			]);
-			array_push($user, ...array_column($users, 'id'));
+			foreach($users as $userrow){
+				if (PERMISSION::filteredUser($userrow)) continue;
+				array_push($user, $userrow['id']);
+			}
 		}
 		if ($permission) $recipients = $permission;
 		if ($unit) $recipients = $unit;
 		if ($permission && $unit) $recipients = array_intersect($permission, $unit);
 		array_push($recipients, ...$user);
 		$recipients = array_unique($recipients);
-		// delete system user to receive any messages
-		if (($sysusr = array_search('1', $recipients)) !== false) unset($recipients[$sysusr]);
 		if (!$recipients) return false;
 		if (!isset($this->_messages[$message])) $this->_messages[$message] = [];
 		array_push($this->_messages[$message], ...$recipients);
@@ -276,8 +283,8 @@ class API {
 				// confirm new login or reauth from previous user
 				if (!isset($_SESSION['user']['token']) || $_SESSION['user']['token'] === $user['token']) {
 					$_SESSION['user'] = $user;
-					$_SESSION['user']['permissions'] = explode(',', $user['permissions']);
-					$_SESSION['user']['units'] = explode(',', $user['units']);
+					$_SESSION['user']['permissions'] = explode(',', $user['permissions'] ? : '');
+					$_SESSION['user']['units'] = explode(',', $user['units'] ? : '');
 					$_SESSION['user']['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
 					$_SESSION['user']['image'] = ($user['id'] > 1 ? './api/api.php/file/stream/' : '') . $user['image'];
 					// default primary unit if only one unit is assigned
@@ -298,7 +305,8 @@ class API {
 					'app_settings' => $_SESSION['user']['app_settings'],
 					'fingerprint' => $this->session_get_fingerprint(),
 					'permissions' => [
-						'orderprocessing' => PERMISSION::permissionFor('orderprocessing')
+						'orderprocessing' => PERMISSION::permissionFor('orderprocessing'),
+						'patient' => boolval(array_intersect(['patient'], $_SESSION['user']['permissions']))
 					]
 				],
 				'config' => [

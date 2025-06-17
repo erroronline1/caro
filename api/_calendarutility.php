@@ -18,6 +18,7 @@
  */
 
 namespace CARO\API;
+
 // calendar
 class CALENDARUTILITY {
 	/**
@@ -263,14 +264,14 @@ class CALENDARUTILITY {
 
 		$affected_users = $affected_unit_users = ['...' => ['value' => '...']];
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		// unset system user
-		array_splice($users, array_search(1, array_column($users, 'id')), 1);
 		// set self to top 
 		$self = array_splice($users, array_search($_SESSION['user']['id'], array_column($users, 'id')), 1);
 		array_splice($users, 0, 0, $self);
 		// construct list for affected user selection
 		foreach($users as $user){
-			if ($user === $self) continue;
+			if ($user == $self || PERMISSION::filteredUser($user)) continue;
+			if (in_array($columns[':type'], ['timesheet']) && PERMISSION::filteredUser($user, ['permission' => ['group']])) continue;
+			
 			$affected_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
 			if (array_intersect(explode(',', $user['units']), $_SESSION['user']['units'])) $affected_unit_users[$user['name']] = ($columns[':affected_user_id'] === $user['id']) ? ['value' => $user['id'], 'selected' => true] : ['value' => $user['id']];
 			if ($columns[':affected_user_id'] === $user['id'] && !$columns[':organizational_unit']) $columns[':organizational_unit'] = $user['units'];

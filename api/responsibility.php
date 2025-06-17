@@ -28,7 +28,7 @@ class RESPONSIBILITY extends API {
 
 	public function __construct(){
 		parent::__construct();
-		if (!isset($_SESSION['user'])) $this->response([], 401);
+		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_unit = isset(REQUEST[3]) ? REQUEST[3] : null;
@@ -390,8 +390,9 @@ class RESPONSIBILITY extends API {
 
 				//user datalist
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				// unset system user
-				unset($users[array_search(1, array_column($users, 'id'))]);
+				foreach($users as $key => $user){
+					if (PERMISSION::filteredUser($user)) unset($users[$key]);
+				}
 				// reassing generic keys
 				$users = array_values($users);
 				// set datalist
