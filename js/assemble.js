@@ -847,11 +847,7 @@ export class Dialog {
 				if (this.render.transfer) {
 					return [canvas, ...this.confirm()];
 				} else {
-					a.href = this.render.url;
-					a.target = "_blank";
-					a.download = this.render.name || this.render.url;
-					a.dataset.type = "downloadlink";
-					a.append(document.createTextNode(this.render.name || this.render.url));
+					a.href = this.render.content;
 					return [canvas, a];
 				}
 			} else {
