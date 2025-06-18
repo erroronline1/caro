@@ -2187,6 +2187,603 @@
 		}
 	},
 	{
+		"name": "TAPES-R-OE Prothetik II",
+		"alias": "",
+		"context": "component",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Bewertung für die Prothese"
+						},
+						"content": {
+							"Vorversorgung": [],
+							"Testversorgung": [],
+							"Definitivversorgung": []
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "TAPES-R-OE"
+						},
+						"content": "Trinity Amputation & Prosthesis Experience Scales - Revised\n \nUrheberrecht: Dublin Psychoprosthetics Group (DPG) Anerkannte deutsche Version, 2017."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Womit befasst sich dieser Fragebogen?"
+						},
+						"content": "Dieser Fragebogen befasst sich mit verschiedenen Aspekten des Tragens einer Prothese. Die gesammelten Informationen sollen dazu dienen, die Bedürfnisse von Prothesennutzern zu erkennen und die Behandlung entsprechend zu optimieren."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Wer sollte den Fragebogen ausfüllen?"
+						},
+						"content": "Der Fragebogen richtet sich an Prothesennutzer/ -Nutzerinnen und sollte von diesen persönlich ausgefüllt werden."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Wie ist der Fragebogen auszufüllen?"
+						},
+						"content": "Es gibt keine richtigen oder falschen Antworten. Bitte beantworten Sie jede Frage so ehrlich wie möglich."
+					},
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Ihre Antworten werden mit strengster Vertraulichkeit behandelt."
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Die folgenden Fragen erfassen verschiedene Informationen, zum einen zu Ihrer Person, zum anderen zu Ihrer Amputation und prothetischen Versorgung"
+						},
+						"content": "Bitte beantworten Sie jede Frage so genau wie möglich."
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Name"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Geburtsdatum"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Geschlecht"
+						},
+						"content": {
+							"weiblich": [],
+							"männlich": [],
+							"divers": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Wohnen Sie mit jemandem zusammen, der Sie unterstützen kann, falls nötig?"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Welches ist Ihr höchster Schulabschluss?"
+						},
+						"content": {
+							"Hauptschule": [],
+							"Mittlere Reife": [],
+							"Abitur": [],
+							"Abgeschlossene Berufsausbildung z.B. Lehre": [],
+							"Fachschule": [],
+							"Fachhochschule / Universität": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstiger Schulabschluss"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Welche der folgenden Aussagen beschreibt Ihre derzeitige berufliche Situation?"
+						},
+						"content": {
+							"Ich befinde mich in einem Arbeitsverhältnis": [],
+							"Altersruhestand": [],
+							"Aufgrund einer Erkrankung im Ruhestand": [],
+							"Hausfrau / Hausmann": [],
+							"Arbeitssuchend": [],
+							"Schüler / Student": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstige berufliche Situation"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Wann hat die Amputation stattgefunden?"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Falls mehr als eine Amputation stattgefunden hat, wann war der letzte operative Eingriff?"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Was war der Grund für Ihre Amputation?"
+						},
+						"content": {
+							"Periphere Durchblutungsstörung": [],
+							"Unfall": [],
+							"Krebs": [],
+							"Diabetes": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Sonstiger Amputationsgrund"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Auf welcher Höhe hat die Amputation stattgefunden?"
+						},
+						"content": {
+							"Schulter": [],
+							"Oberarm": [],
+							"Ellbogen": [],
+							"Unterarm": [],
+							"Handgelenk": [],
+							"Hand": []
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Wann hat die Erstversorgung mit einer Prothese stattgefunden?"
+						}
+					},
+					{
+						"type": "date",
+						"attributes": {
+							"name": "Wann haben Sie Ihre derzeitige Prothese erhalten?"
+						}
+					},
+					{
+						"type": "number",
+						"attributes": {
+							"name": "Wie viele Stunden am Tag tragen Sie durchschnittlich Ihre Prothese?"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Leiden Sie unter Stumpfschmerzen? (Schmerz im verbliebenen Teil des amputierten Körperteils)"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "range",
+						"attributes": {
+							"name": "Falls Sie unter Stumpfschmerzen leiden, wie stark sind diese Schmerzen? (Überhaupt nicht bis stärkste vorstellbare Schmerzen)",
+							"min": "0",
+							"max": "10",
+							"value": "0"
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Leiden Sie unter Phantomschmerz? (Schmerz in dem Körperteil, das amputiert wurde)"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "range",
+						"attributes": {
+							"name": "Falls Sie unter Phantomschmerz leiden, wie stark sind diese Schmerzen? (Überhaupt nicht bis stärkste vorstellbare Schmerzen)",
+							"min": "0",
+							"max": "10",
+							"value": "0"
+						}
+					},
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Haben Sie irgendwelche anderen medizinischen Probleme, die Sie daran hindern Ihre Prothese zu tragen (z.B. Rheuma, ein neurologisches Problem)?"
+						},
+						"content": {
+							"ja": [],
+							"nein": []
+						}
+					},
+					{
+						"type": "text",
+						"attributes": {
+							"name": "Medizinische Probleme, die Sie daran hindern Ihre Prothese zu tragen"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Zufriedenheit mit der Prothese"
+						},
+						"content": "Bitte kreuzen Sie das Kästchen an, welches den Grad Ihrer Zufriedenheit mit jedem der nachfolgenden Aspekte Ihrer Prothese angibt."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Farbe",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Form",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Aussehen",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Gewicht",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Zweckmäßigkeit",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Zuverlässigkeit",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Passform",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Tragekomfort",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Geräusch",
+							"required": true
+						},
+						"content": {
+							"nicht zufrieden": [],
+							"zufrieden": [],
+							"sehr zufrieden": []
+						}
+					},
+					{
+						"type": "range",
+						"attributes": {
+							"name": "Bitte geben Sie die Nummer (0-10) an, die am besten beschreibt, wie zufrieden Sie insgesamt mit Ihrer Prothese sind. (Überhaupt nicht zufrieden bis sehr zufrieden)",
+							"min": "0",
+							"max": "10",
+							"value": "0"
+						}
+					}
+				],
+				[
+					{
+						"type": "textsection",
+						"attributes": {
+							"name": "Aussagen zum Tragen einer Prothese"
+						},
+						"content": "Im Folgenden finden Sie eine Reihe von Aussagen zum Tragen einer Prothese. Bitte lesen Sie jede Aussage sorgfältig durch. Kreuzen Sie das Kästchen an, das wiedergibt wie Sie die jeweilige Aussage bewerten.\n Es ist wichtig, dass Sie jede Aussage bewerten. Falls Sie sich nicht sicher sind, wählen Sie das Kästchen, das Ihre Meinung am ehesten widerspiegelt."
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Ich habe mich darauf eingestellt eine Prothese zu haben.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Mit der Zeit akzeptiere ich meine Prothese immer mehr.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Ich denke, ich bin mit diesem Trauma in meinem Leben gut fertig geworden.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Obwohl ich eine Prothese trage, ist mein Leben ausgefüllt.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Ich habe mich daran gewöhnt, eine Prothese zu tragen.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Es macht mir nichts aus, wenn jemand auf meine Prothese schaut.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Es fällt mir leicht, über meine Prothese zu sprechen.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Es stört mich nicht, wenn andere mich auf meine Prothese ansprechen.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Es fällt mir leicht, über den Verlust meines Körperteils zu sprechen",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Eine Prothese behindert meine Fähigkeit alltägliche Arbeiten zu verrichten.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Eine Prothese zu haben bedeutet stärker auf andere angewiesen zu sein, als mir lieb ist.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Eine Prothese zu haben, begrenzt die Art der alltäglichen Arbeiten, die ich ausüben kann.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Amputiert zu sein bedeutet, dass ich nicht das tun kann, was ich tun möchte.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					},
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Eine Prothese zu haben, schränkt den Umfang der Tätigkeiten ein, die ich verrichten kann.",
+							"required": true
+						},
+						"content": {
+							"stimme gar nicht zu": [],
+							"stimme nicht zu": [],
+							"stimme zu": [],
+							"stimme voll zu": []
+						}
+					}
+				],
+				[
+					{
+						"type": "radio",
+						"attributes": {
+							"name": "Statistische Auswertung für Studienzwecke",
+							"required": true
+						},
+						"content": {
+							"Ich willige ein, dass die Angaben anonymisiert statistisch verwertet werden dürfen. Die Einwilligung kann ich jederzeit ohne Angaben von Gründen und ohne Auswirkungen auf meine Behandlung wieder entziehen.": [],
+							"Meine Daten sollen statistisch nicht verwendet werden.": []
+						}
+					},
+					{
+						"type": "signature",
+						"attributes": {
+							"name": "Unterschrift für die Erlaubnis zur statistischen Auswertung"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"comment": "following are prosthetics ii documents #################################################################################################"
 	},
 	{
@@ -2276,6 +2873,18 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Armierungsplan Prothetik II"
+	},
+	{
+		"name": "TAPES-R-OE Patienten-Fragebogen",
+		"alias": "",
+		"context": "casedocumentation",
+		"unit": "prosthetics2",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Identifikator,TAPES-R-OE Prothetik II",
+		"patient_access": true
 	},
 	{
 		"comment": "following are prosthetics ii bundles #################################################################################################"
