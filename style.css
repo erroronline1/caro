@@ -1322,6 +1322,11 @@ button.productselection {
 	margin: 0 0 0 1em;
 }
 
+label[data-type]>span,
+header[data-type]{
+	margin-top:1rem;
+}
+
 /*************************** decorators ******************************/
 
 .red {
@@ -1427,6 +1432,9 @@ dialog a:not([data-type])::before {
 
 label[data-type]::before {
 	margin-bottom: -2.5em;
+}
+label[data-type="range"]::before {
+	margin-bottom: 0;
 }
 
 article > header[data-type]::before {
