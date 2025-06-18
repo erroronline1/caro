@@ -1067,14 +1067,16 @@ export class Composer {
 	 * @event updates this.componentIdentify and this.componentSignature count
 	 */
 	drop_delete(evnt) {
-		let draggedElement;
+		let draggedElement = evnt.dataTransfer.getData("text")
+			? document.getElementById(evnt.dataTransfer.getData("text")) // dragged to trash area
+			: evnt.target; // context menu deletion
 		// determine target:
 		// target is element
-		if (evnt.target.classList.contains("draggableDocumentElement")) draggedElement = evnt.target; // draggable element container
-		else if (evnt.target.parentNode.classList.contains("draggableDocumentElement")) draggedElement = evnt.target.parentNode; // draggable element container content
+		if (draggedElement.classList.contains("draggableDocumentElement")) draggedElement = draggedElement; // draggable element container
+		else if (draggedElement.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode; // draggable element container content
 		// target is container
-		else if (["main", "section"].includes(evnt.target.parentNode.localName)) draggedElement = evnt.target; // draggable div container
-		else if (["main", "section"].includes(evnt.target.parentNode.parentNode.localName)) draggedElement = evnt.target.parentNode; // draggable div container content
+		else if (["main", "section"].includes(draggedElement.parentNode.localName)) draggedElement = draggedElement; // draggable div container
+		else if (["main", "section"].includes(draggedElement.parentNode.parentNode.localName)) draggedElement = draggedElement.parentNode; // draggable div container content
 
 		if (!draggedElement) {
 			new _client.Toast(api._lang.GET("assemble.compose.context_delete_error"), "error");
