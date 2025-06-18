@@ -251,10 +251,17 @@ class DOCUMENT extends API {
 
 					// gather informal document properties
 					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => $this->convertFromServerTime($approve['date'])]);
+					foreach($this->_lang->_USER['documentcontext'] as $type => $context){
+						if (array_key_exists($approve['context'], $context)){
+							$documentproperties .= "\n" . $this->_lang->_USER['documentcontext'][$type][$approve['context']];
+							break;
+						}
+					}
 					if ($approve['alias']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_alias') . ': ' . $approve['alias'];
 					if ($approve['regulatory_context']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_regulatory_context') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['regulatory'][$context], explode(',', $approve['regulatory_context'])));
 					if ($approve['restricted_access']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_restricted_access') . ': ' . implode(', ', array_map(Fn($context) => $this->_lang->_USER['permissions'][$context], explode(',', $approve['restricted_access'])));
 					if ($approve['permitted_export']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_permitted_export');
+					if ($approve['patient_access']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_patient_access');
 					if ($dependeddocuments) $documentproperties .= "\n \n" . $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(', ', $dependeddocuments)]);
 
 					array_push($return['render']['content'], 
