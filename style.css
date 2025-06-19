@@ -599,6 +599,7 @@ article > header {
 	width: auto;
 	text-align: left;
 	display: block;
+	overflow-wrap: break-word;
 }
 [data-type="order"],
 [data-type="cancellation"],
@@ -931,6 +932,7 @@ a:visited {
 	text-decoration: none;
 	outline: none;
 	display: block;
+	overflow-wrap: break-word;
 }
 
 a[data-filtered],
@@ -1244,6 +1246,7 @@ p {
 /*textsection*/
 p {
 	user-select: all;
+	overflow-wrap: break-word;
 	a {
 		user-select: none;
 	}
