@@ -2237,13 +2237,7 @@
 						"attributes": {
 							"name": "Wie ist der Fragebogen auszufüllen?"
 						},
-						"content": "Es gibt keine richtigen oder falschen Antworten. Bitte beantworten Sie jede Frage so ehrlich wie möglich."
-					},
-					{
-						"type": "textsection",
-						"attributes": {
-							"name": "Ihre Antworten werden mit strengster Vertraulichkeit behandelt."
-						}
+						"content": "Es gibt keine richtigen oder falschen Antworten. Bitte beantworten Sie jede Frage so ehrlich wie möglich.\nIhre Antworten werden mit strengster Vertraulichkeit behandelt."
 					}
 				],
 				[
@@ -2685,7 +2679,7 @@
 					{
 						"type": "radio",
 						"attributes": {
-							"name": "Es fällt mir leicht, über den Verlust meines Körperteils zu sprechen",
+							"name": "Es fällt mir leicht, über den Verlust meines Körperteils zu sprechen.",
 							"required": true
 						},
 						"content": {
