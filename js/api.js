@@ -1666,9 +1666,13 @@ export const api = {
 						successFn = function (data) {
 							if (data.data !== undefined) {
 								let inputs = document.querySelectorAll("input, textarea, select");
-								let inputname, groupname, files, a;
+								let inputname,
+									groupname,
+									files,
+									a,
+									inputnamesanitation = new RegExp(String.raw`${api._settings.config.forbidden.input.characters}`, "g");
 								for (const input of inputs) {
-									inputname = input.name.replaceAll(" ", "_");
+									inputname = input.name.replaceAll(inputnamesanitation, "_");
 									if (input.type === "file") {
 										if (Object.keys(data.data).includes(inputname.replace("[]", ""))) {
 											files = data.data[inputname.replace("[]", "")].split(", ");
@@ -1719,7 +1723,7 @@ export const api = {
 											}
 											dynamicMultiples.forEach((name) => {
 												if (element.nextSibling && element.nextSibling.classList.contains("hint")) element = element.nextSibling;
-												clone.attributes.name = name.replaceAll("_", " ");
+												clone.attributes.name = name.replaceAll(inputnamesanitation, " ");
 												clone.attributes.value = data.data[name];
 												switch (type) {
 													case "select":
@@ -1734,8 +1738,8 @@ export const api = {
 														element = element.nextSibling; // button
 														break;
 												}
-												if (!document.getElementsByName(name.replaceAll("_", " "))[0]) new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
-												element = document.getElementsByName(name.replaceAll("_", " "))[0].nextSibling; // label
+												if (!document.getElementsByName(name.replaceAll(inputnamesanitation, " "))[0]) new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
+												element = document.getElementsByName(name.replaceAll(inputnamesanitation, " "))[0].nextSibling; // label
 											});
 										}
 									}

@@ -1893,7 +1893,15 @@ class RECORD extends API {
 				return $enumerate;
 			}
 	
-			// recursive content setting according to the most recent document
+			/**
+			 * recursive content setting according to the most recent document
+			 * @param array $element component and subsets
+			 * @param array $payload
+			 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
+			 * @param array $enumerate names of elements that have to be enumerated
+			 * 
+			 * also see document.php export()
+			 */
 			function printable($element, $payload, $type, $enumerate = []){
 				$content = ['content' => []];
 				foreach($element as $subs){
@@ -1915,20 +1923,21 @@ class RECORD extends API {
 						if ($enumerate[$name] > 1) {
 							$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 						}
+						$payloadname = preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', ' ', $name);
 
 						if ($subs['type'] === 'textsection'){
 							$value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
 							 : ' ';
 						}
-						elseif (isset($payload[$name])) {
-							$value = $payload[$name];
+						elseif (isset($payload[$payloadname])) {
+							$value = $payload[$payloadname];
 						}
 						else $value = '-';
 
 						$content['content'][$name] = $value;
 						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys($payload));
 						foreach($dynamicMultiples as $submitted){
-							$value = $payload[$submitted];
+							$value = $payload[preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', ' ', $submitted)];
 							$content['content'][$submitted] = $value;
 						}
 					}
@@ -1954,6 +1963,8 @@ class RECORD extends API {
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}
 		}
+//		var_dump($summary);
+//		die();
 		return $summary;
 	}
 }

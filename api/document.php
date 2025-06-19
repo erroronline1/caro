@@ -1268,6 +1268,8 @@ class DOCUMENT extends API {
 		 * @param array $payload
 		 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
 		 * @param array $enumerate names of elements that have to be enumerated
+		 * 
+		 * also see record.php summarizeRecord()
 		 */
 		function printable($element, $payload, $_lang, $enumerate = []){
 			$content = ['content' => [], 'images' => [], 'fillable' => false];
@@ -1295,11 +1297,11 @@ class DOCUMENT extends API {
 					else $name = $subs['attributes']['name'];
 					$enumerate = enumerate($name, $enumerate); // enumerate proper names, checkbox gets a generated payload with chained checked values by default
 					$originName = $name;
-					$postname = str_replace(' ', '_', $name);
 					if ($enumerate[$name] > 1) {
-						$postname .= '(' . $enumerate[$name] . ')'; // payload variable name
 						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 					}
+					$postname = preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $name);
+
 					if (isset($subs['attributes']['required'])) $name .= ' *';
 					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
 						foreach($subs['content'] as $key => $attributes) {
@@ -1320,7 +1322,7 @@ class DOCUMENT extends API {
 							$selected = '';
 
 							// dynamic multiple select
-							$dynamicMultiples = preg_grep('/' . preg_quote(str_replace(' ', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
+							$dynamicMultiples = preg_grep('/' . preg_quote(preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
 							foreach($dynamicMultiples as $submitted){
 								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
 							}
@@ -1376,8 +1378,8 @@ class DOCUMENT extends API {
 					}
 					else {
 						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
-						$dynamicMultiples = preg_grep('/' . preg_quote(str_replace(' ', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
-						foreach($dynamicMultiples as $matchkey => $submitted){
+						$dynamicMultiples = preg_grep('/' . preg_quote(preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
+						foreach($dynamicMultiples as $submitted){
 							$content['content'][$submitted] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $submitted) ? : ''];
 						}
 					}

@@ -1628,6 +1628,8 @@ names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users
 
 filename[characters] = "[,\/\\\]" ; replace matched characters to avoid link error
 
+input[characters] = "[\s.]" ; sanitation of document field names for reimport of previous document entries, corresponding to post payload properties
+
 [lifespan]
 calendar_completed = 365 ; DAYS after compleded calendar entries are deleted if not specified otherwise
 idle = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
