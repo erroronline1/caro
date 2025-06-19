@@ -229,6 +229,7 @@ class PDF{
 							// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 							else $this->_pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
 							$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']); // font size
+							$this->_pdf->Ln(($height['default'] + max([1, $nameLines])));
 							break;
 						}
 						$this->_pdf->SetFontSize(0); // variable font size
