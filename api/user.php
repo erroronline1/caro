@@ -806,7 +806,7 @@ class USER extends API {
 				if ($idle != CONFIG['lifespan']['idle']){
 					$user['app_settings']['idle'] = $idle;
 				}
-				else unset ($user['app_settings']['timeout']);
+				else unset ($user['app_settings']['idle']);
 
 				// sanitize app settings for empty values
 				foreach($user['app_settings'] as $key => $value){
