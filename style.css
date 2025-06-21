@@ -773,7 +773,7 @@ article:has(> article) {
 }
 
 .collapsible.extended {
-	max-height: 100em;
+	max-height: 1000em;
 	overflow: auto;
 	mask-image: none;
 
