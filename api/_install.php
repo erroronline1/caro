@@ -683,7 +683,7 @@ class INSTALL {
 			$this->{$method}();
 		}
 		else {
-			foreach(get_class_vars(get_class($this)) as $varName => $varValue){
+			foreach (get_class_vars(get_class($this)) as $varName => $varValue){
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
@@ -691,7 +691,7 @@ class INSTALL {
 			echo 'You must be logged in with administrator privileges to do anything beside database installation.<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
-			foreach($methods as $methodName){
+			foreach ($methods as $methodName){
 				if (!in_array($methodName, [
 					'__construct',
 					'navigation',
@@ -802,7 +802,7 @@ class INSTALL {
 	public function importJSON($path, $type, $defaultLanguage = true){
 		$lookup = $path . '*' . $type . ($defaultLanguage ? '.' . $this->_defaultLanguage : '') . '.*';
 		$files = [];
-		foreach(glob($lookup) as $file){
+		foreach (glob($lookup) as $file){
 			$pinfo = pathinfo($file);
 			$files[] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $pinfo['dirname'] . '/' . $pinfo['filename']);
 		}
@@ -908,7 +908,7 @@ class INSTALL {
 			$similar = array_filter($similar, fn($audit) => ($audit['hint'] === $entry['hint'] || boolval($audit['hint']) === boolval($entry['hint'])));
 			// proceed only if NO similar items remain
 			if (!$similar) {
-				foreach($entry['content'] as $key => &$question){
+				foreach ($entry['content'] as $key => &$question){
 					// filter empty sets
 					if (!$question['question']){
 						unset ($entry['content'][$key]);
@@ -996,7 +996,7 @@ class INSTALL {
 		 */
 		function containsForbidden($elements) {
 			$forbidden = false;
-			foreach($elements as $element) {
+			foreach ($elements as $element) {
 				if (array_is_list($element)) {
 					$forbidden = containsForbidden($element);
 				} else {					
@@ -1012,9 +1012,11 @@ class INSTALL {
 			return $forbidden;
 		}
 		
-		$insertions = $names = [];
+		$name_context = array_map(fn($doc) => $doc['name'] . '_' . $doc['context'], $DBall);
+
+		$insertions = [];
 		foreach ($json as $entry){
-			// documents are only transferred if the name is not already taken
+			// documents are only transferred if the name is not already taken for the context
 			if (!(
 				isset($entry['name']) && $entry['name'] &&
 				isset($entry['context']) && $entry['context'] &&
@@ -1025,41 +1027,39 @@ class INSTALL {
 				continue;
 			}
 
-			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
-				if($pattern = UTILITY::forbiddenName($entry['name'])){
-					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
-					continue;
-				}
-				if (isset($names[$entry['context']]) && in_array($entry['name'], $names[$entry['context']])) {
-					$this->printError('Multiple occurences of the name are not allowed' . '. This item will be skipped:', $entry);
-					continue;
-				}
-				if ($entry['context'] === 'component' && $entry['content']){
-					if ($forbidden = containsForbidden($entry['content'])){
-						$this->printError('The component ' . $entry['name'] . ' contains a forbidden input name: ' . $forbidden['name']. ' is not allowed by matching ' . $forbidden['pattern'] . '. This item will be skipped:', $entry);
-						continue;
-					}
-				}
-
-				// ensure proper formatting
-				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context'] ? : ''));
-				$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
-
-				if (!isset($names[$entry['context']]))$names[$entry['context']] = [];
-				$names[$entry['context']][] = $entry['name'];
-				$insertions[] = [
-					':name' => $entry['name'],
-					':alias' => isset($entry['alias']) ? $entry['alias'] : '',
-					':context' => $entry['context'],
-					':unit' => $entry['unit'],
-					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-					':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
-					':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $entry['regulatory_context'] : '',
-					':permitted_export' => isset($entry['permitted_export']) && $entry['permitted_export'] ? $entry['permitted_export'] : null,
-					':restricted_access' => isset($entry['restricted_access']) && $entry['restricted_access'] ? $entry['restricted_access'] : null,
-					':patient_access' => isset($entry['patient_access']) && $entry['patient_access'] ? $entry['patient_access'] : null
-				];
+			if (in_array($entry['name'] . '_' . $entry['context'], $name_context)){
+				$this->printError('Multiple occurences of the name ' . $entry['name'] . ' are not allowed for context ' . $entry['context'] . '. This item will be skipped:', $entry);
+				continue;
 			}
+
+			if($pattern = UTILITY::forbiddenName($entry['name'])){
+				$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+				continue;
+			}
+			if ($entry['context'] === 'component' && $entry['content']){
+				if ($forbidden = containsForbidden($entry['content'])){
+					$this->printError('The component ' . $entry['name'] . ' contains a forbidden input name: ' . $forbidden['name']. ' is not allowed by matching ' . $forbidden['pattern'] . '. This item will be skipped:', $entry);
+					continue;
+				}
+			}
+
+			// ensure proper formatting
+			$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context'] ? : ''));
+			$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
+
+			$name_context[] = $entry['name'] . '_' . $entry['context'];
+			$insertions[] = [
+				':name' => $entry['name'],
+				':alias' => isset($entry['alias']) ? $entry['alias'] : '',
+				':context' => $entry['context'],
+				':unit' => $entry['unit'],
+				':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
+				':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
+				':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $entry['regulatory_context'] : '',
+				':permitted_export' => isset($entry['permitted_export']) && $entry['permitted_export'] ? $entry['permitted_export'] : null,
+				':restricted_access' => isset($entry['restricted_access']) && $entry['restricted_access'] ? $entry['restricted_access'] : null,
+				':patient_access' => isset($entry['patient_access']) && $entry['patient_access'] ? $entry['patient_access'] : null
+			];
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('document_post'), $insertions)))
 			$this->printSuccess('Novel entries by name from documents have been installed.');
@@ -1121,7 +1121,7 @@ class INSTALL {
 		$json = $this->importJSON('../templates/', 'risks');
 		// gather possibly existing entries
 		$DBall = [];
-		foreach(SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist') as $row){
+		foreach (SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist') as $row){
 			$DBall[] = $row['process'].$row['risk'].$row['cause'].$row['measure'];
 		}
 		$insertions = [];
@@ -1134,7 +1134,7 @@ class INSTALL {
 				// validity check, match with risk.php
 				switch($entry['type']){
 					case 'characteristic': // implement further cases if suitable, according to languagefile
-						foreach($entry as $key => $value){
+						foreach ($entry as $key => $value){
 							if (in_array($key, [
 								'effect',
 								'probability',
@@ -1157,7 +1157,7 @@ class INSTALL {
 						}		
 						break;
 					default: //risk
-					foreach($entry as $key => $value){
+					foreach ($entry as $key => $value){
 						if (in_array($key, [
 							'cause',
 							'measure_remainder',
@@ -1256,7 +1256,7 @@ class INSTALL {
 					continue;
 				}
 				$used = $entry['type'] === 'template' ? $names['template'] : [...$names['text'], ...$names['replacement']];
-				foreach($used as $name){
+				foreach ($used as $name){
 					if (str_starts_with($entry['name'], $name) || str_starts_with($name, $entry['name']))
 					$this->printError($entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed. This item will be skipped:', $entry);
 					continue;
@@ -1479,7 +1479,7 @@ class INSTALL {
 				echo 'Check what to update by vendor. If template has any value it will override the database, otherwise the original will be kept.';
 				echo '<form method="post">';
 				$intersections=array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
-				foreach($DBall as $vendor){
+				foreach ($DBall as $vendor){
 					if (!in_array($vendor['name'], $intersections)) continue;
 					echo '<br /><br />' . $vendor['name'] . ($vendor['hidden'] ? ' (this vendor is marked as hidden)' : '');
 					echo '<br /><label><input type="checkbox" name="' . $vendor['name'] . '_info" /> info</label> | ' . '<label><input type="checkbox" name="' . $vendor['name'] . '_pricelistfilter" /> pricelist filter</label>';
