@@ -209,7 +209,7 @@ class USER extends API {
 
 				// resolve primary case states for default view within records
 				$primary_casestates = [$this->_lang->GET('record.casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')]];
-				foreach($this->_lang->_USER['casestate']['casedocumentation'] as $state => $translation){
+				foreach($this->_lang->_USER['casestate']['casedocumentation'] as $translation){
 					$primary_casestates[$translation] = ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')];
 				}
 				if(isset($user['app_settings']['primaryRecordState'])) $primary_casestates[$this->_lang->GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
@@ -384,7 +384,7 @@ class USER extends API {
 				$languages = [];
 				foreach(glob('language.*.json') as $file){
 					$lang = explode('.', $file);
-					$languages[$lang[1]] = (isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) ? ['selected' => true] : [];
+					$languages[$lang[1]] = ((isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) || (!isset($user['app_settings']['language']) && $lang[1] == CONFIG['application']['defaultlanguage'])) ? ['selected' => true] : [];
 				}
 				// preset available themes
 				$theme = [];
