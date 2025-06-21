@@ -100,26 +100,22 @@ class APPLICATION extends API {
 		foreach (['../', '../js', '../api'] as $dir){
 			foreach (scandir($dir) as $file){
 				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json'])) continue;
-				foreach(file($dir . '/' . $file) as $row){
-					if (in_array(pathinfo($file)['extension'], ['md'])){
-						$lines['documentation']++;				
-					}
-					else {
-						$lines['code']++;
-					}
+				if (in_array(pathinfo($file)['extension'], ['md'])){
+					$lines['documentation'] += count(file($dir . '/' . $file));
+				}
+				else {
+					$lines['code'] += count(file($dir . '/' . $file));
 				}
 			}
 		}
 		foreach (['../templates'] as $dir){
 			foreach (scandir($dir) as $file){
 				if (!isset(pathinfo($file)['extension']) || !in_array(pathinfo($file)['extension'], ['php','ini','js','html','css','md','json'])) continue;
-				foreach(file($dir . '/' . $file) as $row){
-					if (in_array(pathinfo($file)['extension'], ['md'])){
-						$lines['documentation']++;				
-					}
-					else {
-						$lines['configuration']++;
-					}
+				if (in_array(pathinfo($file)['extension'], ['md'])){
+					$lines['documentation']+= count(file($dir . '/' . $file));			
+				}
+				else {
+					$lines['configuration']+= count(file($dir . '/' . $file));
 				}
 			}
 		}
@@ -202,9 +198,10 @@ class APPLICATION extends API {
 					);
 					SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_notified',
 						[
-						'values' => [
-							':notified' => $diff,
-							':id' => $row['id']]
+							'values' => [
+								':notified' => $diff,
+								':id' => $row['id']
+							]
 						]
 					);
 				}
@@ -957,7 +954,7 @@ class APPLICATION extends API {
 			// sort by context for easier comprehension
 			foreach ($displayeddocuments as $context => $list){
 				$contexttranslation = '';
-				foreach ($this->_lang->_USER['documentcontext'] as $documentcontext => $contexts){
+				foreach ($this->_lang->_USER['documentcontext'] as $contexts){
 					if (isset($contexts[$context])){
 						$contexttranslation = $contexts[$context];
 						break;
