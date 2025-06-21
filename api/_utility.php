@@ -452,6 +452,13 @@ class UTILITY {
 	 * @return object with request parameters and their value
 	 */
 	public static function parsePayload(){
+$x=
+1
+;
+if ($x){
+var_dump(file_get_contents("php://input"), $_POST, $_SERVER['QUERY_STRING']);
+die();
+}
 		switch($_SERVER['REQUEST_METHOD']){
 			case "POST":
 				if (!$_POST) { // has not been sent via multipartform

@@ -181,7 +181,7 @@ export const api = {
 				const date = new Date();
 				_client.application.debug(request, date.toUTCString(), error);
 				const errorcode = error.message.match(/\d+/g);
-				if (api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
+				//if (api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
 
 				if (errorFn != null) errorFn(error);
 				new Toast(error, "error");

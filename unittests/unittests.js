@@ -1879,3 +1879,19 @@ export async function screenshot(lang = null) {
 	}
 	console.log("done. reload to return to normal.");
 }
+
+export function vartest(){
+	const payload = new FormData();
+	payload.append("asdföäü._? aksldfjn[", "1");
+
+	api.send("post", ["application", "start", "api"], null, null, payload);
+	api.send("put", ["application", "start", "api"], null, null, payload);
+	api.send("get", ["application", "start", "api"], null, null, payload);
+	api.send("delete", ["application", "start", "api"], null, null, payload);
+
+	_.api("post", "api/api.php/application/start/error", payload, true);
+	_.api("put", "api/api.php/application/start/error", payload, true);
+	_.api("get", "api/api.php/application/start/error", payload, true);
+	_.api("delete", "api/api.php/application/start/error", payload);
+
+}

@@ -73,7 +73,7 @@ var httpResponse = {
 	504: "Gateway Timeout",
 	505: "HTTP Version Not Supported",
 	507: "Insufficient Storage",
-	511: 'Network Authentication Required'
+	511: "Network Authentication Required",
 };
 
 const _ = {
@@ -85,7 +85,7 @@ const _ = {
 		// searches if at least one element of values (string or array) occurs in obj (string or array)
 		return Array.isArray(values) ? values.some((value) => obj.includes(value)) : obj.includes(values);
 	},
-	replaceArray : function (obj, find, replace) {
+	replaceArray: function (obj, find, replace) {
 		var replaceString = obj;
 		var regex;
 		for (var i = 0; i < find.length; i++) {
@@ -97,27 +97,43 @@ const _ = {
 	api: async function (method, destination, payload, form_data = false) {
 		method = method.toUpperCase();
 		let query = "";
-		if (method == "GET") {
+		if (["GET", "DELETE"].includes(method)) {
 			query = payload ? "?" : "";
+			if (form_data) payload.forEach((value, key) => {
+				query += "&" + key + "=" + value;
+			});
+			else {
+				for (const [key, value] of Object.entries(payload)){
+					query += "&" + key + "=" + value;
+				}
+			}
+		}
+		if (!form_data){
+			let json =[];
 			Object.keys(payload).forEach((key) => {
-				query += "&" + key + "=" + payload[key];
+				json[key] =  payload[key];
 			});
 		}
 		const response = await fetch(destination + query, {
 			method: method, // *GET, POST, PUT, DELETE, etc.
 			cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-			body: method == "GET" ? null : form_data ? payload : JSON.stringify(payload), // body data type must match "Content-Type" header
-			timeout: false
-		}).then(async (response) => {
-			if (response.statusText === "OK" || response.status === 511)
-				return {
-					status: response.status,
-					body: await response.json(),
-				};
-			else throw new Error("server responded " + response.status + ": " + httpResponse[response.status]);
-		}).catch(e => {
-			return {error:e};
-		});
+			body: ["GET", "DELETE"].includes(method) ? null : (form_data ? payload : json), // body data type must match "Content-Type" header
+			timeout: false,
+			headers:{
+				"Content-Type": ["GET", "DELETE"].includes(method) ? "text/plain" : (form_data ? "application/octet-stream" : "application/json")
+			}
+		})
+			.then(async (response) => {
+				if (response.statusText === "OK" || response.status === 511)
+					return {
+						status: response.status,
+						body: await response.json(),
+					};
+				else throw new Error("server responded " + response.status + ": " + httpResponse[response.status]);
+			})
+			.catch((e) => {
+				return { error: e };
+			});
 		return response;
 		/* use like 
 			_.api(method, url, payload-object)
@@ -299,7 +315,7 @@ const _ = {
 				}
 				const objectStoreRequest = objectStore.add(entry);
 				objectStoreRequest.onerror = (event) => {
-					reject({"event": event, contents: contents});
+					reject({ event: event, contents: contents });
 				};
 				objectStoreRequest.onsuccess = (event) => {
 					resolve(event.target.result); // key
