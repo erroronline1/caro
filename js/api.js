@@ -100,15 +100,9 @@ export const api = {
 		api.preventDataloss.stop();
 		api.loadindicator(true);
 
-		// revert masonry breakpoint if former call (current history has been set by recent api call) had prevented this
+		// default reset masonry breakpoint if former call (current history has been set by recent api call) had prevented this
 		// currently masonry is counterproductive for conversations
-		// add other expected calls if necessary like message_conversation_\d|application_start
-		const history = JSON.parse(sessionStorage.getItem("history"));
-		if (history) {
-			const back = api.history && history[api.history.currentStep + 1] ? history[api.history.currentStep + 1].join("_") : "";
-			const forth = api.history && history[api.history.currentStep - 1] ? history[api.history.currentStep - 1].join("_") : "";
-			if (api._settings.user.app_settings && api._settings.user.app_settings.masonry && (back.match(/message_conversation_\d+/g) || forth.match(/message_conversation_\d+/g))) await window.Masonry.breakpoints(true);
-		}
+		if (api._settings.user.app_settings && api._settings.user.app_settings.masonry) await window.Masonry.breakpoints(true);
 
 		if (api._settings.user && api._settings.user.fingerprint && ["post", "put"].includes(method)) {
 			let sanitizedpayload = {};
