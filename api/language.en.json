@@ -532,6 +532,7 @@
 				"delete_confirm_ok": "Yes, delete",
 				"delete_error": "The template could not be deleted",
 				"delete_success": "Template deleted",
+				"edit": "Edit Template",
 				"hint": "Hint",
 				"hint_hint": "e.g. subunit",
 				"import_summary": "Import previous summary",
@@ -1507,7 +1508,10 @@
 			"price_surcharge": "Surcharge in %",
 			"price_tax": "Tax in %",
 			"result": "Result",
-			"select_type": "Calculate"
+			"select_type": "Calculate",
+			"thread": "Core Hole",
+			"thread_core": "Metric thread",
+			"thread_fine": "Fine thread"
 		},
 		"code": {
 			"barcode_code128": "Barcode CODE128",

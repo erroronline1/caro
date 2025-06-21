@@ -532,6 +532,7 @@
 				"delete_confirm_ok": "Ja, Vorlage löschen",
 				"delete_error": "Die Vorlage konnte nicht gelöscht werden",
 				"delete_success": "Die Vorlage wurde gelöscht",
+				"edit": "Vorlage bearbeiten",
 				"hint": "Hinweis",
 				"hint_hint": "zum Beispiel Teilbereich",
 				"import_summary": "Vorige Zusammenfassung importieren",
@@ -1507,7 +1508,10 @@
 			"price_surcharge": "Aufschlag in %",
 			"price_tax": "Steuer in %",
 			"result": "Ergebnis",
-			"select_type": "Berechne"
+			"select_type": "Berechne",
+			"thread": "Kernlochbohrung",
+			"thread_core": "Metrische Gewindegröße",
+			"thread_fine": "Feingewinde"
 		},
 		"code": {
 			"barcode_code128": "Barcode CODE128",
