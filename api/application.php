@@ -120,7 +120,26 @@ class APPLICATION extends API {
 			}
 		}
 
-		$response = ['render' => ['content' => [
+		$response = ['render' => ['content' => []]];
+
+		if (isset($_SESSION['user'])){
+			// add manual filtered by applicable permission
+			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
+			$topics = [];
+			foreach ($query as $row){
+				if (PERMISSION::permissionIn($row['permissions'])) $topics[] =
+					[[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $row['title']
+						],
+						'content' => $row['content']
+					]];
+			}
+			if ($topics) $response['render']['content'][] = $topics;
+		}
+
+		array_push($response['render']['content'], ...[
 			[
 				'type' => 'textsection',
 				'attributes' => [
@@ -142,7 +161,7 @@ class APPLICATION extends API {
 				],
 				'content' => $this->_lang->GET('application.about.lines', [':code' => $lines['code'], ':documentation' => $lines['documentation'], ':configuration' => $lines['configuration']])
 			],
-		]]];
+		]);
 		$this->response($response);
 	}
 
@@ -218,7 +237,7 @@ class APPLICATION extends API {
 				// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
 				$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_vendor_certificate_expired', [':vendor' => $vendor['name']], true));
 				$open = false;
-				foreach($reminders as $reminder){
+				foreach ($reminders as $reminder){
 					if (!$reminder['closed']) $open = true;
 				}
 				if (!$open){
@@ -247,7 +266,7 @@ class APPLICATION extends API {
 				if ($vendor['hidden']) continue;
 				if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]))) {
 					if (!isset($documents[$vendor['id']])) $documents[$vendor['id']] = [];
-					foreach($docfiles as $path){
+					foreach ($docfiles as $path){
 						$file = pathinfo($path);
 						$article_no = explode('_', $file['filename'])[2];
 						$date = date('Y-m-d', filemtime($path));
@@ -258,7 +277,7 @@ class APPLICATION extends API {
 
 			$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 			$alerts = [];
-			foreach($products as $product){
+			foreach ($products as $product){
 				if ($product['hidden']) continue;
 				$article_no = preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $product['article_no'] ? : '');
 				if (isset($documents[$product['vendor_id']]) && isset($documents[$product['vendor_id']][$article_no])){
@@ -306,7 +325,7 @@ class APPLICATION extends API {
 					], true);
 					$reminders = $calendar->search($subject);
 					$open = false;
-					foreach($reminders as $reminder){
+					foreach ($reminders as $reminder){
 						if (!$reminder['closed']) $open = true;
 					}
 					if (!$open){
@@ -330,7 +349,7 @@ class APPLICATION extends API {
 			// alert requesting unreceived orders or marking received as delivered
 			$alerts = [];
 			$undelivered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unreceived_undelivered');
-			foreach($undelivered as $order){
+			foreach ($undelivered as $order){
 				$update = false;
 				$decoded_order_data = null;
 				$ordered = new \DateTime($order['ordered'] ? : '');
@@ -429,13 +448,13 @@ class APPLICATION extends API {
 
 			// schedule renewal of expired responsibilities
 			$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
-			foreach($responsibilities as $row){
+			foreach ($responsibilities as $row){
 				if ($row['hidden']) continue;
 				if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 					// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
 					$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true));
 					$open = false;
-					foreach($reminders as $reminder){
+					foreach ($reminders as $reminder){
 						if (!$reminder['closed']) $open = true;
 					}
 					if (!$open){
@@ -463,7 +482,7 @@ class APPLICATION extends API {
 					':ids' => implode(',', array_column($users, 'id'))
 				]
 			]);
-			foreach($trainings as $training){
+			foreach ($trainings as $training){
 				if ($training['evaluation'] || !$training['date']) continue;
 				$trainingdate = new \DateTime($training['date']);
 				if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
@@ -477,7 +496,7 @@ class APPLICATION extends API {
 						], true);
 						$reminders = $calendar->search($subject);
 						$open = false;
-						foreach($reminders as $reminder){
+						foreach ($reminders as $reminder){
 							if (!$reminder['closed']) $open = true;
 						}
 						if (!$open){
@@ -501,7 +520,7 @@ class APPLICATION extends API {
 
 			// schedule retrainings
 			$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
-			foreach($trainings as $training){
+			foreach ($trainings as $training){
 				if ($training['planned']) {
 					continue;
 				}
@@ -512,7 +531,7 @@ class APPLICATION extends API {
 						$user = $users[$user];
 						// check for scheduled trainings. if none add a new.
 						$none = true;
-						foreach($reversetrainings as $scheduled){
+						foreach ($reversetrainings as $scheduled){
 							// must be of same name for this user
 							if ($scheduled['user_id'] !== $user['id'] || $scheduled['name'] != $training['name']) continue;
 							// date has been set and is newer than expiry, obviously a follow up training or already planned
@@ -547,7 +566,7 @@ class APPLICATION extends API {
 								$this->_lang->GET('user.training.auto_schedule_alert_message', [
 									':user' => $user['name'],
 									':training' => $training['name'],
-									':date' =>$this->convertFromServerTime($training['date'], true),
+									':date' => $this->convertFromServerTime($training['date'], true),
 									':expires' => $this->convertFromServerTime($training['expires'], true)
 								], true)
 							);
@@ -597,7 +616,7 @@ class APPLICATION extends API {
 	 */
 	public function manual(){
 		if (!PERMISSION::permissionFor('appmanual')) $this->response([], 401);
-		$result = ['render' => ['content' => []]];
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// prepare entry
@@ -609,10 +628,10 @@ class APPLICATION extends API {
 				];
 				
 				// check forbidden names
-				if(UTILITY::forbiddenName($entry['title'])) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($entry['title'])) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 		
 				// chain checked permission levels
-				foreach($this->_lang->_USER['permissions'] as $level => $description){
+				foreach ($this->_lang->_USER['permissions'] as $level => $description){
 					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
 						$permissions[] = $level;
 					}
@@ -651,10 +670,10 @@ class APPLICATION extends API {
 				];
 		
 				// check forbidden names
-				if(UTILITY::forbiddenName($entry['title'])) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($entry['title'])) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
 		
 				// chain checked permission levels
-				foreach($this->_lang->_USER['permissions'] as $level => $description){
+				foreach ($this->_lang->_USER['permissions'] as $level => $description){
 					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
 						$permissions[] = $level;
 					}
@@ -701,7 +720,7 @@ class APPLICATION extends API {
 				else $entry = $query[0];
 
 				// append form
-				$result['render']['form'] = [
+				$response['render']['form'] = [
 					'data-usecase' => 'manual',
 					'action' => "javascript:api.application('" . ($entry['id'] ? 'put' : 'post') . "', 'manual'" . ($entry['id'] ? ", " . $entry['id'] : '') . ")"];
 
@@ -717,12 +736,12 @@ class APPLICATION extends API {
 				// set up available permissions, set checked from selected entry
 				$permissions = [];
 				$entry['permissions'] = explode(',', $entry['permissions']);
-				foreach($this->_lang->_USER['permissions'] as $level => $description){
+				foreach ($this->_lang->_USER['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, $entry['permissions']) ? ['checked' => true] : [];
 				}
 
 				// append entry form
-				$result['render']['content'] = [
+				$response['render']['content'] = [
 					[
 						[
 							'type' => 'select',
@@ -758,7 +777,7 @@ class APPLICATION extends API {
 				];
 
 				// append delete button if applicable
-				if ($entry['id']) $result['render']['content'][] = [
+				if ($entry['id']) $response['render']['content'][] = [
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
@@ -792,7 +811,7 @@ class APPLICATION extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -917,10 +936,10 @@ class APPLICATION extends API {
 		if (!isset($_SESSION['user'])) $this->response([], 401);
 		// cron job
 		$cron = $this->cron();
-		$result = array_merge(['render' => ['content' => []]], $this->_auth);
+		$response = array_merge(['render' => ['content' => []]], $this->_auth);
 
 		// aria timeout information
-		$result['render']['content'][] = [
+		$response['render']['content'][] = [
 			[
 				'type' => 'textsection',
 				'attributes' => [
@@ -940,7 +959,7 @@ class APPLICATION extends API {
 			$search = new SHARED($this->_pdo, $this->_date);
 			$documents = $search->documentsearch(['search' => null]);
 			// prepare existing documents lists grouped by context
-			foreach($documents as $row) {
+			foreach ($documents as $row) {
 				if (!$row['patient_access'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
 				if (!in_array($row['name'], $documentdatalist)) {
 					$documentdatalist[] = $row['name'];
@@ -960,7 +979,7 @@ class APPLICATION extends API {
 						break;
 					}
 				}
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					'type' => 'links',
 					'description' => $contexttranslation,
 					'content' => $list
@@ -975,7 +994,7 @@ class APPLICATION extends API {
 			// storage warning
 			$storage = round(disk_free_space("/") / pow(1024, 3), 3);
 			if ($storage < CONFIG['limits']['storage_warning'] && PERMISSION::permissionFor('audit')){ // closest permission for matching responsibility with the whole quality management system
-				$result['render']['content'][count($result['render']['content']) - 1][] = [
+				$response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'textsection',
 					'attributes' => [
 						'name' => $this->_lang->GET('application.storage_warning', [':space' => $storage . ' GB']),
@@ -986,14 +1005,14 @@ class APPLICATION extends API {
 
 			// cron job
 			if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-				$result['render']['content'][count($result['render']['content']) - 1][] = [
+				$response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'textsection',
 					'attributes' => [
 						'name' => 'CRON'
 					],
 					'content' => $cron['last']
 				];
-				$result['render']['content'][count($result['render']['content']) - 1][] = [
+				$response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('application.delete_cron_log', [':count' => $cron['count']]),
@@ -1229,7 +1248,7 @@ class APPLICATION extends API {
 					];
 				}
 			}
-			if (count($tiles)) $result['render']['content'][] = $tiles;
+			if (count($tiles)) $response['render']['content'][] = $tiles;
 
 			// append search function to landing page
 			$searchelements = [
@@ -1251,7 +1270,7 @@ class APPLICATION extends API {
 				if ($records = $search->recordsearch(['search' => $this->_search])){
 					$matches = [];
 					foreach ($records as $contextkey => $context){
-						foreach($context as $record){
+						foreach ($context as $record){
 							$display = $this->_lang->GET('record.list_touched', [
 								':identifier' => $record['identifier'],
 								':date' => $this->convertFromServerTime($record['last_touch']),
@@ -1260,7 +1279,7 @@ class APPLICATION extends API {
 							$matches[$display] = [
 									'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
 								];
-							foreach($record['case_state'] as $case => $state){
+							foreach ($record['case_state'] as $case => $state){
 								$matches[$display]['data-' . $case] = $state;
 							}
 							if ($record['complaint']) $matches[$display]['class'] = 'orange';
@@ -1309,7 +1328,7 @@ class APPLICATION extends API {
 					]
 				];
 			}
-			$result['render']['content'][] = $searchelements;
+			$response['render']['content'][] = $searchelements;
 
 			// calendar scheduled events
 			$overview = [];
@@ -1364,24 +1383,9 @@ class APPLICATION extends API {
 				'content' => $uncompleted
 			];
 
-			if ($overview) $result['render']['content'][] = $overview;
-
-			// default add manual to landing page filteres by applicable permission
-			$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
-			$topics = [];
-			foreach ($query as $row){
-				if (PERMISSION::permissionIn($row['permissions'])) $topics[] =
-					[[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $row['title']
-						],
-						'content' => $row['content']
-					]];
-			}
-			if ($topics) $result['render']['content'][] = $topics;
+			if ($overview) $response['render']['content'][] = $overview;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 }
 ?>
