@@ -233,6 +233,88 @@
 		}
 	},
 	{
+		"name": "Lieferantenbewertung",
+		"alias": "",
+		"context": "component",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": {
+			"content": [
+				[
+					{
+						"type": "checkbox",
+						"attributes": {
+							"name": "Kritikalität der bezogenen Produkte oder Dienstleistungen",
+							"required": true
+						},
+						"content": {
+							"Direkter Einfluss auf die Sicherheit der Medizinprodukte": [],
+							"Indirekter Einfluss auf die Sicherheit der Medizinprodukte": [],
+							"Direkter Einfluss auf die Leistung der Medizinprodukte": [],
+							"Indirekter Einfluss auf die Leistung der Medizinprodukte": [],
+							"Direkter Einfluss auf die regulatorischen Anforderungen der Medizinprodukte": [],
+							"Indirekter Einfluss auf die regulatorischen Anforderungen der Medizinprodukte": [],
+							"Das Unternehmen kann Medizinprodukte nicht ohne die Produkte herstellen": [],
+							"Nur dieser Lieferant kann die Produkte liefern": []
+						}
+					},
+					{
+						"type": "range",
+						"attributes": {
+							"name": "Qualität der Produkte oder Dienstleistungen"
+						}
+					},
+					{
+						"type": "range",
+						"attributes": {
+							"name": "kurze Lieferzeit oder Pünktlichkeit"
+						}
+					},
+					{
+						"type": "range",
+						"attributes": {
+							"name": "Kooperation"
+						}
+					},
+					{
+						"type": "select",
+						"attributes": {
+							"name": "akkreditiertes QM-System",
+							"required": true
+						},
+						"content": {
+							"...": [],
+							"keines": [],
+							"ISO 13485": [],
+							"ISO 9001": []
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Besondere Risikobetrachtung"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Ausgelagerte Prozesse"
+						}
+					},
+					{
+						"type": "textarea",
+						"attributes": {
+							"name": "Bemerkung zur Evaluation"
+						}
+					}
+				]
+			]
+		}
+	},
+	{
 		"comment": "following are purchase documents #################################################################################################"
 	},
 	{
@@ -267,5 +349,16 @@
 		"permitted_export": null,
 		"restricted_access": null,
 		"content": "Qualitätsvereinbarung"
+	},
+	{
+		"name": "Lieferantenbewertung",
+		"alias": "",
+		"context": "vendor_evaluation_document",
+		"unit": "common",
+		"author": "Caro App",
+		"regulatory_context": "iso13485_7_4_1,iso13485_4_1_3,iso13485_5_6_1,iso13485_5_6_2",
+		"permitted_export": null,
+		"restricted_access": null,
+		"content": "Lieferantenbewertung"
 	}
 ]
