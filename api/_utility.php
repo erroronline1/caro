@@ -179,7 +179,7 @@ class UTILITY {
 	public static function cleanInputs($data){
 		$clean_input = [];
 		if(is_array($data)){
-			foreach($data as $k => $v){
+			foreach ($data as $k => $v){
 				$clean_input[$k] = self::cleanInputs($v);
 			}
 		} else {
@@ -245,7 +245,7 @@ class UTILITY {
 				$result = unlink($path);
 			}
 			elseif (is_dir($path)){
-				foreach(scandir($path) as $subdir){
+				foreach (scandir($path) as $subdir){
 					if (is_file($path . '/' . $subdir)) unlink($path . '/' . $subdir);
 					if (is_dir($path . '/' . $subdir) && !in_array($subdir, ['.','..'])) self::delete($path . '/' . $subdir);
 				}
@@ -275,7 +275,7 @@ class UTILITY {
 		$patterns = [];
 		$replacements = [];
 		if ($replace){
-			foreach($replace as $pattern => $replacement){
+			foreach ($replace as $pattern => $replacement){
 				$patterns[] = '/' . $pattern . '/';
 				$replacements[] = $replacement;
 			}
@@ -300,14 +300,14 @@ class UTILITY {
 	 * @return string|false matched pattern or not matched
 	 */
 	public static function forbiddenName($name, $extendedpattern = []){
-		foreach(CONFIG['forbidden']['names'] as $key => $pattern) {
+		foreach (CONFIG['forbidden']['names'] as $key => $pattern) {
 			if (isset($extendedpattern[$key])) $pattern = $extendedpattern[$key];
 			preg_match('/' . $pattern. '/m', $name, $match);
 			if ($match) {
 				return $pattern;
 			}
 		}
-		foreach($extendedpattern as $key => $pattern) {
+		foreach ($extendedpattern as $key => $pattern) {
 			preg_match('/' . $pattern. '/m', $name, $match);
 			if ($match) {
 				return $pattern;
@@ -402,7 +402,7 @@ class UTILITY {
 				$dir = scandir($folder);
 				break;
 		}
-		foreach($dir as $file){
+		foreach ($dir as $file){
 			if (is_dir($folder . '/' . $file) && !in_array($file, ['.', '..'])) $result[] = $folder . '/' . $file;
 		}
 		return $result;
@@ -432,7 +432,7 @@ class UTILITY {
 				$dir = scandir($folder);
 				break;
 		}
-		foreach($dir as $file){
+		foreach ($dir as $file){
 			if (is_file($folder . '/' . $file) && !in_array($file, [
 				'.htaccess',
 				'web.config'
@@ -482,7 +482,7 @@ class UTILITY {
 				// Fetch content and determine boundary
 				$boundary = substr($raw_data, 0, strpos($raw_data, "\r\n"));
 
-				if(empty($boundary)){
+				if (empty($boundary)){
 					parse_str($raw_data,$data);
 				}
 				else {
@@ -520,7 +520,7 @@ class UTILITY {
 							list(, $type, $name) = $matches;
 
 							//Parse File
-							if(isset($matches[4])){
+							if (isset($matches[4])){
 								//get filename
 								$filename = $matches[4];
 								$fieldname = str_replace(' ', '_', preg_replace('/\[\]/', '', $matches[2]));
@@ -724,7 +724,7 @@ class PERMISSION {
 	public static function fullyapproved($function = '', $approvalcolumn = ''){
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
 		$approved = true;
-		foreach(self::permissionFor($function, true) as $permission){
+		foreach (self::permissionFor($function, true) as $permission){
 			if (!$approvalcolumn || !isset($approvalcolumn[$permission])) $approved = false;
 		}
 		return $approved;
@@ -746,7 +746,7 @@ class PERMISSION {
 	public static function pending($function = '', $approvalcolumn = ''){
 		if (gettype($approvalcolumn) === 'string') $approvalcolumn = $approvalcolumn ? json_decode($approvalcolumn, true) : [];
 		$pending = [];
-		foreach(self::permissionFor($function, true) as $permission){
+		foreach (self::permissionFor($function, true) as $permission){
 			if (!$approvalcolumn || array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && !isset($approvalcolumn[$permission])) $pending[] = $permission;
 		}
 		return $pending;

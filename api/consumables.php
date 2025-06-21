@@ -151,7 +151,7 @@ class CONSUMABLES extends API {
 			CONFIG['csv']['dialect']['separator'],
 			CONFIG['csv']['dialect']['enclosure'],
 			CONFIG['csv']['dialect']['escape']);
-		foreach($products as $row) {
+		foreach ($products as $row) {
 			fputcsv($file, array_map(fn($column) => $row[$column], $columns),
 			CONFIG['csv']['dialect']['separator'],
 			CONFIG['csv']['dialect']['enclosure'],
@@ -210,7 +210,7 @@ class CONSUMABLES extends API {
 				}
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'replacements' => [
-						':ids' =>implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $batchids)])
+						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id) => intval($id), $batchids)])
 					]
 				]);
 				if (!$products) $this->response([
@@ -221,14 +221,14 @@ class CONSUMABLES extends API {
 
 				// recursively retrieve input names, alter as url format (see language->PROPERTY)
 				function inputnames($element, $result = []){
-					foreach($element as $sub){
+					foreach ($element as $sub){
 						if (array_is_list($sub)){
 							$result = array_merge($result, inputnames($sub, $result));
 						} elseif (isset($sub['type']) && isset($sub['attributes']) && isset($sub['attributes']['name'])) {
 							switch ($sub['type']){
 								case 'checkbox':
 									if (isset($sub['content'])) {
-										foreach(array_keys($sub['content']) as $name){
+										foreach (array_keys($sub['content']) as $name){
 											$result[$name] = preg_replace('/[\s\.]/', '_', $name);					
 										}
 									}
@@ -253,7 +253,7 @@ class CONSUMABLES extends API {
 						// convert checkbox value
 						// unset empty values and keys from payload to freely process occasionally hidden system values
 						$check = [];
-						foreach($this->_payload as $key => &$value){
+						foreach ($this->_payload as $key => &$value){
 							if (!in_array($key, array_values($inputnames))) continue;
 							if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 							if (!$value || $value === '...') unset($this->_payload->$key);
@@ -303,7 +303,7 @@ class CONSUMABLES extends API {
 				// convert checkbox value
 				// unset empty values and keys from payload to freely process occasionally hidden system values
 				$check = [];
-				foreach($this->_payload as $key => &$value){
+				foreach ($this->_payload as $key => &$value){
 					if (!in_array($key, array_values($inputnames))) continue;
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					if (!$value || $value === '...') unset($this->_payload->$key);
@@ -330,7 +330,7 @@ class CONSUMABLES extends API {
 
 				// set approval for all permissions owned by submitting user
 				$tobeapprovedby = ['user', ...PERMISSION::permissionFor('incorporation', true)];
-				foreach($tobeapprovedby as $permission){
+				foreach ($tobeapprovedby as $permission){
 					if (in_array($permission, $_SESSION['user']['permissions'])){
 						$approve[$permission] = [
 							'name' => $_SESSION['user']['name'],
@@ -342,7 +342,7 @@ class CONSUMABLES extends API {
 				// upload files for requested product if part of the documents
 				if ($_FILES) {
 					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
-					foreach($_FILES as $input => $files){
+					foreach ($_FILES as $input => $files){
 						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':name' => $currentproduct['vendor_immutable_fileserver']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
 					}
 					// set protected
@@ -360,7 +360,7 @@ class CONSUMABLES extends API {
 				// update incorporation state for selected products
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
 					'replacements' => [
-						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id)=> intval($id), $batchids)]),
+						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id) => intval($id), $batchids)]),
 						':incorporated' => UTILITY::json_encode($approve)
 					]
 				])) $this->response([
@@ -375,14 +375,14 @@ class CONSUMABLES extends API {
 					]]);
 				break;
 			case 'GET':
-				$result = [];
+				$response = [];
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'values' => [
 						':ids' => intval($this->_requestedID)
 					]
 				]);
 				$product = $product ? $product[0] : null;
-				if (!$product) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// get incorporation- and sample-check-documents, chain for eligible products
 				$incorporationdocument = $document->recentdocument('document_document_get_by_context', [
@@ -403,7 +403,7 @@ class CONSUMABLES extends API {
 				$similarproducts = [];
 				$productsPerSlide = 0;
 				$matches = [[]];
-				foreach($vendorproducts as $vendorproduct){
+				foreach ($vendorproducts as $vendorproduct){
 					if ($vendorproduct['article_no'] === $product['article_no']) continue;
 					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
@@ -465,7 +465,7 @@ class CONSUMABLES extends API {
 				}
 
 				// append incorporation elements so far to render output
-				$result['render'] = [
+				$response['render'] = [
 					'content' => [
 						[
 							'type' => 'textsection',
@@ -479,15 +479,15 @@ class CONSUMABLES extends API {
 					],
 					'options' => [
 							$this->_lang->GET('order.incorporation.cancel') => false,
-							$this->_lang->GET('order.incorporation.submit') => [ 'value' => true, 'class'=> 'reducedCTA']
+							$this->_lang->GET('order.incorporation.submit') => [ 'value' => true, 'class' => 'reducedCTA']
 					],
 					'productid' => $product['id']
 				];
 
 				// actual add option to adopt previous, if any similar incorporations have been identified
 				if ($matches[0]){
-					array_push($result['render']['content'], ...$matches);
-					$result['render']['content'][] = [
+					array_push($response['render']['content'], ...$matches);
+					$response['render']['content'][] = [
 						[
 							'type' => 'text',
 							'hint' => $this->_lang->GET('order.incorporation.matching_previous_hint'),
@@ -501,7 +501,7 @@ class CONSUMABLES extends API {
 				}
 
 				// add text input for denial statement
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textarea',
 						'hint' => $this->_lang->GET('order.incorporation.denied_hint'),
@@ -510,7 +510,7 @@ class CONSUMABLES extends API {
 						]
 					]
 				];
-				$this->response($result);
+				$this->response($response);
 				break;
 		}
 	}
@@ -545,14 +545,14 @@ class CONSUMABLES extends API {
 
 				// recursively retrieve input names, alter as url format (see language->PROPERTY)
 				function inputnames($element, $result = []){
-					foreach($element as $sub){
+					foreach ($element as $sub){
 						if (array_is_list($sub)){
 							$result = array_merge($result, inputnames($sub, $result));
 						} elseif (isset($sub['type']) && isset($sub['attributes']) && isset($sub['attributes']['name'])) {
 							switch ($sub['type']){
 								case 'checkbox':
 									if (isset($sub['content'])) {
-										foreach(array_keys($sub['content']) as $name){
+										foreach (array_keys($sub['content']) as $name){
 											$result[$name] = preg_replace('/[\s\.]/', '_', $name);					
 										}
 									}
@@ -579,7 +579,7 @@ class CONSUMABLES extends API {
 				// convert checkbox value
 				// unset empty values and keys from payload to freely process occasionally hidden system values
 				$check = [];
-				foreach($this->_payload as $key => &$value){
+				foreach ($this->_payload as $key => &$value){
 					if (!in_array($key, array_values($inputnames))) continue;
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					if (!$value || $value === '...') unset($this->_payload->$key);
@@ -606,7 +606,7 @@ class CONSUMABLES extends API {
 				// upload files for requested product if part of the documents
 				if ($_FILES) {
 					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
-					foreach($_FILES as $input => $files){
+					foreach ($_FILES as $input => $files){
 						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':name' => $currentproduct['vendor_immutable_fileserver']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
 					}
 					// set protected
@@ -654,9 +654,9 @@ class CONSUMABLES extends API {
 					]
 				]);
 				$product = $product ? $product[0] : null;
-				if (!$product) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				$result = ['render' => [
+				$response = ['render' => [
 					'content' => [
 						[
 							[
@@ -680,7 +680,7 @@ class CONSUMABLES extends API {
 					],
 					'productid' => $product['id']
 				]];
-				$this->response($result);
+				$this->response($response);
 				break;
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('mdrsamplecheck')) $this->response([], 401);
@@ -734,23 +734,23 @@ class CONSUMABLES extends API {
 	 */
 	public function pendingincorporations(){
 		if (!PERMISSION::permissionFor('incorporation')) $this->response([], 401);
-		$result = ['render' => ['content' => []]];
+		$response = ['render' => ['content' => []]];
 		$links = [];
 		$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
-		foreach($allproducts as $product) {
+		foreach ($allproducts as $product) {
 			if (!$product['incorporated']) continue;
 			$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 			if (isset($product['incorporated']['_denied'])) continue;
 			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onclick' => "api.purchase('get', 'product', " . $product['id'] . ")"];
 		}
 		if ($links){
-			$result['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'links',
 					'content' => $links
 					]
 			];
-			$this->response($result);
+			$this->response($response);
 		}
 		else $this->response(['render' => ['content' => $this->noContentAvailable($this->_lang->GET('consumables.product.incorporation_no_approvals'))]]);
 	}
@@ -853,7 +853,7 @@ class CONSUMABLES extends API {
 					]
 				]);
 				$product = $product ? $product[0] : null;
-				if (!$product) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if (!$product) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// hand over payload to product properties
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null;
@@ -879,7 +879,7 @@ class CONSUMABLES extends API {
 						if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $product['incorporated'] = null;
 						else {
 							$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-							foreach($this->_lang->_USER['permissions'] as $permission => $translation){
+							foreach ($this->_lang->_USER['permissions'] as $permission => $translation){
 								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
 									'name' => $_SESSION['user']['name'],
 									'date' => $this->_date['servertime']->format('Y-m-d H:i')
@@ -929,7 +929,7 @@ class CONSUMABLES extends API {
 				if (PERMISSION::permissionFor('products') && $_batchupdate){
 					$batchids = explode(',', $_batchupdate);
 
-					foreach(['trading_good', 'has_expiry_date', 'special_attention', 'stock_item'] as $field){ // apply setting to selected similar products
+					foreach (['trading_good', 'has_expiry_date', 'special_attention', 'stock_item'] as $field){ // apply setting to selected similar products
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 							'values' => [
 								':value' => $product[$field],
@@ -994,7 +994,7 @@ class CONSUMABLES extends API {
 				$datalist = [];
 				$options = [$this->_lang->GET('consumables.product.vendor_select_default') => []];
 				$datalist_unit = [];
-				$result = [];
+				$response = [];
 				$vendors = [];
 
 				// select single product based on id or name
@@ -1026,13 +1026,13 @@ class CONSUMABLES extends API {
 					'stock_item' => '',
 					'erp_id' => '',
 				];
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $result['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				$documents = [];
 
 				// gather files
 				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
-				foreach($docfiles as $path){
+				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					$article_no = explode('_', $file['filename'])[2];
 					similar_text($article_no, $product['article_no'], $percent);
@@ -1046,7 +1046,7 @@ class CONSUMABLES extends API {
 					]
 				]);
 				$similarproducts = [];
-				foreach($vendorproducts as $vendorproduct){
+				foreach ($vendorproducts as $vendorproduct){
 					if ($vendorproduct['article_no'] === $product['article_no']) continue;
 					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
@@ -1077,7 +1077,7 @@ class CONSUMABLES extends API {
 
 				$vendors[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 
-				foreach($vendor as $row) {
+				foreach ($vendor as $row) {
 					$display = $row['name'];
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$options[$display] = [];
@@ -1087,7 +1087,7 @@ class CONSUMABLES extends API {
 
 				// prepare existing delivery unit lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
-				foreach($vendor as $row) {
+				foreach ($vendor as $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
 
@@ -1100,7 +1100,7 @@ class CONSUMABLES extends API {
 				// render search and selection
 				require_once('_shared.php');
 				$search = new SHARED($this->_pdo, $this->_date);
-				$result = ['render' => ['content' => $search->productsearch($this->_usecase ? : 'product')]];
+				$response = ['render' => ['content' => $search->productsearch($this->_usecase ? : 'product')]];
 		
 				// switch between display- and edit mode 
 				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')) {
@@ -1108,11 +1108,11 @@ class CONSUMABLES extends API {
 					if ($product['id']){
 						// deactivate inputs for regular users
 						$isactive['disabled'] = $isinactive['disabled'] = true;
-						foreach($regulatoryoptions as &$option){
+						foreach ($regulatoryoptions as &$option){
 							$option['disabled'] = true;
 						}
 						// display available product information
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'textsection',
 								'attributes' => [
@@ -1142,7 +1142,7 @@ class CONSUMABLES extends API {
 
 						// inform about last order
 						if ($product['id'] && $product['last_order']){
-							$result['render']['content'][1][] = [
+							$response['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))])
@@ -1159,10 +1159,10 @@ class CONSUMABLES extends API {
 							elseif (PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.accepted');
 			
 							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
-							foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
+							foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 								if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date']);
 							}
-							$result['render']['content'][1][] = [
+							$response['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $incorporationState
@@ -1171,7 +1171,7 @@ class CONSUMABLES extends API {
 							];
 						}
 						else {
-							$result['render']['content'][1][] = [
+							$response['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.incorporated_not')
@@ -1179,7 +1179,7 @@ class CONSUMABLES extends API {
 							];
 						}
 						if ($documents) {
-							$result['render']['content'][1][] = [
+							$response['render']['content'][1][] = [
 								'type' => 'links',
 								'description' => $this->_lang->GET('consumables.product.documents_download'),
 								'content' => $documents
@@ -1190,11 +1190,11 @@ class CONSUMABLES extends API {
 						// get purchase member names
 						// while possible to intersect with products-permission, ceo, prrc and qmo by default may not have time to handle this
 						$purchasemembers = [];
-						foreach($users as $user){
+						foreach ($users as $user){
 							$user['permissions'] = explode(',', $user['permissions'] ? : '');
 							if (array_intersect(['purchase', 'admin'], $user['permissions'])) $purchasemembers[] = $user['name'];
 						}
-						$result['render']['content'][] = [[
+						$response['render']['content'][] = [[
 								'type' => 'button',
 								'attributes' => [
 									'value' => $this->_lang->GET('consumables.product.edit_product_request'),
@@ -1214,7 +1214,7 @@ class CONSUMABLES extends API {
 				}
 				else {
 					// display form for adding or editing a product
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 							[
 								'type' => 'select',
 								'numeration' => 'prevent',
@@ -1279,7 +1279,7 @@ class CONSUMABLES extends API {
 					];
 					// append form for authorized users
 					if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited')){
-						$result['render']['form'] = [
+						$response['render']['form'] = [
 						'data-usecase' => 'purchase',
 						'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
 						'data-confirm' => true
@@ -1288,26 +1288,26 @@ class CONSUMABLES extends API {
 
 					// deactivate inputs for restricted users
 					if (!PERMISSION::permissionFor('products')){
-						$result['render']['content'][0][2]['attributes']['disabled'] = // add new product
-						$result['render']['content'][1][0]['attributes']['disabled'] = // select vendor
-						$result['render']['content'][1][1]['attributes']['readonly'] = // type vendor
-						$result['render']['content'][1][2]['attributes']['readonly'] = // article number
-						$result['render']['content'][1][3]['attributes']['readonly'] = // article name
-						$result['render']['content'][1][4]['attributes']['readonly'] = // article alias
-						$result['render']['content'][1][5]['attributes']['readonly'] = // order unit
-						$result['render']['content'][1][6]['attributes']['readonly'] = // article ean
-						$result['render']['content'][1][7]['attributes']['readonly'] = // erp_id
-						$result['render']['content'][1][8]['attributes']['readonly'] = // article info
+						$response['render']['content'][0][2]['attributes']['disabled'] = // add new product
+						$response['render']['content'][1][0]['attributes']['disabled'] = // select vendor
+						$response['render']['content'][1][1]['attributes']['readonly'] = // type vendor
+						$response['render']['content'][1][2]['attributes']['readonly'] = // article number
+						$response['render']['content'][1][3]['attributes']['readonly'] = // article name
+						$response['render']['content'][1][4]['attributes']['readonly'] = // article alias
+						$response['render']['content'][1][5]['attributes']['readonly'] = // order unit
+						$response['render']['content'][1][6]['attributes']['readonly'] = // article ean
+						$response['render']['content'][1][7]['attributes']['readonly'] = // erp_id
+						$response['render']['content'][1][8]['attributes']['readonly'] = // article info
 						true; 
 					}
 					if (PERMISSION::permissionFor('productslimited')){
-						unset($result['render']['content'][1][4]['attributes']['readonly']); // article alias
-						unset($result['render']['content'][1][8]['attributes']['readonly']); // article info
+						unset($response['render']['content'][1][4]['attributes']['readonly']); // article alias
+						unset($response['render']['content'][1][8]['attributes']['readonly']); // article info
 					}
 
 					// append toggles
 					if (PERMISSION::permissionFor('products')){
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'br'
 							],
@@ -1326,18 +1326,18 @@ class CONSUMABLES extends API {
 						];
 						
 						// inform about number of similar products
-						if ($product['vendor_name']) $result['render']['content'][count($result['render']['content']) - 1] = [
+						if ($product['vendor_name']) $response['render']['content'][count($response['render']['content']) - 1] = [
 							[
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.similar_count', [':number' => count($similarproducts)]) . ($product['vendor_name'] && !$product['vendor_id'] ? ".\n" . $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]) : '')
 								]
 							],
-							...$result['render']['content'][count($result['render']['content']) - 1]
+							...$response['render']['content'][count($response['render']['content']) - 1]
 						];
 
 						// add file upload
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'file',
 								'attributes' => [
@@ -1349,7 +1349,7 @@ class CONSUMABLES extends API {
 						];
 
 						// add availability toggle
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'radio',
 								'attributes' => [
@@ -1373,7 +1373,7 @@ class CONSUMABLES extends API {
 
 					// add last order info
 					if ($product['id'] && $product['last_order']){
-						$result['render']['content'][1][] = [
+						$response['render']['content'][1][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))])
@@ -1383,8 +1383,8 @@ class CONSUMABLES extends API {
 
 					// add download options for documents
 					if ($documents) {
-						if (isset($result['render']['content'][3]))
-							$result['render']['content'][3] = [
+						if (isset($response['render']['content'][3]))
+							$response['render']['content'][3] = [
 								[
 									[
 										'type' => 'links',
@@ -1392,9 +1392,9 @@ class CONSUMABLES extends API {
 										'content' => $documents
 									]
 								],
-								$result['render']['content'][3]
+								$response['render']['content'][3]
 							];
-						else $result['render']['content'][] = [
+						else $response['render']['content'][] = [
 							[
 								[
 									'type' => 'links',
@@ -1415,13 +1415,13 @@ class CONSUMABLES extends API {
 						$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 						$incorporationInfo .= " \n";
 						$pendingIncorporationCheck = "";
-						foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
+						foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 							if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date']);
-							else $pendingIncorporationCheck .= "\n" . $this->_lang->GET('consumables.product.incorporation_pending', [':permission' =>$this->_lang->_USER['permissions'][$permission]]);
+							else $pendingIncorporationCheck .= "\n" . $this->_lang->GET('consumables.product.incorporation_pending', [':permission' => $this->_lang->_USER['permissions'][$permission]]);
 						}
 						if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
 
-						array_push($result['render']['content'][2],
+						array_push($response['render']['content'][2],
 							[
 								'type' => 'textsection',
 								'attributes' => [
@@ -1431,13 +1431,13 @@ class CONSUMABLES extends API {
 							]);
 						if (PERMISSION::permissionFor('incorporation')){
 							$incorporation = [];
-							foreach(PERMISSION::pending('incorporation', $product['incorporated']) as $position){
+							foreach (PERMISSION::pending('incorporation', $product['incorporated']) as $position){
 								$incorporation[$this->_lang->GET('permissions.' . $position)] = [];
 								if ($similarproducts) $incorporation[$this->_lang->GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 							}
 							$incorporation[$this->_lang->GET('consumables.product.incorporated_revoke')] = [];
 							if ($similarproducts) $incorporation[$this->_lang->GET('consumables.product.incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
-							array_push($result['render']['content'][2], [
+							array_push($response['render']['content'][2], [
 									'type' => 'checkbox',
 									'attributes' => [
 										'name' => $this->_lang->GET('order.incorporation.state_approve')
@@ -1449,7 +1449,7 @@ class CONSUMABLES extends API {
 						}
 					}
 					else {
-						$result['render']['content'][2][] = [
+						$response['render']['content'][2][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('consumables.product.incorporated_not')
@@ -1460,7 +1460,7 @@ class CONSUMABLES extends API {
 					}
 
 					// add delete button for eligible products
-					if ($product['id'] && !$product['protected'] && !$product['article_alias'] && !$product['checked'] && !$product['incorporated'] && !PERMISSION::permissionFor('productslimited')) array_push($result['render']['content'],
+					if ($product['id'] && !$product['protected'] && !$product['article_alias'] && !$product['checked'] && !$product['incorporated'] && !PERMISSION::permissionFor('productslimited')) array_push($response['render']['content'],
 						[
 							[
 								'type' => 'deletebutton',
@@ -1475,7 +1475,7 @@ class CONSUMABLES extends API {
 						]
 					);
 				}
-				$this->response($result);
+				$this->response($response);
 				break;
 		case 'DELETE':
 			if (!PERMISSION::permissionFor('products')) $this->response([], 401);
@@ -1549,7 +1549,7 @@ class CONSUMABLES extends API {
 			"', render: [{type: 'checkbox', content: similarproducts}], options:{".
 			"'".$this->_lang->GET('consumables.product.delete_confirm_cancel')."': false,".
 			"'".$this->_lang->GET('consumables.product.batch_confirm')."': {value: true, class: 'reducedCTA'}".
-			"}}).then(response => { document.getElementById('" . $target . "').value = Object.keys(response) ? Object.keys(response).map(key=>{return key.substring(" . $substring . ")}).join(',') : '';})";
+			"}}).then(response => { document.getElementById('" . $target . "').value = Object.keys(response) ? Object.keys(response).map(key => {return key.substring(" . $substring . ")}).join(',') : '';})";
 	}
 
 	/**
@@ -1573,7 +1573,7 @@ class CONSUMABLES extends API {
 
 		// update csv-filter filter_by_comparison_file if set or drop if not
 		if (isset($filter['filter'])){
-			foreach($filter['filter'] as $ruleindex => &$rule) {
+			foreach ($filter['filter'] as $ruleindex => &$rule) {
 				if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
 					if (isset($files['match']) && $files['match']) $rule['filesetting']['source'] = $files['match'];
 					else unset($filter['filter'][$ruleindex]);
@@ -1612,7 +1612,7 @@ class CONSUMABLES extends API {
 					':ids' => intval($vendorID)
 				]
 			]);
-			foreach($remained as $row) {
+			foreach ($remained as $row) {
 				$remainder[] = [
 					'id' => $row['id'],
 					'article_no' => $row['article_no'],
@@ -1647,7 +1647,7 @@ class CONSUMABLES extends API {
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				];
 				// iterate over columns and values, strip equals to shorten each query and crunch more into one the chunks to speed up sql
-				foreach([
+				foreach ([
 					// 'article_name', leave one out to remain a valid query
 					'article_unit',
 					'article_ean',
@@ -1759,7 +1759,7 @@ class CONSUMABLES extends API {
 				];
 				
 				// check forbidden names
-				if(UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
 				if (isset($vendor['pricelist']['filter']) && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
@@ -1798,7 +1798,7 @@ class CONSUMABLES extends API {
 				// unset checkboxes while relying on a prepared additional dataset
 				// unset empty values
 				$evaluation = [];
-				foreach($this->_payload as $key => &$value){
+				foreach ($this->_payload as $key => &$value){
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
@@ -1821,7 +1821,7 @@ class CONSUMABLES extends API {
 					$vendor['evaluation'][] = $evaluation;
 					// upload files  if part of the evaluation document
 					if ($_FILES) {
-						foreach($_FILES as $input => $files){
+						foreach ($_FILES as $input => $files){
 							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
 						}
 					}
@@ -1829,13 +1829,13 @@ class CONSUMABLES extends API {
 				else $vendor['evaluation'] = null;
 
 				// tidy up unused properties
-				foreach($vendor['info'] as $key => $value){
+				foreach ($vendor['info'] as $key => $value){
 					if (!$value) unset($vendor['info'][$key]);
 				}
-				foreach($vendor['certificate'] as $key => $value){
+				foreach ($vendor['certificate'] as $key => $value){
 					if (!$value) unset($vendor['certificate'][$key]);
 				}
-				foreach($vendor['pricelist'] as $key => $value){
+				foreach ($vendor['pricelist'] as $key => $value){
 					if (!$value) unset($vendor['pricelist'][$key]);
 				}
 
@@ -1886,7 +1886,7 @@ class CONSUMABLES extends API {
 				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['mdr14_sample_reusable'];
 
 				// check forbidden names
-				if(UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
 				if (isset($vendor['pricelist']['filter']) && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
@@ -1949,7 +1949,7 @@ class CONSUMABLES extends API {
 				// unset checkboxes while relying on a prepared additional dataset
 				// unset empty values
 				$evaluation = [];
-				foreach($this->_payload as $key => &$value){
+				foreach ($this->_payload as $key => &$value){
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
@@ -1977,7 +1977,7 @@ class CONSUMABLES extends API {
 						$vendor['evaluation'][] = $evaluation;
 						// upload files  if part of the evaluation document
 						if ($_FILES) {
-							foreach($_FILES as $input => $files){
+							foreach ($_FILES as $input => $files){
 								UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
 							}
 						}
@@ -1985,14 +1985,14 @@ class CONSUMABLES extends API {
 				}
 			
 				// tidy up unused properties
-				foreach($vendor['info'] as $key => $value){
+				foreach ($vendor['info'] as $key => $value){
 					if (!$value) unset($vendor['info'][$key]);
 				}
-				foreach($vendor['certificate'] as $key => $value){
+				foreach ($vendor['certificate'] as $key => $value){
 					if (!$value) unset($vendor['certificate'][$key]);
 				}
 				// tidy up unused properties
-				foreach($vendor['pricelist'] as $key => $value){
+				foreach ($vendor['pricelist'] as $key => $value){
 					if (!$value) unset($vendor['pricelist'][$key]);
 				}
 
@@ -2023,7 +2023,7 @@ class CONSUMABLES extends API {
 			case 'GET':
 				$datalist = [];
 				$options = ['...' . (PERMISSION::permissionFor('vendors') ? $this->_lang->GET('consumables.vendor.edit_existing_vendors_new') : '') => (!$this->_requestedID) ? ['selected' => true] : []];
-				$result = [];
+				$response = [];
 				
 				// select single vendor based on id or name
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
@@ -2044,7 +2044,7 @@ class CONSUMABLES extends API {
 					'evaluation' => null
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . $this->_lang->GET('consumables.vendor.edit_existing_vendors_new') && !$vendor['id'])
-					$result['response'] = ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+					$response['response'] = ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// resolve objects
 				$vendor['info'] = json_decode($vendor['info'] ? : '', true) ? : [];
@@ -2055,7 +2055,7 @@ class CONSUMABLES extends API {
 
 				// prepare existing vendor lists
 				$vendorlist = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-				foreach($vendorlist as $key => $row) {
+				foreach ($vendorlist as $key => $row) {
 					$datalist[] = $row['name'];
 					$display = $row['name'];
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
@@ -2069,11 +2069,11 @@ class CONSUMABLES extends API {
 				$documents = [];
 				if ($vendor['id']) {
 					$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
-					foreach($certfiles as $path){
+					foreach ($certfiles as $path){
 						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . $path];
 					}
 					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
-					foreach($docfiles as $path){
+					foreach ($docfiles as $path){
 						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
 					}
 				}
@@ -2088,7 +2088,7 @@ class CONSUMABLES extends API {
 						]
 					]);
 					// count available products for this vendor
-					foreach($vendorproducts as $product){
+					foreach ($vendorproducts as $product){
 						if (!$product['hidden']) $available++;
 						if ($product['last_order']) $ordered++;
 					}
@@ -2104,7 +2104,7 @@ class CONSUMABLES extends API {
 				if (!PERMISSION::permissionFor('products')) {
 					// standard user view
 					// render search elements, not the same as edit mode languagewise
-					$result['render'] = ['content' => [
+					$response['render'] = ['content' => [
 						[
 							[
 								'type' => 'select',
@@ -2133,7 +2133,7 @@ class CONSUMABLES extends API {
 
 
 						// render information on vendor
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'textsection',
 								'attributes' => [
@@ -2157,7 +2157,7 @@ class CONSUMABLES extends API {
 
 						// add mailto
 						if (isset($vendor['info']['mail']) && $vendor['info']['mail'])
-							array_splice($result['render']['content'][1], 1, 0,
+							array_splice($response['render']['content'][1], 1, 0,
 								[[[
 									'type' => 'links',
 									'description' => $this->_lang->GET('consumables.vendor.mail'),
@@ -2168,7 +2168,7 @@ class CONSUMABLES extends API {
 							);
 
 						// append certificates if applicable
-						if ($certificates) $result['render']['content'][1][] = [
+						if ($certificates) $response['render']['content'][1][] = [
 								'type' => 'links',
 								'description' => $this->_lang->GET('consumables.vendor.certificate_download'),
 								'content' => $certificates,
@@ -2176,7 +2176,7 @@ class CONSUMABLES extends API {
 							];
 		
 						// append documents if applicable
-						if ($documents) $result['render']['content'][1][] = [
+						if ($documents) $response['render']['content'][1][] = [
 							'type' => 'links',
 							'description' => $this->_lang->GET('consumables.vendor.documents_download'),
 							'content' => $documents
@@ -2197,7 +2197,7 @@ class CONSUMABLES extends API {
 					];
 
 					// render inputs
-					$result['render'] = ['content' => [
+					$response['render'] = ['content' => [
 						[
 							[
 								'type' => 'select',
@@ -2333,7 +2333,7 @@ class CONSUMABLES extends API {
 
 					// add mailto
 					if (isset($vendor['info']['mail']) && $vendor['info']['mail'])
-						array_splice($result['render']['content'][1][0], 3, 0,
+						array_splice($response['render']['content'][1][0], 3, 0,
 							[[[
 								'type' => 'links',
 								'description' => $this->_lang->GET('consumables.vendor.mail'),
@@ -2345,7 +2345,7 @@ class CONSUMABLES extends API {
 
 					// add pricelist upload form
 					if ($vendor['id'] && !$vendor['hidden'])
-						array_splice($result['render']['content'][4], 0, 0,
+						array_splice($response['render']['content'][4], 0, 0,
 							[[[
 								'type' => 'file',
 								'attributes' => [
@@ -2363,7 +2363,7 @@ class CONSUMABLES extends API {
 						);
 
 					// add certificate download
-					if ($certificates) array_splice($result['render']['content'][2], 0, 0,
+					if ($certificates) array_splice($response['render']['content'][2], 0, 0,
 						[
 							[
 								'type' => 'links',
@@ -2374,7 +2374,7 @@ class CONSUMABLES extends API {
 					);
 
 					// add document downloads
-					if ($documents) $result['render']['content'][3]=[
+					if ($documents) $response['render']['content'][3]=[
 						[
 							[
 								'type' => 'links',
@@ -2382,11 +2382,11 @@ class CONSUMABLES extends API {
 								'content' => $documents
 							]
 						],
-						$result['render']['content'][3]
+						$response['render']['content'][3]
 					];
 
 					// add pricelist info if provided
-					if (isset($vendor['pricelist']['validity'])) array_splice($result['render']['content'][4], 0, 0,
+					if (isset($vendor['pricelist']['validity'])) array_splice($response['render']['content'][4], 0, 0,
 						[[
 							[
 								'type' => 'textsection',
@@ -2413,7 +2413,7 @@ class CONSUMABLES extends API {
 					);
 					
 					// add pricelist export button
-					if ($vendor['id'] && $vendorproducts) $result['render']['content'][4][] = [
+					if ($vendor['id'] && $vendorproducts) $response['render']['content'][4][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
@@ -2430,7 +2430,7 @@ class CONSUMABLES extends API {
 					if ($vendor['id']){
 						$special_attention = $texttemplate = [];
 						// create selection of products to request, ordered are preselected for relevance 
-						foreach($vendorproducts as $product){
+						foreach ($vendorproducts as $product){
 							if ($product['special_attention']){
 								$prd = $product['article_no'] . " " . $product['article_name'];
 								$special_attention[$prd] = ['value' => $prd];
@@ -2464,11 +2464,11 @@ class CONSUMABLES extends API {
 								]) . "')",
 							]
 						];
-						$result['render']['content'][] = $texttemplate;
+						$response['render']['content'][] = $texttemplate;
 					}
 				}
-				if ($vendor['name']) $result['header'] = $vendor['name'];
-				$this->response($result);
+				if ($vendor['name']) $response['header'] = $vendor['name'];
+				$this->response($response);
 				break;
 		}
 	}

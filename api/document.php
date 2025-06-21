@@ -67,7 +67,7 @@ class DOCUMENT extends API {
 				// append passed approvals
 				$approve['approval'] = $approve['approval'] ? json_decode($approve['approval'], true) : []; 
 				$tobeapprovedby = PERMISSION::permissionFor('documentapproval', true);
-				foreach($tobeapprovedby as $permission){
+				foreach ($tobeapprovedby as $permission){
 					if (array_intersect(['admin', $permission], $_SESSION['user']['permissions']) && in_array($this->_lang->GET('permissions.' . $permission), $approveas)){
 						$approve['approval'][$permission] = [
 							'name' => $_SESSION['user']['name'],
@@ -97,7 +97,7 @@ class DOCUMENT extends API {
 							$dependeddocuments = [];
 							$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 							$hidden = [];
-							foreach($fd as $row) {
+							foreach ($fd as $row) {
 								if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 								if (isset($approve['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($approve['name'], explode(',', $row['content']))) {
 									$dependeddocuments[] = $row['name'];
@@ -132,9 +132,9 @@ class DOCUMENT extends API {
 				$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 				$unapproved = ['documents' => [], 'components' => []];
-				$return = ['render'=> ['content' => [[]]]]; // default first nesting
+				$response = ['render' => ['content' => [[]]]]; // default first nesting
 				$hidden = [];
-				foreach(array_merge($components, $documents) as $element){
+				foreach (array_merge($components, $documents) as $element){
 					if ($element['context'] === 'bundle') continue;
 					if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($element['context'] . $element['name'], $hidden)){
@@ -160,7 +160,7 @@ class DOCUMENT extends API {
 				if ($componentselection) {
 					$componentselection['...'] = [];
 					ksort($componentselection);
-					$return['render']['content'][0][] = [
+					$response['render']['content'][0][] = [
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('assemble.approve.component_select'),
@@ -173,7 +173,7 @@ class DOCUMENT extends API {
 				if ($documentselection) {
 					$documentselection['...'] = [];
 					ksort($documentselection);
-					$return['render']['content'][0][] =
+					$response['render']['content'][0][] =
 					[
 						'type' => 'select',
 						'attributes' => [
@@ -183,7 +183,7 @@ class DOCUMENT extends API {
 						'content' => $documentselection
 					];
 				}
-				if ($componentselection || $documentselection) $return['render']['content'][count($return['render']['content']) - 1][] = [
+				if ($componentselection || $documentselection) $response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'hr'
 				];
 				else $this->response(['render' => ['content' => $this->noContentAvailable($this->_lang->GET('assemble.approve.no_approvals'))]]);
@@ -194,7 +194,7 @@ class DOCUMENT extends API {
 					// recursively delete required attributes
 					function unrequire($element){
 						$result = [];
-						foreach($element as $sub){
+						foreach ($element as $sub){
 							if (array_is_list($sub)){
 								array_push($result, ...unrequire($sub));
 							} else {
@@ -217,18 +217,18 @@ class DOCUMENT extends API {
 					if (!$approve) $this->response([], 404);
 
 					// get remaining approval options
-					foreach(PERMISSION::pending('documentapproval', $approve['approval']) as $position){
+					foreach (PERMISSION::pending('documentapproval', $approve['approval']) as $position){
 						$approvalposition[$this->_lang->GET('permissions.' . $position)] = [];
 					}
 
 					// unset requires attributes in advance to posting approval to avoid unneccessary formvalidation
 					$dependeddocuments = [];
 					if ($approve['context'] === 'component'){
-						array_push($return['render']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
+						array_push($response['render']['content'], ...unrequire(json_decode($approve['content'], true)['content'])[0]);
 						// check for dependencies in documents
 						$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 						$hidden = [];
-						foreach($fd as $row) {
+						foreach ($fd as $row) {
 							if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 							if (isset($approve['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($approve['name'], explode(',', $row['content']))) {
 								$dependeddocuments[] = $row['name'];
@@ -236,22 +236,22 @@ class DOCUMENT extends API {
 						}
 					}
 					else {
-						foreach(explode(',', $approve['content']) as $component){
+						foreach (explode(',', $approve['content']) as $component){
 							// get latest approved by name
 							$cmpnnt = $this->latestApprovedName('document_component_get_by_name', $component);
 							if ($cmpnnt) {
 								if (!PERMISSION::fullyapproved('documentapproval', $cmpnnt['approval'])){
 									$alert .= $this->_lang->GET('assemble.approve.document_unapproved_component', [':name' => $cmpnnt['name']]). '<br />';
 								}
-								array_push($return['render']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
+								array_push($response['render']['content'], ...unrequire(json_decode($cmpnnt['content'], true)['content'])[0]);
 							}
 						}
-						if ($alert) $return['response'] = ['msg' => $alert, 'type' => 'info'];
+						if ($alert) $response['response'] = ['msg' => $alert, 'type' => 'info'];
 					}
 
 					// gather informal document properties
 					$documentproperties = $this->_lang->GET('assemble.compose.component.component_author', [':author' => $approve['author'], ':date' => $this->convertFromServerTime($approve['date'])]);
-					foreach($this->_lang->_USER['documentcontext'] as $type => $context){
+					foreach ($this->_lang->_USER['documentcontext'] as $type => $context){
 						if (array_key_exists($approve['context'], $context)){
 							$documentproperties .= "\n" . $this->_lang->_USER['documentcontext'][$type][$approve['context']];
 							break;
@@ -264,7 +264,7 @@ class DOCUMENT extends API {
 					if ($approve['patient_access']) $documentproperties .= "\n" . $this->_lang->GET('assemble.compose.document.document_patient_access');
 					if ($dependeddocuments) $documentproperties .= "\n \n" . $this->_lang->GET('assemble.compose.component.component_document_dependencies', [':documents' => implode(', ', $dependeddocuments)]);
 
-					array_push($return['render']['content'], 
+					array_push($response['render']['content'], 
 						[
 							[
 								'type' => 'hr'
@@ -282,7 +282,7 @@ class DOCUMENT extends API {
 					);
 					// optional revision of element if allowed (e.g. not supervisors by default)
 					if (PERMISSION::permissionFor('documentcomposer')) {
-						array_push($return['render']['content'][count($return['render']['content']) -1], [
+						array_push($response['render']['content'][count($response['render']['content']) -1], [
 							[
 								'type' => 'button',
 								'attributes' => [
@@ -293,14 +293,14 @@ class DOCUMENT extends API {
 						]);
 					}
 
-					$return['render']['form'] = [
+					$response['render']['form'] = [
 						'data-usecase' => 'approval',
 						'action' => "javascript: api.document('put', 'approval', " . $this->_requestedID . ")",
 						'data-confirm' => true
 					];
-					if ($approve['name']) $return['header'] = $approve['name'];
+					if ($approve['name']) $response['header'] = $approve['name'];
 				}
-				$this->response($return);
+				$this->response($response);
 				break;
 		}
 	}
@@ -373,7 +373,7 @@ class DOCUMENT extends API {
 				}
 
 				// check forbidden names
-				if(UTILITY::forbiddenName($bundle[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($bundle[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
 
 				// append bundle to database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
@@ -396,7 +396,7 @@ class DOCUMENT extends API {
 				$options = ['...' . $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$alloptions = ['...' . $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$insertdocument = ['...' . $this->_lang->GET('assemble.compose.bundle.insert_default') => ['value' => ' ']];
-				$return = [];
+				$response = [];
 
 				// get selected bundle
 				if (intval($this->_requestedID)){
@@ -430,12 +430,12 @@ class DOCUMENT extends API {
 					'content' => '',
 					'hidden' => NULL
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('assemble.compose.bundle.not_found', [':name' => $this->_requestedID]), 'type' => 'error']; // early exit
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$bundle['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('assemble.compose.bundle.not_found', [':name' => $this->_requestedID]), 'type' => 'error']; // early exit
 		
 				// prepare existing bundle lists
 				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 				$hidden = [];
-				foreach($bundles as $row) {
+				foreach ($bundles as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 						if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 							$bundledatalist[] = $row['name'];
@@ -450,7 +450,7 @@ class DOCUMENT extends API {
 				// get latest approved by name
 				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 				$hidden = [];
-				foreach($documents as $row) {
+				foreach ($documents as $row) {
 					if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($row['name'], $hidden)) {
@@ -466,7 +466,7 @@ class DOCUMENT extends API {
 					if ($bundle['unit'] == $unit) $units[$translation]['selected'] = true;
 				}
 
-				$return['render'] = [
+				$response['render'] = [
 					'form' => [
 						'data-usecase' => 'bundle',
 						'action' => "javascript:api.document('post', 'bundle')"],
@@ -559,10 +559,10 @@ class DOCUMENT extends API {
 						$hidden['content'][$this->_lang->GET('assemble.compose.bundle.hidden')]['checked'] = true;
 						$hidden['hint'] .= ' ' . $this->_lang->GET('assemble.compose.edit_hidden_set', [':name' => $bundle['hidden']['name'], ':date' => $this->convertFromServerTime($bundle['hidden']['date'])]);
 					}
-					array_push($return['render']['content'][1], $hidden);
+					array_push($response['render']['content'][1], $hidden);
 				}
 
-				$this->response($return);
+				$this->response($response);
 				break;
 		}
 	}
@@ -581,7 +581,7 @@ class DOCUMENT extends API {
 		$this->_requestedID = $this->_requestedID ? urldecode($this->_requestedID) : null;
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = $bundles = [];
-		foreach($bd as $row) {
+		foreach ($bd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (in_array($row['name'], $hidden)) continue;
 			$available_units[] = $row['unit'];
@@ -610,7 +610,7 @@ class DOCUMENT extends API {
 		sort($available_units);
 		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'bundles', encodeURIComponent(document.getElementById('_bundlefilter').value) || 'null')"];
 		if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
-		foreach($available_units as $unit){
+		foreach ($available_units as $unit){
 			if (!$unit) {
 				continue;
 			}
@@ -618,7 +618,7 @@ class DOCUMENT extends API {
 			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 		}
 
-		$return['render'] = ['content' => [
+		$response['render'] = ['content' => [
 			[
 				[
 					'type' => 'filtered',
@@ -642,7 +642,7 @@ class DOCUMENT extends API {
 		]];
 		// append actual bundles
 		foreach ($bundles as $bundle => $list){
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				'type' => 'collapsible',
 				'attributes' => [
 					'class' => "em12"
@@ -658,7 +658,7 @@ class DOCUMENT extends API {
 		}
 
 		if (PERMISSION::permissionFor('documentcomposer')){
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'button',
 					'attributes' => [
@@ -669,7 +669,7 @@ class DOCUMENT extends API {
 			];
 		}
 
-		$this->response($return);
+		$this->response($response);
 	}
 
 	/**
@@ -705,7 +705,7 @@ class DOCUMENT extends API {
 					if (isset($_FILES['composedComponent_files'])){
 						$uploads = UTILITY::storeUploadedFiles(['composedComponent_files'], UTILITY::directory('component_attachments'), [$component_name . '_' . $timestamp]);
 						$uploaded_files = [];
-						foreach($uploads as $path){
+						foreach ($uploads as $path){
 							UTILITY::alterImage($path, CONFIG['limits']['document_image'], UTILITY_IMAGE_REPLACE);
 							// retrieve actual filename with prefix dropped to compare to upload filename
 							// boundary is underscore, actual underscores within uploaded file name will be reinserted
@@ -714,7 +714,7 @@ class DOCUMENT extends API {
 						}
 						function replace_images($element, $uploaded_filearray){
 							$result = [];
-							foreach($element as $sub){
+							foreach ($element as $sub){
 								if (array_is_list($sub)){
 									$result[] = replace_images($sub, $uploaded_filearray);
 								} else {
@@ -738,7 +738,7 @@ class DOCUMENT extends API {
 
 				// recursively scan for images within content
 				function usedImages($element, $result = []){
-					foreach($element as $sub){
+					foreach ($element as $sub){
 						if (array_is_list($sub)){
 							array_push($result, ...usedImages($sub, $result));
 						} else {
@@ -766,7 +766,7 @@ class DOCUMENT extends API {
 
 						$former_images = array_unique(usedImages(json_decode($exists['content'], true)));
 						$new_images = array_unique(usedImages($component['content']));
-						foreach(array_diff($former_images, $new_images) as $path) UTILITY::delete($path);
+						foreach (array_diff($former_images, $new_images) as $path) UTILITY::delete($path);
 
 						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
 							'values' => [
@@ -833,7 +833,7 @@ class DOCUMENT extends API {
 				if (!$component_approve) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.component_not_saved_missing'), 'type' => 'error']]);
 
 				// check for forbidden name
-				if(UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
 				$component['content'] = fileupload($component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
@@ -853,7 +853,7 @@ class DOCUMENT extends API {
 					// alert userGroups for approval
 					$component_id = $this->_pdo->lastInsertId();
 					$message = $this->_lang->GET('assemble.approve.component_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $component_id . ')"> ' . $component_name . '</a>'], true);
-					foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
+					foreach (PERMISSION::permissionFor('documentapproval', true) as $permission){
 						if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$component_approve]], $message);
 						else $this->alertUserGroup(['permission' => [$permission]], $message);
 					}
@@ -901,7 +901,7 @@ class DOCUMENT extends API {
 				if (!$component || PERMISSION::fullyapproved('documentapproval', $component['approval'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.component.component_delete_failure'), 'type' => 'error']]); //early exit
 				// recursively delete images
 				function deleteImages($element){
-					foreach($element as $sub){
+					foreach ($element as $sub){
 						if (array_is_list($sub)){
 							deleteImages($sub);
 						} else {
@@ -937,7 +937,7 @@ class DOCUMENT extends API {
 		$componentdatalist = [];
 		$options = [];
 		$alloptions = [];
-		$return = [];
+		$response = [];
 		
 		// get selected component
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
@@ -961,16 +961,16 @@ class DOCUMENT extends API {
 				'unit' => null
 			];
 		}
-		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('assemble.compose.component.component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']; // early exit
+		if ($this->_requestedID && $this->_requestedID !== 'false' && !$component['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('assemble.compose.component.component_not_found', [':name' => $this->_requestedID]), 'type' => 'error']; // early exit
 
 		// prepare existing component lists, sorted by units
-		foreach(array_keys($this->_lang->_USER['units']) as $unit){
+		foreach (array_keys($this->_lang->_USER['units']) as $unit){
 			$options[$unit] = ['...' . $this->_lang->GET('assemble.compose.component.existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 			$alloptions[$unit] = ['...' . $this->_lang->GET('assemble.compose.component.existing_components_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 		}
 		$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 		$hidden = [];
-		foreach($components as $row) {
+		foreach ($components as $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!isset($options[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('documentapproval', $row['approval'])) {
@@ -986,7 +986,7 @@ class DOCUMENT extends API {
 
 		// delete empty selections, order the rest and create remaining selections by unit for easier access
 		$options_selection = $alloptions_selection = [];
-		foreach($options as $unit => $components){
+		foreach ($options as $unit => $components){
 			if (count($components) < 2) {
 				continue;
 			}
@@ -1001,7 +1001,7 @@ class DOCUMENT extends API {
 				'content' => $components
 			];
 		}
-		foreach($alloptions as $unit => $components){
+		foreach ($alloptions as $unit => $components){
 			if (count($components) < 2) {
 				continue;
 			}
@@ -1022,7 +1022,7 @@ class DOCUMENT extends API {
 		$approveddocuments = $dependeddocuments = [];
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = [];
-		foreach($fd as $row) {
+		foreach ($fd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) $approveddocuments[$row['name']] = []; // prepare for selection
 			if (isset($component['content']) && !in_array($row['name'], $dependeddocuments) && !in_array($row['name'], $hidden) && in_array($component['name'], explode(',', $row['content']))) {
@@ -1036,13 +1036,13 @@ class DOCUMENT extends API {
 			'name' => $this->_lang->GET('assemble.compose.component.component_approve'),
 			'content' => ['...' . $this->_lang->GET('assemble.compose.component.component_approve_select_default') => ['value' => '0']]
 		];
-		foreach($this->_lang->_USER['units'] as $key => $value){
+		foreach ($this->_lang->_USER['units'] as $key => $value){
 			$approve['content'][$value] = $component['unit'] === $key ? ['selected' => true] : [];
 		}
 
 		$fullyapproved = '';
 		if (!($pending_approvals = PERMISSION::pending('documentapproval', $component['approval']))){
-			foreach(json_decode($component['approval'], true) as $position => $data){
+			foreach (json_decode($component['approval'], true) as $position => $data){
 				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
@@ -1051,7 +1051,7 @@ class DOCUMENT extends API {
 			}
 		}
 
-		$return['render'] = [
+		$response['render'] = [
 			'content' => [
 				[
 					[
@@ -1176,7 +1176,7 @@ class DOCUMENT extends API {
 		];
 		// admins are allowed to insert raw json syntax <3
 		if (array_intersect(['admin'], $_SESSION['user']['permissions'])){
-			$return['render']['content'][1][] = [[
+			$response['render']['content'][1][] = [[
 				'form' => false,
 				'type' => 'compose_raw',
 				'description' => $this->_lang->GET('assemble.compose.component.raw')
@@ -1184,7 +1184,7 @@ class DOCUMENT extends API {
 		}
 		// option to delete unapproved component
 		if ($component['name'] && (!PERMISSION::fullyapproved('documentapproval', $component['approval'])))
-			$return['render']['content'][count($return['render']['content']) - 2][] = [
+			$response['render']['content'][count($response['render']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
@@ -1194,9 +1194,9 @@ class DOCUMENT extends API {
 				]
 			];
 
-		if (isset($component['content'])) $return['render']['component'] = json_decode($component['content']);
-		if ($component['name']) $return['header'] = $component['name'];
-		$this->response($return);
+		if (isset($component['content'])) $response['render']['component'] = json_decode($component['content']);
+		if ($component['name']) $response['header'] = $component['name'];
+		$this->response($response);
 	}
 	
 	/**
@@ -1235,7 +1235,7 @@ class DOCUMENT extends API {
 		// create proper identifier with timestamp if not provided
 		// unset checkboxes while relying on a prepared additional dataset
 		// unset empty values
-		foreach($this->_payload as $key => &$value){
+		foreach ($this->_payload as $key => &$value){
 			if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 				$identifier = $value;
 				if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
@@ -1281,10 +1281,10 @@ class DOCUMENT extends API {
 		 */
 		function printable($element, $payload, $_lang, $enumerate = []){
 			$content = ['content' => [], 'images' => [], 'fillable' => false];
-			foreach($element as $subs){
+			foreach ($element as $subs){
 				if (!isset($subs['type'])){
 					$subcontent = printable($subs, $payload, $_lang, $enumerate);
-					foreach($subcontent['enumerate'] as $name => $number){
+					foreach ($subcontent['enumerate'] as $name => $number){
 						$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
 					}
 					$content['content'] = array_merge($content['content'], $subcontent['content']);
@@ -1312,7 +1312,7 @@ class DOCUMENT extends API {
 
 					if (isset($subs['attributes']['required'])) $name .= ' *';
 					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
-						foreach($subs['content'] as $key => $attributes) {
+						foreach ($subs['content'] as $key => $attributes) {
 							if (!$attributes) break;
 							if (isset($attributes['required'])) {
 								$name .= ' *';
@@ -1324,14 +1324,14 @@ class DOCUMENT extends API {
 					if (!in_array($subs['type'], ['textsection', 'image', 'links', 'documentbutton'])) $content['fillable'] = true;
 					if (in_array($subs['type'], ['radio', 'checkbox', 'select'])){
 						$content['content'][$name] = ['type' => 'selection', 'value' => []];
-						foreach($subs['content'] as $key => $v){
+						foreach ($subs['content'] as $key => $v){
 							if ($key === '...') continue;
 							$enumerate = enumerate($key, $enumerate); // enumerate checkbox names for following elements by same name
 							$selected = '';
 
 							// dynamic multiple select
 							$dynamicMultiples = preg_grep('/' . preg_quote(preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
-							foreach($dynamicMultiples as $submitted){
+							foreach ($dynamicMultiples as $submitted){
 								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
 							}
 	
@@ -1352,7 +1352,7 @@ class DOCUMENT extends API {
 						$content['content'][$name] = ['type' => 'multiline', 'value' => ''];
 					}
 					elseif ($subs['type'] === 'image'){
-						$content['content'][$name] = ['type'=> 'image', 'value' => $subs['attributes']['url']];
+						$content['content'][$name] = ['type' => 'image', 'value' => $subs['attributes']['url']];
 						$file = pathinfo($subs['attributes']['url']);
 						if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 							$content['images'][] = $subs['attributes']['url'];
@@ -1366,12 +1366,12 @@ class DOCUMENT extends API {
 					}
 					elseif ($subs['type'] === 'links'){
 						$content['content'][$name] = ['type' => 'links', 'value' => []];
-						foreach(array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
+						foreach (array_keys($subs['content']) as $link) $content['content'][$name]['value'][] = $link . "\n";
 					}
 					elseif ($subs['type'] === 'documentbutton'){
 						// strip language chunk from wrappers to extract only the linkes documents name
 						$language = [$_lang->GET('assemble.compose.component.link_document_display_button'),$_lang->GET('assemble.compose.component.link_document_continue_button')];
-						foreach($language as $chunk){
+						foreach ($language as $chunk){
 							$chunk = preg_replace('/\:document/', '(.+?)', $chunk);
 							preg_match('/' . $chunk . '/', $name, $document);
 							if (isset($document[1])){
@@ -1385,10 +1385,10 @@ class DOCUMENT extends API {
 						$content['content'][$name] = ['type' => 'textsection', 'value' => ''];
 					}
 					else {
-						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $postname) ? : ''];
+						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
 						$dynamicMultiples = preg_grep('/' . preg_quote(preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
-						foreach($dynamicMultiples as $submitted){
-							$content['content'][$submitted] = ['type' => 'singleline', 'value'=> UTILITY::propertySet($payload, $submitted) ? : ''];
+						foreach ($dynamicMultiples as $submitted){
+							$content['content'][$submitted] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $submitted) ? : ''];
 						}
 					}
 				}
@@ -1401,7 +1401,7 @@ class DOCUMENT extends API {
 		$fillable = false;
 		// iterate over components and fill fields with provided values if any
 		// maxDocumentTimestamp is used for audit exports of outdated documents on request
-		foreach(explode(',', $document['content']) as $usedcomponent) {
+		foreach (explode(',', $document['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent, $maxDocumentTimestamp);
 			if (!$component) continue;
 			// add component version
@@ -1468,11 +1468,11 @@ class DOCUMENT extends API {
 			case 'POST':
 				if (!$this->_payload->context) $this->response(['response' => ['msg' => $this->_lang->GET("assemble.compose.document.document_not_saved_missing"), 'type' => 'error']]); // no content provided
 				// check for forbidden names
-				if(UTILITY::forbiddenName($this->_payload->name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($this->_payload->name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $this->_payload->name]), 'type' => 'error']]);
 
 				// recursively retrieve input names and check for identifier withon component
 				function componentAttributes($element, $result = ['names' => [], 'hasidentifier' => false]){
-					foreach($element as $sub){
+					foreach ($element as $sub){
 						if (array_is_list($sub)){
 							$subresult = componentAttributes($sub, $result);
 							$result['names'] = array_merge($result['names'], $subresult['names']);
@@ -1491,7 +1491,7 @@ class DOCUMENT extends API {
 
 				if (in_array($this->_payload->context, array_keys($this->_lang->_USER['documentcontext']['identify']))){
 					$hasidentifier = false;
-					foreach($this->_payload->content as $component){
+					foreach ($this->_payload->content as $component){
 						// get latest approved by name
 						$latestcomponent = $this->latestApprovedName('document_component_get_by_name', $component);
 						if (componentAttributes(json_decode($latestcomponent['content'], true)['content'])['hasidentifier']) $hasidentifier = true;
@@ -1506,13 +1506,13 @@ class DOCUMENT extends API {
 					$hasreservednames = [];
 					$reservednames = [];
 					// get all language values from available languagefiles (json, env)
-					foreach(glob('./language.*') as $file){
+					foreach (glob('./language.*') as $file){
 						$file = file_get_contents($file);
 						$filecontent = json_decode($file, true);
 						if (isset($filecontent['consumables']['vendor'])) array_push($reservednames, ...array_values($filecontent['consumables']['vendor']));
 					}
 					// iterate over components and compare name attributes with reservednames
-					foreach($this->_payload->content as $component){
+					foreach ($this->_payload->content as $component){
 						// get latest approved by name
 						$latestcomponent = $this->latestApprovedName('document_component_get_by_name', $component);
 						array_push($hasreservednames, ...array_intersect(componentAttributes(json_decode($latestcomponent['content'], true)['content'])['names'], $reservednames));
@@ -1525,7 +1525,7 @@ class DOCUMENT extends API {
 				$regulatory_context = [];
 				if ($this->_payload->regulatory_context) {
 					$rc = explode(', ', $this->_payload->regulatory_context);
-					foreach($rc as $context){
+					foreach ($rc as $context){
 						$regulatory_context[] = array_search($context, $this->_lang->_USER['regulatory']); 
 					}
 				}
@@ -1533,7 +1533,7 @@ class DOCUMENT extends API {
 				$restricted_access = [];
 				if ($this->_payload->restricted_access) {
 					$rc = explode(', ', $this->_payload->restricted_access);
-					foreach($rc as $context){
+					foreach ($rc as $context){
 						$restricted_access[] = array_search($context, $this->_lang->_USER['permissions']); 
 					}
 				}
@@ -1632,7 +1632,7 @@ class DOCUMENT extends API {
 				])) {
 						$document_id = $this->_pdo->lastInsertId();
 						$message = $this->_lang->GET('assemble.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);
-						foreach(PERMISSION::permissionFor('documentapproval', true) as $permission){
+						foreach (PERMISSION::permissionFor('documentapproval', true) as $permission){
 							if ($permission === 'supervisor') $this->alertUserGroup(['permission' => ['supervisor'], 'unit' => [$this->_payload->approve]], $message);
 							else $this->alertUserGroup(['permission' => [$permission]], $message);
 						}
@@ -1689,7 +1689,7 @@ class DOCUMENT extends API {
 		$alloptions = [];
 		$componentoptions = [];
 		$contextoptions = ['...' . $this->_lang->GET('assemble.compose.document.document_context_default') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-		$return = [];
+		$response = [];
 		
 		// get selected document
 		if ($this->_requestedID == '0' || intval($this->_requestedID)){
@@ -1715,17 +1715,17 @@ class DOCUMENT extends API {
 			'approval' => null,
 			'patient_access' => null,
 		];
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$document['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('assemble.compose.document.document__not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if ($this->_requestedID && $this->_requestedID !== 'false' && !$document['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('assemble.compose.document.document__not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing documents lists, sorted by units
-		foreach(array_keys($this->_lang->_USER['units']) as $unit){
+		foreach (array_keys($this->_lang->_USER['units']) as $unit){
 			$documentoptions[$unit] = ['...' . $this->_lang->GET('assemble.compose.document.existing_documents_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 			$alloptions[$unit] = ['...' . $this->_lang->GET('assemble.compose.document.existing_documents_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 			$componentoptions[$unit] = ['...' => ['value' => '']];
 		}
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = [];
-		foreach($fd as $key => $row) {
+		foreach ($fd as $key => $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!isset($documentoptions[$row['unit']][$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('documentapproval', $row['approval'])) {
@@ -1742,7 +1742,7 @@ class DOCUMENT extends API {
 		// prepare existing component list of fully approved
 		$cd = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 		$hidden = [];
-		foreach($cd as $key => $row) {
+		foreach ($cd as $key => $row) {
 			$row['unit'] = $row['unit'] ? : 'common';
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!isset($componentoptions[$row['name']]) && !in_array($row['name'], $hidden) && PERMISSION::fullyapproved('documentapproval', $row['approval'])) {
@@ -1753,7 +1753,7 @@ class DOCUMENT extends API {
 
 		// delete empty selections, order the rest and create remaining selections by unit for easier access
 		$options_selection = $alloptions_selection = $components_selection = [];
-		foreach($documentoptions as $unit => $components){
+		foreach ($documentoptions as $unit => $components){
 			if (count($components) < 2) {
 				continue;
 			}
@@ -1768,7 +1768,7 @@ class DOCUMENT extends API {
 				'content' => $components
 			];
 		}
-		foreach($alloptions as $unit => $components){
+		foreach ($alloptions as $unit => $components){
 			if (count($components) < 2) {
 				continue;
 			}
@@ -1783,7 +1783,7 @@ class DOCUMENT extends API {
 				'content' => $components
 			];
 		}
-		foreach($componentoptions as $unit => $components){
+		foreach ($componentoptions as $unit => $components){
 			if (count($components) < 2) {
 				continue;
 			}
@@ -1802,7 +1802,7 @@ class DOCUMENT extends API {
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = [];
 		$dependedbundles = [];
-		foreach($bd as $key => $row) {
+		foreach ($bd as $key => $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden) && 
 			in_array($document['name'], explode(',', $row['content'])) && 
@@ -1814,7 +1814,7 @@ class DOCUMENT extends API {
 		if ($document['name']){
 			$cd = SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist');
 			$hidden = [];
-			foreach($cd as $row) {
+			foreach ($cd as $row) {
 				if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 				if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 				if (!in_array($row['name'], $dependedcomponents) && !in_array($row['name'], $hidden)) {
@@ -1826,8 +1826,8 @@ class DOCUMENT extends API {
 		}		
 
 		// prepare existing context list
-		foreach($this->_lang->_USER['documentcontext'] as $type => $contexts){
-			foreach($contexts as $context => $display){
+		foreach ($this->_lang->_USER['documentcontext'] as $type => $contexts){
+			foreach ($contexts as $context => $display){
 				if ($type === 'identify') $display .= ' *';
 				$contextoptions[$display] = $context===$document['context'] ? ['value' => $context, 'selected' => true] : ['value' => $context];
 			}
@@ -1840,14 +1840,14 @@ class DOCUMENT extends API {
 			'name' => $this->_lang->GET('assemble.compose.component.component_approve'),
 			'content' => ['...' . $this->_lang->GET('assemble.compose.component.component_approve_select_default') => ['value' => '0']]
 		];
-		foreach($this->_lang->_USER['units'] as $key => $value){
+		foreach ($this->_lang->_USER['units'] as $key => $value){
 			$approve['content'][$value] = $document['unit'] === $key ? ['selected' => true] : [];
 		}
 
 		// prepare lists to select regulatory context
 		$regulatory_context = [];
 		$document['regulatory_context'] = explode(',', $document['regulatory_context'] ? : '');
-		foreach($this->_lang->_USER['regulatory'] as $key => $value){
+		foreach ($this->_lang->_USER['regulatory'] as $key => $value){
 			$regulatory_context[$value] = ['value' => $key];
 			if (in_array($key, $document['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 		}
@@ -1874,14 +1874,14 @@ class DOCUMENT extends API {
 			'content' => []
 		];
 		$document['restricted_access'] = explode(',', strval($document['restricted_access']));
-		foreach($this->_lang->_USER['permissions'] as $value => $translation){
+		foreach ($this->_lang->_USER['permissions'] as $value => $translation){
 			$restricted_access['content'][$translation] = ['value' => $value];
 			if (in_array($value, $document['restricted_access'])) $restricted_access['content'][$translation]['checked'] = true;
 		}
 
 		$fullyapproved = '';
 		if (!($pending_approvals = PERMISSION::pending('documentapproval', $document['approval']))){
-			foreach(json_decode($document['approval'], true) as $position => $data){
+			foreach (json_decode($document['approval'], true) as $position => $data){
 				$fullyapproved .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
@@ -1890,7 +1890,7 @@ class DOCUMENT extends API {
 			}
 		}
 
-		$return['render'] = [
+		$response['render'] = [
 			'content' => [
 				[
 					[
@@ -1973,7 +1973,7 @@ class DOCUMENT extends API {
 
 		// delete option if not approved yet
 		if ($document['name'] && (!PERMISSION::fullyapproved('documentapproval', $document['approval'])))
-			$return['render']['content'][count($return['render']['content']) - 2][] = [
+			$response['render']['content'][count($response['render']['content']) - 2][] = [
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
@@ -1985,20 +1985,20 @@ class DOCUMENT extends API {
 
 		// add used components to response
 		if (isset($document['content'])) {
-			$return['render']['components'] = [];
-			foreach(explode(',', $document['content']) as $usedcomponent) {
+			$response['render']['components'] = [];
+			foreach (explode(',', $document['content']) as $usedcomponent) {
 				// get latest approved by name
 				$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent);
 				if ($component){
 					$component['content'] = json_decode($component['content'], true);
 					$component['content']['name'] = $usedcomponent;
 					$component['content']['hidden'] = json_decode($component['hidden'] ? : '', true);
-					$return['render']['components'][] = $component['content'];
+					$response['render']['components'][] = $component['content'];
 				}
 			}
 		}
-		if ($document['name']) $return['header'] = $document['name'];
-		$this->response($return);
+		if ($document['name']) $response['header'] = $document['name'];
+		$this->response($response);
 	}
 		
 	/**
@@ -2012,7 +2012,7 @@ class DOCUMENT extends API {
 	public function documents(){
 		$documentdatalist = $displayeddocuments = [];
 		$available_units = ['common'];
-		$return = [];
+		$response = [];
 
 		// get all documents or these fitting the search
 		require_once('_shared.php');
@@ -2021,11 +2021,11 @@ class DOCUMENT extends API {
 
 		// also see application.php start()
 		// prepare existing documents lists grouped by context
-		foreach($documents as $row) {
+		foreach ($documents as $row) {
 			if (in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) continue;
 			if (!in_array($row['name'], $documentdatalist)) {
 				$documentdatalist[] = $row['name'];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) if ($alias) $documentdatalist[] = $alias;
+				foreach (preg_split('/[^\w\d]/', $row['alias']) as $alias) if ($alias) $documentdatalist[] = $alias;
 				$available_units[] = $row['unit'];
 
 				// filter by unit
@@ -2044,7 +2044,7 @@ class DOCUMENT extends API {
 		sort($available_units);
 		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.document('get', 'documents', encodeURIComponent(document.getElementById('_documentfilter').value) || 'null')"];
 		if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
-		foreach($available_units as $unit){
+		foreach ($available_units as $unit){
 			if (!$unit) {
 				continue;
 			}
@@ -2052,7 +2052,7 @@ class DOCUMENT extends API {
 			if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 		}
 				
-		$return['render'] = [
+		$response['render'] = [
 			'content' => [
 				[
 					[
@@ -2087,14 +2087,14 @@ class DOCUMENT extends API {
 					break;
 				}
 			}
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				'type' => 'links',
 				'description' => $contexttranslation,
 				'content' => $list
 			];
 		}
 		if (PERMISSION::permissionFor('documentcomposer')){
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'button',
 					'attributes' => [
@@ -2103,7 +2103,7 @@ class DOCUMENT extends API {
 					]
 				]
 			];
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'button',
 					'attributes' => [
@@ -2114,7 +2114,7 @@ class DOCUMENT extends API {
 			];
 		}
 
-		$this->response($return);
+		$this->response($response);
 	}
 
 	/**

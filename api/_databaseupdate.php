@@ -41,8 +41,8 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach(['_2025_06_13'] as $update){
-			foreach($this->{$update}() as $query){
+		foreach (['_2025_06_13'] as $update){
+			foreach ($this->{$update}() as $query){
 				echo $query . '<br />';
 				if (SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[0]) !== false)	SQLQUERY::EXECUTE($this->_pdo, $query);
 				else {

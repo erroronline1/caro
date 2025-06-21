@@ -66,11 +66,11 @@ class AUDIT extends API {
 			case 'POST':
 				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', ['values' => [':id' => $this->_requestedTemplate]]);
 				$template = $template ? $template[0] : null;
-				if (!$template) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
+				if (!$template) $this->response(['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
 
 				// set up general properties
 				$audit = [
-					':template'=> $template['id'],
+					':template' => $template['id'],
 					':unit' => $template['unit'],
 					':content' => [],
 					':last_user' => $_SESSION['user']['name'],
@@ -100,7 +100,7 @@ class AUDIT extends API {
 
 				// iterate over payload, match template question index, input name and possible multiples
 				// values always will be stored within an array to handle multiples by default
-				foreach($this->_payload as $key => $value){
+				foreach ($this->_payload as $key => $value){
 					if ($key === 'null') continue;
 					if (!$value) $value = ''; // the audit has to contain all questions as planned
 					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
@@ -123,15 +123,15 @@ class AUDIT extends API {
 						$summary = $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit[':unit']] . "\n \n";
 						$summary .= $audit[':last_user'] . "\n";
 						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit[':content']['objectives'];
-						foreach($audit[':content']['questions'] as $question){
+						foreach ($audit[':content']['questions'] as $question){
 							// start with  question and direct response as initial value
-							foreach($question as $key => $values){
+							foreach ($question as $key => $values){
 								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 								$summary .= "\n \n" .$key . ': ' . implode("\n", $values) . "\n";
 								break;
 							}
 							// assign question response as value
-							foreach($question as $key => $values){
+							foreach ($question as $key => $values){
 								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
 									$summary .=  "\n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
 									switch ($key){
@@ -168,10 +168,10 @@ class AUDIT extends API {
 			case 'PUT':
 				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', ['values' => [':id' => $this->_requestedTemplate]]);
 				$template = $template ? $template[0] : null;
-				if (!$template) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
+				if (!$template) $this->response(['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
 				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
 				$audit = $audit ? $audit[0] : null;
-				if (!$audit) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
+				if (!$audit) $this->response(['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
 				// update general properties
 				$audit['last_user'] = $_SESSION['user']['name'];
@@ -202,7 +202,7 @@ class AUDIT extends API {
 
 				// iterate over payload, match template question index, input name and possible multiples
 				// values always will be stored within an array to handle multiples by default
-				foreach($this->_payload as $key => $value){
+				foreach ($this->_payload as $key => $value){
 					if ($key === 'null') continue;
 					if (!$value) $value = ''; // the audit has to contain all questions as planned
 					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
@@ -227,15 +227,15 @@ class AUDIT extends API {
 						$summary = $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit['unit']] . "\n \n";
 						$summary .= $audit['last_user'] . "\n";
 						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit['content']['objectives'];
-						foreach($audit['content']['questions'] as $question){
+						foreach ($audit['content']['questions'] as $question){
 							// start with  question and direct response as initial value
-							foreach($question as $key => $values){
+							foreach ($question as $key => $values){
 								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 								$summary .= "\n \n" .$key . ': ' . implode("\n", $values) . "\n";
 								break;
 							}
 							// assign question response as value
-							foreach($question as $key => $values){
+							foreach ($question as $key => $values){
 								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
 									$summary .=  "\n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
 									switch ($key){
@@ -270,13 +270,13 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'GET':
-				$result = [];
+				$response = [];
 				$audit = $template = $recent = null;
 				$select = [
 					'edit' => [
 						'...' => ['value' => '0']
 					],
-					'templates'=> [
+					'templates' => [
 						'...' => ['value' => '0']
 					]
 				];
@@ -284,15 +284,15 @@ class AUDIT extends API {
 				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				// drop system user and group accounts
-				foreach($users as $key => $row){
+				foreach ($users as $key => $row){
 					if (PERMISSION::filteredUser($row, ['id' => [1], 'permission' => ['patient', 'group']])) unset($users[$key]);
 				}
 				$users = array_column($users, 'name');
 
-				if($this->_requestedID && $this->_requestedID !== 'false' && ($audit = $audits[array_search($this->_requestedID, array_column($audits, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && ($audit = $audits[array_search($this->_requestedID, array_column($audits, 'id'))]) === false) $response['response'] = ['msg' => $this->_lang->GET('audit.audit.execute.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				//template selection
-				foreach($templates as $row){
+				foreach ($templates as $row){
 					$select['templates'][$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $this->convertFromServerTime($row['date'])] = ['value' => $row['id']];
 				}
 				if ($this->_requestedTemplate && $this->_requestedTemplate !== 'null' && !$audit){
@@ -303,7 +303,7 @@ class AUDIT extends API {
 				}
 
 				// audit selections
-				foreach($audits as $row){
+				foreach ($audits as $row){
 					if (!$row['closed']){
 						$select['edit'][$this->_lang->_USER['units'][$row['unit']] . ' ' . $this->convertFromServerTime($row['last_touch'])] = $row['id'] === $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
@@ -315,8 +315,8 @@ class AUDIT extends API {
 				// sanitize $recent preset to only questions and statement
 				if ($recent){
 					$recent['content'] =  json_decode($recent['content'], true);
-					foreach($recent['content']['questions'] as $i => $set){
-						foreach($set as $key => $value)
+					foreach ($recent['content']['questions'] as $i => $set){
+						foreach ($set as $key => $value)
 						if (in_array($key, array_keys($this->_lang->_USER['audit']['audit']['execute'])) && !in_array($key, ['statement'])) unset($recent['content']['questions'][$i][$key]);
 					}
 					$recent['content'] =  UTILITY::json_encode(['questions' => $recent['content']['questions']]);
@@ -325,7 +325,7 @@ class AUDIT extends API {
 				if (!$audit){
 					$audit = [
 						'id' => null,
-						'template'=> isset($template['id']) ? $template['id'] : null,
+						'template' => isset($template['id']) ? $template['id'] : null,
 						'content' => $recent ? $recent['content'] : '',
 						'unit' => isset($template['unit']) ? $template['unit'] : null,
 						'last_touch' => null,
@@ -334,7 +334,7 @@ class AUDIT extends API {
 
 				if (!$template) {
 					// display selections
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
@@ -343,7 +343,7 @@ class AUDIT extends API {
 							]
 						]
 					];
-					if (count(array_keys($select['templates'])) > 1) $result['render']['content'][count($result['render']['content']) - 1][] = [
+					if (count(array_keys($select['templates'])) > 1) $response['render']['content'][count($response['render']['content']) - 1][] = [
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('audit.audit.template.select'),
@@ -351,7 +351,7 @@ class AUDIT extends API {
 						],
 						'content' => $select['templates']
 					];
-					if (count(array_keys($select['edit'])) > 1) $result['render']['content'][count($result['render']['content']) - 1][] = [
+					if (count(array_keys($select['edit'])) > 1) $response['render']['content'][count($response['render']['content']) - 1][] = [
 						'type' => 'select',
 						'attributes' => [
 							'name' => $this->_lang->GET('audit.audit.edit'),
@@ -362,14 +362,14 @@ class AUDIT extends API {
 				}
 				else {
 					// render template
-					$result['render']['form'] = [
+					$response['render']['form'] = [
 						'data-usecase' => 'audit',
 						'action' => "javascript:api.audit('" . ($audit['id'] ? 'put' : 'post') . "', 'audit', " . $template['id']. ", " . $audit['id'] . ")"
 					];
 					$audit['content'] = json_decode($audit['content'], true);
 
 					// display unit and audit objectives
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
@@ -383,19 +383,19 @@ class AUDIT extends API {
 
 					// display template questions and respective inputs
 					$rating = [];
-					foreach(json_decode($template['content'], true) as $number => $question){
+					foreach (json_decode($template['content'], true) as $number => $question){
 						$preset = [];
 						if (isset($audit['content']['questions'][strval($number + 1)])) $preset = $audit['content']['questions'][strval($number + 1)];
 
 						// set up rating and import preset if applicable
-						foreach($this->_lang->_USER['audit']['audit']['execute']['rating_steps'] as $key => $translation){
+						foreach ($this->_lang->_USER['audit']['audit']['execute']['rating_steps'] as $key => $translation){
 							$rating[$translation] = ['value' => $key];
 							if (isset($preset['rating']) && $preset['rating'][0] === $key) $rating[$translation] = ['value' => $key, 'checked' => true];
 						}
 						// set up proof inputs, multiple if applicable due to preset
 						$proof = [];
 						if (isset($preset['proof'])){
-							foreach($preset['proof'] as $value){
+							foreach ($preset['proof'] as $value){
 								if ($value) // empty values are stored by default, to have everything an the audits data, clear empty proofs that otherwise would pile up to an array of emptyness
 									$proof[] = ['type' => 'scanner',
 										'attributes' => [
@@ -417,7 +417,7 @@ class AUDIT extends API {
 							];
 						if (isset($preset['files'])){
 							$link = [];
-							foreach($preset['files'] as $file){
+							foreach ($preset['files'] as $file){
 								$fileinfo = pathinfo($file);
 								$file = [
 									'path' => substr($file, 1),
@@ -457,7 +457,7 @@ class AUDIT extends API {
 							];
 
 						// render regular inputs
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'text',
 								'attributes' => [
@@ -503,7 +503,7 @@ class AUDIT extends API {
 					}
 
 					// append final note, deletion and closing options
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'textarea',
 							'attributes' => [
@@ -524,7 +524,7 @@ class AUDIT extends API {
 					];
 
 					if ($audit['id']){
-						$result['render']['content'][count($result['render']['content']) - 1][] = [
+						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'deletebutton',
 							'attributes' => [
 								'value' => $this->_lang->GET('audit.audit.delete'),
@@ -552,7 +552,7 @@ class AUDIT extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 	/**
 	 * creates and returns a download link to the export file for given audit
@@ -577,10 +577,10 @@ class AUDIT extends API {
 		$summary['content'][$audit['last_user']] = '';
 		$summary['content'][$this->_lang->GET('audit.audit.objectives', [], true)] = $audit['content']['objectives'];
 		$summary['content'][$this->_lang->GET('audit.audit.method', [], true)] = isset($audit['content']['method']) ? $this->_lang->GET('audit.audit.methods.' . $audit['content']['method']) : '';
-		foreach($audit['content']['questions'] as $question){
+		foreach ($audit['content']['questions'] as $question){
 			$currentquestion = null;
 			// assign question as key and current question direct response as initial value
-			foreach($question as $key => $values){
+			foreach ($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 				$currentquestion = $key;
 				$summary['content'][$currentquestion] = implode("\n", $values) . "\n";
@@ -588,7 +588,7 @@ class AUDIT extends API {
 			}
 			if (!$currentquestion) continue;
 			// assign question response as value
-			foreach($question as $key => $values){
+			foreach ($question as $key => $values){
 				if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
 					$summary['content'][$currentquestion] .= "\n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
 					switch ($key){
@@ -649,10 +649,10 @@ class AUDIT extends API {
 						(!isset($audit['content']['method']) ? '' : " \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $audit['content']['method']))
 				]
 			];
-			foreach($audit['content']['questions'] as $question){
+			foreach ($audit['content']['questions'] as $question){
 				// assign question as key and current question direct response as initial value
 				$currentquestion = $currentanswer = '';
-				foreach($question as $key => $values){
+				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 					$currentquestion = $key;
 					$currentanswer = implode("\n", $values) . "\n";
@@ -660,7 +660,7 @@ class AUDIT extends API {
 				}
 				if (!$currentquestion) continue;
 				// assign question response as value
-				foreach($question as $key => $values){
+				foreach ($question as $key => $values){
 					if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
 						$currentanswer .= (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute'])) ? $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] : $key) . ': ';
 						switch ($key){
@@ -689,7 +689,7 @@ class AUDIT extends API {
 
 				if (isset($question['files'])){
 					$link = [];
-					foreach($question['files'] as $file){
+					foreach ($question['files'] as $file){
 						$fileinfo = pathinfo($file);
 						$file = [
 							'path' => substr($file, 1),
@@ -744,7 +744,7 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
 		// recursively sanitize unpredictable nested frontend input
 		function sanitizeQuestionNesting($element, $result = []){
-			foreach($element as $sub){
+			foreach ($element as $sub){
 				if (array_is_list($sub)){
 					array_push($result, ...sanitizeQuestionNesting($sub, $result));
 				} else {
@@ -766,7 +766,7 @@ class AUDIT extends API {
 				];
 
 				// sanitize payload content and translate regulatory to keys
-				foreach($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
+				foreach ($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
 					if ($description === UTILITY::propertySet($this->_payload, 'method')){
 						$template[':method'] = $method;
 						break;
@@ -775,7 +775,7 @@ class AUDIT extends API {
 				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives'] || !$template[':method']) $this->response([], 400);
 				$template[':content'] = json_decode($template[':content'] ? : '', true);
 				$template[':content'] = sanitizeQuestionNesting($template[':content']);
-				foreach($template[':content'] as &$question){
+				foreach ($template[':content'] as &$question){
 					$question['regulatory'] = explode(', ', $question['regulatory']);
 					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
@@ -809,7 +809,7 @@ class AUDIT extends API {
 				];
 
 				// sanitize payload content and translate regulatory to keys
-				foreach($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
+				foreach ($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
 					if ($description === UTILITY::propertySet($this->_payload, 'method')){
 						$template[':method'] = $method;
 						break;
@@ -818,7 +818,7 @@ class AUDIT extends API {
 				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives'] || !$template[':method']) $this->response([], 400);
 				$template[':content'] = json_decode($template[':content'] ? : '', true);
 				$template[':content'] = sanitizeQuestionNesting($template[':content']);
-				foreach($template[':content'] as &$question){
+				foreach ($template[':content'] as &$question){
 					$question['regulatory'] = explode(', ', $question['regulatory']);
 					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
 				}
@@ -841,14 +841,14 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'GET':
-				$result = [];
-				$datalist = ['objectives'=> [], 'questions' => [], 'hints' => []];
+				$response = [];
+				$datalist = ['objectives' => [], 'questions' => [], 'hints' => []];
 				$templatehints = [];
 				$select = ['...' . $this->_lang->GET('audit.audit.template.new') => ['value' => '0']];
 				$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 				$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates');
 
-				if($this->_requestedID && $this->_requestedID !== 'false' && ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && ($template = $data[array_search($this->_requestedID, array_column($data, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'];
 
 				if (!$data || !$this->_requestedID || !$template){
 					$template = [
@@ -865,18 +865,18 @@ class AUDIT extends API {
 
 				// set up regulatory selection according to language file
 				$regulatory = [];
-				foreach($this->_lang->_USER['regulatory'] as $key => $translation){
+				foreach ($this->_lang->_USER['regulatory'] as $key => $translation){
 					$regulatory[$translation] = ['value' => $key];
 				}
 
 				// gather available units
 				$units = [];
-				foreach($this->_lang->_USER['units'] as $unit => $description){
+				foreach ($this->_lang->_USER['units'] as $unit => $description){
 					$units[$description] = $unit === $template['unit'] ? ['selected' => true] : [];
 				}
 				
 				// prepare selection and datalists
-				foreach($data as $row){
+				foreach ($data as $row){
 					// selection
 					$select[$this->_lang->_USER['units'][$row['unit']] . ($row['hint'] ? ' - ' . $row['hint'] : '') . ' ' . $row['date']] = intval($this->_requestedID) === $row['id'] ? ['value' => strval($row['id']), 'selected' => true] : ['value' => strval($row['id'])];
 					// template hint datalist
@@ -885,13 +885,13 @@ class AUDIT extends API {
 					$datalist['objectives'][] = $row['objectives'];
 					// question datalist
 					$row['content'] = json_decode($row['content'] ? : '', true);
-					foreach($row['content'] as $question){
+					foreach ($row['content'] as $question){
 						$datalist['questions'][] = $question['question'];
 						$datalist['hints'][] = $question['hint'];
 					}
 				}
 				// sanitize datalists
-				foreach($datalist as $data => &$values){
+				foreach ($datalist as $data => &$values){
 					$values = array_filter($values, fn($v) => boolval($v));
 					ksort($values);
 				}
@@ -901,25 +901,25 @@ class AUDIT extends API {
 
 				// prepare methods
 				$auditmethods = [];
-				foreach($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
+				foreach ($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
 					$auditmethods[$description] = $method === $template['method'] ? ['selected' => true] : [];
 				}
 
 				// prepare and append content for editor rendering
 				if ($template['content'] = json_decode($template['content'] ? : '', true)){
-					foreach($template['content'] as &$question){
+					foreach ($template['content'] as &$question){
 						$question['regulatory'] = explode(',', $question['regulatory']);
 						$question['regulatory'] = implode(', ', array_map(fn($r) => isset($this->_lang->_USER['regulatory'][$r]) ? $this->_lang->_USER['regulatory'][$r] : $r, $question['regulatory']));
 					}
-					$result['selected'] = $template['content'];
+					$response['selected'] = $template['content'];
 				}
 
-				$result['render']['form'] = [
+				$response['render']['form'] = [
 					'data-usecase' => 'audittemplate',
 					'action' => "javascript:api.audit('" . ($template['id'] ? 'put' : 'post') . "', 'audittemplate', 'null', " . $template['id'] . ")"
 				];
 
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'select',
 						'attributes' => [
@@ -929,7 +929,7 @@ class AUDIT extends API {
 						'content' => $select
 					]
 				];
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textsection',
 						'content' => $template['author'] ? $this->_lang->GET('risk.author', [':author' => $template['author'], ':date' => $this->convertFromServerTime($template['date'])]) : null
@@ -984,7 +984,7 @@ class AUDIT extends API {
 					]
 
 				];
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textarea',
 						'attributes' => [
@@ -1027,13 +1027,13 @@ class AUDIT extends API {
 					// a template can only be deleted if not used by an unfinished audit
 					$unused = true;
 					$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
-					foreach($audits as $audit){
+					foreach ($audits as $audit){
 						if ($audit['template'] === $template['id'] && !$audit['closed']) {
 							$unused = false;
 							break;
 						}
 					}
-					if ($unused) $result['render']['content'][count($result['render']['content']) - 1][] = [
+					if ($unused) $response['render']['content'][count($response['render']['content']) - 1][] = [
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
@@ -1045,7 +1045,7 @@ class AUDIT extends API {
 							]
 						]
 					];
-					else $result['render']['content'][count($result['render']['content']) - 1][] = [
+					else $response['render']['content'][count($response['render']['content']) - 1][] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
@@ -1055,7 +1055,7 @@ class AUDIT extends API {
 					];
 				}
 
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'trash',
 						'description' => $this->_lang->GET('assemble.compose.edit_trash')
@@ -1077,7 +1077,7 @@ class AUDIT extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -1095,10 +1095,10 @@ class AUDIT extends API {
 			case 'POST':
 			case 'PUT':
 			case 'GET':
-				$result['render'] = ['content' => []];
+				$response['render'] = ['content' => []];
 				$selecttypes = ['...' => []];
 				
-				foreach([
+				foreach ([
 					'audits', // internal audits
 					'managementreviews',
 					'mdrsamplecheck', // sample checks on products
@@ -1120,7 +1120,7 @@ class AUDIT extends API {
 						if ($this->_requestedType === $category) $selecttypes[$this->_lang->GET('audit.checks_type.' . $category)]['selected'] = true;
 				}
 				ksort($selecttypes);
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'select',
 						'content' => $selecttypes,
@@ -1132,9 +1132,9 @@ class AUDIT extends API {
 				];
 
 				if ($this->_requestedType && $this->_requestedType !== '...') {
-					if ($append = $this->{$this->_requestedType}()) array_push($result['render']['content'] , ...$append);
+					if ($append = $this->{$this->_requestedType}()) array_push($response['render']['content'] , ...$append);
 				}
-				$this->response($result);
+				$this->response($response);
 				break;
 			case 'DELETE':
 				if (!PERMISSION::permissionFor('regulatoryoperation')) $this->response([], 401);
@@ -1176,7 +1176,7 @@ class AUDIT extends API {
 				'content' => $this->_lang->GET('audit.complaints_summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => PERMISSION::fullyapproved('complaintclosing', $c['closed'])))])
 			];
 			foreach ($cases as $identifier => $property){
-				$units = implode(', ', array_map(Fn($u)=> $this->_lang->_USER['units'][$u], explode(',', $property['units'])));
+				$units = implode(', ', array_map(Fn($u) => $this->_lang->_USER['units'][$u], explode(',', $property['units'])));
 				$linkdescription = $this->_lang->GET('audit.complaints_case_description', [':identifier' => $identifier, ':units' => $units]);
 				if (PERMISSION::fullyapproved('complaintclosing', $property['closed'])) {
 					$linkdescription .= $this->_lang->GET('audit.complaints_closed');
@@ -1260,7 +1260,7 @@ class AUDIT extends API {
 		// get all current approved document older than given timestamp
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $currentdocuments = [];
-		foreach($documents as $document){
+		foreach ($documents as $document){
 			if (!PERMISSION::fullyapproved('documentapproval', $document['approval']) || $document['date'] >= $requestedTimestamp) continue;
 			if ($document['hidden']) {
 				$document['hidden'] = json_decode($document['hidden'], true);
@@ -1276,7 +1276,7 @@ class AUDIT extends API {
 		// get all current bundles
 		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = $currentbundles = [];
-		foreach($bundles as &$bundle){
+		foreach ($bundles as &$bundle){
 			if ($bundle['hidden']) $hidden[] = $bundle['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($bundle['name'], array_column($currentbundles, 'name')) && !in_array($bundle['name'], $hidden)) $currentbundles[] = $bundle;
 		}
@@ -1325,11 +1325,11 @@ class AUDIT extends API {
 		];
 
 		// iterate over documents an their respective components
-		foreach($currentdocuments as $document){
+		foreach ($currentdocuments as $document){
 			$entry = '';
 			$documentscontent = [];
 			// display document approval
-			foreach(json_decode($document['approval'], true) as $position => $data){
+			foreach (json_decode($document['approval'], true) as $position => $data){
 				$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
@@ -1338,12 +1338,12 @@ class AUDIT extends API {
 			}
 			// display component approval
 			$has_components = false;
-			foreach(explode(',', $document['content'] ? : '') as $used_component_name){
+			foreach (explode(',', $document['content'] ? : '') as $used_component_name){
 				if ($cmpnnt = latestApprovedComponent($components, $requestedTimestamp, $used_component_name)){
 					$has_components = true;
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
 					$entry .= " \n" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $cmpnnt['author'], ':date' => $this->convertFromServerTime($cmpnnt['date'])]) . "\n";
-					foreach($cmpnnt['approval'] as $position => $data){
+					foreach ($cmpnnt['approval'] as $position => $data){
 						$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
 							':permission' => $this->_lang->GET('permissions.' . $position),
 							':name' => $data['name'],
@@ -1352,7 +1352,7 @@ class AUDIT extends API {
 					}
 				}
 			}
-			foreach(explode(',', $document['regulatory_context'] ? : '') as $context){
+			foreach (explode(',', $document['regulatory_context'] ? : '') as $context){
 				$entry .= "\n" . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
 			}
 
@@ -1365,7 +1365,7 @@ class AUDIT extends API {
 			];
 			if (!$has_components) {
 				$documentscontent[count($documentscontent) - 1]['attributes']['class'] = 'orange';
-				$documentscontent[count($documentscontent) - 1]['content'] .="\n \n" . $this->_lang->GET('assemble.render.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v)=>$this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))]);
+				$documentscontent[count($documentscontent) - 1]['content'] .="\n \n" . $this->_lang->GET('assemble.render.error_no_approved_components', [':permission' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('documentcomposer', true)))]);
 			}
 			$documentscontent[] = [
 				'type' => 'button',
@@ -1417,7 +1417,7 @@ class AUDIT extends API {
 					$file['url'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 				}
 				$display = pathinfo($file['path'])['basename'] . ' ' . $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $this->convertFromServerTime($file['activated'], true)]);
-				foreach(explode(',', $file['regulatory_context'] ? : '') as $context){
+				foreach (explode(',', $file['regulatory_context'] ? : '') as $context){
 					if ($context) $display .= " | " . (isset($this->_lang->_USER['regulatory'][$context]) ? $this->_lang->_USER['regulatory'][$context] : $context);
 				}
 				$links[$display] = ['href' => $file['url'], 'target' => 'blank'];
@@ -1435,7 +1435,7 @@ class AUDIT extends API {
 				'content' => ''
 			]
 		];
-		foreach($currentbundles as $bundle){
+		foreach ($currentbundles as $bundle){
 			$documentslist = explode(',', $bundle['content'] ? : '');
 			natsort($documentslist);
 			$bundlescontent[] = [
@@ -1468,7 +1468,7 @@ class AUDIT extends API {
 		$documents = $this->documents();
 
 		for($i = 1; $i < count($documents); $i++){
-			foreach($documents[$i] as $item){
+			foreach ($documents[$i] as $item){
 				if (isset($item['content'])){
 					if (gettype($item['content']) === 'string' && isset($item['attributes']['name']))
 						$summary['content'][$item['attributes']['name']] = $item['content'];
@@ -1511,7 +1511,7 @@ class AUDIT extends API {
 
 		foreach ($records as $record){
 			$record['content'] = json_decode($record['content'], true);
-			foreach($record['content'] as $rc){
+			foreach ($record['content'] as $rc){
 				if (!isset($rc['document'])) continue;
 				if (!isset($usedid[$rc['document']])) $usedid[$rc['document']] = 0;
 				$usedid[$rc['document']]++;
@@ -1520,7 +1520,7 @@ class AUDIT extends API {
 
 		// accumulate usecount by name
 		$hidden = [];
-		foreach($documents as $row => $document){
+		foreach ($documents as $row => $document){
 			if ($document['hidden']) $hidden[] = $document['name'];
 
 			// skip, and drop for performace reasons
@@ -1544,7 +1544,7 @@ class AUDIT extends API {
 				'content' => $this->_lang->GET('audit.documentusage_warning')
 			]
 		];
-		foreach($usedname as $name => $count){
+		foreach ($usedname as $name => $count){
 			$document = $documents[array_search($name, array_column($documents, 'name'))]; // since the document datalist is ordered by date desc the first match is suitable
 
 			if ($document['regulatory_context']) $document['regulatory_context'] = array_map(fn($c) => isset($this->_lang->_USER['regulatory'][$c]) ? $this->_lang->_USER['regulatory'][$c] : $c, explode(',', $document['regulatory_context']));
@@ -1580,7 +1580,7 @@ class AUDIT extends API {
 			case 'auditsummary':
 				$this->_requestedOption = array_search($this->_requestedOption, $this->_lang->_USER['units']);
 				$audits = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
-				foreach($audits as $audit){
+				foreach ($audits as $audit){
 					if ($audit['unit'] === $this->_requestedOption && $audit['closed']) {
 						$audit['content'] = json_decode($audit['content'], true);
 						if (isset($audit['content']['summary']) && $audit['content']['summary']) $this->response(['data' => $audit['content']['summary']]);
@@ -1609,12 +1609,12 @@ class AUDIT extends API {
 
 		// get unincorporated articles from approved orders
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
-		foreach($products as $id => $row){
+		foreach ($products as $id => $row){
 			if (!$row['incorporated']) continue;
 			$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
 			if (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) continue;
 			$fullyapproved = null;
-			foreach(PERMISSION::permissionfor('incorporation', true) as $approved){
+			foreach (PERMISSION::permissionfor('incorporation', true) as $approved){
 				$date = $row['incorporated'][$approved]['date'];
 				if ($date > $fullyapproved) $fullyapproved = $date;
 			}
@@ -1696,11 +1696,11 @@ class AUDIT extends API {
 			],
 			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDate, true) . ' ' . $this->_requestedTime])
 		];
-		foreach($incorporated as $product){
+		foreach ($incorporated as $product){
 			if (!isset($incorporations[$product['vendor_name']])) $incorporations[$product['vendor_name']] = [];
 
 			$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
-			foreach(['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
+			foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 				if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date'], true);
 			}
 			$incorporations[$product['vendor_name']][] = [
@@ -1712,7 +1712,7 @@ class AUDIT extends API {
 			];
 		}
 		ksort($incorporations);
-		foreach($incorporations as $vendor => $vendorchecks){
+		foreach ($incorporations as $vendor => $vendorchecks){
 			$content[] = [
 				[
 					'type' => 'textsection',
@@ -1744,7 +1744,7 @@ class AUDIT extends API {
 		$documents = $this->incorporation();
 
 		for($i = 3; $i<count($documents); $i++){
-			foreach($documents[$i] as $item){
+			foreach ($documents[$i] as $item){
 				if (isset($item['content']) || isset($item['linkedcontent'])){
 					if (isset($item['content']) && isset($item['attributes']['name']))
 						$summary['content'][$item['attributes']['name']] = $item['content'];
@@ -1823,7 +1823,7 @@ class AUDIT extends API {
 			case 'PUT';
 				$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
 				$managementreview = $managementreview ? $managementreview[0] : null;
-				if (!$managementreview) $this->response($return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
+				if (!$managementreview) $this->response(['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
 				
 				// update general properties
 				$managementreview['last_user'] = $_SESSION['user']['name'];
@@ -1862,7 +1862,7 @@ class AUDIT extends API {
 					]]);
 				break;
 			case 'GET':
-				$result = $datalist = [];
+				$response = $datalist = [];
 				$managementreview = $recent = null;
 				$select = [
 					'edit' => [
@@ -1871,11 +1871,11 @@ class AUDIT extends API {
 				];
 				$managementreviews = SQLQUERY::EXECUTE($this->_pdo, 'management_get');
 
-				if($this->_requestedID && $this->_requestedID !== 'false' && ($managementreview = $managementreviews[array_search($this->_requestedID, array_column($managementreviews, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && ($managementreview = $managementreviews[array_search($this->_requestedID, array_column($managementreviews, 'id'))]) === false) $return['response'] = ['msg' => $this->_lang->GET('audit.managementreview.not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 				// managementreview selections and previous content as autocomplete datalists
-				foreach($managementreviews as $row){
-					foreach(json_decode($row['content'], true) as $key => $value){
+				foreach ($managementreviews as $row){
+					foreach (json_decode($row['content'], true) as $key => $value){
 						if (!isset($datalist[$key])) $datalist[$key] = [];
 						$datalist[$key][] = $value;
 					}
@@ -1886,7 +1886,7 @@ class AUDIT extends API {
 					$select['edit'][$this->convertFromServerTime($row['last_touch'])] = $row['id'] == $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 				// sanitize datalists
-				foreach($datalist as &$values){
+				foreach ($datalist as &$values){
 					$values = array_filter($values, fn($v) => boolval($v));
 					ksort($values);
 				}
@@ -1894,7 +1894,7 @@ class AUDIT extends API {
 				if (!$managementreview){
 					$managementreview = [
 						'id' => null,
-						'template'=> null,
+						'template' => null,
 						'content' => $recent ? $recent['content'] : '',
 						'unit' => null,
 						'last_touch' => null,
@@ -1902,7 +1902,7 @@ class AUDIT extends API {
 				}
 
 				// render template
-				$result['render']['form'] = [
+				$response['render']['form'] = [
 					'data-usecase' => 'audit',
 					'action' => "javascript:api.audit('" . ($managementreview['id'] ? 'put' : 'post') . "', 'managementreview', 'null', " . $managementreview['id'] . ")"
 				];
@@ -1910,7 +1910,7 @@ class AUDIT extends API {
 
 				// selection of open reviews
 				if (count(array_keys($select['edit']))>1){
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 						[
 							'type' => 'select',
 							'attributes' => [
@@ -1922,7 +1922,7 @@ class AUDIT extends API {
 					];
 				}
 				// display last edit
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textsection',
 						'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->convertFromServerTime($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : $this->_lang->GET('audit.managementreview.last_version'))
@@ -1930,7 +1930,7 @@ class AUDIT extends API {
 				];
 				// display issue inputs
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $issue){
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'textarea',
 							'attributes' => [
@@ -1944,7 +1944,7 @@ class AUDIT extends API {
 				}
 
 				// append deletion and closing options
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'checkbox',
 						'content' => [
@@ -1959,7 +1959,7 @@ class AUDIT extends API {
 				];
 
 				if ($managementreview['id']){
-					$result['render']['content'][count($result['render']['content']) - 1][] = [
+					$response['render']['content'][count($response['render']['content']) - 1][] = [
 						'type' => 'deletebutton',
 						'attributes' => [
 							'value' => $this->_lang->GET('audit.audit.delete'),
@@ -1986,7 +1986,7 @@ class AUDIT extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 	/**
 	 * creates and returns a download link to the export file for given management review
@@ -2009,7 +2009,7 @@ class AUDIT extends API {
 		];
 		
 		$summary['content'][$managementreview['last_user']] = '';
-		foreach($managementreview['content'] as $issue => $review){
+		foreach ($managementreview['content'] as $issue => $review){
 			// translate or keep issue if not found in languagefile 
 			$key = isset($this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue]) ? $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] : $issue;
 			$summary['content'][$key] = $review . "\n";
@@ -2057,7 +2057,7 @@ class AUDIT extends API {
 				]
 			];
 
-			foreach($managementreview['content'] as $issue => $review){
+			foreach ($managementreview['content'] as $issue => $review){
 				$currentquestion = $currentanswer = '';
 				// translate or keep issue if not found in languagefile 
 				$key = isset($this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue]) ? $this->_lang->_DEFAULT['audit']['managementreview']['required'][$issue] : $issue;
@@ -2104,7 +2104,7 @@ class AUDIT extends API {
 		// get unchecked articles for MDR §14 sample check
 		// this is actually faster than a nested sql query
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-		foreach($vendors as &$vendor){
+		foreach ($vendors as &$vendor){
 			$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true); 
 		}
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -2114,7 +2114,7 @@ class AUDIT extends API {
 		]);
 		// get all checkable products
 		$checkable = [];
-		foreach($products as $product){
+		foreach ($products as $product){
 			if (!$product['trading_good']) continue;
 			if (!isset($checkable[$product['vendor_name']])) $checkable[$product['vendor_name']] = [];
 			if (!$product['checked']){
@@ -2128,7 +2128,7 @@ class AUDIT extends API {
 			}
 		}
 		// drop vendors that have been checked within their sample check interval
-		foreach($products as $product){
+		foreach ($products as $product){
 			if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_name']])) continue;
 			$check = new \DateTime($product['checked']);
 			if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['servertime'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
@@ -2193,7 +2193,7 @@ class AUDIT extends API {
 		});
 
 		$checks = [];
-		foreach($products as $product){
+		foreach ($products as $product){
 			if (!$product['sample_checks']) continue;
 			if ($product['checked'] < $this->_requestedDate . ' ' . $this->_requestedTime . ':00') continue;
 
@@ -2201,7 +2201,7 @@ class AUDIT extends API {
 
 			$product['sample_checks'] = json_decode($product['sample_checks'], true);
 			$productchecks = [];
-			foreach($product['sample_checks'] as $check){
+			foreach ($product['sample_checks'] as $check){
 				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true) . "\n" . $check['content'];
 			}
 			$checks[$product['vendor_name']][] = [
@@ -2212,7 +2212,7 @@ class AUDIT extends API {
 				'content' => implode("\n\n", $productchecks)
 			];
 
-			if(PERMISSION::permissionFor('regulatoryoperation')) $checks[$product['vendor_name']][] = [
+			if (PERMISSION::permissionFor('regulatoryoperation')) $checks[$product['vendor_name']][] = [
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('audit.mdrsamplecheck_revoke'),
@@ -2225,7 +2225,7 @@ class AUDIT extends API {
 			];
 		}
 		ksort($checks);
-		foreach($checks as $vendor => $vendorchecks){
+		foreach ($checks as $vendor => $vendorchecks){
 			$content[] = [
 				[
 					'type' => 'textsection',
@@ -2257,7 +2257,7 @@ class AUDIT extends API {
 		$checks = $this->mdrsamplecheck();
 
 		for($i = 3; $i < count($checks); $i++){
-			foreach($checks[$i] as $item){
+			foreach ($checks[$i] as $item){
 				if (isset($item['content']) && isset($item['attributes']['name']))
 						$summary['content'][$item['attributes']['name']] = $item['content'];
 			}
@@ -2356,7 +2356,7 @@ class AUDIT extends API {
 
 		// prepare result as subsets of vendors
 		$vendor_orders = [];
-		foreach($orders as $order){
+		foreach ($orders as $order){
 			$order['order_data'] = json_decode($order['order_data'], true);
 			$deliverytime = '';
 			if ($order['received']){
@@ -2386,7 +2386,7 @@ class AUDIT extends API {
 		$writer = new \XLSXWriter();
 		$writer->setAuthor($_SESSION['user']['name']); 
 
-		foreach($vendor_orders as $vendor => $orders){
+		foreach ($vendor_orders as $vendor => $orders){
 			$writer->writeSheetRow($vendor, array_values($columns));
 			foreach ($orders as $line)
 				$writer->writeSheetRow($vendor, $line, array('height' => 30, 'wrap_text' => true));
@@ -2487,13 +2487,13 @@ class AUDIT extends API {
 			'type' => '_' . $this->_lang->_DEFAULT['audit']['records_type']
 		];
 		// iterate over all entries, create arrays with all available keys and append to result
-		foreach($records as $row){
+		foreach ($records as $row){
 			if (!in_array($row['context'], ['casedocumentation'])) continue;
 
 			$line = [];
 			$skip = false;
 			$row['content'] = json_decode($row['content'], true);
-			foreach($row['content'] as $entry){
+			foreach ($row['content'] as $entry){
 				$currentdate = substr($entry['date'], 0, 10);
 				// check if entry is out of requested timestamp bound
 				if ($currentdate < $startDate || $currentdate > $endDate) {
@@ -2511,7 +2511,7 @@ class AUDIT extends API {
 
 				if (gettype($entry['content']) === 'string') $entry['content'] = json_decode($entry['content'], true);
 				// iterate over all entries, fill up result line with the most recent value
-				foreach($entry['content'] as $field => $input){
+				foreach ($entry['content'] as $field => $input){
 					$field = $document_name . str_replace('_', ' ', $field);
 					if ($input) {
 						if (!in_array($field, $keys)) $keys[] = $field;
@@ -2548,9 +2548,9 @@ class AUDIT extends API {
 			CONFIG['csv']['dialect']['enclosure'],
 			CONFIG['csv']['dialect']['escape']);
 		// rows
-		foreach($result as $line){
+		foreach ($result as $line){
 			// complete and sort line columns, unshift default columns
-			foreach(array_diff($keys, array_keys($line)) as $nkey){
+			foreach (array_diff($keys, array_keys($line)) as $nkey){
 				$line[$nkey] = '';
 			}
 			ksort($line, SORT_REGULAR);
@@ -2602,11 +2602,11 @@ class AUDIT extends API {
 		// prepare existing document lists
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $regulatory = [];
-		foreach($fd as $key => $row) {
+		foreach ($fd as $key => $row) {
 			if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
-				foreach(explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
+				foreach (explode(',', $row['regulatory_context'] ? : '') as $regulatory_context){
 					$satisfied = false;
 					if (isset($regulatory[$regulatory_context])){
 						foreach ($regulatory[$regulatory_context] as $key => $value){
@@ -2620,7 +2620,7 @@ class AUDIT extends API {
 		// get active external documents
 		if ($files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active')) {
 			foreach ($files as $file){
-				foreach(explode(',', $file['regulatory_context']) as $context){
+				foreach (explode(',', $file['regulatory_context']) as $context){
 					if (preg_match('/^\.\.\//', $file['path'])){
 						$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 					}
@@ -2630,7 +2630,7 @@ class AUDIT extends API {
 		}
 
 		// add export button
-		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -2640,7 +2640,7 @@ class AUDIT extends API {
 				]
 			]
 		];
-		foreach($this->_lang->_USER['regulatory'] as $key => $issue){
+		foreach ($this->_lang->_USER['regulatory'] as $key => $issue){
 			if (isset($regulatory[$key])) $content[] = [
 				'type' => 'links',
 				'description' => $issue,
@@ -2674,7 +2674,7 @@ class AUDIT extends API {
 		];
 
 		$issues = $this->regulatory();
-		foreach($issues as $item){
+		foreach ($issues as $item){
 			if (!isset($item['type'])) continue;
 			switch ($item['type']){
 				case 'links':
@@ -2725,7 +2725,7 @@ class AUDIT extends API {
 
 		// gathering and distributing entry properties
 		$entries = [];
-		foreach($risks as $risk){
+		foreach ($risks as $risk){
 			if ($risk['date'] >= $requestedTimestamp) continue;
 			if ($risk['hidden']) {
 				$risk['hidden'] = json_decode($risk['hidden'], true);
@@ -2751,14 +2751,14 @@ class AUDIT extends API {
 
 		// match required characteristics risks with actual risks
 		$missing = [];
-		foreach($entries as $process => $properties){
+		foreach ($entries as $process => $properties){
 			if (!isset($missing[$process])) $missing[$process] = ['characteristic' => [], 'risk' => [], 'assignmenterror' => $properties['assignmenterror']];
 			if (!$properties['characteristic'])
 				array_push($missing[$process]['characteristic'], ...$properties['risk']); // risks are probably set but not yet defined as required
 			else {
 				// compare key beginnings to match main risk groups according to languagefile
 				foreach ($properties['characteristic'] as $risk){
-					$properties['risk'] = array_filter($properties['risk'], fn($v)=> !str_starts_with($v, $risk));				
+					$properties['risk'] = array_filter($properties['risk'], fn($v) => !str_starts_with($v, $risk));				
 				}
 				if ($properties['risk']){ // remaining if not filtered out completely
 					$missing[$process]['risk'] = array_diff($properties['characteristic'], $properties['risk']); // all required but not present risks
@@ -2769,13 +2769,13 @@ class AUDIT extends API {
 
 		// render issues with translated risks or literal property values
 		$issues = [];
-		foreach($missing as $process => $properties){
-			foreach($properties as $key => $value) {
+		foreach ($missing as $process => $properties){
+			foreach ($properties as $key => $value) {
 				$value = array_unique($value);
 				if (!$value) continue;
 
 				$issuecontent = implode("\n", $value);
-				if (!in_array($key, ['assignmenterror'])) $issuecontent = implode("\n", array_values(array_map(fn($r)=> isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, $value)));
+				if (!in_array($key, ['assignmenterror'])) $issuecontent = implode("\n", array_values(array_map(fn($r) => isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, $value)));
 				$issues[] = [
 					'type' => 'textsection',
 					'attributes' => [
@@ -2790,7 +2790,7 @@ class AUDIT extends API {
 		}
 
 		// add export button
-		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'date',
 				'attributes' => [
@@ -2852,7 +2852,7 @@ class AUDIT extends API {
 
 		// render issue list for pdf export
 		$issues = $this->risks();
-		foreach($issues as $issue){
+		foreach ($issues as $issue){
 			if (!isset($issue['type'])) continue;
 			if ($issue['type'] === 'textsection' && isset($issue['attributes']['name'])) $summary['content'][$issue['attributes']['name']] = isset($issue['content']) ? $issue['content'] : ' ';	
 		}
@@ -2871,7 +2871,7 @@ class AUDIT extends API {
 		// gathering and distributing entry properties
 		$entries = [];
 
-		foreach($risks as $risk){
+		foreach ($risks as $risk){
 			if ($risk['date'] >= $requestedTimestamp) continue;
 			if ($risk['hidden']) {
 				$risk['hidden'] = json_decode($risk['hidden'], true);
@@ -2880,7 +2880,7 @@ class AUDIT extends API {
 			}
 
 			// translate
-			$risk['risk'] = implode("\n", array_values(array_map(fn($r)=> isset($this->_lang->_DEFAULT['risks'][$r]) ? $this->_lang->_DEFAULT['risks'][$r] : $r, explode(',', $risk['risk'] ? : ''))));
+			$risk['risk'] = implode("\n", array_values(array_map(fn($r) => isset($this->_lang->_DEFAULT['risks'][$r]) ? $this->_lang->_DEFAULT['risks'][$r] : $r, explode(',', $risk['risk'] ? : ''))));
 			$risk['relevance'] = $risk['relevance'] ? $this->_lang->GET('risk.relevance_yes', [], true) : $this->_lang->GET('risk.relevance_no', [], true);
 
 			// sort to process and type, consider form fields and names within GET RISK->risk() as well
@@ -2920,12 +2920,12 @@ class AUDIT extends API {
 			$tempFile = UTILITY::directory('tmp') . '/' . $summary['filename'] . '_' . time() . '.xlsx';
 			$writer = new \XLSXWriter();
 			$writer->setAuthor($_SESSION['user']['name']); 
-			foreach($entries as $process => $types){
+			foreach ($entries as $process => $types){
 				foreach ($types as $type => $lines){
 					// write each to xlsx sheet
 					$sheetname = '';
 					preg_match_all('/\w+/', $process . ' ' . $type, $words);
-					foreach($words[0] as $word){
+					foreach ($words[0] as $word){
 						$sheetname .= substr($word, 0, 1) . preg_replace('/[\Waeiou]/i', '', substr($word, 1));
 					}
 					$writer->writeSheetRow($sheetname, [$process, $type, $this->_lang->GET('audit.risk_export_column.effective_date', [':date' => $this->convertFromServerTime($requestedTimestamp, true)], true)]);
@@ -2986,7 +2986,7 @@ class AUDIT extends API {
 				(array_intersect(array_filter(PERMISSION::permissionFor('trainingevaluation', true), fn($permission) => $permission === 'supervisor'), $_SESSION['user']['permissions']) ||
 				(array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))))
 			) {
-				foreach($this->_payload as $key => &$value){
+				foreach ($this->_payload as $key => &$value){
 					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
@@ -3128,7 +3128,7 @@ class AUDIT extends API {
 				}
 			}
 		}
-		foreach($content as $index => $set){
+		foreach ($content as $index => $set){
 			if (count($set) < 2) unset($content[$index]);
 		}
 
@@ -3145,7 +3145,7 @@ class AUDIT extends API {
 	 */
 	private function userexperience(){
 		// add export button
-		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -3185,7 +3185,7 @@ class AUDIT extends API {
 							'name' => $user['name']
 						],
 					]];
-					foreach($years as $year => $summary){
+					foreach ($years as $year => $summary){
 						$usercontent[] = [
 							'type' => 'links',
 							'description' => $this->_lang->GET('audit.experience_points', [':number' => $summary['xp'], ':year' => $year]),
@@ -3220,7 +3220,7 @@ class AUDIT extends API {
 		$experience = $this->userexperience();
 
 		for($i = 1; $i < count($experience); $i++){
-			foreach($experience[$i] as $item){
+			foreach ($experience[$i] as $item){
 				if ($item['type'] === 'textsection') {
 					$previous = $item['attributes']['name'];
 				}
@@ -3265,7 +3265,7 @@ class AUDIT extends API {
 
 		$organizational_units = [];
 		$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.audit('get', 'checks', 'userskills')"];
-		foreach($this->_lang->_USER['units'] as $unit => $description){
+		foreach ($this->_lang->_USER['units'] as $unit => $description){
 			$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.audit('get', 'checks', 'userskills', '" . $unit . "')"];
 		}
 		if (!$this->_requestedOption) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
@@ -3281,7 +3281,7 @@ class AUDIT extends API {
 		];
 
 		// add export button
-		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -3316,7 +3316,7 @@ class AUDIT extends API {
 				if ($duty === '_LEVEL') continue;
 				foreach ($skills as $skill => $skilldescription){
 					if ($skill === '_DESCRIPTION') continue;
-					foreach($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
+					foreach ($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
 						if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])){
 							$skillmatrix .=  $this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription . " \n";
 							unset($unfulfilledskills[array_search($this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription, $unfulfilledskills)]);
@@ -3479,12 +3479,12 @@ class AUDIT extends API {
 		]);
 		$trainings = $trainings ? array_values($trainings) : [];
 		$allskills = [];
-		foreach($trainings as $training){
+		foreach ($trainings as $training){
 			if (!isset($allskills[$training['name']])) $allskills[$training['name']] = [];
 			if (!$training['date'] || ($training['expires'] && $training['expires'] < $this->_date['servertime']->format('Y-m-d'))) continue;
 			if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) $allskills[$training['name']][] = $users[$user]['name'];
 		}
-		foreach($allskills as $skill => $skilledusers){
+		foreach ($allskills as $skill => $skilledusers){
 			$content[] = [
 				[
 					'type' => 'textsection',
@@ -3516,7 +3516,7 @@ class AUDIT extends API {
 		$summary['content'][''] = (!$this->_requestedOption || $this->_requestedOption == 'null') ? implode(', ', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], $_SESSION['user']['units'])) : $this->_lang->_DEFAULT['units'][$this->_requestedOption];
 
 		for($i = 1; $i < count($skills); $i++){
-			foreach($skills[$i] as $item){
+			foreach ($skills[$i] as $item){
 				if ($item['type'] === 'textsection' && isset($item['attributes']['name'])) {
 					$summary['content'][$item['attributes']['name']] = $item['content'];
 					$previous = $item['attributes']['name'];
@@ -3565,7 +3565,7 @@ class AUDIT extends API {
 		];
 
 		// add export button
-		if(PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
+		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			[
 				'type' => 'button',
 				'attributes' => [
@@ -3575,7 +3575,7 @@ class AUDIT extends API {
 				]
 			]
 		];
-		foreach($vendors as $vendor){
+		foreach ($vendors as $vendor){
 			$info = '';
 			if ($vendor['hidden']) continue;
 			if ($vendor['info']) {
@@ -3591,10 +3591,10 @@ class AUDIT extends API {
 			if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
 			if ($vendor['evaluation']){
 				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
-				foreach($vendor['evaluation'] as $evaluation){
+				foreach ($vendor['evaluation'] as $evaluation){
 					$info .= " \n". $this->_lang->GET('consumables.vendor.last_evaluation', [':author' => $evaluation['_author'], ':date' => $this->convertFromServerTime($evaluation['_date'], true)]) . "\n";
 					unset($evaluation['_author'], $evaluation['_date']);
-					foreach($evaluation as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";	
+					foreach ($evaluation as $key => $value) $info .= str_replace('_', ' ', $key) . ': ' . $value . "\n";	
 				}
 			}
 
@@ -3610,7 +3610,7 @@ class AUDIT extends API {
 			
 			$certificates = [];
 			$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
-			foreach($certfiles as $path){
+			foreach ($certfiles as $path){
 				$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
 			}
 			if ($certificates) $content[count($content) - 1][] = [
@@ -3640,7 +3640,7 @@ class AUDIT extends API {
 		$incorporations = $this->vendors();
 		$previous = ''; // given there's a text followed by links
 		for($i = 1; $i < count($incorporations); $i++){
-			foreach($incorporations[$i] as $item){
+			foreach ($incorporations[$i] as $item){
 				if ($item['type'] === 'textsection') {
 					$summary['content'][$item['attributes']['name']] = $item['content'];
 					$previous = $item['attributes']['name'];

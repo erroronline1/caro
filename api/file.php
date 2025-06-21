@@ -64,7 +64,7 @@ class FILE extends API {
 	 */
 	public function bundle(){
 		// append filter input for bundle names
-		$result['render'] = [
+		$response['render'] = [
 			'content' => [
 				[
 					[
@@ -80,7 +80,7 @@ class FILE extends API {
 		];
 		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
 		$external = array_map(Fn($path) => substr($path, 1), $this->activeexternalfiles());
-		foreach($bundles as $row) {
+		foreach ($bundles as $row) {
 			$list = [];
 			// construct file links to external files per bundle
 			foreach (json_decode($row['content'], true) as $file => $path){
@@ -90,7 +90,7 @@ class FILE extends API {
 				$list[$file] = UTILITY::link(['href' => $path, 'data-filtered' => 'breakline']);
 			}
 			// append bundle
-			$result['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'links',
 					'description' => $row['name'],
@@ -103,7 +103,7 @@ class FILE extends API {
 		}
 
 		if (PERMISSION::permissionFor('filebundles')){
-			$result['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'button',
 					'attributes' => [
@@ -114,7 +114,7 @@ class FILE extends API {
 			];
 		}
 
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -129,7 +129,7 @@ class FILE extends API {
 	public function bundlefilter(){
 		$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get_active');
 		$matches = [];
-		foreach($bundles as $row) {
+		foreach ($bundles as $row) {
 			similar_text($this->_requestedFolder, $row['name'], $percent);
 			if ($percent >= CONFIG['likeliness']['file_search_similarity'] || !$this->_requestedFolder) $matches[] = strval($row['id']);
 		}
@@ -166,9 +166,9 @@ class FILE extends API {
 				unset ($this->_payload->{$this->_lang->PROPERTY('file.bundle.availability')});
 				// unset grouped checkbox submits that are appended to payload by default
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
-				foreach($this->_payload as $key => $value){
+				foreach ($this->_payload as $key => $value){
 					$match = true;
-					foreach($cmpstrings as $cmp) if (!stristr($key, str_replace(' ', '_', $cmp))) $match = false;
+					foreach ($cmpstrings as $cmp) if (!stristr($key, str_replace(' ', '_', $cmp))) $match = false;
 					if ($match) unset ($this->_payload->{$key});
 				}
 
@@ -233,7 +233,7 @@ class FILE extends API {
 			case 'GET':
 				$datalist = [];
 				$options = ['...' => []];
-				$return = [];
+				$response = [];
 				
 				$bundle = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_get', [
 					'values' => [
@@ -248,11 +248,11 @@ class FILE extends API {
 					'content' => '',
 					'hidden' => null
 				];
-				if($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $return['response'] = ['msg' => $this->_lang->GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
+				if ($this->_requestedFolder && $this->_requestedFolder !== 'false' && !$bundle['name']) $response['response'] = ['msg' => $this->_lang->GET('file.bundle_error_not_found', [':name' => $this->_requestedFolder]), 'type' => 'error'];
 
 				// prepare existing bundle lists
 				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'file_bundles_datalist');
-				foreach($bundles as $row) {
+				foreach ($bundles as $row) {
 					$datalist[] = $row['name'];
 					$display = $row['name'];
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
@@ -260,7 +260,7 @@ class FILE extends API {
 				}
 				
 				// append file bundle selection
-				$return['render'] = [
+				$response['render'] = [
 					'form' => [
 						'data-usecase' => 'file',
 						'action' => "javascript:api.file('post', 'bundlemanager')"
@@ -333,7 +333,7 @@ class FILE extends API {
 
 				// append folder
 				foreach ($matches as $folder) {
-					$return['render']['content'][] = $folder;
+					$response['render']['content'][] = $folder;
 				}
 
 				// set up and append file bundle options
@@ -342,11 +342,11 @@ class FILE extends API {
 					$hiddenproperties = json_decode($bundle['hidden'], true);
 					$hidden = $this->_lang->GET('file.manager.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 				}
-				$return['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'text',
-						'attributes'=>[
-							'name'=> $this->_lang->GET('file.bundle.save_bundle'),
+						'attributes' => [
+							'name' => $this->_lang->GET('file.bundle.save_bundle'),
 							'value' => $bundle['name']
 						],
 						'hint' => $bundle['name'] ? $this->_lang->GET('file.last_edit', [':user' => $bundle['author'], ':date' => $this->convertFromServerTime($bundle['date'])]): ''
@@ -363,8 +363,8 @@ class FILE extends API {
 						'hint' => $hidden
 					]
 				];
-				if ($bundle['name']) $return['header'] = $bundle['name'];
-				$this->response($return);
+				if ($bundle['name']) $response['header'] = $bundle['name'];
+				$this->response($response);
 				break;
 		}
 	}
@@ -390,7 +390,7 @@ class FILE extends API {
 					// process provided files 
 					$files = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('file.manager.new_file')], UTILITY::directory('external_documents'));
 					$insertions = [];
-					foreach($files as $file){
+					foreach ($files as $file){
 						$insertions[] = [
 							':author' => $_SESSION['user']['name'],
 							':path' => $file
@@ -454,7 +454,7 @@ class FILE extends API {
 						break;
 					default:
 						$regulatory_context = [];
-						foreach(explode(', ', $this->_accessible) as $context){
+						foreach (explode(', ', $this->_accessible) as $context){
 							$regulatory_context[] = array_search($context, $this->_lang->_USER['regulatory']); 
 						}
 						$prepare = 'file_external_documents_context';
@@ -477,17 +477,17 @@ class FILE extends API {
 				]]);
 				break;
 			case 'GET':
-				$result = ['render'=> ['form' => [
+				$response = ['render' => ['form' => [
 					'data-usecase' => 'file',
 					'action' => "javascript:api.file('post', 'externalfilemanager')"],
-					'content'=>[]
+					'content' => []
 				]];
 
 				// retrieve all external documents per database
 				$files = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get');		
 				if ($files){
 					// append filter input
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'filtered',
 							'attributes' => [
@@ -497,7 +497,7 @@ class FILE extends API {
 							]
 						]
 					];
-					$result['render']['content'][] = [];
+					$response['render']['content'][] = [];
 					foreach ($files as $file){
 						if ($file) {
 							// distinguish between uploaded files and linked ressources
@@ -511,7 +511,7 @@ class FILE extends API {
 							// resolve regulatory context
 							$regulatory_context = [];
 							$file['regulatory_context'] = explode(',', $file['regulatory_context']);
-							foreach($this->_lang->_USER['regulatory'] as $key => $value){
+							foreach ($this->_lang->_USER['regulatory'] as $key => $value){
 								$regulatory_context[$value] = ['value' => $key];
 								if (in_array($key, $file['regulatory_context'])) $regulatory_context[$value]['checked'] = true;
 							}
@@ -520,7 +520,7 @@ class FILE extends API {
 							$link[$file['name']] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
 			
 							// append file, link and options
-							array_push($result['render']['content'][1],
+							array_push($response['render']['content'][1],
 								[
 									'type' => 'links',
 									'description' => ($file['retired'] ? $this->_lang->GET('file.external_file.retired', [':user' => $file['author'], ':introduced' => $file['activated'], ':retired' => $this->convertFromServerTime($file['retired'])]) : $this->_lang->GET('file.external_file.introduced', [':user' => $file['author'], ':introduced' => $file['activated']])),
@@ -559,10 +559,10 @@ class FILE extends API {
 						}
 					}
 				}
-				else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+				else $response['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
 
 				// append submission inputs for new files and ressources
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'link',
 						'attributes' => [
@@ -579,7 +579,7 @@ class FILE extends API {
 						'hint' => $this->_lang->GET('file.external_file.hint')
 					]
 				];
-				$this->response($result);
+				$this->response($response);
 				break;
 		}
 	}
@@ -607,7 +607,7 @@ class FILE extends API {
 				$new_folder = preg_replace(['/[\s-]{1,}/', '/\W/'], ['_', ''], UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('file.manager.new_folder')));
 				if ($new_folder){
 					// check forbidden names
-					if(UTILITY::forbiddenName($new_folder)) $this->response(['response' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
+					if (UTILITY::forbiddenName($new_folder)) $this->response(['response' => ['msg' => $this->_lang->GET('file.manager.new_folder_forbidden_name', [':name' => $new_folder]), 'type' => 'error']]);
 
 					// create new folder if not present
 					$new_folder = UTILITY::directory('files_documents', [':category' => $new_folder]);
@@ -636,7 +636,7 @@ class FILE extends API {
 				]]);
 		break;
 			case 'GET':
-				$result = ['render' => [
+				$response = ['render' => [
 					'form' => [
 						'data-usecase' => 'file',
 						'action' => "javascript:api.file('post', 'filemanager')"
@@ -646,7 +646,7 @@ class FILE extends API {
 
 				// default view lists available custom directories within files_documents
 				if (!$this->_requestedFolder){
-					$result['render']['content'][] = [];
+					$response['render']['content'][] = [];
 					$folders = UTILITY::listDirectories(UTILITY::directory('files_documents'),'asc');
 					if ($folders){
 						foreach ($folders as $folder){
@@ -654,7 +654,7 @@ class FILE extends API {
 							$foldername = str_replace(UTILITY::directory('files_documents') . '/', '', $folder);
 							$filedate = new \DateTime('@' . filemtime($folder), new \DateTimeZone($this->_date['timezone']));
 							// append folder link and delete button
-							array_push($result['render']['content'][0],
+							array_push($response['render']['content'][0],
 								[
 									'type' => 'links',
 									'description' => $this->_lang->GET('file.manager.folder_header', [':date' => $this->convertFromServerTime($filedate->format('Y-m-d H:i'))]),
@@ -677,7 +677,7 @@ class FILE extends API {
 					}
 
 					// append entry point to sharepoint as authorized users can delete files prematurely
-					array_push($result['render']['content'][0],
+					array_push($response['render']['content'][0],
 						[
 							'type' => 'links',
 							'description' => $this->_lang->GET('menu.files.sharepoint'),
@@ -688,7 +688,7 @@ class FILE extends API {
 					);
 
 					// append input for new folder
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'text',
 							'attributes' => [
@@ -705,7 +705,7 @@ class FILE extends API {
 					else $files = UTILITY::listFiles(UTILITY::directory('files_documents', [':category' => $this->_requestedFolder]) ,'asc');
 					if ($files){
 						// append file filter
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'filtered',
 								'attributes' => [
@@ -715,7 +715,7 @@ class FILE extends API {
 								]
 							]
 						];
-						$result['render']['content'][] = [];
+						$response['render']['content'][] = [];
 						foreach ($files as $file){
 							if ($file) {
 								// set up file properties
@@ -732,7 +732,7 @@ class FILE extends API {
 								$link[$file['name']] = UTILITY::link(['href' => $file['link'], 'data-filtered' => $file['path']]);
 	
 								// append file options
-								array_push($result['render']['content'][1],
+								array_push($response['render']['content'][1],
 									[
 										'type' => 'links',
 										'description' => $this->convertFromServerTime($filedate->format('Y-m-d H:i')),
@@ -764,12 +764,12 @@ class FILE extends API {
 							}
 						}
 					}
-					else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+					else $response['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
 
 					// sharepoint has no option to add files from this place
-					if (in_array($this->_requestedFolder, ['sharepoint'])) unset ($result['render']['form']);
+					if (in_array($this->_requestedFolder, ['sharepoint'])) unset ($response['render']['form']);
 					// but any other folder gets one
-					else $result['render']['content'][] = [
+					else $response['render']['content'][] = [
 						[
 							'type' => 'hidden',
 							'attributes' => [
@@ -788,7 +788,7 @@ class FILE extends API {
 						]
 					];
 				}
-				$this->response($result);
+				$this->response($response);
 				break;
 			case 'DELETE':
 				if (in_array($this->_requestedFolder, ['sharepoint'])) $success = UTILITY::delete(UTILITY::directory($this->_requestedFolder) . '/' . $this->_requestedFile);
@@ -816,7 +816,7 @@ class FILE extends API {
 	 */
 	public function files(){
 		// append file filter
-		$result['render'] = [
+		$response['render'] = [
 		'content' => [
 				[
 					[
@@ -836,12 +836,12 @@ class FILE extends API {
 			$this->_lang->GET('file.external_file.folder') => $this->_requestedFolder === 'external_documents' ? ['checked' => true] : ['onchange' => "api.file('get', 'files', 'external_documents')"],
 
 		];
-		foreach(UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc') as $folder){
+		foreach (UTILITY::listDirectories(UTILITY::directory('files_documents') ,'asc') as $folder){
 			$folder = pathinfo($folder)['basename'];
 			$options[$folder] = $this->_requestedFolder === $folder ? ['checked' => true] : [];
 			$options[$folder]['onchange'] = "api.file('get', 'files', '" . $folder . "')";
 		}
-		$result['render']['content'][count($result['render']['content']) - 1 ][] = [
+		$response['render']['content'][count($response['render']['content']) - 1 ][] = [
 			'type' => 'radio',
 			'attributes' => [
 				'name' => $this->_lang->GET('file.file_filter_folder')
@@ -886,7 +886,7 @@ class FILE extends API {
 				// reassign displayed folder name
 				$folder = $folder === UTILITY::directory('external_documents') ? $this->_lang->GET('file.external_file.folder') : pathinfo($folder)['filename'];
 				// append folder
-				$result['render']['content'][] =
+				$response['render']['content'][] =
 				[
 					[
 						'type' => 'links',
@@ -896,10 +896,10 @@ class FILE extends API {
 				];
 			}
 		}
-		else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+		else $response['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
 
 		if (PERMISSION::permissionFor('files')){
-			$result['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'button',
 					'attributes' => [
@@ -910,7 +910,7 @@ class FILE extends API {
 			];
 		}
 		if (PERMISSION::permissionFor('externaldocuments')){
-			$result['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'button',
 					'attributes' => [
@@ -921,7 +921,7 @@ class FILE extends API {
 			];
 		}
 
-		$this->response($result);
+		$this->response($response);
 	}
 	
 	/**
@@ -975,12 +975,12 @@ class FILE extends API {
 				]]);
 		break;
 			case 'GET':
-				$result = ['render' => [
+				$response = ['render' => [
 					'form' => [
 						'data-usecase' => 'file',
 						'action' => "javascript:api.file('post', 'sharepoint')"
 					],
-					'content'=>[]
+					'content' => []
 				]];
 
 				// gather sharepoint files
@@ -1008,7 +1008,7 @@ class FILE extends API {
 				}
 				if ($display){
 					// append filter and sharepoint files
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'filtered',
 							'attributes' => [
@@ -1018,17 +1018,17 @@ class FILE extends API {
 							]
 						]
 					];
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'links',
 							'content' => $display
 						]
 					];
 				}
-				else $result['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
+				else $response['render']['content'] = $this->noContentAvailable($this->_lang->GET('file.no_files'));
 
 				// append upload input
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'file',
 						'attributes' => [
@@ -1039,7 +1039,7 @@ class FILE extends API {
 						'hint' => $this->_lang->GET('file.sharepoint_lifespan_hint', [':hours' => CONFIG['lifespan']['sharepoint']])
 					]
 				];
-				$this->response($result);
+				$this->response($response);
 				break;
 		}
 	}

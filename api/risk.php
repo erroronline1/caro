@@ -60,7 +60,7 @@ class RISK extends API {
 					':risk_benefit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_benefit')) ? : null,
 					':measure_remainder' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_remainder')) ? : null,
 					':proof' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.proof')) ? : null,
-					':author' =>$_SESSION['user']['name']
+					':author' => $_SESSION['user']['name']
 				];
 
 				if (!$risk[':type']) $this->response([], 417);
@@ -69,7 +69,7 @@ class RISK extends API {
 				$risks_converted = [];
 				if ($risk[':risk']) {
 					$rsks = explode(', ', $risk[':risk']);
-					foreach($rsks as $rsk){
+					foreach ($rsks as $rsk){
 						$risks_converted[] = array_search($rsk, $this->_lang->_USER['risks']); 
 					}
 					$risk[':risk'] = implode(',', $risks_converted);
@@ -83,7 +83,7 @@ class RISK extends API {
 						$risk[':measure'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.type.characteristic')) ? : null;
 						$risk[':risk'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_related')) ? : null;
 						// check if neccessary values have been provided, match with _install.php
-						foreach($risk as $key => $value){
+						foreach ($risk as $key => $value){
 							if (in_array($key, [
 								':effect',
 								':probability',
@@ -103,7 +103,7 @@ class RISK extends API {
 						break;
 					default: // risks
 						// check if neccessary values have been provided, match with _install.php
-						foreach($risk as $key => $value){
+						foreach ($risk as $key => $value){
 							if (in_array($key, [
 								':measure_remainder',
 								':proof'
@@ -158,7 +158,7 @@ class RISK extends API {
 				$risks_converted = [];
 				if ($risk[':risk']) {
 					$rsks = explode(', ', $risk[':risk']);
-					foreach($rsks as $rsk){
+					foreach ($rsks as $rsk){
 						$risks_converted[] = array_search($rsk, $this->_lang->_USER['risks']); 
 					}
 					$risk[':risk'] = implode(',', $risks_converted);
@@ -213,17 +213,17 @@ class RISK extends API {
 
 				// set up risk selection according to language file
 				$risks = [];
-				foreach($this->_lang->_USER['risks'] as $key => $translation){
+				foreach ($this->_lang->_USER['risks'] as $key => $translation){
 					$risks[$translation] = ['value' => $key];
 				}
 
 				// gather all processes and sort database entries according to type and process to selects
 				$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
-				foreach($risk_datalist as $row){
+				foreach ($risk_datalist as $row){
 					if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 
 					// provide datalists with unique values and the most recent letter cases
-					foreach(['cause', 'effect', 'process', 'measure', 'risk_benefit', 'measure_remainder'] as $data){
+					foreach (['cause', 'effect', 'process', 'measure', 'risk_benefit', 'measure_remainder'] as $data){
 						if (!isset($datalist[$data])) $datalist[$data] = [];
 						$row[$data] = trim($row[$data] ? : '');
 						if (!$row[$data]) continue;
@@ -245,7 +245,7 @@ class RISK extends API {
 				}
 
 				// sanitize datalists
-				foreach($datalist as $data => &$values){
+				foreach ($datalist as $data => &$values){
 					$values = array_filter($values, fn($v) => boolval($v));
 					ksort($values);
 					// for sanitation of template files:
@@ -253,13 +253,13 @@ class RISK extends API {
 				}
 
 				// preselect risk selection according to database response
-				foreach(explode(',', $risk['risk'] ? : '') as $selectedrisk){
+				foreach (explode(',', $risk['risk'] ? : '') as $selectedrisk){
 					if (isset($this->_lang->_USER['risks'][$selectedrisk]) && isset($risks[$this->_lang->_USER['risks'][$selectedrisk]])) $risks[$this->_lang->_USER['risks'][$selectedrisk]]['checked'] = true;
 				}
 
 				require_once('_shared.php');
 				$search = new SHARED($this->_pdo, $this->_date);
-				$result = ['render' => ['content' => $search->risksearch()]];		
+				$response = ['render' => ['content' => $search->risksearch()]];		
 				
 				// render selection of types and their content, one selection per process
 				$selection = [];
@@ -279,7 +279,7 @@ class RISK extends API {
 						]
 					];
 					if (isset($select[$type]))
-						foreach($select[$type] as $process => $dbrisks){
+						foreach ($select[$type] as $process => $dbrisks){
 							$typeselection[] = [
 								'type' => 'select',
 								'numeration' => 'prevent',
@@ -292,7 +292,7 @@ class RISK extends API {
 						}
 					$selection[] = $typeselection;
 				}
-				if ($selection) $result['render']['content'][] = $selection;
+				if ($selection) $response['render']['content'][] = $selection;
 
 				$isactive = !$risk['hidden'] ? ['checked' => true] : [];
 				$isinactive = $risk['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
@@ -301,12 +301,12 @@ class RISK extends API {
 				switch($risk['type']){
 					case 'characteristic': // implement further cases if suitable, according to languagefile
 						if (PERMISSION::permissionFor('riskmanagement')) {
-							$result['render']['form'] = [
+							$response['render']['form'] = [
 								'data-usecase' => 'risk',
 								'action' => "javascript:api.risk('" . ($risk['id'] ? 'put' : 'post') . "', 'risk', " . $risk['id'] . ")"
 							];
 
-							$result['render']['content'][] = [
+							$response['render']['content'][] = [
 								[
 									'type' => 'textsection',
 									'attributes' => [
@@ -365,17 +365,17 @@ class RISK extends API {
 
 							// disable non editable inputs and append hidden option
 							if ($risk['id']){
-								$last = count($result['render']['content']) - 1;
-								foreach([4, 5, 6, 7] as $index){
-									if (isset($result['render']['content'][$last][$index]['content'])){
-										foreach ($result['render']['content'][$last][$index]['content'] as $key => $value){
-											$result['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
+								$last = count($response['render']['content']) - 1;
+								foreach ([4, 5, 6, 7] as $index){
+									if (isset($response['render']['content'][$last][$index]['content'])){
+										foreach ($response['render']['content'][$last][$index]['content'] as $key => $value){
+											$response['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
 										}
 									}
 									else {
-										unset ($result['render']['content'][$last][$index]['attributes']['onclick']);
-										unset ($result['render']['content'][$last][$index]['attributes']['onpointerdown']);
-										$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
+										unset ($response['render']['content'][$last][$index]['attributes']['onclick']);
+										unset ($response['render']['content'][$last][$index]['attributes']['onpointerdown']);
+										$response['render']['content'][$last][$index]['attributes']['disabled'] = true;
 									}
 								}
 
@@ -384,7 +384,7 @@ class RISK extends API {
 									$hiddenproperties = json_decode($risk['hidden'], true);
 									$hidden = $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 								}
-								$result['render']['content'][$last][] = [
+								$response['render']['content'][$last][] = [
 									'type' => 'radio',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.availability')
@@ -399,7 +399,7 @@ class RISK extends API {
 						}
 						else {
 							if ($risk['id'] && !$risk['hidden']){
-								$result['render']['content'][] = [
+								$response['render']['content'][] = [
 									[
 										'type' => 'textsection',
 										'attributes' => [
@@ -438,7 +438,7 @@ class RISK extends API {
 										'attributes' => [
 											'name' => $this->_lang->GET('risk.risk_related'),
 										],
-										'content' => implode("\n", array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
+										'content' => implode("\n", array_values(array_map(fn($r) => $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
 									]
 								];
 							}
@@ -446,7 +446,7 @@ class RISK extends API {
 						break;
 					default: // risk
 					if (PERMISSION::permissionFor('riskmanagement')) {
-						$result['render']['form'] = [
+						$response['render']['form'] = [
 							'data-usecase' => 'risk',
 							'action' => "javascript:api.risk('" . ($risk['id'] ? 'put' : 'post') . "', 'risk', " . $risk['id'] . ")"
 						];
@@ -459,11 +459,11 @@ class RISK extends API {
 
 						// set up selections for probabilities and damages translated by index
 						$probabilities = $measure_probabilities = $damages = $measure_damages = [];
-						foreach($this->_lang->_USER['risk']['probabilities'] as $index => $description){
+						foreach ($this->_lang->_USER['risk']['probabilities'] as $index => $description){
 							$probabilities[$description] = $risk['probability'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 							$measure_probabilities[$description] = $risk['measure_probability'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 						}
-						foreach($this->_lang->_USER['risk']['damages'] as $index => $description){
+						foreach ($this->_lang->_USER['risk']['damages'] as $index => $description){
 							$damages[$description] = $risk['damage'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 							$measure_damages[$description] = $risk['measure_damage'] == $index + 1 ? ['value' => $index + 1, 'selected' => true] : ['value' => $index + 1];
 						}
@@ -473,7 +473,7 @@ class RISK extends API {
 						$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 						$hidden = $insertdocument = [];
 						$selecteddocuments = explode(', ', $risk['proof'] ? : '');
-						foreach($documents as $key => $row) {
+						foreach ($documents as $key => $row) {
 							if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 							if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 							if (!in_array($row['name'], $hidden)) {
@@ -483,7 +483,7 @@ class RISK extends API {
 						}
 						ksort($insertdocument);
 		
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'textsection',
 								'attributes' => [
@@ -621,17 +621,17 @@ class RISK extends API {
 
 						// disable non editable inputs and append hidden option
 						if ($risk['id']){
-							$last = count($result['render']['content']) - 1;
-							foreach([3, 5, 6, 8, 12, 13, 17] as $index){
-								if (isset($result['render']['content'][$last][$index]['content'])){
-									foreach ($result['render']['content'][$last][$index]['content'] as $key => $value){
-										$result['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
+							$last = count($response['render']['content']) - 1;
+							foreach ([3, 5, 6, 8, 12, 13, 17] as $index){
+								if (isset($response['render']['content'][$last][$index]['content'])){
+									foreach ($response['render']['content'][$last][$index]['content'] as $key => $value){
+										$response['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
 									}
 								}
 								else {
-									unset ($result['render']['content'][$last][$index]['attributes']['onclick']);
-									unset ($result['render']['content'][$last][$index]['attributes']['onpointerdown']);
-									$result['render']['content'][$last][$index]['attributes']['disabled'] = true;
+									unset ($response['render']['content'][$last][$index]['attributes']['onclick']);
+									unset ($response['render']['content'][$last][$index]['attributes']['onpointerdown']);
+									$response['render']['content'][$last][$index]['attributes']['disabled'] = true;
 								}
 							}
 							$hidden = null;
@@ -639,7 +639,7 @@ class RISK extends API {
 								$hiddenproperties = json_decode($risk['hidden'], true);
 								$hidden = $this->_lang->GET('risk.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 							}
-							$result['render']['content'][$last][] = [
+							$response['render']['content'][$last][] = [
 								'type' => 'radio',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.availability')
@@ -654,7 +654,7 @@ class RISK extends API {
 					}
 					else {
 						if ($risk['id'] && !$risk['hidden']){
-							$result['render']['content'][] = [
+							$response['render']['content'][] = [
 								[
 									'type' => 'textsection',
 									'attributes' => [
@@ -672,7 +672,7 @@ class RISK extends API {
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.risk_related'),
 									],
-									'content' => implode("\n", array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
+									'content' => implode("\n", array_values(array_map(fn($r) => $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $risk['risk'] ? : ''))))
 								], [
 									'type' => 'radio',
 									'attributes' => [
@@ -721,7 +721,7 @@ class RISK extends API {
 					}
 					break;
 				}
-				$this->response($result);
+				$this->response($response);
 				break;
 		}
 	}

@@ -176,26 +176,26 @@ class API {
 	public function alertUserGroup($group = [], $message = ''){
 		$permission = $unit = $user = $recipients = [];
 		if (isset($group['permission'])){
-			foreach($group['permission'] as $prmssn){
+			foreach ($group['permission'] as $prmssn){
 				$permissions = SQLQUERY::EXECUTE($this->_pdo, 'application_get_permission_group', [
 					'values' => [
 						':group' => $prmssn
 					]
 				]);
-				foreach($permissions as $userrow){
+				foreach ($permissions as $userrow){
 					if (PERMISSION::filteredUser($userrow)) continue;
 					array_push($permission, $userrow['id']);
 				}
 			}
 		}
 		if (isset($group['unit'])){
-			foreach($group['unit'] as $unt){
+			foreach ($group['unit'] as $unt){
 				$groups = SQLQUERY::EXECUTE($this->_pdo, 'application_get_unit_group', [
 					'values' => [
 						':group' => $unt
 					]
 				]);
-				foreach($groups as $userrow){
+				foreach ($groups as $userrow){
 					if (PERMISSION::filteredUser($userrow)) continue;
 					array_push($unit, $userrow['id']);
 				}
@@ -208,7 +208,7 @@ class API {
 					':name' => implode(',', $group['user'])
 				]
 			]);
-			foreach($users as $userrow){
+			foreach ($users as $userrow){
 				if (PERMISSION::filteredUser($userrow)) continue;
 				array_push($user, $userrow['id']);
 			}
@@ -233,10 +233,10 @@ class API {
 	public function alertUserGroupSubmit(){
 		if (!$this->_messages) return;
 		$sqlchunks = [];
-		foreach($this->_messages as $message => $recipients) {
+		foreach ($this->_messages as $message => $recipients) {
 			$recipients = array_unique($recipients);
 			$insertions = [];
-			foreach($recipients as $rcpnt_id) {
+			foreach ($recipients as $rcpnt_id) {
 				$insertions[] = [
 					':to_user' => $rcpnt_id,
 					':message' => $message
@@ -522,7 +522,7 @@ class API {
 	 */
 	public function processApi(){
 		$func = strtolower($this->_requestedMethod);
-		if(method_exists($this, $func))
+		if (method_exists($this, $func))
 			$this->$func();
 		else
 			$this->response([], 404); // if the method doesn't exist within this class, response would be "Page not found".
@@ -595,7 +595,7 @@ class API {
 	public function response($data, $status = 200){
 		$this->alertUserGroupSubmit();
 
-		if(is_array($data)) {
+		if (is_array($data)) {
 			$data = UTILITY::json_encode($data);
 			$this->_httpResponse = $status;
 		}

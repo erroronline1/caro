@@ -93,7 +93,7 @@ class SHARED {
 		 */
 		function findInComponent($element, $search){
 			$found = false;
-			foreach($element as $subs){
+			foreach ($element as $subs){
 				if (!isset($subs['type'])){
 					if ($found = findInComponent($subs, $search)) return true;
 				}
@@ -102,7 +102,7 @@ class SHARED {
 					foreach (['description', 'content', 'hint'] as $property){
 						if (isset($subs[$property])){
 							if (is_array($subs[$property])){ // links, checkboxes, etc
-								foreach(array_keys($subs[$property]) as $key) $comparisons[] = $key;
+								foreach (array_keys($subs[$property]) as $key) $comparisons[] = $key;
 							}
 							else $comparisons[] = $subs[$property];
 						}
@@ -112,7 +112,7 @@ class SHARED {
 							if (isset($subs['attributes'][$property])) $comparisons[] = $subs['attributes'][$property];
 						}
 					}
-					foreach($comparisons as $term) {
+					foreach ($comparisons as $term) {
 						similar_text($search, $term, $percent);
 						// suppress errors on long terms for fnmatch limit
 						if (stristr($term, $search) || $percent >= CONFIG['likeliness']['file_search_similarity'] || @fnmatch($search, $term, FNM_CASEFOLD)) return true;
@@ -122,12 +122,12 @@ class SHARED {
 			return $found;
 		};
 
-		foreach($fd as $row) {
+		foreach ($fd as $row) {
 			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access']) || !PERMISSION::fullyapproved('documentapproval', $row['approval'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
 				// set up search terms with name and alias
 				$terms = [$row['name']];
-				foreach(preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
+				foreach (preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
 				// match similarity
 				foreach ($terms as $term){
 					// limit search to similarity
@@ -140,7 +140,7 @@ class SHARED {
 				if (in_array($row, $matches)) continue;
 
 				// if not found within name, search regulatory contexts
-				foreach(explode(',', $row['regulatory_context']) as $context) {
+				foreach (explode(',', $row['regulatory_context']) as $context) {
 					if (stristr($this->_lang->GET('regulatory.' . $context), $parameter['search']) !== false) {
 						$matches[] = $row;
 						break;	
@@ -179,7 +179,7 @@ class SHARED {
 
 		$contexts = [];
 
-		foreach($data as $row){
+		foreach ($data as $row){
 			// limit search to similarity
 			if ($parameter['search']){
 				similar_text($parameter['search'], $row['identifier'], $percent);
@@ -196,7 +196,7 @@ class SHARED {
 
 			$row['units'] = $row['units'] ? explode(',', $row['units'] ? : '') : [];
 
-			foreach($this->_lang->_USER['documentcontext'] as $key => $subkeys){
+			foreach ($this->_lang->_USER['documentcontext'] as $key => $subkeys){
 				if (in_array($row['context'], array_keys($subkeys))) $row['context'] = $key . '.' . $row['context'];
 			}
 			if (isset($contexts[$row['context']])) {
@@ -247,9 +247,9 @@ class SHARED {
 				]
 			]
 		];
-		foreach($risk_datalist as $row){
+		foreach ($risk_datalist as $row){
 			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
-			$row['risk'] = implode(' ', array_values(array_map(fn($r)=> $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
+			$row['risk'] = implode(' ', array_values(array_map(fn($r) => $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
 			if ($parameter['search'] && 
 				(
 					stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search']) ||
@@ -353,7 +353,7 @@ class SHARED {
 
 						$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
 
-						foreach($vendors as $key => $row) {
+						foreach ($vendors as $key => $row) {
 							$datalist[] = $row['name'];
 							$display = $row['name'];
 							if ($row['hidden']) $display = UTILITY::hiddenOption($display);
@@ -400,7 +400,7 @@ class SHARED {
 		
 						// prepare existing vendor lists
 						$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
-						foreach($vendors as $key => $row) {
+						foreach ($vendors as $key => $row) {
 							if ($row['hidden']) continue;
 							$datalist[] = $row['name'];
 							$vendorselection[$row['name']] = ['value' => $row['id']];
@@ -410,7 +410,7 @@ class SHARED {
 		
 						// prepare existing sales unit lists
 						$product_units = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
-						foreach($product_units as $key => $row) {
+						foreach ($product_units as $key => $row) {
 							$datalist_unit[] = $row['article_unit'];
 						}
 
@@ -482,8 +482,8 @@ class SHARED {
 						];
 				}
 
-				foreach($search as $key => $row) {
-					foreach($row as $key => $value){
+				foreach ($search as $key => $row) {
+					foreach ($row as $key => $value){
 						$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
 					}
 					if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
@@ -581,7 +581,7 @@ class SHARED {
 	 */
 	public function populatedocument($element, $values){
 		$content = [];
-		foreach($element as $subs){
+		foreach ($element as $subs){
 			if (!isset($subs['type'])){
 				$content[] = self::populatedocument($subs, $values);
 			}
@@ -593,7 +593,7 @@ class SHARED {
 					else $underscored_name = $subs['attributes']['name'];
 					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
 						$settings = explode(' | ', $values[$underscored_name]);
-						foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
+						foreach ($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
 							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
 							else $subs['content'][$key]['checked'] = true;
 						}
@@ -633,7 +633,7 @@ class SHARED {
 		$contentBody = [];
 		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
 		if ($contents){
-			foreach($contents as $content){
+			foreach ($contents as $content){
 				if (PERMISSION::fullyapproved('documentapproval', $content['approval'])) break;
 			}
 			$content['hidden'] = json_decode($content['hidden'] ? : '', true); 
@@ -650,7 +650,7 @@ class SHARED {
 				$contentBody = explode(',', $content['content']);
 			}
 			else {
-				foreach(explode(',', $content['content']) as $usedcomponent) {
+				foreach (explode(',', $content['content']) as $usedcomponent) {
 					// get latest approved by name
 					$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
 						'values' => [
@@ -687,7 +687,7 @@ class SHARED {
 	 */
 	public function unmatchedrequired($element, $values){
 		$content = [];
-		foreach($element as $subs){
+		foreach ($element as $subs){
 			if (!isset($subs['type'])){
 				array_push($content, ...self::unmatchedrequired($subs, $values));
 			}

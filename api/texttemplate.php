@@ -69,16 +69,16 @@ class TEXTTEMPLATE extends API {
 				// add multiplier
 				$pattern = substr_replace($pattern, '+?', -1, 0);
 
-				foreach([...CONFIG['forbidden']['names'], $pattern] as $pattern){
+				foreach ([...CONFIG['forbidden']['names'], $pattern] as $pattern){
 					if (preg_match("/" . $pattern . "/m", $chunk[':name'], $matches)) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_forbidden_name', [':name' => $chunk[':name']]) . ' - ' . $pattern, 'type' => 'error']]);
 				}
 
 				$exists = null;
 				$all = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
-				foreach($all as $entry){
+				foreach ($all as $entry){
 					if ($entry['type'] === 'template') continue;
 					if ($entry['name'] !== $chunk[':name'] && (str_starts_with($entry['name'], $chunk[':name']) || str_starts_with($chunk[':name'], $entry['name']))) $this->response(['response' => ['msg' => $this->_lang->GET('texttemplate.error_name_taken'), 'type' => 'error']]);
-					if($entry['name'] == $chunk[':name']){
+					if ($entry['name'] == $chunk[':name']){
 						$exists = $entry;
 						break;
 					}
@@ -118,7 +118,7 @@ class TEXTTEMPLATE extends API {
 			case 'GET':
 				$chunkdatalist = $replacements = $options = $alloptions = [];
 				$insertreplacement = ['...' . $this->_lang->GET('texttemplate.chunk.insert_default') => ['value' => ' ']];
-				$return = [];
+				$response = [];
 
 				// get selected chunk
 				if (intval($this->_requestedID)){
@@ -143,13 +143,13 @@ class TEXTTEMPLATE extends API {
 					'content' => '',
 					'type' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('texttemplate.chunk.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$chunk['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('texttemplate.chunk.error_chunk_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing chunks lists
 				$chunks = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 				$hidden = [];
 				$dependedtemplates = [];
-				foreach($chunks as $key => $row) {
+				foreach ($chunks as $key => $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (in_array($row['type'], ['template', 'text'])){
 						if (!in_array($row['name'], $dependedtemplates) && !in_array($row['name'], $hidden) && strpos($row['content'], $chunk['name']) !== false) {
@@ -178,7 +178,7 @@ class TEXTTEMPLATE extends API {
 				}
 				// one selection per unit
 				$renderoptions = [];
-				foreach($options as $unit => &$templates){
+				foreach ($options as $unit => &$templates){
 					ksort($templates);
 					$renderoptions[] = [
 						'type' => 'select',
@@ -192,7 +192,7 @@ class TEXTTEMPLATE extends API {
 				}
 				// one selection per unit
 				$renderalloptions = [];
-				foreach($alloptions as $unit => &$templates){
+				foreach ($alloptions as $unit => &$templates){
 					$renderalloptions[] = [
 						'type' => 'select',
 						'numeration' => 'prevent',
@@ -215,7 +215,7 @@ class TEXTTEMPLATE extends API {
 					if ($chunk['unit'] == $unit) $units[$translation]['selected'] = true;
 				}
 
-				$return['render'] = [
+				$response['render'] = [
 					'form' => [
 						'data-usecase' => 'texttemplate',
 						'action' => "javascript:api.texttemplate('post', 'chunk')"],
@@ -300,8 +300,8 @@ class TEXTTEMPLATE extends API {
 					]
 				];
 
-				if ($chunk['type'] === 'text') $return['render']['content'][1][1]['content'][$this->_lang->GET('texttemplate.chunk.types.text')]['selected'] = true;
-				if ($chunk['type'] === 'replacement') $return['render']['content'][1][1]['content'][$this->_lang->GET('texttemplate.chunk.types.replacement')]['selected'] = true;
+				if ($chunk['type'] === 'text') $response['render']['content'][1][1]['content'][$this->_lang->GET('texttemplate.chunk.types.text')]['selected'] = true;
+				if ($chunk['type'] === 'replacement') $response['render']['content'][1][1]['content'][$this->_lang->GET('texttemplate.chunk.types.replacement')]['selected'] = true;
 				if ($chunk['id']){
 					$hidden = [
 						'type' => 'radio',
@@ -320,9 +320,9 @@ class TEXTTEMPLATE extends API {
 						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
 					if (count($dependedtemplates)) $hidden['hint'] = $hidden['hint'] . '\n' . $this->_lang->GET('texttemplate.chunk.dependencies', [':templates' => implode(', ', $dependedtemplates)]);
-					array_push($return['render']['content'][1], $hidden);
+					array_push($response['render']['content'][1], $hidden);
 				}
-				$this->response($return);
+				$this->response($response);
 				break;
 		}					
 	}
@@ -357,7 +357,7 @@ class TEXTTEMPLATE extends API {
 						':name' => $template[':name']
 					]
 				]);
-				foreach($exists as $row => $entry){
+				foreach ($exists as $row => $entry){
 					if ($entry['type'] !== 'template') unset($exists[$row]);
 				}
 				$exists = $exists ? array_values($exists)[0] : null;
@@ -398,7 +398,7 @@ class TEXTTEMPLATE extends API {
 				$options = [];
 				$alloptions = [];
 				$insertreplacement = [];
-				$return = [];
+				$response = [];
 
 				// get selected template
 				if (intval($this->_requestedID)){
@@ -423,12 +423,12 @@ class TEXTTEMPLATE extends API {
 					'content' => '',
 					'type' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing templates lists
 				$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 				$hidden = $chunks = [];
-				foreach($templates as $row) {
+				foreach ($templates as $row) {
 					if ($row['type'] === 'replacement') continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if ($row['type'] === 'template'){
@@ -456,7 +456,7 @@ class TEXTTEMPLATE extends API {
 
 				// one selection per unit
 				$renderoptions = [];
-				foreach($options as $unit => &$templates){
+				foreach ($options as $unit => &$templates){
 					ksort($templates);
 					$renderoptions[] = [
 						'type' => 'select',
@@ -470,7 +470,7 @@ class TEXTTEMPLATE extends API {
 				}
 				// one selection per unit
 				$renderalloptions = [];
-				foreach($alloptions as $unit => &$templates){
+				foreach ($alloptions as $unit => &$templates){
 					$renderalloptions[] = [
 						'type' => 'select',
 						'numeration' => 'prevent',
@@ -483,7 +483,7 @@ class TEXTTEMPLATE extends API {
 				}
 				// one selection per unit
 				$renderinsertreplacement = [];
-				foreach($insertreplacement as $unit => &$templates){
+				foreach ($insertreplacement as $unit => &$templates){
 					ksort($templates);
 					$renderinsertreplacement[] = [
 						'type' => 'select',
@@ -501,9 +501,9 @@ class TEXTTEMPLATE extends API {
 					if ($template['unit'] == $unit) $units[$translation]['selected'] = true;
 				}
 
-				$return['data'] = $chunks;
-				$return['selected'] = $template['content'] ? json_decode($template['content'], true): [];
-				$return['render'] = ['content' => [
+				$response['data'] = $chunks;
+				$response['selected'] = $template['content'] ? json_decode($template['content'], true): [];
+				$response['render'] = ['content' => [
 					[
 						[
 							...$renderoptions,
@@ -591,10 +591,10 @@ class TEXTTEMPLATE extends API {
 						$hiddenproperties = json_decode($template['hidden'], true);
 						$hidden['hint'] .= ' ' . $this->_lang->GET('texttemplate.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
-					array_push($return['render']['content'][1], $hidden);
+					array_push($response['render']['content'][1], $hidden);
 				}
-				if ($template['name']) $return['header'] = $template['name'];
-				$this->response($return);
+				if ($template['name']) $response['header'] = $template['name'];
+				$this->response($response);
 				break;
 		}
 	}
@@ -608,7 +608,7 @@ class TEXTTEMPLATE extends API {
 	 * retrieve the actual templates for use
 	 */
 	public function text(){
-		$templatedatalist = $options = $return = $hidden = $texts = $replacements = [];
+		$templatedatalist = $options = $response = $hidden = $texts = $replacements = [];
 
 		// get selected template
 		$template = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_chunk', [
@@ -622,16 +622,16 @@ class TEXTTEMPLATE extends API {
 			'name' => '',
 		];
 
-		if($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+		if ($this->_requestedID && $this->_requestedID !== 'false' && !$template['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('texttemplate.template.error_template_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
 		// prepare existing templates lists
 		$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 		if (!$templates) {
-			$result['render']['content'] = $this->noContentAvailable($this->_lang->GET('message.no_messages'));
-			$this->response($result);		
+			$response['render']['content'] = $this->noContentAvailable($this->_lang->GET('message.no_messages'));
+			$this->response($response);		
 		}
 
-		foreach($templates as $row) {
+		foreach ($templates as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
 				if ($row['type'] !== 'template') {
@@ -650,11 +650,11 @@ class TEXTTEMPLATE extends API {
 				}
 			}
 		}
-		$return['render'] = ['content' => [[]]];
+		$response['render'] = ['content' => [[]]];
 
 		// sort templates to units for easier access
 		foreach ($options as $unit => $templates) {
-			$return['render']['content'][0][] = [
+			$response['render']['content'][0][] = [
 				[
 					'type' => 'select',
 					'attributes' => [
@@ -671,7 +671,7 @@ class TEXTTEMPLATE extends API {
 			$inputs = $undefined = [];
 
 			$usegenus = [];
-			foreach($this->_lang->_USER['texttemplate']['use']['genus'] as $key => $genus){
+			foreach ($this->_lang->_USER['texttemplate']['use']['genus'] as $key => $genus){
 				$usegenus[$genus] = ['value' => $key, 'data-loss' => 'prevent'];
 			}
 			$inputs[] = [
@@ -706,11 +706,11 @@ class TEXTTEMPLATE extends API {
 			$pattern = substr_replace($pattern, '+?', -1, 0);
 
 			$usedreplacements = $usedtexts = [];
-			foreach(json_decode($template['content']) as $paragraph){
-				foreach($paragraph as $chunk){
+			foreach (json_decode($template['content']) as $paragraph){
+				foreach ($paragraph as $chunk){
 					$add = isset($texts[$chunk]) ? $texts[$chunk] : $chunk . "\n";
 					preg_match_all('/' . $pattern . $delimiter . '/m', $add, $placeholders);
-					foreach($placeholders[1] as $ph){
+					foreach ($placeholders[1] as $ph){
 						if (!isset($replacements[$ph])) array_push($undefined, $ph);
 						else $usedreplacements[$ph] = $replacements[$ph]; // reassign to reduce payload
 					}
@@ -738,10 +738,10 @@ class TEXTTEMPLATE extends API {
 
 			// import button (values from passed document-element-ids)
 			// $this->_clientimport as json-string with ':placeholder' : 'inputid' pairs
-			if($this->_clientimport && $undefined){
+			if ($this->_clientimport && $undefined){
 				$clientimport = [];
 				// only display placeholders defined within chunk on button, not neccessarily all passed ones
-				foreach(json_decode($this->_clientimport, true) as $key => $value){
+				foreach (json_decode($this->_clientimport, true) as $key => $value){
 					if (in_array($key, $undefined)) $clientimport[$key] = $value;
 				}
 				if ($clientimport) $inputs[] = [
@@ -757,7 +757,7 @@ class TEXTTEMPLATE extends API {
 			// set up selectable blocks
 			foreach (json_decode($template['content']) as $block){
 				$useblocks = [];
-				foreach($block as $key => $value){
+				foreach ($block as $key => $value){
 					$useblocks[substr($value, 1)] = ['checked' => true, 'data-usecase' => 'useblocks', 'data-loss' => 'prevent'];
 				}
 				if (count($useblocks)) $inputs[] = [
@@ -781,10 +781,10 @@ class TEXTTEMPLATE extends API {
 			];
 
 			// append inputs
-			$return['render']['content'][] = $inputs;
+			$response['render']['content'][] = $inputs;
 
 			// append output 
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'textarea',
 					'attributes' => [
@@ -798,17 +798,17 @@ class TEXTTEMPLATE extends API {
 				]
 			];
 			// append data for frontent processing
-			$return['data'] = ['blocks' => $usedtexts, 'replacements' => $usedreplacements];
+			$response['data'] = ['blocks' => $usedtexts, 'replacements' => $usedreplacements];
 		}
 		if (!$this->_modal && PERMISSION::permissionFor('texttemplates')){
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('menu.communication.texttemplate_chunks'),
 					'onclick' => "api.texttemplate('get', 'chunk')"
 				]
 			];
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
 					'value' => $this->_lang->GET('menu.communication.texttemplate_templates'),
@@ -816,7 +816,7 @@ class TEXTTEMPLATE extends API {
 				]
 			];
 		}
-		$this->response($return);
+		$this->response($response);
 	}
 }
 ?>

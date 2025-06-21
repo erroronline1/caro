@@ -28,7 +28,7 @@ if (is_file('config.env')){
 	 * @param array $env starting with $envconfig
 	 */
 	function override($config, $env){
-		foreach($env as $key => $value){
+		foreach ($env as $key => $value){
 			if (gettype($value) === 'array'){
 				if (!isset($config[$key])) {
 					$config[$key] = [];

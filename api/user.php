@@ -102,7 +102,7 @@ class USER extends API {
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				if(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
+				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
 					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
 
 					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
@@ -139,7 +139,7 @@ class USER extends API {
 						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
 				}
 
-				foreach($user['app_settings'] as $key => $value){
+				foreach ($user['app_settings'] as $key => $value){
 					if (!$value) unset($user['app_settings'][$key]);
 				}
 
@@ -194,25 +194,25 @@ class USER extends API {
 
 				// resolve permissions
 				$permissions = [];
-				foreach(explode(',', $user['permissions']) as $level){
+				foreach (explode(',', $user['permissions']) as $level){
 					$permissions[] = $this->_lang->GET('permissions.' . $level);
 				}
 
 				// resolve units
 				$units = $primary_unit = [];
-				foreach(explode(',', $user['units']) as $unit){
+				foreach (explode(',', $user['units']) as $unit){
 					if (!$unit) continue;
 					$primary_unit[$this->_lang->GET('units.' . $unit)] = ['name' => $this->_lang->PROPERTY('user.settings_primary_unit')];
 					$units[] = $this->_lang->GET('units.' . $unit);
 				}
-				if(isset($user['app_settings']['primaryUnit'])) $primary_unit[$this->_lang->GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
+				if (isset($user['app_settings']['primaryUnit'])) $primary_unit[$this->_lang->GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
 
 				// resolve primary case states for default view within records
 				$primary_casestates = [$this->_lang->GET('record.casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')]];
-				foreach($this->_lang->_USER['casestate']['casedocumentation'] as $translation){
+				foreach ($this->_lang->_USER['casestate']['casedocumentation'] as $translation){
 					$primary_casestates[$translation] = ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')];
 				}
-				if(isset($user['app_settings']['primaryRecordState'])) $primary_casestates[$this->_lang->GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
+				if (isset($user['app_settings']['primaryRecordState'])) $primary_casestates[$this->_lang->GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
 				else $primary_casestates[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
 
 				// gather current skills
@@ -222,7 +222,7 @@ class USER extends API {
 					if ($duty === '_LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
 						if ($skill === '_DESCRIPTION') continue;
-						foreach($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
+						foreach ($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
 							$skillmatrix .= in_array($duty . '.' . $skill . '.' . $level, $user['skills']) ? " \n" . $this->_lang->GET('skills.' . $duty . '._DESCRIPTION') . ' ' . $skilldescription . ': ' . $leveldescription: '';
 						}
 					}
@@ -316,7 +316,7 @@ class USER extends API {
 					]
 				]);
 				$sessions = [];
-				foreach($usersessions as $session){
+				foreach ($usersessions as $session){
 					$sessions[] = $this->convertFromServerTime($session['date']);
 				}
 				if ($sessions && !array_intersect(['patient'], $_SESSION['user']['permissions'])) $user_data[] = [
@@ -336,7 +336,7 @@ class USER extends API {
 						]
 					]
 				];
-				$result['render'] = [
+				$response['render'] = [
 					'content' => array_intersect(['patient'], $_SESSION['user']['permissions']) ? $user_data[0] : [$user_data],
 					'form' => [
 						'data-usecase' => 'user',
@@ -345,7 +345,7 @@ class USER extends API {
 				];
 
 				if (!array_intersect(['patient'], $_SESSION['user']['permissions'])) {
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 							[
 								'type' => 'photo',
 								'attributes' => [
@@ -358,7 +358,7 @@ class USER extends API {
 
 					// append image options
 					if ($user['image']) {
-						$result['render']['content'][1] = [
+						$response['render']['content'][1] = [
 							[
 								[
 									'type' => 'image',
@@ -369,9 +369,9 @@ class USER extends API {
 									]
 								]
 							],
-							$result['render']['content'][1]
+							$response['render']['content'][1]
 						];
-						$result['render']['content'][1][1][] = [
+						$response['render']['content'][1][1][] = [
 							'type' => 'checkbox',
 							'content' => [
 								$this->_lang->GET('user.reset_photo') => []
@@ -382,30 +382,30 @@ class USER extends API {
 
 				// retrieve language options
 				$languages = [];
-				foreach(glob('language.*.json') as $file){
+				foreach (glob('language.*.json') as $file){
 					$lang = explode('.', $file);
 					$languages[$lang[1]] = ((isset($user['app_settings']['language']) && $user['app_settings']['language'] === $lang[1]) || (!isset($user['app_settings']['language']) && $lang[1] == CONFIG['application']['defaultlanguage'])) ? ['selected' => true] : [];
 				}
 				// preset available themes
 				$theme = [];
-				foreach(glob('../*.css') as $file){
+				foreach (glob('../*.css') as $file){
 					$name = pathinfo($file)['filename'];
 					if (in_array($name, ['style'])) continue;
 					$theme[ucfirst($name)] = (!isset($user['app_settings']['theme']) || $user['app_settings']['theme'] === $name) ? ['checked' => true, 'value' => $name] : ['value' => $name];
 				}
 				// available timezones
 				$timezones = [];
-				foreach(CONFIG['calendar']['timezones'] as $tz => $name){
+				foreach (CONFIG['calendar']['timezones'] as $tz => $name){
 					$timezones[$name] = (isset($user['app_settings']['timezone']) && $user['app_settings']['timezone'] === $tz) ? ['selected' => true, 'value' => $tz] : ['value' => $tz]; 
 				}
 				// available date formats
 				$dateformats = [];
-				foreach(CONFIG['calendar']['dateformats'] as $df => $name){
+				foreach (CONFIG['calendar']['dateformats'] as $df => $name){
 					$dateformats[$name] = (isset($user['app_settings']['dateformat']) && $user['app_settings']['dateformat'] === $df) ? ['selected' => true, 'value' => $df] : ['value' => $df]; 
 				}
 				// available states / holiday options
 				$locations = [];
-				foreach(CONFIG['locations'] as $location => $void){
+				foreach (CONFIG['locations'] as $location => $void){
 					$locations[$location] = (isset($user['app_settings']['location']) && $user['app_settings']['location'] === $location) ? ['selected' => true, 'value' => $location] : ['value' => $location]; 
 				}
 				// append application settings
@@ -527,9 +527,9 @@ class USER extends API {
 					]
 				];
 
-				$result['render']['content'][] = $applicationSettings;
+				$response['render']['content'][] = $applicationSettings;
 
-				$this->response($result);
+				$this->response($response);
 				break;
 		}
 	}
@@ -569,11 +569,11 @@ class USER extends API {
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-				if(UTILITY::forbiddenName($user['name']) || $nametaken) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($user['name']) || $nametaken) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 		
 				// checked permission levels
 				if ($setpermissions = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.permissions'))){
-					foreach(explode(' | ', $setpermissions) as $setpermission){
+					foreach (explode(' | ', $setpermissions) as $setpermission){
 						$permissions[] = array_search($setpermission, $this->_lang->_USER['permissions']);
 					}
 				}
@@ -581,7 +581,7 @@ class USER extends API {
 
 				// checked organizational units
 				if ($setunits = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.units'))){
-					foreach(explode(' | ', $setunits) as $setunit){
+					foreach (explode(' | ', $setunits) as $setunit){
 						$units[] = array_search($setunit, $this->_lang->_USER['units']);
 					}
 				}
@@ -594,11 +594,11 @@ class USER extends API {
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
 				// check formats according to _calendarutility.php
-				foreach(['weeklyhours', 'annualvacation'] as $setting){
+				foreach (['weeklyhours', 'annualvacation'] as $setting){
 					if (isset($user['app_settings'][$setting])){
 						$settingentries = explode('\n', $user['app_settings'][$setting]);
 						natsort($settingentries);
-						foreach($settingentries as $line){
+						foreach ($settingentries as $line){
 							// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
 							preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 							// append datetime value and contract value
@@ -619,7 +619,7 @@ class USER extends API {
 				else unset ($user['app_settings']['idle']);
 
 				// sanitize app settings for empty values
-				foreach($user['app_settings'] as $key => $value){
+				foreach ($user['app_settings'] as $key => $value){
 					if (!$value) unset ($user['app_settings'][$key]);
 				}
 
@@ -634,7 +634,7 @@ class USER extends API {
 				}
 
 				// generate order auth
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
 					$orderauths = [];
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
@@ -646,7 +646,7 @@ class USER extends API {
 				}
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
@@ -694,14 +694,14 @@ class USER extends API {
 						}
 						$registered['permissions'] = explode(',', $registered['permissions']);
 						$registered['units'] = explode(',', $registered['units']);
-						foreach($roles as $key => &$values){
+						foreach ($roles as $key => &$values){
 							if (in_array($key, $registered['permissions'])) {
 								if ($key !== 'supervisor' || ($key === 'supervisor' && array_intersect($units, $registered['units'])))
 									$values[] = $registered['name'];
 							}
 						}
 					}
-					foreach($roles as $key => &$values){
+					foreach ($roles as $key => &$values){
 						$values = array_unique($values);
 						$values = array_map(fn($v) => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\''. $this->_lang->GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
 					}
@@ -759,10 +759,10 @@ class USER extends API {
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-				if(UTILITY::forbiddenName($user['name']) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($user['name']) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
 				
 				// chain checked permission levels
-				foreach($this->_lang->_USER['permissions'] as $level => $description){
+				foreach ($this->_lang->_USER['permissions'] as $level => $description){
 					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('permissions.' . $level))) {
 						$permissions[] = $level;
 					}
@@ -770,7 +770,7 @@ class USER extends API {
 				$user['permissions'] = implode(',', $permissions);
 
 				// chain checked organizational units
-				foreach($this->_lang->_USER['units'] as $unit => $description){
+				foreach ($this->_lang->_USER['units'] as $unit => $description){
 					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('units.' . $unit))) {
 						$units[] = $unit;
 					}
@@ -784,11 +784,11 @@ class USER extends API {
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
 				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
 				// check formats according to _calendarutility.php
-				foreach(['weeklyhours', 'annualvacation'] as $setting){
+				foreach (['weeklyhours', 'annualvacation'] as $setting){
 					if (isset($user['app_settings'][$setting])){
 						$settingentries = explode('\n', $user['app_settings'][$setting]);
 						natsort($settingentries);
-						foreach($settingentries as $line){
+						foreach ($settingentries as $line){
 							// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
 							preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 							// append datetime value and contract value
@@ -809,7 +809,7 @@ class USER extends API {
 				else unset ($user['app_settings']['idle']);
 
 				// sanitize app settings for empty values
-				foreach($user['app_settings'] as $key => $value){
+				foreach ($user['app_settings'] as $key => $value){
 					if (!$value) unset ($user['app_settings'][$key]);
 				}
 
@@ -825,10 +825,10 @@ class USER extends API {
 				}
 
 				// generate order auth
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
 					$user['orderauth'] = '';
 				}
-				if(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
 					$orderauths = [];
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 					foreach ($users as $row){
@@ -840,7 +840,7 @@ class USER extends API {
 				}
 
 				// generate token
-				if(UTILITY::propertySet($this->_payload, str_replace(' ', '_', $this->_lang->GET('user.token_renew')))){
+				if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $this->_lang->GET('user.token_renew')))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 
@@ -893,11 +893,11 @@ class USER extends API {
 			case 'GET':
 				$datalist = [];
 				$options = ['...' . $this->_lang->GET('user.existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
-				$result = [];
+				$response = [];
 				
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				foreach($user as $row) {
+				foreach ($user as $row) {
 					$datalist[] = $row['name'];
 					$options[$row['name']] = ($row['name'] === $this->_requestedID) ? ['selected' => true] : [];
 					if ($row['name'] === $this->_requestedID) $this->_requestedID = $row['id'];
@@ -923,16 +923,16 @@ class USER extends API {
 					'app_settings' => '',
 					'skills' => ''
 				];}
-				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.existing_user_new')) $result['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$user['id'] && $this->_requestedID !== '...' . $this->_lang->GET('user.existing_user_new')) $response['response'] = ['msg' => $this->_lang->GET('user.error_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// gather available permissions
 				$permissions = [];
-				foreach($this->_lang->_USER['permissions'] as $level => $description){
+				foreach ($this->_lang->_USER['permissions'] as $level => $description){
 					$permissions[$description] = in_array($level, explode(',', $user['permissions'])) ? ['checked' => true] : [];
 				}
 				// gather available units
 				$units = [];
-				foreach($this->_lang->_USER['units'] as $unit => $description){
+				foreach ($this->_lang->_USER['units'] as $unit => $description){
 					if ($unit === 'common') continue;
 					$units[$description] = in_array($unit, explode(',', $user['units'])) ? ['checked' => true] : [];
 				}
@@ -1002,7 +1002,7 @@ class USER extends API {
 								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.user('delete', 'training', ". $row['id'] . ");}})"
 						]
 					];
-					if($planned){
+					if ($planned){
 						$skillmatrix[0][] = [
 							'type' => 'button',
 							'attributes' => [
@@ -1019,7 +1019,7 @@ class USER extends API {
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					$skillselection = [];
 					if ($duty === '_LEVEL') {
-						foreach($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
+						foreach ($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
 							$skilldatalistwithlabel[] = $leveldescription;
 						}
 						continue;
@@ -1027,7 +1027,7 @@ class USER extends API {
 					foreach ($skills as $skill => $skilldescription){
 						if ($skill === '_DESCRIPTION') continue;
 						$userlevel = 0;
-						foreach($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
+						foreach ($this->_lang->_USER['skills']['_LEVEL'] as $level => $leveldescription){
 							if (in_array($duty . '.' . $skill . '.' . $level, $user['skills'])) $userlevel = $level;
 						}
 						$skillselection[] = [
@@ -1046,7 +1046,7 @@ class USER extends API {
 					];
 				}
 
-				$result['render'] = ['content' => [
+				$response['render'] = ['content' => [
 					[
 						[
 							'type' => 'select',
@@ -1178,7 +1178,7 @@ class USER extends API {
 
 					// append image options
 					if ($user['image']) {
-								$result['render']['content'][2] = [
+								$response['render']['content'][2] = [
 							[
 								[
 									'type' => 'image',
@@ -1189,9 +1189,9 @@ class USER extends API {
 									]
 								]
 							],
-							$result['render']['content'][2]
+							$response['render']['content'][2]
 						];
-						$result['render']['content'][2][1][] = [
+						$response['render']['content'][2][1][] = [
 							'type' => 'checkbox',
 							'content' => [
 								$this->_lang->GET('user.reset_photo') => []
@@ -1200,7 +1200,7 @@ class USER extends API {
 					}
 
 					// append order auth options
-					if ($user['orderauth']) $result['render']['content'][3]=[
+					if ($user['orderauth']) $response['render']['content'][3]=[
 						[
 							[
 								'type' => 'text',
@@ -1211,11 +1211,11 @@ class USER extends API {
 								]
 							]
 						],
-						$result['render']['content'][3]
+						$response['render']['content'][3]
 					];
 
 					// append login token options
-					if ($user['token']) $result['render']['content'][6]=[
+					if ($user['token']) $response['render']['content'][6]=[
 						[
 							[
 								'type' => 'image',
@@ -1230,10 +1230,10 @@ class USER extends API {
 								]
 							]
 						],
-						$result['render']['content'][6]
+						$response['render']['content'][6]
 					];
 
-				$this->response($result);
+				$this->response($response);
 				break;
 
 			case 'DELETE':
@@ -1313,7 +1313,7 @@ class USER extends API {
 		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
 		$font_size = 36;
 		$l = 0;
-		foreach(preg_split('/\s+/m', $STRING) as $line){
+		foreach (preg_split('/\s+/m', $STRING) as $line){
 			imagefttext($image, $font_size, 0, $dimensions[1] - $margin['qr']['x'], $margin['qr']['y'] + $font_size + ($font_size * 1.5 * $l++), $text_color, '../media/UbuntuMono-R.ttf', $line);
 		}
 		ob_start();
@@ -1367,7 +1367,7 @@ class USER extends API {
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				$notfound = [];
-				foreach($usernames as $username){
+				foreach ($usernames as $username){
 					if (!$username) continue;
 					if ($user = array_search($username, array_column($users, 'name'))){
 						$user = $users[$user];
@@ -1436,7 +1436,7 @@ class USER extends API {
 									':experience_points' => $training['experience_points'],
 									':file_path' => $training['file_path'],
 									':evaluation' => $training['evaluation'],
-									':planned' =>$training['planned']
+									':planned' => $training['planned']
 								]
 							])) $this->response([
 								'response' => [
@@ -1461,7 +1461,7 @@ class USER extends API {
 				$datalist = ['user' => [], 'training' => []];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				foreach($user as $row) {
+				foreach ($user as $row) {
 					if (PERMISSION::filteredUser($row)) continue;
 					$datalist['user'][] = $row['name'];
 					if ($this->_prefilledTrainingUser && $row['id'] == $this->_prefilledTrainingUser) $prefill['user'] = $row['name'];
@@ -1472,7 +1472,7 @@ class USER extends API {
 						':ids' => implode(',', array_column($user, 'id'))
 					]
 				]);
-				foreach($trainings as $training){
+				foreach ($trainings as $training){
 					$datalist['training'][] = $training['name'];
 				}
 				$datalist['training'] = array_unique($datalist['training']);
@@ -1497,7 +1497,7 @@ class USER extends API {
 					}
 				}
 
-				$result = ['render' => ['content' => [
+				$response = ['render' => ['content' => [
 					[
 						[
 							'type' => 'text',
@@ -1556,11 +1556,11 @@ class USER extends API {
 					]
 				]]];
 				if ($prefill['user']) {
-					$result['render']['content'][0][0]['attributes']['readonly'] = true;
-					unset($result['render']['content'][0][0]['hint']);
+					$response['render']['content'][0][0]['attributes']['readonly'] = true;
+					unset($response['render']['content'][0][0]['hint']);
 				}
 
-				$this->response($result);
+				$this->response($response);
 				break;
 			case 'DELETE':
 				$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [

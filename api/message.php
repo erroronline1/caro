@@ -44,10 +44,10 @@ class MESSAGE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'GET':
 				$datalist = [];
-				$result = ['render' => ['content' => []]];
+				$response = ['render' => ['content' => []]];
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				foreach($user as $row) {
+				foreach ($user as $row) {
 					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient']])) continue;
 					$datalist[] = $row['name'];
 				}
@@ -72,7 +72,7 @@ class MESSAGE extends API {
 					$conversation_user = $conversation_user ? $conversation_user[0] : null;
 
 					// add up messages to conversation thread
-					foreach($messages as $conversation){
+					foreach ($messages as $conversation){
 						$conversation_content[] = [
 							'type' => 'message',
 							'content' => [
@@ -92,18 +92,18 @@ class MESSAGE extends API {
 						];
 					}
 					// render mark/unmark all messages button
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('message.delete_mark'),
 								'data-checked' => 0,
-								'onclick' => "this.dataset.checked = + !Boolean(parseInt(this.dataset.checked)); document.querySelectorAll('article>input[type=\"radio\"]').forEach(radio => {radio.checked = Boolean(parseInt(this.dataset.checked));})"
+								'onclick' => "this.dataset.checked = + !Boolean(parseInt(this.dataset.checked)); document.querySelectorAll('article>input[type=\"radio\"]').foreach (radio => {radio.checked = Boolean(parseInt(this.dataset.checked));})"
 							]
 						]
 					];
 					// render delete button for marked messages
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
@@ -113,7 +113,7 @@ class MESSAGE extends API {
 									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => { if (confirmation) {" .
 										"let ids = [];" .
-										"document.querySelectorAll('article>input[type=\"radio\"]').forEach(radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
+										"document.querySelectorAll('article>input[type=\"radio\"]').foreach (radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
 										"api.message('delete', 'conversation', ids.join('_'));" .
 									"} })"
 							]
@@ -121,11 +121,11 @@ class MESSAGE extends API {
 					];
 
 					// append messages
-					$result['render']['content'][] = $conversation_content;
+					$response['render']['content'][] = $conversation_content;
 
 					// add reply input if not the system user
 					if ($conversation['conversation_user'] != '1' && $conversation_user['name']) {
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'hidden',
 								'attributes' => [
@@ -141,19 +141,19 @@ class MESSAGE extends API {
 								'hint' => $this->_lang->GET('message.forward_hint')
 							]
 						];
-						$result['render']['form'] = [
+						$response['render']['form'] = [
 							'data-usecase' => 'message',
 							'action' => "javascript:api.message('post', 'message', '_')"
 						];
 					}
 					require_once('notification.php');
 					$notifications = new NOTIFICATION;
-					$result['data'] = ['message_unseen' => $notifications->messageunseen()];
+					$response['data'] = ['message_unseen' => $notifications->messageunseen()];
 				}
 				else {
 					// display "mailbox"
 					// new message to anybody button
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
@@ -171,7 +171,7 @@ class MESSAGE extends API {
 					]);
 					if ($conversations) {
 						// list up all last messages, with unread mark if applicable
-						foreach($conversations as $conversation){
+						foreach ($conversations as $conversation){
 							// select unseen per conversation
 							$unseen = SQLQUERY::EXECUTE($this->_pdo, 'message_get_unseen_conversations', [
 								'values' => [
@@ -182,7 +182,7 @@ class MESSAGE extends API {
 							$unseen = $unseen ? intval($unseen[0]['unseen']) : 0;
 
 							$conversation['message'] = preg_replace('/\n|\r/', ' ', strip_tags($conversation['message']));
-							$result['render']['content'][] = [
+							$response['render']['content'][] = [
 								[
 									'type' => 'message',
 									'content' => [
@@ -198,7 +198,7 @@ class MESSAGE extends API {
 								]
 							];
 						}
-					} else $result['render']['content'][] = $this->noContentAvailable($this->_lang->GET('message.no_messages'))[0];
+					} else $response['render']['content'][] = $this->noContentAvailable($this->_lang->GET('message.no_messages'))[0];
 				}
 				break;
 			case 'DELETE':
@@ -223,7 +223,7 @@ class MESSAGE extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 	
 	/**
@@ -305,35 +305,35 @@ class MESSAGE extends API {
 		// prepare existing users lists
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
-		$result = ['render' => ['content' => []]];
+		$response = ['render' => ['content' => []]];
 
-		foreach($users as $user){
+		foreach ($users as $user){
 			if (PERMISSION::filteredUser($user)) continue;
 
 			// sort to groups, units, etc.
 			$groups['name'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 			if ($user['orderauth']) $groups['orderauth'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 			if ($user['units'])
-				foreach(explode(',', $user['units']) as $unit){
+				foreach (explode(',', $user['units']) as $unit){
 					if (!isset($groups['units'][$unit])) $groups['units'][$unit] = [];
 					$groups['units'][$unit][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
 			if ($user['permissions'])
-				foreach(explode(',', $user['permissions']) as $permission){
+				foreach (explode(',', $user['permissions']) as $permission){
 					if (in_array($permission, ['user', 'group'])) continue;
 					if (!isset($groups['permissions'][$permission])) $groups['permissions'][$permission] = [];
 					$groups['permissions'][$permission][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
 		}
 
-		foreach($groups as $group => $content){
+		foreach ($groups as $group => $content){
 			// display name list and order auth-list as a single panel
 			if (in_array($group, ['name', 'orderauth'])){
 				$links = [];
 				ksort($content);
 
 				// assemble message link
-				foreach($content as $user) $links[$user['name']] = [
+				foreach ($content as $user) $links[$user['name']] = [
 					'href' => 'javascript:void(0)',
 					'data-type' => 'input',
 					'class' => 'messageto',
@@ -348,7 +348,7 @@ class MESSAGE extends API {
 						$description = $this->_lang->GET('message.register_orderauth');
 						break;
 				}
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'links',
 						'description' => $description,
@@ -358,7 +358,7 @@ class MESSAGE extends API {
 			} else {
 				// display units and permissions as slideable multipanels
 				$panel = [];
-				foreach($content as $sub => $users){
+				foreach ($content as $sub => $users){
 					$users = array_unique($users, SORT_REGULAR);
 					ksort($users);
 
@@ -374,7 +374,7 @@ class MESSAGE extends API {
 					];
 
 					// add "message to user"
-					foreach($users as $user) $links[$user['name']] = [
+					foreach ($users as $user) $links[$user['name']] = [
 						'href' => 'javascript:void(0)',
 						'data-type' => 'input',
 						'class' => 'messageto',
@@ -391,10 +391,10 @@ class MESSAGE extends API {
 						]
 					];
 				}
-				$result['render']['content'][] = $panel;
+				$response['render']['content'][] = $panel;
 			}
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 }
 ?>

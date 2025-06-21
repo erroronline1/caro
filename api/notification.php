@@ -93,7 +93,7 @@ class NOTIFICATION extends API {
 
 		// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day
 		$alerts = $calendar->alert($today->format('Y-m-d'));
-		foreach($alerts as $event){
+		foreach ($alerts as $event){
 			// alert current events including workmates pto if alert is set
 			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '')], $this->_lang->GET('calendar.schedule.alert_message', [':content' => (isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
 		}
@@ -143,7 +143,7 @@ class NOTIFICATION extends API {
 		$unapproved = 0;
 		if (PERMISSION::permissionFor('incorporation')){
 			$allproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
-			foreach($allproducts as $product) {
+			foreach ($allproducts as $product) {
 				if (!$product['incorporated']) continue;
 				$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
 				if (isset($product['incorporated']['_denied'])) continue;
@@ -167,7 +167,7 @@ class NOTIFICATION extends API {
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$unapproved = 0;
 		$hidden = [];
-		foreach(array_merge($components, $documents) as $element){
+		foreach (array_merge($components, $documents) as $element){
 			if ($element['context'] === 'bundle') continue;
 			if ($element['hidden']) $hidden[] = $element['context'] . $element['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($element['context'] . $element['name'], $hidden)){
@@ -282,7 +282,7 @@ class NOTIFICATION extends API {
 		$prepared = 0;
 		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 		$units = $_SESSION['user']['units']; // see only orders for own units
-		foreach($orders as $row) {
+		foreach ($orders as $row) {
 			$order_data = json_decode($row['order_data'], true);
 			if (array_intersect([$order_data['organizational_unit']], $units)) {
 				$prepared++;
@@ -328,7 +328,7 @@ class NOTIFICATION extends API {
 	public function responsibilities(){
 		$number = 0;
 		$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
-		foreach($responsibilities as $row){
+		foreach ($responsibilities as $row){
 			if ($row['hidden']) continue;
 			$row['assigned_users'] = json_decode($row['assigned_users'], true);
 			if (isset($row['assigned_users'][$_SESSION['user']['id']]) && !$row['assigned_users'][$_SESSION['user']['id']]) {
@@ -369,7 +369,7 @@ class NOTIFICATION extends API {
 		$unitusers = [];
 		$number = 0;
 		// find all users within current users units
-		foreach($users as $user){
+		foreach ($users as $user){
 			if (array_intersect($_SESSION['user']['units'], explode(',', $user['units'] ? : ''))) $unitusers[] = $user['id'];
 		}
 		$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
@@ -377,7 +377,7 @@ class NOTIFICATION extends API {
 				':ids' => implode(',', $unitusers)
 			]
 		]);
-		foreach($trainings as $training){
+		foreach ($trainings as $training){
 			if ($training['planned']) {
 				$number++;
 				continue;

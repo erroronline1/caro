@@ -67,7 +67,7 @@ class ORDER extends API {
 								// ordered aka processed canellation orders are deleted immediately 
 								$this->orderStatistics($this->_requestedID); // write to statistics about a cancelled order
 								if ($this->delete_approved_order($order)) {
-									$result = [
+									$response = [
 									'response' => [
 										'id' => false,
 										'msg' => $this->_lang->GET('order.deleted'),
@@ -75,13 +75,13 @@ class ORDER extends API {
 									],
 									'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 								}
-								else $result = [
+								else $response = [
 									'response' => [
 										'id' => $this->_requestedID,
 										'msg' => $this->_lang->GET('order.failed_delete'),
 										'type' => 'error'
 									]];
-								$this->response($result);
+								$this->response($response);
 							}
 							elseif ($order['ordertype'] === 'return') {
 								// ordered aka processed return orders are received immediately
@@ -184,7 +184,7 @@ class ORDER extends API {
 							]);
 							// inform user group
 							$messagepayload = [];
-							foreach (['quantity'=> 'quantity_label',
+							foreach (['quantity' => 'quantity_label',
 								'unit' => 'unit_label',
 								'number' => 'ordernumber_label',
 								'name' => 'productname_label',
@@ -218,7 +218,7 @@ class ORDER extends API {
 							if (str_starts_with(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info')), $this->_lang->GET('order.orderstate_description'))){
 								// inform user group
 								$messagepayload = [];
-								foreach (['quantity'=> 'quantity_label',
+								foreach (['quantity' => 'quantity_label',
 									'unit' => 'unit_label',
 									'number' => 'ordernumber_label',
 									'name' => 'productname_label',
@@ -275,7 +275,7 @@ class ORDER extends API {
 								]
 							])) {
 								$this->_requestedID = $this->_pdo->lastInsertId();
-								$result = [
+								$response = [
 								'response' => [
 									'id' => $this->_requestedID,
 									'msg' => $this->_lang->GET('order.saved'),
@@ -283,9 +283,9 @@ class ORDER extends API {
 								]];
 
 								// alert purchase on "new order"
-								$this->alertUserGroup(['permission'=>['purchase']], $this->_lang->GET('order.alert_purchase', [], true));
+								$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));
 							}
-							else $result = [
+							else $response = [
 								'response' => [
 									'id' => false,
 									'msg' => $this->_lang->GET('order.failed_save'),
@@ -295,7 +295,7 @@ class ORDER extends API {
 					}
 				}
 				// construct result toast
-				$result = isset($result) ? $result: [
+				$response = isset($response) ? $response : [
 					'response' => [
 						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_subMethod) : $this->_lang->GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_subMethod)]),
 						'type' => 'info'
@@ -321,7 +321,7 @@ class ORDER extends API {
 				// sanitize search
 				$this->_requestedID = in_array($this->_requestedID, ['null']) ? '' : trim($this->_requestedID ? : '');
 
-				$result = ['data' => [
+				$response = ['data' => [
 					'filter' => $this->_requestedID ? : '', // preset search term
 					'state' => $this->_subMethodState ? : 'unprocessed', // preset the appropriate language key
 					'order' => [], 'approval' => [], 'export' => false]];
@@ -336,7 +336,7 @@ class ORDER extends API {
 				$special_attention = [];
 				
 				// gather product information on incorporation and special attention
-				foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
+				foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
 					$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
 					if ($product['special_attention']) $special_attention[] = $product['id'];
 					if (!$product['incorporated']) {
@@ -356,7 +356,7 @@ class ORDER extends API {
 				// get unchecked articles for MDR §14 sample check
 				// this is actually faster than a nested sql query
 				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
-				foreach($vendors as &$vendor){
+				foreach ($vendors as &$vendor){
 					$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true); 
 				}
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
@@ -366,7 +366,7 @@ class ORDER extends API {
 				]);
 				// get all checkable products
 				$checkable = [];
-				foreach($products as $product){
+				foreach ($products as $product){
 					if (!$product['trading_good']) continue;
 					if (!isset($checkable[$product['vendor_id']])) $checkable[$product['vendor_id']] = [];
 					if (!$product['checked']){
@@ -380,7 +380,7 @@ class ORDER extends API {
 					}
 				}
 				// drop vendors that have been checked within their sample check interval
-				foreach($products as $product){
+				foreach ($products as $product){
 					if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_id']])) continue;
 					$check = new \DateTime($product['checked']);
 					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['servertime'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
@@ -395,7 +395,7 @@ class ORDER extends API {
 
 				// gather applicable order states
 				$statechange = ['...' => ['value' => '']];
-				foreach($this->_lang->_USER['order']['orderstate'] as $value){
+				foreach ($this->_lang->_USER['order']['orderstate'] as $value){
 					$statechange[$value] = [];
 				}
 				ksort($statechange);
@@ -418,23 +418,23 @@ class ORDER extends API {
 					'orderprocessing' => PERMISSION::permissionFor('orderprocessing'),
 					'purchasemembers' => []
 				];
-				$result['data']['export'] = $permission['orderprocessing'];
+				$response['data']['export'] = $permission['orderprocessing'];
 
 				// userlist to decode orderer
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				// get purchase member names passed to data['editproductrequest'] as array type for message initialization
 				// while possible to intersect with products-permission, ceo, prrc and qmo by default may not have time to handle this
-				foreach($users as $user){
+				foreach ($users as $user){
 					$user['permissions'] = explode(',', $user['permissions'] ? : '');
 					if (array_intersect(['purchase', 'admin'], $user['permissions'])) $permission['purchasemembers'][] = $user['name'];
 				}
 
 				// create array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
-				foreach($order as $row){
-					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $result['data']['approval'])) $result['data']['approval'][] = $row['approval'];
+				foreach ($order as $row){
+					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
 				}
-				foreach($order as $row) {
+				foreach ($order as $row) {
 					// filter selected state or default to unprocessed
 					if ((!$this->_subMethodState && $row['ordered']) || ($this->_subMethodState && !$row[$this->_subMethodState])) continue;
 					
@@ -495,7 +495,7 @@ class ORDER extends API {
 					if (!str_contains($row['approval'], 'data:image/png')) {
 						$data['ordertext'] .= "\n". $row['approval'];
 					} else {
-						$data['approval'] = array_search($row['approval'], $result['data']['approval']);
+						$data['approval'] = array_search($row['approval'], $response['data']['approval']);
 					}
 
 					// add additional info
@@ -504,7 +504,7 @@ class ORDER extends API {
 					}
 
 					// append order processing states
-					foreach(['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'] as $s){
+					foreach (['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'] as $s){
 						if (!isset($data['state'][$s])) $data['state'][$s] = [];
 						$data['state'][$s]['data-'.$s] = boolval($row[$s]) ? 'true' : 'false';
 						if (boolval($row[$s])) {
@@ -548,7 +548,7 @@ class ORDER extends API {
 
 					// order attachments
 					if (isset($decoded_order_data['attachments'])){
-						foreach(explode(',', $decoded_order_data['attachments']) as $file){
+						foreach (explode(',', $decoded_order_data['attachments']) as $file){
 							$data['attachments'][pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
 						}
 					}
@@ -587,7 +587,7 @@ class ORDER extends API {
 						$data['editproductrequest'] = $product ? $permission['purchasemembers'] : null;
 					}
 
-					array_push($result['data']['order'], array_filter($data, fn($property)=> $property || $property === 0));
+					array_push($response['data']['order'], array_filter($data, fn($property) => $property || $property === 0));
 				}
 				break;
 			case 'DELETE':
@@ -599,7 +599,7 @@ class ORDER extends API {
 				$row = $row ? $row[0] : null;
 				
 				if ($row && !in_array('group', $_SESSION['user']['permissions']) && $this->delete_approved_order($row)) {
-					$result = [
+					$response = [
 					'response' => [
 						'id' => false,
 						'msg' => $this->_lang->GET('order.deleted'),
@@ -607,7 +607,7 @@ class ORDER extends API {
 					],
 					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
 				}
-				else $result = [
+				else $response = [
 					'response' => [
 						'id' => $this->_requestedID,
 						'msg' => $this->_lang->GET('order.failed_delete'),
@@ -615,7 +615,7 @@ class ORDER extends API {
 					]];
 				break;
 			}
-		$this->response($result);
+		$this->response($response);
 	}
 	
 	/**
@@ -680,14 +680,14 @@ class ORDER extends API {
 
 		// gather product information on stock item flag
 		$stock_items = $erp_ids = [];
-		foreach(SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
+		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
 			if ($product['stock_item']) $stock_items[] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
 			if ($product['erp_id']) $erp_ids[$product['erp_id']] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
 		}
 
 		$data = [];
 		$item = 1;
-		foreach($order as $row) {
+		foreach ($order as $row) {
 			// filter selected state or default to unprocessed
 			if ((!$this->_subMethodState && $row['ordered']) || ($this->_subMethodState && !$row[$this->_subMethodState])) continue;
 			
@@ -705,7 +705,7 @@ class ORDER extends API {
 
 			$erp_id = array_search($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $erp_ids);
 			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
-				':quantity'=> UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : '',
+				':quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : '',
 				':unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : '',
 				':number' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '',
 				':name' => UTILITY::propertySet($decoded_order_data, 'productname_label') ? : '',
@@ -772,7 +772,7 @@ class ORDER extends API {
 							':order_data' => UTILITY::json_encode($processedOrderData['order_data'])
 						]
 					]);
-					$result = [
+					$response = [
 						'response' => [
 							'id' => $this->_pdo->lastInsertId(),
 							'msg' => $this->_lang->GET('order.saved_to_prepared'),
@@ -784,7 +784,7 @@ class ORDER extends API {
 				}
 
 				// else process approved order
-				$result = $this->postApprovedOrder($processedOrderData);
+				$response = $this->postApprovedOrder($processedOrderData);
 
 				break;
 			case 'PUT':
@@ -798,7 +798,7 @@ class ORDER extends API {
 							':id' => $this->_requestedID
 						]
 					]);
-					$result = [
+					$response = [
 						'response' => [
 							'id' => $this->_requestedID,
 							'msg' => $this->_lang->GET('order.saved_to_prepared'),
@@ -809,16 +809,16 @@ class ORDER extends API {
 				}
 
 				// else process approved order
-				$result = $this->postApprovedOrder($processedOrderData);
+				$response = $this->postApprovedOrder($processedOrderData);
 				
 				// delete prepared order if successfully approved
-				if ($result['response']['msg'] === $this->_lang->GET('order.saved')){
+				if ($response['response']['msg'] === $this->_lang->GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
 							':id' => intval($this->_requestedID)
 						]
 					]);
-					$result['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
+					$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
 				}
 				break;
 			case 'GET':
@@ -829,7 +829,7 @@ class ORDER extends API {
 				// prepare existing vendor lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				$vendors[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
-				foreach($vendor as $key => $row) {
+				foreach ($vendor as $key => $row) {
 					if ($row['hidden']) continue;
 					$datalist[] = $row['name'];
 					$vendors[$row['name']] = ['value' => $row['id']];
@@ -838,7 +838,7 @@ class ORDER extends API {
 
 				// prepare existing sales unit lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
-				foreach($vendor as $key => $row) {
+				foreach ($vendor as $key => $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
 
@@ -865,7 +865,7 @@ class ORDER extends API {
 
 				// prepare organizational unit selection
 				$organizational_units = [];
-				foreach($this->_lang->_USER['units'] as $unit => $description){
+				foreach ($this->_lang->_USER['units'] as $unit => $description){
 					$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'required' => true];
 					if (isset($order['organizational_unit']) && in_array($unit, explode(',', $order['organizational_unit']))) $organizational_units[$description]['checked'] = true;
 					elseif (isset($_SESSION['user']['app_settings']['primaryUnit'])) $organizational_units[$this->_lang->GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
@@ -873,7 +873,7 @@ class ORDER extends API {
 
 				// prepare order type selection
 				$order_type = [];
-				foreach($this->_lang->_USER['order']['ordertype'] as $key => $description){
+				foreach ($this->_lang->_USER['order']['ordertype'] as $key => $description){
 					$order_type[$description] = ['value' => $key];
 					if (isset($order['order_type']) && $order['order_type'] == $key) $order_type[$description]['selected'] = true;
 				}
@@ -911,8 +911,8 @@ class ORDER extends API {
 				// render search and selection
 				require_once('_shared.php');
 				$search = new SHARED($this->_pdo, $this->_date);
-				$result['render'] = ['form' => [
-					'data-usecase'=> 'purchase',
+				$response['render'] = ['form' => [
+					'data-usecase' => 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"
 				],
 				'content' => [
@@ -982,7 +982,7 @@ class ORDER extends API {
 
 				// append identification for group members
 				if (array_intersect(['group'], $_SESSION['user']['permissions'])){
-					array_splice($result['render']['content'][1], 1, 0, [[
+					array_splice($response['render']['content'][1], 1, 0, [[
 							'type' => 'text',
 							'hint' => $this->_lang->GET('order.orderer_group_hint'),
 							'attributes' => [
@@ -997,10 +997,10 @@ class ORDER extends API {
 
 				// append existing attachments
 				if (isset($order['attachments'])){
-					foreach(explode(',', $order['attachments']) as $file){
+					foreach (explode(',', $order['attachments']) as $file){
 						$files[pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
 					}
-					array_splice($result['render']['content'], 3, 0, [
+					array_splice($response['render']['content'], 3, 0, [
 						[
 							[
 								'type' => 'links',
@@ -1099,11 +1099,11 @@ class ORDER extends API {
 							]
 						]);
 					}
-					array_splice($result['render']['content'], 1, 0, $items);
+					array_splice($response['render']['content'], 1, 0, $items);
 				}
 
 				// append delete button
-				if ($this->_requestedID) array_push($result['render']['content'], [
+				if ($this->_requestedID) array_push($response['render']['content'], [
 					['type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('order.delete_prepared_order'),
@@ -1137,14 +1137,14 @@ class ORDER extends API {
 						':id' => intval($this->_requestedID)
 					]
 				])) {
-					$result = [
+					$response = [
 					'response' => [
 						'id' => false,
 						'msg' => $this->_lang->GET('order.deleted'),
 						'type' => 'deleted'
 					]];
 				}
-				else $result = [
+				else $response = [
 					'response' => [
 						'id' => $this->_requestedID,
 						'msg' => $this->_lang->GET('order.failed_delete'),
@@ -1152,7 +1152,7 @@ class ORDER extends API {
 					]];
 				break;
 			}
-		$this->response($result);
+		$this->response($response);
 	}
 	
 	/**
@@ -1189,7 +1189,7 @@ class ORDER extends API {
 		if (!$order) return;
 		// minimize order data
 		$order['order_data'] = json_decode($order['order_data'], true);
-		foreach($order['order_data'] as $key => $value){
+		foreach ($order['order_data'] as $key => $value){
 			if (!in_array($key, [
 				'quantity_label',
 				'unit_label',
@@ -1255,7 +1255,7 @@ class ORDER extends API {
 			}
 		}
 		if ($success) {
-			$result = [
+			$response = [
 				'response' => [
 					'id' => false,
 					'msg' => $this->_lang->GET('order.saved'),
@@ -1263,15 +1263,15 @@ class ORDER extends API {
 				]
 			];
 			// alert user group on new orders
-			$this->alertUserGroup(['permission'=>['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
+			$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
 		}
-		else $result = [
+		else $response = [
 			'response' => [
 				'id' => false,
 				'msg' => $this->_lang->GET('order.failed_save'),
 				'type' => 'error'
 			]];
-		return $result;
+		return $response;
 	}
 	
 	/**
@@ -1331,8 +1331,8 @@ class ORDER extends API {
 					// create itemized order data from prepared order
 					foreach (json_decode($order['order_data'], true) as $key => $items){ // data
 						if (is_array($items)){
-							foreach($items as $item){
-								foreach($item as $key => $subvalue){
+							foreach ($items as $item){
+								foreach ($item as $key => $subvalue){
 									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
 								}
 								$index++;
@@ -1343,11 +1343,11 @@ class ORDER extends API {
 					}
 				}
 
-				if(!count($order_data['items'])) $this->response([], 406);
-				$result = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
+				if (!count($order_data['items'])) $this->response([], 406);
+				$response = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
 
 				// if successfully posted as approved delete prepared order
-				if ($result['response']['msg'] === $this->_lang->GET('order.saved')){
+				if ($response['response']['msg'] === $this->_lang->GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
 							':id' => implode(",", array_map(fn($id) => intval($id), $approvedIDs))
@@ -1355,7 +1355,7 @@ class ORDER extends API {
 					]);
 					require_once('notification.php');
 					$notifications = new NOTIFICATION;
-					$result['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
+					$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
 				}
 				break;
 			case 'GET':
@@ -1366,24 +1366,24 @@ class ORDER extends API {
 
 				// filter by organizational unit
 				$organizational_orders = [];
-				foreach($orders as $key => $row) {
+				foreach ($orders as $key => $row) {
 					$order_data = json_decode($row['order_data'], true);
 					if (array_intersect([$order_data['organizational_unit']], $units)) {
 						array_push($organizational_orders, $row);
 					}
 				}
-				$result = ['render' => ['content' => []]];
+				$response = ['render' => ['content' => []]];
 
 				// users with order authorization can access all prepared orders by request
 				if ($_SESSION['user']['orderauth']){
 					$organizational_units = [];
 					$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared')"];
-					foreach($this->_lang->_USER['units'] as $unit => $description){
+					foreach ($this->_lang->_USER['units'] as $unit => $description){
 						$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.purchase('get', 'prepared', '" . $unit . "')"];
 					}
 					if (!$this->_requestedID) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
 					else $organizational_units[$this->_lang->GET('units.' . $this->_requestedID)]['checked'] = true;
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						['type' => 'radio',
 						'attributes' => [
 							'name' => $this->_lang->GET('order.organizational_unit')
@@ -1398,13 +1398,13 @@ class ORDER extends API {
 
 				// display selected prepared orders 
 				if (count($organizational_orders)){
-					foreach($organizational_orders as $order){ // order
+					foreach ($organizational_orders as $order){ // order
 						$items = $info = '';
 						$order_attributes = [];
 						$processedOrderData = json_decode($order['order_data'], true);
 						foreach ($processedOrderData as $key => $value){ // data
 							if (is_array($value)){
-								foreach($value as $item){
+								foreach ($value as $item){
 									$items .= $this->_lang->GET('order.prepared_order_item', [
 										':quantity' => UTILITY::propertySet($item, 'quantity_label') ? : '',
 										':unit' => UTILITY::propertySet($item, 'unit_label') ? : '',
@@ -1432,7 +1432,7 @@ class ORDER extends API {
 								$info .= $this->_lang->GET('order.' . $key) . ': ' . $value . "\n";
 							}
 						}
-						array_push($result['render']['content'], [
+						array_push($response['render']['content'], [
 							[
 								'type' => 'textsection',
 								'attributes' => $order_attributes,
@@ -1447,7 +1447,7 @@ class ORDER extends API {
 								]
 							], [
 								'type' => 'button',
-								'attributes' =>[
+								'attributes' => [
 									'value' => $this->_lang->GET('order.edit_prepared_order'),
 									'onclick' => "api.purchase('get', 'order', " . $order['id']. ")"
 								]
@@ -1457,10 +1457,10 @@ class ORDER extends API {
 						// append attachments
 						if (isset($processedOrderData['attachments'])){
 							$files = [];
-							foreach(explode(',', $processedOrderData['attachments']) as $file){
+							foreach (explode(',', $processedOrderData['attachments']) as $file){
 								$files[pathinfo($file)['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $file]);
 							}
-							array_splice($result['render']['content'][count($result['render']['content']) - 1], 2, 0, [
+							array_splice($response['render']['content'][count($response['render']['content']) - 1], 2, 0, [
 								[
 									[
 										'type' => 'links',
@@ -1510,15 +1510,15 @@ class ORDER extends API {
 						];
 						// append if any authorization methods and orders are available
 						if ($authorize){
-							array_push($result['render']['content'], $authorize);
-							$result['render']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];	
+							array_push($response['render']['content'], $authorize);
+							$response['render']['form'] = ['action' => "javascript:api.purchase('put', 'prepared')", 'data-usecase' => 'purchase'];	
 						}
 					}
 				}
-				else $result['render']['content'][] = $this->noContentAvailable($this->_lang->GET('order.no_orders'))[0];
+				else $response['render']['content'][] = $this->noContentAvailable($this->_lang->GET('order.no_orders'))[0];
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -1573,14 +1573,14 @@ class ORDER extends API {
 		$attachments = [];
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_photo')]) && $_FILES[$this->_lang->PROPERTY('order.attach_photo')]['tmp_name'][0]){
 			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_photo')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')]));
-			foreach($attachments as $key => $value){
+			foreach ($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
 		}
 		if (isset($_FILES[$this->_lang->PROPERTY('order.attach_file')]) && $_FILES[$this->_lang->PROPERTY('order.attach_file')]['tmp_name'][0]){
 			$attachments = array_merge($attachments, UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('order.attach_file')], UTILITY::directory('order_attachments'), [$this->_date['servertime']->format('YmdHis')]));
-			foreach($attachments as $key => $value){
+			foreach ($attachments as $key => $value){
 				if ($value)	$attachments[$key] = substr($value, str_starts_with($value, '..') ? 1: 0);
 				else unset($attachments[$key]);
 			}
@@ -1597,14 +1597,14 @@ class ORDER extends API {
 
 		// translate payload-names to languagefile keys
 		$language = [];
-		foreach(array_keys($this->_lang->_USER['order']) as $key){
+		foreach (array_keys($this->_lang->_USER['order']) as $key){
 			$language[$key] = $this->_lang->PROPERTY('order.' . $key);
 		}
 		// set data itemwise
 		foreach ($this->_payload as $key => $value){
 			$key = array_search($key, $language);
 			if (is_array($value)){
-				foreach($value as $index => $subvalue){
+				foreach ($value as $index => $subvalue){
 					if (boolval($subvalue) && $subvalue !== 'undefined') {
 						if (!isset($order_data['items'][intval($index)])) $order_data['items'][] = [];
 						$order_data['items'][intval($index)][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
@@ -1615,7 +1615,7 @@ class ORDER extends API {
 			}
 		}
 		$order_data['orderer'] = $_SESSION['user']['id'];
-		if(!count($order_data['items'])) $this->response([], 406);
+		if (!count($order_data['items'])) $this->response([], 406);
 		return ['approval' => $approval, 'order_data' => $order_data];
 	}
 }

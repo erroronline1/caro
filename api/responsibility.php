@@ -80,13 +80,13 @@ class RESPONSIBILITY extends API {
 				
 				break;
 			case 'GET':
-				$result = ['render' => ['content' => []]];
+				$response = ['render' => ['content' => []]];
 				$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
 				$available_units = [];
 				$selected = [];
 
 				// prepare existing responsibilities filtered by unit
-				foreach($responsibilities as $row){
+				foreach ($responsibilities as $row){
 					if (!PERMISSION::permissionFor('responsibilities') && $row['hidden']) continue;
 					$row['units'] = explode(',', $row['units']);
 					$row['assigned_users'] = json_decode($row['assigned_users'], true);
@@ -113,7 +113,7 @@ class RESPONSIBILITY extends API {
 				if ($this->_unit === '_my') $organizational_units[$this->_lang->GET('responsibility.my')]['checked'] = true;
 				$organizational_units[$this->_lang->GET('assemble.render.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.responsibility('get', 'responsibilities', 'null')"];
 				if (!$this->_unit) $organizational_units[$this->_lang->GET('assemble.render.mine')]['checked'] = true;
-				foreach($available_units as $unit){
+				foreach ($available_units as $unit){
 					if (!$unit) {
 						continue;
 					}
@@ -121,7 +121,7 @@ class RESPONSIBILITY extends API {
 					if ($this->_unit === $unit) $organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 				}
 
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'radio',
 						'content' => $organizational_units,
@@ -140,7 +140,7 @@ class RESPONSIBILITY extends API {
 						$assigned = [];
 						$proxy = [];
 
-						foreach($row['assigned_users'] as $user_id => $date){
+						foreach ($row['assigned_users'] as $user_id => $date){
 							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
 							else $user = $users[$user];
 							$assigned[$user['name']] = ['checked' => boolval($date)];
@@ -152,7 +152,7 @@ class RESPONSIBILITY extends API {
 								];
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $assigned[$user['name']]['disabled'] = true;
 						}
-						foreach($row['proxy_users'] as $user_id => $date){
+						foreach ($row['proxy_users'] as $user_id => $date){
 							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
 							else $user = $users[$user];
 							$proxy[$user['name']] = ['checked' => boolval($date)];
@@ -202,11 +202,11 @@ class RESPONSIBILITY extends API {
 							]
 						];
 
-						$result['render']['content'][] = $content;
+						$response['render']['content'][] = $content;
 					}
 				}
 				if (PERMISSION::permissionFor('responsibilities')) {
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
@@ -218,7 +218,7 @@ class RESPONSIBILITY extends API {
 				}
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 
@@ -249,7 +249,7 @@ class RESPONSIBILITY extends API {
 				];
 				// process selected units
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
-					foreach( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
+					foreach ( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
 						$responsibility[':units'][] = array_search($unit, $this->_lang->_USER['units']);
 					}
 				}
@@ -259,7 +259,7 @@ class RESPONSIBILITY extends API {
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				// process assigned users
-				foreach($this->_payload as $key => $value){
+				foreach ($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.assigned')) || !$value) continue;
 					$responsibility[':assigned_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
@@ -267,7 +267,7 @@ class RESPONSIBILITY extends API {
 				$responsibility[':assigned_users'] = UTILITY::json_encode($responsibility[':assigned_users']);
 
 				// process proxy users
-				foreach($this->_payload as $key => $value){
+				foreach ($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.proxy')) || !$value) continue;
 					$responsibility[':proxy_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
@@ -311,7 +311,7 @@ class RESPONSIBILITY extends API {
 				];
 				// process selected units
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
-					foreach( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
+					foreach ( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
 						$responsibility[':units'][] = array_search($unit, $this->_lang->_USER['units']);
 					}
 				}
@@ -321,7 +321,7 @@ class RESPONSIBILITY extends API {
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 				// process assigned users
-				foreach($this->_payload as $key => $value){
+				foreach ($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.assigned')) || !$value) continue;
 					$responsibility[':assigned_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
@@ -329,7 +329,7 @@ class RESPONSIBILITY extends API {
 				$responsibility[':assigned_users'] = UTILITY::json_encode($responsibility[':assigned_users']);
 
 				// process proxy users
-				foreach($this->_payload as $key => $value){
+				foreach ($this->_payload as $key => $value){
 					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.proxy')) || !$value) continue;
 					$responsibility[':proxy_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
 				}
@@ -361,7 +361,7 @@ class RESPONSIBILITY extends API {
 
 				break;
 			case 'GET':
-				$result = ['render' => ['form' => [
+				$response = ['render' => ['form' => [
 					'data-usecase' => 'responsibility',
 					'action' => "javascript:api.responsibility('" . (intval($this->_requestedID) ? 'put': 'post') . "', 'responsibility', " . intval($this->_requestedID) . ")"
 					],
@@ -390,7 +390,7 @@ class RESPONSIBILITY extends API {
 
 				//user datalist
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-				foreach($users as $key => $user){
+				foreach ($users as $key => $user){
 					if (PERMISSION::filteredUser($user)) unset($users[$key]);
 				}
 				// reassing generic keys
@@ -400,7 +400,7 @@ class RESPONSIBILITY extends API {
 				
 				// unit selection
 				$units = [];
-				foreach($this->_lang->_USER['units'] as $unit => $translation){
+				foreach ($this->_lang->_USER['units'] as $unit => $translation){
 					$units[$translation] = ['checked' => boolval(in_array($unit, $responsibility['units']))];
 				}
 
@@ -411,7 +411,7 @@ class RESPONSIBILITY extends API {
 					$created = $this->_lang->GET('responsibility.created', [':name' => $creator['name']]);
 				}
 				// default values
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textarea',
 						'attributes' => [
@@ -450,14 +450,14 @@ class RESPONSIBILITY extends API {
 					]
 				];
 				if (intval($this->_requestedID)){
-					$result['render']['content'][count($result['render']['content']) - 1][] = [
+					$response['render']['content'][count($response['render']['content']) - 1][] = [
 						'type' => 'textsection',
 						'attributes' => [
 							'name' => $this->_lang->GET('responsibility.update_hint')
 						],
 						'content' => $created
 					];
-					$result['render']['content'][count($result['render']['content']) - 1][] = [
+					$response['render']['content'][count($response['render']['content']) - 1][] = [
 						'type' => 'deletebutton',
 						'attributes' => [
 							'value' => $this->_lang->GET('responsibility.delete'),
@@ -470,7 +470,7 @@ class RESPONSIBILITY extends API {
 				}
 
 				// assigned users
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textsection',
 						'attributes' => [
@@ -479,12 +479,12 @@ class RESPONSIBILITY extends API {
 					]
 				];
 				if ($responsibility['assigned_users']){
-					foreach($responsibility['assigned_users'] as $user_id => $property){
+					foreach ($responsibility['assigned_users'] as $user_id => $property){
 						$user = array_search($user_id, array_column($users, 'id'));
 						if ($user === false) continue;
 						$user = $users[$user];
 
-						$result['render']['content'][count($result['render']['content']) - 1][] = [
+						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'text',
 							'attributes' => [
 								'name' => $this->_lang->GET('responsibility.assigned'),
@@ -496,7 +496,7 @@ class RESPONSIBILITY extends API {
 					}
 				}
 				// add empty field
-				$result['render']['content'][count($result['render']['content']) - 1][] = [
+				$response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'text',
 					'attributes' => [
 						'name' => $this->_lang->GET('responsibility.assigned'),
@@ -507,7 +507,7 @@ class RESPONSIBILITY extends API {
 				];
 
 				// proxy users
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textsection',
 						'attributes' => [
@@ -516,12 +516,12 @@ class RESPONSIBILITY extends API {
 					]
 				];
 				if ($responsibility['proxy_users']){
-					foreach($responsibility['proxy_users'] as $user_id => $property){
+					foreach ($responsibility['proxy_users'] as $user_id => $property){
 						$user = array_search($user_id, array_column($users, 'id'));
 						if ($user === false) continue;
 						$user = $users[$user];
 
-						$result['render']['content'][count($result['render']['content']) - 1][] = [
+						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'text',
 							'attributes' => [
 								'name' => $this->_lang->GET('responsibility.proxy'),
@@ -533,7 +533,7 @@ class RESPONSIBILITY extends API {
 					}
 				}
 				// add empty field
-				$result['render']['content'][count($result['render']['content']) - 1][] = [
+				$response['render']['content'][count($response['render']['content']) - 1][] = [
 					'type' => 'text',
 					'attributes' => [
 						'name' => $this->_lang->GET('responsibility.proxy'),
@@ -560,7 +560,7 @@ class RESPONSIBILITY extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 }
 ?>

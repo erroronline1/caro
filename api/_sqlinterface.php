@@ -132,7 +132,7 @@ class SQLQUERY {
 		if ($query && $items){
 			[$query, $values] = explode('VALUES', $query);
 			$chunkeditems = [];
-			foreach($items as $item){
+			foreach ($items as $item){
 				foreach ($item as &$replace){
 					if (gettype($replace) === 'NULL' || ($replace && strtoupper($replace) === 'NULL')) $replace = 'NULL';
 					elseif ($replace === '') $replace = "''";
@@ -147,7 +147,7 @@ class SQLQUERY {
 					else $chunkeditems[] = [$item];
 				} else $chunkeditems[] = [$item];
 			}
-			foreach($chunkeditems as $items){
+			foreach ($chunkeditems as $items){
 				$chunks[] = $query . ' VALUES ' . implode(',', $items) . ';';
 			}
 		}

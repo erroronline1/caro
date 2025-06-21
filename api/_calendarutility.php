@@ -209,7 +209,7 @@ class CALENDARUTILITY {
 			]
 		]);
 		$num = 0;
-		foreach($this->getWithinDateRange() as $entry){
+		foreach ($this->getWithinDateRange() as $entry){
 			if (!$entry['closed']) continue;
 			$entry['closed'] = json_decode($entry['closed'], true);
 			$closed = new \DateTime($entry['closed']['date']);
@@ -251,14 +251,14 @@ class CALENDARUTILITY {
 		if (!isset($columns[':type'])) return;
 
 		// fill up default values
-		foreach([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!isset($columns[$str])) $columns[$str] = '';
-		foreach([':id', ':alert', ':autodelete'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
-		foreach([':author_id'] as $user) if (!isset($columns[$user])) $columns[$user] = $_SESSION['user']['id'];
+		foreach ([':span_start', ':span_end', ':organizational_unit', ':subject', ':misc', 'closed'] as $str) if (!isset($columns[$str])) $columns[$str] = '';
+		foreach ([':id', ':alert', ':autodelete'] as $int) if (!isset($columns[$int])) $columns[$int] = 0;
+		foreach ([':author_id'] as $user) if (!isset($columns[$user])) $columns[$user] = $_SESSION['user']['id'];
 		$columns[':affected_user_id'] = isset($columns[':affected_user_id']) ? $columns[':affected_user_id'] : null; 
 
 		// prepare lists and datetime types for modification 
 		$units = [];
-		foreach($this->_lang->_USER['units'] as $unit => $description){
+		foreach ($this->_lang->_USER['units'] as $unit => $description){
 			$units[$description] = (in_array($unit, explode(',', $columns[':organizational_unit'])) || (!$columns[':organizational_unit'] && isset($_SESSION['user']['app_settings']['primaryUnit']) && $unit === $_SESSION['user']['app_settings']['primaryUnit'])) ? ['checked' => true, 'value' => 'unit'] : ['value' => 'unit'];
 		}
 
@@ -268,7 +268,7 @@ class CALENDARUTILITY {
 		$self = array_splice($users, array_search($_SESSION['user']['id'], array_column($users, 'id')), 1);
 		array_splice($users, 0, 0, $self);
 		// construct list for affected user selection
-		foreach($users as $user){
+		foreach ($users as $user){
 			if ($user == $self || PERMISSION::filteredUser($user)) continue;
 			if (in_array($columns[':type'], ['timesheet']) && PERMISSION::filteredUser($user, ['permission' => ['group']])) continue;
 			
@@ -369,7 +369,7 @@ class CALENDARUTILITY {
 				
 				// construct available pto-reasons
 				$ptoselect = [];
-				foreach($this->_lang->_USER['calendar']['timesheet']['pto'] as $subject => $reason){
+				foreach ($this->_lang->_USER['calendar']['timesheet']['pto'] as $subject => $reason){
 					$ptoselect[$reason] = ['value' => $subject];
 					if ($columns[':subject'] === $subject) $ptoselect[$reason]['selected'] = true;
 				}
@@ -419,7 +419,7 @@ class CALENDARUTILITY {
 					$breakrecommendation = "let start = document.getElementById('_starttime').value, end = this.value, time, breaktime; ".
 						"start = parseInt(start) + parseInt(start.split(':')[1]) / 60; end = parseInt(end) + parseInt(end.split(':')[1]) / 60; ".
 						"time = end - start; ";
-					foreach($this->_breaks as $break){
+					foreach ($this->_breaks as $break){
 						$break = explode('-', $break);
 						$breakrecommendation .= "if (time > " . $break[0]. ") breaktime = '" . (strlen(intval($break[1] / 60)) < 2 ? '0'. intval($break[1] / 60) : intval($break[1] / 60)) . ":" . intval((floatval($break[1]) / 60 - intval($break[1] / 60)) * 60) . "'; ";
 					}
@@ -577,7 +577,7 @@ class CALENDARUTILITY {
 		// apply all holidays depended on easter sunday
 		$easter = new \DateTime('now');
 		$easter->setTimestamp(easter_date($year));
-		foreach($this->_easter_holidays as $offset){
+		foreach ($this->_easter_holidays as $offset){
 			$easterholiday = clone $easter;
 			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
 			$holidays[] = $easterholiday->format('Y-m-d');
@@ -798,12 +798,12 @@ class CALENDARUTILITY {
 
 			// prepare occasionally changing contract settings
 			// create array with start date of changes and applicable value
-			foreach(['weeklyhours', 'annualvacation'] as $setting){
+			foreach (['weeklyhours', 'annualvacation'] as $setting){
 				$hours_vacation = [];
 				if (isset($user['app_settings'][$setting])){
 					$settingentries = explode('\n', $user['app_settings'][$setting]);
 					natsort($settingentries);
-					foreach($settingentries as $line){
+					foreach ($settingentries as $line){
 						// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
 						preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
 						// append datetime value and contract value
@@ -901,7 +901,7 @@ class CALENDARUTILITY {
 				$holidays = $this->numberOfNonWorkdays($startdate, $enddate);
 
 				// add reasonable pto to holiday count, that are not expected to contribute to projected
-				foreach($user['timesheet']['_pto'] as $pto){
+				foreach ($user['timesheet']['_pto'] as $pto){
 					$ptostart = $pto['start'];
 					$ptoend = $pto['end'];
 					if ($ptostart >= $startdate && $ptoend <= $enddate) {

@@ -56,7 +56,7 @@ class STRESSTEST extends INSTALL{
 			$this->{$method}();
 		}
 		else {
-			foreach(get_class_vars(get_class($this)) as $varName => $varValue){
+			foreach (get_class_vars(get_class($this)) as $varName => $varValue){
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
@@ -66,7 +66,7 @@ class STRESSTEST extends INSTALL{
 			$methods = get_class_methods($this);
 			sort($methods);
 			$delimiter = '';
-			foreach($methods as $methodName){
+			foreach ($methods as $methodName){
 				if (!in_array($methodName, [
 					'__construct',
 					'navigation',
@@ -142,7 +142,7 @@ class STRESSTEST extends INSTALL{
 				':subject' => $this->_prefix
 			]
 		]);
-		foreach($entries as $entry){
+		foreach ($entries as $entry){
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
 				'values' => [
 					':id' => $entry['id']
@@ -168,13 +168,13 @@ class STRESSTEST extends INSTALL{
 
 			$content = [];
 			$names = ['abc','def','ghi','jkl','mno','pqr','stu','vwx','yz'];
-			foreach(array_rand($names, 4) as $component){
+			foreach (array_rand($names, 4) as $component){
 				$content[$names[$component]] = 'sdf' . random_int(1000, 100000000); 
 			}
 
 			$current_record = [];
 			shuffle($documents);
-			foreach($documents as $document){
+			foreach ($documents as $document){
 				$current_record[] = [
 					'author' => $this->_defaultUser,
 					'date' => $this->_currentdate->format('Y-m-d H:i:s'),
@@ -297,7 +297,7 @@ class STRESSTEST extends INSTALL{
 				...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
 				...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist')
 			];
-			foreach($DBall as $row){
+			foreach ($DBall as $row){
 				SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
 					'values' => [
 						':approval' => UTILITY::json_encode($permissions),
@@ -320,8 +320,8 @@ class STRESSTEST extends INSTALL{
 			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates')
 		];
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				if (
 					isset($entry['unit']) &&
 					$dbentry['unit'] === $entry['unit'] &&
@@ -351,8 +351,8 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				if (
 					isset($entry['name']) &&
 					$dbentry['name'] === $entry['name'] &&
@@ -362,7 +362,7 @@ class STRESSTEST extends INSTALL{
 						'mysql' => "DELETE FROM caro_csvfilter WHERE id = " . $dbentry['id'],
 						'sqlsrv' => "DELETE FROM caro_csvfilter WHERE id = " . $dbentry['id']
 					];
-					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
 						$matches++;
 				}
 			}
@@ -388,7 +388,7 @@ class STRESSTEST extends INSTALL{
 		$usedid = [];
 		foreach ($records as $record){
 			$record['content'] = json_decode($record['content'], true);
-			foreach($record['content'] as $rc){
+			foreach ($record['content'] as $rc){
 				if (!isset($rc['document'])) continue;
 				if (!isset($usedid[$rc['document']])) $usedid[$rc['document']] = 0;
 				$usedid[$rc['document']]++;
@@ -396,8 +396,8 @@ class STRESSTEST extends INSTALL{
 		}
 
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				//ensure proper formatting
 				if (!isset($entry['name'])) continue;
 				$entry['regulatory_context'] = implode(',', preg_split('/[^\w\d]+/m', $entry['regulatory_context'] ? : ''));
@@ -437,8 +437,8 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual');
 
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				//ensure proper formatting
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 
@@ -448,7 +448,7 @@ class STRESSTEST extends INSTALL{
 					$dbentry['content'] === $entry['content'] &&
 					!array_diff(explode(',', $dbentry['permissions'] ? : ''), explode(',', $entry['permissions'] ? : ''))
 				){
-					if (SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', ['values'=> [':id' => $dbentry['id']]]))
+					if (SQLQUERY::EXECUTE($this->_pdo, 'application_delete_manual', ['values' => [':id' => $dbentry['id']]]))
 						$matches++;
 				}
 			}
@@ -465,8 +465,8 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				//ensure proper formatting
 				$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk'] ? : ''));
 				if (
@@ -499,8 +499,8 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				if (
 					isset($texts['type']) &&
 					$dbentry['type'] === $entry['type'] &&
@@ -513,7 +513,7 @@ class STRESSTEST extends INSTALL{
 						'mysql' => "DELETE FROM caro_texttemplates WHERE id = " . $dbentry['id'],
 						'sqlsrv' => "DELETE FROM caro_texttemplates WHERE id = " . $dbentry['id']
 					];
-					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
 						$matches++;
 				}
 			}
@@ -530,8 +530,8 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				//ensure proper formatting
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 				$entry['units'] = implode(',', preg_split('/[^\w\d]+/m', $entry['units'] ? : ''));
@@ -575,8 +575,8 @@ class STRESSTEST extends INSTALL{
 		$DBall = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
 		$matches = 0;
-		foreach($DBall as $dbentry){
-			foreach($json as $entry){
+		foreach ($DBall as $dbentry){
+			foreach ($json as $entry){
 				if (
 					isset($entry['name']) &&
 					$dbentry['name'] === $entry['name'] &&
@@ -586,7 +586,7 @@ class STRESSTEST extends INSTALL{
 						'mysql' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbentry['id'],
 						'sqlsrv' => "DELETE FROM caro_consumables_vendors WHERE id = " . $dbentry['id']
 					];
-					if(SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
+					if (SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]))
 						$matches++;
 				}
 			}

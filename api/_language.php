@@ -71,7 +71,7 @@ class LANG {
 		if ($chunk = self::find($request, $languagefile)) {
 			$patterns = [];
 			$replacements = [];
-			foreach($replace as $pattern => $replacement){
+			foreach ($replace as $pattern => $replacement){
 				$patterns[] = '/' . $pattern . '/';
 				$replacements[] = $replacement;
 			}
@@ -101,7 +101,7 @@ class LANG {
 	 */
 	public function GETALL(){
 		$return = $this->_USER;
-		foreach(['skills', 'documentcontext', 'risk', 'regulatory', 'risks'] as $unset) {
+		foreach (['skills', 'documentcontext', 'risk', 'regulatory', 'risks'] as $unset) {
 			unset($return[$unset]);
 		}
 		return $return;
@@ -123,7 +123,7 @@ class LANG {
 	* @param array $env starting with language.xx.env
 	*/
 	private static function override($lang, $env){
-	   foreach($env as $key => $value){
+	   foreach ($env as $key => $value){
 		   if (gettype($value) === 'array'){
 			   if (!isset($lang[$key])) {
 				   $lang[$key] = [];

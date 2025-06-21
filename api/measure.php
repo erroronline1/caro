@@ -89,7 +89,7 @@ class MEASURE extends API {
 					boolval($measure['closed']) == boolval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')))
 				);
 				$measure['measures'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.measure'));
-				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? UTILITY::json_encode(['date' =>$this->_date['servertime']->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
+				$measure['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('measure.closed')) ? UTILITY::json_encode(['date' => $this->_date['servertime']->format('Y-m-d H:i'), 'user' => $_SESSION['user']['name']]) : null;
 				$measure['id'] = $this->_requestedID;
 				$measure['last_user'] = $_SESSION['user']['name'];
 
@@ -113,7 +113,7 @@ class MEASURE extends API {
 
 				// put if not deleted
 				if (SQLQUERY::EXECUTE($this->_pdo, 'measure_put', [
-					'values' =>[
+					'values' => [
 						':measures' => $measure['measures'],
 						':closed' => $measure['closed'],
 						':id' => $measure['id'],
@@ -139,12 +139,12 @@ class MEASURE extends API {
 					]]);
 				break;
 			case 'GET':
-				$result = [];
+				$response = [];
 				// get measures and assemble selection
 				$measures = SQLQUERY::EXECUTE($this->_pdo, 'measure_get');
 
 				// new suggestion button
-				$result['render']['content'] = [[
+				$response['render']['content'] = [[
 					[
 						'type' => 'button',
 						'attributes' => [
@@ -179,7 +179,7 @@ class MEASURE extends API {
 				]];
 
 				// all suggestions
-				foreach($measures as $measure){
+				foreach ($measures as $measure){
 					$measurecontent = [];
 					$measure['closed'] = json_decode($measure['closed'] ? : '', true);
 					$measurecontent[] = [
@@ -268,11 +268,11 @@ class MEASURE extends API {
 							]
 						];
 					}
-					$result['render']['content'][] = $measurecontent;
+					$response['render']['content'][] = $measurecontent;
 				}
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**

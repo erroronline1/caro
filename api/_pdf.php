@@ -36,9 +36,9 @@ class PDF{
 			'header_image' => isset($setup['header_image']) ? $setup['header_image'] : null,
 			'footer_image' => isset($setup['footer_image']) ? $setup['footer_image'] : null,
 			'exportimage_maxheight' => isset($setup['exportimage_maxheight']) ? intval($setup['exportimage_maxheight']) : 75,
-			'rows'=> isset($setup['rows']) ? intval($setup['rows']) : 1,
-			'columns'=> isset($setup['columns']) ? intval($setup['columns']) : 1,
-			'fontsize'=> isset($setup['fontsize']) ? intval($setup['fontsize']) : 12,
+			'rows' => isset($setup['rows']) ? intval($setup['rows']) : 1,
+			'columns' => isset($setup['columns']) ? intval($setup['columns']) : 1,
+			'fontsize' => isset($setup['fontsize']) ? intval($setup['fontsize']) : 12,
 			'codesizelimit' => isset($setup['codesizelimit']) ? intval($setup['codesizelimit']) : null,
 			'codepadding' => isset($setup['codepadding']) ? intval($setup['codepadding']) : 0,
 			'header' => isset($setup['header']) ? $setup['header'] : true,
@@ -99,7 +99,7 @@ class PDF{
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		
-		foreach($content['content'] as $key => $value){
+		foreach ($content['content'] as $key => $value){
 			// name column
 			$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 			$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
@@ -135,10 +135,10 @@ class PDF{
 			'default' => 5
 		];
 
-		foreach($content['content'] as $document => $entries){
+		foreach ($content['content'] as $document => $entries){
 			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] + 2);
 			$this->_pdf->MultiCell(145, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-			foreach($entries as $key => $value){
+			foreach ($entries as $key => $value){
 				// make sure to write on next page if multiline textfield would reach into footer
 				if ($value['type'] === "multiline" && !$value['value']
 					&& $this->_pdf->GetY() > $this->_pdf->getPageHeight() - $this->_setup['marginbottom'] - $height['multiline']) {
@@ -180,7 +180,7 @@ class PDF{
 						}
 						break;
 					case 'selection':
-						foreach($value['value'] as $option){
+						foreach ($value['value'] as $option){
 							$this->_pdf->applyCustomPageBreak($nameLines, $this->_setup['fontsize']);
 
 							$this->_pdf->SetFontSize(14);
@@ -205,7 +205,7 @@ class PDF{
 					case 'links':
 						if ($value['value']) { // print value for missing field values on some systems
 							$this->_pdf->SetFont('helvetica', 'I', $this->_setup['fontsize']); // font size
-							foreach($value['value'] as $link){
+							foreach ($value['value'] as $link){
 								if ($link) {
 									// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 									$this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link . '" target="_blank">' . $link . '</a>', 0, 1, 0, true, '', true);
@@ -285,10 +285,10 @@ class PDF{
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		
-		foreach($content['content'] as $document => $entries){
+		foreach ($content['content'] as $document => $entries){
 			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] + 2); 
 			$this->_pdf->MultiCell(140, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-			foreach($entries as $key => $value){
+			foreach ($entries as $key => $value){
 				// name column
 				$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
@@ -335,10 +335,10 @@ class PDF{
 		$this->_pdf->SetFont('helvetica', '', 8); // font size
 		
 		$page = 0;
-		foreach($content['content'] as $user){
+		foreach ($content['content'] as $user){
 			//$this->_pdf->startPageGroup();
 			if ($page++)$this->_pdf->AddPage();
-			foreach($user as $row){
+			foreach ($user as $row){
 				$key = array_key_exists(0, $row) ? $row[0][0] : '';
 				$value = array_key_exists(1, $row) ? $row[1] : '';
 				if (array_key_exists(0, $row) && $row[0][1]) $this->_pdf->SetTextColor(192, 192, 192);

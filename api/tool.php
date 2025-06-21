@@ -57,7 +57,7 @@ class TOOL extends API {
 			$weight = floatval(str_replace(',', '.', $weight));
 			$sum = array_sum($parts);
 			$destination = [];
-			foreach($parts as $part) if ($part) $destination[] = ceil($weight * floatval($part) / $sum);
+			foreach ($parts as $part) if ($part) $destination[] = ceil($weight * floatval($part) / $sum);
 			return implode(' / ', $destination);
 		}
 
@@ -272,7 +272,7 @@ class TOOL extends API {
 			$types['thread'][1]['content'][$this->_lang->PROPERTY('tool.calculator.thread_fine')]['checked'] = true;
 		}
 
-		$result['render'] = ['form' => [
+		$response['render'] = ['form' => [
 			'data-usecase' => 'tool_calculator',
 			'action' => "javascript:api.tool('post', 'calculator', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'pow') . "')"
 		],
@@ -315,10 +315,10 @@ class TOOL extends API {
 							UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_measure')),
 							UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.ma_measure') . '(2)')
 						];
-						foreach($this->_payload as $key => $value){
+						foreach ($this->_payload as $key => $value){
 							if (!in_array($key, [$this->_lang->GET('tool.calculator.ma_measure'), $this->_lang->GET('tool.calculator.ma_measure') . '(2)']) && str_starts_with($key, $this->_lang->GET('tool.calculator.ma_measure'))){
 								if ($value) $measures[] = $value;
-								$result['render']['content'][count($result['render']['content']) -1][] = [
+								$response['render']['content'][count($response['render']['content']) -1][] = [
 									'type' => 'number',
 									'attributes' => [
 										'name' => $key,
@@ -337,7 +337,7 @@ class TOOL extends API {
 						$calculation = thread(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_core')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_fine')));
 						break;
 				}
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'textsection',
 						'attributes' => [
@@ -348,7 +348,7 @@ class TOOL extends API {
 				];
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -399,12 +399,12 @@ class TOOL extends API {
 		];
 
 		$options = [];
-		foreach($types as $type => $properties){
+		foreach ($types as $type => $properties){
 			$options[$properties['name']] = ['value' => $type];
 			if ($this->_requestedType === $type) $options[$properties['name']]['selected'] = true;
 		}
 
-		$result['render'] = ['form' => [
+		$response['render'] = ['form' => [
 			'data-usecase' => 'tool_create_code',
 			'action' => "javascript:api.tool('post', 'code', '" . (isset($types[$this->_requestedType]) ? $this->_requestedType : 'qrcode_text') . "')"
 		],
@@ -426,11 +426,11 @@ class TOOL extends API {
 			if ($types[$this->_requestedType]['code'] && count((array_keys((array) $this->_payload)))){
 				switch ($this->_requestedType){
 					case 'qrcode_text':
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'image',
 								'description' => $this->_lang->GET('tool.code.code_created'),
-								'attributes' =>[
+								'attributes' => [
 									'name' => $types[$this->_requestedType]['name'],
 									'qrcode' => $types[$this->_requestedType]['code']
 								]
@@ -438,7 +438,7 @@ class TOOL extends API {
 						];
 						break;
 					default: //barcode
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'image',
 							'description' => $this->_lang->GET('tool.code.code_created'),
@@ -451,7 +451,7 @@ class TOOL extends API {
 				}
 			}
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -467,7 +467,7 @@ class TOOL extends API {
 		$watermark = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.image.options_watermark'));
 		$label = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.image.label'));
 
-		$result['render'] = ['form' => [
+		$response['render'] = ['form' => [
 			'data-usecase' => 'tool_image',
 			'action' => "javascript:api.tool('post', 'image')"
 		],
@@ -520,21 +520,21 @@ class TOOL extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.image.source')]) && $_FILES[$this->_lang->PROPERTY('tool.image.source')]['tmp_name'][0]) {
-					$result['render']['content'][] = [];
+					$response['render']['content'][] = [];
 					$images = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('tool.image.source')], UTILITY::directory('tmp'), [$size]);
 					$size = explode(' x ', $size);
 					$size = isset ($size[1]) ? max(intval($size[0]), intval($size[1])) : null;
-					foreach($images as $image){
+					foreach ($images as $image){
 						UTILITY::alterImage($image, $size, UTILITY_IMAGE_REPLACE, null, $label, $watermark ? '../' . CONFIG['application']['watermark'] : '');
 						$dimensions = getimagesize($image);
-						$result['render']['content'][count($result['render']['content']) - 1][] = [
+						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'image',
 							'description' => pathinfo($image)['filename'],
 							'attributes' => [
 								'name' => pathinfo($image)['filename'],
 								'url' => substr($image, 3)
 							],
-							'dimensions'=> [
+							'dimensions' => [
 								'width' => $dimensions[0],
 								'height' => $dimensions[1]
 							]
@@ -542,7 +542,7 @@ class TOOL extends API {
 					}
 				}
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -553,7 +553,7 @@ class TOOL extends API {
 	 *
 	 */
 	public function scanner(){
-		$result['render'] = ['content' => [
+		$response['render'] = ['content' => [
 			[
 				[
 					'type' => 'scanner',
@@ -561,7 +561,7 @@ class TOOL extends API {
 					'destination' => 'tool_scanner'
 				], [
 					'type' => 'textarea',
-					'attributes' =>[
+					'attributes' => [
 						'name' => $this->_lang->GET('tool.scanner.result'),
 						'rows' => 8,
 						'readonly' => true,
@@ -570,7 +570,7 @@ class TOOL extends API {
 				]
 			]
 		]];
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -581,7 +581,7 @@ class TOOL extends API {
 	 *        |_|  
 	 */
 	public function zip(){
-		$result['render'] = [
+		$response['render'] = [
 			'form' => [
 				'data-usecase' => 'tool_zip',
 				'action' => "javascript:api.tool('post', 'zip')"
@@ -643,13 +643,13 @@ class TOOL extends API {
 					// create an archive
 					// create filename by concatenation
 					$zipname = '';
-					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'] as $filename){
+					foreach ($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'] as $filename){
 						$zipname .= preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $filename);
 					}
 					// create zip
 					$zip = new \ZipArchive();
 					$zip->open(UTILITY::directory('tmp') . '/' . $zipname .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-					foreach($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['tmp_name'] as $index => $file){
+					foreach ($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['tmp_name'] as $index => $file){
 						$zip->addFile($file, $_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'][$index]);
 					}
 					$zip->close();
@@ -672,7 +672,7 @@ class TOOL extends API {
 				]);
 		}
 
-		$this->response($result);
+		$this->response($response);
 	}
 }
 ?>

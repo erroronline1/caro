@@ -80,7 +80,7 @@ class CSVFILTER extends API {
 
 				// check if neccessary compare file is provided 
 				$comparefileindex = 0;
-				foreach($content['filter'] as &$filtertype){
+				foreach ($content['filter'] as &$filtertype){
 					if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') {
 						$comparefile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]) && isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_compare_file')]['tmp_name'][$comparefileindex] : null;
 						if (!$comparefile) $this->response([
@@ -104,7 +104,7 @@ class CSVFILTER extends API {
 				$downloadfiles=[];
 				switch (strtolower(pathinfo($content['filesetting']['destination'])['extension'])){
 					case 'csv':
-						foreach($datalist->_list as $subsetname => $subset){
+						foreach ($datalist->_list as $subsetname => $subset){
 							// datalist may contain multiple subsets based on split setting
 							// write each to temp file
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
@@ -116,7 +116,7 @@ class CSVFILTER extends API {
 								$datalist->_setting['filesetting']['dialect']['separator'],
 								$datalist->_setting['filesetting']['dialect']['enclosure'],
 								$datalist->_setting['filesetting']['dialect']['escape']);
-							foreach($subset as $line) {
+							foreach ($subset as $line) {
 								fputcsv($file, $line,
 								$datalist->_setting['filesetting']['dialect']['separator'],
 								$datalist->_setting['filesetting']['dialect']['enclosure'],
@@ -135,7 +135,7 @@ class CSVFILTER extends API {
 						$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . '.xlsx';
 						$writer = new \XLSXWriter();
 						$writer->setAuthor($_SESSION['user']['name']); 
-						foreach($datalist->_list as $subsetname => $subset){
+						foreach ($datalist->_list as $subsetname => $subset){
 							// datalist may contain multiple subsets based on split setting
 							// write each to xlsx sheet
 							if (intval($subsetname)) $subsetname = pathinfo($content['filesetting']['destination'])['filename'];
@@ -161,7 +161,7 @@ class CSVFILTER extends API {
 			case 'GET':
 				$filterdatalist = [];
 				$options = ['...' . $this->_lang->GET('csvfilter.use.filter_select') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				$return = [];
+				$response = [];
 
 				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
@@ -185,12 +185,12 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing filter lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
-				foreach($filters as $row) {
+				foreach ($filters as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 						$filterdatalist[] = $row['name'];
@@ -200,7 +200,7 @@ class CSVFILTER extends API {
 				ksort($options);
 
 				// append filter selection
-				$return['render'] = [
+				$response['render'] = [
 					'content' => [
 						[
 							[
@@ -255,7 +255,7 @@ class CSVFILTER extends API {
 					];
 
 					// add inputs for comparison files if applicable
-					foreach($content['filter'] as $filtertype){
+					foreach ($content['filter'] as $filtertype){
 						if ($filtertype['apply'] === 'filter_by_comparison_file' && $filtertype['filesetting']['source'] !== 'SELF') array_push($additionalform, [
 							'type' => 'file',
 							'hint' => $this->_lang->GET('csvfilter.use.filter_input_file_hint', [':name' => $filtertype['filesetting']['source']]),
@@ -268,17 +268,17 @@ class CSVFILTER extends API {
 					}
 
 					// append all filter inputs
-					array_push($return['render']['content'], $additionalform);
+					array_push($response['render']['content'], $additionalform);
 
 					// append form
-					$return['render']['form'] = [
+					$response['render']['form'] = [
 						'data-usecase' => 'csvfilter',
 						'action' => "javascript:api.csvfilter('post', 'filter', " . $filter['id'] . ")"
 					];
 				}
 
 				if (PERMISSION::permissionFor('csvrules')){
-					$return['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
@@ -289,7 +289,7 @@ class CSVFILTER extends API {
 					];
 				}
 				
-				$this->response($return);
+				$this->response($response);
 				break;
 		}
 	}
@@ -343,7 +343,7 @@ class CSVFILTER extends API {
 				}
 
 				// check forbidden names
-				if(UTILITY::forbiddenName($filter[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($filter[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('csvfilter.edit.error_forbidden_name', [':name' => $filter[':name']]), 'type' => 'error']]);
 
 				// post filter
 				if (SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_post', [
@@ -365,7 +365,7 @@ class CSVFILTER extends API {
 				$filterdatalist = [];
 				$options = ['...' . $this->_lang->GET('csvfilter.edit.filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$alloptions = ['...' . $this->_lang->GET('csvfilter.edit.filter_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
-				$return = [];
+				$response = [];
 
 				// get selected filter by int id or string name
 				if (intval($this->_requestedID)){
@@ -389,12 +389,12 @@ class CSVFILTER extends API {
 					'name' => '',
 					'content' => ''
 				];
-				if($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $return['response'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
+				if ($this->_requestedID && $this->_requestedID !== 'false' && !$filter['name'] && $this->_requestedID !== '0') $response['response'] = ['msg' => $this->_lang->GET('csvfilter.edit.error_filter_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 		
 				// prepare existing filter lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
-				foreach($filters as $row) {
+				foreach ($filters as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 						$filterdatalist[] = $row['name'];
@@ -407,7 +407,7 @@ class CSVFILTER extends API {
 				}
 
 				// append form, filter selection and inputs for adding filter 
-				$return['render'] = [
+				$response['render'] = [
 					'form' => [
 						'data-usecase' => 'csvfilter',
 						'action' => "javascript:api.csvfilter('post', 'rule')"],
@@ -482,9 +482,9 @@ class CSVFILTER extends API {
 						$hiddenproperties = json_decode($filter['hidden'], true);
 						$hidden['hint'] .= ' ' . $this->_lang->GET('csvfilter.edit.edit_hidden_set', [':date' => $this->convertFromServerTime($hiddenproperties['date']), ':name' => $hiddenproperties['name']]);
 					}
-					array_push($return['render']['content'][1], $hidden);
+					array_push($response['render']['content'][1], $hidden);
 				}
-				$this->response($return);
+				$this->response($response);
 				break;
 		}					
 	}

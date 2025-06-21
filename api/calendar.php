@@ -59,7 +59,7 @@ class CALENDAR extends API {
 					$PDF = new PDF(CONFIG['pdf']['appointment']);
 
 					$appointment = [];
-					foreach([
+					foreach ([
 						'date',
 						'time',
 						'occasion',
@@ -262,7 +262,7 @@ class CALENDAR extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('longtermplanning')) $this->response([], 401);
-				$result = ['render' => [
+				$response = ['render' => [
 					'form' => [
 						'data-usecase' => 'longtermplanning',
 						'action' => "javascript:api.calendar('post', 'longtermplanning')"
@@ -299,9 +299,9 @@ class CALENDAR extends API {
 					
 					// import if available, do first to append new given names
 					if (isset($schedule['misc']['content'])){
-						foreach($schedule['misc']['content'] as $name => $importtimeunit){
+						foreach ($schedule['misc']['content'] as $name => $importtimeunit){
 							$imports = [];
-							foreach($defaulttimeunits as $label => $color){
+							foreach ($defaulttimeunits as $label => $color){
 								$imports[$label] = isset($importtimeunit[$label]) ? $importtimeunit[$label] : $color;
 							}
 							$content[$name] = $imports;
@@ -309,14 +309,14 @@ class CALENDAR extends API {
 					}
 					// create default content with requested names assigning default timeunits
 					$content = [];
-					foreach($this->_payload as $key => $value){
+					foreach ($this->_payload as $key => $value){
 						if (str_starts_with($key, $this->_lang->PROPERTY('calendar.longtermplanning.name')) && $value){
 							$content[$value] = $defaulttimeunits;
 						}
 					}
 					if (!$content) $this->response([], 406);
 
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'longtermplanning_timeline',
 							'attributes' => [
@@ -336,7 +336,7 @@ class CALENDAR extends API {
 							]
 						]
 					];
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'longtermplanning_topics',
 							'content' => isset($schedule['misc']['preset']) ? $schedule['misc']['preset'] : null
@@ -408,10 +408,10 @@ class CALENDAR extends API {
 				}
 				break;
 			case 'GET':
-				$result = ['render' => [
+				$response = ['render' => [
 					'content' => []]
 				];
-				if (PERMISSION::permissionFor('longtermplanning')) $result['render']['form'] = [
+				if (PERMISSION::permissionFor('longtermplanning')) $response['render']['form'] = [
 						'data-usecase' => 'longtermplanning',
 						'action' => "javascript:api.calendar('post', 'longtermplanning')"
 					];
@@ -432,14 +432,14 @@ class CALENDAR extends API {
 					if (!isset($b['closed']['date'])) $b['closed']['date'] = 0;
 					return $a['closed']['date'] === $b['closed']['date'] ? 0 : ($a['closed']['date'] < $b['closed']['date'] ? 1 : -1); 
 				});
-				foreach($schedules as $schedule){
+				foreach ($schedules as $schedule){
 					if (!PERMISSION::permissionFor('longtermplanning') && !$schedule['closed']) continue;
 					$schedule['closed'] = json_decode($schedule['closed'] ? : '', true);
 					$select['edit'][$schedule['subject'] . (isset($schedule['closed']['date']) ? (' - ' . $this->convertFromServerTime($schedule['closed']['date'])) : '')] = $schedule['id'] === $this->_requestedId ? ['value' => $schedule['id'], 'selected' => true] : ['value' => $schedule['id']];
 					if ($schedule['span_end'] > $this->_date['usertime']->format('Y-m-d H:i:s')) $select['import'][$schedule['subject']] = ['value' => $schedule['id']];
 				}
 
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'select',
 						'attributes' => [
@@ -453,7 +453,7 @@ class CALENDAR extends API {
 					$planning = $schedules[array_search($this->_requestedId, array_column($schedules, 'id'))];
 					if (!$planning) $this->response([], 404);
 					$misc = json_decode($planning['misc'], true);
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'longtermplanning_timeline',
 							'attributes' => [
@@ -468,7 +468,7 @@ class CALENDAR extends API {
 							]
 						]
 					];
-					$result['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'longtermplanning_topics',
 							'attributes' => [
@@ -478,7 +478,7 @@ class CALENDAR extends API {
 						]
 					];
 					if (PERMISSION::permissionFor('longtermplanning')){
-						array_splice($result['render']['content'][count($result['render']['content']) - 2], -1, 0 , [
+						array_splice($response['render']['content'][count($response['render']['content']) - 2], -1, 0 , [
 							[
 								'type' => 'checkbox',
 								'content' => [
@@ -501,12 +501,12 @@ class CALENDAR extends API {
 							]
 						]);
 					} else {
-						$result['render']['content'][count($result['render']['content']) - 2][0]['attributes']['readonly'] = $result['render']['content'][count($result['render']['content']) - 1][0]['attributes']['readonly'] = true;
+						$response['render']['content'][count($response['render']['content']) - 2][0]['attributes']['readonly'] = $response['render']['content'][count($response['render']['content']) - 1][0]['attributes']['readonly'] = true;
 					}
 				}
 				else {
 					if (PERMISSION::permissionFor('longtermplanning')){
-						$result['render']['content'][] = [
+						$response['render']['content'][] = [
 							[
 								'type' => 'text',
 								'attributes' => [
@@ -537,7 +537,7 @@ class CALENDAR extends API {
 							]
 						];
 						if (count($select['import']) > 1){
-							$result['render']['content'][count($result['render']['content']) - 1][] = [
+							$response['render']['content'][count($response['render']['content']) - 1][] = [
 								'type' => 'select',
 								'attributes' => [
 									'name' => $this->_lang->GET('calendar.longtermplanning.import')
@@ -566,7 +566,7 @@ class CALENDAR extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -598,7 +598,7 @@ class CALENDAR extends API {
 		}
 
 		// set $first day of month to datetime object of first calendar-day
-		foreach($days as $id => $day){
+		foreach ($days as $id => $day){
 			if ($day === null) unset($days[$id]);
 			else {
 				$first = clone $day;
@@ -640,7 +640,7 @@ class CALENDAR extends API {
 				if (!isset($timesheets[$entry['affected_user_id']])) {
 					$units = array_map(Fn($u) => isset($this->_lang->_DEFAULT['units'][$u]) ? $this->_lang->_DEFAULT['units'][$u] : false, explode(',', $entry['affected_user_units']));
 					$pto = [];
-					foreach($this->_lang->_DEFAULT['calendar']['timesheet']['pto'] as $key => $translation){
+					foreach ($this->_lang->_DEFAULT['calendar']['timesheet']['pto'] as $key => $translation){
 						if (isset($stats_month_row[$key])) $pto[$key] = $stats_month_row[$key];
 					}
 					$timesheets[$entry['affected_user_id']] = [
@@ -691,7 +691,7 @@ class CALENDAR extends API {
 			}
 		}
 		// postprocess array
-		foreach($timesheets as $id => $user){
+		foreach ($timesheets as $id => $user){
 			// append missing dates for overview, after all the output shall be comprehensible
 			foreach ($days as $day){
 				if (!isset($user['days'][$day->format('Y-m-d')])) $timesheets[$id]['days'][$day->format('Y-m-d')] = [];
@@ -778,7 +778,7 @@ class CALENDAR extends API {
 	 */
 	private function prepareTimesheetOutput($timesheets = []){
 		$result = [];
-		foreach($timesheets as $user){
+		foreach ($timesheets as $user){
 			$rows = [];
 			if (PERMISSION::permissionFor('calendarfulltimesheetexport')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) && array_intersect(explode(',', $user['units']), $_SESSION['user']['units']))
@@ -800,7 +800,7 @@ class CALENDAR extends API {
 				foreach ($user['days'] as $date => $day){
 					$dayinfo = [];
 					if (isset($day['subject']) && $day['subject']) $dayinfo[] = $day['subject'];
-					foreach($this->_lang->_DEFAULT['calendar']['timesheet']['export']['sheet_daily'] as $key => $value){
+					foreach ($this->_lang->_DEFAULT['calendar']['timesheet']['export']['sheet_daily'] as $key => $value){
 						//UTILITY::debug($key, $value, $day);
 						if (isset($day[$key]) && $day[$key] && !in_array($day[$key], [0, '00:00'])) $dayinfo[] = $value . ' ' . $day[$key];
 					}
@@ -838,7 +838,7 @@ class CALENDAR extends API {
 				$rows[] = [];
 
 				// signatures
-				foreach($this->_lang->_DEFAULT['calendar']['timesheet']['signature'] as $key => $value) $rows[] = [[$value, false], str_repeat('_', 20)];
+				foreach ($this->_lang->_DEFAULT['calendar']['timesheet']['signature'] as $key => $value) $rows[] = [[$value, false], str_repeat('_', 20)];
 
 				$result[] = $rows;				
 			}
@@ -861,7 +861,7 @@ class CALENDAR extends API {
 		if (!$this->_requestedId) $this->schedule(); // default view instead of redirect
 
 		// append filter inputs
-		$result = ['render' => ['content' => [
+		$response = ['render' => ['content' => [
 			[
 				[
 					'type' => 'scanner',
@@ -890,8 +890,8 @@ class CALENDAR extends API {
 				]
 			]
 		] ;
-		$result['render']['content'][] = $events;
-		$this->response($result);
+		$response['render']['content'][] = $events;
+		$this->response($response);
 	}
 
 	/**
@@ -1016,7 +1016,7 @@ class CALENDAR extends API {
 					}
 				break;
 			case 'GET':
-				$result = ['render' => ['content' => []]];
+				$response = ['render' => ['content' => []]];
 
 				// set up calendar
 				$month = $calendar->render('month', 'schedule', $this->_requestedTimespan);
@@ -1026,7 +1026,7 @@ class CALENDAR extends API {
 				$nextmonth->modify('+1 month')->modify('first day of this month');
 
 				// append filter inputs
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'scanner',
 						'destination' => 'recordfilter', // assuming/hoping record identifiers are used to schedule events/tasks
@@ -1042,7 +1042,7 @@ class CALENDAR extends API {
 				];
 
 				// append month overview and navigation buttons
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'calendar',
 						'description' => $month['header'],
@@ -1109,7 +1109,7 @@ class CALENDAR extends API {
 
 				// add events
 				if ($thisDaysEvents) array_push($events, ...$this->scheduledEvents($thisDaysEvents, $calendar));
-				$result['render']['content'][] = $events;
+				$response['render']['content'][] = $events;
 
 				// add past unclosed events for user units
 				$today = new \DateTime($this->_requestedDate);
@@ -1130,7 +1130,7 @@ class CALENDAR extends API {
 							]
 						];
 						array_push($events, ...$this->scheduledEvents($pastEvents, $calendar));
-						$result['render']['content'][] = $events;	
+						$response['render']['content'][] = $events;	
 					}
 				}
 				break;
@@ -1150,7 +1150,7 @@ class CALENDAR extends API {
 			
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 	
 	/**
@@ -1169,7 +1169,7 @@ class CALENDAR extends API {
 		$events = [];
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'); // to eventually match affected_user_id
 
-		foreach($dbevents as $row){
+		foreach ($dbevents as $row){
 			$date = new \DateTime($row['span_start']);
 			$due = new \DateTime($row['span_end']);
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
@@ -1414,7 +1414,7 @@ class CALENDAR extends API {
 					}
 				break;
 			case 'GET':
-				$result = ['render' => ['content' => []]];
+				$response = ['render' => ['content' => []]];
 				// set up calendar
 				$month = $calendar->render('month', 'timesheet', $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
@@ -1423,7 +1423,7 @@ class CALENDAR extends API {
 				$nextmonth->modify('+1 month')->modify('first day of this month');
 
 				// append month overview and navigation buttons
-				$result['render']['content'][] = [
+				$response['render']['content'][] = [
 					[
 						'type' => 'calendar',
 						'description' => $month['header'],
@@ -1526,7 +1526,7 @@ class CALENDAR extends API {
 				$today = new \DateTime($this->_requestedDate);
 				if ($thisMonthsEvents = $calendar->getWithinDateRange($today->modify('first day of this month')->format('Y-m-d'), $today->modify('last day of this month')->format('Y-m-d'))) {
 					$timesheetentries = false;
-					foreach($thisMonthsEvents as $evt) if ($evt['type']==='timesheet') $timesheetentries = true;
+					foreach ($thisMonthsEvents as $evt) if ($evt['type']==='timesheet') $timesheetentries = true;
 					if ($timesheetentries) $events[] = [
 						'type' => 'button',
 						'attributes' => [
@@ -1536,7 +1536,7 @@ class CALENDAR extends API {
 						]
 					];
 				}
-				$result['render']['content'][] = $events;
+				$response['render']['content'][] = $events;
 
 				// display past unclosed scheduled events to raise awareness
 				$today = new \DateTime($this->_requestedDate);
@@ -1556,7 +1556,7 @@ class CALENDAR extends API {
 							]
 						];
 						array_push($events, ...$this->scheduledEvents($pastEvents, $calendar));
-						$result['render']['content'][] = $events;	
+						$response['render']['content'][] = $events;	
 					}
 				}
 				break;
@@ -1585,7 +1585,7 @@ class CALENDAR extends API {
 					]]);
 				break;
 		}
-		$this->response($result);
+		$this->response($response);
 	}
 
 	/**
@@ -1602,7 +1602,7 @@ class CALENDAR extends API {
  	*/
 	 private function timesheetEntries($dbevents, $calendar){
 		$events = [];
-		foreach($dbevents as $row){
+		foreach ($dbevents as $row){
 			$date = new \DateTime($row['span_start']);
 			$due = new \DateTime($row['span_end']);
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 

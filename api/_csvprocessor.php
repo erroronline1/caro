@@ -220,7 +220,7 @@ class Listprocessor {
 		if ($track && isset($this->_argument['track'])){
 			$thislistrow = $this->_list[$row];
 			if ($thislistrow) {
-				foreach($this->_argument['track'] as $column => $values){
+				foreach ($this->_argument['track'] as $column => $values){
 					$tracked = array_search($thislistrow[$column], $values);
 					if ($tracked !== false)
 						$this->_log[] = "[!] tracked deletion " . $values[$tracked] . ' in ' . $column . ': ' . json_encode($track);
@@ -243,7 +243,7 @@ class Listprocessor {
 		$remaining = count(array_filter($this->_list->toArray(), fn($row) => $row ? : false));
 
 		/* apply filter or modifications in given order */
-		foreach($this->_setting as $method => $rules){
+		foreach ($this->_setting as $method => $rules){
 			switch($method){
 				case 'filter':
 					foreach ($rules as $filter){
@@ -276,7 +276,7 @@ class Listprocessor {
 			$evaluate_warning = [];
 			foreach ($this->_list as $row => $values){
 				if (!$values) continue;
-				foreach($unsetcolumns as $unset){
+				foreach ($unsetcolumns as $unset){
 					unset($values[$unset]);
 				}
 				$this->_list[$row] = $values;  // SplFixedArray has problems accessing nested elements, must assign array to key directly
@@ -358,19 +358,19 @@ class Listprocessor {
 		$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
 	
 		// match lists
-		foreach($thislistwithoutempty as $index => $self_row){
+		foreach ($thislistwithoutempty as $index => $self_row){
 			foreach ($rule['match'] as $compareType => $compare_columns){
 				$corresponds = [];
 				$cmp_index = null;
 				// detect index from compare file for matching column
-				foreach($compare_columns as $column => $cmp_column){
+				foreach ($compare_columns as $column => $cmp_column){
 					if ($cmp_index = array_search($self_row[$column], array_column($compare_list->_list[1], $cmp_column))){
 						if (!isset($corresponds[$index])) $corresponds[$index] = [];
 						$corresponds[$index][] = $cmp_index;
 					}
 					if ($compareType === 'any') break;
 				}
-				foreach($corresponds as $index => $corresponding){
+				foreach ($corresponds as $index => $corresponding){
 					if (($compareType === 'any' && count($corresponding)) ||
 						($compareType === 'all' && count($corresponding) === count(array_keys($compare_columns)) && count(array_unique($corresponding)) === 1)) {
 						$matched[] = [$index, $cmp_index];
@@ -440,7 +440,7 @@ class Listprocessor {
 
 			$identifier = $row[$rule['duplicates']['column']];
 			$orderby = [];
-			foreach($rule['duplicates']['orderby'] as $k => $column){
+			foreach ($rule['duplicates']['orderby'] as $k => $column){
 				$orderby[] = $row[$column]; 
 			}
 			if (!isset($duplicates[$identifier])) $duplicates[$identifier] = [[implode('', $orderby), $i]];
@@ -448,7 +448,7 @@ class Listprocessor {
 		}
 		$descending = $rule['duplicates']['descending'];
 		
-		foreach($duplicates as &$multiple){
+		foreach ($duplicates as &$multiple){
 			usort($multiple, function ($a, $b) use ($descending){
 				if ($a[0] === $b[0]) return 0;
 				if ($descending) return ($a[0] < $b[0]) ? 1: -1;
@@ -517,7 +517,7 @@ class Listprocessor {
 				$keep = true;
 				$track = [];
 				if (isset($rule['match']['any'])){
-					foreach($rule['match']['any'] as $column => $filter){
+					foreach ($rule['match']['any'] as $column => $filter){
 						$track = [
 							'filter' => 'filter_by_expression',
 							'column' => $column,
@@ -531,7 +531,7 @@ class Listprocessor {
 					}
 				}
 				elseif (isset($rule['match']['all'])){
-					foreach($rule['match']['all'] as $column => $filter){
+					foreach ($rule['match']['all'] as $column => $filter){
 						$track = [
 							'filter' => 'filter_by_expression',
 							'column' => $column,
@@ -570,7 +570,7 @@ class Listprocessor {
 	 *	},
 	*/
 	public function filter_by_monthdiff($rule){
-		foreach($rule['interval']['format'] as &$unit){
+		foreach ($rule['interval']['format'] as &$unit){
 			switch ($unit){
 				case 'dd':
 					$unit = 'd';
@@ -640,7 +640,7 @@ class Listprocessor {
 	 *	},
 	 */
 	public function filter_by_monthinterval($rule){
-		foreach($rule['interval']['format'] as &$unit){
+		foreach ($rule['interval']['format'] as &$unit){
 			switch ($unit){
 				case 'dd':
 					$unit = 'd';
@@ -795,7 +795,7 @@ class Listprocessor {
 		fclose($csvfile);
 
 		foreach ($this->_list as $row => $values){
-			foreach($values as $column => &$columnvalue){
+			foreach ($values as $column => &$columnvalue){
 				$columnvalue = @mb_convert_encoding(strval($columnvalue), 'UTF-8', $this->_setting['filesetting']['encoding']);
 			}
 			$this->_list[$row] = $values; // SplFixedArray has problems accessing nested elements, must assign array to key directly
@@ -911,7 +911,7 @@ class Listprocessor {
 						foreach ($this->_list as $i => $row) {
 							if (!$row) continue;
 
-							foreach($modifications as $translate => $translation){
+							foreach ($modifications as $translate => $translation){
 								if (isset($this->_setting['translations'][$rule][$row[$rule]]))
 									$row[$key] = trim(preg_replace('/^' . $row[$rule] . '$/m', $this->_setting['translations'][$rule][$row[$rule]], $row[$rule]));
 							}
@@ -1030,7 +1030,7 @@ class Listprocessor {
 					preg_match_all('/' . $pattern . '/mi', $row[$key], $match, PREG_OFFSET_CAPTURE);
 					// "special company" matched by (special).+(company).+ or by .*
 					// (.+) may be critical for matching line end as well and having indifferent results
-					foreach($match as $index => $submatch){
+					foreach ($match as $index => $submatch){
 						if (count($match)>1 && $index === 0) continue;
 						if (!trim($submatch[0][0])) continue;
 						$sorting .= ' ' . $submatch[0][0];
