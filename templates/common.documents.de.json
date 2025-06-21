@@ -1048,7 +1048,7 @@
 		"content": "Identifikator,Empfangsbestätigung"
 	},
 	{
-		"name": "erlaubnis zur ausstellung und veröffentlichung",
+		"name": "Erlaubnis zur Ausstellung und Veröffentlichung",
 		"alias": "",
 		"context": "casedocumentation",
 		"unit": "common",
@@ -1056,7 +1056,7 @@
 		"regulatory_context": "iso13485_7_2_3",
 		"permitted_export": 1,
 		"restricted_access": null,
-		"content": "Identifikator,erlaubnis zur ausstellung und veröffentlichung"
+		"content": "Identifikator,Erlaubnis zur Ausstellung und Veröffentlichung"
 	},
 	{
 		"name": "Versorgungsmaßnahme",
