@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// unlike other helper modules that are supposed to work anonymously this module handles module specific tasks that are similar but not identical over different modules
+// unlike other helper modules that are supposed to work mostly anonymously this module handles module specific tasks that are similar but not identical over different modules
 // import when needed, initialize with pdo and call methods with required parameters
 
 namespace CARO\API;
@@ -586,19 +586,27 @@ class SHARED {
 				$content[] = self::populatedocument($subs, $values);
 			}
 			else {
-				if (!isset($values[$subs['attributes']['name']])) $underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
-				else $underscored_name = $subs['attributes']['name'];
-				if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
-					$settings = explode(' | ', $values[$underscored_name]);
-					foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
-						if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
-						else $subs['content'][$key]['checked'] = true;
+				try {
+					if (!isset($subs['attributes']['name'])) throw new \ErrorException('faulty element construction', 0);
+
+					if (!isset($values[$subs['attributes']['name']])) $underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
+					else $underscored_name = $subs['attributes']['name'];
+					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
+						$settings = explode(' | ', $values[$underscored_name]);
+						foreach($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
+							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
+							else $subs['content'][$key]['checked'] = true;
+						}
 					}
+					elseif (isset($values[$underscored_name])){
+						$subs['attributes']['value'] = $values[$underscored_name];
+					}
+					$content[] = $subs;
 				}
-				elseif (isset($values[$underscored_name])){
-					$subs['attributes']['value'] = $values[$underscored_name];
+				catch (\Exception $e){
+					UTILITY::debug('faulty element construction', $subs, $e);
+					die();
 				}
-				$content[] = $subs;
 			}
 		}
 		return $content;
