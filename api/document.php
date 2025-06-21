@@ -435,7 +435,7 @@ class DOCUMENT extends API {
 				// prepare existing bundle lists
 				$bundles = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 				$hidden = [];
-				foreach($bundles as $key => $row) {
+				foreach($bundles as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 						if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 							$bundledatalist[] = $row['name'];
@@ -450,7 +450,7 @@ class DOCUMENT extends API {
 				// get latest approved by name
 				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 				$hidden = [];
-				foreach($documents as $key => $row) {
+				foreach($documents as $row) {
 					if (!PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($row['name'], $hidden)) {
@@ -581,7 +581,7 @@ class DOCUMENT extends API {
 		$this->_requestedID = $this->_requestedID ? urldecode($this->_requestedID) : null;
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 		$hidden = $bundles = [];
-		foreach($bd as $key => $row) {
+		foreach($bd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (in_array($row['name'], $hidden)) continue;
 			$available_units[] = $row['unit'];
@@ -595,7 +595,7 @@ class DOCUMENT extends API {
 			if (!$this->_requestedID || $percent >= CONFIG['likeliness']['file_search_similarity'] || fnmatch($this->_requestedID, $row['name'], FNM_CASEFOLD)) {
 				if (($documents = $row['content'] ? explode(',', $row['content']) : false) !== false){
 					if (!isset($bundles[$row['name']])) $bundles[$row['name']] = [];
-					foreach ($documents as $key => $documentname){
+					foreach ($documents as $documentname){
 						// recurring queries to make sure linked forms are permitted
 						if ($document = $this->latestApprovedName('document_document_get_by_name', $documentname))
 							if (!$document['hidden']) $bundles[$row['name']][$document['name']] = ['href' => "javascript:api.record('get', 'document', '" . $document['name'] . "')", 'data-filtered' => $row['id']];
@@ -643,9 +643,17 @@ class DOCUMENT extends API {
 		// append actual bundles
 		foreach ($bundles as $bundle => $list){
 			$return['render']['content'][] = [
-				'type' => 'links',
-				'description' => $bundle,
-				'content' => $list
+				'type' => 'collapsible',
+				'attributes' => [
+					'class' => "em12"
+				],
+				'content' => [
+					[
+						'type' => 'links',
+						'description' => $bundle,
+						'content' => $list
+					]
+				]
 			];
 		}
 
@@ -2073,7 +2081,7 @@ class DOCUMENT extends API {
 		// sort by context for easier comprehension
 		foreach ($displayeddocuments as $context => $list){
 			$contexttranslation = '';
-			foreach ($this->_lang->_USER['documentcontext'] as $documentcontext => $contexts){
+			foreach ($this->_lang->_USER['documentcontext'] as $contexts){
 				if (isset($contexts[$context])){
 					$contexttranslation = $contexts[$context];
 					break;
