@@ -1077,7 +1077,7 @@ class CONSUMABLES extends API {
 
 				$vendors[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => implode('_', array_map(fn($r) => $r['id'], $vendor))];
 
-				foreach($vendor as $key => $row) {
+				foreach($vendor as $row) {
 					$display = $row['name'];
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$options[$display] = [];
@@ -1087,7 +1087,7 @@ class CONSUMABLES extends API {
 
 				// prepare existing delivery unit lists
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
-				foreach($vendor as $key => $row) {
+				foreach($vendor as $row) {
 					$datalist_unit[] = $row['article_unit'];
 				}
 

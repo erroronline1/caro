@@ -392,7 +392,7 @@ class UTILITY {
 	 * @return array file list 
 	 */
 	public static function listDirectories($folder, $order = 'desc'){
-		$result=[];
+		$result = [];
 		if (!file_exists($folder)) return $result;
 		switch ($order){
 			case 'desc':
@@ -402,7 +402,7 @@ class UTILITY {
 				$dir = scandir($folder);
 				break;
 		}
-		foreach($dir as $i => $file){
+		foreach($dir as $file){
 			if (is_dir($folder . '/' . $file) && !in_array($file, ['.', '..'])) $result[] = $folder . '/' . $file;
 		}
 		return $result;
@@ -422,7 +422,7 @@ class UTILITY {
 	 * @return array file list 
 	 */
 	public static function listFiles($folder, $order = 'desc'){
-		$result=[];
+		$result = [];
 		if (!file_exists($folder)) return $result;
 		switch ($order){
 			case 'desc':
@@ -432,7 +432,7 @@ class UTILITY {
 				$dir = scandir($folder);
 				break;
 		}
-		foreach($dir as $i => $file){
+		foreach($dir as $file){
 			if (is_file($folder . '/' . $file) && !in_array($file, [
 				'.htaccess',
 				'web.config'

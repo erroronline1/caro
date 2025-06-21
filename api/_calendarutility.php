@@ -577,7 +577,7 @@ class CALENDARUTILITY {
 		// apply all holidays depended on easter sunday
 		$easter = new \DateTime('now');
 		$easter->setTimestamp(easter_date($year));
-		foreach($this->_easter_holidays as $day => $offset){
+		foreach($this->_easter_holidays as $offset){
 			$easterholiday = clone $easter;
 			$easterholiday->modify(($offset < 0 ? '-' : '+') . $offset .' days');
 			$holidays[] = $easterholiday->format('Y-m-d');

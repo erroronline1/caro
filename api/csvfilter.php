@@ -190,7 +190,7 @@ class CSVFILTER extends API {
 				// prepare existing filter lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
-				foreach($filters as $key => $row) {
+				foreach($filters as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 						$filterdatalist[] = $row['name'];
@@ -394,7 +394,7 @@ class CSVFILTER extends API {
 				// prepare existing filter lists
 				$filters = SQLQUERY::EXECUTE($this->_pdo, 'csvfilter_datalist');
 				$hidden = [];
-				foreach($filters as $key => $row) {
+				foreach($filters as $row) {
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!isset($options[$row['name']]) && !in_array($row['name'], $hidden)) {
 						$filterdatalist[] = $row['name'];

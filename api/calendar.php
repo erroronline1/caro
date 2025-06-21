@@ -1115,7 +1115,6 @@ class CALENDAR extends API {
 				$today = new \DateTime($this->_requestedDate);
 				$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 				if ($pastEvents) {
-					$uncompleted = [];
 					foreach ($pastEvents as $id => $row){
 						if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 						if (in_array($row, $thisDaysEvents) || $row['type'] !== 'schedule' || !array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || $row['closed']) unset($pastEvents[$id]);

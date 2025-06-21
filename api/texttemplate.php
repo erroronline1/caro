@@ -428,7 +428,7 @@ class TEXTTEMPLATE extends API {
 				// prepare existing templates lists
 				$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 				$hidden = $chunks = [];
-				foreach($templates as $key => $row) {
+				foreach($templates as $row) {
 					if ($row['type'] === 'replacement') continue;
 					if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if ($row['type'] === 'template'){

@@ -511,7 +511,8 @@ class API {
 		return [[
 			[
 				'type' => 'nocontent',
-				'content' => $this->_lang->GET('general.no_content_available', [':content' => $type])]
+				'content' => $this->_lang->GET('general.no_content_available', [':content' => $type])
+			]
 		]];
 	}
 
