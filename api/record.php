@@ -117,11 +117,11 @@ class RECORD extends API {
 					$content[$this->_lang->GET('record.casestate_filter_all')] = ['onchange' => "_client.record.casestatefilter(undefined)"];
 					if (!$checked) $content[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
 				}
-				foreach($this->_lang->_USER['casestate'][$context] as $state => $translation){
+				foreach ($this->_lang->_USER['casestate'][$context] as $state => $translation){
 					$content[$translation] = $action;
 					$content[$translation]['data-casestate'] = $state;
 					if (isset($checked[$state])) $content[$translation]['checked'] = true;
-					if($type === 'radio' && isset($_SESSION['user']['app_settings']['primaryRecordState']) && $state === $_SESSION['user']['app_settings']['primaryRecordState']) $content[$translation]['checked'] = true;
+					if ($type === 'radio' && isset($_SESSION['user']['app_settings']['primaryRecordState']) && $state === $_SESSION['user']['app_settings']['primaryRecordState']) $content[$translation]['checked'] = true;
 					if (!PERMISSION::permissionFor('recordscasestate') && $type === 'checkbox') $content[$translation]['disabled'] = true;
 				}
 				return [
@@ -235,7 +235,7 @@ class RECORD extends API {
 		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
 		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access']) || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
-		$return = ['title'=> $document['name'], 'render' => [
+		$response = ['title' => $document['name'], 'render' => [
 			'content' => []
 		]];
 
@@ -244,7 +244,7 @@ class RECORD extends API {
 		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $document['unit']]]);
 		function setidentifier($element, $identify, $calendar, $_lang, $datalists){
 			$content = [];
-			foreach($element as $subs){
+			foreach ($element as $subs){
 				if (!isset($subs['type'])){
 					$content[] = setidentifier($subs, $identify, $calendar, $_lang, $datalists);
 				}
@@ -294,15 +294,15 @@ class RECORD extends API {
 			return $content;
 		};
 		$has_components = false;
-		foreach(explode(',', $document['content']) as $usedcomponent) {
+		foreach (explode(',', $document['content']) as $usedcomponent) {
 			$component = $this->latestApprovedName('document_component_get_by_name', $usedcomponent);
 			if ($component){
 				$has_components = true;
 				$component['content'] = json_decode($component['content'], true);
-				array_push($return['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar, $this->_lang, $datalists));
+				array_push($response['render']['content'], ...setidentifier($component['content']['content'], $this->_passedIdentify, $calendar, $this->_lang, $datalists));
 			}
 		}
-		if (!$has_components) array_push($return['render']['content'], [[
+		if (!$has_components) array_push($response['render']['content'], [[
 			'type' => 'textsection',
 			'attributes' => [
 				'class' => 'orange',
@@ -313,7 +313,7 @@ class RECORD extends API {
 		// check if a submit button is applicable
 		function saveable($element){
 			$saveable = false;
-			foreach($element as $subs){
+			foreach ($element as $subs){
 				if (!isset($subs['type'])){
 					if ($saveable = saveable($subs)) return true;
 				}
@@ -323,7 +323,7 @@ class RECORD extends API {
 			}
 			return $saveable;
 		}
-		if (saveable($return['render']['content'])) $return['render']['form'] = [
+		if (saveable($response['render']['content'])) $response['render']['form'] = [
 			'data-usecase' => 'record',
 			'action' => "javascript:api.record('post', 'record')",
 			'data-confirm' => true];
@@ -350,7 +350,7 @@ class RECORD extends API {
 			]
 		];
 
-		if (isset($return['render']['form'])) {
+		if (isset($response['render']['form'])) {
 			// add record timestamp options if this is a fillable document (and not a process instruction) 
 			$record_date = [
 				'type' => 'date',
@@ -368,7 +368,7 @@ class RECORD extends API {
 					'required' => true
 				]
 			];
-			if(array_intersect(['patient'], $_SESSION['user']['permissions'])) {
+			if (array_intersect(['patient'], $_SESSION['user']['permissions'])) {
 				$record_date['attributes']['readonly'] = $record_time['attributes']['readonly'] = true;
 			}
 
@@ -387,12 +387,12 @@ class RECORD extends API {
 					'content' => $options
 				];
 			}
-			$return['render']['content'][] = $defaults;
+			$response['render']['content'][] = $defaults;
 		}
 
 		// add export options or notifictaion
 		if (PERMISSION::permissionFor('documentexport') || ($document['permitted_export'] && !array_intersect(['patient'], $_SESSION['user']['permissions']))){
-			if (isset($return['render']['form'])) {
+			if (isset($response['render']['form'])) {
 				$export = [
 					'type' => 'button',
 					'hint' => $this->_lang->GET('assemble.render.export_hint'),
@@ -416,7 +416,7 @@ class RECORD extends API {
 				];
 			} 
 
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'textsection',
 					'attributes' => [
@@ -427,7 +427,7 @@ class RECORD extends API {
 			];
 		}
 		else {
-			$return['render']['content'][] = [
+			$response['render']['content'][] = [
 				[
 					'type' => 'textsection',
 					'attributes' => [
@@ -436,9 +436,9 @@ class RECORD extends API {
 				]
 			];
 		}
-		if (isset($return['render']['content'][0][0]['type'])) array_push($return['render']['content'][0], ...$context); // append to first article within a section
-		else array_push($return['render']['content'][0][0], ...$context);
-		$this->response($return);
+		if (isset($response['render']['content'][0][0]['type'])) array_push($response['render']['content'][0], ...$context); // append to first article within a section
+		else array_push($response['render']['content'][0][0], ...$context);
+		$this->response($response);
 	}
 	
 	/**
@@ -524,7 +524,7 @@ class RECORD extends API {
 					$content = [
 						'title' => $this->_lang->GET('record.create_identifier', [], true),
 						'content' => [$content, $content],
-						'filename' =>preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $content)
+						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $content)
 					];
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
 						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
@@ -546,9 +546,9 @@ class RECORD extends API {
 				]]);
 				break;
 			case 'GET':
-				$result = ['render' =>
+				$response = ['render' =>
 				[
-					'content'=>[
+					'content' => [
 						[
 							[
 								'type' => 'textsection',
@@ -568,8 +568,8 @@ class RECORD extends API {
 					]
 				]];
 				// display available options according to CONFIG
-				foreach(CONFIG['label'] as $type => $setting){
-					$result['render']['content'][] = [
+				foreach (CONFIG['label'] as $type => $setting){
+					$response['render']['content'][] = [
 						'type' => 'button',
 						'attributes' => [
 							'onclick' => "_client.application.postLabelSheet(document.getElementById('_identifier').value, 'appendDate', {_type:'" . $type . "'});",
@@ -577,7 +577,7 @@ class RECORD extends API {
 						]
 					];
 				}
-				$this->response($result);
+				$this->response($response);
 				break;
 		}
 	}
@@ -604,12 +604,12 @@ class RECORD extends API {
 			$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 
 			$records = json_decode($data['content'], true);
-			foreach($records as $record){
+			foreach ($records as $record){
 				$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 				if (!PERMISSION::permissionIn($document['restricted_access'])) continue; // check if user has access to form
 				if ($record['document'] == 0) continue; // skip pseudoforms
 				if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
-				foreach($record['content'] as $key => $value){
+				foreach ($record['content'] as $key => $value){
 					preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
 					if ($link) $value = $link[1];
 					$result[$key] = $value;
@@ -661,7 +661,7 @@ class RECORD extends API {
 				PERMISSION::permissionIn($element['restricted_access']) && // user has permisson to restricted
 				$element['date'] <= $requestedTimestamp) { // element is prior to requestedTimestamp
 					$element['hidden'] = json_decode($element['hidden'] ? : '', true); 
-					if(!$element['hidden'] || $element['hidden']['date'] > $requestedTimestamp) return $element;
+					if (!$element['hidden'] || $element['hidden']['date'] > $requestedTimestamp) return $element;
 					else return false;
 				}
 		}
@@ -678,16 +678,16 @@ class RECORD extends API {
 	 */
 	public function matchbundles(){
 		$documents = [];
-		$return = [];
+		$response = [];
 
 		// prepare existing bundle lists
 		$bundle = $this->latestApprovedName('document_bundle_get_by_name', $this->_requestedID); // is bundle valid
-		if(!$bundle) $bundle = ['content' => []];
+		if (!$bundle) $bundle = ['content' => []];
 		$necessarydocuments = $bundle['content'] ? explode(',', $bundle['content']) : []; // extract document names
 
 		// unset hidden documents from bundle presets
 		$alldocuments = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-		foreach($alldocuments as $row){
+		foreach ($alldocuments as $row){
 			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
 			if ($row['hidden'] && ($key = array_search($row['name'], $necessarydocuments)) !== false) unset($necessarydocuments[$key]);
 		}
@@ -707,24 +707,24 @@ class RECORD extends API {
 				$considered[] = $alldocuments[$documentIndex]['name'];
 		}
 		// summarize required documents
-		foreach(array_diff($necessarydocuments, $considered) as $needed){
+		foreach (array_diff($necessarydocuments, $considered) as $needed){
 			$documents[$needed] = ['href' => "javascript:api.record('get', 'document', '" . $needed . "', '" . $this->_passedIdentify . "')"];
 		}
 
-		if ($documents) $return['render'] = [
+		if ($documents) $response['render'] = [
 			[
 				'type' => 'links',
-				'description' => $this->_lang->GET('record.append_missing_document'),
+				'description' => $this->_lang->GET('record.append_missing_document', [':bundle' => $this->_requestedID]),
 				'content' => $documents
 			]
 		];
-		else $return['render'] =[
+		else $response['render'] =[
 			[
 				'type' => 'textsection',
 				'content' => $this->_lang->GET('record.append_missing_document_unneccessary'),
 			]
 		];
-		$this->response($return);
+		$this->response($response);
 	}
 
 	/**
@@ -741,7 +741,7 @@ class RECORD extends API {
 		$validDocuments = [];
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = [];
-		foreach($fd as $key => $row) {
+		foreach ($fd as $key => $row) {
 			if (!PERMISSION::fullyapproved('documentapproval', $row['approval']) || !PERMISSION::permissionIn($row['restricted_access'])) continue;
 			if ($row['hidden'] || in_array($row['context'], array_keys($this->_lang->_USER['documentcontext']['notdisplayedinrecords']))) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $validDocuments) && !in_array($row['name'], $hidden)) {
@@ -781,7 +781,7 @@ class RECORD extends API {
 				// create proper identifier with timestamp if not provided
 				// unset checkboxes while relying on a prepared additional dataset
 				// unset empty values
-				foreach($this->_payload as $key => &$value){
+				foreach ($this->_payload as $key => &$value){
 					if (substr($key, 0, 12) === 'IDENTIFY_BY_'){
 						$identifier = $value;
 						if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
@@ -831,7 +831,7 @@ class RECORD extends API {
 						}
 					}
 				}
-				foreach($attachments as $input => $files){
+				foreach ($attachments as $input => $files){
 					$this->_payload->$input = implode(', ', $files);
 				}
 
@@ -842,7 +842,7 @@ class RECORD extends API {
 						// recursive check for names that permit autocompletion
 						function autocomplete($element){
 							$content = [];
-							foreach($element as $subs){
+							foreach ($element as $subs){
 								if (!isset($subs['type'])){
 									$content = array_merge($content, autocomplete($subs));
 								}
@@ -855,12 +855,12 @@ class RECORD extends API {
 
 						if ($issues = autocomplete($useddocument['content'])){
 							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $useddocument['unit']]]);
-							foreach($issues as $issue){
+							foreach ($issues as $issue){
 								// translate issue as payloadencoded according to LANG::PROPERTY
 								$issue = preg_replace('/[\s\.]/', '_', $issue);
 								// gather values even for enumerated submissions
 								$values = [];
-								foreach(array_keys((array) $this->_payload) as $key){
+								foreach (array_keys((array) $this->_payload) as $key){
 									preg_match('/' . $issue . '(?:$|\()/m', $key, $matches);
 									if ($matches) $values[] = $this->_payload->$key;
 								}
@@ -937,7 +937,7 @@ class RECORD extends API {
 						// append next document recommendation for common and matching user units
 						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 						$hidden = $recommended = [];
-						foreach($bd as $key => $row) {
+						foreach ($bd as $key => $row) {
 							if ($row['hidden'] || !(in_array($row['unit'], $_SESSION['user']['units']) || $row['unit'] === 'common')) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 							if (!in_array($row['name'], $hidden)) {
 								$necessarydocuments = $row['content'] ? explode(',', $row['content']) : [];
@@ -981,7 +981,7 @@ class RECORD extends API {
 				break;
 			case 'GET':
 				if (array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
-				$return = ['render' => []];
+				$response = ['render' => []];
 				$body = [];
 				// summarize content
 				$content = $this->summarizeRecord('full');
@@ -997,7 +997,7 @@ class RECORD extends API {
 					]
 				];
 				// option to export a sticky label according to CONFIG options
-				foreach(CONFIG['label'] as $type => $setting){
+				foreach (CONFIG['label'] as $type => $setting){
 					$body[count($body) -1][] = [
 						'type' => 'button',
 						'attributes' => [
@@ -1009,12 +1009,12 @@ class RECORD extends API {
 				
 				// set up case state and userAlert form 
 				$messagedialog = [$this->_lang->GET('record.casestate_change_recipient_supervisor_only', [':supervisor' => $this->_lang->GET('permissions.supervisor')]) => []];
-				foreach($content['units'] as $unit){
+				foreach ($content['units'] as $unit){
 					$messagedialog[$this->_lang->_USER['units'][$unit]] = ['value' => $unit];
 				}
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				$datalist = [];
-				foreach($user as $key => $row) {
+				foreach ($user as $key => $row) {
 					if (PERMISSION::filteredUser($row, ['id' => [1, $_SESSION['user']['id']], 'permission' => ['patient', 'group']])) continue;
 					$datalist[] = $row['name'];
 				}
@@ -1054,7 +1054,7 @@ class RECORD extends API {
 					. "'), options: JSON.parse('"
 					. UTILITY::json_encode([
 						$this->_lang->GET('general.cancel_button') => false,
-						$this->_lang->GET('general.submit_button') => ['value' => true, 'class'=> 'reducedCTA']
+						$this->_lang->GET('general.submit_button') => ['value' => true, 'class' => 'reducedCTA']
 					])
 					."')}).then((response) => { if (response) { response.casestate = this.dataset.casestate; response.casestatestate = this.checked; api.record('post', 'casestatealert', null, _client.application.dialogToFormdata(response)); }});"
 					], $content['case_state'])){
@@ -1077,7 +1077,7 @@ class RECORD extends API {
 							. "'), options: JSON.parse('"
 							. UTILITY::json_encode([
 								$this->_lang->GET('general.cancel_button') => false,
-								$this->_lang->GET('general.submit_button') => ['value' => true, 'class'=> 'reducedCTA']
+								$this->_lang->GET('general.submit_button') => ['value' => true, 'class' => 'reducedCTA']
 							])
 							."')}).then((response) => { if (response) { api.record('post', 'casestatealert', null, _client.application.dialogToFormdata(response)); }});"
 					]
@@ -1087,18 +1087,26 @@ class RECORD extends API {
 				$includedDocuments = array_keys($content['content']);
 
 				// display contents of each document
-				foreach($content['content'] as $document => $entries){
+				foreach ($content['content'] as $document => $entries){
 					if ($document === $this->_lang->GET('record.altering_pseudodocument_name')) continue;
 					$body[] = [
 						[
-							'type' => 'textsection',
+							'type' => 'collapsible',
 							'attributes' => [
-								'name' => $document
+								'class' => "em12"
+							],
+							'content' => [
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $document
+									]
+								]
 							]
 						]
 					];
-					foreach($entries as $key => $value){
-						array_push($body[count($body) -1],
+					foreach ($entries as $key => $value){
+						array_push($body[count($body) -1][0]['content'],
 							[
 								'type' => 'textsection',
 								'attributes' => [
@@ -1110,7 +1118,7 @@ class RECORD extends API {
 					if (isset($content['images'][$document])){
 						foreach ($content['images'][$document] as $image){
 							$imagedata = pathinfo($image);
-							array_push($body[count($body) -1],
+							array_push($body[count($body) -1][0]['content'],
 							[
 								'type' => 'image',
 								'description' => $imagedata['basename'],
@@ -1122,7 +1130,7 @@ class RECORD extends API {
 						}
 					}
 					if (isset($content['files'][$document])){
-						array_push($body[count($body) -1],
+						array_push($body[count($body) -1][0]['content'],
 						[
 							'type' => 'links',
 							'description' => $this->_lang->GET('record.file_attachments'),
@@ -1159,16 +1167,16 @@ class RECORD extends API {
 				// retrieve bundles
 				$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 				$hidden = $bundles = [];
-				foreach($bd as $key => $row) {
+				foreach ($bd as $key => $row) {
 					if ($row['hidden'] || !((in_array($row['unit'], $content['units']) && array_intersect($_SESSION['user']['units'], $content['units'])) || $row['unit'] === 'common')) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 					if (!in_array($row['name'], $hidden) && !isset($bundles[$row['name']]))
 						$bundles[$row['name']] = $row['content'] ? explode(',', $row['content']) : [];
 				}
 				// process bundles
-				foreach($bundles as $bundle => $necessarydocuments){
+				foreach ($bundles as $bundle => $necessarydocuments){
 					$recommendation = [];
 					if (array_intersect($necessarydocuments, $includedDocuments)){
-						foreach(array_diff($necessarydocuments, $includedDocuments) as $recommended){ // possible missing documents
+						foreach (array_diff($necessarydocuments, $includedDocuments) as $recommended){ // possible missing documents
 							if (in_array($recommended, $validDocuments)) // document is permitted
 							$recommendation[$recommended] = ['href' => "javascript:api.record('get', 'document', '" . $recommended . "', '" . $this->_requestedID . "')"];
 						}
@@ -1180,7 +1188,7 @@ class RECORD extends API {
 							'content' => [
 								[
 									'type' => 'links',
-									'description' => $this->_lang->GET('record.append_missing_document') . ' ' . $bundle,
+									'description' => $this->_lang->GET('record.append_missing_document', [':bundle' => $bundle]),
 									'content' => $recommendation
 								]
 							]
@@ -1199,7 +1207,7 @@ class RECORD extends API {
 							]
 						]
 					];
-					foreach($entries as $key => $value){
+					foreach ($entries as $key => $value){
 						array_push($body[count($body) -1],
 							[
 								'type' => 'textsection',
@@ -1211,7 +1219,7 @@ class RECORD extends API {
 					}
 				}
 		
-				$return['render']['content'] = $body;
+				$response['render']['content'] = $body;
 
 				// add option for retyping if permitted
 				if ($content['record_type']) {
@@ -1241,7 +1249,7 @@ class RECORD extends API {
 						"}}).then(response => { if (response) api.record('post', 'retype', null, _client.application.dialogToFormdata(response))})"
 						. "\">" . $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . '</a>';
 					}
-					$return['render']['content'][] = [
+					$response['render']['content'][] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
@@ -1252,7 +1260,7 @@ class RECORD extends API {
 					];
 					// add training button if type would possibly suggest one
 					if (in_array($content['record_type'], ['complaint'])) {
-						$return['render']['content'][count($return['render']['content']) - 1][] = [
+						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('user.training.add_training'),
@@ -1261,14 +1269,14 @@ class RECORD extends API {
 						];
 					}
 
-					$last_element = count($return['render']['content']) - 1;
+					$last_element = count($response['render']['content']) - 1;
 				}
-				else $last_element = count($return['render']['content']);
+				else $last_element = count($response['render']['content']);
 
 				// add option to reidentify record
 				if (PERMISSION::permissionFor('recordsclosing')){
 					// similar dialog on similarity check within reidentify method
-					$return['render']['content'][$last_element][] = 
+					$response['render']['content'][$last_element][] = 
 					[
 						'type' => 'button',
 						'attributes' => [
@@ -1305,32 +1313,32 @@ class RECORD extends API {
 						]
 					];
 				}
-				else $return['render']['content'][$last_element][] = [
+				else $response['render']['content'][$last_element][] = [
 					[
 						'type' => 'textsection',
 						'attributes' => [
 							'name' => $this->_lang->GET('record.reidentify_unauthorized_name')
 						],
-						'content' => $this->_lang->GET('record.reidentify_unauthorized_content', [':permissions' => implode(', ', array_map(fn($v)=>$this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('recordsclosing', true)))])
+						'content' => $this->_lang->GET('record.reidentify_unauthorized_content', [':permissions' => implode(', ', array_map(fn($v) => $this->_lang->_USER['permissions'][$v], PERMISSION::permissionFor('recordsclosing', true)))])
 					]
 				];
 
 				// display general bundle matching options
 				if (!array_intersect(['group'], $_SESSION['user']['permissions'])){
-					$last_element = count($return['render']['content'])-1;
+					$last_element = count($response['render']['content'])-1;
 					// simple groups are not allowed to append to document
 					$bundles = ['...' . $this->_lang->GET('record.match_bundles_default') => ['value' => '0']];
 					// match against bundles
 					// prepare existing bundle lists, not reusable forom above because all bundles are supposed to be displayed
 					$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 					$hidden = [];
-					foreach($bd as $key => $row) {
+					foreach ($bd as $key => $row) {
 						if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 						if (!in_array($row['name'], $bundles) && !in_array($row['name'], $hidden)) {
 							$bundles[$row['name']] = ['value' => $row['name']];
 						}
 					}
-					$return['render']['content'][$last_element][] = 
+					$response['render']['content'][$last_element][] = 
 						[
 							'type' => 'select',
 							'attributes' => [
@@ -1343,7 +1351,7 @@ class RECORD extends API {
 					
 					// option to export records if permitted
 					if (PERMISSION::permissionFor('recordsexport'))
-						array_push ($return['render']['content'][$last_element], [
+						array_push ($response['render']['content'][$last_element], [
 							[
 								'type' => 'button',
 								'attributes' => [
@@ -1362,7 +1370,7 @@ class RECORD extends API {
 					$content['closed'] = $content['closed'] !== null ? json_decode($content['closed'], true) : [];
 					$approvalposition = [];
 					foreach ($content['closed'] as $role => $property){
-						array_splice($return['render']['content'][$last_element], 1, 0, [[
+						array_splice($response['render']['content'][$last_element], 1, 0, [[
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('record.closed', [':role' => $this->_lang->GET('permissions.' . $role), ':name' => $property['name'], ':date' => $this->convertFromServerTime($property['date'])])
@@ -1372,7 +1380,7 @@ class RECORD extends API {
 
 					// append option to close record
 					if ($content['record_type'] === 'complaint' && PERMISSION::permissionFor('complaintclosing')){
-						foreach(PERMISSION::pending('complaintclosing', $content['closed']) as $position){
+						foreach (PERMISSION::pending('complaintclosing', $content['closed']) as $position){
 							$approvalposition[$this->_lang->GET('permissions.' . $position)] = [
 								'value' => $position,
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.complaint_mark_as_closed_info') . "', options:{".
@@ -1383,7 +1391,7 @@ class RECORD extends API {
 						}
 					}
 					elseif (!$content['closed'] && PERMISSION::permissionFor('recordsclosing')) {
-						foreach(PERMISSION::pending('recordsclosing', $content['closed']) as $position){
+						foreach (PERMISSION::pending('recordsclosing', $content['closed']) as $position){
 							$approvalposition[$this->_lang->GET('permissions.' . $position)] = [
 								'value' => $position,
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.mark_as_closed_info') . "', options:{".
@@ -1394,7 +1402,7 @@ class RECORD extends API {
 						}
 					}
 					if ($approvalposition){
-						array_splice($return['render']['content'][$last_element], 1, 0, [[
+						array_splice($response['render']['content'][$last_element], 1, 0, [[
 							'type' => 'checkbox',
 							'content' => $approvalposition,
 							'attributes' => [
@@ -1403,7 +1411,7 @@ class RECORD extends API {
 						]]);
 					}
 				}
-				$this->response($return);
+				$this->response($response);
 				break;
 			default:
 				$this->response([], 401);
@@ -1419,7 +1427,7 @@ class RECORD extends API {
 	 * display records overview
 	 */
 	public function records(){
-		$result = ['render' => ['content' => []]];
+		$response = ['render' => ['content' => []]];
 		$this->_requestedID = $this->_requestedID === 'null' ? null : $this->_requestedID;
 		// get all records or these fitting the search
 		require_once('_shared.php');
@@ -1428,8 +1436,8 @@ class RECORD extends API {
 
 		// prepare datalists, display values, available units to select and styling
 		$recorddatalist = $contexts = $available_units = [];
-		foreach($data as $contextkey => $context){
-			foreach($context as $record){
+		foreach ($data as $contextkey => $context){
+			foreach ($context as $record){
 				// prefilter record datalist for performance reasons
 				preg_match('/' . CONFIG['likeliness']['records_identifier_pattern']. '/mi', $record['identifier'], $simplified_identifier);
 				if ($simplified_identifier && !in_array($simplified_identifier[0], $recorddatalist)) $recorddatalist[] = $simplified_identifier[0];
@@ -1455,7 +1463,7 @@ class RECORD extends API {
 					'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
 				];
 				// append dataset states
-				foreach($record['case_state'] as $case => $state){
+				foreach ($record['case_state'] as $case => $state){
 					$contexts[$contextkey][$linkdisplay]['data-' . $case] = $state;
 				}
 				// style closed and complaints
@@ -1471,7 +1479,7 @@ class RECORD extends API {
 		$assignable = true;
 		$organizational_units[$this->_lang->GET('record.mine')] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'onchange' => "api.record('get', 'records', encodeURIComponent(document.getElementById('_recordfilter').value) || 'null')"];
 		if (!$this->_unit) $organizational_units[$this->_lang->GET('record.mine')]['checked'] = true;
-		foreach($available_units as $unit){
+		foreach ($available_units as $unit){
 			if (!$unit) {
 				$assignable = false;
 				continue;
@@ -1513,7 +1521,7 @@ class RECORD extends API {
 		];
 		// append records
 		if ($contexts){
-			foreach($contexts as $context => $links){
+			foreach ($contexts as $context => $links){
 				if ($links){
 					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"], isset($_SESSION['user']['app_settings']['primaryRecordState']) ? $_SESSION['user']['app_settings']['primaryRecordState'] : null))
 						array_push($content, $casestate);
@@ -1530,8 +1538,8 @@ class RECORD extends API {
 		}
 		else array_push($content, ...$this->noContentAvailable($this->_lang->GET('record.no_records')));
 
-		$result['render']['content'] = $content;
-		$this->response($result);		
+		$response['render']['content'] = $content;
+		$this->response($response);		
 	}
 
 	/**
@@ -1573,7 +1581,7 @@ class RECORD extends API {
 		similar_text($similar_new_id, $similar_entry_id, $percent);
 		if (!$thresholdconfirmation && $percent < CONFIG['likeliness']['record_reidentify_similarity']) {
 				// similar dialog on reidentify button within record method
-				$return = ['render' => ['content' => [
+				$response = ['render' => ['content' => [
 					[
 						'type' => 'textsection',
 						'attributes' => [
@@ -1619,7 +1627,7 @@ class RECORD extends API {
 						]
 					]
 				]]];
-				$this->response($return);
+				$this->response($response);
 		}
 		
 		// check if new id (e.g. scanned) is already taken
@@ -1666,7 +1674,7 @@ class RECORD extends API {
 		else {
 			// append merged content to new identifier
 			$original['content'] = json_decode($original['content'], true);
-			foreach($merge['content'] as $record){
+			foreach ($merge['content'] as $record){
 				$original['content'][] = $record;
 			}
 			usort($original['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
@@ -1815,7 +1823,7 @@ class RECORD extends API {
 		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 
 		$records = json_decode($data['content'], true);
-		foreach($records as $record){
+		foreach ($records as $record){
 			// check whether the record is within a valid and accessible document
 			$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
 			if (!PERMISSION::permissionIn($document['restricted_access'])) continue;
@@ -1829,7 +1837,7 @@ class RECORD extends API {
 			// initiate and populate documentwise content
 			if (!isset($accumulatedcontent[$useddocument])) $accumulatedcontent[$useddocument] = ['last_record' => null, 'content' => []];
 			if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
-			foreach($record['content'] as $key => $value){
+			foreach ($record['content'] as $key => $value){
 				$key = str_replace('_', ' ', $key);
 				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
 				$value = str_replace('\n', "\n", $value); // format linebreaks
@@ -1843,12 +1851,13 @@ class RECORD extends API {
 			}
 		}
 
-		foreach($accumulatedcontent as $document => $entries){
+		ksort($accumulatedcontent);
+		foreach ($accumulatedcontent as $document => $entries){
 			$summary['content'][$document] = [];
-			foreach($entries['content'] as $key => $data){
+			foreach ($entries['content'] as $key => $data){
 				$summary['content'][$document][$key] = '';
 				$value = '';
-				foreach($data as $entry){
+				foreach ($data as $entry){
 					if ($entry['value'] !== $value){
 						$displayvalue = $entry['value'];
 						// populate file image and attachments based on values containing respective paths and extensions
@@ -1904,10 +1913,10 @@ class RECORD extends API {
 			 */
 			function printable($element, $payload, $type, $enumerate = []){
 				$content = ['content' => []];
-				foreach($element as $subs){
+				foreach ($element as $subs){
 					if (!isset($subs['type'])){
 						$subcontent = printable($subs, $payload, $type, $enumerate);
-						foreach($subcontent['enumerate'] as $name => $number){
+						foreach ($subcontent['enumerate'] as $name => $number){
 							$enumerate = enumerate($name, $enumerate,  $number); // add from recursive call
 						}
 						$content['content'] = array_merge($content['content'], $subcontent['content']);
@@ -1936,7 +1945,7 @@ class RECORD extends API {
 
 						$content['content'][$name] = $value;
 						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys($payload));
-						foreach($dynamicMultiples as $submitted){
+						foreach ($dynamicMultiples as $submitted){
 							$value = $payload[preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', ' ', $submitted)];
 							$content['content'][$submitted] = $value;
 						}
@@ -1947,12 +1956,12 @@ class RECORD extends API {
 			};
 
 			$printablecontent = $enumerate = [];
-			foreach($summary['content'] as $document => $content){
+			foreach ($summary['content'] as $document => $content){
 				if ($useddocument = $documentfinder->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $document
 					]], $accumulatedcontent[$document]['last_record'])) $printablecontent[$document] = printable($useddocument['content'], $content, $type, $enumerate)['content'];
-					else $printablecontent[$document] = $content; // pseudodocument
+				else $printablecontent[$document] = $content; // pseudodocument
 			}
 			$summary['content'] = $printablecontent;
 			if ($type === 'simplifieddocument'){
