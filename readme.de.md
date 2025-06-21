@@ -1544,8 +1544,6 @@ names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users
 
 filename[characters] = "[,\/\\\]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
 
-input[characters] = "[\s.]" ; Bereinigung von Zeichen von Dokumenten-Eingabefelder für den Reimport vorheriger Daten, entsprechend POST Payload Eigenschaften
-
 [lifespan]
 calendar_completed = 365 ; Tage nach denen abgeschlossene Kalendereinträge gelöscht werden sofern nicht anderweitig angegeben
 idle = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt

@@ -114,7 +114,7 @@ class LANG {
 	 * @return string textchunk with replacements and whitespaces replaced with underscore as in request parameters
 	 */
 	public function PROPERTY($request, $replace = [], $forceDefault = false){
-		return preg_replace('/[\s\.]/', '_', $this->GET($request, $replace, $forceDefault));
+		return preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $this->GET($request, $replace, $forceDefault));
 	}
 
 	/**

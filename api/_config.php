@@ -43,6 +43,13 @@ if (is_file('config.env')){
 	}
 	$defaultconfig = override($defaultconfig, $envconfig);
 }
+
+// shortcut solution to handle unsupported characters within request variable names according to https://stackoverflow.com/a/20832228/6087758
+// since i did not get https://stackoverflow.com/a/18209799/6087758 to work yet
+$forbidden = [32, 46, 91];
+for ($char = 128; $char < 159; $char++) $forbidden[] = $char;
+$defaultconfig['forbidden']['input']['characters'] = '[' . implode('', array_map(fn($char) => chr($char), $forbidden)) . ']';
+
 define ('CONFIG', $defaultconfig);
 
 // set runtime settings as per config
