@@ -39,6 +39,7 @@
 * [In der Anwendung verteilte Integrationen](#in-der-anwendung-verteilte-integrationen)
     * [Erinnerungen und automatische Aufgabenplanung](#erinnerungen-und-automatische-aufgabenplanung)
     * [Schulungen](#schulungen)
+    * [Suche](#suche)
     * [CSV Prozessor](#csv-prozessor)
 * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
 * [Voraussetzungen](#voraussetzungen)
@@ -353,7 +354,7 @@ Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
 * Dokumentenverknüpfung, nur zur Ansicht oder als Weiterleitung mit Übernahme eines Identifikators
 * horizontale Linie zur Dokumentenstrukturierung
 
-Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren.
+Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren. Theoretisch erlaubt dies Dokumente mit detaillierteren Eigenschaften, diese können jedoch nicht vollständig auf normalem Wege bearbeitet werden.
 Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
 
 > [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Dieser Export beinhaltet die jeweils neusten Daten der verschiedenen Fragestellungen innerhalb der Dokumente in einer entsprechenden Tabellenspalte. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
@@ -989,6 +990,13 @@ Schulungen sind keine dauerhaften Aufzeichnungen und können von berechtigten Nu
 
 Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
 
+## Suche
+Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zusammenhang unterscheiden.
+
+* die Kalender-Suche, Artikel-Suche und der Filter für Bestellungen suchen aus Leistungsgründen buchstäblich nach dem angegebenen Begriff als Teil der Datenbankinformation. Es muss gegebenenfalls genauer gesucht werden um das gewünschte Ergebnis zu erzielen.
+* Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden.
+* alle anderen Such-Möglichkeiten (z.B. Dateien, Aufzeichnungs-Identifikatoren, Dokumentensuche) erlauben Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position und berücksichtigen zumeist [ähnliche Schreibweisen](#laufzeitvariablen) bei den Ergebnissen.
+
 [Übersicht](#übersicht)
 
 ## CSV Prozessor
@@ -1443,7 +1451,7 @@ Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronlin
     * vendors
 * die Standardsprache der Anwendung, wie sie in der  [Laufzeitvariablen](#laufzeitvariablen) festgelegt ist
 * die Dateinamenerweiterung `.json` optional von `.env`-Dateien erweitert wird (siehe auch [Anpassung](#anpassung))
-* die Standardautorin von Inhalten *CARO App* ist und diese in einen berechtigten nutzer geänder werden sollte um Verwirrungen bei Auditoren zu vermeiden
+* die Standardautorin von Inhalten *CARO App* ist und diese in einen berechtigten Nutzer geändert werden sollte um Verwirrungen bei Auditoren zu vermeiden
 
 Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können mehrere Dateien eines Typs mit einem frei wählbaren Namensteil angelegt werden um die Übersicht zu behalten (vor dieser Designentscheidung hatten die Risiken 30.000 Zeilen, die noch unüberisichtlicher waren). Das ist jedoch nur eine Option, sofern keine Berührungsängste bestehen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch in jedem Fall nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
 

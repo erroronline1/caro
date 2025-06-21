@@ -17,7 +17,7 @@ graph LR;
     beta-.->union{{Union approval}};
     union-.->release{{Full release}}
 ```
-Things are still in motion. Images my be outdated.
+Things are still in motion. Images may be outdated.
 
 ## nice to have but still lacking reasonable ideas how to implement
 * recall option
@@ -72,6 +72,7 @@ Things are still in motion. Images my be outdated.
 * [Cross application integrations](#cross-application-integrations)
     * [Reminders and automated schedules](#reminders-and-automated-schedules)
     * [User trainings](#user-trainings)
+    * [Search](#search)
     * [CSV processor](#csv-processor)
 * [Intended regulatory goals](#intended-regulatory-goals)
 * [Prerequisites](#prerequisites)
@@ -438,7 +439,7 @@ Available elements for components or rather documents are:
 * document link, just for display or to continue transferring identifier
 * horizontal line for document structure
 
-Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation.
+Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation. In theory this allows for the creation of documents with more detailed properties but these will not be able to be fully edited the standard way.
 Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
 
 > [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) allow for an export of records data. This export contains the most recent data of distinct document issues in their respective table column. It is beneficial and recommended that document issues do not repeat themself within components and documents. Repetitions do not harm the documentation per se, but may limit the analytical possibilities for the data dump.
@@ -1081,6 +1082,13 @@ Trainings are not persistent and can be deleted by authorized users, thus not ha
 
 Trainings are matched by their name.
 
+## Search
+Search functionality across the application may differ slightly depending of context.
+
+* Calendar search, product search and order filter search literally for the provided term as part of the database information for performance reasons. You may have to be more specific to get the desired result.
+* Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext.
+* All other searches (e.g. files, record identifiers, document search) allow wildcards as `*` for any amount of any characters or `?` as any character on the given position and often take [similar spelling](#runtime-variables) into account within the displayed results.
+
 [Content](#content)
 
 ## CSV processor
@@ -1445,7 +1453,7 @@ Application support legend:
 | SGB 5 §33 Additional Costs | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR Art. 14 Sample check | yes, partial | &bull; Sample check is implemented. Set up a respective document, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents), [Importing vendor pricelists](#importing-vendor-pricelists) |
 | MDR Art. 61 Clinical evaluation | structural | &bull; *describe within documents with the "Case documentation"-context* | |
-| MDR Art. 83 Post-market surveillance system | partial | &bull; Post-Market-Surveillance is not a part of the application per se. The regulatory need to invite patients to check on the aids is not integrated, as consistent gathering of contact information would add to the workload and would be redundant as an additional ERP-Software is needed anyway. Instead use its data-exports of your customers and create a csv-filter with custom rules to receive a list of corresponding addressees for serial letters. Store the filtered lists as a record of your invitations and regulatory fulfilments. | [Tools](#tools), [CSV processor](#csv-processor) |
+| MDR Art. 83 Post-market surveillance system | partial | &bull; Post-Market-Surveillance is not a part of the application per se. The regulatory need to invite patients to check on the aids is not integrated, as consistent gathering of contact information would add to the workload and would be redundant as an additional ERP-Software is needed anyway. Instead use its data-exports of your customers and create a CSV-filter with custom rules to receive a list of corresponding addressees for serial letters. Store the filtered lists as a record of your invitations and regulatory fulfilments. | [Tools](#tools), [CSV processor](#csv-processor) |
 | MDR annex 1 General safety and performance requirements | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR annex 4 EU Declaration of conformity | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR annex 13 Procedure for custom-made devices | structural | &bull; *describe within documents with the "Case documentation"-context* | |
@@ -1498,7 +1506,7 @@ It is strongly recommended to create an additional development environment to te
 
 ### Server setup
 * php.ini memory_limit ~4096M for [processing of large CSV-files and pricelist imports](#csv-processor), disable open_basedir at least for local IIS for file handlers.
-    * [processing a csv](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
+    * [processing a CSV](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
     * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB. On IIS [uploadReadAheadSize](#https://techcommunity.microsoft.com/blog/iis-support-blog/solution-for-%E2%80%9Crequest-entity-too-large%E2%80%9D-error/501134) should be configured accordingly.
 * php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
@@ -2261,6 +2269,7 @@ Stakeholder identification:
 | Memory overflow due to looping by erroneous RegEx filter for CSV | High (server unresponsive) | Since most users are unlikely to be experienced with RegEx and an development environment is recommended anyway the responsible person should test filters there in advance | The versatility to process complex data must not suffer |
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 | Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
+| Lost attributes on widgets during regular editing of JSON-imported custom document components | Low | Low (unexpected rendering of content) | Most important properties remain, the manual [warns](#component-editing) about this usage |
 
 [Content](#content)
 
@@ -2417,8 +2426,8 @@ Response properties are
 * *config* (application settings on login/reload)
 * *data* (filtered ids, record imports, notif numbers, approved order data to be assembled by _client.order.approved())
 * *response* (state messages, message type, affected ids, redirect path params, names)
-* *log* (csv-filter log)
-* *links* (csv-filter result file)
+* *log* (CSV-filter log)
+* *links* (CSV-filter result file)
 
 All form data for POST and PUT require either the provided input fields as previously created from GET fetches (./js/assemble.js), the JS _client-methods (./js/utility.js) or JS Composer-methods (./js/compose.js). Processing is regularily dependent on specific names.
 
@@ -4876,7 +4885,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 * O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
     > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
 * O.Source_7 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the application.
-    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway.
+    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
 * O.Source_8 Tools for static code analysis SHOULD be used for the development of the application.
     > [Code design patterns](#code-design-patterns)
 * O.Source_9 If the web application uses URL redirects, this MUST be done in a controlled manner.
@@ -5125,7 +5134,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 * O.Source_9 The manufacturer SHOULD use automatic tools to identify program errors and best practice violations in the build process. Any warnings MUST be mitigated by the manufacturer prior to deployment.
     > [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint vor VSC, PHPIntelephense for VSC
 * O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
-    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway.
+    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
 * O.Source_11 Tools for static code analysis SHOULD be used for the development of the application.
     > [Code design patterns](#code-design-patterns)
 
