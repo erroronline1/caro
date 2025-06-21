@@ -1272,7 +1272,7 @@
 	"record": {
 		"altering_pseudodocument_name": "Record altering",
 		"append_document": "Append",
-		"append_missing_document": "Some documents seem not be be taken into account. Append missing data now:",
+		"append_missing_document": "Some documents of the bundle :bundle seem not be be taken into account. Append missing data now:",
 		"append_missing_document_unneccessary": "You're good.",
 		"assign_hint": "\"My units\" lists all records for your assigned units. \"Not assignable\" means the last editing user has been deleted. The next addition by a qualified user reassigns the unit.",
 		"casestate_change_message": "Notify on state change?",

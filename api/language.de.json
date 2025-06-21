@@ -1272,7 +1272,7 @@
 	"record": {
 		"altering_pseudodocument_name": "Änderungen an der Dokumentation",
 		"append_document": "Ergänzen",
-		"append_missing_document": "Es scheint als wären Dokumente nicht berücksichtigt worden. Ergänze die Daten gleich jetzt:",
+		"append_missing_document": "Es scheint als wären Dokumente für das Dokumentenpaket :bundle nicht berücksichtigt worden. Ergänze die Daten gleich jetzt:",
 		"append_missing_document_unneccessary": "Alles erledigt.",
 		"assign_hint": "\"Meine Bereiche\" listet alle Aufzeichnungen für deine zugeordneten Bereiche auf. \"Nicht zugeordnet\" bedeutet, dass der letzte eintragende Nutzer gelöscht wurde. Die nächste Ergänzung weist den Bereich neu zu.",
 		"casestate_change_message": "Statusänderung mitteilen?",
