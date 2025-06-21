@@ -923,7 +923,7 @@ class AUDIT extends API {
 					[
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('audit.audit.edit'),
+							'name' => $this->_lang->GET('audit.audit.template.edit'),
 							'onchange' => "api.audit('get', 'audittemplate', 'null', this.value)"
 						],
 						'content' => $select
@@ -1886,7 +1886,7 @@ class AUDIT extends API {
 					$select['edit'][$this->convertFromServerTime($row['last_touch'])] = $row['id'] == $this->_requestedID ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
 				// sanitize datalists
-				foreach($datalist as $data => &$values){
+				foreach($datalist as &$values){
 					$values = array_filter($values, fn($v) => boolval($v));
 					ksort($values);
 				}
@@ -1922,12 +1922,12 @@ class AUDIT extends API {
 					];
 				}
 				// display last edit
-					$result['render']['content'][] = [
-						[
-							'type' => 'textsection',
-							'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->convertFromServerTime($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : $this->_lang->GET('audit.managementreview.last_version'))
-						]
-					];
+				$result['render']['content'][] = [
+					[
+						'type' => 'textsection',
+						'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->convertFromServerTime($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : $this->_lang->GET('audit.managementreview.last_version'))
+					]
+				];
 				// display issue inputs
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $issue){
 					$result['render']['content'][] = [
