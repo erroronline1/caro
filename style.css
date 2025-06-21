@@ -1291,6 +1291,7 @@ button:active {
 #signaturecanvas {
 	border-bottom: 1px solid var(--foreground);
 	height: 15em;
+	margin-bottom:1rem;
 }
 
 input:invalid.input_required_alert,
