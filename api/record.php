@@ -1088,7 +1088,7 @@ class RECORD extends API {
 
 				// display contents of each document
 				foreach($content['content'] as $document => $entries){
-					if ($document === $this->_lang->GET('record.altering_pseudodocument_name', [], true)) continue;
+					if ($document === $this->_lang->GET('record.altering_pseudodocument_name')) continue;
 					$body[] = [
 						[
 							'type' => 'textsection',
@@ -1129,7 +1129,7 @@ class RECORD extends API {
 							'content' => $content['files'][$document]
 						]); 
 					}
-					if ($document != $this->_lang->GET('record.altering_pseudodocument_name', [])){
+					if ($document != $this->_lang->GET('record.altering_pseudodocument_name')){
 						// option to append to document entries
 						if (in_array($document, $includedDocuments) && in_array($document, $validDocuments) && !array_intersect(['group'], $_SESSION['user']['permissions'])) array_push($body[count($body) -1],[
 							'type' => 'button',
@@ -1189,8 +1189,8 @@ class RECORD extends API {
 				}
 
 				// append record_altering_pseudodocument
-				if (isset($content['content'][$this->_lang->GET('record.altering_pseudodocument_name', [], true)])){
-					$entries = $content['content'][$this->_lang->GET('record.altering_pseudodocument_name', [], true)];
+				if (isset($content['content'][$this->_lang->GET('record.altering_pseudodocument_name')])){
+					$entries = $content['content'][$this->_lang->GET('record.altering_pseudodocument_name')];
 					$body[] = [
 						[
 							'type' => 'textsection',
@@ -1963,8 +1963,6 @@ class RECORD extends API {
 				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
 			}
 		}
-//		var_dump($summary);
-//		die();
 		return $summary;
 	}
 }
