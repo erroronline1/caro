@@ -1891,7 +1891,7 @@ export function vartest(){
 
 	_.api("post", "api/api.php/application/start/error", payload, true);
 	_.api("put", "api/api.php/application/start/error", payload, true);
-	_.api("get", "api/api.php/application/start/error", payload, true);
+	_.api("get", "api/api.php/application/start/error", payload, false);
 	_.api("delete", "api/api.php/application/start/error", payload);
 
 }

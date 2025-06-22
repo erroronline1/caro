@@ -462,11 +462,10 @@ class UTILITY {
 					$_SERVER['QUERY_STRING']
 				);
 				parse_str($inputstream, $post);
-				$result = array();
+				$data = array();
 				foreach ($post as $key => $val) {
-					$result[hex2bin($key)] = $val;
+					$data[hex2bin($key)] = $val;
 				}
-				$payload = self::cleanInputs($result);
 				break;
 			case "POST":
 			case "PUT":
