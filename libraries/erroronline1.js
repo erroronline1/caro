@@ -97,30 +97,26 @@ const _ = {
 	api: async function (method, destination, payload, form_data = false) {
 		method = method.toUpperCase();
 		let query = "";
-		if (["GET", "DELETE"].includes(method)) {
-			query = payload ? "?" : "";
-			if (form_data) payload.forEach((value, key) => {
-				query += "&" + key + "=" + value;
-			});
+		if (["GET", "DELETE"].includes(method) && payload) {
+			if (payload instanceof FormData){
+				payload.forEach((value, key) => {
+					query += "&" + encodeURI(key) + "=" + encodeURI(value);
+				});
+			}
 			else {
 				for (const [key, value] of Object.entries(payload)){
-					query += "&" + key + "=" + value;
+					query += "&" + encodeURI(key) + "=" + encodeURI(value);
 				}
 			}
+			console.log(method, payload, query);
 		}
-		if (!form_data){
-			let json =[];
-			Object.keys(payload).forEach((key) => {
-				json[key] =  payload[key];
-			});
-		}
-		const response = await fetch(destination + query, {
+		const response = await fetch(destination + (query ? "?" + query : ""), {
 			method: method, // *GET, POST, PUT, DELETE, etc.
 			cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-			body: ["GET", "DELETE"].includes(method) ? null : (form_data ? payload : json), // body data type must match "Content-Type" header
+			body: ["GET", "DELETE"].includes(method) ? null : payload, // body data type must match "Content-Type" header
 			timeout: false,
 			headers:{
-				"Content-Type": ["GET", "DELETE"].includes(method) ? "text/plain" : (form_data ? "application/octet-stream" : "application/json")
+				"Content-Type": payload instanceof FormData ? "application/octet-stream" : "application/json"
 			}
 		})
 			.then(async (response) => {
