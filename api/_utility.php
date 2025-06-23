@@ -469,17 +469,18 @@ class UTILITY {
 				break;
 			case "POST":
 			case "PUT":
-				// according to https://stackoverflow.com/a/18209799/6087758
-				$raw_data = preg_replace_callback(
-					'/(^|(?<=&))[^=[&]+/',
-					function($key) { return bin2hex(urldecode($key[0])); },
-					file_get_contents('php://input')
-				);
+				$raw_data = file_get_contents('php://input');
 
 				// Fetch content and determine boundary
 				$boundary = substr($raw_data, 0, strpos($raw_data, "\r\n"));
 
 				if (empty($boundary)){
+					// according to https://stackoverflow.com/a/18209799/6087758
+					$raw_data = preg_replace_callback(
+						'/(^|(?<=&))[^=[&]+/',
+						function($key) { return bin2hex(urldecode($key[0])); },
+						$raw_data
+					);
 					parse_str($raw_data, $input);
 					$data = [];
 					foreach ($input as $key => $val) {
@@ -503,7 +504,7 @@ class UTILITY {
 						$raw_headers = explode("\r\n", $raw_headers);
 						$headers = array();
 						foreach ($raw_headers as $header){
-							//list($name, $value) = explode(':', $header); this original does not work with input names containing colons
+							// list($name, $value) = explode(':', $header); this original does not work with input names containing colons
 							preg_match("/^(.+?):(.+?)$/m", $header, $formerlyexploded);
 							list(, $name, $value) = $formerlyexploded;
 							$headers[strtolower($name)] = ltrim($value, ' ');
@@ -520,17 +521,17 @@ class UTILITY {
 							);
 							list(, $type, $name) = $matches;
 
-							//Parse File
+							// Parse File
 							if (isset($matches[4])){
-								//get filename
+								// get filename
 								$filename = $matches[4];
-								$fieldname = preg_replace('/\[\]/', '', hex2bin($matches[2])); //str_replace(' ', '_', preg_replace('/\[\]/', '', $matches[2]));
+								$fieldname = preg_replace('/\[\]/', '', $matches[2]); //str_replace(' ', '_', preg_replace('/\[\]/', '', $matches[2]));
 
-								//get tmp name
+								// get tmp name
 								$filename_parts = pathinfo( $filename );
 								$tmp_name = tempnam( ini_get('upload_tmp_dir'), $filename_parts['filename']);
 
-								//populate $_FILES with information, size may be off in multibyte situation
+								// populate $_FILES with information, size may be off in multibyte situation
 								$_files = [
 									'error' => 0,
 									'name' => $filename,
@@ -545,14 +546,14 @@ class UTILITY {
 								$_FILES[$fieldname]['size'][] = $_files['size'];
 								$_FILES[$fieldname]['type'][] = $_files['type'];
 
-								//place in temporary directory
+								// place in temporary directory
 								file_put_contents($tmp_name, $body);
 							}
-							//Parse Field
+							// Parse Field
 							else
 							{
-								$name = hex2bin($name);//str_replace(' ', '_', $name);
-								if (substr($name, -2) == '[]') { //is array
+								//$name = str_replace(' ', '_', $name);
+								if (substr($name, -2) == '[]') { // is array
 									$name = substr($name, 0, strlen($name)-2);
 									if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
 									else $data[$name] = [substr($body, 0, strlen($body) - 2)];
@@ -562,12 +563,12 @@ class UTILITY {
 						}
 					}
 				}
-				$payload = self::cleanInputs($data);
 				break;
 			default:
 				return [];
 				break;
 		}
+		$payload = self::cleanInputs($data);
 		return (object) $payload;
 	}		
 	
