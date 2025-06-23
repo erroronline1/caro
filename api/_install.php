@@ -1028,7 +1028,7 @@ class INSTALL {
 			}
 
 			if (in_array($entry['name'] . '_' . $entry['context'], $name_context)){
-				$this->printError('Multiple occurences of the name ' . $entry['name'] . ' are not allowed for context ' . $entry['context'] . '. This item will be skipped:', $entry);
+				$this->printError('Multiple occurences of the name ' . $entry['name'] . ' are not allowed for context ' . $entry['context'] . '. This item may be already installed and in use and will be skipped:', $entry);
 				continue;
 			}
 
