@@ -108,7 +108,6 @@ const _ = {
 					query += "&" + encodeURI(key) + "=" + encodeURI(value);
 				}
 			}
-			console.log(method, payload, query);
 		}
 		const response = await fetch(destination + (query ? "?" + query : ""), {
 			method: method, // *GET, POST, PUT, DELETE, etc.

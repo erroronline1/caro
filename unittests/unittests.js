@@ -1880,7 +1880,7 @@ export async function screenshot(lang = null) {
 	console.log("done. reload to return to normal.");
 }
 
-export function request(){
+export function request_param(){
 	const payload = new FormData();
 	payload.append("asdföäü._? aksldfjn[]", "1");
 	payload.append("asdföäü._? aksldfjn[]", "2");
