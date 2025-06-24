@@ -793,7 +793,6 @@
 				"businesstrip": "Business trip",
 				"vocationalschool": "Vocational school",
 				"publicholiday": "Public holiday",
-				"workinghourscorrection": "Working hours correction",
 				"misc": "See note"
 			},
 			"pto_exemption": "Entry type",
@@ -804,7 +803,8 @@
 			},
 			"start": "Start",
 			"start_date": "Start date",
-			"start_time": "Start time"
+			"start_time": "Start time",
+			"workinghourscorrection": "Working hours correction"
 		}
 	},
 	"consumables": {
