@@ -373,6 +373,8 @@ class API {
 					]
 				]
 			];
+			// linux style delay of login form especially on wrong attempts
+			sleep(2);
 		}
 		$this->response($response, 511);
 	}
