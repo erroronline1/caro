@@ -33,9 +33,6 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* timesheet
-    * recommended break faulty on 8:20 to 17:40
-    * drop userAlert on regular working day
 * order
     * on approval of prepared some ordertype transfer error occured
     * rejected order message to orderer only, create calendar task

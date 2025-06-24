@@ -357,17 +357,18 @@ export const _client = {
 
 		/**
 		 * toggles inputs visibility on conditional request
-		 * @param {string} names json stringified {'input name' : required bool}
+		 * @param {string} inputs json stringified {'input name' : {required: bool, display: bool}
 		 * @param {bool} display
 		 */
-		setFieldVisibilityByNames: (names = "", display = true) => {
-			names = JSON.parse(names);
+		setFieldVisibilityByNames: (inputs = "", display = true) => {
+			inputs = JSON.parse(inputs);
 			let fields;
-			for (const [name, required] of Object.entries(names)) {
+			for (const [name, attributes] of Object.entries(inputs)) {
+				console.log(name, attributes);
 				fields = document.getElementsByName(name);
 				for (const [id, field] of Object.entries(fields)) {
-					field.parentNode.style.display = display ? "initial" : "none";
-					if (required) {
+					field.parentNode.style.display = display === attributes.display ? "initial" : "none";
+					if (attributes.required) {
 						if (display) field.setAttribute("required", true);
 						else field.removeAttribute("required");
 					}

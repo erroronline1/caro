@@ -301,53 +301,46 @@ class CALENDARUTILITY {
 							'value' => $columns[':subject'],
 							'required' => true
 						]
-					],
-					[
+					], [
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.schedule.date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
-					],
-					[
+					], [
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.schedule.due'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
-					],
-					[
+					], [
 						'type' => 'checkbox',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.schedule.organizational_unit')
 						],
 						'content' => $units,
 						'hint' => $this->_lang->GET('calendar.schedule.organizational_unit_hint')
-					],
-					[
+					], [
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.schedule.affected_user')
 						]
-					],
-					[
+					], [
 						'type' => 'checkbox',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.schedule.options')
 						],
 						'content' => array_merge($alert, $autodelete)
-					],
-					[
+					], [
 						'type' => 'hidden',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.schedule.type'),
 							'value' => $columns[':type']
 						]
-					],
-					[
+					], [
 						'type' => 'hidden',
 						'attributes' => [
 							'name' => 'calendarEventId',
@@ -404,24 +397,30 @@ class CALENDARUTILITY {
 						]
 					];
 				}
-				// name => required bool as per _client.calendar.setFieldVisibilityByNames()
+				// name => required bool, display bool as per _client.calendar.setFieldVisibilityByNames()
 				$setFieldVisibility = [
-					$this->_lang->GET('calendar.timesheet.start_time') => true,
-					$this->_lang->GET('calendar.timesheet.end_time') => true,
-					$this->_lang->GET('calendar.timesheet.break_time') => true,
-					$this->_lang->GET('calendar.timesheet.homeoffice') => true,
-					$this->_lang->GET('calendar.timesheet.pto.workinghourscorrection') => false,
+					$this->_lang->GET('calendar.timesheet.start_time') => ['required' => true, 'display' => true],
+					$this->_lang->GET('calendar.timesheet.end_time') => ['required' => true, 'display' => true],
+					$this->_lang->GET('calendar.timesheet.break_time') => ['required' => true, 'display' => true],
+					$this->_lang->GET('calendar.timesheet.homeoffice') => ['required' => true, 'display' => true],
+					$this->_lang->GET('calendar.timesheet.workinghourscorrection') => ['required' => false, 'display' => true],
+					$this->_lang->GET('calendar.schedule.alert') => ['required' => false, 'display' => false],
 				];
 
 				// break recommendation according to config
 				$breakrecommendation = '';
 				if(isset($this->_date['locations']['breaks'])){
-					$breakrecommendation = "let start = document.getElementById('_starttime').value, end = this.value, time, breaktime; ".
+					$breakrecommendation = "let start = document.getElementById('_starttime').value, end = this.value, time, breaktime = '00:00'; ".
 						"start = parseInt(start) + parseInt(start.split(':')[1]) / 60; end = parseInt(end) + parseInt(end.split(':')[1]) / 60; ".
 						"time = end - start; ";
-					foreach ($this->_breaks as $break){
-						$break = explode('-', $break);
-						$breakrecommendation .= "if (time > " . $break[0]. ") breaktime = '" . (strlen(intval($break[1] / 60)) < 2 ? '0'. intval($break[1] / 60) : intval($break[1] / 60)) . ":" . intval((floatval($break[1]) / 60 - intval($break[1] / 60)) * 60) . "'; ";
+					for ($i = 0; $i < count($this->_breaks); $i++){
+						list(, $previousbreak) = isset($this->_breaks[$i-1]) ? explode('-', $this->_breaks[$i-1]): [0, 0];
+						list($hours, $break) = explode('-', $this->_breaks[$i]);
+						$hrs = strlen(intval($break / 60)) < 2 ? '0'. intval($break / 60) : intval($break / 60);
+						$min = intval((floatval($break) / 60 - intval($break / 60)) * 60);
+						$hrs = strlen($hrs) < 2 ? '0' . $hrs : $hrs;
+						$min = strlen($min) < 2 ? '0' . $min : $min;
+						$breakrecommendation .= "if (time - " . (floatval($previousbreak) / 60) . " > " . $hours . ") breaktime = '" . $hrs . ":" . $min . "'; ";
 					}
 					$breakrecommendation .= "if (breaktime) document.getElementById('_break').value = breaktime;";
 				}
@@ -434,14 +433,14 @@ class CALENDARUTILITY {
 							'onchange' => "_client.calendar.setFieldVisibilityByNames('" . UTILITY::json_encode($setFieldVisibility) . "', this.value === 'regular')"
 						],
 						'content' => $ptoselect
-					],[
+					], [
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.start_date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
-					],[
+					], [
 						'type' => 'time',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.start_time'),
@@ -449,55 +448,55 @@ class CALENDARUTILITY {
 							'required' => true,
 							'id' => '_starttime'
 						]
-					],[
+					], [
 						'type' => 'date',
 						'attributes' => [
 							'name' => $this->_lang->GET('calendar.timesheet.end_date'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
-						],[
-							'type' => 'time',
-							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet.end_time'),
-								'value' => $span_end->format('H:i'),
-								'required' => true,
-								'onchange' => $breakrecommendation
-							]
-						],[
-							'type' => 'time',
-							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet.break_time'),
-								'value' => isset($misc['break']) ? $misc['break'] : '',
-								'required' => true,
-								'id' => '_break'
-							]
-						],[
-							'type' => 'number',
-							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet.pto.workinghourscorrection'),
-								'value' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : ''
-							]
-						],[
-							'type' => 'text',
-							'attributes' => [
-								'name' => $this->_lang->GET('calendar.timesheet.pto_note'),
-								'value' => isset($misc['note']) ? $misc['note'] : '',
-							]
-						],[
-							'type' => 'checkbox',
-							'attributes' => [
-								'name' => $this->_lang->GET('calendar.schedule.options')
-							],
-							'content' => $alert
-						],[
-							'type' => 'hidden',
-							'attributes' => [
-								'name' => 'calendarEventId',
-								'value' => $columns[':id']
-							]
+					], [
+						'type' => 'time',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.end_time'),
+							'value' => $span_end->format('H:i'),
+							'required' => true,
+							'onchange' => $breakrecommendation
 						]
-					]);
+					], [
+						'type' => 'time',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.break_time'),
+							'value' => isset($misc['break']) ? $misc['break'] : '',
+							'required' => true,
+							'id' => '_break'
+						]
+					], [
+						'type' => 'number',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.workinghourscorrection'),
+							'value' => isset($misc['workinghourscorrection']) ? $misc['workinghourscorrection'] : ''
+						]
+					], [
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.timesheet.pto_note'),
+							'value' => isset($misc['note']) ? $misc['note'] : '',
+						]
+					], [
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.schedule.options')
+						],
+						'content' => $alert
+					], [
+						'type' => 'hidden',
+						'attributes' => [
+							'name' => 'calendarEventId',
+							'value' => $columns[':id']
+						]
+					]
+				]);
 				// add homeoffice input if applicable
 				if (isset($_SESSION['user']['app_settings']['homeoffice']) && $_SESSION['user']['app_settings']['homeoffice'])
 					array_splice($inputs, 7, 0, [
