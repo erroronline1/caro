@@ -124,7 +124,7 @@ class API {
 				// post and put MUST have _user_post_validation payload
 				if (($_user_post_validation = UTILITY::propertySet($this->_payload, '_user_post_validation')) !== false) {
 					unset ($this->_payload->_user_post_validation);
-					// sanitize arrays from payload as checksum can't handle these from client side
+					// sanitation of arrays; synchronization with frontent checksum not possible
 					$payload = json_decode(json_encode($this->_payload), true);
 					foreach ($payload as $key => $value){
 						if ($value && gettype($value) === 'array') unset($payload[$key]);

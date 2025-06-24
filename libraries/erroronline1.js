@@ -94,7 +94,7 @@ const _ = {
 		}
 		return replaceString;
 	},
-	api: async function (method, destination, payload, form_data = false) {
+	api: async function (method, destination, payload) {
 		method = method.toUpperCase();
 		let query = "";
 		if (["GET", "DELETE"].includes(method) && payload) {
