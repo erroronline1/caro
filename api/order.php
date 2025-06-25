@@ -162,7 +162,8 @@ class ORDER extends API {
 						else $prepared['items'][0][$key] = $value;
 					}
 					// add initially approval date
-					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
+					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'] . ' ';
+					$prepared['additional_info'] .= UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')) ? : '';
 					// clear unused keys
 					foreach ($prepared as $key => $value) {
 						if (!$value) unset($prepared[$key]);
@@ -182,7 +183,8 @@ class ORDER extends API {
 									':id' => intval($this->_requestedID)
 								]
 							]);
-							// inform user group
+							
+							// inform user on disapproval
 							$messagepayload = [];
 							foreach (['quantity' => 'quantity_label',
 								'unit' => 'unit_label',
@@ -194,11 +196,31 @@ class ORDER extends API {
 								$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 							}
 							$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
-							$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
+							$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
 								':order' => $this->_lang->GET('order.message', $messagepayload, true),
 								':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
 								':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
-							], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')));
+								], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+							// userlist to decode orderer
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							if ($userid = array_search($prepared['orderer'], array_column($users, 'id')))
+								$this->alertUserGroup(['user' => [$users[$userid]['name']]], $message);
+
+							// schedule review of disapproved order for unit (in case of vacation, sick leave etc.)
+							$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+							$calendar->post([
+								':type' => 'schedule',
+								':span_start' => $this->_date['servertime']->format('Y-m-h H:i:s'),
+								':span_end' => $this->_date['servertime']->format('Y-m-h H:i:s'),
+								':author_id' => $_SESSION['user']['id'],
+								':affected_user_id' => null,
+								':organizational_unit' => $prepared['organizational_unit'],
+								':subject' => preg_replace("/\n/", ' ', strip_tags($message)),
+								':misc' => null,
+								':closed' => null,
+								':alert' => null,
+								':autodelete' => 1
+							]);
 							break;
 						case 'addinformation':
 							// append information to order
