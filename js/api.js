@@ -1659,16 +1659,11 @@ export const api = {
 						successFn = function (data) {
 							if (data.data !== undefined) {
 								let inputs = document.querySelectorAll("input, textarea, select");
-								let inputname,
-									groupname,
-									files,
-									a,
-									inputnamesanitation = new RegExp(String.raw`${api._settings.config.forbidden.input.characters}`, "g");
+								let groupname, files, a;
 								for (const input of inputs) {
-									inputname = input.name.replaceAll(inputnamesanitation, "_");
 									if (input.type === "file") {
-										if (Object.keys(data.data).includes(inputname.replace("[]", ""))) {
-											files = data.data[inputname.replace("[]", "")].split(", ");
+										if (Object.keys(data.data).includes(input.name.replace("[]", ""))) {
+											files = data.data[input.name.replace("[]", "")].split(", ");
 											for (const file of files) {
 												a = document.createElement("a");
 												a.href = file;
@@ -1680,16 +1675,16 @@ export const api = {
 										}
 									} else if (input.type === "radio") {
 										// nest to avoid overriding values of other radio elements
-										input.checked = Object.keys(data.data).includes(inputname) && data.data[inputname] === input.value;
+										input.checked = Object.keys(data.data).includes(input.name) && data.data[input.name] === input.value;
 									} else if (input.type === "checkbox") {
-										groupname = input.dataset.grouped.replaceAll(" ", "_");
+										groupname = input.dataset.grouped;
 										input.checked = Object.keys(data.data).includes(groupname) && data.data[groupname].split(" | ").includes(input.name);
 									} else {
-										if (Object.keys(data.data).includes(inputname)) input.value = data.data[inputname];
+										if (Object.keys(data.data).includes(input.name)) input.value = data.data[input.name];
 										// append multiple text-/number inputs / selects / productselections that have been added dynamically
 										let dynamicMultiples = Object.keys(data.data)
 											.filter((name) => {
-												return name.match(new RegExp(String.raw`${inputname}\(\d+\)$`, "g"));
+												return name.match(new RegExp(String.raw`${input.name}\(\d+\)$`, "g"));
 											})
 											.sort();
 										if (dynamicMultiples.length) {
@@ -1716,7 +1711,7 @@ export const api = {
 											}
 											dynamicMultiples.forEach((name) => {
 												if (element.nextSibling && element.nextSibling.classList.contains("hint")) element = element.nextSibling;
-												clone.attributes.name = name.replaceAll(inputnamesanitation, " ");
+												clone.attributes.name = name;
 												clone.attributes.value = data.data[name];
 												switch (type) {
 													case "select":
@@ -1731,8 +1726,8 @@ export const api = {
 														element = element.nextSibling; // button
 														break;
 												}
-												if (!document.getElementsByName(name.replaceAll(inputnamesanitation, " "))[0]) new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
-												element = document.getElementsByName(name.replaceAll(inputnamesanitation, " "))[0].nextSibling; // label
+												if (!document.getElementsByName(name)[0]) new Assemble({ content: [[clone]], composer: "elementClone" }).initializeSection(null, element);
+												element = document.getElementsByName(name)[0].nextSibling; // label
 											});
 										}
 									}
