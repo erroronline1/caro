@@ -40,7 +40,8 @@ in the output files if it is not possible to edit the following filter according
 			"FARBEN_NAME",
 			"BESTELLSTOP",
 			"STATUS",
-			"EAN"
+			"EAN",
+			"WE_DAT_ARTIKELSTAMM"
 		]
 	},
 	"filter": [
@@ -60,10 +61,21 @@ in the output files if it is not possible to edit the following filter according
 			"apply": "filter_by_duplicates",
 			"comment": "keep amount of duplicates of column value, ordered by another concatenated column values (asc/desc)",
 			"duplicates": {
-				"orderby": ["REFERENZ"],
+				"orderby": ["WE_DAT_ARTIKELSTAMM"],
 				"descending": false,
 				"column": "REFERENZ",
 				"amount": 1
+			}
+		},
+		{
+			"apply": "filter_by_monthdiff",
+			"comment": "discard by date diff in months, omit everything last ordered over five years ago",
+			"keep": false,
+			"date": {
+				"column": "WE_DAT_ARTIKELSTAMM",
+				"format": ["dd", "mm", "yyyy"],
+				"threshold": 60,
+				"bias": ">"
 			}
 		}
 	],
@@ -81,7 +93,8 @@ in the output files if it is not possible to edit the following filter according
 				"article_name": ["BEZEICHNUNG", " ", "Zusatzinformation", " ", "MODELL_NAME", " ", "GROESSEN_NAME", " ", "FARBEN_NAME"],
 				"article_unit": ["BESTELL_EINHEIT"],
 				"article_ean": ["EAN"],
-				"erp_id": ["REFERENZ"]
+				"erp_id": ["REFERENZ"],
+				"last_order": ["WE_DAT_ARTIKELSTAMM"]
 			}
 		],
 		"add": {
@@ -106,7 +119,8 @@ in the output files if it is not possible to edit the following filter according
 			"FARBEN_NAME",
 			"BESTELLSTOP",
 			"STATUS",
-			"EAN"
+			"EAN",
+			"WE_DAT_ARTIKELSTAMM"
 		]
 	},
 	"split": {
@@ -380,7 +394,8 @@ import with default filter
 			"article_ean", 
 			"trading_good",
 			"has_expiry_date",
-			"special_attention"
+			"special_attention",
+			"last_order"
 		]
 	}
 }
