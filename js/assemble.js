@@ -2613,7 +2613,7 @@ export class Assemble {
 				],
 				options: options,
 			}).then((response) => {
-				if (response) {
+				if (Boolean(response)) {
 					const inputfield = document.getElementById(input.id);
 					inputfield.value = response._selectedproduct;
 					inputfield.dispatchEvent(new Event("change"));
@@ -2948,7 +2948,7 @@ export class Assemble {
 					header: select.title,
 					options: selectModal,
 				}).then((response) => {
-					if (response && response != e.target.value) {
+					if (Boolean(response) && response != e.target.value) {
 						e.target.value = response;
 						e.target.dispatchEvent(new Event("change"));
 						if (multiple && !VOIDVALUES.includes(response)) {
@@ -3102,7 +3102,7 @@ export class Assemble {
 				],
 				options: options,
 			}).then((response) => {
-				if (response) {
+				if (Boolean(response)) {
 					const inputfield = document.getElementById(input.id);
 					inputfield.value = response._selectedfile || "";
 					inputfield.dispatchEvent(new Event("change"));
@@ -3612,7 +3612,7 @@ export class Assemble {
 					],
 					options: options,
 				}).then((response) => {
-					if (response && response[api._lang.GET("calendar.longtermplanning.addname")]) {
+					if (Boolean(response) && response[api._lang.GET("calendar.longtermplanning.addname")]) {
 						// add name input
 						e.target.parentNode.insertBefore(namefield(response[api._lang.GET("calendar.longtermplanning.addname")]), e.target);
 						// add schedule display
@@ -3753,7 +3753,7 @@ export class Assemble {
 					],
 					options: options,
 				}).then((response) => {
-					if (response && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
+					if (Boolean(response) && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
 						let label = colorselection(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]);
 						e.target.parentNode.insertBefore(label, e.target);
 						window.Masonry.masonry();
