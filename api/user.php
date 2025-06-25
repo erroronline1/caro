@@ -840,7 +840,7 @@ class USER extends API {
 				}
 
 				// generate token
-				if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $this->_lang->GET('user.token_renew')))){
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
 					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
 				}
 

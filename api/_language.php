@@ -115,7 +115,6 @@ class LANG {
 	 */
 	public function PROPERTY($request, $replace = [], $forceDefault = false){
 		return $this->GET($request, $replace, $forceDefault);
-		return preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $this->GET($request, $replace, $forceDefault));
 	}
 
 	/**

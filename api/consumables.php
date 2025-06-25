@@ -229,12 +229,12 @@ class CONSUMABLES extends API {
 								case 'checkbox':
 									if (isset($sub['content'])) {
 										foreach (array_keys($sub['content']) as $name){
-											$result[$name] = preg_replace('/[\s\.]/', '_', $name);					
+											$result[$name] = $name;					
 										}
 									}
 									break;
 								default:
-									$result[$sub['attributes']['name']] = preg_replace('/[\s\.]/', '_', $sub['attributes']['name']);
+									$result[$sub['attributes']['name']] = $sub['attributes']['name'];
 							}
 						}
 					}
@@ -553,12 +553,12 @@ class CONSUMABLES extends API {
 								case 'checkbox':
 									if (isset($sub['content'])) {
 										foreach (array_keys($sub['content']) as $name){
-											$result[$name] = preg_replace('/[\s\.]/', '_', $name);					
+											$result[$name] = $name;					
 										}
 									}
 									break;
 								default:
-									$result[$sub['attributes']['name']] = preg_replace('/[\s\.]/', '_', $sub['attributes']['name']);
+									$result[$sub['attributes']['name']] = $sub['attributes']['name'];
 							}
 						}
 					}
@@ -945,7 +945,7 @@ class CONSUMABLES extends API {
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 							'replacements' => [
 								':field' => 'incorporated',
-								':value' => $product['incorporated'],
+								':value' => $product['incorporated'] ? : 'NULL',
 								':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
 							]
 						]);
