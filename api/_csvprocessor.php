@@ -154,13 +154,6 @@ class Listprocessor {
 	private $_argument = [];
 
 	/**
-	 * define if class is called recursively
-	 * 
-	 * @var bool
-	 */
-	private $_isChild = false;
-
-	/**
 	 * define log messages
 	 * 
 	 * @var array
@@ -174,12 +167,18 @@ class Listprocessor {
 	 */
 	public $_headers = [];
 
-	private $_delimiter = '#'; // transfer to filter settings later
+	/**
+	 * define default regex pattern delimiter
+	 * eventually overrun by setup
+	 * 
+	 * @var string
+	 */
+	private $_delimiter = '#';
 
-	public function __construct($setup, $argument = [], $isChild = false){
+	public function __construct($setup, $argument = []){
 		$this->_setting = gettype($setup) === 'array' ? $setup : json_decode($setup, true);
-		$this->_isChild = $isChild;
 		$this->_argument = $argument;
+		if (isset($this->_setting['filesetting']['dialect']['preg_delimiter'])) $this->_delimiter = $this->_setting['filesetting']['dialect']['preg_delimiter'];
 
 		if (!isset($this->_argument['processedMonth'])) $this->_argument['processedMonth'] = date('m');
 		if (!isset($this->_argument['processedYear'])) $this->_argument['processedYear'] = date('Y');
@@ -353,7 +352,7 @@ class Listprocessor {
 		if (isset($this->_setting['filesetting']['encoding']) && !isset($rule['filesetting']['encoding'])) $rule['filesetting']['encoding'] = $this->_setting['filesetting']['encoding'];
 		if (isset($this->_setting['filesetting']['dialect']) && !isset($rule['filesetting']['dialect'])) $rule['filesetting']['dialect'] = $this->_setting['filesetting']['dialect'];
 		$this->_log[] = '[*] comparing with '. (gettype($rule['filesetting']['source']) === 'string' ? $rule['filesetting']['source'] : 'self');
-		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_argument['processedYear']], True);
+		$compare_list = new Listprocessor($rule, ['processedMonth' => $this->_argument['processedMonth'], 'processedYear' => $this->_argument['processedYear']]);
 		if (!isset($compare_list->_list[1])) return;
 		$matched = [];
 		// reduce current list to avoid key errors on unset items
@@ -704,7 +703,8 @@ class Listprocessor {
 			"dialect": {
 				"separator": ";",
 				"enclosure": "\"",
-				"escape": ""
+				"escape": "",
+				"preg_delimiter": "#"
 			},
 			"columns": [
 				"ORIGININDEX",
