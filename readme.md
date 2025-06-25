@@ -1872,6 +1872,7 @@ If you ever fiddle around with the sourcecode:
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 * The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results. Options best have a value independent on their label.
 * The landing page triggers the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks. This is executed once per day. Admins get the latest entry of the logfile `cron.log` within the api directory. This includes error messages as well. The logfile can be deleted to retrigger the updates.
+* Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
 
 [Content](#content)
 
@@ -5200,7 +5201,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * O.Auth_8 The user SHOULD be given the option of being informed about unusual login processes
     > The user can view their login history e.g. to spot deviations from work schedule.
 * O.Auth_9 The backend system MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
-    > This is not reasonable for the application used within a closed environment and on shared devices.
+    > Failed authentification reponds delayed which reasonably prevents brute-force-attacks. 
 * O.Auth_10 The backend system MUST request re-authentication after an appropriate period of inactivity (idle time).
     > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
 * O.Auth_11 The backend system MUST request re-authentication to reactivate the server session after an appropriate period of active use (active time).
@@ -5329,6 +5330,7 @@ All libraries are embedded locally to avoid external, probably prohibited web re
 ## Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
 * [put request with multipart form data](https://stackoverflow.com/a/18678678)
+* [preserving all characters as request parameters](https://stackoverflow.com/a/18209799/6087758)
 * [webmanifest for iis](https://stackoverflow.com/questions/49566446/how-can-i-have-iis-properly-serve-webmanifest-files-on-my-web-site)
 * [webworker caching](https://developer.chrome.com/docs/workbox/caching-strategies-overview)
 * [indexedDB](https://github.com/jakearchibald/idb)
