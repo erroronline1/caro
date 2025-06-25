@@ -525,7 +525,7 @@ class UTILITY {
 							if (isset($matches[4])){
 								// get filename
 								$filename = $matches[4];
-								$fieldname = preg_replace('/\[\]/', '', $matches[2]); //str_replace(' ', '_', preg_replace('/\[\]/', '', $matches[2]));
+								$fieldname = preg_replace('/\[\]/', '', $matches[2]);
 
 								// get tmp name
 								$filename_parts = pathinfo( $filename );
@@ -552,7 +552,6 @@ class UTILITY {
 							// Parse Field
 							else
 							{
-								//$name = str_replace(' ', '_', $name);
 								if (substr($name, -2) == '[]') { // is array
 									$name = substr($name, 0, strlen($name)-2);
 									if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
