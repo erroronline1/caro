@@ -73,7 +73,7 @@ in the output files if it is not possible to edit the following filter according
 			"keep": false,
 			"date": {
 				"column": "WE_DAT_ARTIKELSTAMM",
-				"format": ["dd", "mm", "yyyy"],
+				"format": "d.m.Y H:i",
 				"threshold": 60,
 				"bias": ">"
 			}

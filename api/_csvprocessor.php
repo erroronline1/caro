@@ -50,7 +50,7 @@ filters and returns a named array according to setup.
 		"date": filter by identifier and date diff in months
 			"identifier": column name with recurring values, e.g. customer id
 			"column": column name with date to process,
-			"format": list/array of date format order e.g. ["dd", "mm", "yyyy"],
+			"format": according to https://www.php.net/manual/en/datetime.format.php,
 			"threshold": integer for months,
 			"bias": < less than, > greater than threshold
 
@@ -80,7 +80,7 @@ filters and returns a named array according to setup.
 		"keep": boolean if matches are kept or omitted
 		"interval": discard by not matching interval in months, optional offset from initial column value
 			"column": column name with date to process,
-			"format": list/array of date format order e.g. ["dd", "mm", "yyyy"],
+			"format": according to https://www.php.net/manual/en/datetime.format.php,
 			"interval": integer for months,
 			"offset": optional offset in months
 
@@ -403,8 +403,10 @@ class Listprocessor {
 		if (isset($rule['transfer'])){
 			$thislistwithoutempty = array_filter($this->_list->toArray(), fn($row, $index) => $row ? true : false, ARRAY_FILTER_USE_BOTH);
 			foreach ($rule['transfer'] as $newcolumn => $from){
-				if (!isset($this->setting['filesetting']['columns'][$newcolumn])) $this->_setting['filesetting']['columns'][] = $newcolumn;
-				foreach ($thislistwithoutempty as $i => $row){
+				if (!in_array($newcolumn, $this->_setting['filesetting']['columns']))
+					$this->_setting['filesetting']['columns'][] = $newcolumn;
+				foreach ($this->_list as $i => $row){
+					if (!$row) continue;
 					if (($match = array_search($i, array_column($matched, 0))) !== false){
 						$row[$newcolumn] = $compare_list->_list[1][$matched[$match][1]][$from];
 					}
@@ -565,50 +567,22 @@ class Listprocessor {
 	 *		"keep": False,
 	 *		"date": {
 	 *			"column": "SOMEDATE",
-	 *			"format": ["dd", "mm", "yyyy"],
+	 *			"format": according to https://www.php.net/manual/en/datetime.format.php,
 	 *			"threshold": 6,
 	 *			"bias": "<"
 	 *		}
 	 *	},
 	*/
 	public function filter_by_monthdiff($rule){
-		foreach ($rule['interval']['format'] as &$unit){
-			switch ($unit){
-				case 'dd':
-					$unit = 'd';
-					break;
-				case 'mm':
-					$unit = 'm';
-					break;
-				case 'yy':
-					$unit = 'y';
-					break;
-				case 'yyyy':
-					$unit = 'Y';
-					break;
-				}
-		}
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
-			preg_match_all($this->_delimiter . '\d+' . $this->_delimiter . 'mi', $row[$rule['date']['column']], $entrydate);
-			if (count($entrydate[0]) < 1) continue;
-			$entrydate[0][array_search('d', $rule['date']['format'])] = '01';
-			$thismonth = [];
-			foreach ($rule['date']['format'] as $key){
-				switch($key){
-					case 'd':
-						$thismonth[] = '01';
-						break;
-					case 'm':
-						$thismonth[] = $this->_argument['processedMonth'];
-						break;
-					case 'Y':
-						$thismonth[] = $this->_argument['processedYear'];
-						break;
-				}
-			}
-			$timespan = $this->monthdiff($entrydate[0], $thismonth, $rule['date']['format']);
+			// format dates to iso
+			$entrydate = \DateTime::createFromFormat($rule['date']['format'], $row[$rule['date']['column']])->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			$thismonth = new \DateTime($this->_argument['processedYear'] . '-' . $this->_argument['processedMonth'] . '-01');
+			$thismonth = $thismonth->format('Y-m-d');
+
+			$timespan = $this->monthdiff($entrydate, $thismonth);
 			$filtermatch = ($rule['date']['bias'] === '<' && $timespan <= $rule['date']['threshold']) || ($rule['date']['bias'] === '>' && $timespan >= $rule['date']['threshold']);
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track = [
@@ -635,51 +609,23 @@ class Listprocessor {
 	 *		"keep": False,
 	 *		"interval": {
 	 *			"column": "SOMEDATE",
-	 *			"format": ["dd", "mm", "yyyy"],
+	 *			"format": according to https://www.php.net/manual/en/datetime.format.php,
 	 *			"interval": 6,
 	 *			"offset": 0
 	 *		}
 	 *	},
 	 */
 	public function filter_by_monthinterval($rule){
-		foreach ($rule['interval']['format'] as &$unit){
-			switch ($unit){
-				case 'dd':
-					$unit = 'd';
-					break;
-				case 'mm':
-					$unit = 'm';
-					break;
-				case 'yy':
-					$unit = 'y';
-					break;
-				case 'yyyy':
-					$unit = 'Y';
-					break;
-				}
-		}
 		foreach ($this->_list as $i => $row){
 			if (!$row) continue;
 
-			preg_match_all($this->_delimiter . '\d+' . $this->_delimiter . 'mi', $row[$rule['interval']['column']], $entrydate);
-			if (count($entrydate[0]) < 1) continue;
-			$entrydate[0][array_search('d', $rule['interval']['format'])] = '01';
-			$thismonth = [];
-			foreach ($rule['interval']['format'] as $key){
-				switch($key){
-					case 'd':
-						$thismonth[] = '01';
-						break;
-					case 'm':
-						$thismonth[] = $this->_argument['processedMonth'];
-						break;
-					case 'Y':
-						$thismonth[] = $this->_argument['processedYear'];
-						break;
-				}
-			}
-			$offset_edate = $this->monthdelta($entrydate[0], $rule['interval']['format'], $rule['interval']['offset']);
-			$timespan = $this->monthdiff($offset_edate, $thismonth, $rule['interval']['format']);
+			// format dates to iso
+			$entrydate = \DateTime::createFromFormat($rule['interval']['format'], $row[$rule['interval']['column']])->modify('first day of this month')->setTime(0, 0)->format('Y-m-d');
+			$thismonth = new \DateTime($this->_argument['processedYear'] . '-' . $this->_argument['processedMonth'] . '-01');
+			$thismonth = $thismonth->format('Y-m-d');
+
+			$offset_edate = $this->monthdelta($entrydate, $rule['interval']['offset']);
+			$timespan = $this->monthdiff($offset_edate, $thismonth);
 			$filtermatch = !@boolval($timespan % $rule['interval']['interval']); // Implicit conversion from float XX.XX to int loses precision
 			if (($filtermatch && !$rule['keep']) || (!$filtermatch && $rule['keep'])){
 				$track = [
@@ -963,24 +909,14 @@ class Listprocessor {
 	 *  |_|_|_|___|_|_|_| |_|_|___|___|_|_| |__,|
 	 *
 	 * adds a month delta to a passed date
-	 * @param array $date [Y, m, d]
-	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
+	 * @param string $date 
 	 * @param int $delta number of months 
 	 * @return array new date
 	 */
-	public function monthdelta($date = [], $dateformat = [], $delta = 0){
-		// force days and months two digit
-		$day = array_search('d', $dateformat);
-		$date[$day] = '01';//strlen($date[$day]) < 2 ? '0' . $date[$day] : $date[$day];
-		$month = array_search('m', $dateformat);
-		$date[$month] = strlen($date[$month]) < 2 ? '0' . $date[$month] : $date[$month];
-
-		$date = implode('-', $date);
-		$dateformat = implode('-', $dateformat);
-		$offset_date = new \DateTime(\DateTime::createFromFormat($dateformat, $date)->format('Y-m-d'));
-		$day = $offset_date->format('j');
+	public function monthdelta($date = "", $delta = 0){
+		$offset_date = new \DateTime($date);
 		$offset_date->modify('first day of ' . ($delta === 0 ? 'this' : ($delta > 1 ? '+' . $delta : '-' . $delta)) . ' month' . ($delta !==0 ? 's': ''));
-		return explode('-', $offset_date->format($dateformat));
+		return $offset_date->format('Y-m-d');
 	}
 	
 	/**
@@ -990,25 +926,14 @@ class Listprocessor {
 	 *  |_|_|_|___|_|_|_| |_|_|___|_|_| |_|
 	 *
 	 * determine approximately difference of months (not taking leap years into account)
-	 * @param array $first [Y, m, d]
-	 * @param array $last [Y, m, d]
-	 * @param array $dateformat ['Y', 'm', 'd'] actual order of date elements
+	 * passed dates have to be prepared as Y-m-d in advance
+	 * @param string $first
+	 * @param string $last
 	 * @return float difference
 	 */
-	public function monthdiff($first = [], $last = [], $dateformat = []){
-		// force days and months two digit
-		$day = array_search('d', $dateformat);
-		$first[$day] = '01';//strlen($first[$day]) < 2 ? '0' . $first[$day] : $first[$day];
-		$last[$day] = '01';//strlen($last[$day]) < 2 ? '0' . $last[$day] : $last[$day];
-		$month = array_search('m', $dateformat);
-		$first[$month] = strlen($first[$month]) < 2 ? '0' . $first[$month] : $first[$month];
-		$last[$month] = strlen($last[$month]) < 2 ? '0' . $last[$month] : $last[$month];
-		
-		$first = implode('-', $first);
-		$last = implode('-', $last);
-		$dateformat = implode('-', $dateformat);
-		$backthen = new \DateTime(\DateTime::createFromFormat($dateformat, $first)->format('Y-m-d'));
-		$processedmonth = new \DateTime(\DateTime::createFromFormat($dateformat, $last)->format('Y-m-d'));
+	public function monthdiff($first = "", $last = ""){
+		$backthen = new \DateTime($first);
+		$processedmonth = new \DateTime($last);
 		return round($processedmonth->diff($backthen, true)->days / (365 / 12), 0);
 	}
 

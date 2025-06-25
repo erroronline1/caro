@@ -56,7 +56,7 @@
 				"keep": false,
 				"date": {
 					"column": "WE_DAT_ARTIKELSTAMM",
-					"format": ["dd", "mm", "yyyy"],
+					"format": "d.m.Y H:i",
 					"threshold": 60,
 					"bias": ">"
 				}
