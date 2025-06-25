@@ -627,7 +627,8 @@ class CALENDARUTILITY {
 	 * 	':subject' => str | null,
 	 * 	':misc' => str (e.g. UTILITY::json_encoded whatnot) | null,
 	 * 	':closed' => str (e.g. UTILITY::json_encoded when, by whom) | null,
-	 * 	':alert' => int 1 | null
+	 * 	':alert' => int 1 | null,
+	 * 	':autodelete' => int 1 | null
 	 * 	]
 	 * @return int|bool insert id
 	 */
@@ -656,7 +657,8 @@ class CALENDARUTILITY {
 	 * 	':subject' => str | null,
 	 * 	':misc' => str (e.g. UTILITY::json_encoded whatnot) | null,
 	 * 	':closed' => str (e.g. UTILITY::json_encoded when, by whom) | null,
-	 * 	':alert' => int 1 | null
+	 * 	':alert' => int 1 | null,
+	 * 	':autodelete' => int 1 | null
 	 * 	]
 	 * @return int affected rows
 	 */
