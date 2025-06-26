@@ -34,13 +34,9 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * order
-    * on approval of prepared some ordertype transfer error occured
-    * rejected order message to orderer only, create calendar task
     * order state filter display not further proceeded
+        * may this be resolved with a table overview?
     * more compact overview, like a table -> table widget, details onclick?
-* product database
-    * össur fst024r 10 results?
-    * incorporation import from erp dump (e.g. last ordered)
 
 ## Content
 * [Aims](#aims)
@@ -224,7 +220,7 @@ Timestamps are not qualified. A reduced validity than manual or stamped dates on
 
 ## Tips
 * Use a calendar-button within surveillance documents to immediately set the next due date while handling the current documentation.
-* Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though.
+* Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though. If contained within the import filters, a default incorporation based of most recent erp-order is initiated.
 * Include the flowcharts from this description in your process instructions to depict your processes where defined by the application.
 
 ![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements.png)
@@ -1128,7 +1124,7 @@ Description of options:
 		"date": Filter by identifier and date diff in months
 			"identifier": Column name with recurring values, e.g. customer id
 			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
+			"format": according to https://www.php.net/manual/en/datetime.format.php,
 			"threshold": Integer for months,
 			"bias": < less than, > greater than threshold
 
@@ -1158,7 +1154,7 @@ Description of options:
 		"keep": Boolean if matches are kept or omitted
 		"interval": Discard by not matching interval in months, optional offset from initial column value
 			"column": Column name with date to process,
-			"format": List/array of date format order e.g. ["dd", "mm", "yyyy"],
+			"format": according to https://www.php.net/manual/en/datetime.format.php,
 			"interval": Integer for months,
 			"offset": Optional offset in months
 
@@ -1254,7 +1250,7 @@ A generic sample:
             "keep": false,
             "date": {
                 "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
+                "format": "d.m.Y",
                 "threshold": 6,
                 "bias": "<"
             }
@@ -1300,7 +1296,7 @@ A generic sample:
             "keep": false,
             "interval": {
                 "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
+                "format": "d.m.Y",
                 "interval": 6,
                 "offset": 0
             }
@@ -1630,6 +1626,7 @@ headerrowindex = 0
 dialect["separator"] = ";"
 dialect["enclosure"] = "\"" ;" coding environments may mess up colouring after this escaped quote
 dialect["escape"] = ""
+dialect["preg_delimiter"] ='#' ; may reduce regex escaping depending on required patterns
 
 ;forbidden names as regex-patterns
 [forbidden]
@@ -1904,70 +1901,95 @@ Vendor pricelists must have an easy structure to be importable. It may need addi
 while setting up a vendor an import rule must be defined like:
 ```js
 {
-	"filesetting": {
-		"headerrowindex": 0,
-		"dialect": {
-			"separator": ";",
-			"enclosure": "\"",
-			"escape": ""
-		},
-		"columns": ["Article Number", "Article Name", "EAN", "Sales Unit"]
-	},
-	"modify": {
-		"add": {
-			"trading_good": "0",
-			"has_expiry_date": "0",
-			"special_attention": "0",
-			"stock_item": "0"
-		},
-		"replace": [["EAN", "\\s+", ""]],
-		"conditional_and": [["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]],
-		"conditional_or": [
-			["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
-			["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
-			["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]]
-		],
-		"rewrite": [
-			{
-				"article_no": ["Article Number"],
-				"article_name": ["Article Name"],
-				"article_ean": ["EAN"],
-				"article_unit": ["Sales Unit"]
-			}
-		]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_comparison_file",
-			"comment": "transfer erp_id. source will be set if match file is provided",
-			"filesetting": {
-				"source": "ERPDUMP.csv",
-				"headerrowindex": 1,
-				"columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO"]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_expression",
-					"comment": "delete inactive articles and unneccessary vendors",
-					"keep": true,
-					"match": {
-						"all": {
-							"INACTIVE": "false",
-							"VENDOR": "magnificent.+?distributor"
-						}
-					}
-				}
-			],
-			"match": {
-				"all": {
-					"Article Number": "ARTICLE_NO"
-				}
-			},
-			"transfer": {
-				"erp_id": "ID"
-			}
-		}
-	]
+    "filesetting": {
+        "headerrowindex": 0,
+        "dialect": {
+            "separator": ";",
+            "enclosure": "\"",
+            "escape": "",
+            "preg_delimiter": "#"
+        },
+        "columns": ["Article Number", "Article Name", "EAN", "Sales Unit"]
+    },
+    "filter": [
+        {
+            "apply": "filter_by_duplicates",
+            "comment": "delete multiple pricelist entries",
+            "keep": true,
+            "duplicates": {
+                "orderby": ["Article Number"],
+                "descending": false,
+                "column": "Article Number",
+                "amount": 1
+            }
+        },
+        {
+            "apply": "filter_by_comparison_file",
+            "comment": "transfer erp_id. source will be set if match file is provided",
+            "filesetting": {
+                "source": "ERPDUMP.csv",
+                "headerrowindex": 1,
+                "columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO", "ORDER_STOP", "LAST_ORDER"]
+            },
+            "filter": [
+                {
+                    "apply": "filter_by_expression",
+                    "comment": "delete inactive articles and unneccessary vendors",
+                    "keep": true,
+                    "match": {
+                        "all": {
+                            "INACTIVE": "false",
+                            "VENDOR": "magnificent.+?distributor",
+                            "ORDER_STOP": "false"
+                        }
+                    }
+                },
+                {
+                    "apply": "filter_by_monthdiff",
+                    "comment": "discard by date diff in months, omit everything last ordered over five years ago",
+                    "keep": false,
+                    "date": {
+                        "column": "LAST_ORDER",
+                        "format": "d.m.Y H:i",
+                        "threshold": 36,
+                        "bias": ">"
+                    }
+                }
+            ],
+            "match": {
+                "all": {
+                    "Article Number": "ARTICLE_NO"
+                }
+            },
+            "transfer": {
+                "erp_id": "ID",
+                "last_order": "LAST_ORDER"
+            }
+        }
+    ],
+    "modify": {
+        "add": {
+            "trading_good": "0",
+            "has_expiry_date": "0",
+            "special_attention": "0",
+            "stock_item": "0"
+        },
+        "replace": [["EAN", "\\s+", ""]],
+        "conditional_and": [["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]],
+        "conditional_or": [
+            ["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
+            ["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
+            ["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]]
+        ],
+        "rewrite": [
+            {
+                "article_no": ["Article Number"],
+                "article_name": ["Article Name"],
+                "article_ean": ["EAN"],
+                "article_unit": ["Sales Unit"],
+            }
+        ]
+    }
 }
 ```
 *headerrowindex* and *dialect* are added with a default value from config.ini if left out.
@@ -1998,6 +2020,9 @@ Products are deleted by default on update of the pricelist unless
 * an alias has been modified
 * or it has been ordered.
 
+### Product incorporation
+In case of transfer of the last order date being part of the filter, an incorporation will be initiated with the last order date noted.
+
 ### Sample check, expiry dates and special attention
 *modify.add* and *modify.conditional* define trading goods for the MDR §14 sample check and the expiry date attribute or special attention. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates and special attention.
 
@@ -2019,7 +2044,8 @@ If not provided a simple import filter will be generated on export of pricelists
             "trading_good",
             "has_expiry_date",
             "special_attention",
-            "stock_item"
+            "stock_item",
+            "last_order"
         ]
     }
 }
@@ -2214,6 +2240,8 @@ Stakeholder identification:
 | Import ERP article ids | Purchase | 2025-05-16 | Implemented; 2025-05-17 |
 | Add soon expiring trainings as planned by default | QMO | 2025-05-30 | Implemented; 2025-05-30 |
 | Break time recommendation on time tracking | User | 2025-06-10 | Implemented; 2025-06-12 |
+| Rejected order message to orderer only, create calendar task | CEO, Supervisor | 2025-06-23 | Implemented; 2025-06-24 |
+| Reconsider incorporation approach on qm-system transfer | Supervisor | 2025-06-23 | On importing pricelists the last ERP-order-date initiates an default incorporation; 2025-06-25 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -2228,7 +2256,7 @@ Stakeholder identification:
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
 | Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation |
-| Supervisor demonstration | Supervisor, CEO, QMO PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull;order overview more compact, like a table? |
+| Supervisor demonstration | Supervisor, CEO, QMO PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull;order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
 
 [Content](#content)
 

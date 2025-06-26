@@ -127,7 +127,7 @@ Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftli
 
 ## Tips
 * Ein Kalender-Element kann in die Überwachungs-Dokumente eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
-* Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden.
+* Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden. Sofern im Import-Filter abgefragt, wird basierend auf der letzten Bestellung im ERP-System eine Produkteinführung initiiert.
 * Die Flussdiagramme dieser Beschreibung können als Darstellung innerhalb der Proszessbeschreibungen / Verfahrensanweisungen zur Darstellung genutzt werden, sofern die Abläufe durch die Anwendung festgelegt sind.
 
 ![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de.png)
@@ -1028,7 +1028,7 @@ Beschreibung der Optionen:
 		"date": Filtert nach identifier und Unterschied zweier Daten in Monaten
 			"identifier": Spaltenname mit wiederkehrenden Werten, z.B. Kundennummer,
 			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
+			"format": gemäß https://www.php.net/manual/en/datetime.format.php,
 			"threshold": Ganzzahl für Monate,
 			"bias": < kleiner als, > größer als threshold
 
@@ -1058,7 +1058,7 @@ Beschreibung der Optionen:
 		"keep": Boolescher Wert ob Treffer behalten oder aussortiert werden sollen
 		"interval": Behalte oder lösche Zeilen bei denen ein Monats-Interval nicht zutrifft, mit optionaler Verschiebung vom ursprünglichen Spaltenwert
 			"column": Spaltenname mit einem zu vergleichenden Datum,
-			"format": Liste des Datum-Formats, z.B. ["dd", "mm", "yyyy"],
+			"format": gemäß https://www.php.net/manual/en/datetime.format.php,
 			"interval": Ganzzahl für Monate,
 			"offset": optionale Verschiebung in Monaten (Ganzzahl)
 
@@ -1154,7 +1154,7 @@ Ein beliebiges Beispiel:
             "keep": false,
             "date": {
                 "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
+                "format": "d.m.Y",
                 "threshold": 6,
                 "bias": "<"
             }
@@ -1200,7 +1200,7 @@ Ein beliebiges Beispiel:
             "keep": false,
             "interval": {
                 "column": "SOMEDATE",
-                "format": ["dd", "mm", "yyyy"],
+                "format": "d.m.Y",
                 "interval": 6,
                 "offset": 0
             }
@@ -1530,6 +1530,7 @@ headerrowindex = 0
 dialect["separator"] = ";"
 dialect["enclosure"] = "\"" ;" coding environments may mess up colouring after this escaped quote
 dialect["escape"] = ""
+dialect["preg_delimiter"] ='#' ; kann Escape-Zeichen in regulären Ausdrücken reduzieren, je nach erforderlichem Muster
 
 ;unzulässige Namen gemäß REGEX-Mustern
 [forbidden]
@@ -1805,70 +1806,84 @@ Lieferantenpreislisten müssen eine einfache Struktur aufweisen um importierbar 
 Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden ähnlich:
 ```js
 {
-	"filesetting": {
-		"headerrowindex": 0,
-		"dialect": {
-			"separator": ";",
-			"enclosure": "\"",
-			"escape": ""
-		},
-		"columns": ["Artikelnummer", "Artikelbezeichnung", "EAN", "Verkaufseinheit"]
-	},
-	"modify": {
-		"add": {
-			"trading_good": "0",
-			"has_expiry_date": "0",
-			"special_attention": "0",
-			"stock_item": "0"
-		},
-		"replace": [["EAN", "\\s+", ""]],
-		"conditional_and": [["trading_good", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die als Handelsware erkannt werden sollen"]]],
-		"conditional_or": [
-			["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
-			["special_attention", "1", ["Artikelnummer", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]],
-			["stock_item", "1", ["Article Number", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die lagernd sind"]]
-		],
-		"rewrite": [
-			{
-				"article_no": ["Artikelnummer"],
-				"article_name": ["Artikelbezeichnung"],
-				"article_ean": ["EAN"],
-				"article_unit": ["Verkaufseinheit"]
-			}
-		]
-	},
-	"filter": [
-		{
-			"apply": "filter_by_comparison_file",
-			"comment": "Übertrage ERP-ID. Source wird von der Anwendung gesetzt, sofern eine Datei bereitgestellt wird.",
-			"filesetting": {
-				"source": "ERPDUMP.csv",
-				"headerrowindex": 1,
-				"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_expression",
-					"comment": "lösche inaktive Produkte und ungenutzte Lieferanten",
-					"keep": true,
-					"match": {
-						"all": {
-							"STATUS": "false",
-							"LIEFERANTENNAME": "toller.+?lieferant"
-						}
-					}
-				}
-			],
-			"match": {
-				"all": {
-					"Artikelnummer": "BESTELL_NUMMER"
-				}
-			},
-			"transfer": {
-				"erp_id": "REFERENZ"
-			}
-		}
-	]
+    "filesetting": {
+        "headerrowindex": 0,
+        "dialect": {
+            "separator": ";",
+            "enclosure": "\"",
+            "escape": "",
+            "preg_delimiter": "#"
+        },
+        "columns": ["Artikelnummer", "Artikelbezeichnung", "EAN", "Verkaufseinheit"]
+    },
+    "filter": [
+        {
+            "apply": "filter_by_comparison_file",
+            "comment": "Übertrage ERP-ID. Source wird von der Anwendung gesetzt, sofern eine Datei bereitgestellt wird.",
+            "filesetting": {
+                "source": "ERPDUMP.csv",
+                "headerrowindex": 1,
+                "columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+            },
+            "filter": [
+                {
+                    "apply": "filter_by_expression",
+                    "comment": "lösche inaktive Produkte und ungenutzte Lieferanten",
+                    "keep": true,
+                    "match": {
+                        "all": {
+                            "STATUS": "false",
+                            "LIEFERANTENNAME": "toller.+?lieferant",
+                            "BESTELLSTOP": "false"
+                        }
+                    }
+                },
+                {
+                    "apply": "filter_by_monthdiff",
+                    "comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+                    "keep": false,
+                    "date": {
+                        "column": "WE_DAT_ARTIKELSTAMM",
+                        "format": "d.m.Y H:i",
+                        "threshold": 36,
+                        "bias": ">"
+                    }
+                }
+            ],
+            "match": {
+                "all": {
+                    "Artikelnummer": "BESTELL_NUMMER"
+                }
+            },
+            "transfer": {
+                "erp_id": "REFERENZ",
+                "last_order": "WE_DAT_ARTIKELSTAMM"
+            }
+        }
+    ],
+    "modify": {
+        "add": {
+            "trading_good": "0",
+            "has_expiry_date": "0",
+            "special_attention": "0",
+            "stock_item": "0"
+        },
+        "replace": [["EAN", "\\s+", ""]],
+        "conditional_and": [["trading_good", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die als Handelsware erkannt werden sollen"]]],
+        "conditional_or": [
+            ["has_expiry_date", "1", ["Artikelbezeichnung", "ein beliebiger regulärer Ausdruck, welcher Artikelbezeichnungen erfasst, die ein Verfallsdatum vorweisen"]],
+            ["special_attention", "1", ["Artikelnummer", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die eine besondere Aufmwerksamkeit erfordern (z.B. Hautkontakt)"]],
+            ["stock_item", "1", ["Article Number", "eine beliebiger regulärer Ausdruck, welcher Artikelnummern erfasst, die lagernd sind"]]
+        ],
+        "rewrite": [
+            {
+                "article_no": ["Artikelnummer"],
+                "article_name": ["Artikelbezeichnung"],
+                "article_ean": ["EAN"],
+                "article_unit": ["Verkaufseinheit"]
+            }
+        ]
+    }
 }
 ```
 *headerrowindex* und *dialect* werden mit dem Standardwert der config.ini ergänzt, falls sie nicht Teil des Filters sind.
@@ -1899,6 +1914,9 @@ Produkte werden im Falle einer Preislistenaktualisierung automatisch gelöscht, 
 * es wurde ein Alias festgelegt
 * oder es wurde schon einmal bestellt.
 
+### Produkteinführung
+Ist der Transfer des letzten Bestelldatums Bestandteil des Filters, wird eine Produkteinführung insofern initiiert, als dass das letzte Bestelldatum vermerkt wird.
+
 ### Stichprobenprüfung, Verfallsdaten und besondere Aufmerksamkeit
 *modify.add* und *modify.conditional* definieren Handelswaren für die Stichprobenprüfung nach MDR §14 und Artikel mit Verfallsdaten oder besonderer Aufmerksamkeit. *conditional* kann auch nach dem *rewrite* von "article_name" angewendet werden, sofern diese Spalte aus zusammenhängenden Ursprungsspalten besteht. Sollen alle Artikel des Lieferanten als Handelswaren markiert werden kann "trading_good" als 1 ergänzt (*add*) und *conditional* ausgelassen werden. Wenn bekanntermaßen keine Handelswaren in der Preisliste enthalten sind kann dies komplett entfallen, da "trading_good" standardmäßig mit 0 angelegt wird. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
 
@@ -1920,7 +1938,8 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
             "trading_good",
             "has_expiry_date",
             "special_attention",
-            "stock_item"
+            "stock_item",
+            "last_order"
         ]
     }
 }
