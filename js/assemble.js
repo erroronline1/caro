@@ -432,7 +432,7 @@ export class Dialog {
 		if (this.type) {
 			// define output dialog
 			if (this.type === "input") this.modal = "inputmodal";
-			if (["input2", "preview"].includes(this.type)) {
+			if (["input2", "confirm", "preview"].includes(this.type)) {
 				this.modal = "inputmodal2";
 			}
 			if (this.type === "input2") this.type = "input";
