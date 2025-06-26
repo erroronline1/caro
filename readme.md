@@ -35,8 +35,10 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 * order
     * order state filter display not further proceeded
-        * may this be resolved with a table overview?
-    * more compact overview, like a table -> table widget, details onclick?
+    * more compact overview, details onclick? => tiles
+    * order type icon | qty, productunit, productname, vendor | unit | commission | orderer
+    * user setting for display mode (tiles/articles)
+    * frontend routes to respective processing of payload
 
 ## Content
 * [Aims](#aims)
