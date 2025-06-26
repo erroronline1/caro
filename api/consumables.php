@@ -35,10 +35,67 @@ class CONSUMABLES extends API {
 			"dialect": {
 				"separator": ";",
 				"enclosure": "\"",
-				"escape": ""
+				"escape": "",
+				"preg_delimiter": "#"
 			},
 			"columns": ["Article Number", "Article Name", "EAN", "Sales Unit"]
 		},
+		"filter": [
+			{
+				"apply": "filter_by_duplicates",
+				"comment": "delete multiple pricelist entries",
+				"keep": true,
+				"duplicates": {
+					"orderby": ["Article Number"],
+					"descending": false,
+					"column": "Article Number",
+					"amount": 1
+				}
+			},
+			{
+				"apply": "filter_by_comparison_file",
+				"comment": "transfer erp_id. source will be set if match file is provided",
+				"filesetting": {
+					"source": "ERPDUMP.csv",
+					"headerrowindex": 1,
+					"columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO", "ORDER_STOP", "LAST_ORDER"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete inactive articles and unneccessary vendors",
+						"keep": true,
+						"match": {
+							"all": {
+								"INACTIVE": "false",
+								"VENDOR": "magnificent.+?distributor",
+								"ORDER_STOP": "false"
+							}
+						}
+					},
+					{
+						"apply": "filter_by_monthdiff",
+						"comment": "discard by date diff in months, omit everything last ordered over five years ago",
+						"keep": false,
+						"date": {
+							"column": "LAST_ORDER",
+							"format": "d.m.Y H:i",
+							"threshold": 60,
+							"bias": ">"
+						}
+					}
+				],
+				"match": {
+					"all": {
+						"Article Number": "ARTICLE_NO"
+					}
+				},
+				"transfer": {
+					"erp_id": "ID",
+					"last_order": "LAST_ORDER"
+				}
+			}
+		],
 		"modify": {
 			"add": {
 				"trading_good": "0",
@@ -61,39 +118,7 @@ class CONSUMABLES extends API {
 					"article_unit": ["Sales Unit"]
 				}
 			]
-		},
-		"filter": [
-			{
-				"apply": "filter_by_comparison_file",
-				"comment": "transfer erp_id. source will be set if match file is provided",
-				"filesetting": {
-					"source": "ERPDUMP.csv",
-					"headerrowindex": 1,
-					"columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO"]
-				},
-				"filter": [
-					{
-						"apply": "filter_by_expression",
-						"comment": "delete inactive articles and unneccessary vendors",
-						"keep": true,
-						"match": {
-							"all": {
-								"INACTIVE": "false",
-								"VENDOR": "magnificent.+?distributor"
-							}
-						}
-					}
-				],
-				"match": {
-					"all": {
-						"Article Number": "ARTICLE_NO"
-					}
-				},
-				"transfer": {
-					"erp_id": "ID"
-				}
-			}
-		]
+		}
 	}
 	END;
 
@@ -143,7 +168,7 @@ class CONSUMABLES extends API {
 			]]);
 
 		// create csv
-		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item'];
+		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'last_order'];
 		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'pricelist.csv';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
@@ -791,6 +816,7 @@ class CONSUMABLES extends API {
 					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					'protected' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
+					'incorporated' => null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
 					'special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null,
 					'stock_item' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null,
@@ -825,6 +851,7 @@ class CONSUMABLES extends API {
 						':hidden' => $product['hidden'],
 						':protected' => $product['protected'],
 						':trading_good' => $product['trading_good'],
+						':incorporated' => $product['incorporated'],
 						':has_expiry_date' => $product['has_expiry_date'],
 						':special_attention' => $product['special_attention'],
 						':stock_item' => $product['stock_item'],
@@ -1681,7 +1708,15 @@ class CONSUMABLES extends API {
 					':hidden' => null,
 					':protected' => null,
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) && intval($pricelist->_list[1][$index]['trading_good']) ? 1 : null,
-					':incorporated' => null,
+					':incorporated' => isset($pricelist->_list[1][$index]['last_order']) && $pricelist->_list[1][$index]['last_order'] 
+						? UTILITY::json_encode([
+							'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $pricelist->_list[1][$index]['last_order']], true),
+							'user' => [
+								'name' => $_SESSION['user']['name'],
+								'date' => $this->_date['servertime']->format('Y-m-d H:i')
+							]
+						])
+						: null,
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ?1 : null,
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) && intval($pricelist->_list[1][$index]['special_attention']) ? 1 : null,
 					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) && intval($pricelist->_list[1][$index]['stock_item']) ? 1 : null,
@@ -1691,7 +1726,7 @@ class CONSUMABLES extends API {
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
 			foreach ($sqlchunks as $chunk){
 				try {
-					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_date['servertime']->format("Y-m-d");
+					if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) $date = $this->_date['servertime']->format('Y-m-d');
 				}
 				catch (\Exception $e) {
 					echo $e, $chunk;

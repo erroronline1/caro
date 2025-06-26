@@ -841,6 +841,7 @@
 			"hidden": "nicht verfügbar",
 			"incorporated_not": "Produkt nicht eingeführt",
 			"incorporated_revoke": "Status widerrufen",
+			"incorporation_import_default": "Das Produkt wurde zuletzt am :date über das ERP-System bestellt, die Einführung erfolgte außerhalb der Anwendung.",
 			"incorporation_no_approvals": "Produkte mit laufenden Einführungsverfahren",
 			"incorporation_pending": "Freigabe von :permission steht noch aus",
 			"information_products_available": ":available verfügbare Produkte in der Datenbank",

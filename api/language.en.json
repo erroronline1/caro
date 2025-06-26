@@ -841,6 +841,7 @@
 			"hidden": "inactive and hidden",
 			"incorporated_not": "Product not incorporated",
 			"incorporated_revoke": "Revoke state",
+			"incorporation_import_default": "Product has been ordered most recently on :date through the ERP-system. Incorporation happened outside of the application.",
 			"incorporation_no_approvals": "products with pending incorporations",
 			"incorporation_pending": "Incorporation by :permission pending",
 			"information_products_available": ":available available products in database",
