@@ -1339,7 +1339,7 @@ export const _client = {
 		 * @event hiding or displaying records
 		 */
 		casestatefilter: (casestate) => {
-			document.querySelectorAll("article>a").forEach((anchor) => {
+			document.querySelectorAll("article[role]").forEach((anchor) => {
 				anchor.style.display = casestate ? "none" : "block";
 			});
 			if (casestate)

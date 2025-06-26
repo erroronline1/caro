@@ -1453,22 +1453,39 @@ class RECORD extends API {
 					|| ($this->_unit && $this->_unit !== '_unassigned' && (!$record['units'] || !in_array($this->_unit, $record['units'])))
 				)) continue;
 
-				// add to result
-				$linkdisplay = $this->_lang->GET('record.list_touched', [
-					':identifier' => $record['identifier'],
-					':date' => $this->convertFromServerTime($record['last_touch']),
-					':document' => $record['last_document']
-					]);
-				$contexts[$contextkey][$linkdisplay] = [
-					'href' => "javascript:api.record('get', 'record', '" . $record['identifier'] . "')"
+				// create entry
+				$tile = [
+					'type' => 'tile',
+					'attributes' => [
+						'onclick' => "api.record('get', 'record', '" . $record['identifier'] . "')",
+						'onkeydown' => "if (event.key==='Enter') api.record('get', 'record', '" . $record['identifier'] . "')",
+						'role' => 'link',
+						'tabindex' => '0'
+					],
+					'content' => [
+						[
+							'type' => 'textsection',
+							'content' => $this->_lang->GET('record.list_touched', [
+								':date' => $this->convertFromServerTime($record['last_touch']),
+								':document' => $record['last_document']
+							]),
+							'attributes' => [
+								'data-type' => 'record',
+								'name' => $record['identifier']
+							]
+						]
+					]
 				];
 				// append dataset states
 				foreach ($record['case_state'] as $case => $state){
-					$contexts[$contextkey][$linkdisplay]['data-' . $case] = $state;
+					$tile['attributes']['data-' . $case] = $state;
 				}
 				// style closed and complaints
-				if ($record['complaint']) $contexts[$contextkey][$linkdisplay]['class'] = 'orange';
-				if ($record['closed']) $contexts[$contextkey][$linkdisplay]['class'] = 'green';
+				if ($record['complaint']) $tile['content'][0]['attributes']['class'] = 'orange';
+				if ($record['closed']) $tile['content'][0]['attributes']['class'] = 'green';
+
+				// add to result
+				$contexts[$contextkey][] = $tile;
 			}
 		}
 
@@ -1521,17 +1538,20 @@ class RECORD extends API {
 		];
 		// append records
 		if ($contexts){
-			foreach ($contexts as $context => $links){
-				if ($links){
+			foreach ($contexts as $context => $tiles){
+				if ($tiles){
 					if ($casestate = $this->casestate(explode('.', $context)[1], 'radio', ['onchange' => "_client.record.casestatefilter(this.dataset.casestate)"], isset($_SESSION['user']['app_settings']['primaryRecordState']) ? $_SESSION['user']['app_settings']['primaryRecordState'] : null))
-						array_push($content, $casestate);
-					array_push($content, [
-						[
-							'type' => 'links',
-							'description' => $this->_lang->GET('documentcontext.' . $context),
-							'content' => $links
+					array_push($content, $casestate);
+
+					$article = [];
+					array_push($article, [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('documentcontext.' . $context)
 						]
 					]);
+					array_push($article, ...$tiles);
+					array_push($content, $article);
 				}
 				else array_push($content, $this->noContentAvailable($this->_lang->GET('record.no_records')));
 			}

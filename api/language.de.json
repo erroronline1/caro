@@ -1308,7 +1308,7 @@
 		"import_success": "Passende Daten wurde importiert. Bitte prüfe diese und beachte deine Verantwortung für die Richtigkeit. Nur die jüngsten Daten für das jeweils benannte Feld werden verwendet.\n\nStelle sicher, dass du den richtigen Identifikator verwendest!",
 		"inquiry": "Frage zum Vorgang",
 		"inquiry_message_content": ":user hat zum Vorgang :identifier eine Frage: :inquiry",
-		"list_touched": ":identifier, letzte Bearbeitung am :date mit :document",
+		"list_touched": "letzte Bearbeitung am :date mit :document",
 		"mark_as_closed": "Als abgeschlossen kennzeichnen in deiner Rolle als",
 		"mark_as_closed_info": "Die Aufzeichnungen erscheinen nicht mehr in der Übersicht, können aber über den Filter weiterhin erreicht werden.",
 		"match_bundles": "Mit beliebigen Paket abgleichen",
