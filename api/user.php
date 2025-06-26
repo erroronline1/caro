@@ -138,6 +138,17 @@ class USER extends API {
 					else
 						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
 				}
+				if ($orderLayout = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_order_layout'))){
+					if ($orderLayout === $this->_lang->GET('user.settings_order_layout_full'))
+						unset($user['app_settings']['orderLayout']);
+					else
+						switch($orderLayout){
+							// in case other options may become implemented also see utility.js _client.order.approved()
+							case $this->_lang->GET('user.settings_order_layout_tile'):
+								$user['app_settings']['orderLayout'] = 'tile';
+								break;
+						}
+				}
 
 				foreach ($user['app_settings'] as $key => $value){
 					if (!$value) unset($user['app_settings'][$key]);
@@ -443,6 +454,16 @@ class USER extends API {
 								$this->_lang->GET('user.settings_force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
+							]
+						], [
+							// append preferred order layout
+							'type' => 'radio',
+							'attributes' => [
+								'name' => $this->_lang->GET('user.settings_order_layout')
+							],
+							'content' => [
+								$this->_lang->GET('user.settings_order_layout_full') => !isset($user['app_settings']['orderLayout']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings_order_layout_tile') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'tile' ? ['checked' => true] : [],
 							]
 						], [
 							'type' => 'hr'

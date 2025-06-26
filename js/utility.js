@@ -601,12 +601,7 @@ export const _client = {
 		approved: (data = undefined) => {
 			if (!data) return;
 			let content = [],
-				filter = {},
-				order = [],
-				collapsible = [],
-				buttons = {},
-				links = {},
-				labels = [];
+				filter = {};
 
 			// construct filter checkboxes with events
 			filter[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value)' };
@@ -645,6 +640,30 @@ export const _client = {
 					},
 				});
 			}
+
+			if (api._settings.user.app_settings.orderLayout) {
+				switch (api._settings.user.app_settings.orderLayout) {
+					// in case other options may become implemented also see user.php profile
+					case "tile":
+						content.push(..._client.order.tiles(data));
+						break;
+					default:
+						content.push(..._client.order.full(data));
+				}
+			} else content.push(..._client.order.full(data));
+
+			const render = new Assemble({ content: content });
+			document.getElementById("main").replaceChildren(render.initializeSection());
+			render.processAfterInsertion();
+		},
+		full: (data) => {
+			// displays full fledged information of every item as article
+			let content = [],
+				order = [],
+				collapsible = [],
+				buttons = {},
+				links = {},
+				labels = [];
 
 			// iterate over orders and construct Assemble syntax
 			for (const element of data.order) {
@@ -716,7 +735,7 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({
-									type: "input",
+									type: "input2",
 									header: api._lang.GET("order.commission"),
 									render: [
 										[
@@ -823,7 +842,7 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({
-									type: "input",
+									type: "input2",
 									header: api._lang.GET("order.ordernumber_label"),
 									render: [
 										[
@@ -906,7 +925,7 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({
-									type: "input",
+									type: "input2",
 									header: api._lang.GET("order.add_information"),
 									render: [
 										{
@@ -1021,7 +1040,7 @@ export const _client = {
 						this.setAttribute("data-partially_received", this.checked.toString());
 						if (this.checked)
 							new _client.Dialog({
-								type: "input",
+								type: "input2",
 								header: api._lang.GET("order.add_information"),
 								render: [
 									{
@@ -1050,7 +1069,7 @@ export const _client = {
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
 							new _client.Dialog({
-								type: "input",
+								type: "input2",
 								header: api._lang.GET("order.disapprove"),
 								render: [
 									{
@@ -1084,7 +1103,7 @@ export const _client = {
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
 							new _client.Dialog({
-								type: "input",
+								type: "input2",
 								header: api._lang.GET("order.cancellation"),
 								render: [
 									{
@@ -1118,7 +1137,7 @@ export const _client = {
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
 							new _client.Dialog({
-								type: "input",
+								type: "input2",
 								header: api._lang.GET("order.return"),
 								render: [
 									{
@@ -1160,7 +1179,7 @@ export const _client = {
 							onchange: function () {
 								if (this.value === "...") return false;
 								new _client.Dialog({
-									type: "input",
+									type: "input2",
 									header: api._lang.GET("order.orderstate_description") + " " + this.value,
 									render: [
 										{
@@ -1327,9 +1346,78 @@ export const _client = {
 				}
 				content.push(order);
 			}
-			const render = new Assemble({ content: content });
-			document.getElementById("main").replaceChildren(render.initializeSection());
-			render.processAfterInsertion();
+			return content;
+		},
+		tiles: (data) => {
+			// displays compact information as tiles with event opening information as dialog
+			let content = [],
+				order = [],
+				tile = [],
+				groups = {},
+				buttons = {},
+				orderdata = {},
+				// intermediate solution, maybe selecteable later
+				groupby = "commission";
+			// iterate over orders and construct Assemble syntax
+			for (const element of data.order) {
+				// reinstatiate
+				order = [];
+				// sanitize null data for proper output
+				["unit", "ordernumber", "name", "vendor"].forEach((e) => {
+					if (!element[e]) element[e] = "";
+				});
+
+				// append ordertext
+				order.push({
+					type: "textsection",
+					content: api._lang.GET("order.ordertype." + element.ordertype) + (element.commission ? "\n" + element.commission : ""),
+					attributes: {
+						name: api._lang.GET("order.prepared_order_item", {
+							":quantity": element.quantity ? element.quantity : "",
+							":unit": element.unit ? element.unit : "",
+							":number": element.ordernumber ? element.ordernumber : "",
+							":name": element.name ? element.name : "",
+							":vendor": element.vendor ? element.vendor : "",
+							":aut_idem": element.aut_idem ? element.aut_idem : "",
+						}),
+						"data-type": element.ordertype,
+					},
+				});
+
+				// pass full info for current element into new object
+				orderdata = {
+					approval: {},
+					order: [element],
+				};
+				if (data.approval[element.approval]) orderdata.approval[element.approval] = data.approval[element.approval];
+				buttons = {};
+				buttons[api._lang.GET("general.ok_button")] = false;
+				tile = {
+					type: "tile",
+					attributes: {
+						onclick: function () {
+							new _client.Dialog({
+								type: "input",
+								header: api._lang.GET("order.ordertype." + "element.ordertype"),
+								render: _client.order.full(orderdata),
+								options: buttons,
+							});
+						}
+							.toString()
+							._replaceArray(["element.ordertype", "orderdata", "buttons"], [element.ordertype, JSON.stringify(orderdata), JSON.stringify(buttons)]),
+						onkeydown: "",
+						role: "link",
+						tabindex: "0",
+					},
+					content: order,
+				};
+				if (!groups[element[groupby]]) groups[element[groupby]] = [];
+				groups[element[groupby]].push(tile);
+			}
+			for (const group of Object.entries(groups)) {
+				content.push(group);
+			}
+			return content;
 		},
 	},
 	record: {

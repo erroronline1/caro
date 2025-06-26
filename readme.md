@@ -35,10 +35,8 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 * order
     * order state filter display not further proceeded
-    * more compact overview, details onclick? => tiles
     * order type icon | qty, productunit, productname, vendor | unit | commission | orderer
-    * user setting for display mode (tiles/articles)
-    * frontend routes to respective processing of payload
+* css dialog toast on top
 
 ## Content
 * [Aims](#aims)
@@ -2244,6 +2242,7 @@ Stakeholder identification:
 | Break time recommendation on time tracking | User | 2025-06-10 | Implemented; 2025-06-12 |
 | Rejected order message to orderer only, create calendar task | CEO, Supervisor | 2025-06-23 | Implemented; 2025-06-24 |
 | Reconsider incorporation approach on qm-system transfer | Supervisor | 2025-06-23 | On importing pricelists the last ERP-order-date initiates an default incorporation; 2025-06-25 |
+| Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information and compect tiles for now; 2025-06-26 | 
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
