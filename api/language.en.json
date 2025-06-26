@@ -1263,6 +1263,8 @@
 		},
 		"saved": "Approved order can now be processed by the purchase department.",
 		"saved_to_prepared": "Order has been saved to prepared orders but has still to be approved.",
+		"tile_mark":"mark",
+		"tile_open":"open",
 		"tile_title": "add :product by :vendor to order",
 		"token_verified": " verified by token",
 		"trace_label": "Batch identifier",

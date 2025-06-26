@@ -1302,7 +1302,7 @@ export const _client = {
 				// append incorporation state
 				if (element.incorporation) {
 					if (element.incorporation.item)
-					productaction.push({
+						productaction.push({
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.incorporation.incorporation"),
@@ -1310,7 +1310,7 @@ export const _client = {
 							},
 						});
 					else if (element.incorporation.state)
-					productaction.push({
+						productaction.push({
 							type: "textsection",
 							attributes: {
 								name: element.incorporation.state,
@@ -1320,7 +1320,7 @@ export const _client = {
 				// append sample check state
 				if (element.samplecheck) {
 					if (element.samplecheck.item)
-					productaction.push({
+						productaction.push({
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.sample_check.sample_check"),
@@ -1328,7 +1328,7 @@ export const _client = {
 							},
 						});
 					else if (element.samplecheck.state)
-					productaction.push({
+						productaction.push({
 							type: "textsection",
 							attributes: {
 								name: element.samplecheck.state,
@@ -1337,13 +1337,9 @@ export const _client = {
 				}
 
 				// create order container
-				if (preventcollapsible){
-					order = [
-						...collapsible,
-						...productaction
-					];
-				}
-				else {
+				if (preventcollapsible) {
+					order = [...collapsible, ...productaction];
+				} else {
 					order = [
 						{
 							type: "collapsible",
@@ -1364,6 +1360,7 @@ export const _client = {
 			let content = [],
 				order = [],
 				tile = [],
+				tileinfo = [],
 				groups = {},
 				buttons = {},
 				orderdata = {},
@@ -1394,7 +1391,6 @@ export const _client = {
 						"data-type": element.ordertype,
 					},
 				});
-
 				// pass full info for current element into new object
 				orderdata = {
 					approval: {},
@@ -1403,9 +1399,10 @@ export const _client = {
 				if (data.approval[element.approval]) orderdata.approval[element.approval] = data.approval[element.approval];
 				buttons = {};
 				buttons[api._lang.GET("general.ok_button")] = false;
-				tile = {
-					type: "tile",
+				order.push({
+					type: "button",
 					attributes: {
+						value: api._lang.GET("order.tile_open"),
 						onclick: function () {
 							new _client.Dialog({
 								type: "input",
@@ -1416,7 +1413,32 @@ export const _client = {
 						}
 							.toString()
 							._replaceArray(["element.ordertype", "orderdata", "buttons"], [element.ordertype, JSON.stringify(orderdata), JSON.stringify(buttons)]),
-						onkeydown: "",
+					},
+				});
+
+				if (!element.incorporation && !element.samplecheck) {
+					// api.purchase("put", "approved", "2036", "partially_received", this.checked);
+					buttons = {};
+					(buttons[api._lang.GET("order.tile_mark")] = { value: element.id }),
+						order.push({
+							type: "checkbox",
+							content: buttons,
+						});
+				} else {
+					tileinfo = [];
+					if (element.incorporation) tileinfo.push(api._lang.GET("order.incorporation.incorporation"));
+					if (element.samplecheck) tileinfo.push(api._lang.GET("order.samplecheck.samplecheck"));
+					order.push({
+						type: "textsection",
+						attributes: {
+							name: tileinfo.join(", "),
+						},
+					});
+				}
+
+				tile = {
+					type: "tile",
+					attributes: {
 						role: "link",
 						tabindex: "0",
 					},
