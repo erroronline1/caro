@@ -13,7 +13,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			},
 			"modify": {
 				"add": {
@@ -52,12 +52,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["schwarz"],
+						"descending": false,
+						"column": "schwarz",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -67,8 +78,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "aet"
+									"LIEFERANTENNAME": "aet",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -78,7 +102,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -112,7 +137,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -144,12 +169,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["article_no"],
+						"descending": false,
+						"column": "article_no",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -159,8 +195,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "albrecht"
+									"LIEFERANTENNAME": "albrecht",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -170,7 +219,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -204,7 +254,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -236,12 +286,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["article_no"],
+						"descending": false,
+						"column": "article_no",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -251,8 +312,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "amt"
+									"LIEFERANTENNAME": "amt",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -262,7 +336,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -298,6 +373,63 @@
 			"filesetting": {
 				"columns": ["Artikelnr.", "Artikelbeschreibung", "Einheit", "Barcode"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnr."],
+						"descending": false,
+						"column": "Artikelnr.",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "Arthroven",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikelnr.": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1",
@@ -311,39 +443,7 @@
 						"article_ean": ["Barcode"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "Arthroven"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikelnr.": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -374,12 +474,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel-Nr."],
+						"descending": false,
+						"column": "Artikel-Nr.",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -389,8 +500,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "Aspen"
+									"LIEFERANTENNAME": "Aspen",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -400,7 +524,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -436,6 +561,63 @@
 			"filesetting": {
 				"columns": ["Art-Nr", "Artikelname", "Groesse", "Seite", "Farbe", "EAN GTIN", "Verpackungseinheit"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Art-Nr"],
+						"descending": false,
+						"column": "Art-Nr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "basko",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Art-Nr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -459,39 +641,7 @@
 						"article_ean": ["EAN GTIN"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "basko"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Art-Nr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -508,7 +658,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -527,6 +677,63 @@
 			"filesetting": {
 				"columns": ["Artikel", "Artikelbeschreibung"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel"],
+						"descending": false,
+						"column": "Artikel",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "blatchford",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikel": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -540,39 +747,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "blatchford"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikel": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -590,6 +765,75 @@
 			"filesetting": {
 				"columns": ["Artikelnr.", "Variante", "Bezeichnung", "Größe", "Farbe", "Seite / Ausführung", "Einheit", "EAN", "CCL"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_expression",
+					"comment": "filter articles",
+					"keep": false,
+					"match": {
+						"any": {
+							"CCL": ".+",
+							"Bezeichnung": "climacare|aktiven|displ..|easylife|knet|hilfe",
+							"Größe": "MAß"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnr."],
+						"descending": false,
+						"column": "Artikelnr.",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "bort",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"article_no": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1",
@@ -609,51 +853,7 @@
 						"article_ean": ["EAN"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_expression",
-					"comment": "filter articles",
-					"keep": false,
-					"match": {
-						"any": {
-							"CCL": ".+",
-							"Bezeichnung": "climacare|aktiven|displ..|easylife|knet|hilfe",
-							"Größe": "MAß"
-						}
-					}
-				},
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "bort"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"article_no": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -670,7 +870,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -690,6 +890,63 @@
 				"columns": ["article_no", "Bezeichnung", "Einheit"],
 				"headerrowindex": 14
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["article_no"],
+						"descending": false,
+						"column": "article_no",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "busch",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"article_no": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"special_attention": 0,
@@ -714,39 +971,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "busch"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"article_no": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -765,6 +990,63 @@
 				"headerrowindex": 8,
 				"columns": ["Artikelnummer", "Bezeichnung", "GTIN"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "caroli",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikelnummer": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"special_attention": "0"
@@ -778,39 +1060,7 @@
 						"article_ean": ["GTIN"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "caroli"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikelnummer": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -842,12 +1092,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["article_no"],
+						"descending": false,
+						"column": "article_no",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -857,8 +1118,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "cosmesil"
+									"LIEFERANTENNAME": "cosmesil",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -868,7 +1142,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -904,6 +1179,63 @@
 				"headerrowindex": 0,
 				"columns": ["Kategorie", "Produktname", "Produktbezeichnung", "Farbe", "Größenbez.", "Artikel-Nr.", "VE ", "EAN 13"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel-Nr"],
+						"descending": false,
+						"column": "Artikel-Nr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "darco",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"article_no": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1",
@@ -922,39 +1254,7 @@
 						"article_ean": ["EAN 13"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "darco"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"article_no": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -971,7 +1271,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -1003,12 +1303,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Bestellnr."],
+						"descending": false,
+						"column": "Bestellnr.",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -1018,8 +1329,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "erkodent"
+									"LIEFERANTENNAME": "erkodent",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -1029,7 +1353,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -1060,6 +1385,63 @@
 			"filesetting": {
 				"columns": ["artnr"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["artnr"],
+						"descending": false,
+						"column": "artnr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "feet-control",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"artnr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"has_expiry_date": "0"
@@ -1073,39 +1455,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "feet-control"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"artnr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1123,6 +1473,63 @@
 			"filesetting": {
 				"columns": ["Art-Nr", "Bezeichnung", "Bezeichnung 2", "ME", "EANNummer"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Art-Nr"],
+						"descending": false,
+						"column": "Art-Nr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "fior.+?gentz",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Art-Nr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0"
@@ -1137,39 +1544,7 @@
 						"article_ean": ["EANNummer"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "fior.+?gentz"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Art-Nr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1188,24 +1563,25 @@
 				"headerrowindex": 2,
 				"columns": ["Art Nr", "Bezeichnung", "Menge"]
 			},
-			"modify": {
-				"rewrite": [
-					{
-						"article_no": ["Art Nr"],
-						"article_name": ["Bezeichnung"],
-						"article_unit": ["Menge"],
-						"article_ean": [""]
-					}
-				]
-			},
 			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Art Nr"],
+						"descending": false,
+						"column": "Art Nr",
+						"amount": 1
+					}
+				},
 				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -1215,8 +1591,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "gottinger"
+									"LIEFERANTENNAME": "gottinger",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -1226,10 +1615,21 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
-			]
+			],
+			"modify": {
+				"rewrite": [
+					{
+						"article_no": ["Art Nr"],
+						"article_name": ["Bezeichnung"],
+						"article_unit": ["Menge"],
+						"article_ean": [""]
+					}
+				]
+			}
 		}
 	},
 	{
@@ -1248,6 +1648,63 @@
 				"headerrowindex": 1,
 				"columns": ["Nr", "Beschreibung 1", "Beschreibung 2", "Farbe", "Groesse", "Einheiten"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Nr"],
+						"descending": false,
+						"column": "Nr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "ihle",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Nr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0"
@@ -1261,39 +1718,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "ihle"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Nr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1310,7 +1735,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -1328,7 +1753,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -1348,6 +1773,63 @@
 				"columns": ["Plangruppe", "Artikelnummer", "Artikelbezeichnung", "Mengeneinheit"],
 				"headerrowindex": 9
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "kowsky",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikelnummer": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1"
@@ -1362,39 +1844,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "kowsky"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikelnummer": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1411,7 +1861,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -1430,6 +1880,63 @@
 			"filesetting": {
 				"columns": ["Material", "Bezeichnung"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Material"],
+						"descending": false,
+						"column": "Material",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "lohmann.+?rauscher",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Material": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"has_expiry_date": "0",
@@ -1447,39 +1954,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "lohmann.+?rauscher"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Material": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1496,7 +1971,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -1514,7 +1989,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -1533,6 +2008,63 @@
 			"filesetting": {
 				"columns": ["ArtikelNr", "Bezeichnung", "Mengeneinh", "EAN-Nummer"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["ArtikelNr"],
+						"descending": false,
+						"column": "ArtikelNr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "medi",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"ArtikelNr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1",
@@ -1559,39 +2091,7 @@
 						"article_ean": ["EAN-Nummer"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "medi"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"ArtikelNr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1621,12 +2121,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -1636,8 +2147,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "minke"
+									"LIEFERANTENNAME": "minke",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -1647,7 +2171,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -1686,6 +2211,63 @@
 			"filesetting": {
 				"columns": ["article_no", "article_name"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["article_no"],
+						"descending": false,
+						"column": "article_no",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "mmib",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"article_no": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"special_attention": "1"
@@ -1698,39 +2280,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "mmib"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"article_no": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1749,6 +2299,63 @@
 				"headerrowindex": 1,
 				"columns": ["Artikel-Nr", "Artikelbezeichnung lang", "Groesse", "Farbe", "Einheit"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel-Nr."],
+						"descending": false,
+						"column": "Artikel-Nr.",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "neatec",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"article_no": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1",
@@ -1762,39 +2369,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "neatec"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"article_no": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1825,12 +2400,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["article_no"],
+						"descending": false,
+						"column": "article_no",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -1840,8 +2426,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "nowecare"
+									"LIEFERANTENNAME": "nowecare",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -1851,7 +2450,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -1886,6 +2486,63 @@
 				"headerrowindex": 0,
 				"columns": ["MATCHCODE", "NAME1", "EANCODE", "VK_EINHEIT"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["MATCHCODE"],
+						"descending": false,
+						"column": "MATCHCODE",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "nowecor",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"MATCHCODE": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0"
@@ -1909,39 +2566,7 @@
 						"article_ean": ["EANCODE"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "nowecore"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"MATCHCODE": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -1960,6 +2585,73 @@
 				"headerrowindex": 4,
 				"columns": ["ART-NR", "BEZEICHNUNG"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_expression",
+					"comment": "delete unnecessary products",
+					"keep": true,
+					"match": {
+						"all": {
+							"ART-NR": ".+"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["ART-NR"],
+						"descending": false,
+						"column": "ART-NR",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "össur",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"ART-NR": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -2053,49 +2745,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_expression",
-					"comment": "delete unnecessary products",
-					"keep": true,
-					"match": {
-						"all": {
-							"ART-NR": ".+"
-						}
-					}
-				},
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "össur"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"ART-NR": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2112,7 +2762,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -2132,6 +2782,73 @@
 				"headerrowindex": 6,
 				"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_expression",
+					"comment": "drop microcoating",
+					"keep": false,
+					"match": {
+						"all": {
+							"Art.Nr.": "501[BDKJ].+C=.+"
+						}
+					}
+				},
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Art.Nr."],
+						"descending": false,
+						"column": "Art.Nr.",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "neuhof",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Art.Nr.": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -2244,49 +2961,7 @@
 						"article_ean": ["UDI-DI"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_expression",
-					"comment": "drop microcoating",
-					"keep": false,
-					"match": {
-						"all": {
-							"Art.Nr.": "501[BDKJ].+C=.+"
-						}
-					}
-				},
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "neuhof"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Art.Nr.": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2304,24 +2979,25 @@
 			"filesetting": {
 				"columns": ["Artikel-Nr", "Einh", "EAN_UDI-DI-Nr", "Auflistung mit Menge und Inhalt-Pos"]
 			},
-			"modify": {
-				"rewrite": [
-					{
-						"article_no": ["Artikel-Nr"],
-						"article_name": ["Auflistung mit Menge und Inhalt-Pos"],
-						"article_unit": ["Einh"],
-						"article_ean": ["EAN_UDI-DI-Nr"]
-					}
-				]
-			},
 			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel-Nr"],
+						"descending": false,
+						"column": "Artikel-Nr",
+						"amount": 1
+					}
+				},
 				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -2331,8 +3007,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "ortho-systems"
+									"LIEFERANTENNAME": "ortho-systems",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -2342,10 +3031,21 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
-			]
+			],
+			"modify": {
+				"rewrite": [
+					{
+						"article_no": ["Artikel-Nr"],
+						"article_name": ["Auflistung mit Menge und Inhalt-Pos"],
+						"article_unit": ["Einh"],
+						"article_ean": ["EAN_UDI-DI-Nr"]
+					}
+				]
+			}
 		}
 	},
 	{
@@ -2363,6 +3063,63 @@
 			"filesetting": {
 				"columns": ["Artikel-NR", "Bezeichnung1 Artikelname", "Bezeichnung2 = Farbe (falls vorhanden)", "Bezeichnung3 = Langtext (kein muss)", "Bezeichnung4 = Dimensionstext (Größe)", "EAN", "HMV-NR "]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel-NR"],
+						"descending": false,
+						"column": "Artikel-NR",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "orthoservice",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikel-NR": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1",
@@ -2378,39 +3135,7 @@
 						"article_ean": ["EAN"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "orthoservice"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikel-NR": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2427,7 +3152,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -2446,6 +3171,63 @@
 			"filesetting": {
 				"columns": ["Material", "Materialtext", "Mengeneinheit", "EAN/UPC"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Material"],
+						"descending": false,
+						"column": "Material",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "otto.*?bock",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Material": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -2474,39 +3256,7 @@
 						"article_ean": ["EAN/UPC"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"LIEFERANTENNAME": "otto.*?bock",
-									"STATUS": "false"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Material": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2525,6 +3275,63 @@
 				"headerrowindex": 9,
 				"columns": ["Material", "Materialkurztext", "ME"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Material"],
+						"descending": false,
+						"column": "Material",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "perpedes",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Material": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0"
@@ -2538,39 +3345,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "perpedes"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Material": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2602,12 +3377,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -2617,8 +3403,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "pochert"
+									"LIEFERANTENNAME": "pochert",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -2628,7 +3427,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -2671,6 +3471,63 @@
 				"headerrowindex": 0,
 				"columns": ["article_no", "article_name", "article_unit"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["article_no"],
+						"descending": false,
+						"column": "article_no",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "protheseus",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"article_no": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0"
@@ -2684,39 +3541,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "protheseus"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"article_no": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2735,6 +3560,63 @@
 				"headerrowindex": 0,
 				"columns": ["ArtikelNummer", "Bezeichnung 1", "Bezeichnung 2", "Farbe", "Groesse", "Menge"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["ArtikelNummer"],
+						"descending": false,
+						"column": "ArtikelNummer",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "pro.*?walk",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"ArtikelNummer": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0"
@@ -2748,39 +3630,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "pro.*?walk"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"ArtikelNummer": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2797,7 +3647,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -2817,6 +3667,63 @@
 				"headerrowindex": 2,
 				"columns": ["Art-Nr", "Bezeichnung1", "Bezeichnung2", "EAN_GTIN", "ME"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Art-Nr"],
+						"descending": false,
+						"column": "Art-Nr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "rebotec",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Art-Nr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -2834,39 +3741,7 @@
 					["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehst(?:ü|Ü)tze|achselst(?:ü|Ü)tze|toiletten|gehgestell|vierfuß|fischer"]],
 					["stock_item", "1", ["Art-Nr", "122.95|106.04.10"]]
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "rebotec"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Art-Nr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -2902,7 +3777,7 @@
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -2912,8 +3787,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "rehaforum"
+									"LIEFERANTENNAME": "rehaforum",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -2923,7 +3811,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -2956,7 +3845,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -2988,12 +3877,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -3003,8 +3903,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "russka"
+									"LIEFERANTENNAME": "russka",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -3014,7 +3927,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -3050,6 +3964,63 @@
 				"headerrowindex": 1,
 				"columns": ["Artikelnummer", "Artikelbezeichnung", "Artikelbezeichnung 2", "Basiseinheit"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "schein",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikelnummer": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -3067,39 +4038,7 @@
 					["trading_good", "1", ["article_name", "einlage|schuh|orthese"]],
 					["stock_item", "1", ["Artikelnummer", "62897000|64010100"]]
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "schein"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikelnummer": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -3118,6 +4057,63 @@
 				"headerrowindex": 1,
 				"columns": ["Bestell-Nr", "ArtikelBez1", "ArtikelBez2", "Seite", "Farbe", "Groesse", "ME", "EAN_CODE"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Bestell-Nr"],
+						"descending": false,
+						"column": "Bestell-Nr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "sporlastic",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Bestell-Nr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1",
@@ -3133,39 +4129,7 @@
 						"article_ean": ["EAN_CODE"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "sporlastic"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Bestell-Nr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -3184,6 +4148,63 @@
 				"headerrowindex": 0,
 				"columns": ["Artikelnummer", "Bezeichnung", "Einheit", "GTIN-Code"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "streifeneder",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikelnummer": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -3219,39 +4240,7 @@
 						"article_ean": ["GTIN-Code"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "streifeneder"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikelnummer": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -3271,28 +4260,30 @@
 				"dialect": {
 					"separator": ";",
 					"enclosure": "\"",
-					"escape": ""
+					"escape": "",
+					"preg_delimiter": "#"
 				},
 				"columns": ["Part", "DE"]
 			},
-			"modify": {
-				"rewrite": [
-					{
-						"article_no": ["Part"],
-						"article_name": ["DE"],
-						"article_unit": [""],
-						"article_ean": [""]
-					}
-				]
-			},
 			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Part"],
+						"descending": false,
+						"column": "Part",
+						"amount": 1
+					}
+				},
 				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -3302,8 +4293,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "taska"
+									"LIEFERANTENNAME": "taska",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -3313,10 +4317,21 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
-			]
+			],
+			"modify": {
+				"rewrite": [
+					{
+						"article_no": ["Part"],
+						"article_name": ["DE"],
+						"article_unit": [""],
+						"article_ean": [""]
+					}
+				]
+			}
 		}
 	},
 	{
@@ -3333,7 +4348,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -3365,12 +4380,23 @@
 					}
 				},
 				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel-Nummer"],
+						"descending": false,
+						"column": "Artikel-Nummer",
+						"amount": 1
+					}
+				},
+				{
 					"apply": "filter_by_comparison_file",
 					"comment": "transfer erp_id. source will be set if match file is provided",
 					"filesetting": {
 						"source": "ERPDUMP.csv",
 						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 					},
 					"filter": [
 						{
@@ -3380,8 +4406,21 @@
 							"match": {
 								"all": {
 									"STATUS": "false",
-									"LIEFERANTENNAME": "thuasne"
+									"LIEFERANTENNAME": "thuasne",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
 								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
 							}
 						}
 					],
@@ -3391,7 +4430,8 @@
 						}
 					},
 					"transfer": {
-						"erp_id": "REFERENZ"
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
 					}
 				}
 			],
@@ -3440,6 +4480,63 @@
 				"headerrowindex": 0,
 				"columns": ["Bestellnr", "Artikelbezeichnung 1", "Artikelbezeichnung 2", "Artikelbezeichnung 3", "Verpackung1"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Bestellnr"],
+						"descending": false,
+						"column": "Bestellnr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "tigges",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Bestellnr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -3457,39 +4554,7 @@
 					["trading_good", "1", ["article_name", "WS-Bandage|Wirbels(?:ä|Ä)ulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]],
 					["stock_item", "1", ["Bestellnr", "81339/5|81339/6|61335/5|61335/6|61339/5|61339/6|61339/4|81339/4|61335/4|61339/3|81339/3|61335/3|61339/1|61339/2|81339/1|81339/2|61335/1|61335/2"]]
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "tigges"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Bestellnr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -3508,6 +4573,63 @@
 				"headerrowindex": 0,
 				"columns": ["Artikelnr", "Artikelbeschreibung"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnr"],
+						"descending": false,
+						"column": "Artikelnr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "triconmed",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikelnr": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "1"
@@ -3520,39 +4642,7 @@
 						"article_ean": [""]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "triconmed"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikelnr": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -3571,6 +4661,63 @@
 				"headerrowindex": 0,
 				"columns": ["Artikel-Nr", "Beschreibung", "ME", "EAN"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikel-Nr"],
+						"descending": false,
+						"column": "Artikel-Nr",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "uniprox",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"article_no": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -3602,39 +4749,7 @@
 						"article_ean": ["EAN"]
 					}
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "uniprox"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"article_no": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
@@ -3651,7 +4766,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -3669,7 +4784,7 @@
 		"pricelist": {
 			"filesetting": {
 				"headerrowindex": 0,
-				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention"]
+				"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 			}
 		}
 	},
@@ -3689,6 +4804,63 @@
 				"headerrowindex": 0,
 				"columns": ["Artikelnummer", "Farbe Groesse", "Artikelbez 1", "Artikelbez 2", "EAN"]
 			},
+			"filter": [
+				{
+					"apply": "filter_by_duplicates",
+					"comment": "delete multiple pricelist entries",
+					"keep": true,
+					"duplicates": {
+						"orderby": ["Artikelnummer"],
+						"descending": false,
+						"column": "Artikelnummer",
+						"amount": 1
+					}
+				},
+				{
+					"apply": "filter_by_comparison_file",
+					"comment": "transfer erp_id. source will be set if match file is provided",
+					"filesetting": {
+						"source": "ERPDUMP.csv",
+						"headerrowindex": 1,
+						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+					},
+					"filter": [
+						{
+							"apply": "filter_by_expression",
+							"comment": "delete inactive articles and unneccessary vendors",
+							"keep": true,
+							"match": {
+								"all": {
+									"STATUS": "false",
+									"LIEFERANTENNAME": "werkmeister",
+									"BESTELLSTOP": "false",
+									"WE_DAT_ARTIKELSTAMM": ".+"
+								}
+							}
+						},
+						{
+							"apply": "filter_by_monthdiff",
+							"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+							"keep": false,
+							"date": {
+								"column": "WE_DAT_ARTIKELSTAMM",
+								"format": "d.m.Y H:i",
+								"threshold": 36,
+								"bias": ">"
+							}
+						}
+					],
+					"match": {
+						"all": {
+							"Artikelnummer": "BESTELL_NUMMER"
+						}
+					},
+					"transfer": {
+						"erp_id": "REFERENZ",
+						"last_order": "WE_DAT_ARTIKELSTAMM"
+					}
+				}
+			],
 			"modify": {
 				"add": {
 					"trading_good": "0",
@@ -3706,39 +4878,7 @@
 					["trading_good", "1", ["article_name", "Arthrodesenkissen"]],
 					["stock_item", "1", ["article_name", "Arthrodesenkissen"]]
 				]
-			},
-			"filter": [
-				{
-					"apply": "filter_by_comparison_file",
-					"comment": "transfer erp_id. source will be set if match file is provided",
-					"filesetting": {
-						"source": "ERPDUMP.csv",
-						"headerrowindex": 1,
-						"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER"]
-					},
-					"filter": [
-						{
-							"apply": "filter_by_expression",
-							"comment": "delete inactive articles and unneccessary vendors",
-							"keep": true,
-							"match": {
-								"all": {
-									"STATUS": "false",
-									"LIEFERANTENNAME": "werkmeister"
-								}
-							}
-						}
-					],
-					"match": {
-						"all": {
-							"Artikelnummer": "BESTELL_NUMMER"
-						}
-					},
-					"transfer": {
-						"erp_id": "REFERENZ"
-					}
-				}
-			]
+			}
 		}
 	},
 	{
