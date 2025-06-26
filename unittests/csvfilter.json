@@ -58,7 +58,7 @@
 			"keep": true,
 			"interval": {
 				"column": "date",
-				"format": ["dd", "mm", "yyyy"],
+				"format": "d.m.Y",
 				"interval": 12,
 				"offset": 0
 			}
