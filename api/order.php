@@ -245,6 +245,7 @@ class ORDER extends API {
 									'number' => 'ordernumber_label',
 									'name' => 'productname_label',
 									'vendor' => 'vendor_label',
+									'aut_idem' => 'aut_idem',
 									'commission' => 'commission'] as $key => $value){
 									$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 								}
