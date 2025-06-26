@@ -656,11 +656,12 @@ export const _client = {
 			document.getElementById("main").replaceChildren(render.initializeSection());
 			render.processAfterInsertion();
 		},
-		full: (data) => {
+		full: (data, preventcollapsible = undefined) => {
 			// displays full fledged information of every item as article
 			let content = [],
 				order = [],
 				collapsible = [],
+				productaction = [],
 				buttons = {},
 				links = {},
 				labels = [];
@@ -1297,21 +1298,11 @@ export const _client = {
 					});
 				}
 
-				// create order container
-				order = [
-					{
-						type: "collapsible",
-						attributes: {
-							class: "em16" + (!element.collapsed ? " extended" : ""),
-						},
-						content: collapsible,
-					},
-				];
-
+				productaction = [];
 				// append incorporation state
 				if (element.incorporation) {
 					if (element.incorporation.item)
-						order.push({
+					productaction.push({
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.incorporation.incorporation"),
@@ -1319,7 +1310,7 @@ export const _client = {
 							},
 						});
 					else if (element.incorporation.state)
-						order.push({
+					productaction.push({
 							type: "textsection",
 							attributes: {
 								name: element.incorporation.state,
@@ -1329,7 +1320,7 @@ export const _client = {
 				// append sample check state
 				if (element.samplecheck) {
 					if (element.samplecheck.item)
-						order.push({
+					productaction.push({
 							type: "button",
 							attributes: {
 								value: api._lang.GET("order.sample_check.sample_check"),
@@ -1337,13 +1328,33 @@ export const _client = {
 							},
 						});
 					else if (element.samplecheck.state)
-						order.push({
+					productaction.push({
 							type: "textsection",
 							attributes: {
 								name: element.samplecheck.state,
 							},
 						});
 				}
+
+				// create order container
+				if (preventcollapsible){
+					order = [
+						...collapsible,
+						...productaction
+					];
+				}
+				else {
+					order = [
+						{
+							type: "collapsible",
+							attributes: {
+								class: "em16" + (!element.collapsed ? " extended" : ""),
+							},
+							content: collapsible,
+						},
+					];
+				}
+
 				content.push(order);
 			}
 			return content;
@@ -1399,7 +1410,7 @@ export const _client = {
 							new _client.Dialog({
 								type: "input",
 								header: api._lang.GET("order.ordertype." + "element.ordertype"),
-								render: _client.order.full(orderdata),
+								render: _client.order.full(orderdata, true),
 								options: buttons,
 							});
 						}
