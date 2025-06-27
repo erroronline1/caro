@@ -50,195 +50,142 @@ class ORDER extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
-				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
-					'values' => [
-						':id' => intval($this->_requestedID)
+				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
+					'replacements' => [
+						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_requestedID)))
 					]
 				]);
-				$order = $order ? $order[0] : null;
-				if (!$order) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
-				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
+				if (!$orders) $this->response(['response' => [ 'id' => $this->_requestedID, 'msg' => $this->_lang->GET('order.not_found'), 'type' => 'error']]);
 
-				// set order process states
-				if (in_array($this->_subMethod, ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'])){
-					switch ($this->_subMethod){
-						case 'ordered':
-							if ($order['ordertype'] === 'cancellation'){
-								// ordered aka processed canellation orders are deleted immediately 
-								$this->orderStatistics($this->_requestedID); // write to statistics about a cancelled order
-								if ($this->delete_approved_order($order)) {
-									$response = [
-									'response' => [
-										'id' => false,
-										'msg' => $this->_lang->GET('order.deleted'),
-										'type' => 'deleted'
-									],
-									'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
+				foreach($orders as $order) {
+					if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
+
+					// set order process states
+					if (in_array($this->_subMethod, ['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived'])){
+						switch ($this->_subMethod){
+							case 'ordered':
+								if ($order['ordertype'] === 'cancellation'){
+									// ordered aka processed canellation orders are deleted immediately 
+									$this->orderStatistics($this->_requestedID); // write to statistics about a cancelled order
+									if ($this->delete_approved_order($order)) {
+										$response = [
+										'response' => [
+											'id' => false,
+											'msg' => $this->_lang->GET('order.deleted'),
+											'type' => 'deleted'
+										],
+										'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]];
+									}
+									else $response = [
+										'response' => [
+											'id' => $this->_requestedID,
+											'msg' => $this->_lang->GET('order.failed_delete'),
+											'type' => 'error'
+										]];
+									continue 2;
 								}
-								else $response = [
-									'response' => [
-										'id' => $this->_requestedID,
-										'msg' => $this->_lang->GET('order.failed_delete'),
-										'type' => 'error'
-									]];
-								$this->response($response);
-							}
-							elseif ($order['ordertype'] === 'return') {
-								// ordered aka processed return orders are received immediately
-								SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_received', [
+								elseif ($order['ordertype'] === 'return') {
+									// ordered aka processed return orders are received immediately
+									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_received', [
+										'values' => [
+											':id' => intval($this->_requestedID)
+										],
+										'replacements' => [
+											':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
+										]
+									]);
+									$query = 'order_put_approved_order_ordered';
+								}
+								else $query = 'order_put_approved_order_ordered';
+								break;
+							case 'partially_received':
+								$query = 'order_put_approved_order_partially_received';
+								break;
+							case 'received':
+								$query = 'order_put_approved_order_received';
+								break;
+							case 'partially_delivered':
+								$query = 'order_put_approved_order_partially_delivered';
+								break;
+							case 'delivered':
+								// sets last order date for next overview
+								$decoded_order_data = json_decode($order['order_data'], true);
+								if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'])){
+									$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
+										'values' => [
+											':article_no' => $decoded_order_data['ordernumber_label'],
+											':vendor' => $decoded_order_data['vendor_label']
+										]
+									]);
+									$product = $product ? $product[0] : null;
+									if ($product) 
+									SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_last_order', [
+										'values' => [
+											':id' => $product['id']
+										]
+									]);
+								}
+								$query = 'order_put_approved_order_delivered';
+								break;
+							case 'archived':
+								$query = 'order_put_approved_order_archived';
+								break;
+						}
+						// generic state update
+						SQLQUERY::EXECUTE($this->_pdo, $query, [
+							'values' => [
+								':id' => $this->_requestedID
+							],
+							'replacements' => [
+								':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
+							]
+						]);
+					}
+
+					// disapprove, addinformation, cancel, return order
+					else {
+						// resolve order data
+						$decoded_order_data = json_decode($order['order_data'], true);
+						// prepare possible keys
+						$prepared = [
+							'items' => [[]],
+							'additional_info' => null,
+							'organizational_unit' => $order['organizational_unit'],
+							'commission' => null,
+							'orderer' => null,
+							'delivery_date' => null,
+							'order_type' => null,
+							'attachments' => null
+						];
+						// fill possible keys
+						foreach ($decoded_order_data as $key => $value){
+							if (array_key_exists($key, $prepared)) $prepared[$key] = $value;
+							else $prepared['items'][0][$key] = $value;
+						}
+						// add initially approval date
+						$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'] . ' ';
+						$prepared['additional_info'] .= UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')) ? : '';
+						// clear unused keys
+						foreach ($prepared as $key => $value) {
+							if (!$value) unset($prepared[$key]);
+						}
+						switch ($this->_subMethod){
+							case 'disapproved':
+								// add to prepared orders
+								SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
+									'values' => [
+										':order_data' => UTILITY::json_encode($prepared)
+									]
+								]);
+
+								// delete approved order
+								SQLQUERY::EXECUTE($this->_pdo, 'order_delete_approved_order', [
 									'values' => [
 										':id' => intval($this->_requestedID)
-									],
-									'replacements' => [
-										':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
 									]
 								]);
-								$query = 'order_put_approved_order_ordered';
-							}
-							else $query = 'order_put_approved_order_ordered';
-							break;
-						case 'partially_received':
-							$query = 'order_put_approved_order_partially_received';
-							break;
-						case 'received':
-							$query = 'order_put_approved_order_received';
-							break;
-						case 'partially_delivered':
-							$query = 'order_put_approved_order_partially_delivered';
-							break;
-						case 'delivered':
-							// sets last order date for next overview
-							$decoded_order_data = json_decode($order['order_data'], true);
-							if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'])){
-								$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_by_article_no_vendor', [
-									'values' => [
-										':article_no' => $decoded_order_data['ordernumber_label'],
-										':vendor' => $decoded_order_data['vendor_label']
-									]
-								]);
-								$product = $product ? $product[0] : null;
-								if ($product) 
-								SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_last_order', [
-									'values' => [
-										':id' => $product['id']
-									]
-								]);
-							}
-							$query = 'order_put_approved_order_delivered';
-							break;
-						case 'archived':
-							$query = 'order_put_approved_order_archived';
-							break;
-					}
-					// generic state update
-					SQLQUERY::EXECUTE($this->_pdo, $query, [
-						'values' => [
-							':id' => $this->_requestedID
-						],
-						'replacements' => [
-							':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
-						]
-					]);
-				}
-
-				// disapprove, addinformation, cancel, return order
-				else {
-					// resolve order data
-					$decoded_order_data = json_decode($order['order_data'], true);
-					// prepare possible keys
-					$prepared = [
-						'items' => [[]],
-						'additional_info' => null,
-						'organizational_unit' => $order['organizational_unit'],
-						'commission' => null,
-						'orderer' => null,
-						'delivery_date' => null,
-						'order_type' => null,
-						'attachments' => null
-					];
-					// fill possible keys
-					foreach ($decoded_order_data as $key => $value){
-						if (array_key_exists($key, $prepared)) $prepared[$key] = $value;
-						else $prepared['items'][0][$key] = $value;
-					}
-					// add initially approval date
-					$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'] . ' ';
-					$prepared['additional_info'] .= UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')) ? : '';
-					// clear unused keys
-					foreach ($prepared as $key => $value) {
-						if (!$value) unset($prepared[$key]);
-					}
-					switch ($this->_subMethod){
-						case 'disapproved':
-							// add to prepared orders
-							SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
-								'values' => [
-									':order_data' => UTILITY::json_encode($prepared)
-								]
-							]);
-
-							// delete approved order
-							SQLQUERY::EXECUTE($this->_pdo, 'order_delete_approved_order', [
-								'values' => [
-									':id' => intval($this->_requestedID)
-								]
-							]);
-							
-							// inform user on disapproval
-							$messagepayload = [];
-							foreach (['quantity' => 'quantity_label',
-								'unit' => 'unit_label',
-								'number' => 'ordernumber_label',
-								'name' => 'productname_label',
-								'vendor' => 'vendor_label',
-								'aut_idem' => 'aut_idem',
-								'commission' => 'commission'] as $key => $value){
-								$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
-							}
-							$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
-							$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
-								':order' => $this->_lang->GET('order.message', $messagepayload, true),
-								':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-								':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
-								], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
-							// userlist to decode orderer
-							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-							if ($userid = array_search($prepared['orderer'], array_column($users, 'id')))
-								$this->alertUserGroup(['user' => [$users[$userid]['name']]], $message);
-
-							// schedule review of disapproved order for unit (in case of vacation, sick leave etc.)
-							$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-							$calendar->post([
-								':type' => 'schedule',
-								':span_start' => $this->_date['servertime']->format('Y-m-h H:i:s'),
-								':span_end' => $this->_date['servertime']->format('Y-m-h H:i:s'),
-								':author_id' => $_SESSION['user']['id'],
-								':affected_user_id' => null,
-								':organizational_unit' => $prepared['organizational_unit'],
-								':subject' => preg_replace("/\n/", ' ', strip_tags($message)),
-								':misc' => null,
-								':closed' => null,
-								':alert' => null,
-								':autodelete' => 1
-							]);
-							break;
-						case 'addinformation':
-							// append information to order
-							if (isset($decoded_order_data['additional_info'])){
-								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
-							}
-							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
-
-							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_addinformation', [
-								'values' => [
-									':order_data' => UTILITY::json_encode($decoded_order_data),
-									':id' => intval($this->_requestedID)
-								]
-							]);
-
-							// alert userGroup on vendor sided order-state change 
-							if (str_starts_with(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info')), $this->_lang->GET('order.orderstate_description'))){
-								// inform user group
+								
+								// inform user on disapproval
 								$messagepayload = [];
 								foreach (['quantity' => 'quantity_label',
 									'unit' => 'unit_label',
@@ -250,85 +197,139 @@ class ORDER extends API {
 									$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
 								}
 								$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
-								$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
+								$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
-								])));
-							}
-							break;
-						case 'cancellation':
-							// append to information
-							if (isset($decoded_order_data['additional_info'])){
-								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
-							}
-							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
-							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
-							$decoded_order_data['orderer'] = $_SESSION['user']['id'];
-							
-							// rewrite order as cancelled type
-							SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
-								'values' => [
+									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+									], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+								// userlist to decode orderer
+								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+								if ($userid = array_search($prepared['orderer'], array_column($users, 'id')))
+									$this->alertUserGroup(['user' => [$users[$userid]['name']]], $message);
+
+								// schedule review of disapproved order for unit (in case of vacation, sick leave etc.)
+								$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+								$calendar->post([
+									':type' => 'schedule',
+									':span_start' => $this->_date['servertime']->format('Y-m-h H:i:s'),
+									':span_end' => $this->_date['servertime']->format('Y-m-h H:i:s'),
+									':author_id' => $_SESSION['user']['id'],
+									':affected_user_id' => null,
+									':organizational_unit' => $prepared['organizational_unit'],
+									':subject' => preg_replace("/\n/", ' ', strip_tags($message)),
+									':misc' => null,
+									':closed' => null,
+									':alert' => null,
+									':autodelete' => 1
+								]);
+								break;
+							case 'addinformation':
+								// append information to order
+								if (isset($decoded_order_data['additional_info'])){
+									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
+								}
+								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info'));
+
+								SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_addinformation', [
+									'values' => [
+										':order_data' => UTILITY::json_encode($decoded_order_data),
+										':id' => intval($this->_requestedID)
+									]
+								]);
+
+								// alert userGroup on vendor sided order-state change 
+								if (str_starts_with(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.additional_info')), $this->_lang->GET('order.orderstate_description'))){
+									// inform user group
+									$messagepayload = [];
+									foreach (['quantity' => 'quantity_label',
+										'unit' => 'unit_label',
+										'number' => 'ordernumber_label',
+										'name' => 'productname_label',
+										'vendor' => 'vendor_label',
+										'aut_idem' => 'aut_idem',
+										'commission' => 'commission'] as $key => $value){
+										$messagepayload[':' . $key] = isset($decoded_order_data[$value]) ? str_replace("\n", '\\\\n', $decoded_order_data[$value]) : '';
+									}
+									$messagepayload[':info'] = isset($decoded_order_data['additional_info']) ? $decoded_order_data['additional_info'] : '';
+									$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
+										':order' => $this->_lang->GET('order.message', $messagepayload, true),
+										':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
+										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+									])));
+								}
+								break;
+							case 'cancellation':
+								// append to information
+								if (isset($decoded_order_data['additional_info'])){
+									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+								}
+								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
+								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
+								
+								// rewrite order as cancelled type
+								SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_cancellation', [
+									'values' => [
+										':order_data' => UTILITY::json_encode($decoded_order_data),
+										':id' => intval($this->_requestedID)
+									]
+								]);
+
+								// alert purchase on change
+								$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
+								break;
+							case 'return':
+								// append to order info 
+								if (isset($decoded_order_data['additional_info'])){
+									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+								}
+								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
+								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
+								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
+
+								// create a new order as return
+								if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
+									'values' => [
 									':order_data' => UTILITY::json_encode($decoded_order_data),
-									':id' => intval($this->_requestedID)
-								]
-							]);
+									':organizational_unit' => $order['organizational_unit'],
+									':approval' => $order['approval'],
+									':ordertype' => 'return'
+									]
+								])) {
+									$this->_requestedID = $this->_pdo->lastInsertId();
+									$response = [
+									'response' => [
+										'id' => $this->_requestedID,
+										'msg' => $this->_lang->GET('order.saved'),
+										'type' => 'success'
+									]];
 
-							// alert purchase on change
-							$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));		
-							break;
-						case 'return':
-							// append to order info 
-							if (isset($decoded_order_data['additional_info'])){
-								$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
-							}
-							else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
-							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
-							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
-							$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
-							$decoded_order_data['orderer'] = $_SESSION['user']['id'];
-
-							// create a new order as return
-							if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
-								'values' => [
-								':order_data' => UTILITY::json_encode($decoded_order_data),
-								':organizational_unit' => $order['organizational_unit'],
-								':approval' => $order['approval'],
-								':ordertype' => 'return'
-								]
-							])) {
-								$this->_requestedID = $this->_pdo->lastInsertId();
-								$response = [
-								'response' => [
-									'id' => $this->_requestedID,
-									'msg' => $this->_lang->GET('order.saved'),
-									'type' => 'success'
-								]];
-
-								// alert purchase on "new order"
-								$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));
-							}
-							else $response = [
-								'response' => [
-									'id' => false,
-									'msg' => $this->_lang->GET('order.failed_save'),
-									'type' => 'error'
-								]];
-							break;
+									// alert purchase on "new order"
+									$this->alertUserGroup(['permission' => ['purchase']], $this->_lang->GET('order.alert_purchase', [], true));
+								}
+								else $response = [
+									'response' => [
+										'id' => false,
+										'msg' => $this->_lang->GET('order.failed_save'),
+										'type' => 'error'
+									]];
+								break;
+						}
 					}
+					// construct result toast
+					$response = isset($response) ? $response : [
+						'response' => [
+							'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_subMethod) : $this->_lang->GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_subMethod)]),
+							'type' => 'info'
+						],
+						'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
+					];
+
+					// update order statistics
+					$this->orderStatistics($this->_requestedID, ($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved');
 				}
-				// construct result toast
-				$response = isset($response) ? $response : [
-					'response' => [
-						'msg' => in_array($this->_subMethod, ['addinformation', 'disapproved', 'cancellation']) ? $this->_lang->GET('order.order.' . $this->_subMethod) : $this->_lang->GET('order.order_type_' . ($this->_subMethodState === 'true' ? 'set' : 'revoked'), [':type' => $this->_lang->GET('order.order.' . $this->_subMethod)]),
-						'type' => 'info'
-					],
-					'data' => ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
-				];
-
-				// update order statistics
-				$this->orderStatistics($this->_requestedID, ($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved');
-
 				break;
 			case 'GET':
 				// delete old received unarchived orders
@@ -347,7 +348,9 @@ class ORDER extends API {
 				$response = ['data' => [
 					'filter' => $this->_requestedID ? : '', // preset search term
 					'state' => $this->_subMethodState ? : 'unprocessed', // preset the appropriate language key
-					'order' => [], 'approval' => [], 'export' => false]];
+					'order' => [], 'approval' => [],
+					'allowedstateupdates'=> [],
+					'export' => false]];
 				// set available units
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
@@ -417,6 +420,7 @@ class ORDER extends API {
 				}
 
 				// gather applicable order states
+				// update on delayed shipment, availability, etc.
 				$statechange = ['...' => ['value' => '']];
 				foreach ($this->_lang->_USER['order']['orderstate'] as $value){
 					$statechange[$value] = [];
@@ -547,24 +551,28 @@ class ORDER extends API {
 								}
 							case 'received':
 								if (!$permission['orderprocessing']){
-								$data['state'][$s]['disabled'] = true;
+									$data['state'][$s]['disabled'] = true;
 								}
+								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'partially_received':
 								if ($row['received'] || !$permission['orderprocessing']){
 									$data['state'][$s]['disabled'] = true;
-									}
+								}
+								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'partially_delivered':
 								if ($row['delivered'] || !(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
 									$data['state'][$s]['disabled'] = true;
 								}
+								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'delivered':
 							case 'archived':
 								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
 									$data['state'][$s]['disabled'] = true;
 								}
+								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 						}
 					}
@@ -611,12 +619,13 @@ class ORDER extends API {
 					}
 
 					array_push($response['data']['order'], array_filter($data, fn($property) => $property || $property === 0));
+					$response['data']['allowedstateupdates'] = array_unique($response['data']['allowedstateupdates']);
 				}
 				break;
 			case 'DELETE':
-				$row = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
-					'values' => [
-						':id' => $this->_requestedID
+				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
+					'replacements' => [
+						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_requestedID)))
 					]
 				]);
 				$row = $row ? $row[0] : null;
@@ -1203,9 +1212,9 @@ class ORDER extends API {
 		}
 
 		// get approved order to gather data
-		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_id', [
-			'values' => [
-				':id' => intval($order_id)
+		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
+			'replacements' => [
+				':ids' => intval($order_id)
 			]
 		]);
 		$order = $order ? $order[0] : null;

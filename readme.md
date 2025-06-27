@@ -36,9 +36,6 @@ Things are still in motion. Images may be outdated.
 * order
     * order state filter display not further proceeded
     * order type icon | qty, productunit, productname, vendor | unit | commission | orderer
-    * batch orderstate
-        * api.purchase("put", "approved", "2036", "partially_received", this.checked);
-        * utility.js order.tiles also see //assemble state toggles
 * css dialog toast on top
 
 ## Content

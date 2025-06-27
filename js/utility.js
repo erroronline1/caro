@@ -656,6 +656,20 @@ export const _client = {
 			document.getElementById("main").replaceChildren(render.initializeSection());
 			render.processAfterInsertion();
 		},
+		batchStateUpdate: (stateinput) => {
+			const marked = document.getElementsByName(api._lang.GET("order.tile_mark")),
+				// gather marked orders
+				orders = [];
+			for (const mark of marked) {
+				if (mark.checked) orders.push(mark.value);
+			}
+			// set all available state inputs the same
+			const inputs = document.querySelectorAll('[data-grouped="' + api._lang.GET("order.bulk_update_state") + '"');
+			for (const input of inputs) {
+				if (input.value === stateinput.value) input.checked = stateinput.checked;
+			}
+			api.purchase("put", "approved", orders.join("_"), stateinput.value, stateinput.checked);
+		},
 		full: (data, preventcollapsible = undefined) => {
 			// displays full fledged information of every item as article
 			let content = [],
@@ -1447,8 +1461,34 @@ export const _client = {
 				if (!groups[element[groupby]]) groups[element[groupby]] = [];
 				groups[element[groupby]].push(tile);
 			}
+
+			const inputs = {};
+			let bulk;
+			if (data.allowedstateupdates) {
+				let skip=true;
+				for (const input of data.allowedstateupdates) {
+					// skip all previous
+					if (skip) {
+						if (input === data.state || data.state === 'unprocessed') skip = false;
+						else continue;
+					}
+					inputs[api._lang.GET("order.order." + input)] = { value: input, onchange: "_client.order.batchStateUpdate(this)" };
+					if (input === data.state) inputs[api._lang.GET("order.order." + input)].checked = true;
+				}
+				bulk = [
+					{
+						type: "checkbox",
+						attributes: {
+							name: api._lang.GET("order.bulk_update_state"),
+						},
+						content: inputs,
+					},
+				];
+			}
+
 			for (const group of Object.entries(groups)) {
 				content.push(group);
+				if (bulk) content.push(bulk);
 			}
 			return content;
 		},

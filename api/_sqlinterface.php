@@ -667,9 +667,9 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
 
-		'order_get_approved_order_by_id' => [
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id = :id"
+		'order_get_approved_order_by_ids' => [
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)"
 		],
 		'order_get_approved_order_by_delivered' => [ // preselection for safe deletion
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE delivered < :date_time AND archived IS NULL",
