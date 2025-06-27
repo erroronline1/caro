@@ -828,6 +828,8 @@ Aus der in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen 
 
 Mit der Bestellnummer kann direkt ein Aufkleberbogen mit Ergänzung einer geeigneten Chargen- oder Lieferscheinnummer erstellt werden um einen scanbaren Code für eine Rückverfolgung zu erhalten.
 
+Die Darstellung von Bestellungen kann innerhalb des [Nutzer-Profils](#nutzer) aus Volldarstellung und kompakten Kacheln mit eingeschränktem Informationsgehalt gewählt werden. Dies soll eine Anpassung an unterschiedliche Bedürfnisse ermöglichen, z.B. der Warenwirtschaft alle erforderlichen Informationen anzeigen, während andere Nutzer eine geringere Informationsfülle bevorzugen.
+
 Bearbeitete Bestellungen werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) exportiert und für die Lieferantenbewertung genutzt werden.
 
 ![orders screenshot](http://toh.erroronline.one/caro/orders%20de.png)

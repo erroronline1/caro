@@ -930,6 +930,8 @@ A label can be created directly from the commission field to support allocation 
 
 A label can be created directly from the article number field supplemented by a suitable batch or delivery note number to create a scannable code for material traceability.
 
+The layout of orders can be selected within the [user profile](#users) from full view and tile layout with reduced information. This is intended to accomodate to different needs, e.g. purchase having all neccessary information directly available whereas other users may prefer less information load.
+
 Processed orders are also added to a second database with reduced data. This data can be exported through the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and used for vendor evaluation.
 
 ![orders screenshot](http://toh.erroronline.one/caro/orders.png)
