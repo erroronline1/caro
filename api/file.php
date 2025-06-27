@@ -85,8 +85,7 @@ class FILE extends API {
 			// construct file links to external files per bundle
 			foreach (json_decode($row['content'], true) as $file => $path){
 				if (stristr($path, CONFIG['fileserver']['external_documents']) && !in_array($path, $external)) continue; // filter inactive linked external files
-				$file = substr_replace($file, '.', strrpos($file, '_'), 1);
-
+				$path = './api/api.php/file/stream/' . $path;
 				$list[$file] = UTILITY::link(['href' => $path, 'data-filtered' => 'breakline']);
 			}
 			// append bundle
@@ -168,7 +167,7 @@ class FILE extends API {
 				$cmpstrings = preg_split('/:folder/', $this->_lang->GET('file.file_list')); // extract plain immutable strings
 				foreach ($this->_payload as $key => $value){
 					$match = true;
-					foreach ($cmpstrings as $cmp) if (!stristr($key, str_replace(' ', '_', $cmp))) $match = false;
+					foreach ($cmpstrings as $cmp) if (!stristr($key, $cmp)) $match = false;
 					if ($match) unset ($this->_payload->{$key});
 				}
 
@@ -399,7 +398,7 @@ class FILE extends API {
 
 					// process provided linkes ressources
 					foreach ($this->_payload as $key => $value){
-						if (preg_match("/^".$this->_lang->PROPERTY('file.external_file.link')."/", $key) && $value && preg_match("/(?:^href=')(.+?)(?:')/", $value, $link)){
+						if (preg_match("/^" . $this->_lang->PROPERTY('file.external_file.link') . "/", $key) && $value && preg_match("/(?:^href=')(.+?)(?:')/", $value, $link)){
 							$insertions[] = [
 								':author' => $_SESSION['user']['name'],
 								':path' => $link[1]

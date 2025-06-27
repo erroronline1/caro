@@ -1308,7 +1308,7 @@ class DOCUMENT extends API {
 					if ($enumerate[$name] > 1) {
 						$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 					}
-					$postname = preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $name);
+					$postname = $name;
 
 					if (isset($subs['attributes']['required'])) $name .= ' *';
 					elseif (isset($subs['content']) && gettype($subs['content']) === 'array'){
@@ -1330,7 +1330,7 @@ class DOCUMENT extends API {
 							$selected = '';
 
 							// dynamic multiple select
-							$dynamicMultiples = preg_grep('/' . preg_quote(preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
+							$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
 							foreach ($dynamicMultiples as $submitted){
 								if ($key == UTILITY::propertySet($payload, $submitted)) $selected = '_____';
 							}
@@ -1386,7 +1386,7 @@ class DOCUMENT extends API {
 					}
 					else {
 						if (isset($name)) $content['content'][$name] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];
-						$dynamicMultiples = preg_grep('/' . preg_quote(preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', '_', $originName), '/') . '\(\d+\)/m', array_keys((array)$payload));
+						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys((array)$payload));
 						foreach ($dynamicMultiples as $submitted){
 							$content['content'][$submitted] = ['type' => 'singleline', 'value' => UTILITY::propertySet($payload, $submitted) ? : ''];
 						}

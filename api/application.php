@@ -632,7 +632,7 @@ class APPLICATION extends API {
 		
 				// chain checked permission levels
 				foreach ($this->_lang->_USER['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
+					if (UTILITY::propertySet($this->_payload, $description)) {
 						$permissions[] = $level;
 					}
 				}

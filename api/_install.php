@@ -647,6 +647,8 @@ class INSTALL {
 	 */
 	public $_lang = null;
 
+	public $_payload = [];
+
 	/**
 	 * current settings for install
 	 */
@@ -666,6 +668,27 @@ class INSTALL {
 		$this->_currentdate = new \DateTime('now');
 
 		$this->_lang = new LANG();
+
+		switch($_SERVER['REQUEST_METHOD']){
+			case "GET":
+			case "DELETE":
+				$inputstream = $_SERVER['QUERY_STRING'];
+				break;
+			case "POST":
+			case "PUT":
+				$inputstream = file_get_contents('php://input');
+				break;
+		}
+		$inputstream = preg_replace_callback(
+			'/(^|(?<=&))[^=[&]+/',
+			function($key) { return bin2hex(urldecode($key[0])); },
+			$inputstream
+		);
+		parse_str($inputstream, $post);
+		foreach ($post as $key => $val) {
+			$this->_payload[hex2bin($key)] = $val;
+		}
+		
 	}
 
 	/**
@@ -1420,6 +1443,7 @@ class INSTALL {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$sqlchunks = [];
+				$unfound = [];
 				foreach ($json as $entry){
 					// documents are only transferred if the name is not already taken
 					if (!(
@@ -1428,40 +1452,40 @@ class INSTALL {
 						$this->printError('The following dataset is invalid and will be skipped:', $entry);
 						continue;
 					}
-					$vendor = null;
-					if ($vendor = array_search($entry['name'], array_column($DBall, 'name'))) {
-						if (!$vendor) {
-							$this->printError('The following vendor has not been found in database:', $entry['name']);
-							continue;
-						}
-						$vendor = $DBall[$vendor];
-						// whitespaces and periods replaced with underscore as in request parameters
-						$infovar = preg_replace('/[\s\.]/', '_', $vendor['name'] . '_info');
-						$filtervar = preg_replace('/[\s\.]/', '_', $vendor['name'] . '_pricelistfilter');
-						if (!(isset($_POST[$infovar]) || isset($_POST[$filtervar])))
-							continue;
-
-						if (isset($_POST[$infovar])) {
-							$vendor['info'] = isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : $vendor['info'];
-						}
-						if (isset($_POST[$filtervar])) {
-							$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
-							$newpricelistfilter = (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array') ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null;
-							$vendor['pricelist']['filter'] = $newpricelistfilter ? : (isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : null);
-							$vendor['pricelist'] = UTILITY::json_encode($vendor['pricelist']);
-						}
-
-						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_vendor'),
-						[
-							':id' => $vendor['id'],
-							':name' => $this->_pdo->quote($vendor['name']),
-							':evaluation' => $this->_pdo->quote($vendor['evaluation']),
-							':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
-							':certificate' => $vendor['certificate'] ? $this->_pdo->quote($vendor['certificate']) : 'NULL',
-							':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
-							':pricelist' => $vendor['pricelist'] ? $this->_pdo->quote($vendor['pricelist']) : 'NULL',
-						]) . '; ');
+					$vendor = array_search($entry['name'], array_column($DBall, 'name'));
+					if ($vendor === false) {
+						$unfound[] = $entry['name'];
+						continue;
 					}
+					$vendor = $DBall[$vendor];
+					// whitespaces and periods replaced with underscore as in request parameters
+					$infovar = $vendor['name'] . '_info';
+					$filtervar = $vendor['name'] . '_pricelistfilter';
+
+					if (!(isset($this->_payload[$infovar]) || isset($this->_payload[$filtervar])))
+						continue;
+
+					if (isset($this->_payload[$infovar])) {
+						$vendor['info'] = isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : $vendor['info'];
+					}
+					if (isset($this->_payload[$filtervar])) {
+						$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
+						$newpricelistfilter = (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array') ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null;
+						$vendor['pricelist']['filter'] = $newpricelistfilter ? : (isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : null);
+						$vendor['pricelist'] = UTILITY::json_encode($vendor['pricelist']);
+					}
+					echo $this->printSuccess($vendor['name'] . " updated");
+
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_vendor'),
+					[
+						':id' => $vendor['id'],
+						':name' => $this->_pdo->quote($vendor['name']),
+						':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
+						':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
+						':certificate' => $vendor['certificate'] ? $this->_pdo->quote($vendor['certificate']) : 'NULL',
+						':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
+						':pricelist' => $vendor['pricelist'] ? $this->_pdo->quote($vendor['pricelist']) : 'NULL',
+					]) . '; ');
 				}
 				foreach ($sqlchunks as $chunk){
 					try {
@@ -1473,10 +1497,11 @@ class INSTALL {
 					}
 				}
 				if ($sqlchunks)	$this->printSuccess('Entries by name for vendors have been updated.');
+				if ($unfound) $this->printError('The following vendors from import file have not been found in database:', implode(', ', $unfound));
 				else $this->printWarning('There were no updates. Select items to update or check vendor names matching your database entries.');
 				break;
 			case 'GET':
-				echo 'Check what to update by vendor. If template has any value it will override the database, otherwise the original will be kept.';
+				echo 'Check what to update by vendor. If template has any value it will override the database, otherwise the original will be kept.<br />Missing a vendor? Most probably names don\'t match...';
 				echo '<form method="post">';
 				$intersections=array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
 				foreach ($DBall as $vendor){

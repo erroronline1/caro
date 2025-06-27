@@ -257,9 +257,7 @@ class RECORD extends API {
 						$subs['attributes']['onclick'] = $calendar->dialog([':type' => 'schedule']);
 					}
 					if (isset($subs['autocomplete'])){
-						// translate name as payloadencoded according to LANG::PROPERTY
-						$issue = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
-						if (($index = array_search($issue, array_column($datalists, 'issue'))) !== false){
+						if (($index = array_search($subs['attributes']['name'], array_column($datalists, 'issue'))) !== false){
 							if ($subs['type'] === 'text') {
 								$subs['datalist'] = json_decode($datalists[$index]['datalist'], true);
 								unset($subs['autocomplete']);
@@ -856,12 +854,10 @@ class RECORD extends API {
 						if ($issues = autocomplete($useddocument['content'])){
 							$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $useddocument['unit']]]);
 							foreach ($issues as $issue){
-								// translate issue as payloadencoded according to LANG::PROPERTY
-								$issue = preg_replace('/[\s\.]/', '_', $issue);
 								// gather values even for enumerated submissions
 								$values = [];
 								foreach (array_keys((array) $this->_payload) as $key){
-									preg_match('/' . $issue . '(?:$|\()/m', $key, $matches);
+									preg_match('/' . preg_quote($issue, '/') . '(?:$|\()/m', $key, $matches);
 									if ($matches) $values[] = $this->_payload->$key;
 								}
 								if (!$values) continue;
@@ -1858,7 +1854,6 @@ class RECORD extends API {
 			if (!isset($accumulatedcontent[$useddocument])) $accumulatedcontent[$useddocument] = ['last_record' => null, 'content' => []];
 			if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
 			foreach ($record['content'] as $key => $value){
-				$key = str_replace('_', ' ', $key);
 				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
 				$value = str_replace('\n', "\n", $value); // format linebreaks
 				preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
@@ -1952,21 +1947,20 @@ class RECORD extends API {
 						if ($enumerate[$name] > 1) {
 							$name .= '(' . $enumerate[$name] . ')'; // multiple similar form field names -> for fixed component content, not dynamic created multiple fields
 						}
-						$payloadname = preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', ' ', $name);
 
 						if ($subs['type'] === 'textsection'){
 							$value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
 							 : ' ';
 						}
-						elseif (isset($payload[$payloadname])) {
-							$value = $payload[$payloadname];
+						elseif (isset($payload[$name])) {
+							$value = $payload[$name];
 						}
 						else $value = '-';
 
 						$content['content'][$name] = $value;
 						$dynamicMultiples = preg_grep('/' . preg_quote($originName, '/') . '\(\d+\)/m', array_keys($payload));
 						foreach ($dynamicMultiples as $submitted){
-							$value = $payload[preg_replace('/' . CONFIG['forbidden']['input']['characters'] . '/', ' ', $submitted)];
+							$value = $payload[$submitted];
 							$content['content'][$submitted] = $value;
 						}
 					}

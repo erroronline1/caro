@@ -589,17 +589,16 @@ class SHARED {
 				try {
 					if (!isset($subs['attributes']['name'])) throw new \ErrorException('faulty element construction', 0);
 
-					if (!isset($values[$subs['attributes']['name']])) $underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
-					else $underscored_name = $subs['attributes']['name'];
-					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$underscored_name])){
-						$settings = explode(' | ', $values[$underscored_name]);
+					$name = $subs['attributes']['name'];
+					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$name])){
+						$settings = explode(' | ', $values[$name]);
 						foreach ($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
 							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
 							else $subs['content'][$key]['checked'] = true;
 						}
 					}
-					elseif (isset($values[$underscored_name])){
-						$subs['attributes']['value'] = $values[$underscored_name];
+					elseif (isset($values[$name])){
+						$subs['attributes']['value'] = $values[$name];
 					}
 					$content[] = $subs;
 				}
@@ -692,8 +691,8 @@ class SHARED {
 				array_push($content, ...self::unmatchedrequired($subs, $values));
 			}
 			else {
-				$underscored_name = preg_replace('/[\s\.]/', '_', $subs['attributes']['name']);
-				if (isset($subs['attributes']['name']) && isset($subs['attributes']['required']) && !(isset($values[$underscored_name]) || isset($values[$subs['attributes']['name']]))){
+				$name = $subs['attributes']['name'];
+				if (isset($subs['attributes']['name']) && isset($subs['attributes']['required']) && !(isset($values[$name]) || isset($values[$subs['attributes']['name']]))){
 					$content[] = $subs['attributes']['name'];
 				}
 			}
