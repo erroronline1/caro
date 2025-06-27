@@ -657,7 +657,7 @@ export const _client = {
 			render.processAfterInsertion();
 		},
 		batchStateUpdate: (stateinput) => {
-			const marked = document.getElementsByName(api._lang.GET("order.tile_mark")),
+			const marked = document.getElementsByName(api._lang.GET("order.tile_view_mark")),
 				// gather marked orders
 				orders = [];
 			for (const mark of marked) {
@@ -1392,7 +1392,7 @@ export const _client = {
 				// append ordertext
 				order.push({
 					type: "textsection",
-					content: api._lang.GET("order.ordertype." + element.ordertype) + (element.commission ? "\n" + element.commission : ""),
+					content: api._lang.GET("order.ordertype." + element.ordertype) + "\n" + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }),
 					attributes: {
 						name: api._lang.GET("order.prepared_order_item", {
 							":quantity": element.quantity ? element.quantity : "",
@@ -1416,7 +1416,7 @@ export const _client = {
 				order.push({
 					type: "button",
 					attributes: {
-						value: api._lang.GET("order.tile_open"),
+						value: api._lang.GET("order.tile_view_open"),
 						onclick: function () {
 							new _client.Dialog({
 								type: "input",
@@ -1433,7 +1433,7 @@ export const _client = {
 				if (!element.incorporation && !element.samplecheck) {
 					// api.purchase("put", "approved", "2036", "partially_received", this.checked);
 					buttons = {};
-					(buttons[api._lang.GET("order.tile_mark")] = { value: element.id }),
+					(buttons[api._lang.GET("order.tile_view_mark")] = { value: element.id }),
 						order.push({
 							type: "checkbox",
 							content: buttons,
@@ -1465,11 +1465,11 @@ export const _client = {
 			const inputs = {};
 			let bulk;
 			if (data.allowedstateupdates) {
-				let skip=true;
+				let skip = true;
 				for (const input of data.allowedstateupdates) {
 					// skip all previous
 					if (skip) {
-						if (input === data.state || data.state === 'unprocessed') skip = false;
+						if (input === data.state || data.state === "unprocessed") skip = false;
 						else continue;
 					}
 					inputs[api._lang.GET("order.order." + input)] = { value: input, onchange: "_client.order.batchStateUpdate(this)" };

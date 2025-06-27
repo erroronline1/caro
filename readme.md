@@ -33,9 +33,6 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* order
-    * order state filter display not further proceeded
-    * order type icon | qty, productunit, productname, vendor | unit | commission | orderer
 * css dialog toast on top
 
 ## Content
