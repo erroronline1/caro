@@ -34,7 +34,6 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * css dialog toast on top?
-* make order view tile groupby available
 
 ## Content
 * [Aims](#aims)

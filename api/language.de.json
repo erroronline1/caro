@@ -1264,6 +1264,7 @@
 		},
 		"saved": "Die freigegebene Bestellung kann nun vom Einkauf bearbeitet werden.",
 		"saved_to_prepared": "Die Bestellung wurde zu den vorbereiteten Bestellungen hinzugefügt, muss aber noch freigegeben werden.",
+		"tile_view_groupby": "Gruppieren nach",
 		"tile_view_info": "für :commission von :orderer",
 		"tile_view_mark": "markieren",
 		"tile_view_open": "öffnen",

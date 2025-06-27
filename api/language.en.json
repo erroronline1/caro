@@ -1264,6 +1264,7 @@
 		},
 		"saved": "Approved order can now be processed by the purchase department.",
 		"saved_to_prepared": "Order has been saved to prepared orders but has still to be approved.",
+		"tile_view_groupby": "Group by",
 		"tile_view_info": "for :commission by :orderer",
 		"tile_view_mark": "mark",
 		"tile_view_open": "open",

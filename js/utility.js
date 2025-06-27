@@ -601,7 +601,8 @@ export const _client = {
 		approved: (data = undefined) => {
 			if (!data) return;
 			let content = [],
-				filter = {};
+				filter = {},
+				groupby = {};
 
 			// construct filter checkboxes with events
 			filter[api._lang.GET("order.order.unprocessed")] = { onchange: 'api.purchase("get", "approved", document.getElementById("productsearch").value)' };
@@ -645,6 +646,22 @@ export const _client = {
 				switch (api._settings.user.app_settings.orderLayout) {
 					// in case other options may become implemented also see user.php profile
 					case "tile":
+						for (const [key, lang] of Object.entries({
+							commission: "commission",
+							vendor: "vendor_label",
+							organizationalunit: "organizational_unit"
+						})) {
+							groupby[api._lang.GET("order." + lang)] = api._settings.session.orderTilesGroupBy === key ? { selected: true, value: key } : { value: key };
+						}
+						content[content.length - 1].push({
+							type: "select",
+							attributes: {
+								name: api._lang.GET("order.tile_view_groupby"),
+								onchange: "api._settings.session.orderTilesGroupBy = this.value",
+							},
+							content: groupby,
+						});
+
 						content.push(..._client.order.tiles(data));
 						break;
 					default:
@@ -1379,7 +1396,7 @@ export const _client = {
 				buttons = {},
 				orderdata = {},
 				// intermediate solution, maybe selecteable later
-				groupby = "commission";
+				groupby = api._settings.session.orderTilesGroupBy;
 			// iterate over orders and construct Assemble syntax
 			for (const element of data.order) {
 				// reinstatiate
