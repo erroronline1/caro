@@ -23,13 +23,8 @@ import SignaturePad from "../libraries/signature_pad.umd.js";
 import QrCreator from "../libraries/qr-creator.js";
 import Icons from "./icons.json" with { type: "json" };
 
-var ELEMENT_ID = 0,
-	SIGNATURE_CANVAS = null,
-	TEXTAREA_AUTOCOMPLETE_INDEX = null,
-	TEXTAREA_AUTOCOMPLETE_SWIPE = null;
-
 export function getNextElementID() {
-	return "elementID" + ++ELEMENT_ID;
+	return "elementID" + ++api._settings.session.elementId;
 }
 
 const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown", "onfocus"];
@@ -1306,8 +1301,8 @@ export class Assemble {
 	 */
 
 	initialize_SignaturePad() {
-		SIGNATURE_CANVAS = document.getElementById("signaturecanvas");
-		window.signaturePad = new SignaturePad(SIGNATURE_CANVAS, {
+		api._settings.session.signatureCanvas = document.getElementById("signaturecanvas");
+		window.signaturePad = new SignaturePad(api._settings.session.signatureCanvas, {
 			// It's Necessary to use an opaque color when saving image as JPEG;
 			// this option can be omitted if only saving as PNG or SVG
 			//backgroundColor: 'rgb(255, 255, 255)'
@@ -1327,9 +1322,9 @@ export class Assemble {
 		// and only part of the canvas is cleared then.
 		const ratio = Math.max(window.devicePixelRatio || 1, 1);
 		// This part causes the canvas to be cleared
-		SIGNATURE_CANVAS.width = SIGNATURE_CANVAS.offsetWidth * ratio;
-		SIGNATURE_CANVAS.height = SIGNATURE_CANVAS.offsetHeight * ratio;
-		SIGNATURE_CANVAS.getContext("2d").scale(ratio, ratio);
+		api._settings.session.signatureCanvas.width = api._settings.session.signatureCanvas.offsetWidth * ratio;
+		api._settings.session.signatureCanvas.height = api._settings.session.signatureCanvas.offsetHeight * ratio;
+		api._settings.session.signatureCanvas.getContext("2d").scale(ratio, ratio);
 		// This library does not listen for canvas changes, so after the canvas is automatically
 		// cleared by the browser, SignaturePad#isEmpty might still return false, even though the
 		// canvas looks empty, because the internal data of this library wasn't cleared. To make sure
@@ -3276,17 +3271,17 @@ export class Assemble {
 				}
 				if (matches.length) {
 					// navigate through matches with alt key
-					if (TEXTAREA_AUTOCOMPLETE_INDEX === null) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
-					if (TEXTAREA_AUTOCOMPLETE_INDEX > -1) {
-						if (direction === "forth") TEXTAREA_AUTOCOMPLETE_INDEX++;
-						if (direction === "back") TEXTAREA_AUTOCOMPLETE_INDEX--;
+					if (api._settings.session.textareaAutocompleteIndex === null) api._settings.session.textareaAutocompleteIndex = 0;
+					if (api._settings.session.textareaAutocompleteIndex > -1) {
+						if (direction === "forth") api._settings.session.textareaAutocompleteIndex++;
+						if (direction === "back") api._settings.session.textareaAutocompleteIndex--;
 						// out of bound
-						if (TEXTAREA_AUTOCOMPLETE_INDEX > matches.length - 1) TEXTAREA_AUTOCOMPLETE_INDEX = 0;
-						if (TEXTAREA_AUTOCOMPLETE_INDEX < 0) TEXTAREA_AUTOCOMPLETE_INDEX = matches.length - 1;
-					} else TEXTAREA_AUTOCOMPLETE_INDEX = 0; // fallback
-					textarea.value = start + matches[TEXTAREA_AUTOCOMPLETE_INDEX] + end;
-					textarea.selectionEnd = (start + matches[TEXTAREA_AUTOCOMPLETE_INDEX]).length;
-				} else TEXTAREA_AUTOCOMPLETE_INDEX = null;
+						if (api._settings.session.textareaAutocompleteIndex > matches.length - 1) api._settings.session.textareaAutocompleteIndex = 0;
+						if (api._settings.session.textareaAutocompleteIndex < 0) api._settings.session.textareaAutocompleteIndex = matches.length - 1;
+					} else api._settings.session.textareaAutocompleteIndex = 0; // fallback
+					textarea.value = start + matches[api._settings.session.textareaAutocompleteIndex] + end;
+					textarea.selectionEnd = (start + matches[api._settings.session.textareaAutocompleteIndex]).length;
+				} else api._settings.session.textareaAutocompleteIndex = null;
 				textarea.selectionStart = cursorPosition;
 				textarea.focus();
 			};
@@ -3308,10 +3303,10 @@ export class Assemble {
 			if (swipe) {
 				// toggle by swipe especially for tablets as buttons appeared too occupying
 				textarea.addEventListener("touchstart", (event) => {
-					TEXTAREA_AUTOCOMPLETE_SWIPE = [event.clientX, event.clientY];
+					api._settings.session.textareaAutocompleteSwipe = [event.clientX, event.clientY];
 				});
 				textarea.addEventListener("touchend", (event) => {
-					const travel = [TEXTAREA_AUTOCOMPLETE_SWIPE[0] - event.clientX, TEXTAREA_AUTOCOMPLETE_SWIPE[1] - event.clientY];
+					const travel = [api._settings.session.textareaAutocompleteSwipe[0] - event.clientX, api._settings.session.textareaAutocompleteSwipe[1] - event.clientY];
 					// filter for mostly horizontal swipes
 					if (Math.abs(travel[0]) - Math.abs(travel[1]) > 0) {
 						event.preventDefault();
@@ -3320,7 +3315,7 @@ export class Assemble {
 				});
 			}
 
-			let autocomplete_hint = api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey, ":swipe": swipe ? api._lang.GET("assemble.render.textarea_autocomplete_swipe_active") : "" });
+			let autocomplete_hint = api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey, ":swipe": swipe ? api._lang.GET("assemble.render.api._settings.session.textareaAutocompleteSwipe_active") : "" });
 			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + autocomplete_hint : autocomplete_hint;
 		}
 

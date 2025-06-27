@@ -25,6 +25,13 @@ export const api = {
 	_settings: {
 		user: {},
 		config: {},
+		session: {
+			elementId: 0,
+			signatureCanvas: null,
+			textareaAutocompleteIndex: null,
+			textareaAutocompleteSwipe: null,
+			orderTilesGroupBy: "commission",
+		},
 	},
 
 	// instatiate a broadly usable language class
