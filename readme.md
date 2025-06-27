@@ -3940,14 +3940,14 @@ Sample response
 {"data":{"filter":"","state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2025-01-25 01:45:48 ","quantity":"1","unit":"PAK","barcode":"4032767124961","name":"Schlauch-Strumpf","vendor":"Otto Bock HealthCare Deutschland GmbH","ordernumber":"99B25","commission":"1234","approval":0,"addinformation":true,"orderer":"error on line 1","organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"partially_received":{"data-partially_received":"false"},"received":{"data-received":"false"},"partially_delivered":{"data-partially_delivered":"false"},....
 ```
 
-> PUT ./api/api.php/order/approved/{id}/{update}/{state}
+> PUT ./api/api.php/order/approved/{ids}/{update}/{state}
 
-Updates approved order (states, appending information, etc.) or transfer to prepared order revoking order authorization.
+Updates approved orders (states, appending information, etc.) or transfer to prepared order revoking order authorization.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | order item database id (int) |
+| {ids} | path parameter | required | order item database id (int) or _-concatenated for bulk update |
 | {update} | path parameter | required | ordered, received, delivered, archived, addinformation, disapproved, cancellation, return |
 | {state} | path parameter | optional | true, false |
 | payload | form data | optional | messages |
