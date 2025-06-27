@@ -463,7 +463,15 @@ class ORDER extends API {
 				}
 				foreach ($order as $row) {
 					// filter selected state or default to unprocessed
-					if ((!$this->_subMethodState && $row['ordered']) || ($this->_subMethodState && !$row[$this->_subMethodState])) continue;
+					if (!$this->_subMethodState && $row['ordered']) continue;
+					if ($this->_subMethodState){
+						if (!$row[$this->_subMethodState]) continue;
+						// skip whatever has the next logical steps already set
+						foreach (array_reverse(['ordered', 'partially_received', 'received', 'partially_delivered', 'delivered', 'archived']) as $s){
+							if ($this->_subMethodState !== $s && $row[$s]) continue 2;
+							if ($this->_subMethodState === $s) break;
+						}
+					}
 					
 					$decoded_order_data = json_decode($row['order_data'], true);
 
