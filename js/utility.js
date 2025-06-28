@@ -1458,7 +1458,7 @@ export const _client = {
 				} else {
 					tileinfo = [];
 					if (element.incorporation) tileinfo.push(api._lang.GET("order.incorporation.incorporation"));
-					if (element.samplecheck) tileinfo.push(api._lang.GET("order.samplecheck.samplecheck"));
+					if (element.samplecheck) tileinfo.push(api._lang.GET("order.sample_check.sample_check"));
 					order.push({
 						type: "textsection",
 						attributes: {
