@@ -2293,7 +2293,6 @@ export class Assemble {
 			radio.id = radio.name = "_msg" + this.currentElement.attributes.id;
 			mark_deletion = function () {
 				radio.checked = !radio.checked;
-				console.log(radio.name, radio.checked, message);
 			};
 			delete this.currentElement.attributes.id;
 		}
