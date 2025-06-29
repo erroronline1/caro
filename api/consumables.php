@@ -1048,6 +1048,7 @@ class CONSUMABLES extends API {
 					'protected' => null,
 					'trading_good' => null,
 					'incorporated' => '',
+					'sample_checks' => '',
 					'has_expiry_date' => '',
 					'special_attention' => '',
 					'stock_item' => '',
@@ -1391,32 +1392,34 @@ class CONSUMABLES extends API {
 
 					$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
 					$productsPerSlide = 1;
-					foreach ($product['sample_checks'] as $check){
-						if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
-							$checkslides[] = [];
+					if ($product['sample_checks']) {
+						foreach ($product['sample_checks'] as $check){
+							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+								$checkslides[] = [];
+							}
+							$slide = intval(count($checkslides) - 1);
+							$checkslides[$slide][] = [
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true)
+								],
+								'content' => $check['content'],
+							];
 						}
-						$slide = intval(count($checkslides) - 1);
-						$checkslides[$slide][] = [
-							'type' => 'textsection',
+						if (PERMISSION::permissionFor('regulatoryoperation')) $checkslides[$slide][] = [
+							'type' => 'button',
 							'attributes' => [
-								'name' => $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true)
-							],
-							'content' => $check['content'],
+								'value' => $this->_lang->GET('audit.mdrsamplecheck_revoke'),
+								'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
+									"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
+									"if (response !== false) {" .
+									"api.purchase('delete', 'mdrsamplecheck', " . $product['id']. "); this.disabled = true" .
+									"}});"
+							]
 						];
 					}
-					if (PERMISSION::permissionFor('regulatoryoperation')) $checkslides[$slide][] = [
-						'type' => 'button',
-						'attributes' => [
-							'value' => $this->_lang->GET('audit.mdrsamplecheck_revoke'),
-							'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
-								"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
-								"if (response !== false) {" .
-								"api.purchase('delete', 'mdrsamplecheck', " . $product['id']. "); this.disabled = true" .
-								"}});"
-						]
-					];
-
-					$response['render']['content'][] = [$productedit, ...$checkslides];
+					if ($checkslides) $response['render']['content'][] = [$productedit, ...$checkslides];
+					else $response['render']['content'][] = $productedit;
 
 					// append toggles
 					if (PERMISSION::permissionFor('products')){
