@@ -34,6 +34,9 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * css dialog toast on top?
+* vendor update / install
+    * update sample check intervals
+* still consider table layout for orders, records?
 
 ## Content
 * [Aims](#aims)
@@ -2389,6 +2392,7 @@ There is a PERMISSION class handling
 Using these methods is mandatory. (./api/_utility.php) Deviations are allowed only in extending access to *admin*, scenarios lacking a logged in user or limiting access for
 * *supervisors* having access to assigned organizational unit content only
 * *groups* not having access to recording
+* *patients* having access to permitted documents and their profile settings only
 
 There is an SQLQUERY class handling
 * database connections
@@ -2422,7 +2426,7 @@ Notifications are processed within the NOTIFICATION-class extending the API-clas
 
 can be tested and verified importing unittest.js and calling `rendertest('app')` from the console.
 
-* erroronline1.js is fundamental as it handles requests and form data processing
+* erroronline1.js is fundamental as it handles requests, form data processing and some custom prototype functions.
 
 Other libraries rely on dynamic data and have to be tested in development runtime
 * viewstl: upload an stl-file and view it within the file selection
