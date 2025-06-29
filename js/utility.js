@@ -649,7 +649,7 @@ export const _client = {
 						for (const [key, lang] of Object.entries({
 							commission: "commission",
 							vendor: "vendor_label",
-							organizationalunit: "organizational_unit"
+							organizationalunit: "organizational_unit",
 						})) {
 							groupby[api._lang.GET("order." + lang)] = api._settings.session.orderTilesGroupBy === key ? { selected: true, value: key } : { value: key };
 						}
@@ -657,7 +657,7 @@ export const _client = {
 							type: "select",
 							attributes: {
 								name: api._lang.GET("order.tile_view_groupby"),
-								onchange: "api._settings.session.orderTilesGroupBy = this.value",
+								onchange: "api._settings.session.orderTilesGroupBy = this.value; document.querySelector('[name=\"" + api._lang.GET("order.order_filter") + "\"]:checked').dispatchEvent(new Event('change'))",
 							},
 							content: groupby,
 						});
