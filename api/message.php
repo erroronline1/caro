@@ -98,7 +98,7 @@ class MESSAGE extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('message.delete_mark'),
 								'data-checked' => 0,
-								'onclick' => "this.dataset.checked = + !Boolean(parseInt(this.dataset.checked)); document.querySelectorAll('article>input[type=\"radio\"]').foreach (radio => {radio.checked = Boolean(parseInt(this.dataset.checked));})"
+								'onclick' => "this.dataset.checked = + !Boolean(parseInt(this.dataset.checked)); document.querySelectorAll('article>input[type=\"radio\"]').forEach (radio => {radio.checked = Boolean(parseInt(this.dataset.checked));})"
 							]
 						]
 					];
@@ -113,7 +113,7 @@ class MESSAGE extends API {
 									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => { if (confirmation) {" .
 										"let ids = [];" .
-										"document.querySelectorAll('article>input[type=\"radio\"]').foreach (radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
+										"document.querySelectorAll('article>input[type=\"radio\"]').forEach (radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
 										"api.message('delete', 'conversation', ids.join('_'));" .
 									"} })"
 							]
