@@ -507,7 +507,7 @@ class UTILITY {
 
 						if ($linebreak === "\n"){
 							// iis
-							list(, $raw_headers, $body) = explode($linebreak, $part, 3);
+							list(, $raw_headers, , $body) = explode($linebreak, $part, 4);
 							$body = ltrim($body);
 						}
 						else {
