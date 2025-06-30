@@ -448,6 +448,8 @@ class UTILITY {
 	 *  |  _|__,|_| |___|___|  _|__,|_  |_|___|__,|___|
 	 *  |_|                 |_|     |___|
 	 * prepares passed request parameters, mimics post data for put method
+	 * preserves literal variable names without replacing whitepace, questionmark and alike with _
+	 * empty file inputs are stripped from the payload
 	 * 
 	 * @return object with request parameters and their value
 	 */
@@ -472,6 +474,7 @@ class UTILITY {
 				$raw_data = file_get_contents('php://input');
 				// linebreak depending on apache vs iis
 				$linebreak = stristr("\r\n", $raw_data) ? "\r\n" : "\n";
+
 				// Fetch content and determine boundary
 				$boundary = rtrim(substr($raw_data, 0, strpos($raw_data, $linebreak)));
 
@@ -507,13 +510,16 @@ class UTILITY {
 
 						if ($linebreak === "\n"){
 							// iis
-							list(, $raw_headers, , $body) = explode($linebreak, $part, 4);
+							list(, $raw_headers, $type, $body) = explode($linebreak, $part, 4);
 							$body = ltrim($body);
 						}
 						else {
 							// apache
-							list($raw_headers, $body) = explode($linebreak . $linebreak, $part, 2);
+							list($raw_headers, $type, $body) = explode($linebreak . $linebreak, $part, 3);
 						}
+						// retrieve type like Content-Type: application/pdf or '' if not file
+						$type = explode(': ', $type);
+						$type = isset($type[1]) ? $type[1] : '';
 
 						// parse the headers list
 						$raw_headers = explode($linebreak, $raw_headers);
@@ -534,7 +540,7 @@ class UTILITY {
 								$headers['content-disposition'],
 								$matches
 							);
-							list(, $type, $name) = $matches;
+							list(, , $name) = $matches;
 
 							// parse file
 							if (isset($matches[4])){
@@ -553,7 +559,7 @@ class UTILITY {
 									'name' => $filename,
 									'tmp_name' => $tmp_name,
 									'size' => strlen( $body ),
-									'type' => $value
+									'type' => $type
 								];
 								
 								$_FILES[$fieldname]['error'][] = $_files['error'];
@@ -566,14 +572,18 @@ class UTILITY {
 								file_put_contents($tmp_name, $body);
 							}
 							// parse Field
-							else
-							{
-								if (substr($name, -2) == '[]') { // is array
-									$name = substr($name, 0, strlen($name) - 2);
-									if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
-									else $data[$name] = [substr($body, 0, strlen($body) - 2)];
+							else {
+								if (!$type){
+									// type is only set if this input was supposed to be a file upload.
+									// empty file inputs will be stripped from the payload
+									// non empty files have been parsed already
+									if (substr($name, -2) == '[]') { // is array
+										$name = substr($name, 0, strlen($name) - 2);
+										if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
+										else $data[$name] = [substr($body, 0, strlen($body) - 2)];
+									}
+									else $data[$name] = substr($body, 0, strlen($body) - 2);
 								}
-								else $data[$name] = substr($body, 0, strlen($body) - 2);
 							}
 						}
 					}
