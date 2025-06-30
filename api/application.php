@@ -856,7 +856,8 @@ class APPLICATION extends API {
 			],
 			$this->_lang->GET('menu.records.header') => [
 				$this->_lang->GET('menu.records.record_create_identifier') => ['onclick' => "api.record('get', 'identifier')"],
-				$this->_lang->GET('menu.records.record_summary') => ['onclick' => "api.record('get', 'records')"]
+				$this->_lang->GET('menu.records.record_summary') => ['onclick' => "api.record('get', 'records')"],
+				$this->_lang->GET('menu.records.record_record') => ['onclick' => "api.document('get', 'documents')"]
 			],
 			$this->_lang->GET('menu.calendar.header') => [
 				$this->_lang->GET('menu.calendar.appointment') => ['onclick' => "api.calendar('get', 'appointment')"],
@@ -895,7 +896,6 @@ class APPLICATION extends API {
 
 		// records
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onclick' => "api.document('get', 'bundles')"];
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_record')] = ['onclick' => "api.document('get', 'documents')"];
 		// make sure risk management comes after documents so this is an order exception without special permission
 		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onclick' => "api.risk('get', 'risk')"];
 		if (PERMISSION::permissionFor('audit')){

@@ -321,7 +321,7 @@ class RECORD extends API {
 			}
 			return $saveable;
 		}
-		if (saveable($response['render']['content'])) $response['render']['form'] = [
+		if (saveable($response['render']['content']) && !array_intersect(['group'], $_SESSION['user']['permissions'])) $response['render']['form'] = [
 			'data-usecase' => 'record',
 			'action' => "javascript:api.record('post', 'record')",
 			'data-confirm' => true];
