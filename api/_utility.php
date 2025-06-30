@@ -470,9 +470,10 @@ class UTILITY {
 			case "POST":
 			case "PUT":
 				$raw_data = file_get_contents('php://input');
-
+				// linebreak depending on apache vs iis
+				$linebreak = stristr("\r\n", $raw_data) ? "\r\n" : "\n";
 				// Fetch content and determine boundary
-				$boundary = substr($raw_data, 0, strpos($raw_data, "\r\n"));
+				$boundary = substr($raw_data, 0, strpos($raw_data, $linebreak));
 
 				if (empty($boundary)){
 					// according to https://stackoverflow.com/a/18209799/6087758
@@ -488,20 +489,30 @@ class UTILITY {
 					}
 				}
 				else {
-					// Fetch each part
+					// fetch each part
 					$parts = array_slice(explode($boundary, $raw_data), 1);
 					$data = array();
 
 					foreach ($parts as $part){
-						// If this is the last part, break
-						if ($part == "--\r\n") break;
+						// linebreak depending on apache vs iis
+						$linebreak = stristr("\r\n", $part) ? "\r\n" : "\n";
 
-						// Separate content from headers
-						$part = ltrim($part, "\r\n");
-						list($raw_headers, $body) = explode("\r\n\r\n", $part, 2);
+						// if this is the last part, break
+						if ($part == "--" . $linebreak) break;
 
-						// Parse the headers list
-						$raw_headers = explode("\r\n", $raw_headers);
+						// separate content from headers
+						$part = ltrim($part, $linebreak);
+						if ($linebreak === "\n"){
+							// iis
+							list($raw_headers, ,$body) = explode($linebreak, $part, 3);
+						}
+						else {
+							// apache
+							list($raw_headers, $body) = explode($linebreak . $linebreak, $part, 2);
+						}
+
+						// parse the headers list
+						$raw_headers = explode($linebreak, $raw_headers);
 						$headers = array();
 						foreach ($raw_headers as $header){
 							// list($name, $value) = explode(':', $header); this original does not work with input names containing colons
@@ -510,7 +521,7 @@ class UTILITY {
 							$headers[strtolower($name)] = ltrim($value, ' ');
 						}
 
-						// Parse the Content-Disposition to get the field name, etc.
+						// parse the Content-Disposition to get the field name, etc.
 						if (isset($headers['content-disposition'])){
 							$filename = null;
 							$tmp_name = null;
@@ -521,7 +532,7 @@ class UTILITY {
 							);
 							list(, $type, $name) = $matches;
 
-							// Parse File
+							// parse file
 							if (isset($matches[4])){
 								// get filename
 								$filename = $matches[4];
@@ -549,11 +560,11 @@ class UTILITY {
 								// place in temporary directory
 								file_put_contents($tmp_name, $body);
 							}
-							// Parse Field
+							// parse Field
 							else
 							{
 								if (substr($name, -2) == '[]') { // is array
-									$name = substr($name, 0, strlen($name)-2);
+									$name = substr($name, 0, strlen($name) - 2);
 									if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
 									else $data[$name] = [substr($body, 0, strlen($body) - 2)];
 								}
