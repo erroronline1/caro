@@ -473,7 +473,7 @@ class UTILITY {
 				// linebreak depending on apache vs iis
 				$linebreak = stristr("\r\n", $raw_data) ? "\r\n" : "\n";
 				// Fetch content and determine boundary
-				$boundary = substr($raw_data, 0, strpos($raw_data, $linebreak));
+				$boundary = rtrim(substr($raw_data, 0, strpos($raw_data, $linebreak)));
 
 				if (empty($boundary)){
 					// according to https://stackoverflow.com/a/18209799/6087758
@@ -498,13 +498,17 @@ class UTILITY {
 						$linebreak = stristr("\r\n", $part) ? "\r\n" : "\n";
 
 						// if this is the last part, break
-						if ($part == "--" . $linebreak) break;
+						if (str_starts_with($part, "--")) break;
 
 						// separate content from headers
 						$part = ltrim($part, $linebreak);
+
+						if (!$part) continue;
+
 						if ($linebreak === "\n"){
 							// iis
-							list($raw_headers, ,$body) = explode($linebreak, $part, 3);
+							list(, $raw_headers, $body) = explode($linebreak, $part, 3);
+							$body = ltrim($body);
 						}
 						else {
 							// apache
