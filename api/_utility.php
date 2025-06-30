@@ -544,8 +544,9 @@ class UTILITY {
 
 								// get tmp name
 								$filename_parts = pathinfo( $filename );
-								$tmp_name = tempnam( ini_get('upload_tmp_dir'), $filename_parts['filename']);
-
+								//$tmp_name = tempnam( ini_get('upload_tmp_dir'), $filename_parts['filename']);
+								@$tmp_name = tempnam( sys_get_temp_dir(), preg_replace('/\W/', '', $filename_parts['filename']));
+								
 								// populate $_FILES with information, size may be off in multibyte situation
 								$_files = [
 									'error' => 0,
@@ -654,7 +655,7 @@ class UTILITY {
 				$file = pathinfo($_FILES[$name[$i]]['name']);
 				if ($rename && isset($rename[$i])) $file['filename'] = $rename[$i];
 				if ($_FILES[$name[$i]]['tmp_name']) $targets[] = self::handle($_FILES[$name[$i]]['tmp_name'], $file['filename'] . '.' . $file['extension'], $i, $prefix, $folder, $replace);
-		}
+			}
 			else {
 				for ($j = 0; $j < count($_FILES[$name[$i]]['name']); $j++){
 					if (!$_FILES[$name[$i]]['tmp_name'][$j]) continue;
