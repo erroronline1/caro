@@ -734,7 +734,7 @@ class USER extends API {
 						':qmo' => implode(', ', $roles['qmo']),
 						':prrc' => implode(', ', $roles['prrc']),
 						':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('menu.communication.register', [], true) . '</a>',
-						':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'start\')">' . $this->_lang->GET('menu.application.start', [], true) . '</a>',
+						':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'about\')">' . $this->_lang->GET('menu.application.about', [], true) . '</a>',
 						':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('menu.application.user_profile', [], true) . '</a>',
 						':admin' => implode(', ', $roles['admin'])
 					];

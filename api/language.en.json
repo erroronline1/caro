@@ -993,7 +993,7 @@
 	},
 	"menu": {
 		"application": {
-			"about": "About",
+			"about": "About CARO App",
 			"header": "Application",
 			"manual_manager": "Edit manual",
 			"signin": "Please sign in",
