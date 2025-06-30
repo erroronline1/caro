@@ -622,8 +622,8 @@ class TOOL extends API {
 			case 'POST':
 				$downloadfiles = [];
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]) && $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name']
-					&& $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'] && str_ends_with($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'], 'zip')) {
-					$file = $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name'];
+					&& $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'][0] && str_ends_with($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'][0], 'zip')) {
+					$file = $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name'][0];
 					//unpack an archive
 					$zip = new \ZipArchive;
 					if ($zip->open($file)){

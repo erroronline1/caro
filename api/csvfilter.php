@@ -65,7 +65,7 @@ class CSVFILTER extends API {
 				$content = json_decode($filter['content'], true);
 
 				// check if input file ist provided
-				$inputfile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]['tmp_name'] : null;
+				$inputfile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]['tmp_name'][0] : null;
 				if (!$inputfile) $this->response([
 					'response' => [
 						'name' => false,
