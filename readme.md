@@ -37,6 +37,9 @@ Things are still in motion. Images may be outdated.
 * vendor update / install
     * update sample check intervals
 * still consider table layout for orders, records?
+* api payload parsing
+    * iis adaptations need refactoring for apache (approx. line 515)
+    * files had to be removed from payload checksum again for iis, check with apache
 
 ## Content
 * [Aims](#aims)
@@ -1880,6 +1883,7 @@ If you ever fiddle around with the sourcecode:
 * The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results. Options best have a value independent on their label.
 * The landing page triggers the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks. This is executed once per day. Admins get the latest entry of the logfile `cron.log` within the api directory. This includes error messages as well. The logfile can be deleted to retrigger the updates.
 * Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
+* $_FILES is always an array due to a custom processing of POST and PUT payload.
 
 [Content](#content)
 
