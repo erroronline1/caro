@@ -116,8 +116,9 @@ export const api = {
 			if (payload instanceof FormData) {
 				sanitizedpayload = Object.fromEntries(payload);
 				for (const [key, value] of Object.entries(sanitizedpayload)) {
+					// remove file keys for being shifted to $_FILES within the stream
 					// sanitation of arrays; synchronization with backend checksum not possible
-					if (key.endsWith("[]")) {
+					if ((value instanceof File && (method === "post" || (method === "put" && value.size))) || key.endsWith("[]")) {
 						delete sanitizedpayload[key];
 					}
 					// unset '0' values that are not recognized by backend
