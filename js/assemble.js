@@ -2339,7 +2339,7 @@ export class Assemble {
 					link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
 					a = document.createElement("a");
 					a.href = link[2];
-					if (link[4]) a.onclick = new Function(link[4]);
+					if (link[4]) a.onclick = new Function("event.stopPropagation(); " + link[4]);
 					a.classList.add("inline");
 					a.appendChild(document.createTextNode(link[5]));
 					p.append(a);
@@ -2350,7 +2350,7 @@ export class Assemble {
 					link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
 					a = document.createElement("a");
 					a.href = link[2];
-					if (link[4]) a.onclick = new Function(link[4]);
+					if (link[4]) a.onclick = new Function("event.stopPropagation(); " + link[4]);
 					a.classList.add("inline");
 					a.appendChild(document.createTextNode(link[5]));
 					p.append(a);
