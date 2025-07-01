@@ -1970,6 +1970,7 @@ export class Assemble {
 	 */
 	identify() {
 		this.currentElement.attributes.name = "IDENTIFY_BY_" + this.currentElement.attributes.name;
+		this.currentElement.attributes.required = true;
 		return this.scanner();
 	}
 
