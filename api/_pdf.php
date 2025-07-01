@@ -35,6 +35,7 @@ class PDF{
 			'marginleft' => isset($setup['marginleft']) ? intval($setup['marginleft']) : 20,
 			'header_image' => isset($setup['header_image']) ? $setup['header_image'] : null,
 			'footer_image' => isset($setup['footer_image']) ? $setup['footer_image'] : null,
+			'exportimage_maxwidth' => isset($setup['exportimage_maxwidth']) ? min(130, intval($setup['exportimage_maxwidth'])) : 130,
 			'exportimage_maxheight' => isset($setup['exportimage_maxheight']) ? intval($setup['exportimage_maxheight']) : 75,
 			'rows' => isset($setup['rows']) ? intval($setup['rows']) : 1,
 			'columns' => isset($setup['columns']) ? intval($setup['columns']) : 1,
@@ -145,6 +146,12 @@ class PDF{
 						$this->_pdf->AddPage();
 						$this->_pdf->SetY($this->_setup['margintop']);
 				}
+				// make sure to write on next page if image would reach into footer
+				if ($value['type'] === "image" && $value['value']
+					&& $this->_pdf->GetY() > $this->_pdf->getPageHeight() - $this->_setup['marginbottom'] - $this->_setup['exportimage_maxheight']) {
+						$this->_pdf->AddPage();
+						$this->_pdf->SetY($this->_setup['margintop']);
+				}
 
 				// version of components to be displayed smallish and ignoring the name column (component name for unique key)
 				if ($value['type'] === 'version'){
@@ -168,15 +175,18 @@ class PDF{
 						break;
 					case 'image':
 						if (array_key_exists($document, $content['images']) && in_array($value['value'], $content['images'][$document])) {
+							$value['value'] = str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
 							$imagedata = pathinfo($value['value']);
 							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $value['value']);
+							$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
+							$outputsize = [
+								'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
+								'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
+							];
 							$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
-							$this->_pdf->MultiCell(50, $this->_setup['exportimage-maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-							if ($img_width && $this->_setup['exportimage-maxheight'] && ($img_height / $img_width > 145 / $this->_setup['exportimage-maxheight']))
-								$this->_pdf->Image('.' . $value['value'], null, null, 0, $this->_setup['exportimage-maxheight'] - 1, '', '', 'R', true, 300, 'R');
-							else
-								$this->_pdf->Image('.' . $value['value'], null, null, 145, 0, '', '', 'R', true, 300, 'R');
-							$this->_pdf->Ln($this->_setup['exportimage-maxheight'] + 4);
+							$this->_pdf->MultiCell(50, $this->_setup['exportimage_maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, $this->_pdf->GetY() + $nameLines * 5, true, 0, false, true, 0, 'T', false);
+							$this->_pdf->Image('.' . $value['value'], null, $this->_pdf->GetY(), $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+							$this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
 						}
 						break;
 					case 'selection':
@@ -309,15 +319,24 @@ class PDF{
 			}
 			if (array_key_exists($document, $content['images'])){
 				foreach ($content['images'][$document] as $image){
+					// make sure to write on next page if image would reach into footer
+					if ($this->_pdf->GetY() > $this->_pdf->getPageHeight() - $this->_setup['marginbottom'] - $this->_setup['exportimage_maxheight']) {
+						$this->_pdf->AddPage();
+						$this->_pdf->SetY($this->_setup['margintop']);
+					}
+
+					$image = str_ireplace('./api/api.php/file/stream/' , '', $image);
 					$imagedata = pathinfo($image);
 					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
+					$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
+					$outputsize = [
+						'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
+						'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
+					];
 					$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 					$this->_pdf->MultiCell(50, $this->_setup['exportimage_maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-					if ($img_width && $this->_setup['exportimage_maxheight'] && ($img_height / $img_width > 145 / $this->_setup['exportimage_maxheight']))
-						$this->_pdf->Image('.' . $image, null, null, 0, $this->_setup['exportimage_maxheight'] - 1, '', '', 'R', true, 300, 'R');
-					else
-						$this->_pdf->Image('.' . $image, null, null, 145, 0, '', '', 'R', true, 300, 'R');
-					$this->_pdf->Ln($this->_setup['exportimage_maxheight']);
+					$this->_pdf->Image('.' . $image, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+					$this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
 				}
 			}
 		}
