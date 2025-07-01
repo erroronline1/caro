@@ -154,7 +154,7 @@ class API {
 		else {
 			// user validity failed, destroy session
 			$params = session_get_cookie_params();
-			setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+			setcookie(session_name(), '', 1, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 			session_destroy();
 			session_write_close();
 			session_unset();
