@@ -1642,7 +1642,7 @@
 		"name": "Gebrauchsanweisung Schaumstofflagerungen",
 		"alias": "",
 		"context": "casedocumentation",
-		"unit": "orthotics1",
+		"unit": "orthotics2",
 		"author": "Caro App",
 		"regulatory_context": "iso13485_7_2_3,mdr_annex1,mdr_annex4",
 		"permitted_export": true,
