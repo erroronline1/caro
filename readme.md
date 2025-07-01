@@ -37,9 +37,7 @@ Things are still in motion. Images may be outdated.
 * vendor update / install
     * update sample check intervals
 * still consider table layout for orders, records?
-* api payload parsing
-    * iis adaptations need refactoring for apache (approx. line 515)
-    * files had to be removed from payload checksum again for iis, check with apache
+* dynamic creation of modals to not needing to handle assignment to input, input2, etc.
 
 ## Content
 * [Aims](#aims)
@@ -1101,7 +1099,7 @@ Search functionality across the application may differ slightly depending of con
 [Content](#content)
 
 ## CSV processor
-The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) and [regular expression pattern matching](https://regex101.com/).
+The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON), [regular expression pattern matching](https://regex101.com/) and [PHP-DateTime formats](https://www.php.net/manual/en/datetime.format.php).
 
 Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
 
@@ -1784,6 +1782,7 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 | marginleft | plain number in *unit*, margin on left side of page | 20 |
 | header_image | path to image file for header in upper right corner | none |
 | footer_image | path to image file in lower right corner | none |
+| exportimage_maxwidth | plain number in *unit* for maximum width of embedded images, can not exceed 135 | 135 |
 | exportimage_maxheight | plain number in *unit* for maximum height of embedded images | 75 |
 | rows | repetitive rows of content | 1 |
 | columns | repetitive columns of content | 1 |
@@ -1882,8 +1881,9 @@ If you ever fiddle around with the sourcecode:
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 * The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results. Options best have a value independent on their label.
 * The landing page triggers the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks. This is executed once per day. Admins get the latest entry of the logfile `cron.log` within the api directory. This includes error messages as well. The logfile can be deleted to retrigger the updates.
-* Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
-* $_FILES is always an array due to a custom processing of POST and PUT payload.
+* UTILITY::parsePayload:
+    * Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
+    * $_FILES is always an array due to a custom processing of POST and PUT payload.
 
 [Content](#content)
 

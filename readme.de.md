@@ -1002,7 +1002,7 @@ Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zu
 [Übersicht](#übersicht)
 
 ## CSV Prozessor
-Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON) und [regulärer Ausdrücke](https://regex101.com/).
+Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON), [regulärer Ausdrücke](https://regex101.com/) und [PHP-Datetime-Formate](https://www.php.net/manual/en/datetime.format.php).
 
 Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änderungen werden zugunsten einer Leistungsoptimierung erst in der gefilterten Liste durchgeführt. Vergleichslisten können genauso gefiltert und geändert werden. Aufgrund einer rekursiven Implementierung kann die ursprüngliche Liste auch als Filterkriterium genutzt werden.
 
@@ -1686,6 +1686,7 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 | marginleft | einfache Zahl in *unit*, linker Randabstand | 20 |
 | header_image | Pfad zur Bilddatei in der oberen rechten Ecke | none |
 | footer_image | Pfad zur Bilddatei in der unteren rechten Ecke | none |
+| exportimage_maxwidth | einfache Zahl in *unit* für maximale Breite eingebetteter Bilder, kann nicht größer als 135 sein | 135 |
 | exportimage_maxheight | einfache Zahl in *unit* für maximale Höhe eingebetteter Bilder | 75 |
 | rows | wiederholende Zeilen desselben Inhalts | 1 |
 | columns | wiederholende Spalten desselben Inhalts | 1 |
@@ -1784,8 +1785,9 @@ Im Falle einer Anpassung des Quelltexts:
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 * Das checkbox2text-Widget verkettet die gewählten Optionen mit `, ` (Komma und ein Leerzeichen). Optionen dürfen diese Zeichen daher nicht enthalten (z.B. regulatorische Anforderungen für Audit-Vorlagen) oder das Verarbeiten der Optionen benätigt einen eigenen Handler (Produktverwaltung). Anderfalls kann eine erneute Auswahl zu unerwarteten Ergebnissen führen. Falls möglich sollten die gewählten Optionen einen Wert zugewiesen bekommen, unabhängig von der Bezeichnung.
 * Die Startseite löst den 'cron job' für die Bereinigung abgelaufener Dateien und die Erstellung automatischer Benachrichtigungen und Aufgabenplanungen aus. Die Durchführung findet einmal täglich statt. Administratoren wird der letzte Eintrag der Log-Datei `cron.log` innerhalb des API-Verzeichnisses angezeigt. Dies beinhaltet auch Fehlermeldungen. Die Log-Datei kann gelöscht werden um das Update erneut durchzuführen.
-* Arrays können als GET und DELETE Anforderung nicht mit ?var[]=1&var[]=2 verwendet werden. Nur das letzte Vorkommen wird auf diese Weise verwendet.
-* $_FILES ist immer ein Array aufgrund einer individuellen Verarbeitung von POST und PUT Nutzlast.
+* UTILITY::parsePayload:
+    * Arrays können als GET und DELETE Anforderung nicht mit ?var[]=1&var[]=2 verwendet werden. Nur das letzte Vorkommen wird auf diese Weise verwendet.
+    * $_FILES ist immer ein Array aufgrund einer individuellen Verarbeitung von POST und PUT Nutzlast.
 
 [Übersicht](#übersicht)
 
