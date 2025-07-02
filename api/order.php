@@ -46,6 +46,7 @@ class ORDER extends API {
 	 */
 	public function approved(){
 		require_once('notification.php');
+		require_once('./_calendarutility.php');
 		$notifications = new NOTIFICATION;
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -211,8 +212,8 @@ class ORDER extends API {
 								$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 								$calendar->post([
 									':type' => 'schedule',
-									':span_start' => $this->_date['servertime']->format('Y-m-h H:i:s'),
-									':span_end' => $this->_date['servertime']->format('Y-m-h H:i:s'),
+									':span_start' => $this->_date['servertime']->format('Y-m-d H:i:s'),
+									':span_end' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 									':author_id' => $_SESSION['user']['id'],
 									':affected_user_id' => null,
 									':organizational_unit' => $prepared['organizational_unit'],
@@ -636,9 +637,9 @@ class ORDER extends API {
 						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_requestedID)))
 					]
 				]);
-				$row = $row ? $row[0] : null;
+				$order = $order ? $order[0] : null;
 				
-				if ($row && !in_array('group', $_SESSION['user']['permissions']) && $this->delete_approved_order($row)) {
+				if ($order && !in_array('group', $_SESSION['user']['permissions']) && $this->delete_approved_order($order)) {
 					$response = [
 					'response' => [
 						'id' => false,
@@ -1359,35 +1360,35 @@ class ORDER extends API {
 				$approvedIDs = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.bulk_approve_order'));
 				if (!$approvedIDs) $this->response([], 406);
 
-				$order_data = ['items' => []];
 
 				// iterate over prepared orders
 				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
-				$index = 0;
+				$response = null;
 				foreach ($orders as $order){
 					// check if contained in approved
 					if (array_search($order['id'], $approvedIDs) === false) continue;
 
 					// create itemized order data from prepared order
-					foreach (json_decode($order['order_data'], true) as $key => $items){ // data
-						if (is_array($items)){
+					$order_data = ['items' => []];
+					$index = 0;
+					foreach (json_decode($order['order_data'] ? : '', true) as $key => $items){ // data
+						if (is_array($items)){ // actual items
 							foreach ($items as $item){
 								foreach ($item as $key => $subvalue){
 									if (boolval($subvalue)) $order_data['items'][$index][$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $subvalue));
 								}
 								$index++;
 							}
-						} else {
+						} else { // common order info
 							if (boolval($items)) $order_data[$key] = trim(preg_replace(["/\\r/", "/\\n/"], ['', '\\n'], $items));
 						}
 					}
+					if (!count($order_data['items'])) continue;
+					$response = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
 				}
 
-				if (!count($order_data['items'])) $this->response([], 406);
-				$response = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
-
 				// if successfully posted as approved delete prepared order
-				if ($response['response']['msg'] === $this->_lang->GET('order.saved')){
+				if (isset($response['response']['msg']) && $response['response']['msg'] === $this->_lang->GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
 							':id' => implode(",", array_map(fn($id) => intval($id), $approvedIDs))
