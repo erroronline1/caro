@@ -767,7 +767,7 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({
-									type: "input2",
+									type: "input",
 									header: api._lang.GET("order.commission"),
 									render: [
 										[
@@ -874,7 +874,7 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({
-									type: "input2",
+									type: "input",
 									header: api._lang.GET("order.ordernumber_label"),
 									render: [
 										[
@@ -957,7 +957,7 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
 								new _client.Dialog({
-									type: "input2",
+									type: "input",
 									header: api._lang.GET("order.add_information"),
 									render: [
 										{
@@ -1072,7 +1072,7 @@ export const _client = {
 						this.setAttribute("data-partially_received", this.checked.toString());
 						if (this.checked)
 							new _client.Dialog({
-								type: "input2",
+								type: "input",
 								header: api._lang.GET("order.add_information"),
 								render: [
 									{
@@ -1101,7 +1101,7 @@ export const _client = {
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
 							new _client.Dialog({
-								type: "input2",
+								type: "input",
 								header: api._lang.GET("order.disapprove"),
 								render: [
 									{
@@ -1135,7 +1135,7 @@ export const _client = {
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
 							new _client.Dialog({
-								type: "input2",
+								type: "input",
 								header: api._lang.GET("order.cancellation"),
 								render: [
 									{
@@ -1169,7 +1169,7 @@ export const _client = {
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
 							new _client.Dialog({
-								type: "input2",
+								type: "input",
 								header: api._lang.GET("order.return"),
 								render: [
 									{
@@ -1211,7 +1211,7 @@ export const _client = {
 							onchange: function () {
 								if (this.value === "...") return false;
 								new _client.Dialog({
-									type: "input2",
+									type: "input",
 									header: api._lang.GET("order.orderstate_description") + " " + this.value,
 									render: [
 										{

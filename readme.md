@@ -37,7 +37,6 @@ Things are still in motion. Images may be outdated.
 * vendor update / install
     * update sample check intervals
 * still consider table layout for orders, records?
-* dynamic creation of modals to not needing to handle assignment to input, input2, etc.
 
 ## Content
 * [Aims](#aims)

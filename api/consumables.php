@@ -477,7 +477,7 @@ class CONSUMABLES extends API {
 						'content' => $similarproducts,
 						'attributes' => [
 							'value' => $this->_lang->GET('order.incorporation.batch'),
-							'onclick' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input2')
+							'onclick' => $this->selectSimilarDialog('_batchupdate', $similarproducts, '1', 'input')
 						]
 					];
 					$incorporationdocument[] = [
@@ -1599,7 +1599,7 @@ class CONSUMABLES extends API {
 	 * @param string $target document elementId
 	 * @param array $similarproducts prepared named array for checkbox
 	 * @param string|array $substring start or [start, end]
-	 * @param string $type input|input2 destination for js-dialog class
+	 * @param string $type input destination for js-dialog class
 	 * 
 	 * @param string js event
 	 */

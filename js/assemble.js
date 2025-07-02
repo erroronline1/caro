@@ -420,34 +420,27 @@ export class Dialog {
 		this.scannerElements = {};
 		this.previewElements = {};
 		this.assemble = null;
-		this.modal = "modal";
 		this.form = null;
 
-		let dialog = document.getElementById("modal");
-		if (this.type) {
-			// define output dialog
-			if (this.type === "input") this.modal = "inputmodal";
-			if (["input2", "confirm", "preview"].includes(this.type)) {
-				this.modal = "inputmodal2";
-			}
-			if (this.type === "input2") this.type = "input";
+		this.dialog = document.createElement("dialog");
+		this.dialog.id = getNextElementID();
+		this.dialog.role = "dialog";
+		this.dialog.ariaLabel = api._lang.GET("assemble.render.aria.dialog");
 
+		if (this.type) {
 			// assemble render data
 			if (this.type === "input") {
 				if (this.render.content === undefined) this.render = { content: this.render };
 				this.assemble = new Assemble(this.render);
 			}
 
-			// refer to output dialog
-			dialog = document.getElementById(this.modal);
-
 			// create form
 			this.form = document.createElement("form");
+			this.form.method = "dialog";
 			if (this.type === "message") {
 				this.form.dataset.usecase = "message";
 				this.type = "input";
 			}
-			this.form.method = "dialog";
 
 			// append close button
 			const img = document.createElement("img");
@@ -457,7 +450,8 @@ export class Dialog {
 			img.onclick = () => {
 				const scanner = document.querySelector("video");
 				if (scanner) scanner.srcObject.getTracks()[0].stop();
-				document.getElementById(this.modal).close();
+				this.dialog.close();
+				this.dialog.remove();
 			};
 			this.form.append(img);
 
@@ -487,7 +481,10 @@ export class Dialog {
 			for (const element of this[this.type]()) {
 				if (element) this.form.append(element);
 			}
-			dialog.replaceChildren(this.form);
+			this.dialog.append(this.form);
+
+			// append to dom before initializing following library functions to avoid errors
+			document.body.append(this.dialog);
 
 			// append scanner if applicable
 			if (this.type === "scanner") {
@@ -565,12 +562,11 @@ export class Dialog {
 						break;
 				}
 			}
-			if (this.assemble) this.assemble.processAfterInsertion(dialog);
+			if (this.assemble) this.assemble.processAfterInsertion(this.dialog);
 
 			return new Promise((resolve, reject) => {
-				dialog.removeAttribute("aria-hidden");
-				dialog.showModal();
-				dialog.onclose = resolve;
+				this.dialog.showModal();
+				this.dialog.onclose = resolve;
 			}).then((response) => {
 				let result;
 
@@ -578,7 +574,10 @@ export class Dialog {
 					// release ressources
 					this.previewElements.canvas.remove();
 					this.previewElements = {};
-					if (!this.render.transfer) return;
+					if (!this.render.transfer) {
+						this.dialog.remove();
+						return;
+					}
 				}
 
 				/**
@@ -586,7 +585,7 @@ export class Dialog {
 				 * @param {node} parent
 				 * @returns {object} key:value pairs of input names and values if present
 				 */
-				function getValues(parent) {
+				function dialogForm2Obj(parent) {
 					let result = {};
 					parent.childNodes.forEach((node) => {
 						if (["input", "textarea", "select"].includes(node.localName) && node.value) {
@@ -597,7 +596,7 @@ export class Dialog {
 
 							if (["checkbox", "radio"].includes(node.type) && node.checked === true) result[node.name] = node.value;
 							else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
-						} else result = { ...result, ...getValues(node) };
+						} else result = { ...result, ...dialogForm2Obj(node) };
 					});
 					return result;
 				}
@@ -606,23 +605,42 @@ export class Dialog {
 				switch (this.type) {
 					case "select":
 						result = response.target.returnValue;
-						if (!result) return;
+						if (!result) {
+							this.dialog.remove();
+							return;
+						}
 					case "confirm":
 						result = response.target.returnValue;
-						if (result && result == "true") return true;
-						else if (!result || result == "false") return false;
+						if (result && result == "true") {
+							this.dialog.remove();
+							return true;
+						} else if (!result || result == "false") {
+							this.dialog.remove();
+							return false;
+						}
+						this.dialog.remove();
 						return result;
 					default:
-						if (response.target.returnValue == "true") {
-							result = getValues(dialog);
-							return result;
+						if (response.returnValue || response.target.returnValue == "true") {
+							result = dialogForm2Obj(this.dialog);
+							// check for empty object
+							let empty = true;
+							for (const prop in result) {
+								if (Object.hasOwn(result, prop)) {
+									empty = false;
+									break;
+								}
+							}
+							this.dialog.remove();
+							return empty ? false : result;
 						}
+						this.dialog.remove();
 						return false;
 				}
 			});
 		}
-		dialog.close();
-		dialog.setAttribute("aria-hidden", true);
+		this.dialog.close();
+		this.dialog.remove();
 	}
 
 	/**
@@ -673,7 +691,7 @@ export class Dialog {
 			if (properties === true && this.form) {
 				button.onclick = (event) => {
 					event.preventDefault();
-					const required = document.querySelectorAll("#" + this.modal + " [required]");
+					const required = document.querySelectorAll("#" + this.dialog.id + " [required]");
 					let missing_required = false;
 
 					// check regular inputs
@@ -1742,7 +1760,9 @@ export class Assemble {
 		img.onclick = async () => {
 			div.classList.toggle("extended");
 			await _.sleep(500); // wait for transition
-			window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});
+			window.Masonry.masonry().catch(() => {
+				/*catch error to prevent console error*/
+			});
 		};
 		// accessibility setting
 		img.setAttribute("aria-hidden", true);
@@ -2109,7 +2129,9 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+					window.Masonry.masonry().catch(() => {
+						/*catch error to prevent console error*/
+					});
 				}
 			};
 		}
@@ -2563,7 +2585,9 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+					window.Masonry.masonry().catch(() => {
+						/*catch error to prevent console error*/
+					});
 				}
 			};
 		}
@@ -2761,7 +2785,9 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
-						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+						window.Masonry.masonry().catch(() => {
+							/*catch error to prevent console error*/
+						});
 					}
 				};
 			}
@@ -2800,14 +2826,16 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
-						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+						window.Masonry.masonry().catch(() => {
+							/*catch error to prevent console error*/
+						});
 					}
 				}
 			});
 		};
 		result.push(button);
 
-		if (originaltype === "identify" && !(api._settings.user.permissions.patient)) {
+		if (originaltype === "identify" && !api._settings.user.permissions.patient) {
 			let button = document.createElement("button");
 			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.merge")));
 			button.type = "button";
@@ -2954,7 +2982,9 @@ export class Assemble {
 								composer: "elementClone",
 								names: this.names,
 							}).initializeSection(null, hint ? hint[0] : label);
-							window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+							window.Masonry.masonry().catch(() => {
+								/*catch error to prevent console error*/
+							});
 						}
 					}
 				});
@@ -3057,7 +3087,9 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+					window.Masonry.masonry().catch(() => {
+						/*catch error to prevent console error*/
+					});
 				}
 			};
 		}
@@ -3619,7 +3651,9 @@ export class Assemble {
 						});
 						div.append(...schedules(labels, false, every));
 						e.target.parentNode.insertBefore(div, e.target);
-						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+						window.Masonry.masonry().catch(() => {
+							/*catch error to prevent console error*/
+						});
 					}
 				});
 			});
@@ -3751,7 +3785,9 @@ export class Assemble {
 					if (Boolean(response) && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
 						let label = colorselection(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]);
 						e.target.parentNode.insertBefore(label, e.target);
-						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
+						window.Masonry.masonry().catch(() => {
+							/*catch error to prevent console error*/
+						});
 					}
 				});
 			});
