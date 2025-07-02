@@ -31,6 +31,7 @@ export const api = {
 			textareaAutocompleteIndex: null,
 			textareaAutocompleteSwipe: null,
 			orderTilesGroupBy: "commission",
+			toasttimeout: {},
 		},
 	},
 
@@ -707,9 +708,6 @@ export const api = {
 							}
 						}
 					}
-
-					// set general titles to common elements
-					document.querySelector("dialog#toast").ariaLabel = document.querySelector("dialog#sessionwarning").ariaLabel = api._lang.GET("assemble.render.aria.dialog_toast");
 
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());

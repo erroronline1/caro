@@ -886,17 +886,18 @@ export class Toast {
 	 * @param {string} message
 	 * @param {string} type success|error|deleted|info
 	 * @param {int} duration in milliseconds
-	 * @param {string} destination toast or sessionwarning
+	 * @param {string} forcedId e.g. sessionwarning
 	 * @example new Toast('message', 'success')
 	 */
-	constructor(message = "", type = "", duration = 5000, destination = "toast") {
+	constructor(message = "", type = "", duration = 5000, forcedId = null) {
 		this.message = message || undefined;
 		this.duration = duration;
 		this.stop = new Date().getTime() + duration;
-		this.destination = destination;
-		this.toast = document.getElementById(destination);
-		this.toast.removeAttribute("class");
-		this.toast.style = "--icon: url('')";
+		this.toast = document.getElementById(forcedId) || document.createElement("dialog");
+		this.toast.role = "alert";
+		this.toast.id = forcedId ? forcedId : getNextElementID();
+		this.toast.ariaLabel = api._lang.GET("assemble.render.aria.dialog_toast");
+
 		if (this.message) {
 			const closeimg = document.createElement("img"),
 				pauseimg = document.createElement("img"),
@@ -909,31 +910,42 @@ export class Toast {
 			closeimg.classList.add("close");
 			closeimg.src = "./media/times.svg";
 			closeimg.alt = api._lang.GET("assemble.render.aria.cancel");
-			closeimg.onclick = new Function("document.getElementById('" + destination + "').close();");
+			closeimg.onclick = () => {
+				this.toast.close();
+				this.toast.remove();
+			};
 			pauseimg.classList.add("pause");
 			pauseimg.src = "./media/equals.svg";
 			pauseimg.alt = api._lang.GET("assemble.render.aria.pause");
-			pauseimg.onclick = new Function("window.clearTimeout(window.toasttimeout['" + destination + "']);");
+			pauseimg.onclick = () => {
+				window.clearTimeout(api._settings.session.toasttimeout[this.toast.id]);
+			};
 			msg.innerHTML = message;
-			this.toast.replaceChildren(closeimg, pauseimg, msg, div);
-			this.toast.removeAttribute("aria-hidden");
+			this.toast.append(closeimg, pauseimg, msg, div);
+			// append to dom before initializing following library functions to avoid errors
+			document.body.append(this.toast);
 			this.toast.show();
 			this.toast.focus();
 			this.countdown();
-		} else this.toast.close();
-		this.toast.setAttribute("aria-hidden", true);
+		} else {
+			window.clearTimeout(api._settings.session.toasttimeout[this.toast.id]);
+			delete api._settings.session.toasttimeout[this.toast.id];
+			this.toast.close();
+			this.toast.remove();
+		}
 	}
 	/**
 	 * updates reversed progress bar and closes toast on timeout
 	 */
 	countdown() {
-		const countdowndiv = document.querySelector("#" + this.destination + " > div");
+		const countdowndiv = document.querySelector("#" + this.toast.id + " > div");
 		countdowndiv.style.width = Math.round((100 * (this.stop - new Date().getTime())) / this.duration) + "%";
-		window.toasttimeout[this.destination] = window.setTimeout(this.countdown.bind(this), this.duration / 1000);
+		api._settings.session.toasttimeout[this.toast.id] = window.setTimeout(this.countdown.bind(this), this.duration / 1000);
 		if (this.stop - new Date().getTime() < 0) {
-			window.clearTimeout(window.toasttimeout[this.destination]);
+			window.clearTimeout(api._settings.session.toasttimeout[this.toast.id]);
+			delete api._settings.session.toasttimeout[this.toast.id];
 			this.toast.close();
-			this.toast.setAttribute("aria-hidden", true);
+			this.toast.remove();
 		}
 	}
 }
