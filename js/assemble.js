@@ -38,7 +38,7 @@ export class Masonry {
 	 *
 	 * this class has to be on global scope and its masonry method called upon all dimension and content changes:
 	 * * window.Masonry = initiate MutationObserver on instatiation
-	 * * collapsible execution => window.Masonry.masonry()
+	 * * collapsible execution => window.Masonry.masonry().catch(()=>{});
 	 *
 	 * Mutation observer does not fire for unknown reasons for
 	 * * longtermplanning adding users and colours => window.Masonry.masonry()
@@ -1742,7 +1742,7 @@ export class Assemble {
 		img.onclick = async () => {
 			div.classList.toggle("extended");
 			await _.sleep(500); // wait for transition
-			window.Masonry.masonry();
+			window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});
 		};
 		// accessibility setting
 		img.setAttribute("aria-hidden", true);
@@ -2109,7 +2109,7 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					window.Masonry.masonry();
+					window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 				}
 			};
 		}
@@ -2563,7 +2563,7 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					window.Masonry.masonry();
+					window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 				}
 			};
 		}
@@ -2761,7 +2761,7 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
-						window.Masonry.masonry();
+						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 					}
 				};
 			}
@@ -2800,7 +2800,7 @@ export class Assemble {
 							composer: "elementClone",
 							names: this.names,
 						}).initializeSection(null, button);
-						window.Masonry.masonry();
+						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 					}
 				}
 			});
@@ -2954,7 +2954,7 @@ export class Assemble {
 								composer: "elementClone",
 								names: this.names,
 							}).initializeSection(null, hint ? hint[0] : label);
-							window.Masonry.masonry();
+							window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 						}
 					}
 				});
@@ -3057,7 +3057,7 @@ export class Assemble {
 						composer: "elementClone",
 						names: this.names,
 					}).initializeSection(null, hint.length ? hint[0] : label);
-					window.Masonry.masonry();
+					window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 				}
 			};
 		}
@@ -3619,7 +3619,7 @@ export class Assemble {
 						});
 						div.append(...schedules(labels, false, every));
 						e.target.parentNode.insertBefore(div, e.target);
-						window.Masonry.masonry();
+						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 					}
 				});
 			});
@@ -3751,7 +3751,7 @@ export class Assemble {
 					if (Boolean(response) && response[api._lang.GET("calendar.longtermplanning.addcolor_name")]) {
 						let label = colorselection(response[api._lang.GET("calendar.longtermplanning.addcolor_name")]);
 						e.target.parentNode.insertBefore(label, e.target);
-						window.Masonry.masonry();
+						window.Masonry.masonry().catch(()=>{/*catch error to prevent console error*/});;
 					}
 				});
 			});
