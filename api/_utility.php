@@ -570,20 +570,18 @@ class UTILITY {
 
 								// place in temporary directory
 								file_put_contents($tmp_name, $body);
+
+								// preserve payload key for payload checksum
+								$data[$name] = null;
 							}
 							// parse Field
 							else {
-								if (!$type){
-									// type is only set if this input was supposed to be a file upload.
-									// empty file inputs will be stripped from the payload
-									// non empty files have been parsed already
-									if (substr($name, -2) == '[]') { // is array
-										$name = substr($name, 0, strlen($name) - 2);
-										if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
-										else $data[$name] = [substr($body, 0, strlen($body) - 2)];
-									}
-									else $data[$name] = substr($body, 0, strlen($body) - 2);
+								if (substr($name, -2) == '[]') { // is array
+									$name = substr($name, 0, strlen($name) - 2);
+									if (isset($data[$name])) $data[$name][] = substr($body, 0, strlen($body) - 2);
+									else $data[$name] = [substr($body, 0, strlen($body) - 2)];
 								}
+								else $data[$name] = substr($body, 0, strlen($body) - 2);
 							}
 						}
 					}
