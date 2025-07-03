@@ -27,10 +27,9 @@ html {
 }
 
 ::-webkit-scrollbar {
-	width: 0.3rem;
-	height: 0.3rem;
+	width: .4rem;
+	height: .8rem;
 }
-
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-corner {
 	background: transparent;
@@ -1264,7 +1263,7 @@ input:read-only {
 
 .inlinebutton {
 	width: fit-content;
-	max-width: 98%;
+	max-width: 95%;
 	display: inline-block;
 	margin-bottom: 0;
 	margin: 0.25em 1em;
