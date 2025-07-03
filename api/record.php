@@ -1881,7 +1881,7 @@ class RECORD extends API {
 							$file = pathinfo($entry['value']);
 							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
 								if (!isset($summary['images'][$document])) $summary['images'][$document] = [];
-								$summary['images'][$document][] = $entry['value'];
+								$summary['images'][$document][] = './api/api.php/file/stream/' . $entry['value'];
 							}
 							else {
 								if (!isset($summary['files'][$document])) $summary['files'][$document] = [];

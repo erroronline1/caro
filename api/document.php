@@ -723,7 +723,7 @@ class DOCUMENT extends API {
 										$filename = $fakefilename[0][count($fakefilename[0])-1];
 										if ($filename && isset($uploaded_filearray[$filename])){ // replace only if $_FILES exist, in case of updates, where no actual file has been submitted
 											$sub['attributes']['name'] = $filename;
-											$sub['attributes']['url'] = $uploaded_filearray[$filename];
+											$sub['attributes']['url'] = './api/api.php/file/stream/' . $uploaded_filearray[$filename];
 										}
 									}
 									$result[] = $sub;
