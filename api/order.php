@@ -1364,6 +1364,7 @@ class ORDER extends API {
 				// iterate over prepared orders
 				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_orders');
 				$response = null;
+				$success = [];
 				foreach ($orders as $order){
 					// check if contained in approved
 					if (array_search($order['id'], $approvedIDs) === false) continue;
@@ -1385,13 +1386,14 @@ class ORDER extends API {
 					}
 					if (!count($order_data['items'])) continue;
 					$response = $this->postApprovedOrder(['approval' => $approval, 'order_data' => $order_data]);
+					$success[] = $order['id'];
 				}
 
 				// if successfully posted as approved delete prepared order
 				if (isset($response['response']['msg']) && $response['response']['msg'] === $this->_lang->GET('order.saved')){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
-							':id' => implode(",", array_map(fn($id) => intval($id), $approvedIDs))
+							':id' => implode(",", $success)
 						]
 					]);
 					require_once('notification.php');
