@@ -1375,7 +1375,7 @@ class APPLICATION extends API {
 			$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 			$uncompleted = [];
 			foreach ($pastEvents as $row){
-				if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . $row['span_start'] . "', '" . $row['span_start'] . "')"];
+				if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . substr($row['span_start'], 0, 10) . "', '" . substr($row['span_start'], 0, 10) . "')"];
 			}
 			if ($uncompleted) $overview[] = [
 				'type' => 'links',
