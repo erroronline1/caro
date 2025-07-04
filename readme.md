@@ -33,7 +33,6 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* css dialog toast on top?
 * admin/qmo/ceo/prrc landingpage megaphone textsection?
     * editor and history within communication
 

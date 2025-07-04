@@ -890,6 +890,9 @@ export class Toast {
 	 * @example new Toast('message', 'success')
 	 */
 	constructor(message = "", type = "", duration = 5000, forcedId = null) {
+		const openmodal = document.querySelector("dialog[open]");
+		if (openmodal) duration = duration / 2;
+
 		this.message = message || undefined;
 		this.duration = duration;
 		this.stop = new Date().getTime() + duration;
@@ -905,7 +908,7 @@ export class Toast {
 				div = document.createElement("div");
 			if (type) {
 				this.toast.classList.add(type);
-				if (this.icons[type] && this.icons[type].length) this.toast.style = "--icon: url('" + this.icons[type][Math.floor(Math.random() * this.icons[type].length)] + "')";
+				if (!openmodal && this.icons[type] && this.icons[type].length) this.toast.style = "--icon: url('" + this.icons[type][Math.floor(Math.random() * this.icons[type].length)] + "')";
 			}
 			closeimg.classList.add("close");
 			closeimg.src = "./media/times.svg";
@@ -924,7 +927,8 @@ export class Toast {
 			this.toast.append(closeimg, pauseimg, msg, div);
 			// append to dom before initializing following library functions to avoid errors
 			document.body.append(this.toast);
-			this.toast.show();
+			if (openmodal) this.toast.showModal();
+			else this.toast.show();
 			this.toast.focus();
 			this.countdown();
 		} else {
@@ -939,9 +943,11 @@ export class Toast {
 	 */
 	countdown() {
 		const countdowndiv = document.querySelector("#" + this.toast.id + " > div");
-		countdowndiv.style.width = Math.round((100 * (this.stop - new Date().getTime())) / this.duration) + "%";
-		api._settings.session.toasttimeout[this.toast.id] = window.setTimeout(this.countdown.bind(this), this.duration / 1000);
-		if (this.stop - new Date().getTime() < 0) {
+		if (countdowndiv) {
+			countdowndiv.style.width = Math.round((100 * (this.stop - new Date().getTime())) / this.duration) + "%";
+			api._settings.session.toasttimeout[this.toast.id] = window.setTimeout(this.countdown.bind(this), this.duration / 1000);
+		}
+		if (!countdowndiv || this.stop - new Date().getTime() < 0) {
 			window.clearTimeout(api._settings.session.toasttimeout[this.toast.id]);
 			delete api._settings.session.toasttimeout[this.toast.id];
 			this.toast.close();
