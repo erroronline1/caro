@@ -34,8 +34,6 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * css dialog toast on top?
-* vendor update / install
-    * update sample check intervals
 * admin/qmo/ceo/prrc landingpage megaphone textsection?
     * editor and history within communication
 

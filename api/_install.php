@@ -1418,7 +1418,7 @@ class INSTALL {
 					':name' => $entry['name'],
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
 					':certificate' => UTILITY::json_encode([]),
-					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode(['filter' => UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT)]) : null,
+					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null,
 					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', $entry['name']) . $this->_currentdate->format('Ymd'),
 					':evaluation' => null,
 					':hidden' => null
@@ -1470,9 +1470,12 @@ class INSTALL {
 					}
 					if (isset($this->_payload[$filtervar])) {
 						$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
-						$newpricelistfilter = (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array') ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null;
+						$newpricelistfilter = (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' && isset($entry['pricelist']['filter'])) ? UTILITY::json_encode($entry['pricelist']['filter'], JSON_PRETTY_PRINT) : null;
 						$vendor['pricelist']['filter'] = $newpricelistfilter ? : (isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : null);
-						$vendor['pricelist'] = UTILITY::json_encode($vendor['pricelist']);
+						if(isset($entry['pricelist']['samplecheck_interval']) && $entry['pricelist']['samplecheck_interval']) $vendor['pricelist']['samplecheck_interval'] = $entry['pricelist']['samplecheck_interval'];
+						if(isset($entry['pricelist']['samplecheck_reusable']) && $entry['pricelist']['samplecheck_reusable']) $vendor['pricelist']['samplecheck_reusable'] = $entry['pricelist']['samplecheck_reusable'];
+
+						$vendor['pricelist'] = UTILITY::json_encode($vendor['pricelist'], JSON_PRETTY_PRINT);
 					}
 					echo $this->printSuccess($vendor['name'] . " updated");
 

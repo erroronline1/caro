@@ -1,28 +1,37 @@
 [
 	{
 		"name": "Sample Company Ltd.",
-		"info":{
+		"info": {
 			"purchase_info": "Pricelist import: edit the CSV as follows: ...",
-			"infotext":"",
-			"mail":"spam@saco.email",
-			"phone":"",
-			"address":"Off the Track 5, 54321 Failvillage",
-			"sales_representative":"John Knowitall",
-			"customer_id":"76513"
+			"infotext": "",
+			"mail": "spam@saco.email",
+			"phone": "",
+			"address": "Off the Track 5, 54321 Failvillage",
+			"sales_representative": "John Knowitall",
+			"customer_id": "76513"
 		},
-		"pricelist":{}
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"headerrowindex": 0,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
 	},
 	{
 		"name": "",
-		"info":{
+		"info": {
 			"purchase_info": "",
-			"infotext":"",
-			"mail":"",
-			"phone":"",
-			"address":"",
-			"sales_representative":"",
-			"customer_id":""
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "",
+			"sales_representative": "",
+			"customer_id": ""
 		},
-		"pricelist":{}
+		"pricelist": {}
 	}
 ]
