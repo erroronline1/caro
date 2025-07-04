@@ -645,6 +645,25 @@ export const _client = {
 			if (api._settings.user.app_settings.orderLayout) {
 				switch (api._settings.user.app_settings.orderLayout) {
 					// in case other options may become implemented also see user.php profile
+					case "table":
+						for (const [key, lang] of Object.entries({
+							commission: "commission",
+							vendor: "vendor_label",
+							organizationalunit: "organizational_unit",
+						})) {
+							groupby[api._lang.GET("order." + lang)] = api._settings.session.orderTilesGroupBy === key ? { selected: true, value: key } : { value: key };
+						}
+						content[content.length - 1].push({
+							type: "select",
+							attributes: {
+								name: api._lang.GET("order.tile_view_groupby"),
+								onchange: "api._settings.session.orderTilesGroupBy = this.value; document.querySelector('[name=\"" + api._lang.GET("order.order_filter") + "\"]:checked').dispatchEvent(new Event('change'))",
+							},
+							content: groupby,
+						});
+
+						content.push(..._client.order.table(data));
+						break;
 					case "tile":
 						for (const [key, lang] of Object.entries({
 							commission: "commission",
@@ -1386,6 +1405,90 @@ export const _client = {
 			}
 			return content;
 		},
+		table: (data) => {
+			// displays compact information as table with event opening information as dialog
+			let content = [],
+				groups = {},
+				groupname = "",
+				order = [],
+				orderdata = {},
+				buttons = {},
+				info = "",
+				groupby = api._settings.session.orderTilesGroupBy;
+
+			// iterate over orders and construct Assemble syntax
+			for (const element of data.order) {
+				["unit", "ordernumber", "name", "vendor", "commission"].forEach((e) => {
+					if (!element[e]) element[e] = "";
+				});
+				order = [
+					{
+						c: api._lang.GET("order.prepared_order_item", {
+							":quantity": element.quantity ? element.quantity : "",
+							":unit": element.unit ? element.unit : "",
+							":number": element.ordernumber ? element.ordernumber : "",
+							":name": element.name ? element.name : "",
+							":vendor": element.vendor ? element.vendor : "",
+							":aut_idem": element.aut_idem ? element.aut_idem : "",
+						}),
+					},
+					{ c: api._lang.GET("order.ordertype." + element.ordertype) + " " + api._lang.GET("order.tile_view_info", { ":commission": element.commission, ":orderer": element.orderer.name }) },
+				];
+
+				orderdata = {
+					approval: {},
+					order: [element],
+				};
+				if (data.approval[element.approval]) orderdata.approval[element.approval] = data.approval[element.approval];
+				buttons = {};
+				buttons[api._lang.GET("general.ok_button")] = false;
+
+				info = [];
+				for (const [state, attributes] of Object.entries(element.state)) {
+					if (attributes["data-" + state] === "true") info.push(api._lang.GET("order.order." + state));
+				}
+				if (element.incorporation) info.push(api._lang.GET("order.incorporation.incorporation"));
+				if (element.samplecheck) info.push(api._lang.GET("order.sample_check.sample_check"));
+				info = info.join(", ");
+
+				order.push({
+					c: info,
+					a: {
+						style: "cursor: pointer;",
+						class: "cta",
+						onclick: function () {
+							new _client.Dialog({
+								type: "input",
+								header: api._lang.GET("order.ordertype." + "element.ordertype"),
+								render: _client.order.full(orderdata, true),
+								options: buttons,
+							});
+						}
+							.toString()
+							._replaceArray(["element.ordertype", "orderdata", "buttons"], [element.ordertype, JSON.stringify(orderdata), JSON.stringify(buttons)]),
+					},
+				});
+				if (!groups[element[groupby]]) groups[element[groupby]] = [];
+				groups[element[groupby]].push(order);
+			}
+
+			for (const [key, group] of Object.entries(groups)) {
+				group.unshift([{ c: api._lang.GET("order.table_order") }, { c: api._lang.GET("order.commission") }, { c: api._lang.GET("order.table_info") }]);
+				groupname = api._lang._USER.units[key] || key;
+				content.push([
+					{
+						type: "table",
+						attributes: {
+							name: groupname,
+							"data-type": "order",
+						},
+						content: group,
+					},
+				]);
+				//if (bulk) content.push(bulk);
+			}
+			return content;
+		},
 		tiles: (data) => {
 			// displays compact information as tiles with event opening information as dialog
 			let content = [],
@@ -1395,7 +1498,6 @@ export const _client = {
 				groups = {},
 				buttons = {},
 				orderdata = {},
-				// intermediate solution, maybe selecteable later
 				groupby = api._settings.session.orderTilesGroupBy;
 			// iterate over orders and construct Assemble syntax
 			for (const element of data.order) {

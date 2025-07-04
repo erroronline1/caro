@@ -36,7 +36,6 @@ Things are still in motion. Images may be outdated.
 * css dialog toast on top?
 * vendor update / install
     * update sample check intervals
-* still consider table layout for orders, records?
 * admin/qmo/ceo/prrc landingpage megaphone textsection?
     * editor and history within communication
 
@@ -2250,7 +2249,7 @@ Stakeholder identification:
 | Break time recommendation on time tracking | User | 2025-06-10 | Implemented; 2025-06-12 |
 | Rejected order message to orderer only, create calendar task | CEO, Supervisor | 2025-06-23 | Implemented; 2025-06-24 |
 | Reconsider incorporation approach on qm-system transfer | Supervisor | 2025-06-23 | On importing pricelists the last ERP-order-date initiates an default incorporation; 2025-06-25 |
-| Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information and compact tiles for now; 2025-06-26 | 
+| Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information, compact tiles and table layout; 2025-07-04 | 
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data

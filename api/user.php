@@ -144,6 +144,9 @@ class USER extends API {
 					else
 						switch($orderLayout){
 							// in case other options may become implemented also see utility.js _client.order.approved()
+							case $this->_lang->GET('user.settings_order_layout_table'):
+								$user['app_settings']['orderLayout'] = 'table';
+								break;
 							case $this->_lang->GET('user.settings_order_layout_tile'):
 								$user['app_settings']['orderLayout'] = 'tile';
 								break;
@@ -463,6 +466,7 @@ class USER extends API {
 							],
 							'content' => [
 								$this->_lang->GET('user.settings_order_layout_full') => !isset($user['app_settings']['orderLayout']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings_order_layout_table') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'table' ? ['checked' => true] : [],
 								$this->_lang->GET('user.settings_order_layout_tile') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'tile' ? ['checked' => true] : [],
 							]
 						], [
