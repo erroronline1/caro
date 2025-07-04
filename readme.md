@@ -37,6 +37,8 @@ Things are still in motion. Images may be outdated.
 * vendor update / install
     * update sample check intervals
 * still consider table layout for orders, records?
+* admin/qmo/ceo/prrc landingpage megaphone textsection?
+    * editor and history within communication
 
 ## Content
 * [Aims](#aims)
