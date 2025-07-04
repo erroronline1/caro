@@ -27,9 +27,10 @@
 	--lightshadow: rgba(255, 255, 255, 0.9);
 	--lightershadow: rgba(255, 255, 255, 0.5);
 	--darkshadow: rgba(76, 86, 106, 0.3);
+	--notsodarkshadow: rgba(76, 86, 106, 0.15);
 	--frostgreen: rgb(143, 188, 187);
 	--red: rgb(191, 97, 106);
-	--reddish : rgba(191, 97, 106, .3);
+	--reddish: rgba(191, 97, 106, 0.3);
 	--orange: rgb(208, 135, 112);
 	--yellow: rgb(235, 203, 139);
 	--green: rgb(153, 179, 132);

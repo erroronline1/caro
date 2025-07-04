@@ -27,9 +27,10 @@
 	--lightshadow: rgba(255, 255, 255, 0.9);
 	--lightershadow: rgba(255, 255, 255, 0.5);
 	--darkshadow: rgba(76, 86, 106, 0.3);
+	--notsodarkshadow: rgba(76, 86, 106, 0.15);
 	--frostgreen: rgb(143, 188, 187);
 	--red: rgb(156, 58, 67);
-	--reddish : rgba(156, 58, 67, .3);
+	--reddish: rgba(156, 58, 67, 0.3);
 	--orange: rgb(208, 135, 112);
 	--yellow: rgb(235, 203, 139);
 	--green: rgb(120, 151, 94);
@@ -47,8 +48,8 @@ body {
 	background: var(--background);
 }
 
-button{
-	color:var(--foreground);
+button {
+	color: var(--foreground);
 }
 
 [data-type="addblock"]::before,
@@ -70,13 +71,12 @@ button[data-type="submitbutton"]::before,
 button[data-type="upvote"]::before,
 button[data-type="downvote"]::before,
 [data-type="toleft"]::before,
-[data-type="toright"]::after
-{
+[data-type="toright"]::after {
 	background-color: var(--foreground);
 }
 
 input:checked + .checkbox,
 input:checked + .checkbox::before,
-input:checked + .radio{
-	color: var(--foreground)
+input:checked + .radio {
+	color: var(--foreground);
 }

@@ -1389,7 +1389,7 @@ export class Assemble {
 		if (!this.currentElement.description) return [];
 		let header = document.createElement("header");
 		header.appendChild(document.createTextNode(this.currentElement.description.replace(/\[\]|DEFAULT_/g, "")));
-		header.dataset.type = this.currentElement.type;
+		header.dataset.type = this.currentElement.attributes && this.currentElement.attributes["data-type"] ? this.currentElement.attributes["data-type"] : this.currentElement.type;
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
 		// required handled by any input on their own but checkbox and radio
 		if (this.currentElement.content && typeof this.currentElement.content === "object") {
@@ -1954,6 +1954,105 @@ export class Assemble {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "documentbutton";
 		return [...this.br(), ...this.button()];
+	}
+
+	/**
+	 * creates a stl file selection input type text with button to open up an api stl search
+	 * @returns {domNodes} icon, input, button, label, hint
+	 * @example this.currentElement
+	 * ```json
+	 *  {
+	 * 		"type": "filereference",
+	 * 		"hint": "somethingsomething"...,
+	 * 		"numeration": "anything resulting in true to prevent enumeration",
+	 * 		"attributes": {
+	 * 			"name": "variable name will be used as label",
+	 * 			"multiple": "bool on changing the input field another appends"
+	 * 		}
+	 * 	}
+	 * ```
+	 */
+	filereference() {
+		let input = document.createElement("input"),
+			label = document.createElement("label"),
+			span = document.createElement("span"),
+			button = document.createElement("button"),
+			hint;
+		const productselectionClone = structuredClone(this.currentElement);
+		input.type = "text";
+		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
+		input.autocomplete = "off";
+		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
+		label.classList.add("productselection");
+		if (this.currentElement.attributes.required) span.dataset.required = true;
+		if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
+		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
+
+		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
+		else hint = [...this.hint()];
+
+		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
+		if (this.currentElement.attributes.multiple) {
+			input.onchange = () => {
+				// arrow function for reference of this.names
+				if (input.value) {
+					productselectionClone.attributes.name = productselectionClone.attributes.name.replace(/\(\d+\)$/gm, "");
+					delete productselectionClone.attributes.value;
+					new Assemble({
+						content: [[productselectionClone]],
+						composer: "elementClone",
+						names: this.names,
+					}).initializeSection(null, hint.length ? hint[0] : label);
+					window.Masonry.masonry().catch(() => {
+						/*catch error to prevent console error*/
+					});
+				}
+			};
+		}
+		input = this.apply_attributes(this.currentElement.attributes, input);
+
+		label.dataset.type = this.currentElement.type;
+		label.append(span, input);
+
+		button.classList.add("productselection");
+		button.dataset.type = "search";
+		button.type = "button";
+		button.title = api._lang.GET("assemble.render.aria.search");
+		button.onclick = function () {
+			const options = {};
+			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			new Dialog({
+				type: "input",
+				header: api._lang.GET("file.file_filter_label"),
+				render: [
+					[
+						{
+							type: "search",
+							attributes: {
+								name: api._lang.GET("file.file_filter_label"),
+								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', encodeURIComponent(this.value), 'filereference');}",
+							},
+						},
+						{
+							type: "hidden",
+							attributes: {
+								name: "_selectedfile",
+								id: "_selectedfile",
+							},
+						},
+					],
+				],
+				options: options,
+			}).then((response) => {
+				if (Boolean(response)) {
+					const inputfield = document.getElementById(input.id);
+					inputfield.value = response._selectedfile || "";
+					inputfield.dispatchEvent(new Event("change"));
+				}
+			});
+		};
+		return [label, button, ...hint];
 	}
 
 	/**
@@ -3053,105 +3152,6 @@ export class Assemble {
 	}
 
 	/**
-	 * creates a stl file selection input type text with button to open up an api stl search
-	 * @returns {domNodes} icon, input, button, label, hint
-	 * @example this.currentElement
-	 * ```json
-	 *  {
-	 * 		"type": "filereference",
-	 * 		"hint": "somethingsomething"...,
-	 * 		"numeration": "anything resulting in true to prevent enumeration",
-	 * 		"attributes": {
-	 * 			"name": "variable name will be used as label",
-	 * 			"multiple": "bool on changing the input field another appends"
-	 * 		}
-	 * 	}
-	 * ```
-	 */
-	filereference() {
-		let input = document.createElement("input"),
-			label = document.createElement("label"),
-			span = document.createElement("span"),
-			button = document.createElement("button"),
-			hint;
-		const productselectionClone = structuredClone(this.currentElement);
-		input.type = "text";
-		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
-		input.autocomplete = "off";
-		span.appendChild(document.createTextNode(this.currentElement.attributes.name.replace(/\[\]|DEFAULT_/g, "")));
-		label.classList.add("productselection");
-		if (this.currentElement.attributes.required) span.dataset.required = true;
-		if (this.currentElement.attributes.multiple) label.dataset.multiple = "multiple";
-		if (this.currentElement.attributes["data-filtered"]) label.dataset.filtered = this.currentElement.attributes["data-filtered"];
-
-		if (!this.currentElement.hint) hint = this.br(); // quick and dirty hack to avoid messed up linebreaks after inline buttons
-		else hint = [...this.hint()];
-
-		this.currentElement.attributes.name = this.names_numerator(this.currentElement.attributes.name, this.currentElement.numeration);
-		if (this.currentElement.attributes.multiple) {
-			input.onchange = () => {
-				// arrow function for reference of this.names
-				if (input.value) {
-					productselectionClone.attributes.name = productselectionClone.attributes.name.replace(/\(\d+\)$/gm, "");
-					delete productselectionClone.attributes.value;
-					new Assemble({
-						content: [[productselectionClone]],
-						composer: "elementClone",
-						names: this.names,
-					}).initializeSection(null, hint.length ? hint[0] : label);
-					window.Masonry.masonry().catch(() => {
-						/*catch error to prevent console error*/
-					});
-				}
-			};
-		}
-		input = this.apply_attributes(this.currentElement.attributes, input);
-
-		label.dataset.type = this.currentElement.type;
-		label.append(span, input);
-
-		button.classList.add("productselection");
-		button.dataset.type = "search";
-		button.type = "button";
-		button.title = api._lang.GET("assemble.render.aria.search");
-		button.onclick = function () {
-			const options = {};
-			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
-			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({
-				type: "input",
-				header: api._lang.GET("file.file_filter_label"),
-				render: [
-					[
-						{
-							type: "search",
-							attributes: {
-								name: api._lang.GET("file.file_filter_label"),
-								onkeydown: "if (event.key === 'Enter') {event.preventDefault(); api.file('get', 'filter', 'null', encodeURIComponent(this.value), 'filereference');}",
-							},
-						},
-						{
-							type: "hidden",
-							attributes: {
-								name: "_selectedfile",
-								id: "_selectedfile",
-							},
-						},
-					],
-				],
-				options: options,
-			}).then((response) => {
-				if (Boolean(response)) {
-					const inputfield = document.getElementById(input.id);
-					inputfield.value = response._selectedfile || "";
-					inputfield.dispatchEvent(new Event("change"));
-				}
-			});
-		};
-		return [label, button, ...hint];
-	}
-
-	/**
 	 * creates a submit button (styled) for other contexts than general form submission
 	 * @returns {domNodes}
 	 * @example this.currentElement
@@ -3169,6 +3169,54 @@ export class Assemble {
 		// to style it properly by adding data-type to article container
 		this.currentElement.attributes["data-type"] = "submitbutton";
 		return this.button();
+	}
+
+	/**
+	 * creates a simple table with pure text content
+	 * events are assignable per cell
+	 * @returns {domNodes}
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type": "table",
+	 * 		"attributes": {
+	 * 			"name": "table desciption",
+	 * 			"data-type": "whatever is tidy"
+	 * 		},
+	 * 		"content": [
+	 * 			[{"c": "th", "a":{}}, {"c": "th", "a":{}}, {"c": "th", "a":{}}, ...],
+	 * 			[{"c": "td", "a":{}}, {"c": "td", "a":{}}, {"c": "td", "a":{}}, ...],
+	 * 			...
+	 * 		],
+	 * 		"hint": "read this like..."
+	 *	}
+	 * ```
+	 */
+	table() {
+		this.currentElement.description = this.currentElement.attributes.name.replace(/\[\]/g, "");
+		let result = [...this.header()],
+			tr,
+			td,
+			cell;
+		const table = document.createElement("table");
+
+		for (let row = 0; row < this.currentElement.content.length; row++) {
+			tr = document.createElement("tr");
+			for (let column = 0; column < this.currentElement.content[row].length; column++) {
+				cell = this.currentElement.content[row][column];
+				td = document.createElement(row > 0 ? "td" : "th");
+
+				td = this.apply_attributes(cell.a || {}, td);
+				if (cell.c) {
+					td.append(document.createTextNode(cell.c));
+				}
+				tr.append(td);
+			}
+			table.append(tr);
+		}
+		result.push(table);
+		result = result.concat(this.hint());
+		return result;
 	}
 
 	/**

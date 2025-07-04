@@ -586,6 +586,29 @@ export function rendertest(element) {
 				],
 				[
 					{
+						type: "table",
+						attributes: {
+							name: "Table view of data",
+							"data-type": "order",
+						},
+						content: [
+							[{ c: "This" }, { c: "is" }, { c: "the" }, { c: "header" }, { c: "row" }],
+							[{ c: "This" }, { c: "is" }, { c: "the" }, { c: "first" }, { c: "data row" }],
+							[{ c: "Empty" }, { c: "objects" }, {}, { c: "left" }, { c: "blank" }],
+							[
+								{ c: "Long" },
+								{ c: "text" },
+								{ c: "is" },
+								{ c: "possible" },
+								{ c: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua." },
+							],
+							[{ c: "Applied attributes" }, { c: "style and onclick", a: { style: "cursor: pointer;", onclick: "new _client.Toast('the table says hello')" } }, { c: "class red", a: { class: "red" } }],
+						],
+						hint: "As seen in orders. If selected.",
+					},
+				],
+				[
+					{
 						type: "longtermplanning_timeline",
 						attributes: {
 							name: "Apprentices training schedule",
@@ -1079,21 +1102,21 @@ export function rendertest(element) {
 						attributes: {
 							name: "Sucheingabe",
 						},
-						hint: "Suchtastatur und Lupensymbol, Verwendet bei neuen Bestellungen.",
+						hint: "Suchtastatur und Lupensymbol, verwendet bei neuen Bestellungen.",
 					},
 					{
 						type: "filtered",
 						attributes: {
 							name: "Filtereingabe",
 						},
-						hint: "Suchtastatur und Trichtersymbol, Verwendet bei Doumentationen.",
+						hint: "Suchtastatur und Trichtersymbol, verwendet bei Doumentationen.",
 					},
 					{
 						type: "checkbox2text",
 						attributes: {
 							name: "Die ausgewählten Optionen des Popups werden mit Kommata verkettet",
 						},
-						hint: "Vereinfacht eine Auswahlentscheidung und stellt ein einfaches Datenobjekt bereit, Verwendet in der Formularverwaltung.",
+						hint: "Vereinfacht eine Auswahlentscheidung und stellt ein einfaches Datenobjekt bereit, verwendet in der Formularverwaltung.",
 						content: {
 							One: { value: "1" },
 							Two: { value: 2 },
@@ -1140,7 +1163,7 @@ export function rendertest(element) {
 							rows: 3,
 						},
 						hint: 'Starte mit "lorem ipsum". Verwendet im Risikomanagement',
-						autocomplete: ["Lorem ipsum dolor sit amet, Version Eins", "Lorem ipsum dolor sit amet, Version Zwei", "Lorem ipsum dolor sit amet, Version Drei", "Lorem ipsum dolor sit amet, Version Vier"],
+						autocomplete: ["Lorem ipsum dolor sit amet, version Eins", "Lorem ipsum dolor sit amet, version Zwei", "Lorem ipsum dolor sit amet, version Drei", "Lorem ipsum dolor sit amet, version Vier"],
 					},
 					{
 						type: "checkbox",
@@ -1213,7 +1236,7 @@ export function rendertest(element) {
 								attributes: {
 									name: "textsection auf einer Kachel",
 								},
-								content: "Dies ist die hälte der Parent-Element-Breite, Verwendet auf der Startseite",
+								content: "Dies ist die hälte der Parent-Element-Breite, verwendet auf der Startseite",
 							},
 						],
 					},
@@ -1264,6 +1287,29 @@ export function rendertest(element) {
 							content: "Alle Optionen sind möglich. Verwendet in der Nutzerverwaltung.",
 						},
 					],
+				],
+				[
+					{
+						type: "table",
+						attributes: {
+							name: "Tabellarische Datenanzeige",
+							"data-type": "order",
+						},
+						content: [
+							[{ c: "Dies" }, { c: "ist" }, { c: "die" }, { c: "Kopf" }, { c: "zeile" }],
+							[{ c: "Dies" }, { c: "ist" }, { c: "die" }, { c: "erste" }, { c: "Datenreihe" }],
+							[{ c: "Leere" }, { c: "Objekte" }, {}, { c: "frei" }, { c: "gelassen" }],
+							[
+								{ c: "Langer" },
+								{ c: "Text" },
+								{ c: "ist" },
+								{ c: "möglich" },
+								{ c: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua." },
+							],
+							[{ c: "Angewandte Eigenschaften" }, { c: "style und onclick", a: { style: "cursor: pointer;", onclick: "new _client.Toast('Die Tabelle sagt hallo')" } }, { c: "class red", a: { class: "red" } }],
+						],
+						hint: "Verwendet bei Bestellungen. Falls gewählt.",
+					},
 				],
 				[
 					{
@@ -1880,7 +1926,7 @@ export async function screenshot(lang = null) {
 	console.log("done. reload to return to normal.");
 }
 
-export function request_param(){
+export function request_param() {
 	const payload = new FormData();
 	payload.append("asdföäü._? aksldfjn[]", "1");
 	payload.append("asdföäü._? aksldfjn[]", "2");

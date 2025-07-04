@@ -27,8 +27,8 @@ html {
 }
 
 ::-webkit-scrollbar {
-	width: .4rem;
-	height: .8rem;
+	width: 0.4rem;
+	height: 0.8rem;
 }
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-corner {
@@ -909,6 +909,29 @@ br {
 	clear: both;
 }
 
+table {
+	max-width: calc(100% - 2rem);
+	display: block;
+	font-size: 1em;
+	text-align: left;
+	margin-left: 1.7rem;
+	margin-bottom: 1em;
+}
+
+tr:nth-child(even) {
+	background-color: var(--notsodarkshadow);
+}
+
+th,
+td {
+	padding: 0.5em;
+	vertical-align: top;
+	overflow-wrap: break-word;
+	&:nth-child(n + 2) {
+		border-left: 1px solid var(--notsodarkshadow);
+	}
+}
+
 /*************************** input elements and call to action *******************************/
 
 .visually-hidden {
@@ -1342,6 +1365,10 @@ header[data-type] {
 
 .green {
 	color: var(--green);
+}
+
+.cta {
+	color: var(--cta_darker);
 }
 
 hr.insertionArea {
