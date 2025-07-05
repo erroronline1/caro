@@ -450,7 +450,6 @@ export class Dialog {
 			img.onclick = () => {
 				const scanner = document.querySelector("video");
 				if (scanner) scanner.srcObject.getTracks()[0].stop();
-				this.dialog.close();
 				this.dialog.remove();
 			};
 			this.form.append(img);
@@ -587,8 +586,8 @@ export class Dialog {
 				 */
 				function dialogForm2Obj(parent) {
 					let result = {},
-					child,
-					keyintersections;
+						child,
+						keyintersections;
 					parent.childNodes.forEach((node) => {
 						if (["input", "textarea", "select"].includes(node.localName) && node.value) {
 							// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
@@ -602,13 +601,12 @@ export class Dialog {
 							}
 							if (["radio"].includes(node.type) && node.checked === true) {
 								result[node.name] = node.value;
-							}
-							else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
+							} else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
 						} else {
 							child = dialogForm2Obj(node);
 							// filter and append checkbox values if applicable, shouldn't happen but you never know
-							keyintersections = Object.keys(result).filter(value => Object.keys(child).includes(value));
-							for(const key of keyintersections){
+							keyintersections = Object.keys(result).filter((value) => Object.keys(child).includes(value));
+							for (const key of keyintersections) {
 								result[key] += " | " + child[key];
 								delete child[key];
 							}
