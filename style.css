@@ -1528,6 +1528,12 @@ button[data-type="additem"]::before {
 	mask-image: url("./media/bell.svg");
 }
 
+[data-type="announcementsection"]::before {
+	background-color: var(--foreground);
+	-webkit-mask-image: url("./media/bullhorn.svg");
+	mask-image: url("./media/bullhorn.svg");
+}
+
 [data-type="auditsection"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/question-circle.svg");
