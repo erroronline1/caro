@@ -586,17 +586,34 @@ export class Dialog {
 				 * @returns {object} key:value pairs of input names and values if present
 				 */
 				function dialogForm2Obj(parent) {
-					let result = {};
+					let result = {},
+					child,
+					keyintersections;
 					parent.childNodes.forEach((node) => {
 						if (["input", "textarea", "select"].includes(node.localName) && node.value) {
 							// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
 							if (node.dataset.wrap && node.value) {
 								node.value = node.dataset.wrap.replace("___", node.value);
 							}
-
-							if (["checkbox", "radio"].includes(node.type) && node.checked === true) result[node.name] = node.value;
+							if (["checkbox"].includes(node.type) && node.checked === true) {
+								if (!result[node.dataset.grouped]) result[node.dataset.grouped] = node.name;
+								else result[node.dataset.grouped] += " | " + node.name;
+								result[node.name] = node.value;
+							}
+							if (["radio"].includes(node.type) && node.checked === true) {
+								result[node.name] = node.value;
+							}
 							else if (!["checkbox", "radio"].includes(node.type)) result[node.name] = node.value;
-						} else result = { ...result, ...dialogForm2Obj(node) };
+						} else {
+							child = dialogForm2Obj(node);
+							// filter and append checkbox values if applicable, shouldn't happen but you never know
+							keyintersections = Object.keys(result).filter(value => Object.keys(child).includes(value));
+							for(const key of keyintersections){
+								result[key] += " | " + child[key];
+								delete child[key];
+							}
+							result = { ...result, ...child };
+						}
 					});
 					return result;
 				}
@@ -1503,13 +1520,12 @@ export class Assemble {
 	 */
 
 	/**
-	 * creates a textarea whose content will be inserted into clipboard
+	 * creates a text paragraph styled as announcement
 	 * @returns {domNodes}
-	 * @see this.textarea()
+	 * @see this.textsection()
 	 */
-	textarea_copy() {
-		this.currentElement.attributes.onclick = "_client.application.toClipboard(this)";
-		return this.textarea();
+	announcementsection() {
+		return this.textsection();
 	}
 
 	/**
