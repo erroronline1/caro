@@ -22,8 +22,11 @@ namespace CARO\API;
 ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
+require_once('_utility.php'); // general utilities
 require_once('_config.php');
 require_once('_sqlinterface.php');
+
+// didn't bother handling exceptions like missing driver instructions. if you edit this you are supposed to fairly know what you're doing anyway. 
 
 class UPDATE{
 	public $_pdo;
@@ -41,12 +44,17 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_06_13'] as $update){
-			foreach ($this->{$update}() as $query){
-				echo $query . '<br />';
-				if (SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[0]) !== false)	SQLQUERY::EXECUTE($this->_pdo, $query);
+		foreach (['_2025_07_02'] as $update){
+			foreach ($this->{$update}()[$this->driver] as $query){
+				if (!$this->backup($query) || SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)) !== false){
+					$sql = SQLQUERY::EXECUTE($this->_pdo, $query);
+					if (!$sql[1])
+						echo '<br />[*] This update has no errorInfo and was successful or without side effects:<br /><code>' . $query . '</code><br />';
+					else
+						echo '<br />[X] This update likely has failed with errorInfo ' . json_encode($sql) . ':<br /><code>' . $query . '</code><br />';
+				}
 				else {
-					echo 'This update has been skipped because the database backup failed. Aborting further updates. Please contact the developer' . '<br />';
+					echo '<br />[!] This update has been skipped because the database backup failed. Aborting further updates. Please contact the developer:<br /><code>' . $query . '</code><br />';
 					die();
 				}
 			}
@@ -55,7 +63,7 @@ class UPDATE{
 
 	private function backup($query){
 		preg_match("/ALTER TABLE (.+?) /m", $query, $table);
-		if (!$table[1]) return false;
+		if (!isset($table[1]) || !$table[1]) return false;
 		return [
 			'mysql' => [
 				"DROP TABLE IF EXISTS BACKUP_" . $table[1]. "; CREATE TABLE BACKUP_" . $table[1]. " LIKE " . $table[1]. "; INSERT INTO BACKUP_" . $table[1]. " SELECT * FROM " . $table[1] . ";"
@@ -63,7 +71,7 @@ class UPDATE{
 			'sqlsrv' => [
 				"IF OBJECT_ID(N'dbo.BACKUP_" . $table[1]. "', N'U') IS NOT NULL DROP TABLE BACKUP_" . $table[1]. "; SELECT * INTO BACKUP_" . $table[1]. " FROM " . $table[1] . ";"
 			]
-		][$this->driver];
+		];
 	}
 
 	private function _2024_06_18(){
@@ -90,7 +98,7 @@ class UPDATE{
 				"    ADD info VARCHAR(MAX) NULL DEFAULT ''" .
 				" END"
 			]
-		][$this->driver];
+		];
 	}
 
 	private function _2025_06_13(){
@@ -111,10 +119,42 @@ class UPDATE{
 				"    ADD patient_access TINYINT NULL DEFAULT NULL" .
 				" END; "
 			]
-		][$this->driver];
+		];
 	}
 	
+	private function _2025_07_02(){
+		return [
+			'mysql' => [
+				"CREATE TABLE IF NOT EXISTS `caro_announcements` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`author_id` int NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`span_start` datetime NULL DEFAULT NULL," .
+				"	`span_end` datetime NULL DEFAULT NULL," .
+				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`text` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+			],
+			'sqlsrv' => [
+				"IF OBJECT_ID(N'caro_announcements', N'U') IS NULL " .
+				"CREATE TABLE caro_announcements (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	author_id int NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
+				"	span_start smalldatetime NULL DEFAULT NULL," .
+				"	span_end smalldatetime NULL DEFAULT NULL," .
+				"	subject varchar(MAX) NOT NULL," .
+				"	text varchar(MAX) NULL DEFAULT NULL" .
+				");"
+			]
+		];
+	}
+
 }
+
 $db = new UPDATE();
 $db->update();
 ?>
