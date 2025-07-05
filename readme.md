@@ -33,8 +33,7 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* admin/qmo/ceo/prrc landingpage megaphone textsection?
-    * editor and history within communication
+* tidy up language keys (grouping, etc.)
 
 ## Content
 * [Aims](#aims)
@@ -50,6 +49,7 @@ Things are still in motion. Images may be outdated.
         * [Manual](#manual)
     * [Communication](#communication)
         * [Conversations](#conversations)
+        * [Announcements](#announcements)
         * [Personnel register](#personnel-register)
         * [Text recommendations](#text-recommendations)
         * [Responsibilities](#responsibilities)
@@ -318,6 +318,18 @@ Set up the manual according to your users comprehension. While editing single en
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
 ![conversation screenshot](http://toh.erroronline.one/caro/conversation.png)
+
+[Content](#content)
+
+### Announcements
+Authorized users can add, edit and delete announcements for everyone to see and improve company communication. Announcements are displayed on the landing page in case of
+* matching units - if selected - and
+* current date is in the selected time span or
+* no timespan is set
+
+All users can see all announcements within the distinct menu option though, declaring concerned units if set. Announcements are not a persistent record and can be deleted and edited at any time. The last edit and editing user is displayed.
+
+![announcements screenshot](http://toh.erroronline.one/caro/announcements.png)
 
 [Content](#content)
 
@@ -1387,7 +1399,7 @@ Application support legend:
 | ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.5.1 Responsibility and authority | yes | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A personnel register summarizes all users, also grouped by organizational unit and permission<br/>&bull; Responsibilities can be defined and are publicly accessible | [Users](#users), [Personnel register](#personnel-register), [Responsibilities](#responsibilities), [Runtime variables](#runtime-variables) |
 | ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application allows for common or unitwise announcements on the landing page<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Announcements](#announcements), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.1 General management assessment | partial | &bull; The application has a form to add, edit or close management reviews, containing required issues by default. | [Management review](#management-review), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.2 Rating input | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 5.6.3 Rating results | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
@@ -1684,6 +1696,7 @@ user_image = 256 ; max pixels on longer side
 ; admin by default
 ; IF YOU ADD OR REPLACE A GROUP FOR APPROVALS ALL CURRENT ITEMS MUST BE APPROVED BY THIS GROUP RETROSPECTIVE!
 [permissions]
+announcements = "ceo, qmo, prrc" ; adding, editing and deleting announcements
 appmanual = "qmo" ; contribute to and edit application manual
 audit = "ceo, qmo" ; prepare and execute internal audits
 calendaredit = "ceo, qmo, supervisor" ; edit, delete or complete events and entries (scheduled events can be closed by anyone)
@@ -3839,6 +3852,63 @@ Sample response
 ```
 
 ### Message endpoints
+
+> DELETE ./api/api.php/message/announcement/{announcement id}
+
+Delete announcement.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {announcement id} | path parameter | required | int id |
+
+Sample response
+```
+{"response":{"msg":"Announcement deleted.","type":"success"}}
+```
+
+> POST ./api/api.php/message/announcement
+
+Create a new announcement.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | containing announcement details |
+
+Sample response
+```
+{"response":{"msg":"Announcment saved.","type":"success"}}
+```
+
+> PUT ./api/api.php/message/announcement/{announcement id}
+
+Update an announcement.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {announcement id} | path parameter | required | int id |
+| payload | form data | required | containing announcement details |
+
+Sample response
+```
+{"response":{"msg":"Announcment saved.","type":"success"}}
+```
+
+> GET ./api/api.php/message/announcements
+
+Displays all announcements.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[{"type":"button","attributes":{"value":"New announcement","onclick":"if (!this.disabled) new _client.Dialog({type: 'input', header: 'New announcement', render: JSON.parse('[[{\"type\":\"text\",\"attributes\":{\"name\":\"Subject\",\"required\":true,\"value\":\"\"}},{\"type\":\"textarea\",\"attributes\":{\"name\":\"Description\",\"value\":\"\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Starts\",\"value\":\"2025-07-05\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Valid until\",\"value\":\"\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"Concerns just\"},\"content\":{\"Common\":[],\"Orthotics I\":[],\"Orthotics II\":[],\"Prosthetics I\":[],\"Prosthetics II\":[],\"CAD\":[],\"Polymer Tech\":[],\"Silicone Lab\":[],\"Office/Purchase\":[],\"Administration\":[]}}]]'), options:{'Ok': {value: true},}}).then(response => {if (Object.keys(response).length) { api.message('post', 'announcement', 0, _client.application.dialogToFormdata(response));}});"}},[{"type":"announcementsection","attributes":{"name":"This is a test announcement"},"content":....
+```
 
 > DELETE ./api/api.php/message/conversation/{message ids}
 

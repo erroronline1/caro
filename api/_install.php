@@ -38,7 +38,19 @@ require_once('_language.php');
 
 define('DEFAULTSQL', [
 	'install_tables' => [
-		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_audit_and_management` (" .
+		'mysql' => "CREATE TABLE IF NOT EXISTS `caro_announcements` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`author_id` int NOT NULL," .
+				"	`date` datetime NOT NULL," .
+				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`span_start` datetime NULL DEFAULT NULL," .
+				"	`span_end` datetime NULL DEFAULT NULL," .
+				"	`subject` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`text` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				.
+				"CREATE TABLE IF NOT EXISTS `caro_audit_and_management` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
 				"	`template` int NULL DEFAULT NULL," .
 				"	`unit` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
@@ -331,7 +343,19 @@ define('DEFAULTSQL', [
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
 
-		'sqlsrv' => "IF OBJECT_ID(N'caro_audit_and_management', N'U') IS NULL " .
+		'sqlsrv' => "IF OBJECT_ID(N'caro_announcements', N'U') IS NULL " .
+				"CREATE TABLE caro_announcements (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	author_id int NOT NULL," .
+				"	date smalldatetime NOT NULL," .
+				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
+				"	span_start smalldatetime NULL DEFAULT NULL," .
+				"	span_end smalldatetime NULL DEFAULT NULL," .
+				"	subject varchar(MAX) NOT NULL," .
+				"	text varchar(MAX) NULL DEFAULT NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'caro_audit_and_management', N'U') IS NULL " .
 				"CREATE TABLE caro_audit_and_management (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
 				"	template int NULL DEFAULT NULL," .

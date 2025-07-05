@@ -75,6 +75,8 @@ class SQLQUERY {
 			}
 			$query = strtr($query, $parameters['replacements']);
 		}
+
+		// execute query
 		try {
 			$statement = $_pdo->prepare($query);
 			if (!$statement->execute($parameters['values'])) return false;
@@ -83,13 +85,16 @@ class SQLQUERY {
 			UTILITY::debug($e, $statement->queryString, $statement->debugDumpParams());
 			die();
 		}
+
+		// prepare result response
 		if (str_starts_with($query, 'SELECT')) {
 			//UTILITY::debug($statement->debugDumpParams());
 			$result = $statement->fetchAll();
-			$statement = null;
-			return $result;
 		}
-		$result = $statement->rowCount();
+		elseif (str_starts_with($query, 'CREATE') || str_starts_with($query, 'IF OBJECT_ID(N')) $result = $statement->errorInfo(); // _databaseupdate.php table creation
+		elseif (str_starts_with($query, 'ALTER TABLE') || str_starts_with($query, 'IF COL_LENGTH(')) $result = $statement->errorInfo(); // _databaseupdate.php column altering
+		else $result = $statement->rowCount(); // affected rows
+
 		$statement = null;
 		return $result;
 }
@@ -176,7 +181,29 @@ class SQLQUERY {
 			'sqlsrv' => ""
 		],
 
+
+		'announcement_post' => [
+			'mysql' => "INSERT INTO caro_announcements (id, author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (NULL, :author_id, CURRENT_TIMESTAMP, :organizational_unit, :span_start, :span_end, :subject, :text)",
+			'sqlsrv' => "INSERT INTO caro_announcements (author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, IF :span_start IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_start, 120) END, IF :span_end IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_end, 120) END, :subject, :text)"
+		],
+		'announcement_put' => [
+			'mysql' => "UPDATE caro_announcements SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = :span_start, span_end = :span_end, subject = :subject, text = :text WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_announcements SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = IF :span_start IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_start, 120) END, span_end = IF :span_end IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_end, 120) END, subject = :subject, text = :text WHERE id = :id"
+		],
+		'announcement_get_all' => [
+			'mysql' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id ORDER BY caro_announcements.span_start DESC",
+			'sqlsrv' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id ORDER BY caro_announcements.span_start DESC"
+		],
+		'announcement_get_recent' => [
+			'mysql' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id WHERE CURRENT_TIMESTAMP > caro_announcements.span_start AND (caro_announcements.span_end IS NULL OR CURRENT_TIMESTAMP < caro_announcements.span_end) ORDER BY date DESC",
+			'sqlsrv' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id WHERE CURRENT_TIMESTAMP > caro_announcements.span_start AND (caro_announcements.span_end IS NULL OR CURRENT_TIMESTAMP < caro_announcements.span_end) ORDER BY date DESC"
+		],
+		'announcement_delete' => [
+			'mysql' => "DELETE FROM caro_announcements WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_announcements WHERE id = :id"
+		],
 		
+
 		'audit_and_management_post' => [
 			'mysql' => "INSERT INTO caro_audit_and_management (id, template, unit, content, last_touch, last_user, closed, notified) VALUES (NULL, :template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)",
 			'sqlsrv' => "INSERT INTO caro_audit_and_management (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL)"

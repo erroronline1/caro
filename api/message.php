@@ -24,12 +24,252 @@ class MESSAGE extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_conversation = null;
+	private $_announcement = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_conversation = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_conversation = $this->_announcement = isset(REQUEST[2]) ? REQUEST[2] : null;
+	}
+
+	/**
+	 *                                                 _
+	 *   ___ ___ ___ ___ _ _ ___ ___ ___ _____ ___ ___| |_ 
+	 *  | .'|   |   | . | | |   |  _| -_|     | -_|   |  _|
+	 *  |__,|_|_|_|_|___|___|_|_|___|___|_|_|_|___|_|_|_|
+	 * 
+	 * announcement handler
+	 */
+	public function announcement(){
+		if (!PERMISSION::permissionFor('announcements')) $this->response([], 401);
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$announcement = [
+					':author_id' => $_SESSION['user']['id'],
+					':organizational_unit' => null,
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.start'))) ? : null,
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.end'))) ? : null,
+					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.subject')) ? : null,
+					':text' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.text')) ? : null,
+				];
+				// chain checked units
+				$units = [];
+				foreach ($this->_lang->_USER['units'] as $unit => $description){
+					if (UTILITY::propertySet($this->_payload, $description)) {
+						$units[] = $unit;
+					}
+				}
+				if ($units) $announcement[':organizational_unit'] = implode(',', $units);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_post', [
+					'values' => $announcement
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.announcement.saved_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.announcement.saved_error'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'PUT':
+				$announcement = [
+					':id' => $this->_announcement,
+					':author_id' => $_SESSION['user']['id'],
+					':organizational_unit' => null,
+					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.start'))) ? : null,
+					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.end'))) ? : null,
+					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.subject')) ? : null,
+					':text' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.text')) ? : null,
+				];
+				// chain checked units
+				$units = [];
+				foreach ($this->_lang->_USER['units'] as $unit => $description){
+					if (UTILITY::propertySet($this->_payload, $description)) {
+						$units[] = $unit;
+					}
+				}
+				if ($units) $announcement[':organizational_unit'] = implode(',', $units);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_put', [
+					'values' => $announcement
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.announcement.saved_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.announcement.saved_error'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'DELETE':
+				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_delete', [
+					'values' => [
+						':id' => $this->_announcement
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.announcement.deleted_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.announcement.deleted_error'),
+						'type' => 'error'
+					]]);
+				break;
+		}
+	}
+
+	/**
+	 *                                                 _       
+	 *   ___ ___ ___ ___ _ _ ___ ___ ___ _____ ___ ___| |_ ___ 
+	 *  | .'|   |   | . | | |   |  _| -_|     | -_|   |  _|_ -|
+	 *  |__,|_|_|_|_|___|___|_|_|___|___|_|_|_|___|_|_|_| |___|
+	 * 
+	 * 
+	 * lists all announcements
+	 */
+	public function announcements(){
+		$announcements = SQLQUERY::EXECUTE($this->_pdo, 'announcement_get_all');
+		$response = ['render' => ['content' => []]];
+
+		$units = [];
+		foreach($this->_lang->_USER['units'] as $key => $value){
+			$units[$value] = [];
+		}
+
+		if (PERMISSION::permissionFor('announcements')){
+			$response['render']['content'][] = [
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('message.announcement.new'),
+					'onclick' => "if (!this.disabled) new _client.Dialog({type: 'input', header: '". $this->_lang->GET('message.announcement.new') ."', render: JSON.parse('".
+						UTILITY::json_encode(
+							$this->announcementform([
+								'units' => $units
+							])
+						)
+						."'), options:{".
+							"'".$this->_lang->GET('general.ok_button')."': {value: true},".
+						"}}).then(response => {if (Object.keys(response).length) { api.message('post', 'announcement', 0, _client.application.dialogToFormdata(response));}});"
+				]
+			];
+		}
+
+		foreach($announcements as $announcement){
+			$announcementunits = $units;
+			$concerns = [];
+			foreach(array_filter(explode(',', $announcement['organizational_unit'] ? : ''), fn($u) => boolval($u)) as $unit){
+				$announcementunits[$this->_lang->_USER['units'][$unit]]['checked'] = true;
+				$concerns[] = $this->_lang->_USER['units'][$unit];
+			}
+
+			$announcementcontent = [];
+			if ($announcement['text']) $announcementcontent[] = $announcement['text'];
+			if ($announcement['span_start']) $announcementcontent[] = $this->_lang->GET('message.announcement.start') . ' ' . $this->convertFromServerTime(substr($announcement['span_start'], 0 ,10));
+			if ($announcement['span_end']) $announcementcontent[] = $this->_lang->GET('message.announcement.end') . ' ' . $this->convertFromServerTime(substr($announcement['span_end'], 0 ,10));
+			if ($concerns) $announcementcontent[] = $this->_lang->GET('message.announcement.units') . ' ' . implode(', ', $concerns);
+			$announcementcontent[] = $this->_lang->GET('message.announcement.last_edit', [':author' => $announcement['author_name'], ':date'=> $this->convertFromServerTime($announcement['date'])]);
+
+			$content = [
+				[
+					'type' => 'announcementsection',
+					'attributes' => [
+						'name' => $announcement['subject']
+					],
+					'content' => implode("\n", $announcementcontent), 
+				]
+			];
+			if (PERMISSION::permissionFor('announcements')){
+				$content[] = [
+					'type' => 'button',
+					'attributes' => [
+						'value' => $this->_lang->GET('message.announcement.edit'),
+						'onclick' => "if (!this.disabled) new _client.Dialog({type: 'input', header: '". $this->_lang->GET('message.announcement.edit') ."', render: JSON.parse('".
+							UTILITY::json_encode(
+								[
+									...$this->announcementform([
+										'subject' => $announcement['subject'] ? : '',
+										'text' => $announcement['text'] ? : '',
+										'span_start' => $announcement['span_start'] ? $this->convertFromServerTime(substr($announcement['span_start'], 0, 10), true) : '',
+										'span_end' => $announcement['span_end'] ? $this->convertFromServerTime(substr($announcement['span_end'], 0, 10), true) : '',
+										'units' => $announcementunits
+									])
+								]
+							)
+							."'), options:{".
+								"'".$this->_lang->GET('general.ok_button')."': {value: true},".
+							"}}).then(response => {if (Object.keys(response).length) { api.message('put', 'announcement', " . $announcement['id'] . ", _client.application.dialogToFormdata(response)); this.disabled = true;}});"
+					]
+				];
+				$content[] = [
+					'type' => 'deletebutton',
+					'attributes' => [
+						'value' => $this->_lang->GET('message.announcement.delete'),
+						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.announcement.delete_confirm') ."', options:{".
+							"'" . $this->_lang->GET('general.cancel_button') . "': false,".
+							"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
+						"}}).then(confirmation => {if (confirmation) {api.message('delete', 'announcement', " . $announcement['id'] . "); this.disabled = true;}})"
+					]
+				];
+			}
+			$response['render']['content'][] = $content;
+		}
+		$this->response($response);
+	}
+
+	/**
+	 *                                                 _   ___               
+	 *   ___ ___ ___ ___ _ _ ___ ___ ___ _____ ___ ___| |_|  _|___ ___ _____ 
+	 *  | .'|   |   | . | | |   |  _| -_|     | -_|   |  _|  _| . |  _|     |
+	 *  |__,|_|_|_|_|___|___|_|_|___|___|_|_|_|___|_|_|_| |_| |___|_| |_|_|_|
+	 *                                                                       
+	 * reusable form generator
+	 */
+	private function announcementform($preset){
+		return [
+			[
+				[
+					'type' => 'text',
+					'attributes' => [
+						'name' => $this->_lang->GET('message.announcement.subject'),
+						'required' => true,
+						'value' => isset($preset['subject']) ? $preset['subject'] : ''
+					]
+				], [
+					'type' => 'textarea',
+					'attributes' => [
+						'name' => $this->_lang->GET('message.announcement.text'),
+						'value' => isset($preset['text']) ? $preset['text'] : ''
+					]
+				], [
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('message.announcement.start'),
+						'value' => isset($preset['span_start'])? $preset['span_start'] : $this->_date['usertime']->format('Y-m-d')
+					]
+				], [
+					'type' => 'date',
+					'attributes' => [
+						'name' => $this->_lang->GET('message.announcement.end'),
+						'value' => isset($preset['span_end']) ? $preset['span_end'] : ''
+					]
+				], [
+					'type' => 'checkbox',
+					'attributes' => [
+						'name' => $this->_lang->GET('message.announcement.units'),
+					],
+					'content' => $preset['units']
+				]
+			]
+		];
 	}
 
 	/**

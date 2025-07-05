@@ -1011,6 +1011,8 @@
 			"timesheet": "Timesheet"
 		},
 		"communication": {
+			"announcements": "Announcements",
+			"announcements_manage": "Manage announcements",
 			"conversations": "Conversations",
 			"header": "Communication",
 			"measure": "Improvement suggestions",
@@ -1097,6 +1099,22 @@
 		"vote_error": "Opinion could not be saved, please try again"
 	},
 	"message": {
+		"announcement": {
+			"delete": "Delete announcement",
+			"delete_confirm": "Permanently delete announcement?",
+			"deleted_error": "Announcement could not be deleted. Please try again.",
+			"deleted_success": "Announcement deleted.",
+			"edit": "Edit announcement",
+			"end": "Valid until",
+			"last_edit": "Last edit by :author on :date",
+			"new": "New announcement",
+			"saved_error": "Announcement could not be saved. Please try again.",
+			"saved_success": "Announcment saved.",
+			"start": "Starts",
+			"subject": "Subject",
+			"text": "Description",
+			"units": "Concerns just"
+		},
 		"delete": "Delete marked messages",
 		"delete_confirm_cancel": "No, thank you",
 		"delete_confirm_ok": "Yes, delete selected Messages",

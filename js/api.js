@@ -1383,31 +1383,59 @@ export const api = {
 				if (data.response !== undefined && data.response.redirect) api.message("get", ...data.response.redirect);
 			},
 			title = {
+				announcements: api._lang.GET("menu.communication.announcements"),
 				conversation: api._lang.GET("menu.communication.conversations"),
 				register: api._lang.GET("menu.communication.register"),
 			};
 
 		switch (method) {
 			case "get":
-				successFn = async function (data) {
-					if (data.render) {
-						if (request[2]) await window.Masonry.breakpoints(false);
-						api.update_header(title[request[1]]);
-						const render = new Assemble(data.render);
-						document.getElementById("main").replaceChildren(render.initializeSection());
-						render.processAfterInsertion();
-						if (request[2]) window.scrollTo(0, document.body.scrollHeight);
-					}
-					if (data.data) _serviceWorker.notif.communication(data.data);
-					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-				};
+				switch (request[1]) {
+					case "announcement":
+					case "announcements":
+						successFn = async function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]]);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
+					default:
+						successFn = async function (data) {
+							if (data.render) {
+								if (request[2]) await window.Masonry.breakpoints(false);
+								api.update_header(title[request[1]]);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+								if (request[2]) window.scrollTo(0, document.body.scrollHeight);
+							}
+							if (data.data) _serviceWorker.notif.communication(data.data);
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+				}
 				break;
 			case "post":
-				if (2 in request && request[2] && request[2] instanceof FormData) {
-					// passed formdata
-					payload = request[2];
-					delete request[2];
-				} else payload = _.getInputs("[data-usecase=message]", true);
+			case "put":
+				switch (request[1]) {
+					case "announcement":
+					case "announcements":
+						if (3 in request && request[3] && request[3] instanceof FormData) {
+							// passed formdata
+							payload = request[3];
+							delete request[3];
+						}
+						break;
+					default:
+						if (2 in request && request[2] && request[2] instanceof FormData) {
+							// passed formdata
+							payload = request[2];
+							delete request[2];
+						} else payload = _.getInputs("[data-usecase=message]", true);
+				}
 				break;
 			case "delete":
 				break;

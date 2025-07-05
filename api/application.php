@@ -783,9 +783,9 @@ class APPLICATION extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('application.manual.delete'),
 								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('application.manual.delete_confirm') ."', options: {".
-								"'".$this->_lang->GET('general.cancel_button')."': false,".
-								"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
-									"}}).then(confirmation => {if (confirmation) api.application('delete', 'manual', " . $entry['id'] . ")})"
+									"'".$this->_lang->GET('general.cancel_button')."': false,".
+									"'".$this->_lang->GET('general.ok_button')."': {value: true, class: 'reducedCTA'}".
+								"}}).then(confirmation => {if (confirmation) api.application('delete', 'manual', " . $entry['id'] . ")})"
 							]
 						]
 				];
@@ -848,7 +848,8 @@ class APPLICATION extends API {
 		$menu = [
 			// order here defines frontend order
 			$this->_lang->GET('menu.communication.header') => [
-				$this->_lang->GET('menu.communication.conversations') => ['onclick' => "api.message('get', 'conversation')", 'data-unreadmessages' => '0'],
+				$this->_lang->GET('menu.communication.conversations') => ['onclick' => "api.message('get', 'conversation')"],
+				$this->_lang->GET('menu.communication.announcements') => ['onclick' => "api.message('get', 'announcements')"],
 				$this->_lang->GET('menu.communication.texttemplate_texts') => ['onclick' => "api.texttemplate('get', 'text')"],
 				$this->_lang->GET('menu.communication.register') => ['onclick' => "api.message('get', 'register')"],
 				$this->_lang->GET('menu.communication.responsibility') => ['onclick' => "api.responsibility('get', 'responsibilities')"],
@@ -1021,6 +1022,32 @@ class APPLICATION extends API {
 				];
 			}
 			
+			// display current announcements
+			$recentannouncements = [];
+			$announcements = SQLQUERY::EXECUTE($this->_pdo, 'announcement_get_recent');
+			foreach($announcements as $announcement){
+				$announcement['organizational_unit'] = array_filter(explode(',', $announcement['organizational_unit'] ? : ''), fn($u) => boolval($u));
+				if ($announcement['organizational_unit'] && !array_intersect($announcement['organizational_unit'], $_SESSION['user']['units'])) continue;
+
+				$announcementcontent = [];
+				if ($announcement['text']) $announcementcontent[] = $announcement['text'];
+				if ($announcement['span_start']) $announcementcontent[] = $this->_lang->GET('message.announcement.start') . ' ' . $this->convertFromServerTime(substr($announcement['span_start'], 0 ,10));
+				if ($announcement['span_end']) $announcementcontent[] = $this->_lang->GET('message.announcement.end') . ' ' . $this->convertFromServerTime(substr($announcement['span_end'], 0 ,10));
+				$announcementcontent[] = $this->_lang->GET('message.announcement.last_edit', [':author' => $announcement['author_name'], ':date'=> $this->convertFromServerTime($announcement['date'])]);
+
+				$recentannouncements[] = [
+					[
+						'type' => 'announcementsection',
+						'attributes' => [
+							'name' => $announcement['subject']
+						],
+						'content' => implode("\n", $announcementcontent), 
+					]
+				];
+			}
+			if ($recentannouncements) $response['render']['content'][] = count($recentannouncements) > 1 ? $recentannouncements : $recentannouncements[0];
+
+
 			// set up dashboard notifications
 			$tiles = [];
 			$notifications = new NOTIFICATION;

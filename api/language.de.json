@@ -1011,6 +1011,8 @@
 			"timesheet": "Zeiterfassung"
 		},
 		"communication": {
+			"announcements": "Ankündigungen",
+			"announcements_manage": "Ankündigungen verwalten",
 			"conversations": "Unterhaltungen",
 			"header": "Kommunikation",
 			"measure": "Verbesserungsvorschläge",
@@ -1097,6 +1099,22 @@
 		"vote_error": "Deine Meinung konnte nicht gespeichert werden, bitte versuche es erneut."
 	},
 	"message": {
+		"announcement": {
+			"delete": "Ankündigung löschen",
+			"delete_confirm": "Ankündigung unwiderruflich löschen?",
+			"deleted_error": "Ankündigung konnte nicht gelöscht werden. Bitte versuche es erneut.",
+			"deleted_success": "Ankündigung gelöscht.",
+			"edit": "Ankündigung bearbeiten",
+			"end": "Gültig bis",
+			"last_edit": "letzte Bearbeitung von :author am :date",
+			"new": "neue Ankündigung",
+			"saved_error": "Ankündigung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+			"saved_success": "Ankündigung gespeichert",
+			"start": "Beginn",
+			"subject": "Betreff",
+			"text": "Beschreibung",
+			"units": "Betrifft nur"
+		},
 		"delete": "Gewählte Nachrichten löschen",
 		"delete_confirm_cancel": "Nein danke",
 		"delete_confirm_ok": "Ja, lösche die markierten Nachrichten",
