@@ -557,7 +557,7 @@ class TOOL extends API {
 			[
 				[
 					'type' => 'scanner',
-					'description' => $this->_lang->GET('menu.tools.scanner'),
+					'description' => $this->_lang->GET('tool.navigation.scanner'),
 					'destination' => 'tool_scanner'
 				], [
 					'type' => 'textarea',

@@ -317,15 +317,15 @@ class MESSAGE extends API {
 							'type' => 'message',
 							'content' => [
 								'img' => ($conversation['conversation_user'] > 1 ? './api/api.php/file/stream/' : '') . $conversation['image'],
-								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('message.deleted_user'),
+								'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('general.deleted_user'),
 								'text' => $this->_conversation !== '1' ? strip_tags($conversation['message']) : $conversation['message'],
 								'date' => $this->convertFromServerTime($conversation['timestamp']),
 							],
 							'attributes' =>  [
 								'class' => $conversation['sender'] === $_SESSION['user']['id'] ? 'conversation right': 'conversation',
 								//inline system links won't work otherwise, therefore this property exists for conversation threads
-								'ICON_onclick' => "_client.message.newMessage('". $this->_lang->GET('message.forward', [':user' => $conversation['conversation_user_name']]) ."', '', '" . 
-									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
+								'ICON_onclick' => "_client.message.newMessage('". $this->_lang->GET('message.message.forward', [':user' => $conversation['conversation_user_name']]) ."', '', '" . 
+									preg_replace(["/\r/", "/\n/", "/'/"], ["\\r", "\\n", "\\'"], $this->_lang->GET('message.message.forward_message', [':message' => strip_tags($conversation['message']), ':user' => $conversation['conversation_user_name'], ':date' => $conversation['timestamp']])) .
 									"', {}, '" . implode(',', $datalist). "')",
 								'id' => $conversation['id']
 							]
@@ -336,7 +336,7 @@ class MESSAGE extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('message.delete_mark'),
+								'value' => $this->_lang->GET('message.message.delete_mark'),
 								'data-checked' => 0,
 								'onclick' => "this.dataset.checked = + !Boolean(parseInt(this.dataset.checked)); document.querySelectorAll('article>input[type=\"radio\"]').forEach (radio => {radio.checked = Boolean(parseInt(this.dataset.checked));})"
 							]
@@ -347,10 +347,10 @@ class MESSAGE extends API {
 						[
 							'type' => 'deletebutton',
 							'attributes' => [
-								'value' => $this->_lang->GET('message.delete'),
-								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.delete') ."', options:{".
-									"'".$this->_lang->GET('message.delete_confirm_cancel')."': false,".
-									"'".$this->_lang->GET('message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
+								'value' => $this->_lang->GET('message.message.delete'),
+								'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.message.delete') ."', options:{".
+									"'".$this->_lang->GET('message.message.delete_confirm_cancel')."': false,".
+									"'".$this->_lang->GET('message.message.delete_confirm_ok')."': {value: true, class: 'reducedCTA'},".
 									"}}).then(confirmation => { if (confirmation) {" .
 										"let ids = [];" .
 										"document.querySelectorAll('article>input[type=\"radio\"]').forEach (radio => {if (radio.checked) ids.push(radio.name.substring(4))});" .
@@ -369,16 +369,16 @@ class MESSAGE extends API {
 							[
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => $this->_lang->GET('message.to'),
+									'name' => $this->_lang->GET('message.message.to'),
 									'value' => $conversation_user['name']
 								]
 							],
 							[
 								'type' => 'textarea',
 								'attributes' => [
-									'name' => $this->_lang->GET('message.message_to', [':user' => $conversation_user['name']]),
+									'name' => $this->_lang->GET('message.message.message_to', [':user' => $conversation_user['name']]),
 								],
-								'hint' => $this->_lang->GET('message.forward_hint')
+								'hint' => $this->_lang->GET('message.message.forward_hint')
 							]
 						];
 						$response['render']['form'] = [
@@ -397,8 +397,8 @@ class MESSAGE extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('message.new'),
-								'onclick' => "_client.message.newMessage('". $this->_lang->GET('message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
+								'value' => $this->_lang->GET('message.message.new'),
+								'onclick' => "_client.message.newMessage('". $this->_lang->GET('message.message.new') ."', '', '', {}, '" . implode(',', $datalist). "')"
 							]
 						]
 					];
@@ -427,7 +427,7 @@ class MESSAGE extends API {
 									'type' => 'message',
 									'content' => [
 										'img' => ($conversation['conversation_user'] > 1 ? './api/api.php/file/stream/' : '') . $conversation['image'],
-										'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('message.deleted_user'),
+										'user' => $conversation['conversation_user_name'] ? : $this->_lang->GET('general.deleted_user'),
 										'text' => (strlen($conversation['message']) > 128 ? substr($conversation['message'], 0, 128) . '...': $conversation['message']),
 										'date' => $this->convertFromServerTime($conversation['timestamp']),
 										'unseen' => $unseen
@@ -438,7 +438,7 @@ class MESSAGE extends API {
 								]
 							];
 						}
-					} else $response['render']['content'][] = $this->noContentAvailable($this->_lang->GET('message.no_messages'))[0];
+					} else $response['render']['content'][] = $this->noContentAvailable($this->_lang->GET('message.message.no_messages'))[0];
 				}
 				break;
 			case 'DELETE':
@@ -451,13 +451,13 @@ class MESSAGE extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('message.delete_success'),
+						'msg' => $this->_lang->GET('message.message.delete_success'),
 						'redirect' => ['conversation'],
 						'type' => 'deleted'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('message.delete_failure'),
+						'msg' => $this->_lang->GET('message.message.delete_failure'),
 						'redirect' => false,
 						'type' => 'error'
 					]]);
@@ -481,12 +481,12 @@ class MESSAGE extends API {
 				$recipients = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
-						':name' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.to')) ? : ''))
+						':name' => implode(',', preg_split('/[,;]\s{0,}/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.to')) ? : ''))
 					]
 				]);
 				if (!$recipients) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.to'))]),
+						'msg' => $this->_lang->GET('user.error_not_found', [':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.to'))]),
 						'type' => 'error'
 					]]);
 				// do not send messages to yourself
@@ -494,7 +494,7 @@ class MESSAGE extends API {
 					unset($recipients[$self]);
 					if (!$recipients) $this->response([
 						'response' => [
-							'msg' => $this->_lang->GET('message.send_failure_self'),
+							'msg' => $this->_lang->GET('message.message.send_failure_self'),
 							'type' => 'error'
 						]]);
 					}
@@ -502,10 +502,10 @@ class MESSAGE extends API {
 				$success = 0;
 				foreach ($recipients as $recipient){
 					if ($recipient['id'] < 2) continue;
-					$message = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')) ? : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message_to', [':user' => $recipient['name']]));
+					$message = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')) ? : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message_to', [':user' => $recipient['name']]));
 					if (!$message) $this->response([
 						'response' => [
-							'msg' => $this->_lang->GET('message.send_failure', [':number' => count($recipients) - $success]),
+							'msg' => $this->_lang->GET('message.message.send_failure', [':number' => count($recipients) - $success]),
 							'redirect' => false,
 							'type' => 'error'
 						]]);
@@ -519,13 +519,13 @@ class MESSAGE extends API {
 				}
 				if ($success === count($recipients)) $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('message.send_success'),
+						'msg' => $this->_lang->GET('message.message.send_success'),
 						'redirect' => ['conversation', count($recipients) < 2 ? $recipients[0]['id'] : 0],
 						'type' => 'success'
 					]]);
 				else $this->response([
 					'response' => [
-						'msg' => $this->_lang->GET('message.send_failure', [':number' => count($recipients) - $success]),
+						'msg' => $this->_lang->GET('message.message.send_failure', [':number' => count($recipients) - $success]),
 						'redirect' => false,
 						'type' => 'error'
 					]]);
@@ -582,10 +582,10 @@ class MESSAGE extends API {
 				];
 				switch ($group){
 					case 'name':
-						$description = $this->_lang->GET('message.register_users');
+						$description = $this->_lang->GET('message.register.users');
 						break;
 					case 'orderauth':
-						$description = $this->_lang->GET('message.register_orderauth');
+						$description = $this->_lang->GET('message.register.orderauth');
 						break;
 				}
 				$response['render']['content'][] = [
@@ -604,7 +604,7 @@ class MESSAGE extends API {
 
 					// add "message to all users" of the panel
 					$links = [
-						$this->_lang->GET('message.register_message_all') => [
+						$this->_lang->GET('message.register.message_all') => [
 							'href' => 'javascript:void(0)',
 							'data-type' => 'input',
 							'class' => 'messageto',

@@ -162,7 +162,7 @@ export const api = {
 					if (JSON.stringify(request) !== JSON.stringify(["application", "authentify"])) api._unauthorizedRequest = { method: method, request: request };
 					const options = {};
 					options[api._lang.GET("general.ok_button")] = true;
-					options[api._lang.GET("menu.application.signout_user", { ":name": api._settings.user.name || "" })] = {
+					options[api._lang.GET("application.navigation.signout_user", { ":name": api._settings.user.name || "" })] = {
 						onclick: "api.application('delete', 'authentify'); api.application('get', 'start')",
 						class: "reducedCTA",
 						value: false,
@@ -494,7 +494,7 @@ export const api = {
 				break;
 			case "about":
 				successFn = function (data) {
-					api.update_header(api._lang.GET("menu.application.about"));
+					api.update_header(api._lang.GET("application.navigation.about"));
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
@@ -513,26 +513,26 @@ export const api = {
 						elements = [],
 						icons = {},
 						ariaSkipMenu = document.createElement("a");
-					ariaSkipMenu.append(document.createTextNode(api._lang.GET("menu.ariaSkipMenu")));
+					ariaSkipMenu.append(document.createTextNode(api._lang.GET("application.navigation.ariaSkipMenu")));
 					ariaSkipMenu.href = "#main";
 					ariaSkipMenu.classList.add("visually-hidden");
 					elements.push(ariaSkipMenu);
 
 					// set up icons css property
-					icons[api._lang.GET("menu.application.header")] = "url('./media/bars.svg')";
-					icons[api._lang.GET("menu.communication.header")] = "url('./media/comment.svg')";
-					icons[api._lang.GET("menu.records.header")] = "url('./media/file-signature.svg')";
-					icons[api._lang.GET("menu.calendar.header")] = "url('./media/calendar-alt.svg')";
-					icons[api._lang.GET("menu.purchase.header")] = "url('./media/shopping-bag.svg')";
-					icons[api._lang.GET("menu.files.header")] = "url('./media/folders.svg')";
-					icons[api._lang.GET("menu.tools.header")] = "url('./media/tools.svg')";
+					icons[api._lang.GET("application.navigation.header")] = "url('./media/bars.svg')";
+					icons[api._lang.GET("message.navigation.header")] = "url('./media/comment.svg')";
+					icons[api._lang.GET("record.navigation.header")] = "url('./media/file-signature.svg')";
+					icons[api._lang.GET("calendar.navigation.header")] = "url('./media/calendar-alt.svg')";
+					icons[api._lang.GET("consumables.navigation.header")] = "url('./media/shopping-bag.svg')";
+					icons[api._lang.GET("file.navigation.header")] = "url('./media/folders.svg')";
+					icons[api._lang.GET("tool.navigation.header")] = "url('./media/tools.svg')";
 
 					let label, input, div, button, span;
 
 					// back nav
 					button = document.createElement("button");
 					button.type = "button";
-					button.title = api._lang.GET("menu.nav.back");
+					button.title = api._lang.GET("general.history.back");
 					button.classList.add("inactive");
 					button.onclick = () => {
 						api.history.go("back");
@@ -603,7 +603,7 @@ export const api = {
 					// forth nav
 					button = document.createElement("button");
 					button.type = "button";
-					button.title = api._lang.GET("menu.nav.forth");
+					button.title = api._lang.GET("general.history.forth");
 					button.classList.add("inactive");
 					button.onclick = () => {
 						api.history.go("forth");
@@ -644,7 +644,7 @@ export const api = {
 					api.history.buttoncolor();
 
 					// replace "please sign in" with user name for landing page
-					let signin = api._lang.GET("menu.application.signin"),
+					let signin = api._lang.GET("application.navigation.signin"),
 						greeting = ", " + signin.charAt(0).toLowerCase() + signin.slice(1);
 					api.update_header(
 						api._lang.GET("general.welcome_header", {
@@ -662,7 +662,7 @@ export const api = {
 						let applicationLabel;
 						while (!applicationLabel) {
 							await _.sleep(50);
-							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("menu.application.header") + "]");
+							applicationLabel = document.querySelector("[data-for=userMenu" + api._lang.GET("application.navigation.header") + "]");
 						}
 						applicationLabel.style.maskImage = applicationLabel.style.webkitMaskImage = "none";
 						applicationLabel.style.backgroundImage = "url('" + api._settings.user.image + "')";
@@ -718,7 +718,7 @@ export const api = {
 				switch (method) {
 					case "get":
 						successFn = function (data) {
-							api.update_header(api._lang.GET("menu.application.manual_manager"));
+							api.update_header(api._lang.GET("application.navigation.manual_manager"));
 							const render = new Assemble(data.render);
 							document.getElementById("main").replaceChildren(render.initializeSection());
 							render.processAfterInsertion();
@@ -778,10 +778,10 @@ export const api = {
 				}
 			},
 			title = {
-				audit: api._lang.GET("menu.records.audit"),
-				audittemplate: api._lang.GET("menu.records.audit_templates"),
-				checks: api._lang.GET("menu.tools.regulatory"),
-				managementreview: api._lang.GET("menu.records.management_review"),
+				audit: api._lang.GET("audit.navigation.audit"),
+				audittemplate: api._lang.GET("audit.navigation.templates"),
+				checks: api._lang.GET("tool.navigation.regulatory"),
+				managementreview: api._lang.GET("audit.navigation.management_review"),
 			};
 		switch (method) {
 			case "get":
@@ -918,10 +918,10 @@ export const api = {
 				if (["post", "put", "delete"].includes(method) && ["schedule", "timesheet"].includes(request[1])) api.history.go("forth"); // updates the view after any change
 			},
 			title = {
-				appointment: api._lang.GET("menu.calendar.appointment"),
-				schedule: api._lang.GET("menu.calendar.scheduling"),
-				timesheet: api._lang.GET("menu.calendar.timesheet"),
-				longtermplanning: api._lang.GET("menu.calendar.longtermplanning"),
+				appointment: api._lang.GET("calendar.navigation.appointment"),
+				schedule: api._lang.GET("calendar.navigation.scheduling"),
+				timesheet: api._lang.GET("calendar.navigation.timesheet"),
+				longtermplanning: api._lang.GET("calendar.navigation.longtermplanning"),
 			};
 		switch (method) {
 			case "get":
@@ -1012,8 +1012,8 @@ export const api = {
 				}
 			},
 			title = {
-				rule: api._lang.GET("menu.tools.csvfilter_filter_manager"),
-				filter: api._lang.GET("menu.tools.csvfilter_filter"),
+				rule: api._lang.GET("csvfilter.navigation.filter_manager"),
+				filter: api._lang.GET("csvfilter.navigation.filter"),
 			};
 		switch (method) {
 			case "get":
@@ -1066,12 +1066,12 @@ export const api = {
 			},
 			payload,
 			title = {
-				files: api._lang.GET("menu.files.files"),
-				bundle: api._lang.GET("menu.files.bundles"),
-				sharepoint: api._lang.GET("menu.files.sharepoint"),
-				filemanager: api._lang.GET("menu.files.file_manager"),
-				bundlemanager: api._lang.GET("menu.files.bundle_manager"),
-				externalfilemanager: api._lang.GET("menu.files.external_file_manager"),
+				files: api._lang.GET("file.navigation.files"),
+				bundle: api._lang.GET("file.navigation.bundles"),
+				sharepoint: api._lang.GET("file.navigation.sharepoint"),
+				filemanager: api._lang.GET("file.navigation.file_manager"),
+				bundlemanager: api._lang.GET("file.navigation.bundle_manager"),
+				externalfilemanager: api._lang.GET("file.navigation.external_file_manager"),
 			};
 
 		switch (method) {
@@ -1172,12 +1172,12 @@ export const api = {
 			},
 			payload,
 			title = {
-				component_editor: api._lang.GET("menu.records.documents_manage_components"),
-				document_editor: api._lang.GET("menu.records.documents_manage_documents"),
-				approval: api._lang.GET("menu.records.documents_manage_approval"),
-				bundle: api._lang.GET("menu.records.documents_manage_bundles"),
-				bundles: api._lang.GET("menu.records.record_bundles"),
-				documents: api._lang.GET("menu.records.record_record"),
+				component_editor: api._lang.GET("assemble.navigation.manage_components"),
+				document_editor: api._lang.GET("assemble.navigation.manage_documents"),
+				approval: api._lang.GET("assemble.navigation.manage_approval"),
+				bundle: api._lang.GET("assemble.navigation.manage_bundles"),
+				bundles: api._lang.GET("assemble.navigation.bundles"),
+				documents: api._lang.GET("assemble.navigation.documents"),
 			},
 			composedComponent;
 		switch (method) {
@@ -1329,7 +1329,7 @@ export const api = {
 				new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				measure: api._lang.GET("menu.communication.measure"),
+				measure: api._lang.GET("measure.navigation.measure"),
 			};
 
 		switch (method) {
@@ -1383,9 +1383,9 @@ export const api = {
 				if (data.response !== undefined && data.response.redirect) api.message("get", ...data.response.redirect);
 			},
 			title = {
-				announcements: api._lang.GET("menu.communication.announcements"),
-				conversation: api._lang.GET("menu.communication.conversations"),
-				register: api._lang.GET("menu.communication.register"),
+				announcements: api._lang.GET("message.navigation.announcements"),
+				conversation: api._lang.GET("message.navigation.conversations"),
+				register: api._lang.GET("message.navigation.register"),
 			};
 
 		switch (method) {
@@ -1472,12 +1472,12 @@ export const api = {
 				if (data.data) _serviceWorker.notif.consumables(data.data);
 			},
 			title = {
-				vendor: api._lang.GET("menu.purchase.vendor"),
-				product: api._lang.GET("menu.purchase.product"),
-				order: api._lang.GET("menu.purchase.order"),
-				prepared: api._lang.GET("menu.purchase.prepared_orders"),
-				approved: api._lang.GET("menu.purchase.approved_orders"),
-				pendingincorporations: api._lang.GET("menu.purchase.incorporated_pending"),
+				vendor: api._lang.GET("consumables.navigation.vendor"),
+				product: api._lang.GET("consumables.navigation.product"),
+				order: api._lang.GET("order.navigation.order"),
+				prepared: api._lang.GET("order.navigation.prepared_orders"),
+				approved: api._lang.GET("order.navigation.approved_orders"),
+				pendingincorporations: api._lang.GET("consumables.navigation.incorporated_pending"),
 			};
 		if (request[2] === api._lang.GET("consumables.vendor.edit_existing_vendors_new")) request.splice(2, 1);
 		switch (method) {
@@ -1680,9 +1680,9 @@ export const api = {
 				}
 			},
 			title = {
-				identifier: api._lang.GET("menu.records.record_create_identifier"),
-				record: api._lang.GET("menu.records.record_summary"),
-				records: api._lang.GET("menu.records.record_summary"),
+				identifier: api._lang.GET("record.navigation.create_identifier"),
+				record: api._lang.GET("record.navigation.summaries"),
+				records: api._lang.GET("record.navigation.summaries"),
 			};
 		switch (method) {
 			case "get":
@@ -1864,7 +1864,7 @@ export const api = {
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				responsibilities: api._lang.GET("menu.communication.responsibility"),
+				responsibilities: api._lang.GET("responsibility.navigation.responsibility"),
 			};
 		switch (method) {
 			case "get":
@@ -1911,7 +1911,7 @@ export const api = {
 				new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				risk: api._lang.GET("menu.records.risk_management"),
+				risk: api._lang.GET("risk.navigation.risk_management"),
 				search: api._lang.GET("risk.search"),
 			};
 		switch (method) {
@@ -1975,9 +1975,9 @@ export const api = {
 				new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				chunk: api._lang.GET("menu.communication.texttemplate_chunks"),
-				template: api._lang.GET("menu.communication.texttemplate_templates"),
-				text: api._lang.GET("menu.communication.texttemplate_texts"),
+				chunk: api._lang.GET("texttemplate.navigation.chunks"),
+				template: api._lang.GET("texttemplate.navigation.templates"),
+				text: api._lang.GET("texttemplate.navigation.texts"),
 			};
 		switch (method) {
 			case "get":
@@ -1985,7 +1985,7 @@ export const api = {
 					case "modal":
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({ type: "input", header: api._lang.GET("menu.communication.texttemplate_texts"), render: data.render });
+								new Dialog({ type: "input", header: api._lang.GET("texttemplate.navigation.texts"), render: data.render });
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							if (data.data !== undefined) _client.texttemplate.data = data.data;
@@ -2060,11 +2060,11 @@ export const api = {
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				code: api._lang.GET("menu.tools.digital_codes"),
-				calculator: api._lang.GET("menu.tools.calculator"),
-				scanner: api._lang.GET("menu.tools.scanner"),
-				zip: api._lang.GET("menu.tools.zip"),
-				image: api._lang.GET("menu.tools.image"),
+				code: api._lang.GET("tool.navigation.digital_codes"),
+				calculator: api._lang.GET("tool.navigation.calculator"),
+				scanner: api._lang.GET("tool.navigation.scanner"),
+				zip: api._lang.GET("tool.navigation.zip"),
+				image: api._lang.GET("tool.navigation.image"),
 			};
 		switch (method) {
 			case "get":
@@ -2126,8 +2126,8 @@ export const api = {
 				if (data.response.id) api.user("get", request[1], data.response.id);
 			},
 			title = {
-				profile: api._lang.GET("menu.application.user_profile"),
-				user: api._lang.GET("menu.application.user_manager"),
+				profile: api._lang.GET("application.navigation.user_profile"),
+				user: api._lang.GET("application.navigation.user_manager"),
 			};
 		switch (method) {
 			case "get":

@@ -309,7 +309,7 @@ class CONSUMABLES extends API {
 								])) {
 									$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 										$this->_lang->GET('order.sample_check.alert', [
-											':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>',
+											':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('tool.navigation.regulatory', [], true) . '</a>',
 											':name' => $_SESSION['user']['name']
 										], true) . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 								}
@@ -657,7 +657,7 @@ class CONSUMABLES extends API {
 				])) {
 					$this->alertUserGroup(['permission' => PERMISSION::permissionFor('mdrsamplecheck', true)],
 						$this->_lang->GET('order.sample_check.alert', [
-							':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('menu.tools.regulatory', [], true) . '</a>',
+							':audit' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'mdrsamplecheck\')">' . $this->_lang->GET('tool.navigation.regulatory', [], true) . '</a>',
 							':name' => $_SESSION['user']['name']
 						], true) . " \n" . implode("\n", [$product['vendor_name'], $product['article_no'], $product['article_name'], $checkcontent]));
 					$this->response([
@@ -1401,7 +1401,7 @@ class CONSUMABLES extends API {
 							$checkslides[$slide][] = [
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true)
+									'name' => $this->_lang->GET('audit.mdrsamplecheck.edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true)
 								],
 								'content' => $check['content'],
 							];
@@ -1409,9 +1409,9 @@ class CONSUMABLES extends API {
 						if (PERMISSION::permissionFor('regulatoryoperation')) $checkslides[$slide][] = [
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('audit.mdrsamplecheck_revoke'),
+								'value' => $this->_lang->GET('audit.mdrsamplecheck.revoke'),
 								'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
-									"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
+									"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck.revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 									"if (response !== false) {" .
 									"api.purchase('delete', 'mdrsamplecheck', " . $product['id']. "); this.disabled = true" .
 									"}});"
@@ -2526,7 +2526,7 @@ class CONSUMABLES extends API {
 						$texttemplate[] = [
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('menu.communication.texttemplate_texts'),
+								'value' => $this->_lang->GET('texttemplate.navigation.texts'),
 								'onclick' => "api.texttemplate('get', 'text', 'false', 'modal', '" . UTILITY::json_encode([
 									':PRD' => 'select_special_attention_products',
 									':CID' => 'vendor_customer_id',

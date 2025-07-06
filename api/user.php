@@ -111,17 +111,17 @@ class USER extends API {
 				}
 				// process settings
 				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_force_desktop'));
-				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_homeoffice'));
-				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_language')) ? : CONFIG['application']['defaultlanguage'];
-				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_theme'));
-				$user['app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_masonry'));
-				$user['app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_forth'));
-				$user['app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_back'));
-				$user['app_settings']['autocomplete_swipe'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_autocomplete_swipe'));
-				$user['app_settings']['dateformat'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_dateformat'));
-				$user['app_settings']['location'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_location'));
-				$user['app_settings']['timezone'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_timezone'));
+				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.force_desktop'));
+				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.homeoffice'));
+				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.language')) ? : CONFIG['application']['defaultlanguage'];
+				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.theme'));
+				$user['app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.masonry'));
+				$user['app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_forth'));
+				$user['app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_back'));
+				$user['app_settings']['autocomplete_swipe'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_swipe'));
+				$user['app_settings']['dateformat'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.dateformat'));
+				$user['app_settings']['location'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.location'));
+				$user['app_settings']['timezone'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.timezone'));
 
 				// unset defaults
 				if ($user['app_settings']['language'] === CONFIG['application']['defaultlanguage']) $user['app_settings']['language'] = null;
@@ -129,25 +129,25 @@ class USER extends API {
 				if ($user['app_settings']['location'] === array_key_first(CONFIG['locations'])) $user['app_settings']['location'] = null;
 				if ($user['app_settings']['timezone'] === array_key_first(CONFIG['calendar']['timezones'])) $user['app_settings']['timezone'] = null;
 
-				if ($primaryUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_primary_unit'))){
+				if ($primaryUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.primary_unit'))){
 					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, $this->_lang->_USER['units']);
 				}
-				if ($primaryRecordState = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_primary_recordstate'))){
+				if ($primaryRecordState = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.primary_recordstate'))){
 					if ($primaryRecordState === $this->_lang->GET('record.casestate_filter_all'))
 						unset($user['app_settings']['primaryRecordState']);
 					else
 						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
 				}
-				if ($orderLayout = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_order_layout'))){
-					if ($orderLayout === $this->_lang->GET('user.settings_order_layout_full'))
+				if ($orderLayout = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.order_layout'))){
+					if ($orderLayout === $this->_lang->GET('user.settings.order_layout_full'))
 						unset($user['app_settings']['orderLayout']);
 					else
 						switch($orderLayout){
 							// in case other options may become implemented also see utility.js _client.order.approved()
-							case $this->_lang->GET('user.settings_order_layout_table'):
+							case $this->_lang->GET('user.settings.order_layout_table'):
 								$user['app_settings']['orderLayout'] = 'table';
 								break;
-							case $this->_lang->GET('user.settings_order_layout_tile'):
+							case $this->_lang->GET('user.settings.order_layout_tile'):
 								$user['app_settings']['orderLayout'] = 'tile';
 								break;
 						}
@@ -216,15 +216,15 @@ class USER extends API {
 				$units = $primary_unit = [];
 				foreach (explode(',', $user['units']) as $unit){
 					if (!$unit) continue;
-					$primary_unit[$this->_lang->GET('units.' . $unit)] = ['name' => $this->_lang->PROPERTY('user.settings_primary_unit')];
+					$primary_unit[$this->_lang->GET('units.' . $unit)] = ['name' => $this->_lang->PROPERTY('user.settings.primary_unit')];
 					$units[] = $this->_lang->GET('units.' . $unit);
 				}
 				if (isset($user['app_settings']['primaryUnit'])) $primary_unit[$this->_lang->GET('units.' . $user['app_settings']['primaryUnit'])]['checked'] = true;
 
 				// resolve primary case states for default view within records
-				$primary_casestates = [$this->_lang->GET('record.casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')]];
+				$primary_casestates = [$this->_lang->GET('record.casestate_filter_all') => ['name' => $this->_lang->PROPERTY('user.settings.primary_recordstate')]];
 				foreach ($this->_lang->_USER['casestate']['casedocumentation'] as $translation){
-					$primary_casestates[$translation] = ['name' => $this->_lang->PROPERTY('user.settings_primary_recordstate')];
+					$primary_casestates[$translation] = ['name' => $this->_lang->PROPERTY('user.settings.primary_recordstate')];
 				}
 				if (isset($user['app_settings']['primaryRecordState'])) $primary_casestates[$this->_lang->GET('casestate.casedocumentation.' . $user['app_settings']['primaryRecordState'])]['checked'] = true;
 				else $primary_casestates[$this->_lang->GET('record.casestate_filter_all')]['checked'] = true;
@@ -260,10 +260,10 @@ class USER extends API {
 										$this->_lang->GET('user.display_permissions') . ': ' . implode(', ', $permissions) . "\n" .
 										($units ? $this->_lang->GET('user.units') . ': ' . implode(', ', $units) . "\n" : '') .
 										($user['orderauth'] ? " \n" . $this->_lang->GET('user.display_orderauth'): '') .
-										(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings_initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
-										(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings_weekly_hours') . ': ' . $user['app_settings']['weeklyhours'] : '') .
+										(isset($user['app_settings']['initialovertime']) && $_SESSION['user']['app_settings']['initialovertime'] ? " \n \n" . $this->_lang->GET('user.settings.initial_overtime') . ': ' . $user['app_settings']['initialovertime'] : '') .
+										(isset($user['app_settings']['weeklyhours']) && $_SESSION['user']['app_settings']['weeklyhours'] ? " \n" . $this->_lang->GET('user.settings.weekly_hours') . ': ' . $user['app_settings']['weeklyhours'] : '') .
 										(isset($timesheet_stats['_overtime']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_overtime', [':number' => round($timesheet_stats['_overtime'], 2)]) : '') .
-										(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings_annual_vacation') . ': ' . $user['app_settings']['annualvacation'] : '') .
+										(isset($user['app_settings']['annualvacation']) && $_SESSION['user']['app_settings']['annualvacation'] ? " \n \n" . $this->_lang->GET('user.settings.annual_vacation') . ': ' . $user['app_settings']['annualvacation'] : '') .
 										(isset($timesheet_stats['_leftvacation']) ? " \n" . $this->_lang->GET('calendar.timesheet.export.sheet_left_vacation', [':number' => $timesheet_stats['_leftvacation']]) : '') .
 										($skillmatrix ? " \n" . $skillmatrix : '')
 								]
@@ -291,7 +291,7 @@ class USER extends API {
 					}
 					if ($row['planned']){
 						$row['planned'] = json_decode($row['planned'], true);
-						$planned = $this->_lang->GET('audit.userskills_training_scheduled', [
+						$planned = $this->_lang->GET('audit.userskills.training_scheduled', [
 							':user' => $row['planned']['user'],
 							':date' => $this->convertFromServerTime($row['planned']['date'], true),
 							':scheduled' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['planned']['content']), $row['planned']['content']))
@@ -430,7 +430,7 @@ class USER extends API {
 					$applicationSettings[] = [
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_primary_unit')
+							'name' => $this->_lang->GET('user.settings.primary_unit')
 						],
 						'content' => $primary_unit
 					];
@@ -442,7 +442,7 @@ class USER extends API {
 							// append primary case state selection for records
 							'type' => 'radio',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.settings_primary_recordstate')
+								'name' => $this->_lang->GET('user.settings.primary_recordstate')
 							],
 							'content' => $primary_casestates
 						], [
@@ -451,30 +451,30 @@ class USER extends API {
 							// append application setting
 							'type' => 'checkbox',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.settings')
+								'name' => $this->_lang->GET('user.settings.header')
 							],
 							'content' => [
-								$this->_lang->GET('user.settings_force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
-								$this->_lang->GET('user.settings_homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
-								$this->_lang->GET('user.settings_masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.force_desktop') => isset($user['app_settings']['forceDesktop']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.homeoffice') => isset($user['app_settings']['homeoffice']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.masonry') => isset($user['app_settings']['masonry']) ? ['checked' => true] : [],
 							]
 						], [
 							// append preferred order layout
 							'type' => 'radio',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.settings_order_layout')
+								'name' => $this->_lang->GET('user.settings.order_layout')
 							],
 							'content' => [
-								$this->_lang->GET('user.settings_order_layout_full') => !isset($user['app_settings']['orderLayout']) ? ['checked' => true] : [],
-								$this->_lang->GET('user.settings_order_layout_table') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'table' ? ['checked' => true] : [],
-								$this->_lang->GET('user.settings_order_layout_tile') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'tile' ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.order_layout_full') => !isset($user['app_settings']['orderLayout']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.order_layout_table') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'table' ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.order_layout_tile') => isset($user['app_settings']['orderLayout']) && $user['app_settings']['orderLayout'] === 'tile' ? ['checked' => true] : [],
 							]
 						], [
 							'type' => 'hr'
 						], [
 							'type' => 'text',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.settings_autocomplete_forth'),
+								'name' => $this->_lang->GET('user.settings.autocomplete_forth'),
 								'value' => isset($user['app_settings']['autocomplete_forth']) ? $user['app_settings']['autocomplete_forth'] : 'Alt',
 								'onkeydown' => 'event.preventDefault(); this.value = event.key',
 								'onkeyup' => 'event.preventDefault()'
@@ -482,7 +482,7 @@ class USER extends API {
 						], [
 							'type' => 'text',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.settings_autocomplete_back'),
+								'name' => $this->_lang->GET('user.settings.autocomplete_back'),
 								'value' => isset($user['app_settings']['autocomplete_back']) ? $user['app_settings']['autocomplete_back'] : 'AltGraph',
 								'onkeydown' => 'event.preventDefault(); this.value = event.key',
 								'onkeyup' => 'event.preventDefault()'
@@ -490,7 +490,7 @@ class USER extends API {
 						], [
 							'type' => 'checkbox',
 							'content' => [
-								$this->_lang->GET('user.settings_autocomplete_swipe') =>  isset($user['app_settings']['autocomplete_swipe']) ? ['checked' => true] : [],
+								$this->_lang->GET('user.settings.autocomplete_swipe') =>  isset($user['app_settings']['autocomplete_swipe']) ? ['checked' => true] : [],
 							]
 						], [
 							'type' => 'hr'
@@ -502,16 +502,16 @@ class USER extends API {
 					[
 						'type' => 'radio',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_theme')
+							'name' => $this->_lang->GET('user.settings.theme')
 						],
 						'content' => $theme
 					], [
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_language')
+							'name' => $this->_lang->GET('user.settings.language')
 						],
 						'content' => $languages,
-						'hint' => $this->_lang->GET('user.settings_language_hint', [':lang' => CONFIG['application']['defaultlanguage']])
+						'hint' => $this->_lang->GET('user.settings.language_hint', [':lang' => CONFIG['application']['defaultlanguage']])
 					]
 				]);
 
@@ -519,7 +519,7 @@ class USER extends API {
 					$applicationSettings[] = [
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_dateformat')
+							'name' => $this->_lang->GET('user.settings.dateformat')
 						],
 						'content' => $dateformats
 					];
@@ -528,8 +528,8 @@ class USER extends API {
 					$applicationSettings[] = [
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_location'),
-							'onchange' => "new _client.Dialog({type:'alert', header:'" . $this->_lang->GET('user.settings_location_change_alert') . "'})"
+							'name' => $this->_lang->GET('user.settings.location'),
+							'onchange' => "new _client.Dialog({type:'alert', header:'" . $this->_lang->GET('user.settings.location_change_alert') . "'})"
 						],
 						'content' => $locations
 					];
@@ -538,17 +538,17 @@ class USER extends API {
 					$applicationSettings[] = [
 						'type' => 'select',
 						'attributes' => [
-							'name' => $this->_lang->GET('user.settings_timezone')
+							'name' => $this->_lang->GET('user.settings.timezone')
 						],
 						'content' => $timezones,
-						'hint' => $this->_lang->GET('user.settings_timezone_hint')
+						'hint' => $this->_lang->GET('user.settings.timezone_hint')
 					];
 				}
 
 				$applicationSettings[] = [
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('user.settings_hint')
+						'name' => $this->_lang->GET('user.settings.hint')
 					]
 				];
 
@@ -613,11 +613,11 @@ class USER extends API {
 				$user['units'] = implode(',', $units);
 
 				// gather timesheet setup
-				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
+				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
-				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
+				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
-				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
+				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.initial_overtime'));
 				// check formats according to _calendarutility.php
 				foreach (['weeklyhours', 'annualvacation'] as $setting){
 					if (isset($user['app_settings'][$setting])){
@@ -637,7 +637,7 @@ class USER extends API {
 				}
 
 				// set custom idle timeout
-				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_idle'));
+				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
 				if ($idle != CONFIG['lifespan']['idle']){
 					$user['app_settings']['idle'] = $idle;
 				}
@@ -737,9 +737,9 @@ class USER extends API {
 						':supervisor' => implode(', ', $roles['supervisor']),
 						':qmo' => implode(', ', $roles['qmo']),
 						':prrc' => implode(', ', $roles['prrc']),
-						':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('menu.communication.register', [], true) . '</a>',
-						':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'about\')">' . $this->_lang->GET('menu.application.about', [], true) . '</a>',
-						':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('menu.application.user_profile', [], true) . '</a>',
+						':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('message.navigation.register', [], true) . '</a>',
+						':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'about\')">' . $this->_lang->GET('application.navigation.about', [], true) . '</a>',
+						':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('application.navigation.user_profile', [], true) . '</a>',
 						':admin' => implode(', ', $roles['admin'])
 					];
 					$this->alertUserGroup(['user' => [$user['name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
@@ -803,11 +803,11 @@ class USER extends API {
 				$user['units'] = implode(',', $units);
 
 				// update timesheet settings
-				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_annual_vacation'));
+				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.annual_vacation'));
 				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
-				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_weekly_hours'));
+				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.weekly_hours'));
 				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
-				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_initial_overtime'));
+				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.initial_overtime'));
 				// check formats according to _calendarutility.php
 				foreach (['weeklyhours', 'annualvacation'] as $setting){
 					if (isset($user['app_settings'][$setting])){
@@ -827,7 +827,7 @@ class USER extends API {
 				}
 
 				// set custom idle timeout
-				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings_idle'));
+				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
 				if ($idle != CONFIG['lifespan']['idle']){
 					$user['app_settings']['idle'] = $idle;
 				}
@@ -998,7 +998,7 @@ class USER extends API {
 					}
 					if ($row['planned']){
 						$row['planned'] = json_decode($row['planned'], true);
-						$planned = $this->_lang->GET('audit.userskills_training_scheduled', [
+						$planned = $this->_lang->GET('audit.userskills.training_scheduled', [
 							':user' => $row['planned']['user'],
 							':date' => $this->convertFromServerTime($row['planned']['date'], true),
 							':scheduled' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['planned']['content']), $row['planned']['content']))
@@ -1117,13 +1117,13 @@ class USER extends API {
 						[
 							'type' => 'range',
 							'attributes' => [
-								'name' => $this->_lang->GET('user.settings_idle'),
+								'name' => $this->_lang->GET('user.settings.idle'),
 								'min' => CONFIG['lifespan']['idle'],
 								'max' => CONFIG['lifespan']['idle'] * 3,
 								'step' => CONFIG['lifespan']['idle'] / 2,
 								'value' => strval(isset($user['app_settings']['idle']) ? $user['app_settings']['idle'] : CONFIG['lifespan']['idle']),
 							],
-							'hint' => $this->_lang->GET('user.settings_idle_hint', [':idle' => CONFIG['lifespan']['idle']])
+							'hint' => $this->_lang->GET('user.settings.idle_hint', [':idle' => CONFIG['lifespan']['idle']])
 						]
 					], [
 						[
@@ -1149,27 +1149,27 @@ class USER extends API {
 							[
 								'type' => 'text',
 								'attributes' => [
-									'name' => $this->_lang->GET('user.settings_initial_overtime'),
+									'name' => $this->_lang->GET('user.settings.initial_overtime'),
 									'value' => isset($user['app_settings']['initialovertime']) ? $user['app_settings']['initialovertime'] : 0
 								],
-								'hint' => $this->_lang->GET('user.settings_initial_overtime_hint')
+								'hint' => $this->_lang->GET('user.settings.initial_overtime_hint')
 							],
 							[
 								'type' => 'textarea',
 								'attributes' => [
-									'name' => $this->_lang->GET('user.settings_weekly_hours'),
+									'name' => $this->_lang->GET('user.settings.weekly_hours'),
 									'value' => isset($user['app_settings']['weeklyhours']) ? $user['app_settings']['weeklyhours'] : ''
 								],
-								'hint' => $this->_lang->GET('user.settings_weekly_hours_hint')
+								'hint' => $this->_lang->GET('user.settings.weekly_hours_hint')
 							]
 						], [
 							[
 								'type' => 'textarea',
 								'attributes' => [
-									'name' => $this->_lang->GET('user.settings_annual_vacation'),
+									'name' => $this->_lang->GET('user.settings.annual_vacation'),
 									'value' => isset($user['app_settings']['annualvacation']) ? $user['app_settings']['annualvacation'] : ''
 								],
-								'hint' => $this->_lang->GET('user.settings_annual_vacation_hint')
+								'hint' => $this->_lang->GET('user.settings.annual_vacation_hint')
 							]
 						]
 					],

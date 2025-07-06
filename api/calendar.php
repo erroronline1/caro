@@ -710,18 +710,18 @@ class CALENDAR extends API {
 		array_splice($timesheets, 0, 0, $self);
 
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('menu.calendar.timesheet', [], true) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.navigation.timesheet', [], true) . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => null,
 			'content' => $this->prepareTimesheetOutput($timesheets),
 			'files' => [],
 			'images' => [],
-			'title' => $this->_lang->GET('menu.calendar.timesheet', [], true),
+			'title' => $this->_lang->GET('calendar.navigation.timesheet', [], true),
 			'date' => $this->_date['usertime']->format('Y-m-d H:i')
 		];
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.calendar.timesheet', [], true)] = [
+		$downloadfiles[$this->_lang->GET('calendar.navigation.timesheet', [], true)] = [
 			'href' => './api/api.php/file/stream/' . $PDF->timesheetPDF($summary)
 		];
 		$body = [];
@@ -1084,7 +1084,7 @@ class CALENDAR extends API {
 				// gather events for requested date
 				$thisDaysEvents = $calendar->getDay($this->_requestedDate);
 				foreach ($thisDaysEvents as $id => $row){
-					if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user'); // fallback message
+					if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user'); // fallback message
 					if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . " - ". $this->convertFromServerTime(substr($row['span_end'], 0, 10)) . "\n";
 				}
 
@@ -1184,8 +1184,8 @@ class CALENDAR extends API {
 			}
 
 			// replace deleted user names
-			if (!$row['author']) $row['author'] = $this->_lang->GET('message.deleted_user');
-			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
+			if (!$row['author']) $row['author'] = $this->_lang->GET('general.deleted_user');
+			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 			// construct complete information
 			$completed[$this->_lang->GET('calendar.schedule.complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'schedule')"];
@@ -1468,7 +1468,7 @@ class CALENDAR extends API {
 				foreach ($thisDaysEvents as $id => $row){
 					if (!$row['affected_user_units']) $row['affected_user_units'] = ''; 
 					$row['affected_user_units'] = explode(',', $row['affected_user_units']);
-					if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
+					if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 					// display absent workmates for own units
 					if ($row['type'] === 'timesheet'
@@ -1615,8 +1615,8 @@ class CALENDAR extends API {
 			)) continue; // skip what is no matter to you
 
 			// replace deleted user names
-			if (!$row['author']) $row['author'] = $this->_lang->GET('message.deleted_user');
-			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
+			if (!$row['author']) $row['author'] = $this->_lang->GET('general.deleted_user');
+			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 			// create information
 			$hint = '';

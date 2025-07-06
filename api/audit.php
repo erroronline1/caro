@@ -338,7 +338,7 @@ class AUDIT extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('menu.records.audit_templates'),
+								'value' => $this->_lang->GET('audit.navigation.templates'),
 								'onclick' => "api.audit('get', 'audittemplate')"
 							]
 						]
@@ -722,7 +722,7 @@ class AUDIT extends API {
 			$current[] = [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', 'audit', " . $audit['id'] . ")",
 					'data-type' => 'download'
 				]
@@ -1173,13 +1173,13 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => strval($year)
 				],
-				'content' => $this->_lang->GET('audit.complaints_summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => PERMISSION::fullyapproved('complaintclosing', $c['closed'])))])
+				'content' => $this->_lang->GET('audit.complaints._summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => PERMISSION::fullyapproved('complaintclosing', $c['closed'])))])
 			];
 			foreach ($cases as $identifier => $property){
 				$units = implode(', ', array_map(Fn($u) => $this->_lang->_USER['units'][$u], explode(',', $property['units'])));
-				$linkdescription = $this->_lang->GET('audit.complaints_case_description', [':identifier' => $identifier, ':units' => $units]);
+				$linkdescription = $this->_lang->GET('audit.complaints._case_description', [':identifier' => $identifier, ':units' => $units]);
 				if (PERMISSION::fullyapproved('complaintclosing', $property['closed'])) {
-					$linkdescription .= $this->_lang->GET('audit.complaints_closed');
+					$linkdescription .= $this->_lang->GET('audit.complaints._closed');
 				}
 				$links[$linkdescription] = ['href' => "javascript:api.record('get', 'record', '" . $identifier . "')"];
 				if (PERMISSION::pending('complaintclosing', $property['closed'])) {
@@ -1286,7 +1286,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
@@ -1297,14 +1297,14 @@ class AUDIT extends API {
 			[
 				'type' => 'date',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_date'),
+					'name' => $this->_lang->GET('audit.documents.date'),
 					'value' => $this->_requestedDate,
 					'id' => '_documents_date'
 				]
 			], [
 				'type' => 'time',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_time'),
+					'name' => $this->_lang->GET('audit.documents.time'),
 					'value' => $this->_requestedTime,
 					'id' => '_documents_time' 
 				]
@@ -1312,15 +1312,15 @@ class AUDIT extends API {
 				'type' => 'button',
 				'attributes' => [
 					'data-type' => 'generateupdate',
-					'value' => $this->_lang->GET('audit.documents_update_button'),
+					'value' => $this->_lang->GET('audit.documents.update_button'),
 					'onclick' => "api.audit('get', 'checks', 'documents', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)"
 				]
 			], [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_in_use_documents')
+					'name' => $this->_lang->GET('audit.documents.in_use_documents')
 				],
-				'content' => $this->_lang->GET('audit.documents_export_timestamp', [':timestamp' => $this->convertFromServerTime($requestedTimestamp)])
+				'content' => $this->_lang->GET('audit.documents.export_timestamp', [':timestamp' => $this->convertFromServerTime($requestedTimestamp)])
 			]
 		];
 
@@ -1330,7 +1330,7 @@ class AUDIT extends API {
 			$documentscontent = [];
 			// display document approval
 			foreach (json_decode($document['approval'], true) as $position => $data){
-				$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
+				$entry .= $this->_lang->GET('audit.documents.in_use_approved', [
 					':permission' => $this->_lang->GET('permissions.' . $position),
 					':name' => $data['name'],
 					':date' => $this->convertFromServerTime($data['date']),
@@ -1342,9 +1342,9 @@ class AUDIT extends API {
 				if ($cmpnnt = latestApprovedComponent($components, $requestedTimestamp, $used_component_name)){
 					$has_components = true;
 					$cmpnnt['approval'] = json_decode($cmpnnt['approval'], true);
-					$entry .= " \n" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $cmpnnt['author'], ':date' => $this->convertFromServerTime($cmpnnt['date'])]) . "\n";
+					$entry .= " \n" . $cmpnnt['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $cmpnnt['author'], ':date' => $this->convertFromServerTime($cmpnnt['date'])]) . "\n";
 					foreach ($cmpnnt['approval'] as $position => $data){
-						$entry .= $this->_lang->GET('audit.documents_in_use_approved', [
+						$entry .= $this->_lang->GET('audit.documents.in_use_approved', [
 							':permission' => $this->_lang->GET('permissions.' . $position),
 							':name' => $data['name'],
 							':date' => $this->convertFromServerTime($data['date'], true),
@@ -1359,7 +1359,7 @@ class AUDIT extends API {
 			$documentscontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $this->convertFromServerTime($document['date'], true)])
+					'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $document['author'], ':date' => $this->convertFromServerTime($document['date'], true)])
 				],
 				'content' => $entry
 			];
@@ -1377,7 +1377,7 @@ class AUDIT extends API {
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $document['author'], ':date' => $this->convertFromServerTime($document['date'], true)])
+									'name' => $document['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $document['author'], ':date' => $this->convertFromServerTime($document['date'], true)])
 								],
 							],
 							[
@@ -1406,7 +1406,7 @@ class AUDIT extends API {
 		$externalcontent = [
 			[
 				'type' => 'links',
-				'description' => $this->_lang->GET('audit.documents_in_use_external'),
+				'description' => $this->_lang->GET('audit.documents.in_use_external'),
 				'content' => ''
 			]
 		];
@@ -1430,7 +1430,7 @@ class AUDIT extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_in_use_bundles')
+					'name' => $this->_lang->GET('audit.documents.in_use_bundles')
 				],
 				'content' => ''
 			]
@@ -1441,7 +1441,7 @@ class AUDIT extends API {
 			$bundlescontent[] = [
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $bundle['author'], ':date' => $this->convertFromServerTime($bundle['date'], true)])
+					'name' => $bundle['name'] . ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $bundle['author'], ':date' => $this->convertFromServerTime($bundle['date'], true)])
 				],
 				'content' => implode("\n", $documentslist)
 			];
@@ -1479,7 +1479,7 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
@@ -1541,7 +1541,7 @@ class AUDIT extends API {
 		$content = [
 			[
 				'type' => 'textsection',
-				'content' => $this->_lang->GET('audit.documentusage_warning')
+				'content' => $this->_lang->GET('audit.document.usage_warning')
 			]
 		];
 		foreach ($usedname as $name => $count){
@@ -1556,12 +1556,12 @@ class AUDIT extends API {
 					'name' => $document['name'],
 					'style' => 'color:rgb(' . 200 - $color . ',' . $color . ',0)'
 				],
-				'linkedcontent' => $this->_lang->GET('audit.documentusage_info', [
+				'linkedcontent' => $this->_lang->GET('audit.document.usage_info', [
 					':date' => $this->convertFromServerTime($document['date']),
 					':regulatory' => implode(', ', $document['regulatory_context']),
 					':count' => $count,
 					':unit' => $this->_lang->_USER['units'][$document['unit']]
-					]) . "\n" . '<a href="javascript:api.record(\'get\', \'document\', \'' . $document['name'] . '\')">' . $this->_lang->GET('audit.documentusage_link'). '</a>'
+					]) . "\n" . '<a href="javascript:api.record(\'get\', \'document\', \'' . $document['name'] . '\')">' . $this->_lang->GET('audit.document.usage_link'). '</a>'
 			];
 		}
 		return $content;
@@ -1642,23 +1642,23 @@ class AUDIT extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.incorporation_warning_description')
+					'name' => $this->_lang->GET('audit.incorporation.warning_description')
 				],
-				'content' => $this->_lang->GET('audit.incorporation_warning_content', [':amount' => count($orderedunincorporated)])
+				'content' => $this->_lang->GET('audit.incorporation.warning_content', [':amount' => count($orderedunincorporated)])
 			]
 		];
 		$content[] = [
 			[
 				'type' => 'date',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_date'),
+					'name' => $this->_lang->GET('audit.documents.date'),
 					'value' => $this->_requestedDate,
 					'id' => '_documents_date'
 				]
 			], [
 				'type' => 'time',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_time'),
+					'name' => $this->_lang->GET('audit.documents.time'),
 					'value' => $this->_requestedTime,
 					'id' => '_documents_time' 
 				]
@@ -1675,7 +1675,7 @@ class AUDIT extends API {
 		if (PERMISSION::permissionFor('regulatoryoperation')) $content[] = [
 			'type' => 'button',
 			'attributes' => [
-				'value' => $this->_lang->GET('audit.record_export'),
+				'value' => $this->_lang->GET('audit.records.export'),
 				'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 				'data-type' => 'download'
 			]
@@ -1694,7 +1694,7 @@ class AUDIT extends API {
 			'attributes' => [
 				'name' => $this->_lang->GET('audit.checks_type.incorporation')
 			],
-			'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDate, true) . ' ' . $this->_requestedTime])
+			'content' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDate, true) . ' ' . $this->_requestedTime])
 		];
 		foreach ($incorporated as $product){
 			if (!isset($incorporations[$product['vendor_name']])) $incorporations[$product['vendor_name']] = [];
@@ -1708,7 +1708,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $product['article_no'] . ' ' . $product['article_name']
 				],
-				'linkedcontent' => $incorporationInfo . "\n" . '<a href="javascript:api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . $this->_lang->GET('audit.incorporation_link') . '</a>'
+				'linkedcontent' => $incorporationInfo . "\n" . '<a href="javascript:api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . $this->_lang->GET('audit.incorporation.link') . '</a>'
 			];
 		}
 		ksort($incorporations);
@@ -1717,9 +1717,9 @@ class AUDIT extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('audit.incorporation_export_vendor', [':vendor' => $vendor])
+						'name' => $this->_lang->GET('audit.incorporation.export_vendor', [':vendor' => $vendor])
 					],
-					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDate, true) . ' ' . $this->_requestedTime])
+					'content' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDate, true) . ' ' . $this->_requestedTime])
 				],
 				...$vendorchecks
 			];
@@ -1750,13 +1750,13 @@ class AUDIT extends API {
 						$summary['content'][$item['attributes']['name']] = $item['content'];
 					elseif (isset($item['linkedcontent']) && isset($item['attributes']['name']))
 						// remove link to product to be only displayed onscreen
-						$summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation_link') . '$/m', '', strip_tags($item['linkedcontent']));
+						$summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation.link') . '$/m', '', strip_tags($item['linkedcontent']));
 				}
 			}
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
@@ -1802,7 +1802,7 @@ class AUDIT extends API {
 				])) {
 					if ($managementreview[':closed']){
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
-							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'managementreviews\')">' . $this->_lang->GET('menu.tools.regulatory', [], true). '</a>'],
+							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'managementreviews\')">' . $this->_lang->GET('tool.navigation.regulatory', [], true). '</a>'],
 							true )
 						);
 					}
@@ -1843,7 +1843,7 @@ class AUDIT extends API {
 				])) {
 				if ($managementreview['closed']){
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
-							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\',  \'managementreviews\')">' . $this->_lang->GET('menu.tools.regulatory', [], true). '</a>'],
+							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\',  \'managementreviews\')">' . $this->_lang->GET('tool.navigation.regulatory', [], true). '</a>'],
 							true )
 						);
 					}
@@ -1999,12 +1999,12 @@ class AUDIT extends API {
 		$managementreview['content'] = json_decode($managementreview['content'], true);
 
 		$summary = [
-			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('menu.records.management_review', [], true) . '_' . $managementreview['last_touch']),
+			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('audit.navigation.management_review', [], true) . '_' . $managementreview['last_touch']),
 			'identifier' => null,
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => $this->_lang->GET('menu.records.management_review', [], true),
+			'title' => $this->_lang->GET('audit.navigation.management_review', [], true),
 			'date' => $this->convertFromServerTime($managementreview['last_touch'], true)
 		];
 		
@@ -2017,7 +2017,7 @@ class AUDIT extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.management_review')] = [
+		$downloadfiles[$this->_lang->GET('audit.navigation.management_review')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
@@ -2076,7 +2076,7 @@ class AUDIT extends API {
 			$current[] = [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', 'managementreview', " . $managementreview['id'] . ")",
 					'data-type' => 'download'
 				]
@@ -2143,23 +2143,23 @@ class AUDIT extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.mdrsamplecheck_warning_description')
+					'name' => $this->_lang->GET('audit.mdrsamplecheck.warning_description')
 				],
-				'content' => $this->_lang->GET('audit.mdrsamplecheck_warning_content', [':vendors' => implode(', ', $unchecked)])
+				'content' => $this->_lang->GET('audit.mdrsamplecheck.warning_content', [':vendors' => implode(', ', $unchecked)])
 			]
 		];
 		$content[] = [
 			[
 				'type' => 'date',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_date'),
+					'name' => $this->_lang->GET('audit.documents.date'),
 					'value' => $this->_requestedDate,
 					'id' => '_documents_date'
 				]
 			], [
 				'type' => 'time',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_time'),
+					'name' => $this->_lang->GET('audit.documents.time'),
 					'value' => $this->_requestedTime,
 					'id' => '_documents_time' 
 				]
@@ -2177,7 +2177,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
@@ -2202,7 +2202,7 @@ class AUDIT extends API {
 			$product['sample_checks'] = json_decode($product['sample_checks'], true);
 			$productchecks = [];
 			foreach ($product['sample_checks'] as $check){
-				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck_edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true) . "\n" . $check['content'];
+				$productchecks[] = $this->_lang->GET('audit.mdrsamplecheck.edit', [':author' => $check['author'], ':date' => $this->convertFromServerTime($check['date'], true)], true) . "\n" . $check['content'];
 			}
 			$checks[$product['vendor_name']][] = [
 				'type' => 'textsection',
@@ -2215,9 +2215,9 @@ class AUDIT extends API {
 			if (PERMISSION::permissionFor('regulatoryoperation')) $checks[$product['vendor_name']][] = [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.mdrsamplecheck_revoke'),
+					'value' => $this->_lang->GET('audit.mdrsamplecheck.revoke'),
 					'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('order.disapprove') . "', " .
-						"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck_revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
+						"options:{'" . $this->_lang->GET('order.disapprove_message_cancel') . "': false, '" . $this->_lang->GET('audit.mdrsamplecheck.revoke_confirm') . "': {value: true, class: 'reducedCTA'}}}).then(response => {" .
 						"if (response !== false) {" .
 						"api.purchase('delete', 'mdrsamplecheck', " . $product['id']. "); this.disabled=true" .
 						"}});"
@@ -2230,9 +2230,9 @@ class AUDIT extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('audit.mdrsamplecheck_export_vendor', [':vendor' => $vendor])
+						'name' => $this->_lang->GET('audit.mdrsamplecheck.export_vendor', [':vendor' => $vendor])
 					],
-					'content' => $this->_lang->GET('audit.incorporation_export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDate) . ' ' . $this->_requestedTime, true])
+					'content' => $this->_lang->GET('audit.incorporation.export_timestamp', [':timestamp' => $this->convertFromServerTime($this->_requestedDate) . ' ' . $this->_requestedTime, true])
 				],
 				...$vendorchecks
 			];
@@ -2264,7 +2264,7 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
@@ -2299,9 +2299,9 @@ class AUDIT extends API {
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.orderstatistics_number', [':number' => count($orders), ':from' => $this->convertFromServerTime($from), ':until' => $this->convertFromServerTime($until)])
+					'name' => $this->_lang->GET('audit.orderstatistics.number', [':number' => count($orders), ':from' => $this->convertFromServerTime($from), ':until' => $this->convertFromServerTime($until)])
 				],
-				'content' => count($orders) ? $this->_lang->GET('audit.orderstatistics_info') : ''
+				'content' => count($orders) ? $this->_lang->GET('audit.orderstatistics.info') : ''
 			]
 		];
 
@@ -2311,7 +2311,7 @@ class AUDIT extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('audit.record_export_xlsx'),
+						'value' => $this->_lang->GET('audit.records.export_xlsx'),
 						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 						'data-type' => 'download'
 					]
@@ -2321,10 +2321,10 @@ class AUDIT extends API {
 				[
 					'type' => 'deletebutton',
 					'attributes' => [
-						'value' => $this->_lang->GET('audit.orderstatistics_truncate'),
-						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.orderstatistics_truncate') ."', options:{".
+						'value' => $this->_lang->GET('audit.orderstatistics.truncate'),
+						'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('audit.orderstatistics.truncate') ."', options:{".
 						"'".$this->_lang->GET('general.cancel_button')."': false,".
-						"'".$this->_lang->GET('audit.orderstatistics_truncate_confirm')."': {value: true, class: 'reducedCTA'},".
+						"'".$this->_lang->GET('audit.orderstatistics.truncate_confirm')."': {value: true, class: 'reducedCTA'},".
 						"}}).then(confirmation => {if (confirmation) api.audit('delete', 'checks', '" . $this->_requestedType . "');})",
 					]
 				]
@@ -2351,7 +2351,7 @@ class AUDIT extends API {
 			'ordered' => $this->_lang->GET('order.order.ordered'),
 			'partially_received' => $this->_lang->GET('order.order.partially_received'),
 			'received' => $this->_lang->GET('order.order.received'),
-			'deliverytime' => $this->_lang->GET('audit.order_statistics_delivery_time_column')
+			'deliverytime' => $this->_lang->GET('audit.orderstatistics.delivery_time_column')
 		];
 
 		// prepare result as subsets of vendors
@@ -2365,7 +2365,7 @@ class AUDIT extends API {
 				$deliverytime = ($order['ordered'] && $order['received']) ? intval($ordered->diff($received)->format('%a')) : '-';
 			}
 
-			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = $this->_lang->GET('audit.order_statistics_undefined_vendor');
+			if (!isset($order['order_data']['vendor_label'])) $order['order_data']['vendor_label'] = $this->_lang->GET('audit.orderstatistics.undefined_vendor');
 			if (!isset($vendor_orders[$order['order_data']['vendor_label']])) $vendor_orders[$order['order_data']['vendor_label']] = [];
 
 			$vendor_orders[$order['order_data']['vendor_label']][] = [
@@ -2393,7 +2393,7 @@ class AUDIT extends API {
 		}
 
 		$writer->writeToFile($tempFile);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . substr($tempFile, 1),
 		];
 
@@ -2417,7 +2417,7 @@ class AUDIT extends API {
 		SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
 		$this->response([
 			'response' => [
-				'msg' => $this->_lang->GET('audit.orderstatistics_truncate_success'),
+				'msg' => $this->_lang->GET('audit.orderstatistics.truncate_success'),
 				'type' => 'deleted'
 			]
 		]);
@@ -2440,24 +2440,24 @@ class AUDIT extends API {
 				[
 					'type' => 'date',
 					'attributes' => [
-						'name' => $this->_lang->GET('audit.records_start_date'),
+						'name' => $this->_lang->GET('audit.records.start_date'),
 						'value' => '2023-10-01',
 						'id' => '_records_start_date'
 					]
 				], [
 					'type' => 'date',
 					'attributes' => [
-						'name' => $this->_lang->GET('audit.records_end_date'),
+						'name' => $this->_lang->GET('audit.records.end_date'),
 						'value' => $this->_date['usertime']->format('Y-m-d'),
 						'id' => '_records_end_date'
 					]
 				], [
 					'type' => 'textsection',
-					'content' => $this->_lang->GET('audit.records_hint')
+					'content' => $this->_lang->GET('audit.records.hint')
 				], [
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('audit.record_export_csv'),
+						'value' => $this->_lang->GET('audit.records.export_csv'),
 						'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_records_start_date').value, document.getElementById('_records_end_date').value)",
 						'data-type' => 'download'
 					]
@@ -2480,11 +2480,11 @@ class AUDIT extends API {
 		// initiate all possible keys aka document fields
 		$keys = [];
 		$defaultColumn = [
-			'identifier' => '_' . $this->_lang->_DEFAULT['audit']['records_identifier'],
-			'units' => '_' . $this->_lang->_DEFAULT['audit']['records_units'],
-			'from' => '_' . $this->_lang->_DEFAULT['audit']['records_start_date'],
-			'until' => '_' . $this->_lang->_DEFAULT['audit']['records_end_date'],
-			'type' => '_' . $this->_lang->_DEFAULT['audit']['records_type']
+			'identifier' => '_' . $this->_lang->GET('audit.records.identifier', [], true),
+			'units' => '_' . $this->_lang->GET('audit.records.units', [], true),
+			'from' => '_' . $this->_lang->GET('audit.records.start_date', [], true),
+			'until' => '_' . $this->_lang->GET('audit.records.end_date', [], true),
+			'type' => '_' . $this->_lang->GET('audit.records.type', [], true),
 		];
 		// iterate over all entries, create arrays with all available keys and append to result
 		foreach ($records as $row){
@@ -2634,7 +2634,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
@@ -2688,7 +2688,7 @@ class AUDIT extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
@@ -2794,14 +2794,14 @@ class AUDIT extends API {
 			[
 				'type' => 'date',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_date'),
+					'name' => $this->_lang->GET('audit.documents.date'),
 					'value' => $this->_requestedDate,
 					'id' => '_documents_date'
 				]
 			], [
 				'type' => 'time',
 				'attributes' => [
-					'name' => $this->_lang->GET('audit.documents_time'),
+					'name' => $this->_lang->GET('audit.documents.time'),
 					'value' => $this->_requestedTime,
 					'id' => '_documents_time' 
 				]
@@ -2815,7 +2815,7 @@ class AUDIT extends API {
 			], [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', document.getElementById('_documents_date').value, document.getElementById('_documents_time').value)",
 					'data-type' => 'download'
 				]
@@ -3017,17 +3017,17 @@ class AUDIT extends API {
 		$trainings = $trainings ? array_values($trainings) : [];
 
 		$options = [
-			$this->_lang->GET('audit.userskills_training_evaluation_pending') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation')"],
-			$this->_lang->GET('audit.userskills_training_evaluation_closed') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation', 'closed')"],
-			$this->_lang->GET('audit.userskills_training_evaluation_all') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation', 'all')"],
+			$this->_lang->GET('audit.userskills.training_evaluation_pending') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation')"],
+			$this->_lang->GET('audit.userskills.training_evaluation_closed') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation', 'closed')"],
+			$this->_lang->GET('audit.userskills.training_evaluation_all') => ['onchange' => "api.audit('get', 'checks', 'trainingevaluation', 'all')"],
 		];
-		if (!$this->_requestedOption) $options[$this->_lang->GET('audit.userskills_training_evaluation_pending')]['checked'] = true;
-		if ($this->_requestedOption === 'closed') $options[$this->_lang->GET('audit.userskills_training_evaluation_closed')]['checked'] = true;
-		if ($this->_requestedOption === 'all') $options[$this->_lang->GET('audit.userskills_training_evaluation_all')]['checked'] = true;
+		if (!$this->_requestedOption) $options[$this->_lang->GET('audit.userskills.training_evaluation_pending')]['checked'] = true;
+		if ($this->_requestedOption === 'closed') $options[$this->_lang->GET('audit.userskills.training_evaluation_closed')]['checked'] = true;
+		if ($this->_requestedOption === 'all') $options[$this->_lang->GET('audit.userskills.training_evaluation_all')]['checked'] = true;
 		$content[] = [
 			'type' => 'radio',
 			'attributes' => [
-				'name' => $this->_lang->GET('audit.userskills_training_evaluation_display')
+				'name' => $this->_lang->GET('audit.userskills.training_evaluation_display')
 			],
 			'content' => $options
 		];
@@ -3075,16 +3075,16 @@ class AUDIT extends API {
 
 					if ($row['evaluation']){
 						$row['evaluation'] = json_decode($row['evaluation'], true);
-						$evaluation = $this->_lang->GET('audit.userskills_training_evaluation', [
+						$evaluation = $this->_lang->GET('audit.userskills.training_evaluation', [
 							':user' => $row['evaluation']['user'],
 							':date' => $this->convertFromServerTime($row['evaluation']['date'], true),
 							':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
 						]);
-					} else $evaluation = $this->_lang->GET('audit.userskills_training_evaluation_pending');
+					} else $evaluation = $this->_lang->GET('audit.userskills.training_evaluation_pending');
 
 					if ($row['planned']){
 						$row['planned'] = json_decode($row['planned'], true);
-						$planned = $this->_lang->GET('audit.userskills_training_scheduled', [
+						$planned = $this->_lang->GET('audit.userskills.training_scheduled', [
 							':user' => $row['planned']['user'],
 							':date' => $this->convertFromServerTime($row['planned']['date'], true),
 							':scheduled' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['planned']['content']), $row['planned']['content']))
@@ -3149,7 +3149,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
@@ -3232,7 +3232,7 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
@@ -3285,7 +3285,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "', '" . $this->_requestedOption . "')",
 					'data-type' => 'download'
 				]
@@ -3357,16 +3357,16 @@ class AUDIT extends API {
 					}
 					if ($row['evaluation']){
 						$row['evaluation'] = json_decode($row['evaluation'], true);
-						$evaluation = $this->_lang->GET('audit.userskills_training_evaluation', [
+						$evaluation = $this->_lang->GET('audit.userskills.training_evaluation', [
 							':user' => $row['evaluation']['user'],
 							':date' => $this->convertFromServerTime($row['evaluation']['date'], true),
 							':evaluation' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['evaluation']['content']), $row['evaluation']['content']))
 						]);
-					} else $evaluation = $this->_lang->GET('audit.userskills_training_evaluation_pending');
+					} else $evaluation = $this->_lang->GET('audit.userskills.training_evaluation_pending');
 					
 					if ($row['planned']){
 						$row['planned'] = json_decode($row['planned'], true);
-						$planned = $this->_lang->GET('audit.userskills_training_scheduled', [
+						$planned = $this->_lang->GET('audit.userskills.training_scheduled', [
 							':user' => $row['planned']['user'],
 							':date' => $this->convertFromServerTime($row['planned']['date'], true),
 							':scheduled' => implode(" \n", array_map(fn($key, $value) => $key . ': ' . $value, array_keys($row['planned']['content']), $row['planned']['content']))
@@ -3416,7 +3416,7 @@ class AUDIT extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('audit.userskills_bulk_training'),
+						'value' => $this->_lang->GET('audit.userskills.bulk_training'),
 						'onclick' => "api.user('get', 'training')"
 					]
 				]
@@ -3428,7 +3428,7 @@ class AUDIT extends API {
 				[
 					'type' => 'textsection',
 					'attributes' => [
-						'name' => $this->_lang->GET('audit.userskills_warning_description')
+						'name' => $this->_lang->GET('audit.userskills.warning_description')
 					],
 					'content' => implode(', ', $unfulfilledskills)
 				],
@@ -3526,7 +3526,7 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 
@@ -3569,7 +3569,7 @@ class AUDIT extends API {
 			[
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('audit.record_export'),
+					'value' => $this->_lang->GET('audit.records.export'),
 					'onclick' => "api.audit('get', 'export', '" . $this->_requestedType . "')",
 					'data-type' => 'download'
 				]
@@ -3651,7 +3651,7 @@ class AUDIT extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
 		];
 		$body = [];

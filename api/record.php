@@ -173,12 +173,12 @@ class RECORD extends API {
 
 		if ((array_values((array)$this->_payload) || $recipient) && $this->alertUserGroup(['permission' => $permission, 'unit' => array_values((array)$this->_payload), 'user' => $recipient], $message)) $this->response([
 			'response' => [
-				'msg' => $this->_lang->GET('message.send_success'),
+				'msg' => $this->_lang->GET('message.message.send_success'),
 				'type' => 'success'
 			]]);
 		else $this->response([
 			'response' => [
-				'msg' => $this->_lang->GET('message.send_failure', [':number' => '']),
+				'msg' => $this->_lang->GET('message.message.send_failure', [':number' => '']),
 				'type' => 'error'
 			]]);
 	}
@@ -233,7 +233,7 @@ class RECORD extends API {
 	public function document(){
 		// prepare existing documents lists
 		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
-		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access']) || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access']) || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 		$response = ['title' => $document['name'], 'render' => [
 			'content' => []
@@ -467,7 +467,7 @@ class RECORD extends API {
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
-		$downloadfiles[$this->_lang->GET('menu.records.record_summary')] = [
+		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . $PDF->recordsPDF($content)
 		];
 
@@ -769,7 +769,7 @@ class RECORD extends API {
 						':id' => $document_id
 					]]);
 
-				if (!$useddocument || (!$useddocument['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.document_not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
+				if (!$useddocument || (!$useddocument['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
 				$entry_timestamp = $entry_date . ' ' . $entry_time;
 				if (strlen($entry_timestamp) > 16) { // yyyy-mm-dd hh:ii
@@ -1826,7 +1826,7 @@ class RECORD extends API {
 			'content' => [],
 			'files' => [],
 			'images' => [],
-			'title' => $this->_lang->GET('menu.records.record_summary', [], $export),
+			'title' => $this->_lang->GET('record.navigation.summaries', [], $export),
 			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), $export),
 			'closed' => $data['closed'],
 			'record_type' => $data['record_type'],

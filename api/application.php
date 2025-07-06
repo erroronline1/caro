@@ -488,10 +488,10 @@ class APPLICATION extends API {
 				if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training_evaluation']){
 					if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
 						// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-						$subject = $this->_lang->GET('audit.userskills_notification_message', [
+						$subject = $this->_lang->GET('audit.userskills.notification_message', [
 							':user' => $users[$user]['name'],
 							':training' => $training['name'],
-							':module' => $this->_lang->GET('menu.tools.regulatory', [], true),
+							':module' => $this->_lang->GET('tool.navigation.regulatory', [], true),
 							':date' => $this->convertFromServerTime($training['date'], true)
 						], true);
 						$reminders = $calendar->search($subject);
@@ -824,9 +824,9 @@ class APPLICATION extends API {
 	 */
 	public function menu(){
 		// get permission based menu items
-		if (!isset($_SESSION['user'])) $this->response(['render' => [$this->_lang->GET('menu.application.header') => [
-			$this->_lang->GET('menu.application.signin') => ['onclick' => "api.application('get', 'start')"],
-			$this->_lang->GET('menu.application.about') => ['onclick' => "api.application('get', 'about')"]
+		if (!isset($_SESSION['user'])) $this->response(['render' => [$this->_lang->GET('application.navigation.header') => [
+			$this->_lang->GET('application.navigation.signin') => ['onclick' => "api.application('get', 'start')"],
+			$this->_lang->GET('application.navigation.about') => ['onclick' => "api.application('get', 'about')"]
 			]]]);	// early exit
 
 		//////////////////////////////////////
@@ -834,10 +834,10 @@ class APPLICATION extends API {
 		//////////////////////////////////////
 		if (array_intersect(['patient'], $_SESSION['user']['permissions'])){
 			$this->response(['render' => [
-				$this->_lang->GET('menu.application.header') => [
-					$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authentify')"],
-					$this->_lang->GET('menu.application.start') => ['onclick' => "api.application('get', 'start')"],			
-					$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
+				$this->_lang->GET('application.navigation.header') => [
+					$this->_lang->GET('application.navigation.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authentify')"],
+					$this->_lang->GET('application.navigation.start') => ['onclick' => "api.application('get', 'start')"],			
+					$this->_lang->GET('application.navigation.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
 				]
 			]]);
 		}
@@ -847,47 +847,47 @@ class APPLICATION extends API {
 		///////////////////////////////////////////
 		$menu = [
 			// order here defines frontend order
-			$this->_lang->GET('menu.communication.header') => [
-				$this->_lang->GET('menu.communication.conversations') => ['onclick' => "api.message('get', 'conversation')"],
-				$this->_lang->GET('menu.communication.announcements') => ['onclick' => "api.message('get', 'announcements')"],
-				$this->_lang->GET('menu.communication.texttemplate_texts') => ['onclick' => "api.texttemplate('get', 'text')"],
-				$this->_lang->GET('menu.communication.register') => ['onclick' => "api.message('get', 'register')"],
-				$this->_lang->GET('menu.communication.responsibility') => ['onclick' => "api.responsibility('get', 'responsibilities')"],
-				$this->_lang->GET('menu.communication.measure') => ['onclick' => "api.measure('get', 'measure')"],
+			$this->_lang->GET('message.navigation.header') => [
+				$this->_lang->GET('message.navigation.conversations') => ['onclick' => "api.message('get', 'conversation')"],
+				$this->_lang->GET('message.navigation.announcements') => ['onclick' => "api.message('get', 'announcements')"],
+				$this->_lang->GET('texttemplate.navigation.texts') => ['onclick' => "api.texttemplate('get', 'text')"],
+				$this->_lang->GET('message.navigation.register') => ['onclick' => "api.message('get', 'register')"],
+				$this->_lang->GET('responsibility.navigation.responsibility') => ['onclick' => "api.responsibility('get', 'responsibilities')"],
+				$this->_lang->GET('measure.navigation.measure') => ['onclick' => "api.measure('get', 'measure')"],
 			],
-			$this->_lang->GET('menu.records.header') => [
-				$this->_lang->GET('menu.records.record_create_identifier') => ['onclick' => "api.record('get', 'identifier')"],
-				$this->_lang->GET('menu.records.record_summary') => ['onclick' => "api.record('get', 'records')"],
-				$this->_lang->GET('menu.records.record_record') => ['onclick' => "api.document('get', 'documents')"]
+			$this->_lang->GET('record.navigation.header') => [
+				$this->_lang->GET('record.navigation.create_identifier') => ['onclick' => "api.record('get', 'identifier')"],
+				$this->_lang->GET('record.navigation.summaries') => ['onclick' => "api.record('get', 'records')"],
+				$this->_lang->GET('assemble.navigation.documents') => ['onclick' => "api.document('get', 'documents')"]
 			],
-			$this->_lang->GET('menu.calendar.header') => [
-				$this->_lang->GET('menu.calendar.appointment') => ['onclick' => "api.calendar('get', 'appointment')"],
-				$this->_lang->GET('menu.calendar.scheduling') => ['onclick' => "api.calendar('get', 'schedule')"],
-				$this->_lang->GET('menu.calendar.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
+			$this->_lang->GET('calendar.navigation.header') => [
+				$this->_lang->GET('calendar.navigation.appointment') => ['onclick' => "api.calendar('get', 'appointment')"],
+				$this->_lang->GET('calendar.navigation.scheduling') => ['onclick' => "api.calendar('get', 'schedule')"],
+				$this->_lang->GET('calendar.navigation.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
 			],
-			$this->_lang->GET('menu.application.header') => [
-				$this->_lang->GET('menu.application.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authentify')"],
-				$this->_lang->GET('menu.application.start') => ['onclick' => "api.application('get', 'start')"],			
-				$this->_lang->GET('menu.application.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
+			$this->_lang->GET('application.navigation.header') => [
+				$this->_lang->GET('application.navigation.signout_user', [':name' => $_SESSION['user']['name']]) => ['onclick' => "api.application('delete', 'authentify')"],
+				$this->_lang->GET('application.navigation.start') => ['onclick' => "api.application('get', 'start')"],			
+				$this->_lang->GET('application.navigation.user_profile') => ['onclick' => "api.user('get', 'profile')"],			
 			],
-			$this->_lang->GET('menu.files.header') => [
-				$this->_lang->GET('menu.files.sharepoint') => ['onclick' => "api.file('get', 'sharepoint')"],
-				$this->_lang->GET('menu.files.files') => ['onclick' => "api.file('get', 'files')"],
-				$this->_lang->GET('menu.files.bundles') => ['onclick' => "api.file('get', 'bundle')"],
+			$this->_lang->GET('file.navigation.header') => [
+				$this->_lang->GET('file.navigation.sharepoint') => ['onclick' => "api.file('get', 'sharepoint')"],
+				$this->_lang->GET('file.navigation.files') => ['onclick' => "api.file('get', 'files')"],
+				$this->_lang->GET('file.navigation.bundles') => ['onclick' => "api.file('get', 'bundle')"],
 			],
-			$this->_lang->GET('menu.purchase.header') => [
-				$this->_lang->GET('menu.purchase.order') => ['onclick' => "api.purchase('get', 'order')"],
-				$this->_lang->GET('menu.purchase.prepared_orders') => ['onclick' => "api.purchase('get', 'prepared')"],
-				$this->_lang->GET('menu.purchase.approved_orders') => ['onclick' => "api.purchase('get', 'approved')"],
-				$this->_lang->GET('menu.purchase.vendor') => ['onclick' => "api.purchase('get', 'vendor')"],
-				$this->_lang->GET('menu.purchase.product') => ['onclick' => "api.purchase('get', 'product')"],
+			$this->_lang->GET('consumables.navigation.header') => [
+				$this->_lang->GET('order.navigation.order') => ['onclick' => "api.purchase('get', 'order')"],
+				$this->_lang->GET('order.navigation.prepared_orders') => ['onclick' => "api.purchase('get', 'prepared')"],
+				$this->_lang->GET('order.navigation.approved_orders') => ['onclick' => "api.purchase('get', 'approved')"],
+				$this->_lang->GET('consumables.navigation.vendor') => ['onclick' => "api.purchase('get', 'vendor')"],
+				$this->_lang->GET('consumables.navigation.product') => ['onclick' => "api.purchase('get', 'product')"],
 			],
-			$this->_lang->GET('menu.tools.header') => [
-				$this->_lang->GET('menu.tools.digital_codes') => ['onclick' => "api.tool('get', 'code')"],
-				$this->_lang->GET('menu.tools.scanner') => ['onclick' => "api.tool('get', 'scanner')"],
-				$this->_lang->GET('menu.tools.calculator') => ['onclick' => "api.tool('get', 'calculator')"],
-				$this->_lang->GET('menu.tools.image') => ['onclick' => "api.tool('get', 'image')"],
-				$this->_lang->GET('menu.tools.zip') => ['onclick' => "api.tool('get', 'zip')"],
+			$this->_lang->GET('tool.navigation.header') => [
+				$this->_lang->GET('tool.navigation.digital_codes') => ['onclick' => "api.tool('get', 'code')"],
+				$this->_lang->GET('tool.navigation.scanner') => ['onclick' => "api.tool('get', 'scanner')"],
+				$this->_lang->GET('tool.navigation.calculator') => ['onclick' => "api.tool('get', 'calculator')"],
+				$this->_lang->GET('tool.navigation.image') => ['onclick' => "api.tool('get', 'image')"],
+				$this->_lang->GET('tool.navigation.zip') => ['onclick' => "api.tool('get', 'zip')"],
 			],
 		];
 
@@ -896,31 +896,31 @@ class APPLICATION extends API {
 		//////////////////////////////////
 
 		// records
-		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.record_bundles')] = ['onclick' => "api.document('get', 'bundles')"];
+		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('assemble.navigation.bundles')] = ['onclick' => "api.document('get', 'bundles')"];
 		// make sure risk management comes after documents so this is an order exception without special permission
-		$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.risk_management')] = ['onclick' => "api.risk('get', 'risk')"];
+		$menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('risk.navigation.risk_management')] = ['onclick' => "api.risk('get', 'risk')"];
 		if (PERMISSION::permissionFor('audit')){
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.audit')] = ['onclick' => "api.audit('get', 'audit')"];
-			$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.management_review')] = ['onclick' => "api.audit('get', 'managementreview')"];
+			$menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('audit.navigation.audit')] = ['onclick' => "api.audit('get', 'audit')"];
+			$menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('audit.navigation.management_review')] = ['onclick' => "api.audit('get', 'managementreview')"];
 		}
-		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('menu.records.header')][$this->_lang->GET('menu.records.documents_manage_approval')] = ['onclick' => "api.document('get', 'approval')"];
+		if (PERMISSION::permissionFor('documentapproval'))$menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('assemble.navigation.manage_approval')] = ['onclick' => "api.document('get', 'approval')"];
 
 		// calendar
 		if (!array_intersect(['group'], $_SESSION['user']['permissions']) && isset($_SESSION['user']['app_settings']['weeklyhours']))
-			$menu[$this->_lang->GET('menu.calendar.header')][$this->_lang->GET('menu.calendar.timesheet')] = ['onclick' => "api.calendar('get', 'timesheet')"];
+			$menu[$this->_lang->GET('calendar.navigation.header')][$this->_lang->GET('calendar.navigation.timesheet')] = ['onclick' => "api.calendar('get', 'timesheet')"];
 
 		// application
-		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.user_manager')] =['onclick' => "api.user('get', 'user')"];
-		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.manual_manager')] =['onclick' => "api.application('get', 'manual')"];
+		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('application.navigation.header')][$this->_lang->GET('application.navigation.user_manager')] =['onclick' => "api.user('get', 'user')"];
+		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('application.navigation.header')][$this->_lang->GET('application.navigation.manual_manager')] =['onclick' => "api.application('get', 'manual')"];
 		// make sure about comes last so this is an an order exception without special permission
-		$menu[$this->_lang->GET('menu.application.header')][$this->_lang->GET('menu.application.about')] = ['onclick' => "api.application('get', 'about')"];
+		$menu[$this->_lang->GET('application.navigation.header')][$this->_lang->GET('application.navigation.about')] = ['onclick' => "api.application('get', 'about')"];
 
 		// purchase
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.purchase.header')][$this->_lang->GET('menu.purchase.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('consumables.navigation.header')][$this->_lang->GET('consumables.navigation.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
 		// tools
-		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.csvfilter_filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('menu.tools.header')][$this->_lang->GET('menu.tools.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('tool.navigation.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
 
 		$this->response(['render' => $menu]);
 	}
@@ -1069,7 +1069,7 @@ class APPLICATION extends API {
 							'content' => $this->_lang->GET('application.dashboard.messages', [':number' => $unseen]),
 							'attributes' => [
 								'data-type' => 'message',
-								'name' => $this->_lang->GET('menu.communication.conversations')
+								'name' => $this->_lang->GET('message.navigation.conversations')
 							]
 						]
 					]
@@ -1094,7 +1094,7 @@ class APPLICATION extends API {
 								'content' => $this->_lang->GET('application.dashboard.orders', [':number' => $unprocessed]),
 								'attributes' => [
 									'data-type' => 'purchase',
-									'name' => $this->_lang->GET('menu.purchase.approved_orders')
+									'name' => $this->_lang->GET('order.navigation.approved_orders')
 								]
 							]
 						]
@@ -1120,7 +1120,7 @@ class APPLICATION extends API {
 								'content' => $this->_lang->GET('application.dashboard.preparedorders', [':number' => $prepared]),
 								'attributes' => [
 									'data-type' => 'purchase',
-									'name' => $this->_lang->GET('menu.purchase.prepared_orders')
+									'name' => $this->_lang->GET('order.navigation.prepared_orders')
 								]
 							]
 						]
@@ -1145,7 +1145,7 @@ class APPLICATION extends API {
 							'content' => $this->_lang->GET('application.dashboard.cases', [':number' => $number]),
 							'attributes' => [
 								'data-type' => 'record',
-								'name' => $this->_lang->GET('menu.records.header')
+								'name' => $this->_lang->GET('record.navigation.header')
 							]
 						]
 					]
@@ -1170,7 +1170,7 @@ class APPLICATION extends API {
 								'content' => $this->_lang->GET('application.dashboard.audits', [':number' => $number]),
 								'attributes' => [
 									'data-type' => 'record',
-									'name' => $this->_lang->GET('menu.records.header')
+									'name' => $this->_lang->GET('record.navigation.header')
 								]
 							]
 						]
@@ -1195,7 +1195,7 @@ class APPLICATION extends API {
 							'content' => $this->_lang->GET('application.dashboard.unapproveddocuments', [':number' => $unapproved]),
 							'attributes' => [
 								'data-type' => 'record',
-								'name' => $this->_lang->GET('menu.records.documents_manage_approval')
+								'name' => $this->_lang->GET('assemble.navigation.manage_approval')
 							]
 						]
 					]
@@ -1219,7 +1219,7 @@ class APPLICATION extends API {
 							'content' => $this->_lang->GET('application.dashboard.pendingincorporations', [':number' => $unapproved]),
 							'attributes' => [
 								'data-type' => 'purchase',
-								'name' => $this->_lang->GET('menu.purchase.incorporated_pending')
+								'name' => $this->_lang->GET('consumables.navigation.incorporated_pending')
 							]
 						]
 					]
@@ -1243,7 +1243,7 @@ class APPLICATION extends API {
 							'content' => $this->_lang->GET('application.dashboard.complaints', [':number' => $complaints]),
 							'attributes' => [
 								'data-type' => 'record',
-								'name' => $this->_lang->GET('menu.records.header')
+								'name' => $this->_lang->GET('record.navigation.header')
 							]
 						]
 					]
@@ -1328,7 +1328,7 @@ class APPLICATION extends API {
 					}
 					$searchelements[] = [
 						'type' => 'links',
-						'description' => $this->_lang->GET('menu.records.record_record'),
+						'description' => $this->_lang->GET('assemble.navigation.documents'),
 						'content' => $matches
 					];
 				}
@@ -1341,7 +1341,7 @@ class APPLICATION extends API {
 					}
 					$searchelements[] = [
 						'type' => 'links',
-						'description' => $this->_lang->GET('menu.files.header'),
+						'description' => $this->_lang->GET('file.navigation.header'),
 						'content' => $matches
 					];
 				}
@@ -1375,9 +1375,9 @@ class APPLICATION extends API {
 			$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 			// sort events
 			foreach ($thisDaysEvents as $row){
-				if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('message.deleted_user');
+				if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 				if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || 
-					array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('message.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
+					array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('general.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
 				if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . " - ". $this->convertFromServerTime(substr($row['span_end'], 0, 10)) . "\n";
 			}
 			// display todays events

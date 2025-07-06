@@ -282,7 +282,7 @@ class CSVFILTER extends API {
 						[
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('menu.tools.csvfilter_filter_manager'),
+								'value' => $this->_lang->GET('csvfilter.navigation.filter_manager'),
 								'onclick' => "api.csvfilter('get', 'rule'" . ($filter['id'] ? ", " . $filter['id'] : "") . ")"
 							]
 						]
@@ -401,7 +401,7 @@ class CSVFILTER extends API {
 						$options[$row['name']] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
 					
-					$display = $row['name']. ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
+					$display = $row['name']. ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$display] = ($row['name'] == $filter['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}

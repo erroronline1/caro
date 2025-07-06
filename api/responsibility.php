@@ -141,7 +141,7 @@ class RESPONSIBILITY extends API {
 						$proxy = [];
 
 						foreach ($row['assigned_users'] as $user_id => $date){
-							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
+							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('general.deleted_user')];
 							else $user = $users[$user];
 							$assigned[$user['name']] = ['checked' => boolval($date)];
 							if (!boolval($date) && $_SESSION['user']['id'] == $user_id) $assigned[$user['name']] = ['onchange' =>
@@ -153,7 +153,7 @@ class RESPONSIBILITY extends API {
 							if (boolval($date) || $_SESSION['user']['id'] != $user_id) $assigned[$user['name']]['disabled'] = true;
 						}
 						foreach ($row['proxy_users'] as $user_id => $date){
-							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('message.deleted_user')];
+							if (($user = array_search($user_id, array_column($users, 'id'))) === false) $user = ['name' => $this->_lang->GET('general.deleted_user')];
 							else $user = $users[$user];
 							$proxy[$user['name']] = ['checked' => boolval($date)];
 							if (!boolval($date) && $_SESSION['user']['id'] == $user_id) $assigned[$user['name']] = ['onchange' =>
@@ -282,7 +282,7 @@ class RESPONSIBILITY extends API {
 					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
 						':user' => $_SESSION['user']['name'],
 						':task' => $responsibility[':responsibility'],
-						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('menu.communication.responsibility'). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('responsibility.navigation.responsibility'). '</a>',
 					], true)));
 
 					$this->response([
@@ -345,7 +345,7 @@ class RESPONSIBILITY extends API {
 					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
 						':user' => $_SESSION['user']['name'],
 						':task' => $responsibility[':responsibility'],
-						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('menu.communication.responsibility', [], true). '</a>',
+						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('responsibility.navigation.responsibility', [], true). '</a>',
 					], true)));
 					
 					$this->response([

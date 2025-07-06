@@ -1335,8 +1335,8 @@ export class Assemble {
 				return;
 			}
 			const options = {};
-			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
-			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			options[api._lang.GET("assemble.compose.document.cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.confirm")] = { value: true, class: "reducedCTA" };
 			new Dialog({ type: "confirm", header: api._lang.GET("general.save", { ":title": document.querySelector("header>h1").innerHTML }), options: options }).then((confirmation) => {
 				if (confirmation) event.target.form.submit();
 			});
@@ -2040,8 +2040,8 @@ export class Assemble {
 		button.title = api._lang.GET("assemble.render.aria.search");
 		button.onclick = function () {
 			const options = {};
-			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
-			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			options[api._lang.GET("assemble.compose.document.cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.confirm")] = { value: true, class: "reducedCTA" };
 			new Dialog({
 				type: "input",
 				header: api._lang.GET("file.file_filter_label"),
@@ -2293,8 +2293,8 @@ export class Assemble {
 						else delete content[key].checked;
 					});
 				}
-				options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
-				options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+				options[api._lang.GET("assemble.compose.document.cancel")] = false;
+				options[api._lang.GET("assemble.compose.document.confirm")] = { value: true, class: "reducedCTA" };
 				new Dialog({
 					type: "input",
 					header: currentElement.attributes.name.replace(/\[\]/g, ""),
@@ -2458,7 +2458,7 @@ export class Assemble {
 			if (onclick_forward) {
 				icon.onclick = new Function(onclick_forward);
 				icon.onkeydown = new Function("if (event.key === 'Enter') " + onclick_forward);
-				icon.title = api._lang.GET("message.forward", { ":user": this.currentElement.content.user });
+				icon.title = api._lang.GET("message.message.forward", { ":user": this.currentElement.content.user });
 				icon.role = "link";
 				icon.tabIndex = 0;
 			}
@@ -2524,7 +2524,7 @@ export class Assemble {
 			message = this.apply_attributes(this.currentElement.attributes, message);
 			if ("onclick" in this.currentElement.attributes) {
 				message.role = "link";
-				message.title = api._lang.GET("message.open", { ":user": this.currentElement.content.user });
+				message.title = api._lang.GET("message.message.open", { ":user": this.currentElement.content.user });
 				message.onkeydown = new Function("if (event.key === 'Enter') " + this.currentElement.attributes.onclick);
 				message.tabIndex = 0;
 			}
@@ -2733,8 +2733,8 @@ export class Assemble {
 		button.type = "button";
 		button.onclick = function () {
 			const options = {};
-			options[api._lang.GET("assemble.compose.document.document_cancel")] = false;
-			options[api._lang.GET("assemble.compose.document.document_confirm")] = { value: true, class: "reducedCTA" };
+			options[api._lang.GET("assemble.compose.document.cancel")] = false;
+			options[api._lang.GET("assemble.compose.document.confirm")] = { value: true, class: "reducedCTA" };
 			new Dialog({
 				type: "input",
 				header: api._lang.GET("consumables.product.search"),
@@ -3328,7 +3328,7 @@ export class Assemble {
 		if (this.currentElement.attributes.value !== undefined) textarea.appendChild(document.createTextNode(this.currentElement.attributes.value));
 		if (this.currentElement.texttemplates !== undefined && this.currentElement.texttemplates) {
 			this.currentElement.attributes = {
-				value: api._lang.GET("menu.communication.texttemplate_texts"),
+				value: api._lang.GET("texttemplate.navigation.texts"),
 				onclick: "api.texttemplate('get', 'text', 'false', 'modal')",
 				class: "floatright",
 			};

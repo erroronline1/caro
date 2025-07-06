@@ -172,7 +172,7 @@ class TEXTTEMPLATE extends API {
 						}
 					}
 
-					$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
+					$display .= ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
 					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 					$alloptions[$row['unit']][$display] = ($row['name'] == $chunk['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 				}
@@ -441,7 +441,7 @@ class TEXTTEMPLATE extends API {
 							$templatedatalist[] = $row['name'];
 							$options[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 						}
-						$display .= ' ' . $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
+						$display .= ' ' . $this->_lang->GET('assemble.compose.component.author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])]);
 						if ($row['hidden']) $display = UTILITY::hiddenOption($display);
 						$alloptions[$row['unit']][$display] = ($row['name'] == $template['name']) ? ['value' => $row['id'], 'selected' => true] : ['value' => $row['id']];
 					}
@@ -558,10 +558,10 @@ class TEXTTEMPLATE extends API {
 									$this->_lang->GET("texttemplate.template.save") .
 									"', options:{" .
 									"'" .
-									$this->_lang->GET("assemble.compose.document.document_cancel") .
+									$this->_lang->GET("assemble.compose.document.cancel") .
 									"': false," .
 									"'" .
-									$this->_lang->GET("assemble.compose.document.document_confirm") .
+									$this->_lang->GET("assemble.compose.document.confirm") .
 									"': {value: true, class: 'reducedCTA'}," .
 									"}}).then(confirmation => {if (confirmation) api.texttemplate('post', 'template')})",
 							]
@@ -627,7 +627,7 @@ class TEXTTEMPLATE extends API {
 		// prepare existing templates lists
 		$templates = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_datalist');
 		if (!$templates) {
-			$response['render']['content'] = $this->noContentAvailable($this->_lang->GET('message.no_messages'));
+			$response['render']['content'] = $this->noContentAvailable($this->_lang->GET('message.message.no_messages'));
 			$this->response($response);		
 		}
 
@@ -750,7 +750,7 @@ class TEXTTEMPLATE extends API {
 						'value' => $this->_lang->GET('texttemplate.use.import', [':placeholders' => implode(', ', array_keys($clientimport))]),
 						'onclick' => "_client.texttemplate.import('" . $this->_clientimport . "');"
 					],
-					'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])])
+					'hint' => $this->_lang->GET('assemble.compose.component.author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])])
 				];	
 			}
 
@@ -777,7 +777,7 @@ class TEXTTEMPLATE extends API {
 					'onclick' => '_client.texttemplate.update();',
 					'data-type' => 'generateupdate'
 				],
-				'hint' => $this->_lang->GET('assemble.compose.component.component_author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])])
+				'hint' => $this->_lang->GET('assemble.compose.component.author', [':author' => $row['author'], ':date' => $this->convertFromServerTime($row['date'])])
 			];
 
 			// append inputs
@@ -804,14 +804,14 @@ class TEXTTEMPLATE extends API {
 			$response['render']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('menu.communication.texttemplate_chunks'),
+					'value' => $this->_lang->GET('texttemplate.navigation.chunks'),
 					'onclick' => "api.texttemplate('get', 'chunk')"
 				]
 			];
 			$response['render']['content'][] = [
 				'type' => 'button',
 				'attributes' => [
-					'value' => $this->_lang->GET('menu.communication.texttemplate_templates'),
+					'value' => $this->_lang->GET('texttemplate.navigation.templates'),
 					'onclick' => "api.texttemplate('get', 'template'" . ($template['id'] ? ", " . $template['id'] : "") . ")"
 				]
 			];

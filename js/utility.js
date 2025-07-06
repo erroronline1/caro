@@ -31,9 +31,9 @@ export const _serviceWorker = {
 		calendar: function (data) {
 			let notif;
 			if ("calendar_uncompletedevents" in data) {
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.calendar.header").replace(" ", "_") + "]"); // main menu label
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("calendar.navigation.header").replace(" ", "_") + "]"); // main menu label
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.calendar.scheduling").replace(" ", "_") + "]"); // button
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("calendar.navigation.scheduling").replace(" ", "_") + "]"); // button
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
 			}
 		},
@@ -51,21 +51,21 @@ export const _serviceWorker = {
 					audit_closing = 0,
 					managementreview = 0;
 				if ("document_approval" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.documents_manage_approval").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("assemble.navigation.manage_approval").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.document_approval);
 					document_approval = data.document_approval;
 				}
 				if ("audit_closing" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.audit").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("audit.navigation.audit").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.audit_closing);
 					audit_closing = data.audit_closing;
 				}
 				if ("managementreview" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.records.management_review").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("audit.navigation.management_review").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.managementreview);
 					managementreview = data.managementreview;
 				}
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.records.header").replace(" ", "_") + "]"); // main menu label
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("record.navigation.header").replace(" ", "_") + "]"); // main menu label
 				if (notif) notif.setAttribute("data-notification", parseInt(document_approval, 10) + parseInt(audit_closing, 10) + parseInt(managementreview, 10));
 			}
 		},
@@ -86,21 +86,21 @@ export const _serviceWorker = {
 				let message_unseen = 0,
 					responsibilities = 0;
 				if ("message_unseen" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.conversations").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("message.navigation.conversations").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.message_unseen);
 					message_unseen = data.message_unseen;
 				}
 				if ("responsibilities" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.responsibility").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("responsibility.navigation.responsibility").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.responsibilities);
 					responsibilities = data.responsibilities;
 				}
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.communication.header").replace(" ", "_") + "]"); // main menu label
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("message.navigation.header").replace(" ", "_") + "]"); // main menu label
 				if (notif) notif.setAttribute("data-notification", parseInt(message_unseen, 10) + parseInt(responsibilities, 10));
 			}
 			if ("measure_unclosed" in data) {
 				// no appending number to userMenu to avoid distracting from unread messages
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.communication.measure").replace(" ", "_") + "]"); // button
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("measure.navigation.measure").replace(" ", "_") + "]"); // button
 				if (notif) notif.setAttribute("data-notification", data.measure_unclosed);
 			}
 		},
@@ -118,21 +118,21 @@ export const _serviceWorker = {
 					order_unprocessed = 0,
 					consumables_pendingincorporation = 0;
 				if ("order_prepared" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.prepared_orders").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("order.navigation.prepared_orders").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.order_prepared);
 					order_prepared = data.order_prepared;
 				}
 				if ("order_unprocessed" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.approved_orders").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("order.navigation.approved_orders").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
 					order_unprocessed = data.order_unprocessed;
 				}
 				if ("consumables_pendingincorporation" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("menu.purchase.incorporated_pending").replace(" ", "_") + "]"); // button
+					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("consumables.navigation.incorporated_pending").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
 					consumables_pendingincorporation = data.consumables_pendingincorporation;
 				}
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("menu.purchase.header").replace(" ", "_") + "]");
+				notif = document.querySelector("[for=userMenu" + api._lang.GET("consumables.navigation.header").replace(" ", "_") + "]");
 				if (notif) notif.setAttribute("data-notification", parseInt(order_prepared, 10) + parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10)); // main menu label
 			}
 		},
@@ -155,11 +155,11 @@ export const _serviceWorker = {
 		if ("message_unnotified" in data && parseInt(data.message_unnotified, 10)) {
 			let body =
 				data.message_unnotified > 1
-					? api._lang.GET("message.new_messages", {
+					? api._lang.GET("message.message.new_messages", {
 							":amount": data.message_unnotified,
 					  })
-					: api._lang.GET("message.new_message");
-			this.showLocalNotification(api._lang.GET("menu.communication.header"), body);
+					: api._lang.GET("message.message.new_message");
+			this.showLocalNotification(api._lang.GET("message.navigation.header"), body);
 		}
 		this.notif.communication(data);
 		this.notif.consumables(data);
@@ -458,14 +458,14 @@ export const _client = {
 				{
 					type: "hidden",
 					attributes: {
-						name: api._lang.GET("message.to"),
+						name: api._lang.GET("message.message.to"),
 						value: recipient,
 					},
 				},
 				{
 					type: "textarea",
 					attributes: {
-						name: api._lang.GET("message.message"),
+						name: api._lang.GET("message.message.message"),
 						rows: 8,
 						value: message,
 					},
@@ -486,10 +486,10 @@ export const _client = {
 				render: body,
 				options: options,
 			}).then((response) => {
-				if (response[api._lang.GET("message.message")]) {
+				if (response[api._lang.GET("message.message.message")]) {
 					const formdata = new FormData();
-					formdata.append(api._lang.GET("message.to"), response[api._lang.GET("message.to")]);
-					formdata.append(api._lang.GET("message.message"), response[api._lang.GET("message.message")]);
+					formdata.append(api._lang.GET("message.message.to"), response[api._lang.GET("message.message.to")]);
+					formdata.append(api._lang.GET("message.message.message"), response[api._lang.GET("message.message.message")]);
 					api.message("post", "message", formdata);
 				}
 			});
@@ -1126,7 +1126,7 @@ export const _client = {
 									{
 										type: "textarea",
 										attributes: {
-											name: api._lang.GET("message.message"),
+											name: api._lang.GET("message.message.message"),
 										},
 										hint: api._lang.GET("order.disapprove_message", { ":unit": api._lang.GET("units." + "element.organizationalunit") }),
 									},
@@ -1160,7 +1160,7 @@ export const _client = {
 									{
 										type: "textarea",
 										attributes: {
-											name: api._lang.GET("message.message"),
+											name: api._lang.GET("message.message.message"),
 										},
 										hint: api._lang.GET("order.cancellation_message"),
 									},
@@ -1194,7 +1194,7 @@ export const _client = {
 									{
 										type: "textarea",
 										attributes: {
-											name: api._lang.GET("message.message"),
+											name: api._lang.GET("message.message.message"),
 										},
 										hint: api._lang.GET("order.return_message"),
 									},

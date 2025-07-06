@@ -106,7 +106,7 @@ class FILE extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('menu.files.bundle_manager'),
+						'value' => $this->_lang->GET('file.navigation.bundle_manager'),
 						'onclick' => "api.file('get', 'bundlemanager')"
 					]
 				]
@@ -548,7 +548,7 @@ class FILE extends API {
 									'type' => 'checkbox2text',
 									'content' => $regulatory_context,
 									'attributes' => [
-										'name' => $this->_lang->GET('assemble.compose.document.document_regulatory_context'),
+										'name' => $this->_lang->GET('assemble.compose.document.regulatory_context'),
 										'onchange' => "api.file('put', 'externalfilemanager', '" . $file['id'] . "', this.value)",
 										'data-filtered' => $file['path']
 									],
@@ -679,9 +679,9 @@ class FILE extends API {
 					array_push($response['render']['content'][0],
 						[
 							'type' => 'links',
-							'description' => $this->_lang->GET('menu.files.sharepoint'),
+							'description' => $this->_lang->GET('file.navigation.sharepoint'),
 							'content' => [
-								$this->_lang->GET('menu.files.sharepoint') => ['href' => "javascript:api.file('get', 'filemanager', 'sharepoint')"]
+								$this->_lang->GET('file.navigation.sharepoint') => ['href' => "javascript:api.file('get', 'filemanager', 'sharepoint')"]
 							]
 						]
 					);
@@ -831,7 +831,7 @@ class FILE extends API {
 		];
 		// append filter by folder option
 		$options = [
-			$this->_lang->GET('menu.files.files') => (!$this->_requestedFolder || $this->_requestedFolder == 'null') ? ['checked' => true] : ['onchange' => "api.file('get', 'files')"],
+			$this->_lang->GET('file.navigation.files') => (!$this->_requestedFolder || $this->_requestedFolder == 'null') ? ['checked' => true] : ['onchange' => "api.file('get', 'files')"],
 			$this->_lang->GET('file.external_file.folder') => $this->_requestedFolder === 'external_documents' ? ['checked' => true] : ['onchange' => "api.file('get', 'files', 'external_documents')"],
 
 		];
@@ -902,7 +902,7 @@ class FILE extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('menu.files.file_manager'),
+						'value' => $this->_lang->GET('file.navigation.file_manager'),
 						'onclick' => "api.file('get', 'filemanager')"
 					]
 				]
@@ -913,7 +913,7 @@ class FILE extends API {
 				[
 					'type' => 'button',
 					'attributes' => [
-						'value' => $this->_lang->GET('menu.files.external_file_manager'),
+						'value' => $this->_lang->GET('file.navigation.external_file_manager'),
 						'onclick' => "api.file('get', 'externalfilemanager')"
 					]
 				]

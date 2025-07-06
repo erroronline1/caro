@@ -422,7 +422,7 @@ export class Composer {
 		// append form if applicable, aka available inputs
 		if (isForm) answer.form = {};
 		if (raw_import || (name && componentContent)) return answer;
-		new Toast(api._lang.GET("assemble.compose.component.component_not_saved_missing"), "error");
+		new Toast(api._lang.GET("assemble.compose.component.not_saved_missing"), "error");
 		return null;
 	}
 
@@ -464,7 +464,7 @@ export class Composer {
 			data.append("patient_access", patient_access);
 			return data;
 		}
-		new Toast(api._lang.GET("assemble.compose.document.document_not_saved_missing"), "error");
+		new Toast(api._lang.GET("assemble.compose.document.not_saved_missing"), "error");
 		return null;
 	}
 
@@ -646,8 +646,8 @@ export class Composer {
 		}
 
 		// alert on forbidden widget count per document
-		if (this.componentIdentify > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_identify"), "error");
-		if (this.componentSignature > 1) new Toast(api._lang.GET("assemble.compose.document.document_multiple_signature"), "error");
+		if (this.componentIdentify > 1) new Toast(api._lang.GET("assemble.compose.document.multiple_identify"), "error");
+		if (this.componentSignature > 1) new Toast(api._lang.GET("assemble.compose.document.multiple_signature"), "error");
 	}
 
 	/**
@@ -701,7 +701,7 @@ export class Composer {
 
 		type = widgetcontainer.childNodes[0].dataset.type;
 		if (!type) {
-			new Toast(api._lang.GET("assemble.compose.context_edit_error"), "error");
+			new Toast(api._lang.GET("assemble.compose.context.edit_error"), "error");
 			return;
 		}
 
@@ -725,7 +725,7 @@ export class Composer {
 		if (!targetform) return;
 
 		if (!(element = newElements[widgetcontainer.id])) {
-			new Toast(api._lang.GET("assemble.compose.context_edit_error"), "error");
+			new Toast(api._lang.GET("assemble.compose.context.edit_error"), "error");
 			return;
 		}
 
@@ -854,7 +854,7 @@ export class Composer {
 		button = document.createElement("button");
 		button.type = "button";
 		button.classList.add("discreetButton");
-		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_edit")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context.edit")));
 		button.onclick = () => {
 			if (!target) return;
 			this.importWidget(target);
@@ -866,7 +866,7 @@ export class Composer {
 		button = document.createElement("button");
 		button.type = "button";
 		button.classList.add("discreetButton");
-		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2top")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context.2top")));
 		button.onclick = () => {
 			if (!target) return;
 			if (target.previousElementSibling && target.previousElementSibling.draggable) {
@@ -886,7 +886,7 @@ export class Composer {
 		button = document.createElement("button");
 		button.type = "button";
 		button.classList.add("discreetButton");
-		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1up")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context.1up")));
 		button.onclick = () => {
 			if (!target) return;
 			if (target.previousElementSibling && target.previousElementSibling.draggable) {
@@ -902,7 +902,7 @@ export class Composer {
 		button = document.createElement("button");
 		button.type = "button";
 		button.classList.add("discreetButton");
-		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_1down")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context.1down")));
 		button.onclick = () => {
 			if (!target) return;
 			if (target.nextElementSibling) {
@@ -918,7 +918,7 @@ export class Composer {
 		button = document.createElement("button");
 		button.type = "button";
 		button.classList.add("discreetButton");
-		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_2bottom")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context.2bottom")));
 		button.onclick = () => {
 			if (!target) return;
 			targetClone = target.cloneNode(true);
@@ -932,12 +932,12 @@ export class Composer {
 		button = document.createElement("button");
 		button.type = "button";
 		button.classList.add("discreetButton");
-		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context_delete")));
+		button.appendChild(document.createTextNode(api._lang.GET("assemble.compose.context.delete")));
 		let options = {};
 		(options[api._lang.GET("general.cancel_button")] = false),
 			(options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" }),
 			(button.onclick = () => {
-				new _client.Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.context_delete"), options: options }).then((confirmation) => {
+				new _client.Dialog({ type: "confirm", header: api._lang.GET("assemble.compose.context.delete"), options: options }).then((confirmation) => {
 					if (confirmation) {
 						this.drop_delete(evnt);
 					}
@@ -1079,7 +1079,7 @@ export class Composer {
 		else if (["main", "section"].includes(draggedElement.parentNode.parentNode.localName)) draggedElement = draggedElement.parentNode; // draggable div container content
 
 		if (!draggedElement) {
-			new _client.Toast(api._lang.GET("assemble.compose.context_delete_error"), "error");
+			new _client.Toast(api._lang.GET("assemble.compose.context.delete_error"), "error");
 			return;
 		}
 		const originParent = draggedElement.parentNode;
@@ -1392,7 +1392,7 @@ export class Compose extends Assemble {
 	 */
 	compose_component(
 		std = {
-			name: api._lang.GET("assemble.compose.component.component_name"),
+			name: api._lang.GET("assemble.compose.component.name"),
 			description: api._lang.GET("assemble.compose.component.component"),
 			list: "components",
 			action:
@@ -1400,10 +1400,10 @@ export class Compose extends Assemble {
 				api._lang.GET("assemble.compose.component.component") +
 				"', options:{" +
 				"'" +
-				api._lang.GET("assemble.compose.component.component_cancel") +
+				api._lang.GET("assemble.compose.component.cancel") +
 				"': false," +
 				"'" +
-				api._lang.GET("assemble.compose.component.component_confirm") +
+				api._lang.GET("assemble.compose.component.confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
 				"}}).then(confirmation => {if (confirmation) api.document('post', 'component')})",
 			hidden: {
@@ -1499,7 +1499,7 @@ export class Compose extends Assemble {
 				type: "checkbox2text",
 				content: restricted_access.content,
 				attributes: {
-					name: api._lang.GET("assemble.compose.document.document_restricted_access"),
+					name: api._lang.GET("assemble.compose.document.restricted_access"),
 					id: "ComponentRestrictedAccess",
 					"data-loss": "prevent",
 				},
@@ -1514,7 +1514,7 @@ export class Compose extends Assemble {
 				type: "checkbox2text",
 				content: regulatory_context,
 				attributes: {
-					name: api._lang.GET("assemble.compose.document.document_regulatory_context"),
+					name: api._lang.GET("assemble.compose.document.regulatory_context"),
 					id: "ComponentRegulatoryContext",
 					"data-loss": "prevent",
 				},
@@ -1694,7 +1694,7 @@ export class Compose extends Assemble {
 	 */
 	compose_document() {
 		return this.compose_component({
-			name: api._lang.GET("assemble.compose.document.document_label"),
+			name: api._lang.GET("assemble.compose.document.label"),
 			description: api._lang.GET("assemble.compose.document.document"),
 			list: "documents",
 			action:
@@ -1702,10 +1702,10 @@ export class Compose extends Assemble {
 				api._lang.GET("assemble.compose.document.document") +
 				"', options:{" +
 				"'" +
-				api._lang.GET("assemble.compose.document.document_cancel") +
+				api._lang.GET("assemble.compose.document.cancel") +
 				"': false," +
 				"'" +
-				api._lang.GET("assemble.compose.document.document_confirm") +
+				api._lang.GET("assemble.compose.document.confirm") +
 				"': {value: true, class: 'reducedCTA'}," +
 				"}}).then(confirmation => {if (confirmation) api.document('post', 'document')})",
 			hidden: {

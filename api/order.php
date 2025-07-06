@@ -80,7 +80,7 @@ class ORDER extends API {
 									else $response = [
 										'response' => [
 											'id' => $this->_requestedID,
-											'msg' => $this->_lang->GET('order.failed_delete'),
+											'msg' => $this->_lang->GET('order.delete_failed'),
 											'type' => 'error'
 										]];
 									continue 2;
@@ -165,7 +165,7 @@ class ORDER extends API {
 						}
 						// add initially approval date
 						$prepared['additional_info'] .= ($prepared['additional_info'] ? "\n": '') . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'] . ' ';
-						$prepared['additional_info'] .= UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message')) ? : '';
+						$prepared['additional_info'] .= UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message')) ? : '';
 						// clear unused keys
 						foreach ($prepared as $key => $value) {
 							if (!$value) unset($prepared[$key]);
@@ -201,8 +201,8 @@ class ORDER extends API {
 								$message = str_replace('\n', ', ', $this->_lang->GET('order.alert_disapprove_order', [
 									':order' => $this->_lang->GET('order.message', $messagepayload, true),
 									':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
-									], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+									':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true) . ',' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'))) . '\')">' . $_SESSION['user']['name'] . '</a>'
+									], true)) . "\n \n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								// userlist to decode orderer
 								$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 								if ($userid = array_search($prepared['orderer'], array_column($users, 'id')))
@@ -255,16 +255,16 @@ class ORDER extends API {
 									$this->alertUserGroup(['unit' => [$prepared['organizational_unit']]], str_replace('\n', ', ', $this->_lang->GET('order.alert_orderstate_change', [
 										':order' => $this->_lang->GET('order.message', $messagepayload, true),
 										':unit' => $this->_lang->GET('units.' . $prepared['organizational_unit'], [], true),
-										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
+										':user' => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\'' . $this->_lang->GET('message.message.reply', [':user' => $_SESSION['user']['name']]). '\', \'' . $_SESSION['user']['name'] . '\', \'' . str_replace("\n", ', ', $this->_lang->GET('order.message', $messagepayload, true)) . '\')">' . $_SESSION['user']['name'] . '</a>',
 									])));
 								}
 								break;
 							case 'cancellation':
 								// append to information
 								if (isset($decoded_order_data['additional_info'])){
-									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								}
-								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
 								
@@ -282,9 +282,9 @@ class ORDER extends API {
 							case 'return':
 								// append to order info 
 								if (isset($decoded_order_data['additional_info'])){
-									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+									$decoded_order_data['additional_info'] .= "\n" . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								}
-								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message'));
+								else $decoded_order_data['additional_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.message.message'));
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.approved_on', [], true) . ': ' . $order['approved'];
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
@@ -313,7 +313,7 @@ class ORDER extends API {
 								else $response = [
 									'response' => [
 										'id' => false,
-										'msg' => $this->_lang->GET('order.failed_save'),
+										'msg' => $this->_lang->GET('order.save_failed'),
 										'type' => 'error'
 									]];
 								break;
@@ -485,7 +485,7 @@ class ORDER extends API {
 					// data chunks to be assembled by js _client.order.approved()
 					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
 					if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = ['name' => $users[$orderer]['name'], 'image' => './api/api.php/file/stream/' . $users[$orderer]['image']];
-					else $orderer = ['name' => $this->_lang->GET('message.deleted_user'), 'image' => null];
+					else $orderer = ['name' => $this->_lang->GET('general.deleted_user'), 'image' => null];
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
@@ -651,7 +651,7 @@ class ORDER extends API {
 				else $response = [
 					'response' => [
 						'id' => $this->_requestedID,
-						'msg' => $this->_lang->GET('order.failed_delete'),
+						'msg' => $this->_lang->GET('order.delete_failed'),
 						'type' => 'error'
 					]];
 				break;
@@ -742,7 +742,7 @@ class ORDER extends API {
 
 			$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
 			if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
-			else $orderer = $this->_lang->GET('message.deleted_user');
+			else $orderer = $this->_lang->GET('general.deleted_user');
 
 			$erp_id = array_search($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $erp_ids);
 			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
@@ -762,7 +762,7 @@ class ORDER extends API {
 		if (!$data) $this->response([], 404);
 
 		//set up summary
-		$title = $this->_lang->GET('menu.purchase.order') . ' - ' . $this->_lang->GET('consumables.product.stock_item') . ' - ' . $this->_lang->GET('order.order.' . ($this->_subMethodState ? : 'unprocessed'));
+		$title = $this->_lang->GET('order.navigation.order') . ' - ' . $this->_lang->GET('consumables.product.stock_item') . ' - ' . $this->_lang->GET('order.order.' . ($this->_subMethodState ? : 'unprocessed'));
 		$summary = [
 			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $title . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => null,
@@ -1188,7 +1188,7 @@ class ORDER extends API {
 				else $response = [
 					'response' => [
 						'id' => $this->_requestedID,
-						'msg' => $this->_lang->GET('order.failed_delete'),
+						'msg' => $this->_lang->GET('order.delete_failed'),
 						'type' => 'error'
 					]];
 				break;
@@ -1309,7 +1309,7 @@ class ORDER extends API {
 		else $response = [
 			'response' => [
 				'id' => false,
-				'msg' => $this->_lang->GET('order.failed_save'),
+				'msg' => $this->_lang->GET('order.save_failed'),
 				'type' => 'error'
 			]];
 		return $response;
@@ -1462,7 +1462,7 @@ class ORDER extends API {
 								if ($key === 'organizational_unit') $value = $this->_lang->GET('units.' . $value);
 								if ($key === 'orderer'){
 									if ($orderer = array_search($value, array_column($users, 'id'))) $value = $users[$orderer]['name'];
-									else $value = $this->_lang->GET('message.deleted_user');
+									else $value = $this->_lang->GET('general.deleted_user');
 								}
 								if ($key === 'order_type') {
 									$order_attributes = [
