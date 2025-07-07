@@ -184,19 +184,19 @@ class SQLQUERY {
 
 		'announcement_post' => [
 			'mysql' => "INSERT INTO caro_announcements (id, author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (NULL, :author_id, CURRENT_TIMESTAMP, :organizational_unit, :span_start, :span_end, :subject, :text)",
-			'sqlsrv' => "INSERT INTO caro_announcements (author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, IF :span_start IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_start, 120) END, IF :span_end IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_end, 120) END, :subject, :text)"
+			'sqlsrv' => "INSERT INTO caro_announcements (author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :subject, :text)"
 		],
 		'announcement_put' => [
 			'mysql' => "UPDATE caro_announcements SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = :span_start, span_end = :span_end, subject = :subject, text = :text WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_announcements SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = IF :span_start IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_start, 120) END, span_end = IF :span_end IS NULL BEGIN NULL END ELSE BEGIN CONVERT(SMALLDATETIME, :span_end, 120) END, subject = :subject, text = :text WHERE id = :id"
+			'sqlsrv' => "UPDATE caro_announcements SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), subject = :subject, text = :text WHERE id = :id"
 		],
 		'announcement_get_all' => [
 			'mysql' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id ORDER BY caro_announcements.span_start DESC",
 			'sqlsrv' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id ORDER BY caro_announcements.span_start DESC"
 		],
 		'announcement_get_recent' => [
-			'mysql' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id WHERE CURRENT_TIMESTAMP > caro_announcements.span_start AND (caro_announcements.span_end IS NULL OR CURRENT_TIMESTAMP < caro_announcements.span_end) ORDER BY date DESC",
-			'sqlsrv' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id WHERE CURRENT_TIMESTAMP > caro_announcements.span_start AND (caro_announcements.span_end IS NULL OR CURRENT_TIMESTAMP < caro_announcements.span_end) ORDER BY date DESC"
+			'mysql' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id WHERE (caro_announcements.span_start IS NULL OR CURRENT_TIMESTAMP > caro_announcements.span_start) AND (caro_announcements.span_end IS NULL OR CURRENT_TIMESTAMP < caro_announcements.span_end) ORDER BY date DESC",
+			'sqlsrv' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id WHERE (caro_announcements.span_start IS NULL OR CURRENT_TIMESTAMP > caro_announcements.span_start) AND (caro_announcements.span_end IS NULL OR CURRENT_TIMESTAMP < caro_announcements.span_end) ORDER BY date DESC"
 		],
 		'announcement_delete' => [
 			'mysql' => "DELETE FROM caro_announcements WHERE id = :id",
