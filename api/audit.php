@@ -1541,7 +1541,7 @@ class AUDIT extends API {
 		$content = [
 			[
 				'type' => 'textsection',
-				'content' => $this->_lang->GET('audit.document.usage_warning')
+				'content' => $this->_lang->GET('audit.documents.usage_warning')
 			]
 		];
 		foreach ($usedname as $name => $count){
@@ -1556,12 +1556,12 @@ class AUDIT extends API {
 					'name' => $document['name'],
 					'style' => 'color:rgb(' . 200 - $color . ',' . $color . ',0)'
 				],
-				'linkedcontent' => $this->_lang->GET('audit.document.usage_info', [
+				'linkedcontent' => $this->_lang->GET('audit.documents.usage_info', [
 					':date' => $this->convertFromServerTime($document['date']),
-					':regulatory' => implode(', ', $document['regulatory_context']),
+					':regulatory' => implode(', ', $document['regulatory_context'] ? : []),
 					':count' => $count,
 					':unit' => $this->_lang->_USER['units'][$document['unit']]
-					]) . "\n" . '<a href="javascript:api.record(\'get\', \'document\', \'' . $document['name'] . '\')">' . $this->_lang->GET('audit.document.usage_link'). '</a>'
+					]) . "\n" . '<a href="javascript:api.record(\'get\', \'document\', \'' . $document['name'] . '\')">' . $this->_lang->GET('audit.documents.usage_link'). '</a>'
 			];
 		}
 		return $content;
@@ -2293,8 +2293,16 @@ class AUDIT extends API {
 		$content = [];
 
 		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
-		$from = $orders && $orders[0]['ordered'] ? substr($orders[0]['ordered'], 0, 10) : '-';
-		$until = $orders && $orders[0]['ordered'] ? substr($orders[count($orders) - 1]['ordered'], 0, 10) : '-';
+		$from = $until = '-';
+		// process only valid ordered state to avoid errors
+		$fromtil = array_filter($orders, fn($o) => $o['ordered']);
+		usort($fromtil, function ($a, $b) {
+			if ($a['ordered'] === $b['ordered']) return 0;
+			return $a['ordered'] < $b['ordered'] ? -1: 1;
+		});
+
+		$from = $fromtil && $fromtil[0]['ordered'] ? substr($fromtil[0]['ordered'], 0, 10) : '-';
+		$until = $fromtil && $fromtil[0]['ordered'] ? substr($fromtil[count($fromtil) - 1]['ordered'], 0, 10) : '-';
 		$content[] = [
 			[
 				'type' => 'textsection',
