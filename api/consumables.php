@@ -2171,7 +2171,7 @@ class CONSUMABLES extends API {
 				}
 
 				// switch between display- and edit mode 
-				if (!PERMISSION::permissionFor('products')) {
+				if (!PERMISSION::permissionFor('vendors')) {
 					// standard user view
 					// render search elements, not the same as edit mode languagewise
 					$response['render'] = ['content' => [
