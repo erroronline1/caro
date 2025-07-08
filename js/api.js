@@ -1529,7 +1529,7 @@ export const api = {
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {
-									let submission = _client.application.dialogToFormdata();
+									let submission = _client.application.dialogToFormdata(response);
 									if (submission) api.purchase("post", "incorporation", data.render.productid, submission);
 									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
@@ -1546,7 +1546,7 @@ export const api = {
 									render: data.render.content,
 									options: data.render.options,
 								}).then((response) => {
-									let submission = _client.application.dialogToFormdata();
+									let submission = _client.application.dialogToFormdata(response);
 									if (submission) api.purchase("post", "mdrsamplecheck", data.render.productid, submission);
 									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
@@ -2159,7 +2159,7 @@ export const api = {
 									options: options,
 								}).then((response) => {
 									if (!response) return;
-									let submission = _client.application.dialogToFormdata();
+									let submission = _client.application.dialogToFormdata(response);
 									api.user(2 in request && request[2] !== "null" ? "put" : "post", "training", 2 in request && request[2] ? request[2] : "null", submission);
 								});
 							}

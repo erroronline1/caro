@@ -3130,7 +3130,7 @@ class AUDIT extends API {
 							) . "'), options:{".
 							"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 							"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-							"}}).then(response => {if (response) api.audit('put', 'checks', 'trainingevaluation', '" . $row['id'] . "', _client.application.dialogToFormdata())})"
+							"}}).then(response => {if (response) api.audit('put', 'checks', 'trainingevaluation', '" . $row['id'] . "', _client.application.dialogToFormdata(response))})"
 						]
 					];
 				}
