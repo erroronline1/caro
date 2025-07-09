@@ -1100,7 +1100,7 @@ export class Composer {
 					if (node.firstChild.localName === "section") nodechildren.call(this, node.firstChild);
 					else nodechildren.call(this, node);
 				} else {
-					if (node.name && node.name.match(/IDENTIFY_BY_/g)) {
+					if (node.dataset && node.dataset.type === 'identify'){
 						if (document.getElementById("setIdentify")) document.getElementById("setIdentify").disabled = false;
 						this.componentIdentify--;
 					}
