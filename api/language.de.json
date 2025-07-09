@@ -1266,6 +1266,7 @@
 		},
 		"organizational_unit": "Bereich",
 		"prepared_order_item": ":quantity :unit :number :name von :vendor :aut_idem",
+		"product_not_in_database": "Artikel nicht in Datenbank",
 		"productlink": "zum Artikel",
 		"productname_label": "Artikelname",
 		"quantity_label": "Menge",

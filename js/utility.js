@@ -269,6 +269,7 @@ export const _client = {
 		dialogToFormdata: (dialogData = {}) => {
 			let formdata;
 			if (!Object.keys(dialogData).length) {
+				// currently legacy code because dialogs are closed and removed as of 7/25, dialogData has to be passed
 				formdata = _.getInputs('[method="dialog"]', true);
 				if (!formdata) return false;
 			} else {
@@ -1399,6 +1400,7 @@ export const _client = {
 							content: collapsible,
 						},
 					];
+					order.push(productaction);
 				}
 
 				content.push(order);
@@ -1449,6 +1451,7 @@ export const _client = {
 				}
 				if (element.incorporation) info.push(api._lang.GET("order.incorporation.incorporation"));
 				if (element.samplecheck) info.push(api._lang.GET("order.sample_check.sample_check"));
+				if (!element.id) info.push(api._lang.GET("order.product_not_in_database"));
 				info = info.join(", ");
 
 				order.push({
@@ -1549,8 +1552,7 @@ export const _client = {
 					},
 				});
 
-				if (!element.incorporation && !element.samplecheck) {
-					// api.purchase("put", "approved", "2036", "partially_received", this.checked);
+				if (!element.incorporation && !element.samplecheck && element.id) {
 					buttons = {};
 					(buttons[api._lang.GET("order.tile_view_mark")] = { value: element.id }),
 						order.push({
@@ -1561,6 +1563,7 @@ export const _client = {
 					tileinfo = [];
 					if (element.incorporation) tileinfo.push(api._lang.GET("order.incorporation.incorporation"));
 					if (element.samplecheck) tileinfo.push(api._lang.GET("order.sample_check.sample_check"));
+					if (element.addproduct) tileinfo.push(api._lang.GET("order.product_not_in_database"));
 					order.push({
 						type: "textsection",
 						attributes: {
