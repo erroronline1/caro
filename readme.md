@@ -33,7 +33,20 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* tidy up language keys (grouping, etc.)
+* [Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking](#rejected-requirements)
+    * required selection from language chunks grouped by critical, uncritical, describe within _language.md
+    * consider within order statistics export
+    * withdraw incorporation, restart anew with return reason?
+    * append incorporations / 'reviewed_incorporation'
+    * withdraw most recent like sample checks
+    * mark past incorporations as invalid?
+* review record import
+    * how are files passed and stored? deleteable from import?
+* admin tools
+    * reset cron log
+    * batch update vendors
+    * export/import records datalist as csv for prepopulation an sanitation
+    * refactor and embed _install.php?
 
 ## Content
 * [Aims](#aims)
@@ -2259,7 +2272,8 @@ Stakeholder identification:
 | Break time recommendation on time tracking | User | 2025-06-10 | Implemented; 2025-06-12 |
 | Rejected order message to orderer only, create calendar task | CEO, Supervisor | 2025-06-23 | Implemented; 2025-06-24 |
 | Reconsider incorporation approach on qm-system transfer | Supervisor | 2025-06-23 | On importing pricelists the last ERP-order-date initiates an default incorporation; 2025-06-25 |
-| Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information, compact tiles and table layout; 2025-07-04 | 
+| Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information, compact tiles and table layout; 2025-07-04 |
+| Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 |  |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
@@ -2274,7 +2288,8 @@ Stakeholder identification:
 | ----- | ----------- | ---- | ------- |
 | Determine if order information is suitable to process and contains appropriate interfaces (copy information, qr-codes) to ERP | Purchase | 2025-01-30 | Current state looks suitable, field test will get more detailed results |
 | Initial hands-on, remote access to developer machine, usability, comprehensability | User, Purchase, CEO, QMO | 2025-01-02 - | &bull; general bugfixes, see commit history<br/>&bull; History navigation<br/>&bull; HR option for document composer<br/>&bull; Calendar refresh after edits<br/>&bull; Shorter idle timespan for security reasons<br/>&bull; Confusing ISO time format<br/>&bull; Confusing scroll indicator navigation<br/>&bull; Keyboard input jumping to select modal options would be nice<br/>&bull; Stock article flag, printable list of unprocessed stock articles<br/>&bull; Import erp article ids<br/>&bull; Break time recommendation |
-| Supervisor demonstration | Supervisor, CEO, QMO PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull; order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
+| Supervisor demonstration | Supervisor, CEO, QMO, PRRC | 2025-06-23 | &bull; rejected orders: message to orderer only, create a calendar task<br/>&bull; order state filter: no display of further preceedings<br/>&bull; order overview more compact, like a table?<br/>&bull; reconsider incorporation approach on qm-system transfer |
+| Supervisor demonstration | Supervisor, QMO, PRRC | 2025-07-07 | &bull; Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking? |
 
 [Content](#content)
 
