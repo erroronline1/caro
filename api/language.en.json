@@ -1336,7 +1336,7 @@
 		"import_clear_identifier": "Clear identifier",
 		"import_error": "No data available to import for this identifier.",
 		"import_ok": "OK",
-		"import_success": "Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting!",
+		"import_success": "Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting! Files and photos are not part of the import.",
 		"inquiry": "Case inquiry",
 		"inquiry_message_content": ":user has an inquiry for the case :identifier: :inquiry",
 		"list_touched": "last edit on :date with :document",

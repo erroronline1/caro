@@ -40,8 +40,6 @@ Things are still in motion. Images may be outdated.
     * append incorporations / 'reviewed_incorporation'
     * withdraw most recent like sample checks
     * mark past incorporations as invalid?
-* review record import
-    * how are files passed and stored? deleteable from import?
 * admin tools
     * reset cron log
     * batch update vendors
