@@ -146,8 +146,8 @@ class API {
 						// default primary unit if only one unit is assigned
 						if (count($_SESSION['user']['units']) && count($_SESSION['user']['units']) < 2 && !isset($_SESSION['user']['app_settings']['primaryUnit'])) $_SESSION['user']['app_settings']['primaryUnit'] = $_SESSION['user']['units'][0];
 					}
-					//else $this->response([strlen($payload), $payload], 401);
-					else $this->response([], 401);
+					else $this->response([strlen($payload), $payload], 401);
+					//else $this->response([], 401);
 				} else $this->response([], 401);
 			}
 		}

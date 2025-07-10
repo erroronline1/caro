@@ -117,9 +117,10 @@ export const api = {
 			if (payload instanceof FormData) {
 				sanitizedpayload = Object.fromEntries(payload);
 				for (const [key, value] of Object.entries(sanitizedpayload)) {
-					// sanitation of arrays; synchronization with backend checksum not possible
-					if (key.endsWith("[]")) {
-						delete sanitizedpayload[key];
+					// sanitation of arrays unless set file input; synchronization with backend checksum not possible
+					if (key.endsWith("[]")){
+						if(value instanceof File && value.name) key = key.substring(0,-2);
+						else delete sanitizedpayload[key];
 					}
 					// unset '0' values that are not recognized by backend
 					if (value == "0") sanitizedpayload[key] = "";
@@ -132,7 +133,7 @@ export const api = {
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
-			//_client.application.debug(payload, sanitizedpayload, b.size);
+			_client.application.debug(payload, sanitizedpayload, b.size);
 			payload.append("_user_post_validation", await _.sha256(api._settings.user.fingerprint + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload)

@@ -792,7 +792,11 @@ class RECORD extends API {
 							$identifier .= ' ' . $entry_timestamp;
 						}
 					}
-					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
+					if (gettype($value) === 'array') {
+						// empty file arrays to be skipped
+						if (isset($value[0])) unset ($this->_payload->$key);
+						else $value = trim(implode(' ', $value));
+					}
 					/////////////////////////////////////////
 					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
 					////////////////////////////////////////
