@@ -210,7 +210,6 @@
 			"scheduledtrainings": ":number geplante Schulungen für deine Bereiche",
 			"unapproveddocuments": ":number Komponenten/Dokumente benötigen eine Freigabe"
 		},
-		"delete_cron_log": "cron.log mit :count Einträgen löschen",
 		"error_response": {
 			"400": "Fehlerhafte Anfrage",
 			"401": "Nicht authorisiert",
@@ -220,7 +219,7 @@
 			"406": "Anfrage nicht akzeptiert",
 			"408": "Zeit für Anfrage abgelaufen",
 			"409": "Anfrage erzeugte einen Konflikt",
-			"410": "Quelle nicht verfügbar",
+			"410": "Quelle nicht mehr verfügbar",
 			"411": "Angabe einer Länge der Anfrage erforderlich",
 			"412": "Voraussetzungen nicht erfüllt",
 			"413": "Anfrage zu groß",
@@ -1075,6 +1074,18 @@
 		"sharepoint_file_lifespan": "noch für :hours Stunden verfügbar",
 		"sharepoint_lifespan_hint": "Dateien sind für :hours Stunden verfügbar und werden dann automatisch gelöscht.",
 		"sharepoint_upload_header": "Teile Dateien"
+	},
+	"maintenance": {
+		"navigation": {
+			"cron_log": "Cron Log",
+			"maintenance": "Wartung",
+			"records_datalist": "Textvorschläge für Aufzeichnungen",
+			"vendorupdate": "Lieferantenupdate"
+		},
+		"cron": {
+			"not_found": "Logfile wurde nicht gefunden uns wurde vermutlich gerade eben gelöscht",
+			"delete": "cron.log mit :count Einträgen löschen"
+		}
 	},
 	"measure": {
 		"alert_new": "Es gibt einen neuen Verbesserungsvorschlag. Was hältst Du davon? :link",

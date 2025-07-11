@@ -35,9 +35,9 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 * admin tools
     * reset cron log
-    * batch update vendors
+    * batch update vendors (file upload)
     * export/import records datalist as csv for prepopulation an sanitation
-    * refactor and embed _install.php?
+    * [tools](#tools), [api endpoints](#measure-endpoints)
 
 ## Content
 * [Aims](#aims)
@@ -1719,6 +1719,7 @@ documentcomposer = "ceo, qmo" ; compose documents
 documentexport = "ceo, qmo, supervisor" ; export documents as printable pdf
 incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
 longtermplanning = "ceo, qmo, supervisor" ; set up transfer schedules or other long term planning
+maintenance = "ceo, qmo" ; application maintenance tools
 measureedit = "ceo, qmo, prrc" ; edit, close and delete measures
 mdrsamplecheck = "ceo, qmo, prrc"; must have access to regulatory as well
 orderaddinfo = "ceo, purchase" ; permission to add information to any approved orders beside own unit assigned ones

@@ -210,7 +210,6 @@
 			"scheduledtrainings": ":number scheduled trainings for your units",
 			"unapproveddocuments": ":number documents/components require approval"
 		},
-		"delete_cron_log": "Delete cron.log with :count entries",
 		"error_response": {
 			"400": "Bad Request",
 			"401": "Unauthorized",
@@ -1075,6 +1074,18 @@
 		"sharepoint_file_lifespan": "available for another :hours hours",
 		"sharepoint_lifespan_hint": "Files are available for :hours hours and will be deleted afterwards.",
 		"sharepoint_upload_header": "Share files"
+	},
+	"maintenance": {
+		"navigation": {
+			"cron_log": "Cron Log",
+			"maintenance": "Maintenance",
+			"records_datalist": "Record datalist",
+			"vendorupdate": "Vendor update"
+		},
+		"cron": {
+			"not_found": "Logfile not found and has most probably just been deleted",
+			"delete": "Delete cron.log with :count entries"
+		}
 	},
 	"measure": {
 		"alert_new": "There is a new improvement suggestion. What do you think of it? :link",

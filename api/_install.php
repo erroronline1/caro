@@ -1456,6 +1456,7 @@ class INSTALL {
 
 	/**
 	 * update vendors info and/or pricelist by name
+	 * also see maintenance.php
 	 */
 	public function updateVendors(){
 		$json = $this->importJSON('../templates/', 'vendors');

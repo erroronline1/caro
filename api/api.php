@@ -620,6 +620,7 @@ if (in_array(REQUEST[0], [
 	'csvfilter',
 	'file',
 	'document',
+	'maintenance',
 	'message',
 	'measure',
 	'notification',

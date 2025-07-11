@@ -1623,6 +1623,7 @@ documentcomposer = "ceo, qmo" ; Dokumente und Komponenten erstellen
 documentexport = "ceo, qmo, supervisor" ; Dokumente als PDF exportieren
 incorporation = "ceo, qmo, prrc" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
 longtermplanning = "ceo, qmo, supervisor" ; Anlegen, Ändern und Löschen von Langzeitplanungen
+maintenance = "ceo, qmo" ; Werkzeuge zur Anwendungspflege
 measureedit = "ceo, qmo, prrc" ; Verbesserungsvorschläge bearbeiten, schließen und löschen
 mdrsamplecheck = "ceo, qmo, prrc"; Stichprobenprüfung zurücksetzen - müssen auch Zugriff auf regulatorische Auswertungen haben
 orderaddinfo = "ceo, purchase" ; Berechtigung Informationen auch zu Bestellungen anderer Bereiche hinzuzufügen

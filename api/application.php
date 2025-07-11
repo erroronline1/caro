@@ -178,6 +178,7 @@ class APPLICATION extends API {
 	 * and is currently not much of a performance issue
 	 */
 	private function cron(){
+		// also see maintenance.php->cron_log()
 		$logfile = 'cron.log';
 		// return last entry if last touch has been today
 		if (file_exists($logfile) && date('Y-m-d', filemtime($logfile)) === $this->_date['servertime']->format('Y-m-d')) {
@@ -921,6 +922,7 @@ class APPLICATION extends API {
 		// tools
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('tool.navigation.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('maintenance')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('maintenance.navigation.maintenance')] =['onclick' => "api.maintenance('get', 'task')"];
 
 		$this->response(['render' => $menu]);
 	}
@@ -1012,13 +1014,6 @@ class APPLICATION extends API {
 						'name' => 'CRON'
 					],
 					'content' => $cron['last']
-				];
-				$response['render']['content'][count($response['render']['content']) - 1][] = [
-					'type' => 'deletebutton',
-					'attributes' => [
-						'value' => $this->_lang->GET('application.delete_cron_log', [':count' => $cron['count']]),
-						'onclick' => "api.application('delete', 'cron_log')"
-					]
 				];
 			}
 			

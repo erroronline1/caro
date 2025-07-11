@@ -118,8 +118,8 @@ export const api = {
 				sanitizedpayload = Object.fromEntries(payload);
 				for (const [key, value] of Object.entries(sanitizedpayload)) {
 					// sanitation of arrays unless set file input; synchronization with backend checksum not possible
-					if (key.endsWith("[]")){
-						if(value instanceof File && value.name) key = key.substring(0,-2);
+					if (key.endsWith("[]")) {
+						if (value instanceof File && value.name) key = key.substring(0, -2);
 						else delete sanitizedpayload[key];
 					}
 					// unset '0' values that are not recognized by backend
@@ -1304,6 +1304,48 @@ export const api = {
 					if (data.response !== undefined && data.response.reload !== undefined) api.document("get", data.response.reload);
 				};
 				break;
+		}
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
+	 *             _     _
+	 *   _____ ___|_|___| |_ ___ ___ ___ ___ ___ ___
+	 *  |     | .'| |   |  _| -_|   | .'|   |  _| -_|
+	 *  |_|_|_|__,|_|_|_|_| |___|_|_|__,|_|_|___|___|
+	 *
+	 *
+	 * @param {string} method
+	 * @param  {array} request
+	 * @returns request
+	 */
+	maintenance: (method, ...request) => {
+		request = [...request];
+		if (method === "get") api.history.write(["maintenance", ...request]);
+
+		request.splice(0, 0, "maintenance");
+		let payload,
+			successFn = function (data) {
+				if (data.render) {
+					api.update_header(title[request[1]]);
+					const render = new Assemble(data.render);
+					document.getElementById("main").replaceChildren(render.initializeSection());
+					render.processAfterInsertion();
+					api.preventDataloss.start();
+				}
+				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+			},
+			title = {
+				maintenance: api._lang.GET("maintenance.navigation.maintenance"),
+			};
+		switch (method) {
+			case "get":
+				break;
+			case "post":
+			case "put":
+				payload = _.getInputs("[data-usecase=maintenance]", true);
+				break;
+			default:
 		}
 		api.send(method, request, successFn, null, payload);
 	},
