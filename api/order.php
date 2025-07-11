@@ -289,7 +289,6 @@ class ORDER extends API {
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
-
 								// create a new order as return
 								if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
 									'values' => [
@@ -355,31 +354,7 @@ class ORDER extends API {
 				// set available units
 				if (PERMISSION::permissionFor('orderdisplayall')) $units = array_keys($this->_lang->_USER['units']); // see all orders
 				else $units = $_SESSION['user']['units']; // display only orders for own units
-					
-				$allproducts_key = []; // for quicker matching and access
-				$unincorporated = [];
-				$incorporationdenied = [];
-				$pendingincorporation = [];
-				$special_attention = [];
-				
-				// gather product information on incorporation and special attention
-				foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
-					$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
-					if ($product['special_attention']) $special_attention[] = $product['id'];
-					if (!$product['incorporated']) {
-						$unincorporated[] = $product['id'];
-						continue;
-					}
-					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-					if (isset($product['incorporated']['_denied'])) {
-						$incorporationdenied[] = $product['id'];
-						continue;
-					}
-					elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
-						$pendingincorporation[] = $product['id'];
-					}
-				}
-
+								
 				// get unchecked articles for MDR §14 sample check
 				// this is actually faster than a nested sql query
 				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
@@ -419,6 +394,9 @@ class ORDER extends API {
 				foreach ($checkable as $ids){
 					$sampleCheck = array_merge($sampleCheck, $ids);
 				}
+
+				// reassign varaible to all products
+				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 
 				// gather applicable order states
 				// update on delayed shipment, availability, etc.
@@ -477,11 +455,10 @@ class ORDER extends API {
 					$decoded_order_data = json_decode($row['order_data'], true);
 
 					$product = null;
-					if (isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['vendor_label'] )){
-						if (isset($allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']])){
-							$product = $allproducts_key[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']];
-						}
+					if (isset($decoded_order_data['productid']) && ($dbrow = array_search($decoded_order_data['productid'], array_column($products, 'id')) !== false)){
+						$product = $products[$dbrow];
 					}
+
 					// data chunks to be assembled by js _client.order.approved()
 					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
 					if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = ['name' => $users[$orderer]['name'], 'image' => './api/api.php/file/stream/' . $users[$orderer]['image']];
@@ -514,7 +491,7 @@ class ORDER extends API {
 						'autodelete' => null,
 						'incorporation' => [],
 						'samplecheck' => [],
-						'specialattention' => $product ? array_search($product['id'], $special_attention) !== false : null,
+						'specialattention' => $product ? $product['special_attention'] : null,
 						'collapsed' => !$permission['orderprocessing'],
 						'addproduct' => null,
 						'editproductrequest' => null,
@@ -594,19 +571,23 @@ class ORDER extends API {
 					}
 
 					// incorporation state
-					if ($product && array_search($product['id'], $unincorporated) !== false){
-						if (!in_array('group', $_SESSION['user']['permissions'])){
-							$data['incorporation']['item'] = $product['id'];
-						} else {
-							// simple groups are not allowed to make records
-							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.neccessary_by_user');
+					if ($product){
+						$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
+
+						if (!$product['incorporated']){
+							if (!in_array('group', $_SESSION['user']['permissions'])){
+								$data['incorporation']['item'] = $product['id'];
+							} else {
+								// simple groups are not allowed to make records
+								$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.neccessary_by_user');
+							}
 						}
-					}
-					elseif ($product && array_search($product['id'], $incorporationdenied) !== false){
-						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.denied');
-					}
-					elseif ($product && array_search($product['id'], $pendingincorporation) !== false){
-						$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.pending');
+						elseif (isset($product['incorporated']['_denied'])) {
+							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.denied');
+						}
+						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) {
+							$data['incorporation']['state'] = $this->_lang->GET('order.incorporation.pending');
+						}						
 					}
 					
 					// request MDR §14 sample check
@@ -1263,7 +1244,7 @@ class ORDER extends API {
 	 *  |  _|___|___|_| |__,|  _|  _|_| |___|\_/|___|___|___|_| |___|___|_|
 	 *  |_|                 |_| |_|
 	 * prepare orderdata for database
-	 * @param array $processedOrderDate
+	 * @param array $processedOrderData
 	 * 
 	 * @return array render response
 	 */
@@ -1271,12 +1252,27 @@ class ORDER extends API {
 		$keys = array_keys($processedOrderData['order_data']);
 		$order_data2 = [];
 		$sqlchunks = [];
+
+		// gather products to assign database id to order data if vendor and ordernumber match
+		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
+			$allproducts_key[$product['vendor_name'] . '_' . $product['article_no']] = $product;
+		}
+
 		// iterate over items and create one order per item
 		for ($i = 0; $i < count($processedOrderData['order_data']['items']); $i++){
+			$product =null;
 			$order_data2 = $processedOrderData['order_data']['items'][$i];
 			foreach ($keys as $key){
 				if (!in_array($key, ['items', 'organizational_unit'])) $order_data2[$key] = $processedOrderData['order_data'][$key];
 			}
+			// try to match product id, assign if found
+			if (isset($order_data2['ordernumber_label']) && isset($order_data2['vendor_label'] )){
+				if (isset($allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label']])){
+					$product = $allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label']];
+				}
+				if ($product) $order_data2['productid'] = $product['id'];
+			}
+
 			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('order_post_approved_order'),
 			[
 				':order_data' => $this->_pdo->quote(UTILITY::json_encode($order_data2)),
