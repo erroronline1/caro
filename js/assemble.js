@@ -636,7 +636,7 @@ export class Dialog {
 						this.dialog.remove();
 						return result;
 					default:
-						if (response.returnValue || response.target.returnValue == "true") {
+						if (response.target.returnValue !== "false" && (response.returnValue || response.target.returnValue === "true")) {
 							result = dialogForm2Obj(this.dialog);
 							// check for empty object
 							let empty = true;
