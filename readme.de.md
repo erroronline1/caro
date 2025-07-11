@@ -836,6 +836,7 @@ Falls der Einkauf auch ein ähnliches Produkt bestellen kann, wird daran erinner
 
 Jeder Bestellung kann jederzeit Informationen angehängt werden.
 Bestellte aber noch nicht erhaltene Bestellungen können eine Bestallstatusänderung erfahren, in welchem Fall der bestellende Bereich eine Benachrichtigung erhält. Diese Bestellungen können auch noch storniert werden und werden dann wieder den nicht bestellten Bestellungen mit einem Storno-Kennzeichen zugeordnet. Eine abgeschlossene Stornierung wird automatisch gelöscht. Erhaltene Artikel können zurückgesandt werden. Rücksendungen erzeugen eine neue Retour-Bestellung ohne erforderliche Freigabe und Änderung der Originalbestellung. Eine "bestellte" Rücksendung wird automatisch als "erhalten" gekennzeichet - dies erfasst jedoch bewusst keine Erstattung seitens der Lieferanten, da derartige Vorgänge typischerweise in einem anderen System stattfinden und eine doppelte Bearbeitung vermieden werden soll.
+Es muss ein Rücksendegrund angegeben werden. Kritische Rücksendegründe lösen eine Mitteilung an für die Einführung authorisierte Mitarbeiter aus und initiieren eine Neubewertung der Produkteinführung.
 Alle Maßnahmen bieten an eine Nachricht beizufügen.
 Aus der in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen erzeugt werden um bei der internen Auslieferung eine Zuordnung zu unterstützen.
 

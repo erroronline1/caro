@@ -33,13 +33,6 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* [Reason for order returns, possible complaint, information to prrc, qmo if reasonable cause, possible order blocking](#rejected-requirements)
-    * required selection from language chunks grouped by critical, uncritical, describe within _language.md
-    * consider within order statistics export
-    * withdraw incorporation, restart anew with return reason?
-    * append incorporations / 'reviewed_incorporation'
-    * withdraw most recent like sample checks
-    * mark past incorporations as invalid?
 * admin tools
     * reset cron log
     * batch update vendors
@@ -949,6 +942,7 @@ If purchase is allowed to order something similar there will be a reminder to up
 
 Information can be added anytime.
 Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.
+A reason for return must be provided. Critical return reasons alert incorporation authorized users and append an incorporation review.
 All actions offer to append a message.
 A label can be created directly from the commission field to support allocation of products during internal delivery.
 
@@ -2271,7 +2265,7 @@ Stakeholder identification:
 | Rejected order message to orderer only, create calendar task | CEO, Supervisor | 2025-06-23 | Implemented; 2025-06-24 |
 | Reconsider incorporation approach on qm-system transfer | Supervisor | 2025-06-23 | On importing pricelists the last ERP-order-date initiates an default incorporation; 2025-06-25 |
 | Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information, compact tiles and table layout; 2025-07-04 |
-| Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 |  |
+| Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 | Critical return reasons alert incorporation authorized users and append an incorporation review; 2025-07-11 |
 
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data

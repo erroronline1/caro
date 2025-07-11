@@ -289,6 +289,47 @@ class ORDER extends API {
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.received', [], true) . ': ' . $order['received'];
 								$decoded_order_data['additional_info'] .= "\n" . $this->_lang->GET('order.order.delivered', [], true) . ': ' . $order['delivered'];
 								$decoded_order_data['orderer'] = $_SESSION['user']['id'];
+
+								// determine criticality of return reason
+								$return_reason = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.return_reason'));
+								$criticality = array_search($return_reason, $this->_lang->_USER['orderreturns']['critical']);
+								if ($criticality !== false){
+									$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.critical.' . $criticality, [], true) . "\n" .$decoded_order_data['additional_info'];
+
+									// append incorporation review if applicable and alert eligible users
+									if (isset($decoded_order_data['productid'])){
+										$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+											'values' => [
+												':ids' => intval($decoded_order_data['productid'])
+											]
+										]);
+										$product = $product ? $product[0] : null;
+										if ($product){
+											$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
+											$product['incorporated'][] = [
+												'_check' => $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true),
+												'user' => [
+													'name' => CONFIG['system']['caroapp'],
+													'date' => $this->_date['servertime']->format('Y-m-d H:i')
+												]
+											];
+											SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
+												'replacements' => [
+													':id' => $product['id'],
+													':incorporated' => UTILITY::json_encode($product['incorporated'])
+												]
+											]);
+											$this->alertUserGroup(['permission' => PERMISSION::permissionFor('incorporation', true)], 
+											'<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . implode(' ', [$decoded_order_data['vendor_label'], $decoded_order_data['ordernumber_label'], $decoded_order_data['productname_label']]) . '</a>'
+											. "\n". $this->_lang->GET('consumables.product.incorporation_review', [':orderdata' => $decoded_order_data['additional_info']], true));
+										}
+									}
+								}
+								else {
+									$criticality = array_search($return_reason, $this->_lang->_USER['orderreturns']['easy']);
+									$decoded_order_data['additional_info'] = $this->_lang->GET('orderreturns.easy.' . $criticality, [], true) . "\n" .$decoded_order_data['additional_info'];
+								}
+
 								// create a new order as return
 								if (SQLQUERY::EXECUTE($this->_pdo, 'order_post_approved_order', [
 									'values' => [
@@ -395,7 +436,7 @@ class ORDER extends API {
 					$sampleCheck = array_merge($sampleCheck, $ids);
 				}
 
-				// reassign varaible to all products
+				// reassign variable to contain all products
 				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 
 				// gather applicable order states
@@ -455,7 +496,7 @@ class ORDER extends API {
 					$decoded_order_data = json_decode($row['order_data'], true);
 
 					$product = null;
-					if (isset($decoded_order_data['productid']) && ($dbrow = array_search($decoded_order_data['productid'], array_column($products, 'id')) !== false)){
+					if (isset($decoded_order_data['productid']) && ($dbrow = array_search($decoded_order_data['productid'], array_column($products, 'id'))) !== false){
 						$product = $products[$dbrow];
 					}
 
