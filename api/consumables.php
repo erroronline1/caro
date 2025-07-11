@@ -382,22 +382,32 @@ class CONSUMABLES extends API {
 					]);
 				}
 
-				// update incorporation state for selected products
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
-					'replacements' => [
-						':ids' => implode(',', [intval($this->_requestedID), ...array_map(Fn($id) => intval($id), $batchids)]),
-						':incorporated' => UTILITY::json_encode($approve)
-					]
-				])) $this->response([
+				// update and append incorporation state for selected products
+				foreach($products as $product){
+					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
+					$product['incorporated'][] = $approve;
+					try {
+						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
+							'replacements' => [
+								':id' => $product['id'],
+								':incorporated' => UTILITY::json_encode($product['incorporated'])
+							]
+						]);
+					}
+					catch(\Exception $e){
+						$this->response([
+							'response' => [
+								'msg' => $this->_lang->GET('order.incorporation.failure'),
+								'type' => 'error'
+							]
+						]);
+					}
+				}
+				$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('order.incorporation.success'),
 						'type' => 'success'
-					]]);
-				$this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('order.incorporation.failure'),
-						'type' => 'error'
-					]]);
+					]]);			
 				break;
 			case 'GET':
 				$response = [];
@@ -765,8 +775,10 @@ class CONSUMABLES extends API {
 		foreach ($allproducts as $product) {
 			if (!$product['incorporated']) continue;
 			$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
+			// get latest incorporation entry;
+			$product['incorporated'] = array_pop($product['incorporated']);
 			if (isset($product['incorporated']['_denied'])) continue;
-			elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onclick' => "api.purchase('get', 'product', " . $product['id'] . ")"];
+			elseif ($product['incorporated'] && !PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $links[$product['vendor_name'] . ' ' . $product['article_no'] . ' ' . $product['article_name']] = ['href' => 'javascript:void(0)', 'onclick' => "api.purchase('get', 'product', " . $product['id'] . ")"];
 		}
 		if ($links){
 			$response['render']['content'][] = [
@@ -901,20 +913,26 @@ class CONSUMABLES extends API {
 
 				// handle incorporation options that have not yet been approved
 				if (PERMISSION::permissionFor('incorporation') && $product['incorporated']) {
-					if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation.state_approve'))){
-						$incorporation = explode(' | ', $incorporation);
-						if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $product['incorporated'] = null;
-						else {
-							$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-							foreach ($this->_lang->_USER['permissions'] as $permission => $translation){
-								if (in_array($translation, $incorporation)) $product['incorporated'][$permission] = [
-									'name' => $_SESSION['user']['name'],
-									'date' => $this->_date['servertime']->format('Y-m-d H:i')
-								];
+					$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
+					// get latest incorporation entry;
+					$latestincorporation = array_pop($product['incorporated']);
+					if ($latestincorporation) {
+						if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation.state_approve'))){
+							$incorporation = explode(' | ', $incorporation);
+							if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $latestincorporation = null;
+							else {
+								foreach ($this->_lang->_USER['permissions'] as $permission => $translation){
+									if (in_array($translation, $incorporation)) $latestincorporation[$permission] = [
+										'name' => $_SESSION['user']['name'],
+										'date' => $this->_date['servertime']->format('Y-m-d H:i')
+									];
+								}
 							}
-							$product['incorporated'] = UTILITY::json_encode($product['incorporated']);
 						}
+						$product['incorporated'] = UTILITY::json_encode([...$product['incorporated'], $latestincorporation]);
 					}
+					elseif ($product['incorporated']) $product['incorporated'] = UTILITY::json_encode($product['incorporated']);
+					else $product['incorporated'] = null;
 				}
 
 				// validate vendor
@@ -967,15 +985,44 @@ class CONSUMABLES extends API {
 							]
 						]);	
 					}
-					// update incorporation state on similar products
+					// update incorporation state on similar products 
 					if (PERMISSION::permissionFor('incorporation')){
-						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 							'replacements' => [
-								':field' => 'incorporated',
-								':value' => $product['incorporated'] ? : 'NULL',
-								':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
+								':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids))
 							]
 						]);
+						foreach($products as $similarproduct){
+							$similarproduct['incorporated'] = json_decode($similarproduct['incorporated'] ? : '', true);
+							if ($similarproduct['incorporated']){
+								// get latest incorporation entry;
+								$latestincorporation = array_pop($similarproduct['incorporated']);
+								if ($latestincorporation){
+									if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation.state_approve'))){
+										$incorporation = explode(' | ', $incorporation);
+										if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $latestincorporation = null;
+										else {
+											foreach ($this->_lang->_USER['permissions'] as $permission => $translation){
+												if (in_array($translation, $incorporation)) $latestincorporation[$permission] = [
+													'name' => $_SESSION['user']['name'],
+													'date' => $this->_date['servertime']->format('Y-m-d H:i')
+												];
+											}
+										}
+									}
+								}
+								$similarproduct['incorporated'] = UTILITY::json_encode([...$similarproduct['incorporated'], $latestincorporation]);
+							}
+							elseif ($similarproduct['incorporated']) $product['incorporated'] = UTILITY::json_encode($similarproduct['incorporated']);
+							else $similarproduct['incorporated'] = null;
+
+							SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
+								'replacements' => [
+									':id' => $similarproduct['id'],
+									':incorporated' => $similarproduct['incorporated'] ? $this->_pdo->quote(UTILITY::json_encode($similarproduct['incorporated'])) : 'NULL'
+								]
+							]);
+						}
 					}
 				}
 				require_once('notification.php');
@@ -1181,11 +1228,12 @@ class CONSUMABLES extends API {
 						// inform about incorporation state
 						if ($product['incorporated']) {					
 							$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
+							// regular users only see the most recent state
+							$product['incorporated'] = array_pop($product['incorporated']);
 							$incorporationState = '';
 							if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 							elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 							elseif (PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.accepted');
-			
 							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
 							foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 								if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date']);
@@ -1334,49 +1382,57 @@ class CONSUMABLES extends API {
 					}
 
 					// display checks
-					$checkslides = [[]];
+					$productsPerSlide = 0;
+					$checkslides = [];
 
 					// add incorporation state
 					if ($product['incorporated']) {					
 						$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-						$incorporationState = '';
-						if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
-						elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
+						for($i = 0; $i < count($product['incorporated']); $i++){ // loop with index to display approval options for most recent only
+							$incorporation = $product['incorporated'][$i];
 
-						$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
-						$incorporationInfo .= " \n";
-						$pendingIncorporationCheck = "";
-						foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
-							if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date']);
-							else $pendingIncorporationCheck .= "\n" . $this->_lang->GET('consumables.product.incorporation_pending', [':permission' => $this->_lang->_USER['permissions'][$permission]]);
-						}
-						if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
+							$incorporationState = '';
+							if (isset($incorporation['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
+							elseif (!PERMISSION::fullyapproved('incorporation', $incorporation)) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 
-						array_push($checkslides[0],
-							[
+							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $incorporation['_check']);
+							$incorporationInfo .= " \n";
+							$pendingIncorporationCheck = "";
+							foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
+								if (isset($incorporation[$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $incorporation[$permission]['name'] . ' ' . $this->convertFromServerTime($incorporation[$permission]['date']);
+								else $pendingIncorporationCheck .= "\n" . $this->_lang->GET('consumables.product.incorporation_pending', [':permission' => $this->_lang->_USER['permissions'][$permission]]);
+							}
+							if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
+
+							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+								$checkslides[] = [];
+							}
+							$slide = intval(count($checkslides) - 1);
+							$checkslides[$slide][] = [
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $incorporationState
 								],
 								'content' => $incorporationInfo
-							]);
-						if (PERMISSION::permissionFor('incorporation')){
-							$incorporation = [];
-							foreach (PERMISSION::pending('incorporation', $product['incorporated']) as $position){
-								$incorporation[$this->_lang->GET('permissions.' . $position)] = [];
-								if ($similarproducts) $incorporation[$this->_lang->GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
-							}
-							$incorporation[$this->_lang->GET('consumables.product.incorporated_revoke')] = [];
-							if ($similarproducts) $incorporation[$this->_lang->GET('consumables.product.incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
-							array_push($checkslides[0], [
+							];
+
+							if (PERMISSION::permissionFor('incorporation') && $i === count($product['incorporated']) - 1){
+								$remaining_approvals = [];
+								foreach (PERMISSION::pending('incorporation', $incorporation) as $position){
+									$remaining_approvals[$this->_lang->GET('permissions.' . $position)] = [];
+									if ($similarproducts) $remaining_approvals[$this->_lang->GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
+								}
+								$remaining_approvals[$this->_lang->GET('consumables.product.incorporated_revoke')] = [];
+								if ($similarproducts) $remaining_approvals[$this->_lang->GET('consumables.product.incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
+								$checkslides[$slide][] = [
 									'type' => 'checkbox',
 									'attributes' => [
 										'name' => $this->_lang->GET('order.incorporation.state_approve')
 									],
-									'content' => $incorporation,
+									'content' => $remaining_approvals,
 									'hint' => $this->_lang->GET('consumables.product.similar_hint'),
-								]
-							);
+								];
+							}
 						}
 					}
 					else {
@@ -1388,10 +1444,10 @@ class CONSUMABLES extends API {
 							'content' => ' ',
 							'hint' => $this->_lang->GET('consumables.product.similar_hint'),
 						];
+						$productsPerSlide++;
 					}
 
 					$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
-					$productsPerSlide = 1;
 					if ($product['sample_checks']) {
 						foreach ($product['sample_checks'] as $check){
 							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
@@ -1686,7 +1742,7 @@ class CONSUMABLES extends API {
 					'special_attention' => $row['special_attention'],
 					'stock_item' => $row['stock_item'],
 					'incorporated' => $row['incorporated'],
-					'erp_id' => $row['incorporated'],
+					'erp_id' => $row['erp_id'],
 				];
 			}
 
@@ -1744,13 +1800,13 @@ class CONSUMABLES extends API {
 					':protected' => null,
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) && intval($pricelist->_list[1][$index]['trading_good']) ? 1 : null,
 					':incorporated' => isset($pricelist->_list[1][$index]['last_order']) && $pricelist->_list[1][$index]['last_order'] 
-						? UTILITY::json_encode([
+						? UTILITY::json_encode([[
 							'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $pricelist->_list[1][$index]['last_order']], true),
 							'user' => [
 								'name' => $_SESSION['user']['name'],
 								'date' => $this->_date['servertime']->format('Y-m-d H:i')
 							]
-						])
+						]])
 						: null,
 					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ?1 : null,
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) && intval($pricelist->_list[1][$index]['special_attention']) ? 1 : null,

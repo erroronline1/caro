@@ -391,9 +391,9 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = :sample_checks WHERE id IN (:ids) AND trading_good IS NOT NULL AND trading_good != 0",
 			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = :sample_checks WHERE id IN (:ids) AND trading_good IS NOT NULL AND trading_good != 0"
 		],
-		'consumables_put_incorporation' => [ // preprocess via strtr
-			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)",
-			'sqlsrv' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id IN (:ids)"
+		'consumables_put_incorporation' => [
+			'mysql' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET incorporated = :incorporated WHERE id = :id"
 		],
 		'consumables_put_last_order' => [
 			'mysql' => "UPDATE caro_consumables_products SET last_order = CURRENT_TIMESTAMP WHERE id = :id",

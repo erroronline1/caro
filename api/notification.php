@@ -146,8 +146,10 @@ class NOTIFICATION extends API {
 			foreach ($allproducts as $product) {
 				if (!$product['incorporated']) continue;
 				$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-				if (isset($product['incorporated']['_denied'])) continue;
-				elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $unapproved++;
+				// get latest incorporation entry;
+				$latestincorporation = array_pop($product['incorporated']);
+				if (!$latestincorporation || isset($latestincorporation['_denied'])) continue;
+				elseif (!PERMISSION::fullyapproved('incorporation', $latestincorporation)) $unapproved++;
 			}
 		}
 		return $unapproved;
