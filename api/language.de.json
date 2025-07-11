@@ -130,6 +130,19 @@
 			"settled": "Abgerechnet"
 		}
 	},
+	"orderreturns": {
+		"critical": {
+			"fabrication_issue": "Fertigungsfehler",
+			"fitting_issue": "Sonderanfertigung passt nicht",
+			"function_issue": "Funktionsfehler"
+		},
+		"easy": {
+			"design_error": "Farb- oder Musterfehler",
+			"incorrect_order": "Falschbestellung",
+			"rental": "Leihteil",
+			"selection": "Rücksendung Auswahlbestellung"
+		}
+	},
 	"general": {
 		"calendar_week": "Kalenderwoche :number",
 		"cancel_button": "Nein, ich bin noch nicht fertig",
@@ -1270,10 +1283,11 @@
 		"productlink": "zum Artikel",
 		"productname_label": "Artikelname",
 		"quantity_label": "Menge",
-		"return": "Rücksendung (Gutschrift oder Leihteil)",
+		"return": "Rücksendung",
 		"return_message": "Füge Informationen für den Einkauf an, z.B. Seriennummer, etc.",
 		"return_message_cancel": "Nein danke",
 		"return_message_ok": "Ja, zurücksenden",
+		"return_reason": "Rücksendegrund",
 		"sample_check": {
 			"alert": "Eine neue Stichprobenprüfung wurde von :name übermittelt. Bitte überprüfe sie bei :audit\n\n",
 			"by_user": "Dieser Artikel kommt für eine Stichprobenprüfung durch eine persönliche Nutzeranmeldung in Frage!",

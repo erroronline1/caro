@@ -130,6 +130,19 @@
 			"settled": "Settled"
 		}
 	},
+	"orderreturns": {
+		"critical": {
+			"fabrication_issue": "Defective assembled",
+			"fitting_issue": "Custom made not fitting",
+			"function_issue": "Faulty operation"
+		},
+		"easy": {
+			"design_error": "Wrong colour or design",
+			"incorrect_order": "Incorrect order",
+			"rental": "Rental part",
+			"selection": "Selection return"
+		}
+	},
 	"general": {
 		"calendar_week": "Week :number",
 		"cancel_button": "No, I am not done yet",
@@ -1270,10 +1283,11 @@
 		"productlink": "go to product",
 		"productname_label": "Product name",
 		"quantity_label": "Quantity",
-		"return": "Return product (credit or rental)",
+		"return": "Return product",
 		"return_message": "Add addition information for purchase, like serial number, etc.",
 		"return_message_cancel": "No, thank you",
 		"return_message_ok": "Yes, return",
+		"return_reason": "Reason of return",
 		"sample_check": {
 			"alert": "A new MDR §14 Sample check has been submitted by :name. Review within :audit\n\n",
 			"by_user": "This article qualifies for a MDR §14 sample check by a personified user account!",

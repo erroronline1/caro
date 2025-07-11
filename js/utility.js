@@ -365,7 +365,6 @@ export const _client = {
 			inputs = JSON.parse(inputs);
 			let fields;
 			for (const [name, attributes] of Object.entries(inputs)) {
-				console.log(name, attributes);
 				fields = document.getElementsByName(name);
 				for (const [id, field] of Object.entries(fields)) {
 					field.parentNode.style.display = display === attributes.display ? "initial" : "none";
@@ -1184,6 +1183,18 @@ export const _client = {
 					buttons = {};
 					buttons[api._lang.GET("order.return_message_cancel")] = false;
 					buttons[api._lang.GET("order.return_message_ok")] = { value: true, class: "reducedCTA" };
+
+					let reasons = {};
+
+					if (api._lang._USER.orderreturns.critical) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.critical)) reasons[value] = [];
+					if (api._lang._USER.orderreturns.easy) for (const [key, value] of Object.entries(api._lang._USER.orderreturns.easy)) reasons[value] = [];
+					reasons = Object.keys(reasons)
+						.sort()
+						.reduce((obj, key) => {
+							obj[key] = reasons[key];
+							return obj;
+						}, {});
+
 					states[api._lang.GET("order.return")] = {
 						data_return: "false",
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
@@ -1199,6 +1210,14 @@ export const _client = {
 										},
 										hint: api._lang.GET("order.return_message"),
 									},
+									{
+										type: "select",
+										attributes: {
+											name: api._lang.GET("order.return_reason"),
+											required: true,
+										},
+										content: reasons,
+									},
 								],
 								options: buttons,
 							}).then((response) => {
@@ -1210,7 +1229,7 @@ export const _client = {
 							});
 						}
 							.toString()
-							._replaceArray(["element.id", "buttons"], [element.id, JSON.stringify(buttons)]),
+							._replaceArray(["element.id", "buttons", "reasons"], [element.id, JSON.stringify(buttons), JSON.stringify(reasons)]),
 					};
 				}
 				collapsible.push({ type: "br" });
@@ -1389,7 +1408,7 @@ export const _client = {
 
 				// create order container
 				if (preventcollapsible) {
-					order = [...collapsible, ...productaction];
+					order = [...collapsible];
 				} else {
 					order = [
 						{
@@ -1400,8 +1419,8 @@ export const _client = {
 							content: collapsible,
 						},
 					];
-					order.push(productaction);
 				}
+				if (productaction) order.push(...productaction);
 
 				content.push(order);
 			}

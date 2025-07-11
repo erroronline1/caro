@@ -50,6 +50,9 @@ Keys are hardcoded.
 ### casestate
 Administrative case state, generates a pseudodocument to check states by given permission levels and makes unclosed records filterable by given states within overview. Checkbox options with a low level key according to documentcontext high level keys record_pseudodocument_{low level key} translation must be set in [record](#record). `casestate` order is passed to application.
 
+### orderreturns
+Reasons for a returned order. Split into `critical` and `easy`, while ordered alphabetically critical return reasons may trigger a warning to quality assurance, product review and reincorporation process. Since this is a quality management relevant setting it is not buried withon order language chunks. Keys must not contain duplicates.
+
 ### general
 All keys are hardcoded, `weekday` and `month` order is passed to application.
 
