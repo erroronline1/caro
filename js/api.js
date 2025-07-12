@@ -1333,10 +1333,19 @@ export const api = {
 					render.processAfterInsertion();
 					api.preventDataloss.start();
 				}
+				if (data.links) {
+					new Dialog({
+						type: "input",
+						render: [
+							{ type: "textsection", content: api._lang.GET("maintenance.record_datalist.download") },
+							{ type: "links", content: data.links },
+						],
+					});
+				}
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 			},
 			title = {
-				maintenance: api._lang.GET("maintenance.navigation.maintenance"),
+				task: api._lang.GET("maintenance.navigation.maintenance"),
 			};
 		switch (method) {
 			case "get":
