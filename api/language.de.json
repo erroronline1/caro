@@ -1086,7 +1086,16 @@
 			"records_datalist": "Textvorschläge für Aufzeichnungen",
 			"vendorupdate": "Lieferantenupdate"
 		},
-		"record_datalist": {},
+		"record_datalist": {
+			"description": "Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen.\nDu kannst eine CSV-Datei herunterladen, bearbeiten und wieder bereitstellen, oder vorbereitete Empfehlungen bereitstellen. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs.\nTabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen.\nOhne bereitgestellte Datei gibt es den Export.",
+			"download":"Lade Datenbankeinträge herunter",
+			"unit":"Bereich",
+			"update_abort":"Die Aktualisierung wurde abgebrochen. Es wurde nur eine einzelne Spalte gefunden, was verdächtigt ist und wahrscheinlich an einer fehlerhaften CSV-Formatierung liegt. Bitte beachten: :format",
+			"update_deleted":"Bisherige Einträge wurden gelöscht.",
+			"update_error": "Das Update schlug fehl.",
+			"update_success": ":unit wurde erfolgreich aktualisiert.",
+			"upload":"Wähle eine CSV-Datei um die Datenbank zu überschreiben"
+		},
 		"vendorupdate": {
 			"description": "Lade eine ordentlich vorbereitete Vorlagen-Datei hoch. Anschließend kannst du die Informationen je Lieferant für die Aktualisierung auswählen.",
 			"file": "Vorlagen-Datei",

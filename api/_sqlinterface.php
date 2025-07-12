@@ -795,6 +795,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_records_datalist WHERE unit = :unit",
 			'sqlsrv' => "SELECT * FROM caro_records_datalist WHERE unit = :unit"
 		],
+		'records_datalist_delete' => [ // maintenance update
+			'mysql' => "DELETE FROM caro_records_datalist WHERE unit = :unit",
+			'sqlsrv' => "DELETE FROM caro_records_datalist WHERE unit = :unit"
+		],
 		
 
 

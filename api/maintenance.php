@@ -114,7 +114,9 @@ class MAINTENANCE extends API {
 		if ($this->_requestedType && $this->_requestedType !== '...') {
 			if ($append = $this->{$this->_requestedType}()) array_push($response['render']['content'] , ...$append);
 
-			if (in_array($this->_requestedType, ['records_datalist', 'vendorupdate']) && $_SERVER['REQUEST_METHOD'] !== 'PUT'){
+			if (($this->_requestedType === 'vendorupdate' && $_SERVER['REQUEST_METHOD'] !== 'PUT')
+				|| ($this->_requestedType === 'records_datalist' && $_SERVER['REQUEST_METHOD'] === 'GET')
+			){
 				$response['render']['form'] = [
 					'data-usecase' => 'maintenance',
 					'action' => "javascript:api.maintenance('" . ($_SERVER['REQUEST_METHOD'] === 'GET' ? 'post' : 'put') . "', 'task', '" . $this->_requestedType . "')"
@@ -141,6 +143,89 @@ class MAINTENANCE extends API {
 				if (($unit = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.record_datalist.unit')), $this->_lang->_USER['units'])) === false) die;
 				
 				if (isset($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]) && $_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name']) {
+
+					$data = [];
+					$rownum = 0;
+					if (($handle = fopen($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name'][0], 'r')) !== false) {
+						while (($row = fgetcsv($handle, null,
+							CONFIG['csv']['dialect']['separator'],
+							CONFIG['csv']['dialect']['enclosure'],
+							CONFIG['csv']['dialect']['escape'])) !== FALSE) {
+							if ($rownum < 1){
+								if (count($row) < 2){
+									return [[
+										'type' => 'textsection',
+										'attributes' => [
+											'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
+										],
+										'content' => $this->_lang->GET('maintenance.record_datalist.update_abort', [':format' => UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . implode(', ', $row),
+									]];
+								}
+								// set header as data keys
+								foreach($row as $column){
+									if ($column) $data[$column] = [];
+								}
+							}
+							else {
+								// append content to data keys
+								foreach($row as $index => $column){
+									if ($column) $data[array_keys($data)[$index]][] = $column;
+								}
+							}
+							$rownum++;
+						}
+						fclose($handle);
+					}
+
+					// sort datalists and append sql query
+					$insertions = [];
+					foreach($data as $issue => $datalist){
+						$datalist = array_values(array_unique($datalist));
+						sort($datalist);
+						$insertions[] = [
+							':issue' => $issue,
+							':unit' => $unit,
+							':datalist' => UTILITY::json_encode($datalist)
+						];
+					}
+
+					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('records_datalist_post'), $insertions);
+					if ($sqlchunks){
+						// drop unit entries
+						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', ['values' => [':unit' => $unit]])) $content[] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.record_datalist.update_deleted'),
+							]
+						];
+
+						foreach ($sqlchunks as $chunk){
+							try {
+								SQLQUERY::EXECUTE($this->_pdo, $chunk);
+							}
+							catch (\Exception $e) {
+								return [...$content, [
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
+									],
+									'content' => $e,
+								]];
+							}
+						}
+						$content[] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.record_datalist.update_success', [':unit' => $this->_lang->_USER['units'][$unit]]),
+							]
+						];
+					}
+					else $content[] = [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
+						]
+					];
 				}
 				else {
 					$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $unit]]);
@@ -186,10 +271,6 @@ class MAINTENANCE extends API {
 					];
 					$this->response(['links' => $downloadfiles]);
 				}
-
-				break;
-			case 'PUT':
-				// process csv. if valid truncate table and chunkify insert
 				break;
 			case 'GET':
 				// display options and explanation
@@ -217,6 +298,7 @@ class MAINTENANCE extends API {
 					'type' => 'file',
 					'attributes' => [
 						'name' => $this->_lang->GET('maintenance.record_datalist.upload'),
+						'accept' => '.csv'
 					] 
 				];
 		}
