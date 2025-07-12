@@ -24,14 +24,12 @@ class MAINTENANCE extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
 	private $_requestedType = null;
-	private $_request = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!PERMISSION::permissionFor('maintenance') || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 		$this->_requestedType = isset(REQUEST[2]) ? REQUEST[2] : null;
-		$this->_request = isset(REQUEST[3]) ? REQUEST[3] : null;
 	}
 
 	/**
@@ -137,15 +135,92 @@ class MAINTENANCE extends API {
 	 * csv for easiest handling
 	 */
 	private function records_datalist(){
+		$content = [];
 		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (($unit = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.record_datalist.unit')), $this->_lang->_USER['units'])) === false) die;
+				
+				if (isset($_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]) && $_FILES[$this->_lang->PROPERTY('maintenance.record_datalist.upload')]['tmp_name']) {
+				}
+				else {
+					$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $unit]]);
+					if (!$datalists){
+						die; // todo
+					}
+					$data = [];
+					$maxlength = 0;
+					foreach($datalists as $row){
+						$data[$row['issue']] = json_decode($row['datalist']);
+						if(count($data[$row['issue']]) > $maxlength) $maxlength = count($data[$row['issue']]);
+					}
+					// fill up datalists with empty values to match maxlength
+					// no manipulation by &reference here, doesn't work
+					foreach ($data as $issue => $datalist) {
+						if (count($datalist) < $maxlength) array_push($data[$issue], ...array_fill(0, $maxlength - count($datalist), ''));
+					}
+
+					$name = preg_replace(CONFIG['forbidden']['names']['characters'], '_', $this->_lang->_USER['units'][$unit]);
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $name . '.csv';
+					$file = fopen($tempFile, 'w');
+					fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+					fputcsv($file, array_keys($data),
+						CONFIG['csv']['dialect']['separator'],
+						CONFIG['csv']['dialect']['enclosure'],
+						CONFIG['csv']['dialect']['escape']);
+
+					for($i = 0; $i < $maxlength; $i++){
+						$row = [];
+						foreach ($data as $issue => $datalist) {
+							$row[] = $datalist[$i];
+						}
+						fputcsv($file, $row,
+						CONFIG['csv']['dialect']['separator'],
+						CONFIG['csv']['dialect']['enclosure'],
+						CONFIG['csv']['dialect']['escape']);
+					}
+					fclose($file);
+					// provide downloadfile
+					$downloadfiles[pathinfo($tempFile)['basename']] = [
+						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'download' => pathinfo($tempFile)['basename']
+					];
+					$this->response(['links' => $downloadfiles]);
+				}
+
+				break;
 			case 'PUT':
 				// process csv. if valid truncate table and chunkify insert
 				break;
-			default:
-				// display option and explanation
-				// if $this->_request return csv
-		}
+			case 'GET':
+				// display options and explanation
 
+				$content[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('maintenance.navigation.records_datalist'),
+					],
+					'content' => $this->_lang->GET('maintenance.record_datalist.description')
+				];
+				$units = [];
+				foreach($this->_lang->_USER['units'] as $unit => $description){
+					$units[$description] = [];
+				}
+				$content[] = [
+					'type' => 'radio',
+					'attributes' => [
+						'name' => $this->_lang->GET('maintenance.record_datalist.unit'),
+						'required' => true
+					],
+					'content' => $units
+				];
+				$content[] = [
+					'type' => 'file',
+					'attributes' => [
+						'name' => $this->_lang->GET('maintenance.record_datalist.upload'),
+					] 
+				];
+		}
+		return $content;
 	}
 
 	/**
@@ -176,10 +251,10 @@ class MAINTENANCE extends API {
 						]];
 					}
 					$content[] = [
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('maintenance.vendorupdate.select_description'),
-							]
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('maintenance.vendorupdate.select_description'),
+						]
 					];
 					// gather possibly existing entries
 					$DBall = [
