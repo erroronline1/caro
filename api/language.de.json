@@ -1089,6 +1089,7 @@
 		"record_datalist": {
 			"description": "Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen.\nDu kannst eine CSV-Datei herunterladen, bearbeiten und wieder bereitstellen, oder vorbereitete Empfehlungen bereitstellen. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs.\nTabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen.\nOhne bereitgestellte Datei gibt es den Export.",
 			"download":"Lade Datenbankeinträge herunter",
+			"empty": "Es gibt noch keine Einträge für :unit die exportiert werden könnten.",
 			"unit":"Bereich",
 			"update_abort":"Die Aktualisierung wurde abgebrochen. Es wurde nur eine einzelne Spalte gefunden, was verdächtigt ist und wahrscheinlich an einer fehlerhaften CSV-Formatierung liegt. Bitte beachten: :format",
 			"update_deleted":"Bisherige Einträge wurden gelöscht.",

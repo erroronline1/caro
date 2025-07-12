@@ -230,7 +230,12 @@ class MAINTENANCE extends API {
 				else {
 					$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $unit]]);
 					if (!$datalists){
-						die; // todo
+						return [[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('maintenance.record_datalist.empty', [':unit' => $this->_lang->_USER['units'][$unit]]),
+							]
+						]];
 					}
 					$data = [];
 					$maxlength = 0;

@@ -1089,6 +1089,7 @@
 		"record_datalist": {
 			"description": "Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries.\nYou can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit.\nTable headers resemble input field names, rows are for recommendations.\nWithout a provided file you get the export.",
 			"download":"Download database entries",
+			"empty": "There are no entries for :unit to export yet.",
 			"unit":"Bereich",
 			"update_abort":"Update has been aborted. Only one column has been found, what is suspicious and most likely a CSV formatting issue. Please adhere: :format",
 			"update_deleted":"Previous entries have been deleted.",
