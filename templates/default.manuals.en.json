@@ -88,6 +88,11 @@
 		"permissions": "ceo,qmo,prrc"
 	},
 	{
+		"title": "Maintenance",
+		"content": "Datalists for vendors and suggestions based on saved records can be updated with ease by comparison.",
+		"permissions": "ceo,qmo"
+	},
+	{
 		"title": "Improvement suggestions",
 		"content": "You can contribute improvement suggestions for all topics. Suggestions are public and can be voted on. If you fell uncomfortable you are allowed to contribute anonymously.\nEveryone gets informed on new suggestions, only you as soon as yours are being processed.\nAuthorized users can define measures and close the contribution if this appears reasonable.",
 		"permissions": "user,group"

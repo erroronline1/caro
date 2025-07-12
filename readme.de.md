@@ -37,6 +37,7 @@
         * [Bestellung](#bestellung)
     * [Werkzeuge](#werkzeuge)
     * [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen)
+    * [Wartung](#wartung)
 * [In der Anwendung verteilte Integrationen](#in-der-anwendung-verteilte-integrationen)
     * [Erinnerungen und automatische Aufgabenplanung](#erinnerungen-und-automatische-aufgabenplanung)
     * [Schulungen](#schulungen)
@@ -976,6 +977,14 @@ Ferner hoffentlich hilfreiche Informationen zu
 
 [Übersicht](#übersicht)
 
+## Wartung
+Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
+* Der Aufruf der Startseite löst den 'cron job' für die Bereinigung abgelaufener Dateien und die Erstellung automatischer Benachrichtigungen und Aufgabenplanungen aus. Die Durchführung findet einmal täglich statt. Die Log-Datei `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
+* Bestehende Lieferanten können in Bezug auf ihre Informationen und die Preislisten-Einstellungen (Importfilter und Stichproben-Intervalle) aktualisiert werden. Eine Datei gemäß [Vorlage](#anwendungseinrichtung) kann bereitgestellt werden. Die jeweiligen Aktualisierungen können für jeden übereinstimmenden Lieferanten gewählt werden.
+* Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen. Es kann eine CSV-Datei heruntergeladen, bearbeitet und wieder bereitgestellt werden, oder vorbereitete Empfehlungen bereitgestellt werden. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs. Tabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen. Ohne bereitgestellte Datei gibt es den Export.
+
+[Übersicht](#übersicht)
+
 # In der Anwendung verteilte Integrationen
 
 ## Erinnerungen und automatische Aufgabenplanung
@@ -1800,7 +1809,6 @@ Im Falle einer Anpassung des Quelltexts:
 * Einstellungen um einen lokalen Server der Entwicklungsumgebung zu erreichen: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 * Das checkbox2text-Widget verkettet die gewählten Optionen mit `, ` (Komma und ein Leerzeichen). Optionen dürfen diese Zeichen daher nicht enthalten (z.B. regulatorische Anforderungen für Audit-Vorlagen) oder das Verarbeiten der Optionen benätigt einen eigenen Handler (Produktverwaltung). Anderfalls kann eine erneute Auswahl zu unerwarteten Ergebnissen führen. Falls möglich sollten die gewählten Optionen einen Wert zugewiesen bekommen, unabhängig von der Bezeichnung.
-* Die Startseite löst den 'cron job' für die Bereinigung abgelaufener Dateien und die Erstellung automatischer Benachrichtigungen und Aufgabenplanungen aus. Die Durchführung findet einmal täglich statt. Administratoren wird der letzte Eintrag der Log-Datei `cron.log` innerhalb des API-Verzeichnisses angezeigt. Dies beinhaltet auch Fehlermeldungen. Die Log-Datei kann gelöscht werden um das Update erneut durchzuführen.
 * UTILITY::parsePayload:
     * Arrays können als GET und DELETE Anforderung nicht mit ?var[]=1&var[]=2 verwendet werden. Nur das letzte Vorkommen wird auf diese Weise verwendet.
     * $_FILES ist immer ein Array aufgrund einer individuellen Verarbeitung von POST und PUT Nutzlast.

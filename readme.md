@@ -33,11 +33,6 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* admin tools
-    * reset cron log
-    * batch update vendors (file upload)
-    * export/import records datalist as csv for prepopulation an sanitation
-    * [tools](#tools), [api endpoints](#measure-endpoints)
 
 ## Content
 * [Aims](#aims)
@@ -75,6 +70,7 @@ Things are still in motion. Images may be outdated.
         * [Order](#order)
     * [Tools](#tools)
     * [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)
+    * [Maintenance](#maintenance)
 * [Cross application integrations](#cross-application-integrations)
     * [Reminders and automated schedules](#reminders-and-automated-schedules)
     * [User trainings](#user-trainings)
@@ -116,6 +112,7 @@ Things are still in motion. Images may be outdated.
     * [CSV filter endpoints](#csv-filter-endpoints)
     * [Document endpoints](#document-endpoints)
     * [File endpoints](#file-endpoints)
+    * [Maintenance endpoints](#maintenance-endpoints)
     * [Measure endpoints](#measure-endpoints)
     * [Message endpoints](#message-endpoints)
     * [Notification endpoints](#notification-endpoints)
@@ -1073,6 +1070,14 @@ Furthermore hopefully beneficial information on
 
 [Content](#content)
 
+## Maintenance
+The application has some options to be maintained by authorized users:
+* By accessing the landing page the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks is triggered. This is executed once per day. The logfile `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
+* Existing vendors can be updated regarding their information and pricelist settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
+* Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
+
+[Content](#content)
+
 # Cross application integrations
 
 ## Reminders and automated schedules
@@ -1896,7 +1901,6 @@ If you ever fiddle around with the sourcecode:
 * Settings to access a local server on the development machine: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
 * See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 * The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results. Options best have a value independent on their label.
-* The landing page triggers the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks. This is executed once per day. Admins get the latest entry of the logfile `cron.log` within the api directory. This includes error messages as well. The logfile can be deleted to retrigger the updates.
 * UTILITY::parsePayload:
     * Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
     * $_FILES is always an array due to a custom processing of POST and PUT payload.
@@ -3798,6 +3802,67 @@ Parameters
 | {path to file} | path parameter | true | relative path |
 
 [Content](#content)
+
+### Maintenance endpoints
+
+> DELETE ./api/api.php/maintenance/task/{task}
+
+Currently only deleting cron.log
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {task} | path parameter | required | cron_log |
+
+Sample response
+HTTP status code 410 or 404.
+
+> POST ./api/api.php/maintenance/task/{task}
+
+Depending on {task}:
+* Uploads a vendor template file for selection of updates
+* Updates the records_datalist database or return its data dump
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {task} | path parameter | required | records_datalist or vendorupdate |
+| payload | form data | required | suggestion |
+
+Sample response
+```
+{"links":{"2025-07-13 00-36-50 Prosthetics II.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/2025-07-13 00-36-50 Prosthetics II.csv","download":"2025-07-13 00-36-50 Prosthetics II.csv"}}}
+```
+
+> PUT ./api/api.php/maintenance/task/{task}
+
+Currently only Updates vendor information.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {task} | path parameter | required | vendorupdate |
+| payload | form data | required | selected updates |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log"},"Record datalist":{"value":"records_datalist"},"Vendor update":{"value":"vendorupdate","selected":true}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', 'task', this.value)"}}],{"type":"textsection","attributes":{"name":"Following vendors have been successfully updated:"},"content":"Ortho-Reha Neuhof GmbH"}]}}
+```
+
+> GET ./api/api.php/maintenance/task/{task}
+
+Displays all maintenance options.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {task} | path parameter | optional | |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"...":[],"Cron Log":{"value":"cron_log","selected":true},"Record datalist":{"value":"records_datalist"},"Vendor update":{"value":"vendorupdate"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.maintenance('get', 'task', this.value)"}}],{"type":"textsection","attributes":{"name":"CRON"},"content":"\n\n2025-07-12 01:38:48 OK\n\n2025-07-13 00:07:31 OK"},{"type":"deletebutton","attributes":{"value":"Delete cron.log with 2 entries","onclick":"api.application('delete', 'cron_log')"}}]}}
+```
+
 
 ### Measure endpoints
 
