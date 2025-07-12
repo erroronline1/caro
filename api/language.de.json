@@ -1076,15 +1076,29 @@
 		"sharepoint_upload_header": "Teile Dateien"
 	},
 	"maintenance": {
+		"cron": {
+			"not_found": "Logfile wurde nicht gefunden uns wurde vermutlich gerade eben gelöscht",
+			"delete": "cron.log mit :count Einträgen löschen"
+		},
 		"navigation": {
 			"cron_log": "Cron Log",
 			"maintenance": "Wartung",
 			"records_datalist": "Textvorschläge für Aufzeichnungen",
 			"vendorupdate": "Lieferantenupdate"
 		},
-		"cron": {
-			"not_found": "Logfile wurde nicht gefunden uns wurde vermutlich gerade eben gelöscht",
-			"delete": "cron.log mit :count Einträgen löschen"
+		"record_datalist": {},
+		"vendorupdate": {
+			"description": "Lade eine ordentlich vorbereitete Vorlagen-Datei hoch. Anschließend kannst du die Informationen je Lieferant für die Aktualisierung auswählen.",
+			"file": "Vorlagen-Datei",
+			"file_error": "Keine Datei bereitgestellt",
+			"format_error": "Die bereitgestellte Datei scheint kein richtiges JSON zu sein. Bitte prüfe das.",
+			"select_description": "Wähle pro Lieferant, was aktualisiert werden soll. Die Vorlage überschreibt dann die Datenbankeinträge; im Falle leerer Daten bleiben die Bestandsdaten. Vermisst du einen Lieferanten? Dann stimmen wahrscheinlich die Namen nicht überein...",
+			"update_error": "Das Update schlug fehl",
+			"update_info": "Info",
+			"update_pricelist": "Preislisten-Einstellungen",
+			"update_success": "Folgende Lieferanten wurden erfolgreich aktualisiert:",
+			"vendor_hidden": "Dieser Lieferant wurde als verborgen markiert",
+			"vendor_missing": "Diese Lieferanten in der Anwendung haben keine Übereinstimmung mit der Vorlagen-Datei:"
 		}
 	},
 	"measure": {
