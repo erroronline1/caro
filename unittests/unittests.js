@@ -1830,6 +1830,7 @@ export async function screenshot(lang = null) {
 	function* menucall(index) {
 		const targets = document.querySelectorAll("nav > input");
 		while (index < targets.length) {
+			console.log(`:screenshot --fullpage --filename "${targets[index].title.toLowerCase()} menu ${lang}.png"`);
 			yield targets[index];
 			index++;
 		}
@@ -1838,10 +1839,11 @@ export async function screenshot(lang = null) {
 	function* apicalls1(index) {
 		// with still fixed navigation
 		const targets = [
-			{ en: "api.file('get', 'files')", de: "" },
-			{ en: "api.measure('get', 'measure')", de: "" },
+			{ en: "api.file('get', 'files')", de: "", screenshot: `:screenshot --fullpage --filename "files ${lang}.png"` },
+			{ en: "api.measure('get', 'measure')", de: "", screenshot: `:screenshot --fullpage --filename "measure management ${lang}.png"` },
 		];
 		while (index < targets.length) {
+			console.log(targets[index].screenshot);
 			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
 			index++;
 		}
@@ -1850,25 +1852,24 @@ export async function screenshot(lang = null) {
 	function* apicalls2(index) {
 		// after unfixing navigation
 		const targets = [
-			{ en: "rendertest('app')", de: "rendertest('app_de')" },
-			{ en: "rendertest('documents')", de: "rendertest('documents_de')" },
-			{ en: "api.audit('get', 'audit', 11)", de: "" }, // customize to appropriate caro_audit_and_management id
-			{ en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)" }, // customize to appropriate caro_audit_templates id
-			{ en: "api.message('get', 'conversation')", de: "" }, 
-			{ en: "api.message('get', 'announcements')", de: "" },
-			{ en: "api.risk('get', 'risk')", de: "" },
-			{ en: "api.calendar('get', 'schedule')", de: "" },
-			{ en: "api.application('get', 'start')", de: "" },
-			{ en: "api.document('get', 'document_editor', 127)", de: "" }, // customize id to approprate caro_documents id
-			{ en: "api.record('get', 'document', 'Basisdaten')", de: "" }, // customize document name to appropriate caro_documents name
-			{ en: "api.calendar('get', 'longtermplanning', 11)", de: "" }, // customize id to appropriate caro_calendar id
-			{ en: "api.purchase('get', 'approved')", de: "" },
-			{ en: "api.responsibility('get', 'responsibilities')", de: "" },
-			{ en: "api.user('get', 'profile')", de: "" },
-			{ en: "api.audit('get', 'checks', 'risks')", de: "" },
-			{ en: "api.texttemplate('get', 'text', 40)", de: "" }, // customize id to appropriate caro_texttemplates id
-			{ en: "api.user('get', 'user', 'error%20on%20line%201')", de: "" }, // customize user name to appropriate caro_user name
-			{ en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "" }, // customize vendor name to appropriate caro_consumables_vendors name
+			{ en: "rendertest('documents')", de: "rendertest('documents_de')", screenshot: `:screenshot --fullpage --filename "sample document elements ${lang}.png"` },
+			{ en: "api.audit('get', 'audit', 11)", de: "", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
+			{ en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
+			{ en: "api.message('get', 'conversation')", de: "", screenshot: `:screenshot --fullpage --filename "conversation ${lang}.png"` },
+			{ en: "api.message('get', 'announcements')", de: "", screenshot: `:screenshot --fullpage --filename "announcements ${lang}.png"` },
+			{ en: "api.risk('get', 'risk')", de: "", screenshot: `:screenshot --fullpage --filename "risks ${lang}.png"` },
+			{ en: "api.calendar('get', 'schedule')", de: "", screenshot: `:screenshot --fullpage --filename "calendar ${lang}.png"` },
+			{ en: "api.application('get', 'start')", de: "", screenshot: `:screenshot --fullpage --filename "dashboard ${lang}.png"` },
+			{ en: "api.document('get', 'document_editor', 127)", de: "", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
+			{ en: "api.record('get', 'document', 'Basisdaten')", de: "", screenshot: `:screenshot --fullpage --filename "document screen ${lang}.png"` }, // customize document name to appropriate caro_documents name
+			{ en: "api.calendar('get', 'longtermplanning', 11)", de: "", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
+			{ en: "api.purchase('get', 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
+			{ en: "api.responsibility('get', 'responsibilities')", de: "", screenshot: `:screenshot --fullpage --filename "responsibility ${lang}.png"` },
+			{ en: "api.user('get', 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
+			{ en: "api.audit('get', 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
+			{ en: "api.texttemplate('get', 'text', 40)", de: "", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
+			{ en: "api.user('get', 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
+			{ en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
 		];
 		const rendertesttitle = [
 			{ en: "Sample application elements", de: "Beispiel Anwendungs-Elemente" },
@@ -1876,20 +1877,25 @@ export async function screenshot(lang = null) {
 		];
 		while (index < targets.length) {
 			if (rendertesttitle[index]) api.update_header(rendertesttitle[index][lang]);
+			console.log(targets[index].screenshot);
 			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
 			index++;
 		}
 	}
 
-	const timeout = 8;
+	const timeout = 10;
 	// instructions
 
 	if (!lang) {
-		return "language en or de have not been specified. call by screenshot('en') or screenshot('de') and paste ':screenshot --fullpage' into console during the countdown to capture the screen after preparing custom language and screen view.";
+		console.log(
+			"language en or de have not been specified. call by screenshot('en') or screenshot('de') and copy and re paste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen after preparing custom language and screen view."
+		);
+		return;
 	}
 
+	console.log(`copy and repaste the :screenshot command to have proper prepared filenames`);
 	console.log(`starting in in ${timeout} seconds. we'll start with menu items, after whose we'll iterate over provided endpoints. in the meantime the menu will be set to unfixed for longer contents.`);
-	console.log(`menu items will pop up every ${timeout} seconds, type or preferrably paste ':screenshot --fullpage' into console during the countdown to capture the screen.`);
+	console.log(`menu items will pop up every ${timeout} seconds, copy and repaste the :screenshot command to have proper prepared filenames.`);
 	await _.sleep(timeout * 1000);
 
 	let iterator = menucall(0),
@@ -1906,7 +1912,7 @@ export async function screenshot(lang = null) {
 		console.clear();
 	}
 
-	console.log(`menu will be cleared in ${timeout} seconds. endpoints will load every ${timeout} seconds, type or preferrably paste ':screenshot --fullpage' into console during the countdown to capture the screen.`);
+	console.log(`menu will be cleared in ${timeout} seconds. endpoints will load every ${timeout} seconds, type or preferrably paste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen.`);
 	await _.sleep(timeout * 1000);
 	for (const item of document.querySelectorAll("nav > input")) {
 		item.checked = false;
@@ -1953,6 +1959,15 @@ export async function screenshot(lang = null) {
 		console.clear();
 	}
 	console.log("done. reload to return to normal.");
+	console.log("manually image updates may contain:");
+	console.table([
+		`sample identifier code ${lang}.png`,
+		`record screen.png ${lang}`,
+		`record full summary ${lang}.png`,
+		`record reduced summary ${lang}.png`,
+		`document export ${lang}.png`,
+		`appointment ${lang}.png`
+	]);
 }
 
 export function request_param() {
