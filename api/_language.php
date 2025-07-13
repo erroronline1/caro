@@ -101,7 +101,7 @@ class LANG {
 	 */
 	public function GETALL(){
 		$return = $this->_USER;
-		foreach (['skills', 'documentcontext', 'risk', 'regulatory', 'risks'] as $unset) {
+		foreach (['skills', 'documentcontext', 'regulatory', 'risks'] as $unset) {
 			unset($return[$unset]);
 		}
 		return $return;
