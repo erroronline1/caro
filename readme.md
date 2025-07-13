@@ -33,6 +33,8 @@ Things are still in motion. Images may be outdated.
     * handle hidden attribute?
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
+* record export embed files not being images
+    * https://tcpdf.org/examples/example_041/
 
 ## Content
 * [Aims](#aims)
@@ -176,7 +178,7 @@ Data gathering is supposed to be completely digital and finally wants to get rid
 * Device agnostic: web-application accessible by any suitable device
 * No artificial intelligence: you have absolute data authority
 
-![dashboard screenshot](http://toh.erroronline.one/caro/dashboard.png)
+![dashboard screenshot](http://toh.erroronline.one/caro/dashboard%20en.png)
 
 ## Necessary infrastructure 
 You'll need a server to host the web application and network access for all terminal devices. The application is designed for mobile first e.g. Android tablets or iPads, but can be used on desktop computers as well. In fact some of the features are usable on desktop only (form creation, text templates and audit templates).
@@ -222,14 +224,14 @@ Timestamps are not qualified. A reduced validity than manual or stamped dates on
 * Add an option of grandfathering to product incorporation documents to make things easier, especially on transition from another quality management system to the CARO App. Be sure the fulfilments are satisfied on selecting though. If contained within the import filters, a default incorporation based of most recent erp-order is initiated.
 * Include the flowcharts from this description in your process instructions to depict your processes where defined by the application.
 
-![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements.png)
+![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20en.png)
 
 [Content](#content)
 
 # Modules
 
 ## Application
-![sample application menu](http://toh.erroronline.one/caro/application%20menu.png)
+![sample application menu](http://toh.erroronline.one/caro/application%20menu%20en.png)
 
 ### Users
 The application provides a dedicated role management for registered users. The whole content is only accessible on login. Users can have different permissions. Set permissions decide what content is available or for which functions users are eligible according to predefined permissions within the apps [setup file](#runtime-variables). The provided example is considered a decent choice, but it is up to you.
@@ -269,7 +271,7 @@ Usernames can be edited for societal reasons. This does not affect stored names 
 
 > On rare occasions the QR-token may not be readable by the inbuilt reader. It is advised to check the compatibility with the scanner from [tools](#tools) before passing, generating a new one if required.
 
-![user screenshot](http://toh.erroronline.one/caro/user.png)
+![user screenshot](http://toh.erroronline.one/caro/user%20en.png)
 
 ```mermaid
 graph TD;
@@ -305,7 +307,7 @@ graph TD;
 
 Users can see their information in the profile section for transparency reasons. They can modify their profile picture and set individual application settings.
 
-![user screenshot](http://toh.erroronline.one/caro/profile.png)
+![user screenshot](http://toh.erroronline.one/caro/profile%20en.png)
 
 [Content](#content)
 
@@ -313,12 +315,12 @@ Users can see their information in the profile section for transparency reasons.
 Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others. On installation a default manual will be inserted in the [default language](#runtime-variables).
 
 ## Communication
-![sample communication menu](http://toh.erroronline.one/caro/communication%20menu.png)
+![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20en.png)
 
 ### Conversations
 This is for internal communication and system alerts only and has no record aspect. Messages are grouped by conversation with the respective counterpart. You can message any registered user but the system user or yourself and delete any conversation at any time. Multiple recipients can be separated by comma or semicolon. Tapping on the profile picture of any message enables forwarding. New messages will trigger a system alert. The application can send messages to user groups if reasonable.
 
-![conversation screenshot](http://toh.erroronline.one/caro/conversation.png)
+![conversation screenshot](http://toh.erroronline.one/caro/conversation%20en.png)
 
 [Content](#content)
 
@@ -330,7 +332,7 @@ Authorized users can add, edit and delete announcements for everyone to see and 
 
 All users can see all announcements within the distinct menu option though, declaring concerned units if set. Announcements are not a persistent record and can be deleted and edited at any time. The last edit and editing user is displayed.
 
-![announcements screenshot](http://toh.erroronline.one/caro/announcements.png)
+![announcements screenshot](http://toh.erroronline.one/caro/announcements%20en.png)
 
 [Content](#content)
 
@@ -364,7 +366,7 @@ Text templates arrange generic text chunks. Arrange or group chunks within the [
 
 Output will be copied to clipboad on clicking or tapping the output field.
 
-![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation.png)
+![text recommendation screenshot](http://toh.erroronline.one/caro/text%20recommendation%20en.png)
 
 ```mermaid
 graph TD;
@@ -403,7 +405,7 @@ graph TD;
 ### Responsibilities
 Authorized users can define responsibilities for given tasks and assign users as well as their proxy. Assigned users will retrieve a message and a menu notification to review the assignments and accept the responsibilities. Responsibilities have a mandatory applicability timespan after which a calendar entry reminds admin to renew the expired item. Responsibilities can be edited at any time, only users have to reaccept their assignment for transparency reasons. Responsibilities are not a persistent record as they serve primarily operational information. The overview can be filtered by units as well as displaying only own responsibilities. 
 
-![responsibilities screenshot](http://toh.erroronline.one/caro/responsibility.png)
+![responsibilities screenshot](http://toh.erroronline.one/caro/responsibility%20en.png)
 
 [Content](#content)
 
@@ -412,12 +414,12 @@ All users can publicy suggest improvements to any topic, including processes. Ev
 
 To reduce pointless data and possible malignant spam, suggestions can be deleted although by default it is not recommended to do so. Entries have no record character but are supposed to gather opinion formation and serve as a source for quality improvement and management reporting.
 
-![measure management screenshot](http://toh.erroronline.one/caro/measure%20management.png)
+![measure management screenshot](http://toh.erroronline.one/caro/measure%20management%20en.png)
 
 [Content](#content)
 
 ## Records
-![sample records menu](http://toh.erroronline.one/caro/records%20menu.png)
+![sample records menu](http://toh.erroronline.one/caro/records%20menu%20en.png)
 
 ### Documents
 Several other pieces of software claim to handle your documents and speak of version control. In fact they just import PDF-files that have to be generated elsewhere. (Without going into excessive research) there has been no information on how document control and versioning is actually achieved. The CARO App just doesn't follow this as all: your documents are supposed to be created within the application itself. By aiming for a paperless solution this might be suitable enough; documents can still be exported as editable or prefilled PDFs within boundaries though.
@@ -484,7 +486,7 @@ Documents can be exported as an editable PDF in hopefully rare scenarios where a
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
-![document composer screenshot](http://toh.erroronline.one/caro/document%20manager.png)
+![document composer screenshot](http://toh.erroronline.one/caro/document%20manager%20en.png)
 
 #### Document control
 Components and documents have to be approved by defined authorized users to take effect. An approvement request for documents and components is delivered by the applications [messenger](#conversations) to users with set permissions; supervisors, if set, for the defined organizational unit. Approval is granted by ticking a checkmark while being logged in with the respective assigned roles/permissions. All registered users get a message on document updates.
@@ -554,11 +556,11 @@ graph TD;
 
 Screen document
 
-![screen document](http://toh.erroronline.one/caro/document%20screen.png)
+![screen document](http://toh.erroronline.one/caro/document%20screen%20en.png)
 
 Exported document
 
-![exported document](http://toh.erroronline.one/caro/document%20export.png)
+![exported document](http://toh.erroronline.one/caro/document%20export%20en.png)
 
 [Content](#content)
 
@@ -589,7 +591,7 @@ All alterings on records (reidentification, retyping, case state) are recorded a
 
 Records outside of manually created documents, that are being supported by the application (e.g. case state, see above), are being stored in the [system language](#runtime-variables).
 
-![screen record summary](http://toh.erroronline.one/caro/record%20screen.png)
+![screen record summary](http://toh.erroronline.one/caro/record%20screen%20en.png)
 
 ```mermaid
 graph TD;
@@ -649,11 +651,11 @@ graph TD;
 
 Exported full record summary
 
-![exported full record](http://toh.erroronline.one/caro/record%20full%20summary.png)
+![exported full record](http://toh.erroronline.one/caro/record%20full%20summary%20en.png)
 
 Exported reduced record summary
 
-![exported reduced summary](http://toh.erroronline.one/caro/record%20reduced%20summary.png)
+![exported reduced summary](http://toh.erroronline.one/caro/record%20reduced%20summary%20en.png)
 
 [Content](#content)
 
@@ -665,7 +667,7 @@ Furthermore you are supposed to track a cause and effect, recognize a probabilit
 
 Entries are persistent and can be exported if desired through the [evaluation and summary-module](#regulatory-evaluations-and-summaries). Available entries store and display the user name and date of the last edit. 
 
-![risk screenshot](http://toh.erroronline.one/caro/risks.png)
+![risk screenshot](http://toh.erroronline.one/caro/risks%20en.png)
 
 [Content](#content)
 
@@ -673,11 +675,11 @@ Entries are persistent and can be exported if desired through the [evaluation an
 The application enables you to prepare internal audits, including programme objectives, audit method and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted, reordered by [dragging and dropping](#miscellaneous) and reimported. The summary of a previous audit for the respective unit can be imported for upcoming reference.
 Audits can be added to the calendar from the form as well, informing selected units.
 
-![audit template screenshot](http://toh.erroronline.one/caro/audit%20template.png)
+![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20en.png)
 
 Executing an audit starts by selecting one of the prepared templates. Answers and statements will be initially imported from the last audit for the selected unit. Breaks and edits on ongoing audits are always possible unless the audit is marked as finished. After that the audit is not longer editable nor deleteable and becomes a system record. On finishing an audit the report is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables) and all members of the audited unit. Closed audits can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
-![audit screenshot](http://toh.erroronline.one/caro/audit.png)
+![audit screenshot](http://toh.erroronline.one/caro/audit%20en.png)
 
 [Content](#content)
 
@@ -687,12 +689,12 @@ Similar to audits you can enter management reviews, save and edit later, make th
 [Content](#content)
 
 ## Calendar
-![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu.png)
+![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu%20en.png)
 
 ### Appointment notice
 Create an appointment notice for customers. Setting relevant data you can decide to either hand out a printed version containing the appointment data as well as a QR-code for import into a mobile device calendar or directly an ICS-file to send by mail or messenger.
 
-![appointment screenshot](http://toh.erroronline.one/caro/appointment.png)
+![appointment screenshot](http://toh.erroronline.one/caro/appointment%20en.png)
 
 [Content](#content)
 
@@ -707,7 +709,7 @@ Displayed calendars do include weekends and any non working day intentionally in
 
 Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records). Events are deleted after a [configurable timespan](#runtime-variables) after the event has been as closed if not specified otherwise.
 
-![calendar screenshot](http://toh.erroronline.one/caro/calendar.png)
+![calendar screenshot](http://toh.erroronline.one/caro/calendar%20en.png)
 
 ```mermaid
 graph TD;
@@ -786,7 +788,7 @@ Planning is easy to use:
 
 Given timespans are corrected to the first day of selected starting month and last day of ending month. Colourizing is possible for half months.
 
-![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning.png)
+![sample longterm planning](http://toh.erroronline.one/caro/longtermplanning%20en.png)
 
 [Content](#content)
 
@@ -814,7 +816,7 @@ Exports are ordered by user name with exporting user coming first regardless, fo
 [Content](#content)
 
 ## Files
-![sample files menu](http://toh.erroronline.one/caro/files%20menu.png)
+![sample files menu](http://toh.erroronline.one/caro/files%20menu%20en.png)
 
 Defined authorized users can provide files for everyone to access. Also all users can contribute to the open sharepoint where files have a limited timespan and are deleted after a while by default.
 
@@ -824,12 +826,12 @@ This source can also be used to provide documents that are [unsuitable to be fil
 
 External documents as described in ISO 13485 4.2.4 have to be identified and routed. Therefore these files receive special attention and are to be handled with respective records regarding implementation, regulatory context, possible retirement and the username for the last decision. For consistent documentation purpose these files can not be deleted, only set unavailable. Regarding interface partners network resources can be linked as a source as well.
 
-![files screenshot](http://toh.erroronline.one/caro/files.png)
+![files screenshot](http://toh.erroronline.one/caro/files%20en.png)
 
 [Content](#content)
 
 ## Purchase
-![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu.png)
+![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu%20en.png)
 
 ### Vendor and product management
 Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor).
@@ -855,7 +857,7 @@ Products can be enriched with files as well, e.g. declaration of conformity or p
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
-![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager.png)
+![vendor manager screenshot](http://toh.erroronline.one/caro/vendor%20manager%20en.png)
 
 ```mermaid
 graph TD;
@@ -949,7 +951,7 @@ The layout of orders can be selected within the [user profile](#users) from full
 
 Processed orders are also added to a second database with reduced data. This data can be exported through the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and used for vendor evaluation.
 
-![orders screenshot](http://toh.erroronline.one/caro/orders.png)
+![orders screenshot](http://toh.erroronline.one/caro/orders%20en.png)
 
 ```mermaid
 graph TD;
@@ -1040,7 +1042,7 @@ Sample checks are added to the records. New checks trigger a sytem message to th
 [Content](#content)
 
 ## Tools
-![sample tools menu](http://toh.erroronline.one/caro/tools%20menu.png)
+![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20en.png)
 
 Some general tools are available to read and create 2D-barcodes, as well as support recurring calculations, image scaling and zip archiving.
 
@@ -1066,7 +1068,7 @@ Furthermore hopefully beneficial information on
 * order statistics as a structured Excel-export to support vendor evaluation based on delivery data
 * treatment statistics, as all treatment-records within a given timespan can be exported for analysis of distinct record topics, given the [documents](#documents) provide distinct issues. The export file is a CSV that can be processed with a suitable filter using the [CSV-processor](#csv-processor) too.
 
-![regulatory screenshot](http://toh.erroronline.one/caro/regulatory.png)
+![regulatory screenshot](http://toh.erroronline.one/caro/regulatory%20en.png)
 
 [Content](#content)
 
