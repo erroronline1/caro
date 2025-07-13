@@ -241,7 +241,7 @@ const _ = {
 	},
 	sleep: function (delay = 500) {
 		// use from async function with await _.sleep(ms)
-		return new Promise((resolve) => setTimeout(resolve(), delay));
+		return new Promise((resolve) => setTimeout(resolve, delay));
 	},
 	idb: {
 		/*
