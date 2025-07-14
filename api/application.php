@@ -138,6 +138,14 @@ class APPLICATION extends API {
 			}
 			if ($topics) $response['render']['content'][] = $topics;
 		}
+		
+		if (PERMISSION::permissionFor('appmanual')) $response['render']['content'][] = [
+			'type' => 'button',
+			'attributes' => [
+				'value' => $this->_lang->GET('application.navigation.manual_manager'),
+				'onclick' => "api.application('get', 'manual')"
+			]
+		];
 
 		array_push($response['render']['content'], ...[
 			[
@@ -912,7 +920,6 @@ class APPLICATION extends API {
 
 		// application
 		if (PERMISSION::permissionFor('users')) $menu[$this->_lang->GET('application.navigation.header')][$this->_lang->GET('application.navigation.user_manager')] =['onclick' => "api.user('get', 'user')"];
-		if (PERMISSION::permissionFor('appmanual')) $menu[$this->_lang->GET('application.navigation.header')][$this->_lang->GET('application.navigation.manual_manager')] =['onclick' => "api.application('get', 'manual')"];
 		// make sure about comes last so this is an an order exception without special permission
 		$menu[$this->_lang->GET('application.navigation.header')][$this->_lang->GET('application.navigation.about')] = ['onclick' => "api.application('get', 'about')"];
 
