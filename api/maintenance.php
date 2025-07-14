@@ -49,26 +49,21 @@ class MAINTENANCE extends API {
 				$this->response([], 404);
 				break;
 			default: // get
-				$content = [];
-				if (!is_file($logfile)) return [
-					[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => 'CRON'
-						],
-						'content' => $this->_lang->GET('maintenance.cron.not_found')
-					]
-				];
+				$response = ['render' => ['content' => []]];
+				if (!is_file($logfile)) {
+					$response['response'] = ['msg' => $this->_lang->GET('maintenance.cron.not_found'), 'type' => 'info'];
+					return $response;
+				}
 				$cron = file($logfile);
 
-				$content[] = [
+				$response['render']['content'][] = [
 					'type' => 'textsection',
 					'attributes' => [
 						'name' => 'CRON'
 					],
 					'content' => implode("\n", $cron)
 				];
-				$content[] = [
+				$response['render']['content'][] = [
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('maintenance.cron.delete', [':count' => count($cron) - 1]),
@@ -76,7 +71,7 @@ class MAINTENANCE extends API {
 					]
 				];
 		}
-		return $content;
+		return $response;
 	}
 	
 	/**
@@ -112,15 +107,10 @@ class MAINTENANCE extends API {
 		];
 
 		if ($this->_requestedType && $this->_requestedType !== '...') {
-			if ($append = $this->{$this->_requestedType}()) array_push($response['render']['content'] , ...$append);
-
-			if (($this->_requestedType === 'vendorupdate' && $_SERVER['REQUEST_METHOD'] !== 'PUT')
-				|| ($this->_requestedType === 'records_datalist' && $_SERVER['REQUEST_METHOD'] === 'GET')
-			){
-				$response['render']['form'] = [
-					'data-usecase' => 'maintenance',
-					'action' => "javascript:api.maintenance('" . ($_SERVER['REQUEST_METHOD'] === 'GET' ? 'post' : 'put') . "', 'task', '" . $this->_requestedType . "')"
-				];
+			if ($append = $this->{$this->_requestedType}()) {
+				if (isset($append['render']['content']) && $append['render']['content']) array_push($response['render']['content'], ...$append['render']['content']);
+				if (isset($append['render']['form']) && $append['render']['form']) $response['render']['form'] = $append['render']['form'];
+				if (isset($append['response']) && $append['response']) $response['response'] = $append['response'];
 			}
 		}
 		$this->response($response);
@@ -137,7 +127,7 @@ class MAINTENANCE extends API {
 	 * csv for easiest handling
 	 */
 	private function records_datalist(){
-		$content = [];
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (($unit = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.record_datalist.unit')), $this->_lang->_USER['units'])) === false) die;
@@ -153,13 +143,15 @@ class MAINTENANCE extends API {
 							CONFIG['csv']['dialect']['escape'])) !== FALSE) {
 							if ($rownum < 1){
 								if (count($row) < 2){
-									return [[
+									$response['response'] = ['msg' => $this->_lang->GET('maintenance.record_datalist.update_error'), 'type' => 'error'];
+									$response['render']['content'][] = [
 										'type' => 'textsection',
 										'attributes' => [
 											'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
 										],
 										'content' => $this->_lang->GET('maintenance.record_datalist.update_abort', [':format' => UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . implode(', ', $row),
-									]];
+									];
+									return $response;
 								}
 								// set header as data keys
 								foreach($row as $column){
@@ -192,7 +184,7 @@ class MAINTENANCE extends API {
 					$sqlchunks = SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('records_datalist_post'), $insertions);
 					if ($sqlchunks){
 						// drop unit entries
-						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', ['values' => [':unit' => $unit]])) $content[] = [
+						if (SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_delete', ['values' => [':unit' => $unit]])) $response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('maintenance.record_datalist.update_deleted'),
@@ -204,23 +196,24 @@ class MAINTENANCE extends API {
 								SQLQUERY::EXECUTE($this->_pdo, $chunk);
 							}
 							catch (\Exception $e) {
-								return [...$content, [
+								$response['render']['content'][] = [
 									'type' => 'textsection',
 									'attributes' => [
 										'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
 									],
 									'content' => $e,
-								]];
+								];
+								return $response;
 							}
 						}
-						$content[] = [
+						$response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('maintenance.record_datalist.update_success', [':unit' => $this->_lang->_USER['units'][$unit]]),
 							]
 						];
 					}
-					else $content[] = [
+					else $response['render']['content'][] = [
 						'type' => 'textsection',
 						'attributes' => [
 							'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
@@ -230,12 +223,11 @@ class MAINTENANCE extends API {
 				else {
 					$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $unit]]);
 					if (!$datalists){
-						return [[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('maintenance.record_datalist.empty', [':unit' => $this->_lang->_USER['units'][$unit]]),
-							]
-						]];
+						$response['response'] = [
+							'msg' => $this->_lang->GET('maintenance.record_datalist.empty', [':unit' => $this->_lang->_USER['units'][$unit]]),
+							'type' => 'error'
+						];
+						return $response;
 					}
 					$data = [];
 					$maxlength = 0;
@@ -280,7 +272,7 @@ class MAINTENANCE extends API {
 			case 'GET':
 				// display options and explanation
 
-				$content[] = [
+				$response['render']['content'][] = [
 					'type' => 'textsection',
 					'attributes' => [
 						'name' => $this->_lang->GET('maintenance.navigation.records_datalist'),
@@ -291,7 +283,7 @@ class MAINTENANCE extends API {
 				foreach($this->_lang->_USER['units'] as $unit => $description){
 					$units[$description] = [];
 				}
-				$content[] = [
+				$response['render']['content'][] = [
 					'type' => 'radio',
 					'attributes' => [
 						'name' => $this->_lang->GET('maintenance.record_datalist.unit'),
@@ -299,15 +291,19 @@ class MAINTENANCE extends API {
 					],
 					'content' => $units
 				];
-				$content[] = [
+				$response['render']['content'][] = [
 					'type' => 'file',
 					'attributes' => [
 						'name' => $this->_lang->GET('maintenance.record_datalist.upload'),
 						'accept' => '.csv'
 					] 
 				];
+				$response['render']['form'] = [
+					'data-usecase' => 'maintenance',
+					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+				];
 		}
-		return $content;
+		return $response;
 	}
 
 	/**
@@ -320,7 +316,7 @@ class MAINTENANCE extends API {
 	 * this is only somewhat a duplicate of install.php since the template file can be uploaded to not be reliant on server access
 	 */
 	private function vendorupdate(){
-		$content = [];
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// store within temp to remain for put action, display matches and selection
@@ -329,15 +325,13 @@ class MAINTENANCE extends API {
 					$json = file_get_contents($file[0]);
 					$json = json_decode($json, true);
 					if (!$json)	{
-						return [[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('maintenance.vendorupdate.format_error'),
-								'class' => 'red'
-							]
-						]];
+						$response['response'] = [
+							'msg' => $this->_lang->GET('maintenance.vendorupdate.format_error'),
+							'type' => 'error'
+						];
+						return $response;
 					}
-					$content[] = [
+					$response['render']['content'][] = [
 						'type' => 'textsection',
 						'attributes' => [
 							'name' => $this->_lang->GET('maintenance.vendorupdate.select_description'),
@@ -363,9 +357,9 @@ class MAINTENANCE extends API {
 							]
 						];
 					}
-					if ($options) $content[] = $options;
+					if ($options) $response['render']['content'][] = $options;
 					if ($missing = array_diff(array_column($DBall, 'name'), $intersections)){
-						$content[] = [
+						$response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('maintenance.vendorupdate.vendor_missing'),
@@ -373,15 +367,17 @@ class MAINTENANCE extends API {
 							'content' => implode(', ', $missing)
 						];
 					}
+					$response['render']['form'] = [
+						'data-usecase' => 'maintenance',
+						'action' => "javascript:api.maintenance('put', 'task', '" . $this->_requestedType . "')"
+					];	
 				}
 				else {
-					return [[
-						'type' => 'textsection',
-						'attributes' => [
-							'name' => $this->_lang->GET('maintenance.vendorupdate.file_error'),
-							'class' => 'red'
-						]
-					]];
+					$response['response'] = [
+						'msg' => $this->_lang->GET('maintenance.vendorupdate.file_error'),
+						'type' => 'error'
+					];
+					return $response;
 				}
 				break;
 			case 'PUT':
@@ -438,41 +434,49 @@ class MAINTENANCE extends API {
 						SQLQUERY::EXECUTE($this->_pdo, $chunk);
 					}
 					catch (\Exception $e) {
-						return [[
+						$response['render']['content'][] = [
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->GET('maintenance.vendorupdate.update_error'),
 							],
 							'content' => $e,
-						]];
+						];
+						return $response;
 					}
 				}
-				if ($success) return [[
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => $this->_lang->GET('maintenance.vendorupdate.update_success'),
-					],
-					'content' => implode('\n', $success),
-				]];
+				if ($success) {
+					$response['render']['content'][] = [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('maintenance.vendorupdate.update_success'),
+						],
+						'content' => implode('\n', $success),
+						];
+					return $response;
+				}
 				break;
 			case "GET": 
 				// upload form
-				$content[] = [
+				$response['render']['content'][] = [
 					'type' => 'textsection',
 					'attributes' => [
 						'name' => $this->_lang->GET('maintenance.navigation.vendorupdate'),
 					],
 					'content' => $this->_lang->GET('maintenance.vendorupdate.description'),
 				];
-				$content[] = [
+				$response['render']['content'][] = [
 					'type' => 'file',
 					'attributes' => [
 						'required'=> true,
 						'name' => $this->_lang->GET('maintenance.vendorupdate.file'),
 					] 
 				];
+				$response['render']['form'] = [
+					'data-usecase' => 'maintenance',
+					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+				];
 		}
-		return $content;
+		return $response;
 	}
 }
 ?>
