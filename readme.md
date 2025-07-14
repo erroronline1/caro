@@ -35,6 +35,8 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 * record export embed files not being images
     * https://tcpdf.org/examples/example_041/
+    * select whether to embed files
+    * reconsider (AGAIN) to embed images inline
 
 ## Content
 * [Aims](#aims)
