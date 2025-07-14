@@ -149,13 +149,17 @@ class MAINTENANCE extends API {
 										'attributes' => [
 											'name' => $this->_lang->GET('maintenance.record_datalist.update_error'),
 										],
-										'content' => $this->_lang->GET('maintenance.record_datalist.update_abort', [':format' => UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . implode(', ', $row),
+										'content' => $this->_lang->GET('maintenance.record_datalist.update_abort', [':format' => "\n" . UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . mb_convert_encoding(implode(', ', $row), 'UTF-8', mb_detect_encoding(implode(', ', $row), ['ASCII', 'UTF-8', 'ISO-8859-1'])),
 									];
 									return $response;
 								}
 								// set header as data keys
 								foreach($row as $column){
-									if ($column) $data[$column] = [];
+									if ($column) {
+										$bom = pack('H*','EFBBBF'); //coming from excel this is utf8
+										$column = preg_replace("/^$bom/", '', $column);
+										$data[$column] = [];
+									}
 								}
 							}
 							else {
