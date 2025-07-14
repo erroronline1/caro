@@ -1077,7 +1077,7 @@
 	},
 	"maintenance": {
 		"cron": {
-			"not_found": "Logfile wurde nicht gefunden uns wurde vermutlich gerade eben gelöscht",
+			"not_found": "Logfile wurde nicht gefunden und wurde vermutlich gerade eben gelöscht",
 			"delete": "cron.log mit :count Einträgen löschen"
 		},
 		"navigation": {
