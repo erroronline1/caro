@@ -314,7 +314,7 @@ Users can see their information in the profile section for transparency reasons.
 [Content](#content)
 
 ### Manual
-Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others. On installation a default manual will be inserted in the [default language](#runtime-variables).
+Set up the manual according to your users comprehension. While editing single entries you can select affected permission roles to unclutter the landing page display for others. On installation a default manual will be inserted in the [default language](#runtime-variables). The manual and its edit-button (for authorized users) will be displayed in the *About CARO App*-section.
 
 ## Communication
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20en.png)

@@ -222,7 +222,7 @@ Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihre
 [Übersicht](#übersicht)
 
 ### Anleitung
-Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht auf der Startseite für alle anderen auszublenden. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt.
+Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht auf der Startseite für alle anderen auszublenden. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt. Die Anleitung und die Bearbeitungsschaltfläche (für berechtigte Nutzer) wird in dem Bereich *Über CARO App* angezeigt.
 
 ## Kommunikation
 ![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20de.png)
