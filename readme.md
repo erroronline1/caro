@@ -25,18 +25,30 @@ Things are still in motion. Images may be outdated.
 * post-market evaluation
 
 ## to do
-* data deletion in accordance to dsgvo, eg. recommend deletion after x years?
 * unittests
 * improve screenreader accessibility
 * templates
 * responsibilities
     * handle hidden attribute?
+
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * record export embed files not being images
     * https://tcpdf.org/examples/example_041/
     * select whether to embed files
     * reconsider (AGAIN) to embed images inline
+* order returns
+    * default mark as delivered or exclude from reminders?
+    * no incorporation nor sample check because out of reach
+* order service/warranty extended reminder period to request delivery by purchase
+* records
+    * mark as obsolete by
+    * selection (bg, regular, whatever)
+* maintenance
+    * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
+    * https://dsgvo-gesetz.de/art-17-dsgvo/
+    * https://www.datenschutz-recht-medizin.de/loeschpflicht-loeschkonzept-und-aufbewahrungspflichten/
+
 
 ## Content
 * [Aims](#aims)
