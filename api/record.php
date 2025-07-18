@@ -1105,37 +1105,49 @@ class RECORD extends API {
 							]
 						]
 					];
-					foreach ($entries as $key => $value){
+					foreach ($entries as $key => $values){
+						$display = '';
+						$images = [];
+						$files = [];
+						foreach($values as $value){
+							preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
+							if ($link){
+								$display .= '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>\n";
+								continue;
+							}
+							preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value
+							$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
+							if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
+								$file = pathinfo($path);
+								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+									$display .= $value . "\n";
+									$images[] = [
+										'type' => 'image',
+										'description' => $file['basename'],
+										'attributes' => [
+											'name' => $file['basename'],
+											'url' => './api/api.php/file/stream/' . $path
+										]
+									];
+								}
+								elseif (in_array($file['extension'], ['stl'])) {
+									$display .= ' <a href="javascript:void(0);" onclick="javascript:new _client.Dialog({type: \'preview\', header: \'' . $value . '\', render:{type: \'stl\', name: \'' . $value . '\', url: \'./api/api.php/file/stream/' . $path . '\'}})">' . $value. "</a>\n";
+								}
+								else {
+									$display .= ' <a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'./api/api.php/file/stream/' . $path . '\', \'_blank\').focus();">' . $value. "</a>\n";
+								}
+							}
+							else $display .= $value . "\n";
+						}
 						array_push($body[count($body) -1][0]['content'],
 							[
 								'type' => 'textsection',
 								'attributes' => [
 									'name' => $key
 								],
-								'linkedcontent' => $value
-							]); 
-					}
-					if (isset($content['images'][$document])){
-						foreach ($content['images'][$document] as $image){
-							$imagedata = pathinfo($image);
-							array_push($body[count($body) -1][0]['content'],
-							[
-								'type' => 'image',
-								'description' => $imagedata['basename'],
-								'attributes' => [
-									'name' => $imagedata['basename'],
-									'url' => $image
-								]
-							]); 
-						}
-					}
-					if (isset($content['files'][$document])){
-						array_push($body[count($body) -1][0]['content'],
-						[
-							'type' => 'links',
-							'description' => $this->_lang->GET('record.file_attachments'),
-							'content' => $content['files'][$document]
-						]); 
+								'linkedcontent' => trim($display)
+							]);
+						if ($images) array_push($body[count($body) -1][0]['content'], ...$images);
 					}
 					if ($document != $this->_lang->GET('record.altering_pseudodocument_name')){
 						// option to append to document entries
@@ -1214,7 +1226,7 @@ class RECORD extends API {
 								'attributes' => [
 									'name' => $key
 								],
-								'linkedcontent' => $value
+								'linkedcontent' => implode("\n", $value)
 							]); 
 					}
 				}
@@ -1828,8 +1840,7 @@ class RECORD extends API {
 			'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_requestedID . '_' . $this->_date['usertime']->format('Y-m-d H:i')),
 			'identifier' => $this->_requestedID,
 			'content' => [],
-			'files' => [],
-			'images' => [],
+			'attachments' => [],
 			'title' => $this->_lang->GET('record.navigation.summaries', [], $export),
 			'date' => $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), $export),
 			'closed' => $data['closed'],
@@ -1860,10 +1871,6 @@ class RECORD extends API {
 			foreach ($record['content'] as $key => $value){
 				$value = str_replace(' | ', "\n\n", $value); // part up multiple selected checkbox options
 				$value = str_replace('\n', "\n", $value); // format linebreaks
-				preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
-				if ($link && !$export){
-					$value = '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>";
-				}
 				if (!isset($accumulatedcontent[$useddocument]['content'][$key])) $accumulatedcontent[$useddocument]['content'][$key] = [];
 				$accumulatedcontent[$useddocument]['content'][$key][] = ['value' => $value, 'author' => $this->_lang->GET('record.export_author', [':author' => $record['author'], ':date' => $this->convertFromServerTime(substr($record['date'], 0, -3), $export)], $export)];
 				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $this->convertFromServerTime($record['date'], $export);
@@ -1874,7 +1881,7 @@ class RECORD extends API {
 		foreach ($accumulatedcontent as $document => $entries){
 			$summary['content'][$document] = [];
 			foreach ($entries['content'] as $key => $data){
-				$summary['content'][$document][$key] = '';
+				$summary['content'][$document][$key] = [];
 				$value = '';
 				foreach ($data as $entry){
 					if ($entry['value'] !== $value){
@@ -1883,25 +1890,19 @@ class RECORD extends API {
 						// guess file url; special regex delimiter
 						if (stripos($entry['value'], substr(UTILITY::directory('record_attachments'), 1)) !== false) {
 							$file = pathinfo($entry['value']);
-							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-								if (!isset($summary['images'][$document])) $summary['images'][$document] = [];
-								$summary['images'][$document][] = './api/api.php/file/stream/' . $entry['value'];
-							}
-							else {
-								if (!isset($summary['files'][$document])) $summary['files'][$document] = [];
-								$summary['files'][$document][$file['basename']] = ['href' => './api/api.php/file/stream/' . $entry['value']];
-							}
+							if (!isset($summary['attachments'][$document])) $summary['attachments'][$document] = [];
+							$summary['attachments'][$document][] = $entry['value'];
 							$displayvalue = $file['basename'];
 						}
 						// modify displayed value based on requested type
 						switch ($type){
 							case 'document':
 							case 'full':
-								$summary['content'][$document][$key] .= $displayvalue . ' (' . $entry['author'] . ")\n";
+								$summary['content'][$document][$key][] = $displayvalue . ' (' . $entry['author'] . ")";
 								break;
 							case 'simplified':
 							case 'simplifieddocument':
-								$summary['content'][$document][$key] = $displayvalue . "\n";
+								$summary['content'][$document][$key][] = $displayvalue;
 								break;
 						}
 						$value = $entry['value'];
@@ -1987,7 +1988,7 @@ class RECORD extends API {
 				$summary['content'] = [' ' => $printablecontent[$useddocument['name']]];
 				$summary['date'] = $this->convertFromServerTime($this->_date['usertime']->format('Y-m-d H:i'), $export);
 				$summary['title'] = $useddocument['name'];
-				$summary['images'] = [' ' => isset($summary['images'][$useddocument['name']]) ? $summary['images'][$useddocument['name']] : []];
+				$summary['attachments'] = [' ' => isset($summary['attachments'][$useddocument['name']]) ? $summary['attachments'][$useddocument['name']] : []];
 			}
 		}
 		return $summary;
