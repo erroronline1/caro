@@ -287,6 +287,7 @@ class PDF{
 	}
 
 	public function recordsPDF($content){
+		$_lang = new LANG();
 		// create a pdf for a record summary
 		$this->init($content);
 		// set cell padding
@@ -294,11 +295,10 @@ class PDF{
 
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
-		
 		foreach ($content['content'] as $document => $entries){
 			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize'] + 2); 
 			$this->_pdf->MultiCell(140, 4, $document, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-			foreach ($entries as $key => $value){
+			foreach ($entries as $key => $values){
 				// name column
 				$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
 				$nameLines = $this->_pdf->MultiCell(50, 4, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
@@ -306,38 +306,47 @@ class PDF{
 				
 				// values column
 				$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
-				preg_match("/(?:^href=')(.+?)(?:')(.*)/", $value, $link); // link widget value
-				if ($link) {
-					// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
-					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
+				$valueLines = 0;
+				if (gettype($values) === 'array'){
+					foreach ($values as $value){
+						preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
+						if ($link){
+							// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+							$valueLines += $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), '<a href="' . $link[1] . '" target="_blank">' . $link[1] . '</a>' . ($link[2] ? : ''), 0, 1, 0, true, '', true);
+							continue;
+						}
+						preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value with contributor for full export
+						if (!isset($link[1])) $link = [null, $value];  // attachment value without contributor for simplified export
+						$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
+						if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
+							$file = pathinfo($path);
+							if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
+								// inline image embedding
+								$valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+								list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $path);
+								$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
+								$outputsize = [
+									'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
+									'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
+								];
+								$this->_pdf->Image('.' . $path, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
+								$valueLines += $this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
+							}
+							else {
+								// file attachment
+								$valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+								// Annotation($x, $y, $w, $h, $text, $opt=array('Subtype'=>'Text'), $spaces=0)
+								$this->_pdf->Annotation($this->_pdf->getPageWidth() - $this->_setup['marginleft'] + 5, $this->_pdf->GetY() - $this->_setup['fontsize'] * 1.5 , 10, 10, $_lang->GET('record.export_pdf_attachment', [], true) . ' ' . $value, array('Subtype'=>'FileAttachment', 'Name' => 'PushPin', 'FS' => '.' . $path));
+							}
+						}
+						// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
+						else $valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+					}
 				}
-				// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
-				else $valueLines = $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
-				
+				else $this->_pdf->MultiCell(140, 4, $values, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+
 				$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
 				$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);
-			}
-			if (array_key_exists($document, $content['images'])){
-				foreach ($content['images'][$document] as $image){
-					// make sure to write on next page if image would reach into footer
-					if ($this->_pdf->GetY() > $this->_pdf->getPageHeight() - $this->_setup['marginbottom'] - $this->_setup['exportimage_maxheight']) {
-						$this->_pdf->AddPage();
-						$this->_pdf->SetY($this->_setup['margintop']);
-					}
-
-					$image = str_ireplace('./api/api.php/file/stream/' , '', $image);
-					$imagedata = pathinfo($image);
-					list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $image);
-					$ratio = $img_height ? $img_width / $img_height : 1; // prevent division by 0
-					$outputsize = [
-						'width' => $ratio < 1 ? 0 : $this->_setup['exportimage_maxwidth'],
-						'height' => $ratio > 1 ? 0 : $this->_setup['exportimage_maxheight']
-					];
-					$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
-					$this->_pdf->MultiCell(50, $this->_setup['exportimage_maxheight'], $imagedata['basename'], 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
-					$this->_pdf->Image('.' . $image, null, $this->_pdf->GetY() + 6, $outputsize['width'], $outputsize['height'], '', '', 'R', true, 300, 'R');
-					$this->_pdf->Ln(max($this->_setup['exportimage_maxheight'], $outputsize['height']));
-				}
 			}
 		}
 

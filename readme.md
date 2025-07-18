@@ -35,13 +35,13 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 * record export embed files not being images
     * https://tcpdf.org/examples/example_041/
-    * select whether to embed files
-    * reconsider (AGAIN) to embed images inline
+    * select whether to embed files?
 * order returns
     * default mark as delivered or exclude from reminders?
     * no incorporation nor sample check because out of reach
 * order service/warranty extended reminder period to request delivery by purchase
 * records
+    * stl display
     * mark as obsolete by
     * selection (bg, regular, whatever)
 * maintenance
@@ -579,7 +579,7 @@ Exported document
 [Content](#content)
 
 ### Records
-Records store all inputs for any selected document. Some document contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime.
+Records store all inputs for any selected document. Some document contexts require an identifier that groups records to a summary. Summaries can be exported. Full summaries contain all inputs in chronological order, simplified summaries contain the most recent input only. This may lack transparency but is suitable for a tidy overview for possible third parties. Another usecase are manuals whose content can be saved to the records but also exported for end users including notes anytime. PDF-exports include embedded images and file attachmends if provided.
 
 Paperless might not be suitable in humid environments. Thus single documents can be exported as well e.g. to have data at hand where electronic devices may take damage. 
 
@@ -1632,7 +1632,7 @@ By default following permissions/roles are defined within the language.XX.json-f
 ```
 ; general application settings
 [application]
-debugging = yes ; yes, no; enables or disables error messages
+debugging = no ; yes, no; enables or disables error messages
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
 issue_mail = "issues@companymail.tld" ; address for application and security issues
 order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization

@@ -1377,6 +1377,7 @@
 		"error": "Die Aufzeichnung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"export": "Exportiere die Daten als PDF",
 		"export_author": ":author am :date",
+		"export_pdf_attachment": "Doppelklick auf das Symbolbild um die angehängte Datei zu exportieren:",
 		"export_proceed": "Öffne den Link, speichere oder drucke die Zusammenfassung. Du bist für die Sicherheit exportierter Daten selbst verantwortlich.",
 		"export_type": "als :type",
 		"file_attachments": "Anhängende Dateien",

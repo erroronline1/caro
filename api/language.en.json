@@ -1377,6 +1377,7 @@
 		"error": "Record could not be saved. Please try again.",
 		"export": "Export record",
 		"export_author": ":author on :date",
+		"export_pdf_attachment": "Double click on the icon to export attached file:",
 		"export_proceed": "Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.",
 		"export_type": "as :type",
 		"file_attachments": "Attached files",
