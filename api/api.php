@@ -316,7 +316,9 @@ class API {
 						'debugging' => CONFIG['application']['debugging'],
 					],
 					'lifespan' => [
-						'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime')),
+						'session' => [
+							'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime')),
+						]
 					],
 					'limits' => [
 						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
