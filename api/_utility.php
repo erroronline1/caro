@@ -570,9 +570,6 @@ class UTILITY {
 
 								// place in temporary directory
 								file_put_contents($tmp_name, $body);
-
-								// preserve payload key for payload checksum
-								$data[$name] = null;
 							}
 							// parse Field
 							else {

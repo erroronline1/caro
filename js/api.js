@@ -115,15 +115,15 @@ export const api = {
 		if (api._settings.user && api._settings.user.fingerprint && ["post", "put"].includes(method)) {
 			let sanitizedpayload = {};
 			if (payload instanceof FormData) {
-				sanitizedpayload = Object.fromEntries(payload);
-				for (const [key, value] of Object.entries(sanitizedpayload)) {
-					// sanitation of arrays unless set file input; synchronization with backend checksum not possible
-					if (key.endsWith("[]")) {
-						if (value instanceof File && value.name) key = key.substring(0, -2);
-						else delete sanitizedpayload[key];
+				sanitizedpayload = {};
+				for (const [key, value] of Object.entries(Object.fromEntries(payload))) {
+					// sanitation of arrays and file inputs; synchronization with backend checksum not possible
+					if (key.endsWith("[]") || (value instanceof File && value.name)) {
+						continue;
 					}
 					// unset '0' values that are not recognized by backend
 					if (value == "0") sanitizedpayload[key] = "";
+					else sanitizedpayload[key] = value;
 				}
 			} else payload = new FormData();
 
