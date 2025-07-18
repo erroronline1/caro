@@ -313,7 +313,7 @@ class FILE extends API {
 							$filePerSlide = 0;
 						}
 						$article = intval(count($matches) - 1);
-						if (empty($filePerSlide++ % CONFIG['splitresults']['bundle_files_per_slide'])){
+						if (empty($filePerSlide++ % CONFIG['limits']['bundle_files_per_slide'])){
 							$matches[$article][] = [
 								[
 									'type' => 'checkbox',
@@ -993,7 +993,7 @@ class FILE extends API {
 
 						// delete expired files
 						// tidied up in cron job as well, but duplicate to avoid a faulty lifespan display
-						if ((time() - $filetime) / 3600 > CONFIG['lifespan']['sharepoint']) {
+						if ((time() - $filetime) / 3600 > CONFIG['lifespan']['files']['sharepoint']) {
 							UTILITY::delete($file['path']);
 						}
 						// add remaining files

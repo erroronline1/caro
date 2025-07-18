@@ -260,7 +260,7 @@ class API {
 			//(REQUEST[0] === 'application' && REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'GET') // get requests for intermediate frontent authentification
 			//||
 			(isset($_SESSION['lastrequest'])
-			&& (time() - $_SESSION['lastrequest'] > (isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
+			&& (time() - $_SESSION['lastrequest'] > (isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime'))))) // session timeout
 		);
 		$returnUser = (
 			(!$reAuthUser && isset($_SESSION['user'])) // if there are no reasons for reauthentification on valid user session return if applicable
@@ -316,7 +316,7 @@ class API {
 						'debugging' => CONFIG['application']['debugging'],
 					],
 					'lifespan' => [
-						'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['idle'], ini_get('session.gc_maxlifetime')),
+						'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime')),
 					],
 					'limits' => [
 						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
@@ -559,7 +559,7 @@ class API {
 	 */
 	public function session_set(){
 		$deldate = clone ($this->_date['servertime']);
-		$deldate->modify('-' . CONFIG['lifespan']['sessions'] . ' days');
+		$deldate->modify('-' . CONFIG['lifespan']['session']['records'] . ' days');
 		SQLQUERY::EXECUTE($this->_pdo, 'application_delete_sessions', [
 			'values' => [
 				':date' => $deldate->format('Y-m-d H:i:s')

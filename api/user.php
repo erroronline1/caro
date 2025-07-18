@@ -285,7 +285,7 @@ class USER extends API {
 						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
-							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
+							$expire->modify('-' . CONFIG['lifespan']['training']['renewal'] . ' days');
 							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
@@ -343,7 +343,7 @@ class USER extends API {
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $this->_lang->GET('user.sessions', [':days' => CONFIG['lifespan']['sessions']])
+									'name' => $this->_lang->GET('user.sessions', [':days' => CONFIG['lifespan']['session']['records']])
 								],
 								'content' => implode("\n", $sessions)
 							]
@@ -638,7 +638,7 @@ class USER extends API {
 
 				// set custom idle timeout
 				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
-				if ($idle != CONFIG['lifespan']['idle']){
+				if ($idle != CONFIG['lifespan']['session']['idle']){
 					$user['app_settings']['idle'] = $idle;
 				}
 				else unset ($user['app_settings']['idle']);
@@ -828,7 +828,7 @@ class USER extends API {
 
 				// set custom idle timeout
 				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
-				if ($idle != CONFIG['lifespan']['idle']){
+				if ($idle != CONFIG['lifespan']['session']['idle']){
 					$user['app_settings']['idle'] = $idle;
 				}
 				else unset ($user['app_settings']['idle']);
@@ -992,7 +992,7 @@ class USER extends API {
 						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
-							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
+							$expire->modify('-' . CONFIG['lifespan']['training']['renewal'] . ' days');
 							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
@@ -1118,12 +1118,12 @@ class USER extends API {
 							'type' => 'range',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.settings.idle'),
-								'min' => CONFIG['lifespan']['idle'],
-								'max' => CONFIG['lifespan']['idle'] * 3,
-								'step' => CONFIG['lifespan']['idle'] / 2,
-								'value' => strval(isset($user['app_settings']['idle']) ? $user['app_settings']['idle'] : CONFIG['lifespan']['idle']),
+								'min' => CONFIG['lifespan']['session']['idle'],
+								'max' => CONFIG['lifespan']['session']['idle'] * 3,
+								'step' => CONFIG['lifespan']['session']['idle'] / 2,
+								'value' => strval(isset($user['app_settings']['idle']) ? $user['app_settings']['idle'] : CONFIG['lifespan']['session']['idle']),
 							],
-							'hint' => $this->_lang->GET('user.settings.idle_hint', [':idle' => CONFIG['lifespan']['idle']])
+							'hint' => $this->_lang->GET('user.settings.idle_hint', [':idle' => CONFIG['lifespan']['session']['idle']])
 						]
 					], [
 						[

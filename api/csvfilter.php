@@ -76,7 +76,7 @@ class CSVFILTER extends API {
 				// set up file settings for csvprocessor
 				$content['filesetting']['source'] = $inputfile;
 				if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
-				$content['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
+				$content['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
 
 				// check if neccessary compare file is provided 
 				$comparefileindex = 0;

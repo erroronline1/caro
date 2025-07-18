@@ -1448,7 +1448,7 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
     * Preislistenimport @ 660k Zeilen benötigt aktuell etwa 2 Minuten mit Uniform Server, 3 Minuten mit SQL Server
     * der Preislistenimport benötigt mehr Zeit für die [Aktualisierung von Artikeln](#importierung-von-lieferantenpreislisten) als für das Löschen und Wiedereinfügen
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[lifespan][idle]](#laufzeitvariablen)
+* optional php.ini session.gc_maxlifetime im Verhältnis zu [CONFIG[lifespan][session][idle]](#laufzeitvariablen)
 * php.ini Aktivierung folgender Erweiterungen:
     * curl
     * fileinfo
@@ -1552,6 +1552,8 @@ D-BW[breaks] = "6-30, 9-45" ; gesetzliche Pausenzeiten, aufsteigend [Arbeitsstun
 ; Standardeinstellungen für CSV-Verarbeitung falls nicht im Filter definiert
 [csv]
 headerrowindex = 0
+csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
+
 dialect["separator"] = ";"
 dialect["enclosure"] = "\"" ;" coding environments may mess up colouring after this escaped quote
 dialect["escape"] = ""
@@ -1571,26 +1573,31 @@ names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users
 filename[characters] = "[,\/\\\]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
 
 [lifespan]
-calendar_completed = 365 ; Tage nach denen abgeschlossene Kalendereinträge gelöscht werden sofern nicht anderweitig angegeben
-idle = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt
-mdr14_sample_interval = 93 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
-mdr14_sample_reusable = 1095 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
-open_record_reminder = 30 ; Tage nach denen per Nachricht and nicht abgeschlossene Aufzeichnungen erinnert wird
-order = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
-order_undelivered = 3 ; Tage nach denen Bereiche daran erinnert werden Auslieferungen zu merkieren oder sich nach dem Sachstand zu erkundigen
-order_unreceived = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen
-product_documents = 365; Tage nach der letzten Bereitstellung einer Datei, nach denen eine Erinnerung zur Verifizierung oder Erneuerung der Aktualität erstellt wird
-sessions = 93 ; Tage, nach denen Session-Fingerabdrücke gelöscht und Offline-Fallbacks für Beiträge ungültig werden
-sharepoint =  48 ; Stunden, nach denen Dateien gelöscht werden
-tmp =  24 ; Stunden nach denen Dateien gelöscht werden
-training_evaluation = 62 ; Tage bis an eine Evaluierung erinnert wird
-training_renewal = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
+calendar[autodelete] = 365 ; Tage nach denen abgeschlossene Kalendereinträge gelöscht werden sofern nicht anderweitig angegeben
+
+files[sharepoint] = 48 ; Stunden, nach denen Dateien gelöscht werden
+files[tmp] = 24 ; Stunden nach denen Dateien gelöscht werden
+
+order[autodelete] = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
+order[undelivered] = 3 ; Tage nach denen Bereiche daran erinnert werden Auslieferungen zu merkieren oder sich nach dem Sachstand zu erkundigen
+order[unreceived] = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen
+
+product[documents] = 365 ; Tage nach der letzten Bereitstellung einer Datei, nach denen eine Erinnerung zur Verifizierung oder Erneuerung der Aktualität erstellt wird
+product[mdr14_sample_interval] = 93 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
+product[mdr_sample_reusable] = 1095 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
+
+records[open_reminder] = 30 ; Tage nach denen per Nachricht and nicht abgeschlossene Aufzeichnungen erinnert wird
+
+session[idle] = 600 ; Sekunden nach denen eine Nichtbenutzung der Anwendung eine erneute Authentifizierung erzwingt
+session[records] = 93 ; Tage, nach denen Session-Fingerabdrücke gelöscht und Offline-Fallbacks für Beiträge ungültig werden
+
+training[evaluation] = 62 ; Tage bis an eine Evaluierung erinnert wird
+training[renewal] = 365 ; Tage bis eine Schulung abläuft, farbliche Warnung in Übersichten
 
 ; Wahrscheinlichkeiten für Ähnlichkeiten von Suchtexten in Prozent
 [likeliness]
 consumables_article_no_similarity = 70 ; Prozent
 consumables_article_name_similarity = 80 ; Prozent
-csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; Prozent
 records_identifier_pattern = "^.+?[,\s]+.+?\s" ; z.B. für Nachname, Vorname um die Datalist des Vorgangsfilters zur Leistungsoptimierung vorzuselektieren, vorausgesetzt das Unternehmen kann sich auf einen Standard einigen
 record_reidentify_similarity = 50 ; Prozent, Warnung bei geringer Übereinstimmung neu vergebener Identifikatoren
@@ -1607,6 +1614,8 @@ record_image = 2048 ; maximale Pixel für längste Seite
 risk_acceptance_level = 4 ; farblich markiertes Produkt aus Eintrittswahrscheinlichkeit * Schadenshöhe
 storage_warning = 10 ; Gigabyte, ein niedrigerer Wert für verbleibenden Speicherplatz erzeugt eine Warnung auf der Startseite
 user_image = 256 ; maximale Pixel für längste Seite
+bundle_files_per_slide = 12
+products_per_slide = 6
 
 ; Berechtigungen gemäß der in den Sprachdateien aufgeführten permissions
 ; dynamische Verarbeitung innerhalb der Module
@@ -1691,10 +1700,6 @@ appointment[header_image] = "media/favicon/android/android-launchericon-192-192.
 appointment[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
 appointment[codesizelimit] = 50
 appointment[codepadding] = 10
-
-[splitresults]
-bundle_files_per_slide = 12
-products_per_slide = 6
 ```
 
 Calendar dateformat wird angewendet wo es angemessen ist. Da das ISO 8601 Format mit YYYY-MM-DD überlegen und zudem besser zu sortieren ist, wird es insbesondere bei Auswahllisten unabhängig von der Konfiguration beibehalten. Eingabefelder in Dokumenten vom Datum-Typ halten sich aufgrund der Datumverarbeitung des Browsers ebenfalls an dieses Format.

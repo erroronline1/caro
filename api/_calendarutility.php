@@ -213,7 +213,7 @@ class CALENDARUTILITY {
 			if (!$entry['closed']) continue;
 			$entry['closed'] = json_decode($entry['closed'], true);
 			$closed = new \DateTime($entry['closed']['date']);
-			if (intval(abs($closed->diff($this->_date['servertime'])->days > CONFIG['lifespan']['calendar_completed'])) && SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
+			if (intval(abs($closed->diff($this->_date['servertime'])->days > CONFIG['lifespan']['calendar']['autodelete'])) && SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
 				'values' => [
 					':id' => $entry['id']
 				]
@@ -280,7 +280,7 @@ class CALENDARUTILITY {
 		// set up defaults
 		$alert = $autodelete = $span_start = $span_end = null; 
 		$alert = [$this->_lang->GET('calendar.schedule.alert') => $columns[':alert'] ? ['checked' => true] : []];		
-		$autodelete = [$this->_lang->GET('calendar.schedule.autodelete', [':days' => CONFIG['lifespan']['calendar_completed']]) => $columns[':id'] === 0 || $columns[':autodelete'] ? ['checked' => true] : []];		
+		$autodelete = [$this->_lang->GET('calendar.schedule.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']]) => $columns[':id'] === 0 || $columns[':autodelete'] ? ['checked' => true] : []];		
 		$span_start = new \DateTime($columns[':span_start'] ? : 'now');
 
 		// assemble by type

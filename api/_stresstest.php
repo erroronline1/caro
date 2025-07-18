@@ -97,7 +97,7 @@ class STRESSTEST extends INSTALL{
 		$content = $this->importJSON('../unittests/', 'csvfilter', false);
 		$content['filesetting']['source'] = $this->_csvInput;
 		if (!isset($content['filesetting']['dialect'])) $content['filesetting']['dialect'] = CONFIG['csv']['dialect'];
-		$content['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
+		$content['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
 		
 		$datalist = new Listprocessor($content, [
 			'processedMonth' => $this->_currentdate->format("m"),

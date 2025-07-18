@@ -1557,7 +1557,7 @@ It is strongly recommended to create an additional development environment to te
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
     * pricelist import does take a lot longer on [updating products](#importing-vendor-pricelists) than deleting and reinserting
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
-* optional php.ini session.gc_maxlifetime in relation to [CONFIG[lifespan][idle]](#runtime-variables)
+* optional php.ini session.gc_maxlifetime in relation to [CONFIG[lifespan][session][idle]](#runtime-variables)
 * php.ini enable extensions:
     * curl
     * fileinfo
@@ -1632,16 +1632,16 @@ By default following permissions/roles are defined within the language.XX.json-f
 ```
 ; general application settings
 [application]
-debugging = no ; yes, no; enables or disables error messages
+debugging = yes ; yes, no; enables or disables error messages
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
 issue_mail = "issues@companymail.tld" ; address for application and security issues
-order_auth = "token, sigNature" ; available options: token, signature; pin is default, because it represents authorization
+order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
 order_gtin_barcode = no ; yes, no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
 require_record_type_selection = yes ; yes, no; require selection on records e.g. if this is related to a complaint 
 watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
 
 [calendar]
-timezones[europeberlin] = "Europe/Berlin" ; initial entry has to be server location; append tz time zones to your customs, selecteable within user settings
+timezones[europeberlin] = "Europe/Berlin" ; initial entry has to be server site; append tz time zones to your customs, selecteable within user settings
 
 dateformats["Y-m-d"] = "Y-m-d"; according to https://www.php.net/manual/en/datetime.format.php, e.g. "d.m.Y"; empty for ISO 8601 Y-m-d; top entry is used on exports by default
 dateformats["d.m.Y"] = "d.m.Y" ; append desired options, selecteable within user settings, keys must not contain ?{}|&~![()^" - values can
@@ -1661,6 +1661,8 @@ D-BW[breaks] = "6-30, 9-45" ; law related break times, rising [hours of work]-[m
 ; default values for csv processing if left out of filter rules
 [csv]
 headerrowindex = 0
+csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
+
 dialect["separator"] = ";"
 dialect["enclosure"] = "\"" ;" coding environments may mess up colouring after this escaped quote
 dialect["escape"] = ""
@@ -1668,7 +1670,7 @@ dialect["preg_delimiter"] ='#' ; may reduce regex escaping depending on required
 
 ;forbidden names as regex-patterns
 [forbidden]
-names[characters] = "([^\w\s\d,\.\[\]\(\)\-ÄÖÜäöüß])" ; anything else but word characters, whitespace, decimals, special characters, serves for export filenames as well
+names[characters] = "([^\w\s\d,\.\[\]\(\)\-ÄÖÜäöüßêÁáÉéÍíÓóÚú])" ; anything else but word characters, whitespace, decimals, special characters, serves for export filenames as well
 names[length] = "^.{0,3}$" ; less than 4 characters
 
 ; immutable hardcoded reserved keywords
@@ -1677,29 +1679,34 @@ names[underscorestart] = "^_" ; names must not start with _
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
 names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CID|PRD|ECR)$" ; literal terms |-separated
 
-filename[characters] = "[,\/\\\]" ; replace matched characters to avoid link error
+filename[characters] = "[,\/\\\]" ; replace matched characters to avoid errors, as experienced on iis (NOT apache)
 
 [lifespan]
-calendar_completed = 365 ; DAYS after compleded calendar entries are deleted if not specified otherwise
-idle = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
-mdr14_sample_interval = 93 ; DAYS until a new sample check is required as default value
-mdr14_sample_reusable = 1095 ; DAYS until a new sample check on the same product is allowed as default value
-open_record_reminder = 30 ; DAYS after unclosed records are reminded of via messenger
-order = 182 ; DAYS, after these orders marked as received but not archived will be deleted
-order_undelivered = 3 ; DAYS, after these unit members will be reminded to mark as delivered or enquire delivery
-order_unreceived = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping
-product_documents = 365; DAYS, after the last provision of a file a reminder will be made to verify or update the currency
-sessions = 93 ; DAYS, after these session fingerprints will be deleted, offline fallbacks for contributing become invalid
-sharepoint =  48 ; HOURS, after these files will be deleted
-tmp =  24 ; HOURS, after these files will be deleted
-training_evaluation = 62 ; DAYS until supervisors are reminded to evaluate
-training_renewal = 365 ; DAYS until a training expires, warning per header colour in overviews
+calendar[autodelete] = 365 ; DAYS after compleded calendar entries are deleted if not specified otherwise
+
+files[sharepoint] = 48 ; HOURS, after these files will be deleted
+files[tmp] = 24 ; HOURS, after these files will be deleted
+
+order[autodelete] = 182 ; DAYS, after these orders marked as received but not archived will be deleted
+order[undelivered] = 3 ; DAYS, after these unit members will be reminded to mark as delivered or enquire delivery
+order[unreceived] = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping
+
+product[documents] = 365 ; DAYS, after the last provision of a file a reminder will be made to verify or update the currency
+product[mdr14_sample_interval] = 93 ; default DAYS until a new sample check is required as default value
+product[mdr_sample_reusable] = 1095 ; default DAYS until a new sample check on the same product is allowed as default value
+
+records[open_reminder] = 30 ; DAYS after unclosed records are reminded of via messenger
+
+session[idle] = 600 ; SECONDS after which a reauthorization is necessary without intermittend use
+session[records] = 93 ; DAYS, after these session fingerprints will be deleted, offline fallbacks for contributing become invalid
+
+training[evaluation] = 62 ; DAYS until supervisors are reminded to evaluate
+training[renewal] = 365 ; DAYS until a training expires, warning per header colour in overviews
 
 ; probability factor for similarity of texts in percent
 [likeliness]
 consumables_article_no_similarity = 70 ; percent
 consumables_article_name_similarity = 80 ; percent
-csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 file_search_similarity = 50 ; percent
 records_identifier_pattern = "^.+?[,\s]+.+?\s" ; e.g. for surname, name to prefilter datalist for record search for performance reasons, given the company decides for a best practice
 record_reidentify_similarity = 50 ; percent, warning on low identifier similarity threshold
@@ -1716,6 +1723,8 @@ record_image = 2048 ; max pixels on longer side
 risk_acceptance_level = 4 ; product of probability times damage to be highlighted
 storage_warning = 10 ; gigabyte, lower value of remaining space raises a dashboard warning
 user_image = 256 ; max pixels on longer side
+bundle_files_per_slide = 12
+products_per_slide = 6
 
 ; permissions based of and matching language.XX.json permissions
 ; dynamic handling for modules and methods
@@ -1799,10 +1808,6 @@ appointment[header_image] = "media/favicon/android/android-launchericon-192-192.
 appointment[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
 appointment[codesizelimit] = 50
 appointment[codepadding] = 10
-
-[splitresults]
-bundle_files_per_slide = 12
-products_per_slide = 6
 ```
 
 Calendar dateformat takes effect where reasonable. Since the ISO 8601 YYYY-MM-DD is the superior format and way better at being sorted, selections stick with it independent of any setting. Document inputs of type date adhere to this format as well, due to the browsers date processing.

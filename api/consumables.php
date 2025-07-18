@@ -450,7 +450,7 @@ class CONSUMABLES extends API {
 						$check = explode("\n", $vendorproduct['sample_checks'][count($vendorproduct['sample_checks']) - 1]['content']); // extract check information
 						if ($check[count($check) - 1] !== $this->_lang->GET('order.incorporation.revoked', [], true)){
 							$article = intval(count($matches) - 1);
-							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+							if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
 								$matches[$article][] = [
 									[
 										'type' => 'textsection',
@@ -1404,7 +1404,7 @@ class CONSUMABLES extends API {
 							}
 							if ($pendingIncorporationCheck) $incorporationInfo .= " \n" . $pendingIncorporationCheck;
 
-							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+							if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
 								$checkslides[] = [];
 							}
 							$slide = intval(count($checkslides) - 1);
@@ -1450,7 +1450,7 @@ class CONSUMABLES extends API {
 					$product['sample_checks'] = json_decode($product['sample_checks'] ? : '', true);
 					if ($product['sample_checks']) {
 						foreach ($product['sample_checks'] as $check){
-							if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+							if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
 								$checkslides[] = [];
 							}
 							$slide = intval(count($checkslides) - 1);
@@ -1685,7 +1685,7 @@ class CONSUMABLES extends API {
 	private function update_pricelist($files, $filter, $vendorID){
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $files['pricelist'];
-		$filter['filesetting']['encoding'] = CONFIG['likeliness']['csvprocessor_source_encoding'];
+		$filter['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
 		if (!isset($filter['filesetting']['headerrowindex'])) $filter['filesetting']['headerrowindex'] = CONFIG['csv']['headerrowindex'];
 		if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 
@@ -2008,8 +2008,8 @@ class CONSUMABLES extends API {
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'));
-				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['mdr14_sample_interval'];
-				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['mdr14_sample_reusable'];
+				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['products']['mdr14_sample_interval'];
+				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['products']['mdr14_sample_reusable'];
 
 				// check forbidden names
 				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
@@ -2525,14 +2525,14 @@ class CONSUMABLES extends API {
 								'type' => 'number',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval'),
-									'value' => isset($vendor['pricelist']['samplecheck_interval']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['mdr14_sample_interval']
+									'value' => isset($vendor['pricelist']['samplecheck_interval']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['products']['mdr14_sample_interval']
 								]
 							],
 							[
 								'type' => 'number',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval_reusable'),
-									'value' => isset($vendor['pricelist']['samplecheck_reusable']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['mdr14_sample_reusable']
+									'value' => isset($vendor['pricelist']['samplecheck_reusable']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['products']['mdr14_sample_reusable']
 								]
 							]
 						]]

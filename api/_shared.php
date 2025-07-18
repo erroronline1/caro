@@ -257,7 +257,7 @@ class SHARED {
 					@fnmatch($parameter['search'], $row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], FNM_CASEFOLD)
 				)){
 
-				if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+				if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
 					$slides[] = [
 						[
 							'type' => 'textsection',
@@ -486,7 +486,7 @@ class SHARED {
 					foreach ($row as $key => $value){
 						$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
 					}
-					if (empty($productsPerSlide++ % CONFIG['splitresults']['products_per_slide'])){
+					if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
 						$slides[] = [
 							[
 								'type' => 'textsection',

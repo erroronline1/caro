@@ -376,7 +376,7 @@ class ORDER extends API {
 				// delete old received unarchived orders
 				$old = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_delivered', [
 					'values' => [
-						':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order'] * 24 * 3600)),
+						':date_time' => date('Y-m-d h:i:s', time() - (CONFIG['lifespan']['order']['autodelete'] * 24 * 3600)),
 					]
 				]);
 				foreach ($old as $row){

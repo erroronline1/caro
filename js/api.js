@@ -263,7 +263,7 @@ export const api = {
 		},
 		init: function () {
 			new Toast(null, null, null, "sessionwarning");
-			this.stop = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.idle || 0 : 0) * 1000;
+			this.stop = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.session.idle || 0 : 0) * 1000;
 			this.events = null;
 			// session timeout event counter and resetter, with binded callback only attached once
 			const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "pointerdown"];
@@ -295,22 +295,22 @@ export const api = {
 				return; // timeout has happended anyway, don't bother
 			}
 			if (api.session_timeout.interval) clearInterval(api.session_timeout.interval);
-			this.stop_visual = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.idle || 0 : 0) * 1000; // on event resets (see initializeCARO.js) the indicator will be reset
+			this.stop_visual = new Date().getTime() + (api._settings.config.lifespan ? api._settings.config.lifespan.session.idle || 0 : 0) * 1000; // on event resets (see initializeCARO.js) the indicator will be reset
 			api.session_timeout.interval = setInterval(function () {
-				if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { idle: 0 };
+				if (!("lifespan" in api._settings.config)) api._settings.config.lifespan = { session: { idle: 0 } };
 				const remaining = api.session_timeout.stop - new Date().getTime(),
 					remaining_visual = api.session_timeout.stop_visual - new Date().getTime();
-				if (api._settings.config.lifespan.idle > 0 && remaining < 10000 && api.session_timeout.events > 2) {
+				if (api._settings.config.lifespan.session.idle > 0 && remaining < 10000 && api.session_timeout.events > 2) {
 					// if some events have been counted a small backend request prolongs the session approximately ten seconds before real timeout
 					api.session_timeout.events = null;
 					new Toast(null, null, null, "sessionwarning");
 					api.application("get", "authentify");
 					return;
 				}
-				if (api._settings.config.lifespan.idle > 0 && remaining_visual > 0) {
+				if (api._settings.config.lifespan.session.idle > 0 && remaining_visual > 0) {
 					// render the indicator as long as there is time left
 					document.querySelector("header>div:nth-of-type(3)").style.display = "none";
-					api.session_timeout.render((100 * remaining_visual) / (api._settings.config.lifespan.idle * 1000), remaining_visual);
+					api.session_timeout.render((100 * remaining_visual) / (api._settings.config.lifespan.session.idle * 1000), remaining_visual);
 					return;
 				}
 				// session has been timed out, display message and clear intervals

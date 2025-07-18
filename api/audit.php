@@ -3076,7 +3076,7 @@ class AUDIT extends API {
 						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
-							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
+							$expire->modify('-' . CONFIG['lifespan']['training']['renewal'] . ' days');
 							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
@@ -3359,7 +3359,7 @@ class AUDIT extends API {
 						$expire = new \DateTime($row['expires']);
 						if ($expire < $this->_date['servertime']) $attributes['class'] = 'red';
 						else {
-							$expire->modify('-' . CONFIG['lifespan']['training_renewal'] . ' days');
+							$expire->modify('-' . CONFIG['lifespan']['training']['renewal'] . ' days');
 							if ($expire < $this->_date['servertime']) $attributes['class'] = 'orange';
 						}
 					}
