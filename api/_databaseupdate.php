@@ -44,9 +44,10 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_07_02'] as $update){
+		foreach (['_2025_07_19'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
-				if (!$this->backup($query) || SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)) !== false){
+				if (!$this->backup($query)
+					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
 					$sql = SQLQUERY::EXECUTE($this->_pdo, $query);
 					if (!$sql[1])
 						echo '<br />[*] This update has no errorInfo and was successful or without side effects:<br /><code>' . $query . '</code><br />';
@@ -149,6 +150,21 @@ class UPDATE{
 				"	subject varchar(MAX) NOT NULL," .
 				"	text varchar(MAX) NULL DEFAULT NULL" .
 				");"
+			]
+		];
+	}
+
+	private function _2025_07_19(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS lifespan INT NULL DEFAULT NULL; "
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_records', 'lifespan') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_records" .
+				"    ADD lifespan INT NULL DEFAULT NULL" .
+				" END; "
 			]
 		];
 	}
