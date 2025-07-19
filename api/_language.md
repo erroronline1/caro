@@ -95,7 +95,7 @@ All keys are hardcoded.
 Most keys are hardcoded, orderstate can be cropped or extended. `order.ordertype`, `order.orderstate` orders are passed to application.
 
 ### record
-All keys are hardcoded. `type` order is passed to application.
+All keys are hardcoded. `type` order is passed to application. `record.lifespan.years` contains the selecteable lifespans of records concerning automated deletion to match GDPR requirements. Keys are pure numbers in years, value contain a description and eventually examples.
 
 ### responsibility
 All keys are hardcoded.

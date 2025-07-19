@@ -1390,6 +1390,16 @@
 		"import_success": "Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting! Files and photos are not part of the import.",
 		"inquiry": "Case inquiry",
 		"inquiry_message_content": ":user has an inquiry for the case :identifier: :inquiry",
+		"lifespan": {
+			"description": "Retention period",
+			"forbidden": "This retention period can not be assigned",
+			"hint": "Closed records whose last entry has been done this long ago will be deleted",
+			"set": "Retention period set to :years years",
+			"years": {
+				"10": "10 Years",
+				"30": "30 Years, e.g. trade association"
+			}
+		},
 		"list_touched": "last edit on :date with :document",
 		"mark_as_closed": "Mark as closed in your role as",
 		"mark_as_closed_info": "The record will not show up in the overview, however it will still be found using the filter.",

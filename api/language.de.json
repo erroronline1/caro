@@ -1088,14 +1088,14 @@
 		},
 		"record_datalist": {
 			"description": "Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen.\nDu kannst eine CSV-Datei herunterladen, bearbeiten und wieder bereitstellen, oder vorbereitete Empfehlungen bereitstellen. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs.\nTabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen.\nOhne bereitgestellte Datei gibt es den Export.",
-			"download":"Lade Datenbankeinträge herunter",
+			"download": "Lade Datenbankeinträge herunter",
 			"empty": "Es gibt noch keine Einträge für :unit die exportiert werden könnten.",
-			"unit":"Bereich",
-			"update_abort":"Die Aktualisierung wurde abgebrochen. Es wurde nur eine einzelne Spalte gefunden, was verdächtigt ist und wahrscheinlich an einer fehlerhaften CSV-Formatierung liegt. Bitte beachten: :format",
-			"update_deleted":"Bisherige Einträge wurden gelöscht.",
+			"unit": "Bereich",
+			"update_abort": "Die Aktualisierung wurde abgebrochen. Es wurde nur eine einzelne Spalte gefunden, was verdächtigt ist und wahrscheinlich an einer fehlerhaften CSV-Formatierung liegt. Bitte beachten: :format",
+			"update_deleted": "Bisherige Einträge wurden gelöscht.",
 			"update_error": "Das Update schlug fehl.",
 			"update_success": ":unit wurde erfolgreich aktualisiert.",
-			"upload":"Wähle eine CSV-Datei um die Datenbank zu überschreiben"
+			"upload": "Wähle eine CSV-Datei um die Datenbank zu überschreiben"
 		},
 		"vendorupdate": {
 			"description": "Lade eine ordentlich vorbereitete Vorlagen-Datei hoch. Anschließend kannst du die Informationen je Lieferant für die Aktualisierung auswählen.",
@@ -1390,6 +1390,16 @@
 		"import_success": "Passende Daten wurde importiert. Bitte prüfe diese und beachte deine Verantwortung für die Richtigkeit. Nur die jüngsten Daten für das jeweils benannte Feld werden verwendet.\n\nStelle sicher, dass du den richtigen Identifikator verwendest! Dateien und Fotos sind nicht Teil des Imports.",
 		"inquiry": "Frage zum Vorgang",
 		"inquiry_message_content": ":user hat zum Vorgang :identifier eine Frage: :inquiry",
+		"lifespan": {
+			"description": "Aufbewahrungsfrist",
+			"forbidden": "Diese Aufbewahrungsfrist kann nicht festgelegt werden.",
+			"hint": "Abgeschlossene Vorgänge, deren letzter Eintrag so lange zurück liegt, werden automatisch gelöscht",
+			"set": "Aufbewahrungsfrist auf :years Jahre festgelegt",
+			"years": {
+				"10": "10 Jahre",
+				"30": "30 Jahre, z.B. BG"
+			}
+		},
 		"list_touched": "letzte Bearbeitung am :date mit :document",
 		"mark_as_closed": "Als abgeschlossen kennzeichnen in deiner Rolle als",
 		"mark_as_closed_info": "Die Aufzeichnungen erscheinen nicht mehr in der Übersicht, können aber über den Filter weiterhin erreicht werden.",

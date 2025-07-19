@@ -33,7 +33,7 @@ class RECORD extends API {
 	private $_documentExport = null;
 	private $_caseState = null;
 	private $_unit = null;
-	private $_caseStateBoolean = null;
+	private $_caseStateValue = null;
 
 	public function __construct(){
 		parent::__construct();
@@ -44,7 +44,7 @@ class RECORD extends API {
 
 		$this->_requestedID = $this->_appendDate = isset(REQUEST[2]) ? REQUEST[2] : null;
 		$this->_passedIdentify = $this->_documentExport = $this->_caseState = $this->_unit = isset(REQUEST[3]) ? REQUEST[3] : '';
-		$this->_caseStateBoolean = isset(REQUEST[4]) ? REQUEST[4] : null;
+		$this->_caseStateValue = isset(REQUEST[4]) ? REQUEST[4] : null;
 	}
 
 
@@ -74,18 +74,39 @@ class RECORD extends API {
 				]);
 				$case = $case ? $case[0] : null;
 				if ($case){
-					$current_record = [
-						'author' => $_SESSION['user']['name'],
-						'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
-						'document' => 0,
-						'content' => UTILITY::json_encode([
-							$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET($this->_caseStateBoolean === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
-						])
-					];
+					
+					if ($this->_caseState ==='lifespan'){
+						if (in_array(strval($this->_caseStateValue), array_keys($this->_lang->_USER['record']['lifespan']['years']))){
+							$current_record = [
+								'author' => $_SESSION['user']['name'],
+								'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
+								'document' => 0,
+								'content' => UTILITY::json_encode([
+									$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue], true)
+								])
+							];
+						}
+						else $this->response([
+						'response' => [
+							'msg' => $this->_lang->GET('record.lifespan.forbidden'),
+							'type' => 'error'
+						]]);
+					}
+					else{
+						$current_record = [
+							'author' => $_SESSION['user']['name'],
+							'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
+							'document' => 0,
+							'content' => UTILITY::json_encode([
+								$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
+							])
+						];
+					}
+
 					$records = json_decode($case['content'], true);
 					$records[] = $current_record;
 					$case_state = json_decode($case['case_state'] ? : '', true);
-					if ($this->_caseStateBoolean === 'true') $case_state[$this->_caseState] = true;
+					if ($this->_caseStateValue === 'true') $case_state[$this->_caseState] = true;
 					else unset($case_state[$this->_caseState]);
 					if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
 						'values' => [
@@ -95,11 +116,12 @@ class RECORD extends API {
 							':last_user' => $_SESSION['user']['id'],
 							':last_document' => null,
 							':content' => UTILITY::json_encode($records),
-							':id' => $case['id']
+							':id' => $case['id'],
+							':lifespan' => ($this->_caseState ==='lifespan' && in_array(strval($this->_caseStateValue), array_keys($this->_lang->_USER['record']['lifespan']['years']))) ? intval($this->_caseStateValue) : $case['lifespan']
 						]
 					])) $this->response([
 						'response' => [
-							'msg' => $this->_lang->GET($this->_caseStateBoolean === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]]),
+							'msg' => $this->_caseState ==='lifespan' ? $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue]) : ($this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]])),
 							'type' => 'success'
 						]]);
 				}
@@ -917,7 +939,8 @@ class RECORD extends API {
 								':last_user' => $_SESSION['user']['id'],
 								':last_document' => $document_name,
 								':content' => UTILITY::json_encode($records),
-								':id' => $case['id']
+								':id' => $case['id'],
+								':lifespan' => $case['lifespan']
 							]
 						]);
 					}
@@ -1058,7 +1081,26 @@ class RECORD extends API {
 					])
 					."')}).then((response) => { if (response) { response.casestate = this.dataset.casestate; response.casestatestate = this.checked; api.record('post', 'casestatealert', null, _client.application.dialogToFormdata(response)); }});"
 					], $content['case_state'])){
-					$body[] = [$casestate];
+
+					// retention period selection
+					$retention = [];
+					foreach($this->_lang->_USER['record']['lifespan']['years'] as $years => $description){
+						$retention[$description] = [
+							'value' => $years,
+							'onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', 'lifespan', this.value);"
+						];
+						if ($content['lifespan'] == $years) $retention[$description]['checked'] = true;
+						if(!PERMISSION::permissionFor('recordscasestate')) $retention[$description]['disabled'] = true;
+					}
+
+					$body[] = [$casestate, [
+						'type' => 'radio',
+						'attributes' => [
+							'name' => $this->_lang->GET('record.lifespan.description')
+						],
+						'content' => $retention,
+						'hint' => $this->_lang->GET('record.lifespan.hint')
+					]];
 				}
 				// append general request button
 				$body[count($body) - 1][] = [
@@ -1683,7 +1725,8 @@ class RECORD extends API {
 					':last_user' => $_SESSION['user']['id'],
 					':last_document' => $merge['last_document'],
 					':content' => UTILITY::json_encode($merge['content']),
-					':id' => $merge['id']
+					':id' => $merge['id'],
+					':lifespan' => max($original['lifespan'], $merge['lifespan'])
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.reidentify_success'),
@@ -1707,7 +1750,8 @@ class RECORD extends API {
 					// get last considered document, offset -1 because pseudodocument has been added before by default
 					':last_document' => $original['content'][count($original['content']) - 2]['document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),
 					':content' => UTILITY::json_encode($original['content']),
-					':id' => $original['id']
+					':id' => $original['id'],
+					':lifespan' => max($original['lifespan'], $merge['lifespan'])
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
 				'values' => [
 					':id' => $merge['id']
@@ -1765,7 +1809,8 @@ class RECORD extends API {
 					':last_user' => $_SESSION['user']['id'],
 					':last_document' => $original['last_document'],
 					':content' => UTILITY::json_encode($original['content']),
-					':id' => $original['id']
+					':id' => $original['id'],
+					':lifespan' => $original['lifespan']
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.saved'),
@@ -1834,7 +1879,8 @@ class RECORD extends API {
 			'record_type' => $data['record_type'],
 			'units' => $data['units'] ? explode(',', $data['units']) : [],
 			'context' => $data['context'],
-			'case_state' => $data['case_state']
+			'case_state' => $data['case_state'],
+			'lifespan' => $data['lifespan']
 		];
 		$accumulatedcontent = [];
 
