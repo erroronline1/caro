@@ -1107,7 +1107,6 @@ class RECORD extends API {
 					];
 					foreach ($entries as $key => $values){
 						$display = '';
-						$images = [];
 						$files = [];
 						foreach($values as $value){
 							preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
@@ -1115,29 +1114,13 @@ class RECORD extends API {
 								$display .= '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>\n";
 								continue;
 							}
+							$display .= $value . "\n";
 							preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value
 							$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
 							if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
 								$file = pathinfo($path);
-								if (in_array($file['extension'], ['jpg', 'jpeg', 'gif', 'png'])) {
-									$display .= $value . "\n";
-									$images[] = [
-										'type' => 'image',
-										'description' => $file['basename'],
-										'attributes' => [
-											'name' => $file['basename'],
-											'url' => './api/api.php/file/stream/' . $path
-										]
-									];
-								}
-								elseif (in_array($file['extension'], ['stl'])) {
-									$display .= ' <a href="javascript:void(0);" onclick="javascript:new _client.Dialog({type: \'preview\', header: \'' . $value . '\', render:{type: \'stl\', name: \'' . $value . '\', url: \'./api/api.php/file/stream/' . $path . '\'}})">' . $value. "</a>\n";
-								}
-								else {
-									$display .= ' <a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'./api/api.php/file/stream/' . $path . '\', \'_blank\').focus();">' . $value. "</a>\n";
-								}
+								$files[$file['basename']] = UTILITY::link(['href' => $path]);
 							}
-							else $display .= $value . "\n";
 						}
 						array_push($body[count($body) -1][0]['content'],
 							[
@@ -1147,7 +1130,11 @@ class RECORD extends API {
 								],
 								'linkedcontent' => trim($display)
 							]);
-						if ($images) array_push($body[count($body) -1][0]['content'], ...$images);
+						if ($files) array_push($body[count($body) -1][0]['content'], [
+							'type' => 'links',
+							'description' => $this->_lang->GET('file.file_list', [':folder' => $key]),
+							'content' => $files
+						]);
 					}
 					if ($document != $this->_lang->GET('record.altering_pseudodocument_name')){
 						// option to append to document entries
