@@ -1119,7 +1119,7 @@ class RECORD extends API {
 							$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
 							if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
 								$file = pathinfo($path);
-								$files[$file['basename']] = UTILITY::link(['href' => $path]);
+								$files[$file['basename']] = UTILITY::link(['href' => './api/api.php/file/stream/' . $path]);
 							}
 						}
 						array_push($body[count($body) -1][0]['content'],
