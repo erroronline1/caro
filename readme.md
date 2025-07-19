@@ -33,9 +33,6 @@ Things are still in motion. Images may be outdated.
 
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* record export embed files not being images
-    * https://tcpdf.org/examples/example_041/
-    * select whether to embed files?
 * order returns
     * default mark as delivered or exclude from reminders?
     * no incorporation nor sample check because out of reach
@@ -649,6 +646,10 @@ graph TD;
     missing-->|no|nonemissing(status message);
     summary-->retype[reassign record type];
     retype-->record_db;
+    summary-->record_state[record state, retention period];
+    record_state-->record_db;
+
+    record_db===>|closed, retention period expired|delete;
 
     notification((notification))-....->record_db;
     record_db-..->|"unclosed,
@@ -1004,7 +1005,8 @@ graph TD;
     process_order===>return_order[return order];
     return_order==>clone_order[clone order, set return type];
     clone_order==>approved_orders
-
+    return_order======>|critical reason|incorporate;
+    
     process_order==>disapprove[disapprove];
     disapprove==>|append optional message|message_unit[message all unit members];
     message_unit==>prepared_orders;

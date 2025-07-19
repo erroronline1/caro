@@ -542,6 +542,10 @@ graph TD;
     missing-->|nein|nonemissing(Statusbenachrichtigung);
     summary-->retype[Aufzeichnungstyp ändern];
     retype-->record_db;
+    summary-->record_state[Vorgangsstatus, Aufbewahrungsfrist];
+    record_state-->record_db;
+
+    record_db===>|abgeschlossen, Aufbewahrungsfrist abgelaufen|delete;
 
     notification((Benachrichtigungen))-....->record_db;
     record_db-..->|"nicht abgeschlossen,
@@ -900,7 +904,8 @@ graph TD;
     process_order===>return_order[Rücksendung];
     return_order==>clone_order["Bestellung kopieren,
     als Rücksendung markieren"];
-    clone_order==>approved_orders
+    clone_order==>approved_orders;
+    return_order======>|kritischer Grund|incorporate;
 
     process_order==>disapprove[zurückweisen];
     disapprove==>|optional Nachricht anfügen|message_unit["alle Bereichsmitarbeiter
