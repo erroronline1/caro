@@ -691,6 +691,8 @@ class ORDER extends API {
 	 * @param array $row approved order from database
 	 * 
 	 * @return int number of affected rows
+	 * 
+	 * also see application.php->cron() clone for record deletion
 	 */
 	private function delete_approved_order($row){
 		$order = json_decode($row['order_data'], true);

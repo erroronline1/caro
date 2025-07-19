@@ -418,6 +418,7 @@ class APPLICATION extends API {
 			}
 
 			// alert unclosed records, records not having set lifespan
+			// delete expired records including record attachments and orders that contain identifier e.g. as commission
 			$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 			$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 			$alerts = [];
@@ -471,6 +472,52 @@ class APPLICATION extends API {
 								':notified' => $diff,
 								':identifier' => $this->_pdo->quote($row['identifier'])
 							]) . '; ');
+					}
+					elseif ($row['lifespan'] && abs($last->diff($this->_date['servertime'])->days) > intval($row['lifespan']) * 365 + ceil(intval($row['lifespan']) / 4)){ // last entry lifespan years + leap days as approximation
+						// delete record attachments that begin with the identifier
+						if (file_exists(UTILITY::directory('record_attachments'))){
+							$delete = [];
+							$fileidentifier = preg_replace('/[^\w\d]/m', '', $row['identifier']);
+							foreach (glob(UTILITY::directory('record_attachments') . '/' . $fileidentifier . '*') as $file) {
+								if($file == '.' || $file == '..') continue;
+								$delete[] = $file;
+							}
+							UTILITY::delete($delete);
+						}
+						// prepare deletion
+						$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_delete'),
+							[
+								':id' => intval($row['id'])
+							]) . '; ');
+
+						// delete orders containing identifier e.g. archived case related orders havong idenfier as commission
+						if (in_array($row['record_type'], array_keys($this->_lang->_DEFAULT['record']['type']))) {
+							$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+								'replacements' => [
+									':organizational_unit' => implode(',', array_keys($this->_lang->_DEFAULT['units'])), // all units
+									':orderfilter' => $row['identifier']
+								]
+							]);
+							foreach($orders as $relatedorder){
+								// DUPLICATE OF order.php->delete_approved_order()
+								$order = json_decode($relatedorder['order_data'], true);
+								if (isset($order['attachments'])){
+									$others = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
+										'values' => [
+											':substr' => $order['attachments']
+										]
+									]);
+									if (count($others)<2){
+										$files = explode(',', $order['attachments']);
+										UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
+									}
+								}
+								$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_delete_approved_order'),
+									[
+										':id' => intval($relatedorder['id'])
+									]) . '; ');
+							}
+						}
 					}
 				}
 			}
