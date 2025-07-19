@@ -40,15 +40,6 @@ Things are still in motion. Images may be outdated.
     * default mark as delivered or exclude from reminders?
     * no incorporation nor sample check because out of reach
 * order service/warranty extended reminder period to request delivery by purchase
-* records
-    * stl display
-    * mark as obsolete by
-    * selection (bg, regular, whatever)
-* maintenance
-    * data deletion in accordance to dsgvo, eg. recommend deletion after x years?
-    * https://dsgvo-gesetz.de/art-17-dsgvo/
-    * https://www.datenschutz-recht-medizin.de/loeschpflicht-loeschkonzept-und-aufbewahrungspflichten/
-
 
 ## Content
 * [Aims](#aims)
@@ -92,6 +83,7 @@ Things are still in motion. Images may be outdated.
     * [User trainings](#user-trainings)
     * [Search](#search)
     * [CSV processor](#csv-processor)
+* [Record deletion](#record-deletion)
 * [Intended regulatory goals](#intended-regulatory-goals)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -1397,6 +1389,15 @@ RegEx-patterns are processed case insensitive, however note this only applies to
 
 [Content](#content)
 
+# Record deletion
+Records are supposed to be assigned a retention period. Applicable lifespans are to be preset within the [language files](#customisation) (`record.lifespan.years`). Accomodate available options according to your regulatory circumstances and according to your defined customs.
+
+Lifespans are supposed to be assigned by users that are authorized to set a record state as well. If not set previously, a recurring notification will be sent once the record is marked as closed. Closed records whose last contribution exceed the set retention period will be deleted automatically and without further notice. This includes possible record attachments and orders and their attachments containing the identifier e.g. as commission.
+
+Records can not be deleted otherwise to ensure audit safety. Requests to delete personal data in advance of the expiry of the set retention period conflict with the legitimate interest of audit safety and common keeping of terms storing medical device records.
+
+[Content](#content)
+
 # Intended regulatory goals
 Beside the apps architecture you will still have to set up your quality management system. Most of the regulatory issues are supposed to be fulfilled by documents. This way you ensure a proper version control and approval as well as a fulfillment check within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
@@ -1417,7 +1418,7 @@ Application support legend:
 | ISO 13485 4.2.2 Quality management manual | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 4.2.3 Medical device file | partial | &bull; All form data for case documentation accumulates. Any export does contain this data, thus achieves a complete documentation of measures.<br/>&bull; Case documentation documents require a case identifier to ensure respective data is allocated correctly. | [Records](#records) |
 | ISO 13485 4.2.4 Document control | yes | &bull; The application enables you to design reusable document components and documents.<br/>&bull; Only the most recent approved components and documents are accessible for use [as long as there is a network connection](#network-connection-handling).<br/>&bull; Creation of new components, documents, document bundles, text chunks and text templates is permitted to defined authorized users only.<br/>&bull; Form components and documents need to be [approved by](#users) defined authorized users. Respective user groups will be alerted by system message on saving of a new element. All members of the respective permission group can approve though, assuming they know what they're doing. Any restricted assignment to organizational units would overcomplicate things regarding reuse of elements by multiple units. Unapproved components do not show up even if the document is approved.<br/>&bull; New components, documents, document bundles, text chunks and text templates are appended to the database as a new entry. Each entry will have a timestamp and the saving user name. Within the respective managers the standard selection will access the most recent approved version. The advanced selection will access any existing version. Components and documents can not be deleted after being approved. Unapproved components and documents are not accessible for use.<br/>&bull; Images for document components will not be deleted after component approvement. They are assigned the components name and timestamp of submission to the filename. They are always accessible on accessing a former version. They can not be reused and are part of the component. <br/>&bull; Documents can be exported blank or digitally prefilled by defined authorized users to limit distribution of outdated versions. Authorized document creators can decide for general permission though.<br/>&bull; Documents can be recreated by any validity date through authorized users to identify changes. <br/>&bull; External documents are routed with recording implementation, regulatory context, possible retirement and most recent user interacting. | [Documents](#documents), [Files](#files) |
-| ISO 13485 4.2.5 Record control | yes | &bull; All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.<br/>&bull; Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.<br/>&bull; Not only records per se but any changes to record types will be stored as well.<br/>&bull; Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.<br/>&bull; Accessing any content from the application including confidential personal information of customers requires a personal login from registered users. | [Users](#users), [Records](#records) |
+| ISO 13485 4.2.5 Record control | yes | &bull; All form data accumulates and is not deleteable from the application. Each entry will have a timestamp and the saving user name. Summaries gather all distinct entries and display them in order of submission.<br/>&bull; Images and files for records will not be deleted. They are assigned the identifier and timestamp of submission to the filename.<br/>&bull; Not only records per se but any changes to record types will be stored as well.<br/>&bull; Records can be exported at any time if you want to have another audit safe storage solution or have to share it with a service provider.<br/>&bull; Accessing any content from the application including confidential personal information of customers requires a personal login from registered users.<br/>&bull; Records are supposed to be assigned a lifespan. Exceeding this period, closed records are deleted to comply with data protection regulations | [Users](#users), [Records](#records), [Record deletion](#record-deletion) |
 | ISO 13485 5.1 Management commitment | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.2 Customer orientation | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.3 Quality policy | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
@@ -1502,6 +1503,7 @@ Application support legend:
 | MDR annex 14 Clinical evaluation and post-market clinical follow-up| structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MPBetreibV | structural | &bull; *record within documents with the "Equipment surveillance"-context* | |
 | ArbSchG §3 / BAG Az. 1 ABR 22/21 | yes | &bull; Registered users can contribute their working hours, vacations, sick leaves, etc.<br/>&bull; These inputs can be exported for documentation regarding labour laws | [Calendar](#calendar) |
+| GDPR Art.17 Right to erasure | yes | &bull; Closed medical device records will be deleted after exceeding their individual set retention period | [Record deletion](#record-deletion) |
 | Directive (EU) 2019/882 European Accessibility Act | yes | &bull; The application has been designed to be accessible according to [WCAG 2.1 Level AA](https://www.w3.org/TR/WCAG21/) | [Accessibility statement](#accessibility-statement) |
 
 [Content](#content)
@@ -5453,7 +5455,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * O.Data_1 The application MUST store sensitive data in encrypted form. The backend system SHOULD store sensitive data, encrypted in a way, so that it can only be decrypted by the user itself.
     > [Encryption statement](#encryption-statement)
 * O.Data_2 All sensitive data collected MUST NOT be kept in the backend system beyond the duration of their respective processing.
-    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received ever since 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
+    > User deletion considers all data including calendar-entries, time tracking and trainings. It is a [legitimate interest](#terms-of-service-for-using-the-application) to keep names within records for audit safety. Records are deleted after exceeding their [retention period](#record-deletion). The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.
 * O.Data_3 The backend system MUST take into account the principles of data minimization and limitation due to the purpose.
     > Only active and intentional user input is processed and stored.
 * O.Data_4 The backend system MUST remove all metadata with data protection relevance, such the GPS coordinates of the location, used hardware, etc., whenever these data is not needed for the legitimate purpose of the application.
@@ -5461,7 +5463,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * O.Data_5 Unless necessary for the legitimate purpose of the application, sensitive data like private keys MUST BE exported from the component they were generated from (see Table15).
     > Login tokens are to be exported as a qr-code, for scanning login credentials. There are no other keys to be exported.
 * O.Data_6 The backend system MUST NOT write sensitive data in messages or notifications the user did not explicitly gave permission for.
-    > Notifications only return integers, no sensitive data.
+    > Notifications only return integers, no sensitive data. Messages contain an identifier at best.
 * O.Data_7 The backend system MUST provide the user with the option to delete or make all sensitive data and application-specific credentials completely non accessible from the backend system, whenever the application is uninstalled by the user. If the user does not use this option, the backend system MUST define a maximum and for the application purpose appropriate duration, in which the data remains stored in the backend system. The Backend system MUST inform the user about the duration, in which the sensitive data remains stored in the backend system. After the maximum length of time, the backend system MUST delete or make all sensitive data and application-specific credentials non accessible. Additionally, the backend system MUST provide the user with an option to delete these information within the defined duration, in which the data may remain stored in the backend system.
     > The operator of the infrastructure is responsible for fulfilling this requirement.
 * O.Data_8 To counteract the misuse of sensitive data after a device loss, the application MAY implement a kill switch, i.e. a deliberate, secure overwriting of user data in the device at application level, triggered by the backend system. The manufacturer MUST protect the triggering of the kill switch by the user via the backend system against misuse by means of strong authentication mechanisms.
