@@ -1394,6 +1394,7 @@
 			"description": "Aufbewahrungsfrist",
 			"forbidden": "Diese Aufbewahrungsfrist kann nicht festgelegt werden.",
 			"hint": "Abgeschlossene Vorgänge, deren letzter Eintrag so lange zurück liegt, werden automatisch gelöscht",
+			"reminder_message": "Der Vorgang :identifier hat noch keine Aufbewahrungsfrist festgelegt. Kannst Du das bitte machen?",
 			"set": "Aufbewahrungsfrist auf :years Jahre festgelegt",
 			"years": {
 				"10": "10 Jahre",

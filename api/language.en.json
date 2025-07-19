@@ -1394,6 +1394,7 @@
 			"description": "Retention period",
 			"forbidden": "This retention period can not be assigned",
 			"hint": "Closed records whose last entry has been done this long ago will be deleted",
+			"reminder_message": "The case :identifier has not been assigned a retention period. Would you please do that?",
 			"set": "Retention period set to :years years",
 			"years": {
 				"10": "10 Years",

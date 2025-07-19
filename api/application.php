@@ -417,27 +417,51 @@ class APPLICATION extends API {
 				SQLQUERY::EXECUTE($this->_pdo, $alert);
 			}
 
-			// alert unclosed records
+			// alert unclosed records, records not having set lifespan
 			$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 			$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 			$alerts = [];
 			foreach ($data as $row){
+				// alert about unclosed records if difference between now and last touch is divisible by reminder-interval
 				if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
 					|| ($row['record_type'] !== 'complaint' && !$row['closed'])){
 	
-					// alert if applicable
 					$last = new \DateTime($row['last_touch']);
 					$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
 					if ($row['notified'] < $diff){
 						// get last considered document
 						$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)];
-	
 						$this->alertUserGroup(
-							['unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))],
+							[
+								'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
+							],
 							$this->_lang->GET('record.reminder_message', [
 								':days' => $last->diff($this->_date['servertime'])->days,
 								':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
 								':document' => $lastdocument['name'],			
+								':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+							], true)
+						);
+						// prepare alert flags
+						$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
+							[
+								':notified' => $diff,
+								':identifier' => $this->_pdo->quote($row['identifier'])
+							]) . '; ');
+					}
+				}
+				// alert about unassigned retention period if difference between now and last touch is divisible by reminder-interval
+				// only to set permissions within affected units, e.g. office members of orthotics1
+				else {
+					$last = new \DateTime($row['last_touch']);
+					$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
+					if ($row['notified'] < $diff && !$row['lifespan']){
+						$this->alertUserGroup(
+							[
+								'permission' => PERMISSION::permissionFor('recordscasestate', true),
+								'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
+							],
+							$this->_lang->GET('record.lifespan.reminder_message', [
 								':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 							], true)
 						);
