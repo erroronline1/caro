@@ -1630,6 +1630,8 @@ class AUDIT extends API {
 		]);
 		foreach ($approvedorders as $row){
 			$decoded_order_data = json_decode($row['order_data'], true);
+			// add info on necessary actions if regular order, otherwise out of reach
+			if (isset($decoded_order_data['order_type']) && !in_array($decoded_order_data['order_type'], ['order'])) continue;
 			if (isset($decoded_order_data['ordernumber_label']) && ($tocheck = array_search($decoded_order_data['ordernumber_label'], array_column($products, 'article_no'))) !== false){
 				if (isset($decoded_order_data['vendor_label']) && (isset($products[$tocheck]) && $products[$tocheck]['vendor_name'] === $decoded_order_data['vendor_label'])){
 					$article = $decoded_order_data['ordernumber_label'] . $decoded_order_data['vendor_label'];

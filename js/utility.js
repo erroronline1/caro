@@ -1369,8 +1369,8 @@ export const _client = {
 				}
 
 				productaction = [];
-				// append incorporation state
-				if (element.incorporation) {
+				// append incorporation state if regular order, otherwise out of reach
+				if (["order"].includes(element.ordertype) && element.incorporation) {
 					if (element.incorporation.item)
 						productaction.push({
 							type: "button",
@@ -1387,8 +1387,8 @@ export const _client = {
 							},
 						});
 				}
-				// append sample check state
-				if (element.samplecheck) {
+				// append sample check state if regular order, otherwise out of reach
+				if (["order"].includes(element.ordertype) && element.samplecheck) {
 					if (element.samplecheck.item)
 						productaction.push({
 							type: "button",
@@ -1468,8 +1468,9 @@ export const _client = {
 				for (const [state, attributes] of Object.entries(element.state)) {
 					if (attributes["data-" + state] === "true") info.push(api._lang.GET("order.order." + state));
 				}
-				if (element.incorporation) info.push(api._lang.GET("order.incorporation.incorporation"));
-				if (element.samplecheck) info.push(api._lang.GET("order.sample_check.sample_check"));
+				// add info on necessary actions if regular order, otherwise out of reach
+				if (["order"].includes(element.ordertype) && element.incorporation) info.push(api._lang.GET("order.incorporation.incorporation"));
+				if (["order"].includes(element.ordertype) && element.samplecheck) info.push(api._lang.GET("order.sample_check.sample_check"));
 				if (!element.id) info.push(api._lang.GET("order.product_not_in_database"));
 				info = info.join(", ");
 
@@ -1580,8 +1581,9 @@ export const _client = {
 						});
 				} else {
 					tileinfo = [];
-					if (element.incorporation) tileinfo.push(api._lang.GET("order.incorporation.incorporation"));
-					if (element.samplecheck) tileinfo.push(api._lang.GET("order.sample_check.sample_check"));
+					// add info on necessary actions if regular order, otherwise out of reach
+					if (["order"].includes(element.ordertype) && element.incorporation) tileinfo.push(api._lang.GET("order.incorporation.incorporation"));
+					if (["order"].includes(element.ordertype) && element.samplecheck) tileinfo.push(api._lang.GET("order.sample_check.sample_check"));
 					if (element.addproduct) tileinfo.push(api._lang.GET("order.product_not_in_database"));
 					order.push({
 						type: "textsection",

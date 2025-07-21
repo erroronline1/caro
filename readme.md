@@ -35,7 +35,6 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 * order returns
     * default mark as delivered or exclude from reminders?
-    * no incorporation nor sample check because out of reach
 * order service/warranty extended reminder period to request delivery by purchase
 
 ## Content
