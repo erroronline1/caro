@@ -33,9 +33,6 @@ Things are still in motion. Images may be outdated.
 
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* order returns
-    * default mark as delivered or exclude from reminders?
-* order service/warranty extended reminder period to request delivery by purchase
 
 ## Content
 * [Aims](#aims)
@@ -1692,7 +1689,8 @@ files[tmp] = 24 ; HOURS, after these files will be deleted
 
 order[autodelete] = 182 ; DAYS, after these orders marked as received but not archived will be deleted
 order[undelivered] = 3 ; DAYS, after these unit members will be reminded to mark as delivered or enquire delivery
-order[unreceived] = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping
+order[unreceived] = 14 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for regular orders
+service[unreceived] = 21 ; DAYS, after these purchase will be reminded to enquire information about estimated shipping, for service or warranty cases
 
 product[documents] = 365 ; DAYS, after the last provision of a file a reminder will be made to verify or update the currency
 product[mdr14_sample_interval] = 93 ; default DAYS until a new sample check is required as default value

@@ -1596,7 +1596,8 @@ files[tmp] = 24 ; Stunden nach denen Dateien gelöscht werden
 
 order[autodelete] = 182 ; Tage nach denen ausgelieferte Bestellung die nicht archiviert sind gelöscht werden
 order[undelivered] = 3 ; Tage nach denen Bereiche daran erinnert werden Auslieferungen zu merkieren oder sich nach dem Sachstand zu erkundigen
-order[unreceived] = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen
+order[unreceived] = 14 ; Tage nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen, für gewöhnliche Bestellungen
+service[unreceived] = 21 ; TAGE, nach denen der Einkauf erinnert wird sich nach dem Versanddatum zu erkundigen, für Service und Garantiefälle
 
 product[documents] = 365 ; Tage nach der letzten Bereitstellung einer Datei, nach denen eine Erinnerung zur Verifizierung oder Erneuerung der Aktualität erstellt wird
 product[mdr14_sample_interval] = 93 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist

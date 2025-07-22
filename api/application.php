@@ -361,7 +361,19 @@ class APPLICATION extends API {
 			foreach ($undelivered as $order){
 				$update = false;
 				$decoded_order_data = null;
+
+				// alert purchase to enquire information about estimated shipping
+				// service gets an individual timespan as per config
+				// return or cancellation don't matter as these are handled different on state setting
 				$ordered = new \DateTime($order['ordered'] ? : '');
+				switch($order['ordertype']){
+					case "service":
+						$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['service']['unreceived']));
+						break;
+					default:
+						$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unreceived']));
+						break;
+				}
 				$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unreceived']));
 				if ($order['ordered'] && $order['notified_received'] < $receive_interval){
 					$decoded_order_data = json_decode($order['order_data'], true);
@@ -382,9 +394,11 @@ class APPLICATION extends API {
 					$update = true;
 				} else $receive_interval = $order['notified_received'];
 
+				// alert unit members to mark as received for orders and items returned from service
+				// return or cancellation don't matter as these are not received
 				$received = new \DateTime($order['received'] ? : '');
 				$delivery_interval = intval(abs($received->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
-				if ($order['received'] && $order['notified_delivered'] < $delivery_interval){
+				if ($order['received'] && in_array($order['ordertype'], ['order', 'service']) && $order['notified_delivered'] < $delivery_interval){
 					if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
 					$this->alertUserGroup(
 						['unit' => [$order['organizational_unit']]],
