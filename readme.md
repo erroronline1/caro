@@ -33,6 +33,10 @@ Things are still in motion. Images may be outdated.
 
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
+* consumables - vendors / products
+    * documents request validity for submitted documents, append to filename, require evaluation based on that
+    * hopefully improved handling for automated evaluation reminders
+    * refactor certificate handling, database storage, cron reminder
 
 ## Content
 * [Aims](#aims)

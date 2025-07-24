@@ -847,7 +847,11 @@ class CONSUMABLES extends API {
 
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $product['article_no']]);
+					$oneYearFromNow = clone $this->_date['servertime'];
+					$oneYearFromNow->modify('+1 year');
+					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
+					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -947,7 +951,11 @@ class CONSUMABLES extends API {
 				
 				// save documents
 				if (PERMISSION::permissionFor('products') && isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $product['article_no']]);
+					$oneYearFromNow = clone $this->_date['servertime'];
+					$oneYearFromNow->modify('+1 year');
+					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
+					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -1103,17 +1111,23 @@ class CONSUMABLES extends API {
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
-				$documents = [];
-
-				// gather files
+				// gather documents
+				$documents = ['valid' => [], 'expired' => []];
 				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
 				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					$article_no = explode('_', $file['filename'])[2];
 					similar_text($article_no, $product['article_no'], $percent);
-					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) 
-						$documents[$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path,1)];
+					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
+						preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
+						if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
+							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+						} else {
+							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+						}
+					}
 				}
+
 				// select all products from selected vendor, retrieve similar products
 				$vendorproducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
 					'values' => [
@@ -1234,7 +1248,7 @@ class CONSUMABLES extends API {
 							if (isset($product['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 							elseif (!PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 							elseif (PERMISSION::fullyapproved('incorporation', $product['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.accepted');
-							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']);
+							$incorporationInfo = isset($product['incorporated']['_check']) ? str_replace(["\r", "\n"], ['', " \n"], $product['incorporated']['_check']) : '';
 							foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
 								if (isset($product['incorporated'][$permission])) $incorporationInfo .= " \n" . $this->_lang->_USER['permissions'][$permission] . ' ' . $product['incorporated'][$permission]['name'] . ' ' . $this->convertFromServerTime($product['incorporated'][$permission]['date']);
 							}
@@ -1254,12 +1268,23 @@ class CONSUMABLES extends API {
 								]
 							];
 						}
+						// append documents if applicable
 						if ($documents) {
-							$response['render']['content'][1][] = [
-								'type' => 'links',
-								'description' => $this->_lang->GET('consumables.product.documents_download'),
-								'content' => $documents
-							];
+							if ($documents['valid'])
+								$response['render']['content'][1][] = [
+									'type' => 'links',
+									'description' => $this->_lang->GET('consumables.product.documents_valid'),
+									'content' => $documents['valid']
+								];
+							if ($documents['expired'])
+								$response['render']['content'][1] = [
+									$response['render']['content'][1],
+									[
+										'type' => 'links',
+										'description' => $this->_lang->GET('consumables.product.documents_expired'),
+										'content' => $documents['expired']
+									]
+								];
 						}
 						// userlist
 						$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -1395,7 +1420,7 @@ class CONSUMABLES extends API {
 							if (isset($incorporation['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
 							elseif (!PERMISSION::fullyapproved('incorporation', $incorporation)) $incorporationState = $this->_lang->GET('order.incorporation.pending');
 
-							$incorporationInfo = str_replace(["\r", "\n"], ['', " \n"], $incorporation['_check']);
+							$incorporationInfo = isset($incorporation['_check']) ? str_replace(["\r", "\n"], ['', " \n"], $incorporation['_check']) : '';
 							$incorporationInfo .= " \n";
 							$pendingIncorporationCheck = "";
 							foreach (['user', ...PERMISSION::permissionFor('incorporation', true)] as $permission){
@@ -1517,6 +1542,13 @@ class CONSUMABLES extends API {
 									'multiple' => true,
 								],
 								'hint' => $this->_lang->GET('consumables.product.documents_update_hint')
+							],
+							[
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.documents_validity'),
+								],
+								'hint' => $this->_lang->GET('consumables.product.documents_validity_hint')
 							]
 						];
 
@@ -1553,28 +1585,39 @@ class CONSUMABLES extends API {
 						];
 					}
 
-					// add download options for documents
+					// append documents if applicable
 					if ($documents) {
-						if (isset($response['render']['content'][3]))
-							$response['render']['content'][3] = [
-								[
+						if (isset($response['render']['content'][3])){
+							if ($documents['valid'])
+								$response['render']['content'][3] = [
+									...$response['render']['content'][3],
 									[
 										'type' => 'links',
-										'description' => $this->_lang->GET('consumables.product.documents_download'),
-										'content' => $documents
+										'description' => $this->_lang->GET('consumables.product.documents_valid'),
+										'content' => $documents['valid']
 									]
-								],
-								$response['render']['content'][3]
-							];
+								];
+							if ($documents['expired'])
+								$response['render']['content'][3] = [
+									$response['render']['content'][3],
+									[
+										'type' => 'links',
+										'description' => $this->_lang->GET('consumables.product.documents_expired'),
+										'content' => $documents['expired']
+									]
+								];
+						}
+						/* huh?
 						else $response['render']['content'][] = [
 							[
 								[
 									'type' => 'links',
-									'description' => $this->_lang->GET('consumables.product.documents_download'),
+									'description' => $this->_lang->GET('consumables.product.documents_valid'),
 									'content' => $documents
 								]
 							]
 						];
+						*/
 					}
 
 					// add delete button for eligible products
@@ -1888,7 +1931,7 @@ class CONSUMABLES extends API {
 				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
-				if (isset($vendor['pricelist']['filter']) && !json_decode($vendor['pricelist']['filter'], true))  $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
@@ -1897,11 +1940,15 @@ class CONSUMABLES extends API {
 				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+					$oneYearFromNow = clone $this->_date['servertime'];
+					$oneYearFromNow->modify('+1 year');
+					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
+					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
 					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
 				}
 
-				// unset all beckend defined payload variables leaving vendor evaluation inputs
+				// unset all backend defined payload variables leaving vendor evaluation inputs
 				foreach ([...array_values($vendor_info),
 					'consumables.vendor.edit_existing_vendors',
 					'consumables.vendor.edit_existing_vendors_search',
@@ -1911,6 +1958,7 @@ class CONSUMABLES extends API {
 					'consumables.vendor.certificate_validity',
 					'consumables.vendor.certificate_update',
 					'consumables.vendor.documents_update',
+					'consumables.vendor.documents_validity',
 					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.message_vendor_select_special_attention_products',
 					'consumables.vendor.samplecheck_interval',
@@ -2008,14 +2056,14 @@ class CONSUMABLES extends API {
 				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'));
-				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['products']['mdr14_sample_interval'];
-				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['products']['mdr14_sample_reusable'];
+				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['product']['mdr14_sample_interval'];
+				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['product']['mdr14_sample_reusable'];
 
 				// check forbidden names
 				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
-				if (isset($vendor['pricelist']['filter']) && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
 				// save certificate
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
@@ -2024,9 +2072,14 @@ class CONSUMABLES extends API {
 				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
+					$oneYearFromNow = clone $this->_date['servertime'];
+					$oneYearFromNow->modify('+1 year');
+					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
+					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
 					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
 				}
+
 				// update pricelist
 				$pricelistImportError = '';
 				$pricelistImportResult = [];
@@ -2052,7 +2105,7 @@ class CONSUMABLES extends API {
 					unset ($vendor['pricelist']['validity']);
 				}
 
-				// unset all beckend defined payload variables leaving vendor evaluation inputs
+				// unset all backend defined payload variables leaving vendor evaluation inputs
 				foreach ([...array_values($vendor_info),
 					'consumables.vendor.edit_existing_vendors',
 					'consumables.vendor.edit_existing_vendors_search',
@@ -2062,6 +2115,7 @@ class CONSUMABLES extends API {
 					'consumables.vendor.certificate_validity',
 					'consumables.vendor.certificate_update',
 					'consumables.vendor.documents_update',
+					'consumables.vendor.documents_validity',
 					'consumables.vendor.pricelist_filter',
 					'consumables.vendor.message_vendor_select_special_attention_products',
 					'consumables.vendor.samplecheck_interval',
@@ -2192,7 +2246,7 @@ class CONSUMABLES extends API {
 				
 				// gather documents
 				$certificates = [];
-				$documents = [];
+				$documents = ['valid' => [], 'expired' => []];
 				if ($vendor['id']) {
 					$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
 					foreach ($certfiles as $path){
@@ -2200,7 +2254,13 @@ class CONSUMABLES extends API {
 					}
 					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
 					foreach ($docfiles as $path){
-						$documents[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+						$file = pathinfo($path);
+						preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
+						if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
+							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+						} else {
+							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+						}
 					}
 				}
 
@@ -2302,11 +2362,23 @@ class CONSUMABLES extends API {
 							];
 		
 						// append documents if applicable
-						if ($documents) $response['render']['content'][1][] = [
-							'type' => 'links',
-							'description' => $this->_lang->GET('consumables.vendor.documents_download'),
-							'content' => $documents
-						];
+						if ($documents) {
+							if ($documents['valid'])
+								$response['render']['content'][1][] = [
+									'type' => 'links',
+									'description' => $this->_lang->GET('consumables.vendor.documents_valid'),
+									'content' => $documents['valid']
+								];
+							if ($documents['expired'])
+								$response['render']['content'][1] = [
+									$response['render']['content'][1],
+									[
+										'type' => 'links',
+										'description' => $this->_lang->GET('consumables.vendor.documents_expired'),
+										'content' => $documents['expired']
+									]
+								];
+						}
 					}
 				}
 				else {
@@ -2414,29 +2486,19 @@ class CONSUMABLES extends API {
 							...$evaluationdocument,
 						], [
 							[
-								[
-									'type' => 'date',
-									'attributes' => [
-										'name' => $this->_lang->GET('consumables.vendor.certificate_validity'),
-										'value' => isset($vendor['certificate']['validity']) ? $vendor['certificate']['validity'] : '',
-										'id' => 'vendor_certificate_validity'
-									]
-								]
-							], [
-								[
-									'type' => 'file',
-									'attributes' => [
-										'name' => $this->_lang->GET('consumables.vendor.certificate_update')
-									]
-								]
-							]
-						], [
-							[
 								'type' => 'file',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.documents_update'),
 									'multiple' => true
-								]
+								],
+								'hint' => $this->_lang->GET('consumables.vendor.documents_hint')
+							],
+							[
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.vendor.documents_validity'),
+								],
+								'hint' => $this->_lang->GET('consumables.vendor.documents_validity_hint')
 							]
 						], [
 							[
@@ -2469,9 +2531,25 @@ class CONSUMABLES extends API {
 							]]]
 						);
 
+					// append documents if applicable
+					if ($documents) {
+						if ($documents['valid'])
+							$response['render']['content'][2][] = [
+								'type' => 'links',
+								'description' => $this->_lang->GET('consumables.vendor.documents_valid'),
+								'content' => $documents['valid']
+							];
+						if ($documents['expired'])
+							$response['render']['content'][2][] = [
+								'type' => 'links',
+								'description' => $this->_lang->GET('consumables.vendor.documents_expired'),
+								'content' => $documents['expired']
+							];
+					}
+
 					// add pricelist upload form
 					if ($vendor['id'] && !$vendor['hidden'])
-						array_splice($response['render']['content'][4], 0, 0,
+						array_splice($response['render']['content'][3], 0, 0,
 							[[[
 								'type' => 'file',
 								'attributes' => [
@@ -2488,31 +2566,8 @@ class CONSUMABLES extends API {
 							]]]
 						);
 
-					// add certificate download
-					if ($certificates) array_splice($response['render']['content'][2], 0, 0,
-						[
-							[
-								'type' => 'links',
-								'description' => $this->_lang->GET('consumables.vendor.certificate_download'),
-								'content' => $certificates
-							]
-						]
-					);
-
-					// add document downloads
-					if ($documents) $response['render']['content'][3]=[
-						[
-							[
-								'type' => 'links',
-								'description' => $this->_lang->GET('consumables.vendor.documents_download'),
-								'content' => $documents
-							]
-						],
-						$response['render']['content'][3]
-					];
-
 					// add pricelist info if provided
-					if (isset($vendor['pricelist']['validity'])) array_splice($response['render']['content'][4], 0, 0,
+					if (isset($vendor['pricelist']['validity'])) array_splice($response['render']['content'][3], 0, 0,
 						[[
 							[
 								'type' => 'textsection',
@@ -2525,21 +2580,21 @@ class CONSUMABLES extends API {
 								'type' => 'number',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval'),
-									'value' => isset($vendor['pricelist']['samplecheck_interval']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['products']['mdr14_sample_interval']
+									'value' => isset($vendor['pricelist']['samplecheck_interval']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['product']['mdr14_sample_interval']
 								]
 							],
 							[
 								'type' => 'number',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval_reusable'),
-									'value' => isset($vendor['pricelist']['samplecheck_reusable']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['products']['mdr14_sample_reusable']
+									'value' => isset($vendor['pricelist']['samplecheck_reusable']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['product']['mdr14_sample_reusable']
 								]
 							]
 						]]
 					);
 					
 					// add pricelist export button
-					if ($vendor['id'] && $vendorproducts) $response['render']['content'][4][] = [
+					if ($vendor['id'] && $vendorproducts) $response['render']['content'][3][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
