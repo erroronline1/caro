@@ -1601,7 +1601,7 @@ service[unreceived] = 21 ; TAGE, nach denen der Einkauf erinnert wird sich nach 
 
 product[documents] = 365 ; Tage nach der letzten Bereitstellung einer Datei, nach denen eine Erinnerung zur Verifizierung oder Erneuerung der Aktualität erstellt wird
 product[mdr14_sample_interval] = 93 ; Tage als Standardwert bis eine neue Stichprobenprüfung erforderlich ist
-product[mdr_sample_reusable] = 1095 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
+product[mdr14_sample_reusable] = 1095 ; Tage als Standardwert bis ein Artikel erneut für eine Stichprobenprüfung verwendet werden darf
 
 records[open_reminder] = 30 ; Tage nach denen per Nachricht and nicht abgeschlossene Aufzeichnungen erinnert wird
 

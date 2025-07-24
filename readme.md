@@ -1698,7 +1698,7 @@ service[unreceived] = 21 ; DAYS, after these purchase will be reminded to enquir
 
 product[documents] = 365 ; DAYS, after the last provision of a file a reminder will be made to verify or update the currency
 product[mdr14_sample_interval] = 93 ; default DAYS until a new sample check is required as default value
-product[mdr_sample_reusable] = 1095 ; default DAYS until a new sample check on the same product is allowed as default value
+product[mdr14_sample_reusable] = 1095 ; default DAYS until a new sample check on the same product is allowed as default value
 
 records[open_reminder] = 30 ; DAYS after unclosed records are reminded of via messenger
 
