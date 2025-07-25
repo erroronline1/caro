@@ -154,7 +154,6 @@ define('DEFAULTSQL', [
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`pricelist` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
@@ -461,7 +460,6 @@ define('DEFAULTSQL', [
 				"	name varchar(MAX) NOT NULL," .
 				"	info varchar(MAX) NULL DEFAULT NULL," .
 				"	pricelist varchar(MAX) NULL DEFAULT NULL," .
-				"	immutable_fileserver varchar(MAX) NOT NULL," .
 				"	evaluation varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
@@ -1442,7 +1440,6 @@ class INSTALL {
 					':name' => $entry['name'],
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
 					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null,
-					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', $entry['name']) . $this->_currentdate->format('Ymd'),
 					':evaluation' => null,
 					':hidden' => null
 				];

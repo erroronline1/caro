@@ -241,7 +241,7 @@ class APPLICATION extends API {
 			foreach ($vendors as $vendor){
 				if ($vendor['hidden']) continue;
 				// process vendor-documents
-				if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]))) {
+				if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':id' => $vendor['id']]))) {
 					$documents = [];
 					$considered = [];
 					foreach ($docfiles as $path){
@@ -282,7 +282,7 @@ class APPLICATION extends API {
 					}
 				}
 				// process product-documents
-				if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]))) {
+				if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':id' => $vendor['id']]))) {
 					$documents = [];
 					$considered = [];
 					foreach ($docfiles as $path){

@@ -44,7 +44,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_07_24'] as $update){
+		foreach (['_2025_07_25'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -169,15 +169,15 @@ class UPDATE{
 		];
 	}
 
-	private function _2025_07_24(){
+	private function _2025_07_25(){
 		return [
 			'mysql' => [
-				"ALTER TABLE caro_consumables_vendors DROP COLUMN certificate; "
+				"ALTER TABLE caro_consumables_vendors DROP COLUMN certificate, DROP COLUMN immutable_fileserver; "
 			],
 			'sqlsrv' => [
 				"USE [caro]" .
 				" GO" .
-				" ALTER TABLE [dbo].[caro_consumables_vendors] DROP COLUMN [certificate]" .
+				" ALTER TABLE [dbo].[caro_consumables_vendors] DROP COLUMN [certificate], [immutable_fileserver]" .
 				" GO;"
 			]
 		];

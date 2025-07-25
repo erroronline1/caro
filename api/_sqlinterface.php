@@ -355,8 +355,8 @@ class SQLQUERY {
 
 
 		'consumables_post_vendor' => [
-			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :hidden, :name, :info, :pricelist, :immutable_fileserver, :evaluation)",
-			'sqlsrv' => "INSERT INTO caro_consumables_vendors (hidden, name, info, pricelist, immutable_fileserver, evaluation) VALUES ( :hidden, :name, :info, :pricelist, :immutable_fileserver, :evaluation)"
+			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, pricelist, evaluation) VALUES ( NULL, :hidden, :name, :info, :pricelist, :evaluation)",
+			'sqlsrv' => "INSERT INTO caro_consumables_vendors (hidden, name, info, pricelist, evaluation) VALUES ( :hidden, :name, :info, :pricelist, :evaluation)"
 		],
 		'consumables_put_vendor' => [
 			'mysql' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id",
@@ -404,12 +404,12 @@ class SQLQUERY {
 			'sqlsrv' => "UPDATE caro_consumables_products SET document_reminder = :notified WHERE id  = :id"
 		],
 		'consumables_get_product' => [ // preprocess via strtr
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.id IN (:ids)",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE CONVERT(VARCHAR, caro_consumables_products.id) IN (:ids)"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.id IN (:ids)",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE CONVERT(VARCHAR, caro_consumables_products.id) IN (:ids)"
 		],
 		'consumables_get_products' => [
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name, caro_consumables_vendors.immutable_fileserver as vendor_immutable_fileserver FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id"
 		],
 		'consumables_get_product_search' => [
 			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_ean) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)",

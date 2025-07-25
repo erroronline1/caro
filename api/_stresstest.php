@@ -592,7 +592,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the immutable_fileserver directories, head over directly to the file system and don\'t mess up production server!';
+		echo '[*] ' . $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the vendor fileserver directories, head over directly to the file system and don\'t mess up production server!';
 	}
 }
 
