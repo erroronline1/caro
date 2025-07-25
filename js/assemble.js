@@ -1409,7 +1409,12 @@ export class Assemble {
 	header() {
 		if (!this.currentElement.description) return [];
 		let header = document.createElement("header");
-		header.appendChild(document.createTextNode(this.currentElement.description.replace(/\[\]|DEFAULT_/g, "")));
+		
+		for (const line of this.currentElement.description.replace(/\[\]|DEFAULT_/g, "").split(/\r\n|\n/)) {
+			header.append(document.createTextNode(line));
+			header.append(document.createElement("br"));
+		}
+
 		header.dataset.type = this.currentElement.attributes && this.currentElement.attributes["data-type"] ? this.currentElement.attributes["data-type"] : this.currentElement.type;
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
 		// required handled by any input on their own but checkbox and radio
