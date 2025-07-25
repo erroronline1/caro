@@ -1436,6 +1436,7 @@ span.nocontent {
 
 .draggableDocumentElement {
 	border: 1px solid var(--cta);
+	border-top: 10px solid var(--cta);
 	border-radius: 0.5em;
 }
 
