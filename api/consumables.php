@@ -368,7 +368,7 @@ class CONSUMABLES extends API {
 				if ($_FILES) {
 					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
 					foreach ($_FILES as $input => $files){
-						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':name' => $currentproduct['vendor_immutable_fileserver']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
+						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':id' => $currentproduct['vendor_id']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
 					}
 					// set protected
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
@@ -642,7 +642,7 @@ class CONSUMABLES extends API {
 				if ($_FILES) {
 					$currentproduct = $products[array_search($this->_requestedID, array_column($products, 'id'))];
 					foreach ($_FILES as $input => $files){
-						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':name' => $currentproduct['vendor_immutable_fileserver']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
+						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':id' => $currentproduct['vendor_id']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
 					}
 					// set protected
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
@@ -851,7 +851,7 @@ class CONSUMABLES extends API {
 					$oneYearFromNow->modify('+1 year');
 					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
 					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -955,7 +955,7 @@ class CONSUMABLES extends API {
 					$oneYearFromNow->modify('+1 year');
 					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
 					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
+					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -1092,7 +1092,6 @@ class CONSUMABLES extends API {
 					'id' => null,
 					'vendor_id' => '',
 					'vendor_name' => UTILITY::propertySet($this->_payload, 'vendor_name') ? : '', // occasionally passed parameters from order to add product to database
-					'vendor_immutable_fileserver' => '',
 					'article_no' => UTILITY::propertySet($this->_payload, 'article_no') ? : '',
 					'article_name' => UTILITY::propertySet($this->_payload, 'article_name') ? : '',
 					'article_alias' => '',
@@ -1113,7 +1112,7 @@ class CONSUMABLES extends API {
 
 				// gather documents
 				$documents = ['valid' => [], 'expired' => []];
-				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':name' => $product['vendor_immutable_fileserver']]));
+				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':id' => $product['vendor_id']]));
 				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					$article_no = explode('_', $file['filename'])[2];
@@ -1914,16 +1913,11 @@ class CONSUMABLES extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
-				/**
-				 * 'immutable_fileserver' has to be set for windows server permissions are a pita
-				 * thus directories can not be renamed on name changes of vendors
-				 */
 				$vendor = [
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
 					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
-					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_date['servertime']->format('Ymd'),
 					'evaluation' => []
 				];
 				
@@ -1933,15 +1927,11 @@ class CONSUMABLES extends API {
 				// ensure valid json for filters
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
-				// save documents
-				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-					$oneYearFromNow = clone $this->_date['servertime'];
-					$oneYearFromNow->modify('+1 year');
-					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
-					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
-				}
+				// set expiry date for provided files before unsetting the payload property 
+				$oneYearFromNow = clone $this->_date['servertime'];
+				$oneYearFromNow->modify('+1 year');
+				$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
+				$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
 
 				// unset all backend defined payload variables leaving vendor evaluation inputs
 				foreach ([...array_values($vendor_info),
@@ -1986,12 +1976,6 @@ class CONSUMABLES extends API {
 					$evaluation['_author'] = $_SESSION['user']['name'];
 					$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
 					$vendor['evaluation'][] = $evaluation;
-					// upload files  if part of the evaluation document
-					if ($_FILES) {
-						foreach ($_FILES as $input => $files){
-							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
-						}
-					}
 				}
 				else $vendor['evaluation'] = null;
 
@@ -2010,15 +1994,30 @@ class CONSUMABLES extends API {
 						':hidden' => $vendor['hidden'],
 						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
 						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
-						':immutable_fileserver' => $vendor['immutable_fileserver'],
 						':evaluation' => $vendor['evaluation']
 					]
-				])) $this->response([
+				])) {
+					$vendor['id'] = $this->_pdo->lastInsertId();
+
+					// save documents after creating database entry providing id
+					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
+						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
+						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
+					}
+					// remaining files are possibly from evaluation
+					if ($_FILES) {
+						foreach ($_FILES as $input => $files){
+							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
+						}
+					}
+
+					$this->response([
 					'response' => [
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => $vendor['id'],
 						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]),
 						'type' => 'info'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'id' => false,
@@ -2052,15 +2051,11 @@ class CONSUMABLES extends API {
 				// ensure valid json for filters
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
-				// save documents
-				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-					$oneYearFromNow = clone $this->_date['servertime'];
-					$oneYearFromNow->modify('+1 year');
-					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
-					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
-				}
+				// set expiry date for provided files before unsetting the payload property 
+				$oneYearFromNow = clone $this->_date['servertime'];
+				$oneYearFromNow->modify('+1 year');
+				$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
+				$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
 
 				// update pricelist
 				$pricelistImportError = '';
@@ -2135,12 +2130,6 @@ class CONSUMABLES extends API {
 						$evaluation['_author'] = $_SESSION['user']['name'];
 						$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
 						$vendor['evaluation'][] = $evaluation;
-						// upload files  if part of the evaluation document
-						if ($_FILES) {
-							foreach ($_FILES as $input => $files){
-								UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
-							}
-						}
 					}
 				}
 			
@@ -2162,12 +2151,27 @@ class CONSUMABLES extends API {
 						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
 						':evaluation' => $vendor['evaluation'] ? UTILITY::json_encode($vendor['evaluation']) : null
 					]
-				]) !== false) $this->response([
+				]) !== false) {
+					
+					// file handling only after successful update especially for evaluation document files
+					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
+						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
+						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
+					}
+					// remaining files are possibly from evaluation
+					if ($_FILES) {
+						foreach ($_FILES as $input => $files){
+							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
+						}
+					}
+
+					$this->response([
 					'response' => [
 						'id' => $vendor['id'],
 						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . $pricelistImportError . (isset($pricelistImportResult[1]) ? " \n \n" . implode(" \n", $pricelistImportResult[1]) : ''),
 						'type' => 'info'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'id' => $vendor['id'],
@@ -2220,7 +2224,7 @@ class CONSUMABLES extends API {
 				// gather documents
 				$documents = ['valid' => [], 'expired' => []];
 				if ($vendor['id']) {
-					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
+					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':id' => $vendor['id']]));
 					foreach ($docfiles as $path){
 						$file = pathinfo($path);
 						// match expiry date in Vendor_{uploaddate}-{expirydate}_filename.extension

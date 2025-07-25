@@ -742,7 +742,7 @@ Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht a
 
 Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus.
 
-Lieferantenbezogene Dateianhänge können beigefügt werden. Durch die entsprechende Eingabemaske wird dem [Dateinamen ein Ablaufdatum hinzugefügt](#dateinamenkonventionen). Dateiuploads innerhalb des Dokuments zur Lieferantenbewertung werden zwar bereitgestellt, aber diesbezüglich nicht erfasst und können eine entsprechende Ablaufwarnung erzeugen.
+Lieferantenbezogene Dateianhänge können beigefügt werden. Durch die entsprechende Eingabemaske wird dem [Dateinamen ein Ablaufdatum hinzugefügt](#dateinamenkonventionen). Ohne angegebenes Datum und für Dateiuploads innerhalb des Dokuments zur Lieferantenbewertung wird die Gültigkeit für ein Jahr ab Bereitstellung festgelegt.
 Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
 Die Bearbeitungsansicht für Lieferanten erlaubt die Auswahl von [Textvorschlägen](#textvorschläge). Sofern diese ordnungsgemäß vorbereitet sind können vorbereitete Werte einfach in die Platzhalter eingefügt werden. 
 Kleinere Lieferantenportfolios könnten primär oder anfänglich innerhalb der Anwendung verwaltet werden. Artikellisten können zusammen mit dem Import-Filter exportiert werden. Letzterer [wird erzeugt](#standardfilter-bei-export) sofern nicht definiert.

@@ -33,9 +33,9 @@ Things are still in motion. Images may be outdated.
 
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* consumables - vendors / products
-    * drop specific certificate handling (consumables), database storage and access (_sqlinterface, _install, _stresstest)
-    * run _databaseupdate.php
+* consumables/texttemplate :ecr handling
+* refactor vendor immutable fileserver to vendor id
+    * change folder names manually for iis is an asshole 
 
 ## Content
 * [Aims](#aims)
@@ -844,7 +844,7 @@ Order operations rely on a vendor and product database. Also this is related to 
 
 Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default.
 
-Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Fileuploads within vendor evaluation documents are handled, but not in this context and can generate an expiry warning accordingly. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
+Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Without provided date and for vendor evaluation document file uploads the validity is set to one year after the upload by default. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
 > Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
@@ -2509,7 +2509,7 @@ During development following outcomes could be noted:
 
 Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script must be removed from the production server once being tested, before going public.**
 
-Same applies to vendors. Immutable_fileserver-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.**
+Same applies to vendors. Vendor-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.**
 
 Variables for _stresstest.php can be adjusted within the top class variables in the sourcecode.
 
