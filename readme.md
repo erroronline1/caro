@@ -34,9 +34,8 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 * consumables - vendors / products
-    * documents request validity for submitted documents, append to filename, require evaluation based on that
-    * hopefully improved handling for automated evaluation reminders
-    * refactor certificate handling, database storage, cron reminder
+    * drop specific certificate handling (consumables), database storage and access (_sqlinterface, _install, _stresstest)
+    * run _databaseupdate.php
 
 ## Content
 * [Aims](#aims)
@@ -843,7 +842,9 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ### Vendor and product management
 Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor).
 
-Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default. Here certificate files can be added too. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
+Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default.
+
+Vendor related files can be added. Through the dedicated input an expiry date is inserted in the filename. Fileuploads within vendor evaluation documents are handled, but not in this context and can generate an expiry warning accordingly. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
 > Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
@@ -860,7 +861,7 @@ While editing products, one can edit the
 
 On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)).
 
-Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. After a [defined timespan](#runtime-variables) after the last upload a reevaluation will be reminded of. 
+Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. Like vendor files an expiry date will be added and a renewal be reminded of. 
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 

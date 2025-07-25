@@ -740,7 +740,10 @@ Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werd
 ### Lieferanten- und Artikelverwaltung
 Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der [Import von Preislisten](#importierung-von-lieferantenpreislisten) nutzt den [CSV-Prozessor](#csv-prozessor).
 
-Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus. Hier können auch Zertifikate beigefügt werden. Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
+Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus.
+
+Lieferantenbezogene Dateianhänge können beigefügt werden. Durch die entsprechende Eingabemaske wird dem Dateinamen ein Ablaufdatum hinzugefügt. Dateiuploads innerhalb des Dokuments zur Lieferantenbewertung werden zwar bereitgestellt, aber diesbezüglich nicht erfasst und können eine entsprechende Ablaufwarnung erzeugen.
+Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
 Die Bearbeitungsansicht für Lieferanten erlaubt die Auswahl von [Textvorschlägen](#textvorschläge). Sofern diese ordnungsgemäß vorbereitet sind können vorbereitete Werte einfach in die Platzhalter eingefügt werden. 
 Kleinere Lieferantenportfolios könnten primär oder anfänglich innerhalb der Anwendung verwaltet werden. Artikellisten können zusammen mit dem Import-Filter exportiert werden. Letzterer [wird erzeugt](#standardfilter-bei-export) sofern nicht definiert.
 > Erzeugte Filter funktionieren nicht mit Herstellerpreislisten, exportierte Artikellisten funktionieren nicht mit angepassten Filterregeln!
@@ -757,7 +760,7 @@ Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bear
 
 Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [config.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
 
-Artikel können ebenfalls mit Dateien bereichert werden, z.B. Konformitätserklärungen oder Biokompatibilitätsnachweise. Nach einer [definierten Zeitspanne](#laufzeitvariablen) nach dem letzten Upload wird an eine Überprüfung erinnert.
+Artikel können ebenfalls mit Dateien bereichert werden, z.B. Konformitätserklärungen oder Biokompatibilitätsnachweise. Wie die Hersteller-Dokumente wird ein Ablaufdatum eingefügt und an eine Erneuerung erinnert.
 
 Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschützt markiert sind. Lieferanten können nicht gelöscht werden.
 
