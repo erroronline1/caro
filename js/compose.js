@@ -966,9 +966,9 @@ export class Composer {
 	drop_insert(evnt, droppedUpon, allowSections) {
 		evnt.preventDefault();
 		let draggedElement = document.getElementById(evnt.dataTransfer.getData("text"));
+		if (!draggedElement) return;
 		// determine target:
 		// target is element
-
 		if (draggedElement.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode; // convert dragged label to draggable element container content
 		else if (draggedElement.parentNode.parentNode.classList.contains("draggableDocumentElement")) draggedElement = draggedElement.parentNode.parentNode; // convert dragged input to draggable element container content
 
@@ -1077,6 +1077,7 @@ export class Composer {
 		// target is container
 		else if (["main", "section"].includes(draggedElement.parentNode.localName)) draggedElement = draggedElement; // draggable div container
 		else if (["main", "section"].includes(draggedElement.parentNode.parentNode.localName)) draggedElement = draggedElement.parentNode; // draggable div container content
+		else draggedElement = null; // otherwise forbidden element
 
 		if (!draggedElement) {
 			new _client.Toast(api._lang.GET("assemble.compose.context.delete_error"), "error");

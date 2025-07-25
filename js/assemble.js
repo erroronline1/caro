@@ -3491,6 +3491,7 @@ export class Assemble {
 		if (this.currentElement.linkedcontent) {
 			content = this.currentElement.linkedcontent.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
 			p = document.createElement("p");
+			p.id = getNextElementID();
 			for (const part of content) {
 				if (!part[1].length) continue;
 				// extract and convert links
