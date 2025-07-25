@@ -845,13 +845,8 @@ class CONSUMABLES extends API {
 				if (!$vendor) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_not_found', [':name' => $product['vendor_name']]), 'type' => 'error']]);
 				$product['vendor_id'] = $vendor['id'];
 
-				// save documents
+				// fileuploads happen on success only, but providing files protects this document from removal
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
-					$oneYearFromNow = clone $this->_date['servertime'];
-					$oneYearFromNow->modify('+1 year');
-					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
-					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
 					$product['protected'] = 1;
 				}
 
@@ -873,12 +868,35 @@ class CONSUMABLES extends API {
 						':stock_item' => $product['stock_item'],
 						':erp_id' => $product['erp_id'],
 					]
-				])) $this->response([
+				])) {
+					// save documents
+					if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
+						// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
+						$filenamewarning = [];
+						foreach($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['name'] as $index => $file){
+							preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file, $fileNameComponents);
+							if ($fileNameComponents){
+								$filenamewarning[] = $file;
+								foreach(array_keys($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) as $property){
+									unset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')][$property][$index]);
+								}
+							}
+						}
+						// set expiry date
+						$oneYearFromNow = clone $this->_date['servertime'];
+						$oneYearFromNow->modify('+1 year');
+						$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
+						$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
+						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
+					}
+
+					$this->response([
 					'response' => [
 						'id' => $this->_pdo->lastInsertId(),
-						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]),
+						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 					]]);
+				}
 				else $this->response([
 					'response' => [
 						'id' => false,
@@ -951,6 +969,18 @@ class CONSUMABLES extends API {
 				
 				// save documents
 				if (PERMISSION::permissionFor('products') && isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
+					// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
+					$filenamewarning = [];
+					foreach($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['name'] as $index => $file){
+						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file, $fileNameComponents);
+						if ($fileNameComponents){
+							$filenamewarning[] = $file;
+							foreach(array_keys($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) as $property){
+								unset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')][$property][$index]);
+							}
+						}
+					}
+					// set expiry date
 					$oneYearFromNow = clone $this->_date['servertime'];
 					$oneYearFromNow->modify('+1 year');
 					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
@@ -963,9 +993,9 @@ class CONSUMABLES extends API {
 				// this could have been one block but parting of the respective states is considered relevent
 
 				// activate or deactivate selected similar products
-				$_batchactive = UTILITY::propertySet($this->_payload, '_batchactive');
-				if (PERMISSION::permissionFor('products') && $_batchactive){
-					$batchids = explode(',', $_batchactive);
+				$_batchhidden = UTILITY::propertySet($this->_payload, '_batchhidden');
+				if (PERMISSION::permissionFor('products') && $_batchhidden){
+					$batchids = explode(',', $_batchhidden);
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
 							':value' => $product['hidden'],
@@ -1059,7 +1089,7 @@ class CONSUMABLES extends API {
 				])) $this->response([
 					'response' => [
 						'id' => $this->_requestedID,
-						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($_batchactive || $_batchupdate ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): ''),
+						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($_batchhidden || $_batchupdate ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): '') . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 						],
 						'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
@@ -1119,8 +1149,8 @@ class CONSUMABLES extends API {
 					similar_text($article_no, $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						// match expiry date in Vendor_{uploaddate}-{expirydate}_articlenumber_filename.extension
-						preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
-						if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
+ 						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file['basename'], $fileNameComponents);
+						if (isset($fileNameComponents[3]) && $fileNameComponents[3] > $this->_date['servertime']->format('Ymd')) {
 							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
 						} else {
 							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
@@ -1146,7 +1176,7 @@ class CONSUMABLES extends API {
 				// set up property toggles and apply dialog selecting similar product if any
 				$isactive = !$product['hidden'] ? ['checked' => true] : [];
 				$isinactive = $product['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
-				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = $this->selectSimilarDialog('_batchactive', $similarproducts, '1');
+				if ($similarproducts) $isinactive['onchange'] = $isactive['onchange'] = $this->selectSimilarDialog('_batchhidden', $similarproducts, '1');
 				
 				$regulatoryoptions = [
 					$this->_lang->GET('consumables.product.article_trading_good') => ($product['trading_good']) ? ['checked' => true] : [],
@@ -1568,8 +1598,8 @@ class CONSUMABLES extends API {
 							], [
 								'type' => 'hidden',
 								'attributes' => [
-									'name' => '_batchactive',
-									'id' => '_batchactive'
+									'name' => '_batchhidden',
+									'id' => '_batchhidden'
 								]
 							] 
 						];
@@ -1999,6 +2029,20 @@ class CONSUMABLES extends API {
 				])) {
 					$vendor['id'] = $this->_pdo->lastInsertId();
 
+					// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
+					$filenamewarning = [];
+					foreach($_FILES as $input => $files){
+						foreach($files['name'] as $index => $file){
+							preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)$/', $file, $fileNameComponents);
+							if ($fileNameComponents){
+								$filenamewarning[] = $file;
+								foreach(array_keys($_FILES[$input]) as $property){
+									unset($_FILES[$input][$property][$index]);
+								}
+							}
+						}
+					}
+
 					// save documents after creating database entry providing id
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
 						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
@@ -2014,7 +2058,7 @@ class CONSUMABLES extends API {
 					$this->response([
 					'response' => [
 						'id' => $vendor['id'],
-						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]),
+						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.vendor.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'info'
 					]]);
 				}
@@ -2070,6 +2114,9 @@ class CONSUMABLES extends API {
 					$pricelistImportResult = $this->update_pricelist($files, $vendor['pricelist']['filter'], $vendor['id']);
 					$vendor['pricelist']['validity'] = $pricelistImportResult[0];
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
+					// unset pricelist files for later file processing after successful update
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]);
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]);
 				}
 
 				// tidy up consumable products database if inactive
@@ -2152,8 +2199,22 @@ class CONSUMABLES extends API {
 						':evaluation' => $vendor['evaluation'] ? UTILITY::json_encode($vendor['evaluation']) : null
 					]
 				]) !== false) {
-					
 					// file handling only after successful update especially for evaluation document files
+
+					// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
+					$filenamewarning = [];
+					foreach($_FILES as $input => $files){
+						foreach($files['name'] as $index => $file){
+							preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)$/', $file, $fileNameComponents);
+							if ($fileNameComponents){
+								$filenamewarning[] = $file;
+								foreach(array_keys($_FILES[$input]) as $property){
+									unset($_FILES[$input][$property][$index]);
+								}
+							}
+						}
+					}
+
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
 						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
 						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
@@ -2168,7 +2229,7 @@ class CONSUMABLES extends API {
 					$this->response([
 					'response' => [
 						'id' => $vendor['id'],
-						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . $pricelistImportError . (isset($pricelistImportResult[1]) ? " \n \n" . implode(" \n", $pricelistImportResult[1]) : ''),
+						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . $pricelistImportError . (isset($pricelistImportResult[1]) ? " \n \n" . implode(" \n", $pricelistImportResult[1]) : '') . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.vendor.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'info'
 					]]);
 				}
@@ -2223,16 +2284,18 @@ class CONSUMABLES extends API {
 				
 				// gather documents
 				$documents = ['valid' => [], 'expired' => []];
+				$considered = [];
 				if ($vendor['id']) {
 					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':id' => $vendor['id']]));
 					foreach ($docfiles as $path){
 						$file = pathinfo($path);
-						// match expiry date in Vendor_{uploaddate}-{expirydate}_filename.extension
-						preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
-						if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
+						// match expiry date in {vendor}_{uploaddate}-{expirydate}_{filename_with_extension}
+						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)$/', $file['basename'], $fileNameComponents);
+						if (isset($fileNameComponents[3]) && $fileNameComponents[3] > $this->_date['servertime']->format('Ymd')) {
 							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
 						} else {
 							$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+							if (isset($fileNameComponents[4]) && !in_array($fileNameComponents[4], $considered)) $considered[] = $fileNameComponents[4];
 						}
 					}
 				}
@@ -2422,7 +2485,7 @@ class CONSUMABLES extends API {
 									'attributes' => [
 										'name' => $this->_lang->GET('consumables.vendor.customer_id'),
 										'value' => isset($vendor['info']['customer_id']) ? $vendor['info']['customer_id']: '',
-										'id' => 'vendor_customer_id'
+										'id' => '_vendor_customer_id'
 									]
 								], [
 									'type' => 'textarea',
@@ -2504,10 +2567,21 @@ class CONSUMABLES extends API {
 								'content' => $documents['valid']
 							];
 						if ($documents['expired'])
-							$response['render']['content'][2][] = [
-								'type' => 'links',
-								'description' => $this->_lang->GET('consumables.vendor.documents_expired'),
-								'content' => $documents['expired']
+							$response['render']['content'][2] = [
+								$response['render']['content'][2],
+								[
+									[
+										'type' => 'links',
+										'description' => $this->_lang->GET('consumables.vendor.documents_expired'),
+										'content' => $documents['expired']
+									], [
+										'type' => 'hidden',
+										'attributes' => [
+											'id' => '_recently_expired_documents',
+											'value' => implode(', ', $considered)
+										]
+									]
+								]
 							];
 					}
 
@@ -2571,7 +2645,7 @@ class CONSUMABLES extends API {
 
 					// mail vendor e.g. requesting documents regarding products with special attention
 					// requires text chunks though
-					// using :CID and :PRD as reserved replacement keys
+					// using :CUSTOMERID and :PRODUCTS as reserved replacement keys
 					if ($vendor['id']){
 						$special_attention = $texttemplate = [];
 						// create selection of products to request, ordered are preselected for relevance 
@@ -2593,7 +2667,7 @@ class CONSUMABLES extends API {
 							'type' => 'checkbox2text',
 							'attributes' => [
 								'name' => $this->_lang->GET('consumables.vendor.message_vendor_select_special_attention_products'),
-								'id' => 'select_special_attention_products'
+								'id' => '_select_special_attention_products'
 							],
 							'content' => $special_attention,
 							'hint' => $this->_lang->GET('consumables.vendor.message_vendor_select_special_attention_products_hint')
@@ -2603,9 +2677,9 @@ class CONSUMABLES extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('texttemplate.navigation.texts'),
 								'onclick' => "api.texttemplate('get', 'text', 'false', 'modal', '" . UTILITY::json_encode([
-									':PRD' => 'select_special_attention_products',
-									':CID' => 'vendor_customer_id',
-									':ECR' => 'vendor_certificate_validity'
+									':PRODUCTS' => '_select_special_attention_products',
+									':CUSTOMERID' => '_vendor_customer_id',
+									':EXPIREDDOCUMENTS' => '_recently_expired_documents'
 								]) . "')",
 							]
 						];
