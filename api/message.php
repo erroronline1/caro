@@ -172,7 +172,10 @@ class MESSAGE extends API {
 			}
 
 			$announcementcontent = [];
-			if ($announcement['text']) $announcementcontent[] = $announcement['text'];
+			if ($announcement['text']) {
+				$announcementcontent[] = $announcement['text'];
+				$announcementcontent[] = ' ';
+			}
 			if ($announcement['span_start']) $announcementcontent[] = $this->_lang->GET('message.announcement.start') . ' ' . $this->convertFromServerTime(substr($announcement['span_start'], 0 ,10));
 			if ($announcement['span_end']) $announcementcontent[] = $this->_lang->GET('message.announcement.end') . ' ' . $this->convertFromServerTime(substr($announcement['span_end'], 0 ,10));
 			if ($concerns) $announcementcontent[] = $this->_lang->GET('message.announcement.units') . ' ' . implode(', ', $concerns);
@@ -197,7 +200,7 @@ class MESSAGE extends API {
 								[
 									...$this->announcementform([
 										'subject' => $announcement['subject'] ? : '',
-										'text' => $announcement['text'] ? : '',
+										'text' => $announcement['text'] ? preg_replace(['/\r/','/\n/'],['', "\\n"], $announcement['text']): '',
 										'span_start' => $announcement['span_start'] ? $this->convertFromServerTime(substr($announcement['span_start'], 0, 10), true) : '',
 										'span_end' => $announcement['span_end'] ? $this->convertFromServerTime(substr($announcement['span_end'], 0, 10), true) : '',
 										'units' => $announcementunits
