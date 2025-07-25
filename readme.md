@@ -844,7 +844,7 @@ Order operations rely on a vendor and product database. Also this is related to 
 
 Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default.
 
-Vendor related files can be added. Through the dedicated input an expiry date is inserted in the filename. Fileuploads within vendor evaluation documents are handled, but not in this context and can generate an expiry warning accordingly. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
+Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Fileuploads within vendor evaluation documents are handled, but not in this context and can generate an expiry warning accordingly. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
 > Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
@@ -861,7 +861,7 @@ While editing products, one can edit the
 
 On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)).
 
-Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. Like vendor files an expiry date will be added and a renewal be reminded of. 
+Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. Like vendor files an expiry date will be added and a [renewal](#filename-conventions) be reminded of. 
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
@@ -1857,7 +1857,19 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
 * Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services. Notifications will not work in private modes and [Safari](#safaris-special-needs).
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
-* Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads. 
+* Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads.
+
+### Filename conventions
+Filenames will be modified on upload depending on their use case.
+* User profile pictures will be renamed to profilepic_{username}_{filename}
+* Images for documents will be renamed to {component name}\_{upload timestamp YmdHis}_{filename}
+* Record attachments will be renamed to {sanitized identifier}\_{upload timestamp YmdHis}\_{sanitized field name}_{signature or filename}
+* Order-attachments will be renamed to {upload timestamp YmdHis}_{filename}
+* Sharepoint files will be renamed to {uploading user name}_{filename}
+* Vendor documents will be renamed to {vendor name}\_{upload date Ymd}-{expiry date Ymd}_{filename}
+* Product documents will be renamed to {vendor name}\_{upload date Ymd}-{expiry date Ymd}\_{vendor product code}_{filename}
+
+Especially the latter contain an expiry date that will be monitored, so the filename structure is of some importance. On updating, the original filenames of provided files should be reused to avoid adverse behavior during monitoring.
 
 ### Safaris special needs
 as opposed to proper browsers.
