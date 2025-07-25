@@ -355,12 +355,12 @@ class SQLQUERY {
 
 
 		'consumables_post_vendor' => [
-			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :hidden, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)",
-			'sqlsrv' => "INSERT INTO caro_consumables_vendors (hidden, name, info, certificate, pricelist, immutable_fileserver, evaluation) VALUES ( :hidden, :name, :info, :certificate, :pricelist, :immutable_fileserver, :evaluation)"
+			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, pricelist, immutable_fileserver, evaluation) VALUES ( NULL, :hidden, :name, :info, :pricelist, :immutable_fileserver, :evaluation)",
+			'sqlsrv' => "INSERT INTO caro_consumables_vendors (hidden, name, info, pricelist, immutable_fileserver, evaluation) VALUES ( :hidden, :name, :info, :pricelist, :immutable_fileserver, :evaluation)"
 		],
 		'consumables_put_vendor' => [
-			'mysql' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, certificate = :certificate, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id"
 		],
 		'consumables_get_vendor_datalist' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",

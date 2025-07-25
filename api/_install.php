@@ -153,7 +153,6 @@ define('DEFAULTSQL', [
 				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`certificate` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`pricelist` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`immutable_fileserver` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
@@ -461,7 +460,6 @@ define('DEFAULTSQL', [
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	info varchar(MAX) NULL DEFAULT NULL," .
-				"	certificate varchar(MAX) NULL DEFAULT NULL," .
 				"	pricelist varchar(MAX) NULL DEFAULT NULL," .
 				"	immutable_fileserver varchar(MAX) NOT NULL," .
 				"	evaluation varchar(MAX) NULL DEFAULT NULL" .
@@ -1443,7 +1441,6 @@ class INSTALL {
 				$insertions[] = [
 					':name' => $entry['name'],
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
-					':certificate' => UTILITY::json_encode([]),
 					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null,
 					':immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', $entry['name']) . $this->_currentdate->format('Ymd'),
 					':evaluation' => null,
@@ -1512,7 +1509,6 @@ class INSTALL {
 						':name' => $this->_pdo->quote($vendor['name']),
 						':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
 						':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
-						':certificate' => $vendor['certificate'] ? $this->_pdo->quote($vendor['certificate']) : 'NULL',
 						':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
 						':pricelist' => $vendor['pricelist'] ? $this->_pdo->quote($vendor['pricelist']) : 'NULL',
 					]) . '; ');

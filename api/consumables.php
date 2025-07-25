@@ -1922,7 +1922,6 @@ class CONSUMABLES extends API {
 					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
 					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
-					'certificate' => ['validity' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'))],
 					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
 					'immutable_fileserver' => preg_replace(CONFIG['forbidden']['names']['characters'], '', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'))) . $this->_date['servertime']->format('Ymd'),
 					'evaluation' => []
@@ -1934,11 +1933,6 @@ class CONSUMABLES extends API {
 				// ensure valid json for filters
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
-				// save certificate
-				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]);
-				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
 					$oneYearFromNow = clone $this->_date['servertime'];
@@ -1956,8 +1950,6 @@ class CONSUMABLES extends API {
 					'consumables.vendor.name',
 					'consumables.vendor.availability',
 					'consumables.vendor.available',
-					'consumables.vendor.certificate_validity',
-					'consumables.vendor.certificate_update',
 					'consumables.vendor.documents_update',
 					'consumables.vendor.documents_validity',
 					'consumables.vendor.pricelist_filter',
@@ -2007,9 +1999,6 @@ class CONSUMABLES extends API {
 				foreach ($vendor['info'] as $key => $value){
 					if (!$value) unset($vendor['info'][$key]);
 				}
-				foreach ($vendor['certificate'] as $key => $value){
-					if (!$value) unset($vendor['certificate'][$key]);
-				}
 				foreach ($vendor['pricelist'] as $key => $value){
 					if (!$value) unset($vendor['pricelist'][$key]);
 				}
@@ -2020,7 +2009,6 @@ class CONSUMABLES extends API {
 						':name' => $vendor['name'],
 						':hidden' => $vendor['hidden'],
 						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
-						':certificate' => $vendor['certificate'] ? UTILITY::json_encode($vendor['certificate']) : null,
 						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
 						':immutable_fileserver' => $vendor['immutable_fileserver'],
 						':evaluation' => $vendor['evaluation']
@@ -2053,8 +2041,6 @@ class CONSUMABLES extends API {
 				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null;
 				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
 				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
-				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
-				$vendor['certificate']['validity'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.certificate_validity'));
 				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'));
 				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['product']['mdr14_sample_interval'];
@@ -2066,11 +2052,6 @@ class CONSUMABLES extends API {
 				// ensure valid json for filters
 				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 
-				// save certificate
-				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]['tmp_name']) {
-					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.certificate_update')], UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd')]);
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.certificate_update')]);
-				}
 				// save documents
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
 					$oneYearFromNow = clone $this->_date['servertime'];
@@ -2113,8 +2094,6 @@ class CONSUMABLES extends API {
 					'consumables.vendor.name',
 					'consumables.vendor.availability',
 					'consumables.vendor.available',
-					'consumables.vendor.certificate_validity',
-					'consumables.vendor.certificate_update',
 					'consumables.vendor.documents_update',
 					'consumables.vendor.documents_validity',
 					'consumables.vendor.pricelist_filter',
@@ -2169,10 +2148,6 @@ class CONSUMABLES extends API {
 				foreach ($vendor['info'] as $key => $value){
 					if (!$value) unset($vendor['info'][$key]);
 				}
-				foreach ($vendor['certificate'] as $key => $value){
-					if (!$value) unset($vendor['certificate'][$key]);
-				}
-				// tidy up unused properties
 				foreach ($vendor['pricelist'] as $key => $value){
 					if (!$value) unset($vendor['pricelist'][$key]);
 				}
@@ -2184,7 +2159,6 @@ class CONSUMABLES extends API {
 						':hidden' => $vendor['hidden'],
 						':name' => $vendor['name'],
 						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
-						':certificate' => $vendor['certificate'] ? UTILITY::json_encode($vendor['certificate']) : null,
 						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
 						':evaluation' => $vendor['evaluation'] ? UTILITY::json_encode($vendor['evaluation']) : null
 					]
@@ -2220,7 +2194,6 @@ class CONSUMABLES extends API {
 					'name' => '',
 					'hidden' => null,
 					'info' => null,
-					'certificate' => null,
 					'pricelist' => null,
 					'evaluation' => null
 				];
@@ -2229,7 +2202,6 @@ class CONSUMABLES extends API {
 
 				// resolve objects
 				$vendor['info'] = json_decode($vendor['info'] ? : '', true) ? : [];
-				$vendor['certificate'] = json_decode($vendor['certificate'] ? : '', true);
 				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 				$isactive = !$vendor['hidden'] ? ['checked' => true] : [];
 				$isinactive = $vendor['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
@@ -2246,13 +2218,8 @@ class CONSUMABLES extends API {
 				ksort($options);
 				
 				// gather documents
-				$certificates = [];
 				$documents = ['valid' => [], 'expired' => []];
 				if ($vendor['id']) {
-					$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
-					foreach ($certfiles as $path){
-						$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . $path];
-					}
 					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
 					foreach ($docfiles as $path){
 						$file = pathinfo($path);
@@ -2328,7 +2295,6 @@ class CONSUMABLES extends API {
 									'name' => $vendor['name']
 								],
 								'content' => implode(" \n", array_filter(array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info']), Fn($value) => boolval($value))) .
-									(isset($vendor['certificate']['validity']) && $vendor['certificate']['validity'] ? " \n" . $this->_lang->GET('consumables.vendor.certificate_validity') . ': ' . $vendor['certificate']['validity'] : '') .
 									" \n" . $this->_lang->GET('consumables.product.information_products_available', [':available' => $available]) .
 									" \n" . $this->_lang->GET('consumables.product.information_products_ordered', [':ordered' => $ordered])
 							],[
@@ -2354,14 +2320,6 @@ class CONSUMABLES extends API {
 									]
 								]]]
 							);
-
-						// append certificates if applicable
-						if ($certificates) $response['render']['content'][1][] = [
-								'type' => 'links',
-								'description' => $this->_lang->GET('consumables.vendor.certificate_download'),
-								'content' => $certificates,
-								'hint' => isset($vendor['certificate']['validity']) ? $this->_lang->GET('consumables.vendor.certificate_validity') . $vendor['certificate']['validity'] : false
-							];
 		
 						// append documents if applicable
 						if ($documents) {
