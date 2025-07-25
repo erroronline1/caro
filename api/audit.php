@@ -3618,7 +3618,7 @@ class AUDIT extends API {
 			// gather documents
 			$documents = ['valid' => [], 'expired' => []];
 			if ($vendor['id']) {
-				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
+				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':id' => $vendor['id']]));
 				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					// match expiry date in Vendor_{uploaddate}-{expirydate}_filename.extension
