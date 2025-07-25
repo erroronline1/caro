@@ -54,13 +54,12 @@ class TEXTTEMPLATE extends API {
 					':unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.unit')) ? : array_key_first($this->_lang->_USER['units']),
 					':author' => $_SESSION['user']['name'],
 					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.content')),
-					':language' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.language')),
 					':type' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.type')),
 					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('texttemplate.chunk.availability')) === $this->_lang->PROPERTY('texttemplate.chunk.hidden')? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 				];
 
 				// check forbidden names
-				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !trim($chunk[':language']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
+				if (!trim($chunk[':name']) || !trim($chunk[':content']) || !$chunk[':type'] || $chunk[':type'] === '0') $this->response([], 400);
 				// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
 				// unset types and escaped literals
 				$pattern = preg_replace('/\\\./m', '', CONFIG['forbidden']['names']['characters']);
@@ -349,7 +348,7 @@ class TEXTTEMPLATE extends API {
 					':hidden' => UTILITY::propertySet($this->_payload, 'hidden') && $this->_payload->hidden !== 'false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 				];
 
-				if (!trim($template[':name']) || !trim($template[':content']) || !trim($template[':language'])) $this->response([], 400);
+				if (!trim($template[':name']) || !trim($template[':content'])) $this->response([], 400);
 
 				// put hidden attribute if anything else remains the same
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'texttemplate_get_latest_by_name', [
@@ -685,25 +684,25 @@ class TEXTTEMPLATE extends API {
 			// match and replace placeholders and add paragraph linebreaks
 			$content = '';
 			
-			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
-			// add match not capture
-			$delimiter = substr_replace(CONFIG['forbidden']['names']['characters'], '?:', 1, 0);
-			// unset types and escaped literals
-			$delimiter = preg_replace('/\\\./m', '', $delimiter);
-			// readd some types
-			$delimiter = substr_replace($delimiter, '\\w\\d', -2, 0);
-
-			// modify ([^\w\s\d\.\[\]\(\)\-ÄÖÜäöüß])
+			// modify ([^\w\s\d,\.\[\]\(\)\-ÄÖÜäöüßêÁáÉéÍíÓóÚú]) to (:[ÄÖÜäöüßêÁáÉéÍíÓóÚú\w\d]+?)
 			// invert first forbidden names to allowed
 			$pattern = substr_replace(CONFIG['forbidden']['names']['characters'], '', 2, 1);
 			// add colon
 			$pattern = substr_replace($pattern, ':', 1, 0);
-			// unset types and escaped literals
+			// unset types, escaped literals and comma
 			$pattern = preg_replace('/\\\./m', '', $pattern);
 			// readd some types
 			$pattern = substr_replace($pattern, '\\w\\d', -2, 0);
 			// add multiplier
 			$pattern = substr_replace($pattern, '+?', -1, 0);
+
+			// modify ([^\w\s\d,\.\[\]\(\)\-ÄÖÜäöüßêÁáÉéÍíÓóÚú]) to (?:[^ÄÖÜäöüßêÁáÉéÍíÓóÚú\w\d])
+			// add match not capture
+			$delimiter = substr_replace(CONFIG['forbidden']['names']['characters'], '?:', 1, 0);
+			// unset types and escaped literals
+			$delimiter = preg_replace('/\\\.|,/m', '', $delimiter);
+			// readd some types
+			$delimiter = substr_replace($delimiter, '\\w\\d', -2, 0);
 
 			$usedreplacements = $usedtexts = [];
 			foreach (json_decode($template['content']) as $paragraph){
@@ -723,10 +722,13 @@ class TEXTTEMPLATE extends API {
 
 			// add input fields for undefined placeholders
 			foreach ($undefined as $placeholder) {
+				$name = $this->_lang->GET('texttemplate.use.fill_placeholder') . ' ' . $placeholder;
+				if (in_array(substr($placeholder, 1), array_keys($this->_lang->_DEFAULT['texttemplate']['system']))) $name = $this->_lang->GET('texttemplate.system.' . substr($placeholder, 1));
+
 				$inputs[] = [
 					'type' => 'text',
 					'attributes' => [
-						'name' => $this->_lang->GET('texttemplate.use.fill_placeholder') . ' ' . $placeholder,
+						'name' => $name,
 						'id' => $placeholder,
 						'data-usecase' => 'undefinedplaceholder',
 						'data-loss' => 'prevent'
@@ -794,7 +796,8 @@ class TEXTTEMPLATE extends API {
 						'rows' => 13,
 						'readonly' => true,
 						'onclick' => '_client.application.toClipboard(this.value)'
-						]
+					],
+					'hint' => $this->_lang->GET('texttemplate.use.disclaimer')
 				]
 			];
 			// append data for frontent processing
