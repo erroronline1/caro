@@ -246,8 +246,8 @@ class APPLICATION extends API {
 					$considered = [];
 					foreach ($docfiles as $path){
 						$file = pathinfo($path);
-						// match expiry date in {Vendor}_{uploaddate}-{expirydate}_{filename}
-						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)/', $file['filename'], $fileNameComponents);
+						// match expiry date in {vendor}_{uploaddate}-{expirydate}_{filename_with_extension}
+						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)$/', $file['basename'], $fileNameComponents);
 						if (!isset($fileNameComponents[3]) || $fileNameComponents[3] < $this->_date['servertime']->format('Ymd')) {
 							// detect filename and continue on already considered, UTILITTY::listfiles desc by default
 							if (isset($fileNameComponents[4])) {
@@ -287,8 +287,8 @@ class APPLICATION extends API {
 					$considered = [];
 					foreach ($docfiles as $path){
 						$file = pathinfo($path);
-						// match expiry date in {Vendor}_{uploaddate}-{expirydate}_{articlenumber}_{filename}
-						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)/', $file['filename'], $fileNameComponents);
+						// match expiry date in {Vendor}_{uploaddate}-{expirydate}_{articlenumber}_{filename_with_extension}
+						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file['basename'], $fileNameComponents);
 						if (!isset($fileNameComponents[3]) || $fileNameComponents[3] < $this->_date['servertime']->format('Ymd')) {
 							// detect filename and continue on already considered, UTILITTY::listfiles desc by default
 							if (isset($fileNameComponents[4]) && isset($fileNameComponents[5])) {
@@ -1121,7 +1121,10 @@ class APPLICATION extends API {
 				if ($announcement['organizational_unit'] && !array_intersect($announcement['organizational_unit'], $_SESSION['user']['units'])) continue;
 
 				$announcementcontent = [];
-				if ($announcement['text']) $announcementcontent[] = $announcement['text'];
+				if ($announcement['text']) {
+					$announcementcontent[] = $announcement['text'];
+					$announcementcontent[] = ' ';
+				}
 				if ($announcement['span_start']) $announcementcontent[] = $this->_lang->GET('message.announcement.start') . ' ' . $this->convertFromServerTime(substr($announcement['span_start'], 0 ,10));
 				if ($announcement['span_end']) $announcementcontent[] = $this->_lang->GET('message.announcement.end') . ' ' . $this->convertFromServerTime(substr($announcement['span_end'], 0 ,10));
 				$announcementcontent[] = $this->_lang->GET('message.announcement.last_edit', [':author' => $announcement['author_name'], ':date'=> $this->convertFromServerTime($announcement['date'])]);
