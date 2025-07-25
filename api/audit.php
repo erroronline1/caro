@@ -1173,13 +1173,13 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => strval($year)
 				],
-				'content' => $this->_lang->GET('audit.complaints._summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => PERMISSION::fullyapproved('complaintclosing', $c['closed'])))])
+				'content' => $this->_lang->GET('audit.complaints.summary', [':number' => count($cases), ':closed' => count(array_filter($cases, Fn($c) => PERMISSION::fullyapproved('complaintclosing', $c['closed'])))])
 			];
 			foreach ($cases as $identifier => $property){
 				$units = implode(', ', array_map(Fn($u) => $this->_lang->_USER['units'][$u], explode(',', $property['units'])));
-				$linkdescription = $this->_lang->GET('audit.complaints._case_description', [':identifier' => $identifier, ':units' => $units]);
+				$linkdescription = $this->_lang->GET('audit.complaints.case_description', [':identifier' => $identifier, ':units' => $units]);
 				if (PERMISSION::fullyapproved('complaintclosing', $property['closed'])) {
-					$linkdescription .= $this->_lang->GET('audit.complaints._closed');
+					$linkdescription .= $this->_lang->GET('audit.complaints.closed');
 				}
 				$links[$linkdescription] = ['href' => "javascript:api.record('get', 'record', '" . $identifier . "')"];
 				if (PERMISSION::pending('complaintclosing', $property['closed'])) {
@@ -3586,6 +3586,7 @@ class AUDIT extends API {
 			]
 		];
 		foreach ($vendors as $vendor){
+			$vendortile = [];
 			$info = '';
 			if ($vendor['hidden']) continue;
 			if ($vendor['info']) {
@@ -3597,8 +3598,6 @@ class AUDIT extends API {
 			$pricelist = json_decode($vendor['pricelist'] ? : '', true);
 			if (isset($pricelist['validity']) && $pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $this->convertFromServerTime($pricelist['validity'], true) . "\n";
 			if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $this->convertFromServerTime($lastchecks[$samplecheck]['checked'], true) . "\n";
-			$certificate = json_decode($vendor['certificate'] ? : '', true);
-			if (isset($certificate['validity']) && $certificate['validity']) $info .= $this->_lang->GET('consumables.vendor.certificate_validity') . ' ' . $certificate['validity'] . "\n";
 			if ($vendor['evaluation']){
 				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
 				foreach ($vendor['evaluation'] as $evaluation){
@@ -3608,26 +3607,49 @@ class AUDIT extends API {
 				}
 			}
 
-			$content[] = [
-				[
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => $vendor['name']
-					],
-					'content' => $info
+			$vendortile[] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $vendor['name']
+				],
+				'content' => $info
+			];
+
+			// gather documents
+			$documents = ['valid' => [], 'expired' => []];
+			if ($vendor['id']) {
+				$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
+				foreach ($docfiles as $path){
+					$file = pathinfo($path);
+					// match expiry date in Vendor_{uploaddate}-{expirydate}_filename.extension
+					preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
+					if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
+						$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+					} else {
+						$documents['expired'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
+					}
+				}
+			}
+			if ($documents['valid']) $vendortile[] = [
+				'type' => 'links',
+				'description' => $this->_lang->GET('consumables.vendor.documents_valid', [], true),
+				'content' => $documents['valid']
+			];
+			if ($documents['expired']) $vendortile[] = [
+				'type' => 'links',
+				'description' => $this->_lang->GET('consumables.vendor.documents_expired', [], true),
+				'content' => $documents['expired']
+			];
+			$vendortile[] = [
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('consumables.vendor.edit_existing_vendors'),
+					'class' => 'inlinebutton',
+					'onclick' => "api.purchase('get', 'vendor', " . $vendor['id'] . ")"
 				]
 			];
-			
-			$certificates = [];
-			$certfiles = UTILITY::listFiles(UTILITY::directory('vendor_certificates', [':name' => $vendor['immutable_fileserver']]));
-			foreach ($certfiles as $path){
-				$certificates[pathinfo($path)['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
-			}
-			if ($certificates) $content[count($content) - 1][] = [
-				'type' => 'links',
-				'description' => $this->_lang->GET('consumables.vendor.documents_download'),
-				'content' => $certificates
-			];
+
+			$content[] = $vendortile;
 		}
 		return $content;
 	}
@@ -3655,7 +3677,7 @@ class AUDIT extends API {
 					$summary['content'][$item['attributes']['name']] = $item['content'];
 					$previous = $item['attributes']['name'];
 				}
-				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . implode("\n", array_keys($item['content']));
+				if ($item['type'] === 'links') $summary['content'][$previous] .= "\n" . $item['description'] . "\n" . implode("\n", array_keys($item['content']));
 			}
 		}
 
