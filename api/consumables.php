@@ -1119,6 +1119,7 @@ class CONSUMABLES extends API {
 					$article_no = explode('_', $file['filename'])[2];
 					similar_text($article_no, $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
+						// match expiry date in Vendor_{uploaddate}-{expirydate}_articlenumber_filename.extension
 						preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
 						if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
 							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
@@ -2255,6 +2256,7 @@ class CONSUMABLES extends API {
 					$docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':name' => $vendor['immutable_fileserver']]));
 					foreach ($docfiles as $path){
 						$file = pathinfo($path);
+						// match expiry date in Vendor_{uploaddate}-{expirydate}_filename.extension
 						preg_match('/(\d{8,8})-(\d{8,8})/', $file['basename'], $dates);
 						if (isset($dates[2]) && $dates[2] > $this->_date['servertime']->format('Ymd')) {
 							$documents['valid'][$file['basename']] = ['target' => '_blank', 'href' => './api/api.php/file/stream/' . substr($path, 1)];
