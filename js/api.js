@@ -480,7 +480,7 @@ export const api = {
 										_serviceWorker.postMessage("getnotifications");
 									}, _serviceWorker.notif.interval_duration);
 
-									if (api._unauthorizedRequest.request.length && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
+									if (api._unauthorizedRequest.request && api._unauthorizedRequest.request.length && JSON.stringify(api._unauthorizedRequest.request) !== JSON.stringify(["application", "authentify"])) {
 										// resend last request
 										const call = api._unauthorizedRequest.request.shift();
 										if (api.hasOwnProperty(call)) api[call](api._unauthorizedRequest.method, ...api._unauthorizedRequest.request);
