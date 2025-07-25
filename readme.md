@@ -33,9 +33,9 @@ Things are still in motion. Images may be outdated.
 
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* consumables/texttemplate :ecr handling
 * refactor vendor immutable fileserver to vendor id
     * change folder names manually for iis is an asshole 
+* texttemplates updates fail with 400
 
 ## Content
 * [Aims](#aims)
@@ -362,7 +362,7 @@ On creating a text you can make use of predefined replacements that may contain 
 
 rendered to *"We write to inform you about **the woman Gladys**. We just want to tell you **Gladys** is doing fine. **The woman** can make use od the aid."*
 
-The [vendor management](#vendor-and-product-management) makes use of system preset placeholders. Text recommendations making use of :CID, :PRD or :ECR for example can import prepared values for these.
+The [vendor management](#vendor-and-product-management) makes use of system preset placeholders. Text recommendations making use of :CUSTOMERID, :PRODUCTS or :EXPIREDDOCUMENTS for example can import prepared values for these.
 
 Text templates arrange generic text chunks. Arrange or group chunks within the [drag and drop editor](#miscellaneous). Chunks can always be unselected to customize to the actual use case. Grouping chunks enhances the perception of the creation form.
 
@@ -844,7 +844,7 @@ Order operations rely on a vendor and product database. Also this is related to 
 
 Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default.
 
-Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Without provided date and for vendor evaluation document file uploads the validity is set to one year after the upload by default. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. 
+Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Without provided date and for vendor evaluation document file uploads the validity is set to one year after the upload by default. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. Files matching the filename convention for this type will be rejected.
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
 > Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
@@ -861,7 +861,7 @@ While editing products, one can edit the
 
 On setting any of these, similar products can be selected to apply this setting to as well. The selection happens to propose products of the same vendor whose article number has a set up similarity (as defined within [config.ini](#runtime-variables)).
 
-Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. Like vendor files an expiry date will be added and a [renewal](#filename-conventions) be reminded of. 
+Products can be enriched with files as well, e.g. declaration of conformity or proof of biocompatibility. Like vendor files an expiry date will be added and a [renewal](#filename-conventions) be reminded of. Files matching the filename convention for this type will be rejected.
 
 Disabled products are not accessible through the order module. Products can be deleted as long as they are not marked as protected. Vendors are not deleteable.
 
@@ -1682,7 +1682,7 @@ names[length] = "^.{0,3}$" ; less than 4 characters
 names[numeric] = "^\d+$" ; names must not be numeric only as this is reserved for database ids
 names[underscorestart] = "^_" ; names must not start with _
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; special substrings |-separated
-names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CID|PRD|ECR)$" ; literal terms |-separated
+names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CUSTOMERID|PRODUCTS|EXPIREDDOCUMENTS)$" ; literal terms |-separated
 
 filename[characters] = "[,\/\\\]" ; replace matched characters to avoid errors, as experienced on iis (NOT apache)
 

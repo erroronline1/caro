@@ -35,7 +35,7 @@
 		"name": "Besuchsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Besuchsbestätigung für :FRAU_AKKUSATIV :Name\n\n:SEHR_GEEHRTE :Name,\n\nhiermit bestätigen wir :DER_PATIENTIN_DATIV den Besuch für :Anlass :IHRES_GENITIV :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen"
+		"content": "Besuchsbestätigung für :FRAU_AKKUSATIV :Name\n\n:SEHR_GEEHRTE :Name,\n\nhiermit bestätigen wir :DER_PATIENTIN_DATIV den Besuch für :Anlass :IHRER_GENITIV :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen"
 	},
 	{
 		"type": "template",
@@ -144,14 +144,14 @@
 		"name": "Lieferanten_Biokompatibilität",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Wir benötigen von Ihnen die aktuellen Dokumente betreffend\n\n- Biokompatibilitätsnachweise nach ISO 10993,\n- Konformitätserklärungen nach ISO 13485,\n- Berichte über die Prüfung der Zytotoxizität und Karzerogenität von akkreditierten Prüflaboren oder\n- im Einzelfall ein ÖkoTex100-Zertifikat.\n\nfür die von Ihnen bezogenen Produkte oder deren Varianten:\n\n:PRD\n\nSofern Sie die Erklärungen / Berichte nicht selbst ausgeben akzeptieren wir auch die Erklärungen / Berichte Ihrer Lieferanten mit einer Erklärung von Ihnen dass es sich bei Ihrem Handelsnamen um das entsprechende Produkt handelt. Beachten Sie bitte, dass sich jeder Ihrer Kunden über eine Aktualität der Unterlagen von nicht älter als 5 Jahren freut.\n\n"
+		"content": "Wir benötigen von Ihnen die aktuellen Dokumente betreffend\n\n- Biokompatibilitätsnachweise nach ISO 10993,\n- Konformitätserklärungen nach ISO 13485,\n- Berichte über die Prüfung der Zytotoxizität und Karzerogenität von akkreditierten Prüflaboren oder\n- im Einzelfall ein ÖkoTex100-Zertifikat.\n\nfür die von Ihnen bezogenen Produkte oder deren Varianten:\n\n:PRODUCTS\n\nSofern Sie die Erklärungen / Berichte nicht selbst ausgeben akzeptieren wir auch die Erklärungen / Berichte Ihrer Lieferanten mit einer Erklärung von Ihnen dass es sich bei Ihrem Handelsnamen um das entsprechende Produkt handelt. Beachten Sie bitte, dass sich jeder Ihrer Kunden über eine Aktualität der Unterlagen von nicht älter als 5 Jahren freut.\n\n"
 	},
 	{
 		"type": "text",
-		"name": "Lieferanten_Zertifikat",
+		"name": "Lieferanten_Dokumente",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Uns ist aufgefallen dass Ihr Zertifkat am :ECR abgelaufen ist und freuen uns über eine zeitnahe Zusendung eines aktuellen Zertifikats.\n"
+		"content": "Einige der Dokumente die Sie uns zur Verfügung gestellt haben scheinen abgelaufen zu sein. Wir freuen uns über eine zeitnahe Zusendung folgender Dokumente:\n:EXPIREDDOCUMENTS"
 	},
 	{
 		"type": "text",
@@ -165,13 +165,13 @@
 		"name": "Lieferanten_Abschluss",
 		"unit": "office",
 		"author": "Caro App",
-		"content": "Unsere Kundennummer lautet :CID. Wir freuen uns über eine Zeitnahe zusendung eines aktuellen Zertifikats per eMail.\n"
+		"content": "Unsere Kundennummer lautet :CUSTOMERID. Wir freuen uns über eine zeitnahe Zusendung eines aktuellen Zertifikats per eMail.\n"
 	},
 	{
 		"type": "template",
 		"name": "Lieferanten Zertifikate - Nachweise - Preislisten",
 		"unit": "office",
 		"author": "Caro App",
-		"content": [[":Lieferanten_Einleitung"], [":Lieferanten_Konformität", ":Lieferanten_Biokompatibilität", ":Lieferanten_Zertifikat"], [":Lieferanten_Preisliste"], [":Lieferanten_Abschluss"]]
+		"content": [[":Lieferanten_Einleitung"], [":Lieferanten_Konformität", ":Lieferanten_Biokompatibilität", ":Lieferanten_Dokumente"], [":Lieferanten_Preisliste"], [":Lieferanten_Abschluss"]]
 	}
 ]

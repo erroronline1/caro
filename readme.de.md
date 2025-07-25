@@ -271,7 +271,7 @@ Bei der Erstellung eines Textes können die jeweils passenden grammatikalische F
 
 erzeugt *"Wir berichten über **die Patientin Gladys**. Wir möchten zusammenfassen, dass die Versorgung von **Gladys** voranschreitet und **die Patientin** die Nutzung gut umsetzen kann."*
 
-Die [Lieferantenverwaltung](#lieferanten--und-artikelverwaltung) nutzt systemseitig vordefinierte Platzhalter. Textvorschläge die beispielsweise :CID, :PRD oder :ECR nutzen können für diese vorbereitete Werte importieren.
+Die [Lieferantenverwaltung](#lieferanten--und-artikelverwaltung) nutzt systemseitig vordefinierte Platzhalter. Textvorschläge die beispielsweise :CUSTOMERID, :PRODUCTS oder :EXPIREDDOCUMENTS nutzen können für diese vorbereitete Werte importieren.
  
 Bei der Erstellung von Textvorschlägen können die Textbausteine individuell sortiert und zu Absätzen zusammengestellt werden. Dazu werden die jeweiligen Abschnitte mit der [Maus an die gewünschte Position gezogen](#verschiedenes). Bei der Nutzung von Textvorschlägen können die vorbereiteten Textbausteine und Abschnitte abgewählt werden um den Text an den Bedarf anzupassen. Eine Gruppierung nach Abschnitten erleichtert die visuelle Darstellung und Wiedererkennung des Formulars.
 
@@ -743,7 +743,7 @@ Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht a
 Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus.
 
 Lieferantenbezogene Dateianhänge können beigefügt werden. Durch die entsprechende Eingabemaske wird dem [Dateinamen ein Ablaufdatum hinzugefügt](#dateinamenkonventionen). Ohne angegebenes Datum und für Dateiuploads innerhalb des Dokuments zur Lieferantenbewertung wird die Gültigkeit für ein Jahr ab Bereitstellung festgelegt.
-Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. 
+Die Anwendung überwacht die angegebenen Verfallsdaten und trägt einen Hinweis in den [Kalender](#kalender) ein, sobald das Datum überschritten ist, um die betroffenen Bereiche an eine Aktualisierung zu erinnern. Dateinamen die der Dateinamenkonvention für diesen Anwendungsfall entsprechen werden zurückgewiesen.
 Die Bearbeitungsansicht für Lieferanten erlaubt die Auswahl von [Textvorschlägen](#textvorschläge). Sofern diese ordnungsgemäß vorbereitet sind können vorbereitete Werte einfach in die Platzhalter eingefügt werden. 
 Kleinere Lieferantenportfolios könnten primär oder anfänglich innerhalb der Anwendung verwaltet werden. Artikellisten können zusammen mit dem Import-Filter exportiert werden. Letzterer [wird erzeugt](#standardfilter-bei-export) sofern nicht definiert.
 > Erzeugte Filter funktionieren nicht mit Herstellerpreislisten, exportierte Artikellisten funktionieren nicht mit angepassten Filterregeln!
@@ -760,7 +760,7 @@ Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bear
 
 Bei jeder dieser Einstellungen können ähnliche Artikel gewählt werden, auf die diese Einstellungen ebenfalls angewendet werden sollen. Die Auswahl schlägt alle Artikel des gleichen Lieferanten vor, deren Artikelnummern eine in der [config.ini](#laufzeitvariablen) festgelegte Ähnlichkeit aufweisen.
 
-Artikel können ebenfalls mit Dateien bereichert werden, z.B. Konformitätserklärungen oder Biokompatibilitätsnachweise. Wie die Hersteller-Dokumente wird ein [Ablaufdatum eingefügt](#dateinamenkonventionen) und an eine Erneuerung erinnert.
+Artikel können ebenfalls mit Dateien bereichert werden, z.B. Konformitätserklärungen oder Biokompatibilitätsnachweise. Wie die Hersteller-Dokumente wird ein [Ablaufdatum eingefügt](#dateinamenkonventionen) und an eine Erneuerung erinnert. Dateinamen die der Dateinamenkonvention für diesen Anwendungsfall entsprechen werden zurückgewiesen.
 
 Deaktivierte Produkte können durch das Bestell-Modul nicht erreicht werden. Artikel können gelöscht werden so lange sie nicht als geschützt markiert sind. Lieferanten können nicht gelöscht werden.
 
@@ -1587,7 +1587,7 @@ names[length] = "^.{0,3}$" ; weniger als 4 Zeichen
 names[numeric] = "^\d+$" ; Namen dürfen nicht ausschließlich numerisch sein, da dies für Datenbank-IDs reserviert ist
 names[underscorestart] = "^_" ; Namen dürfen nicht mit _ beginnen
 names[substrings] = "IDENTIFY_BY_|DEFAULT_" ; besondere Teilzeichenketten, getrennt mit |
-names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CID|PRD|ECR)$" ; buchstäbliche Zeichenfogen, getrennt mit |
+names[literal] = "^(caro|search|false|null|sharepoint|selectedID|component|users|context|document|document_name|document_id|bundle|recordaltering|external_documents|CUSTOMERID|PRODUCTS|EXPIREDDOCUMENTS)$" ; buchstäbliche Zeichenfogen, getrennt mit |
 
 filename[characters] = "[,\/\\\]" ; ersetze gefundene Zeichen um Verweisfehler zu vermeiden
 

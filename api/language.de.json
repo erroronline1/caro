@@ -898,6 +898,7 @@
 			"delete_confirm_ok": "Ja, Produkt löschen",
 			"deleted": ":name wurde dauerhaft gelöscht",
 			"documents_expired": "Zeige möglicherweise zugehörige abgelaufene Dokumente",
+			"documents_name_error": "Es wurden jedoch Dokumente aufgrund eines unerlaubten Dateinamens nicht gespeichert. Bitte benenne folgende Dateien um: :files",
 			"documents_update": "Dokumente hinzufügen",
 			"documents_update_hint": "Wenn Dokumente hinzugefügt werden kann der Artikel nicht mehr gelöscht und nur noch deaktiviert werden. Bei Aktualisierung bitte den gleichen Namen verwenden.",
 			"documents_valid": "Zeige möglicherweise zugehörige gültige Dokumente",
@@ -945,8 +946,9 @@
 			"certificate_update": "Zertifikat / Qualitätsverinbarung hinzufügen",
 			"certificate_validity": "Zertifikat / Qualitätsvereinbarung gültig bis",
 			"customer_id": "Kundennummer",
-			"documents_expired":"Abgelaufene Dokumente",
+			"documents_expired": "Abgelaufene Dokumente",
 			"documents_hint": "Zertifikate, Qualitätsvereinbarungen, etc. Bei Aktualisierung bitte den gleichen Namen verwenden.",
+			"documents_name_error": "Es wurden jedoch Dokumente aufgrund eines unerlaubten Dateinamens nicht gespeichert. Bitte benenne folgende Dateien um: :files",
 			"documents_update": "Dokumente hinzufügen",
 			"documents_valid": "Gültige Dokumente",
 			"documents_validity": "Ablaufdatum dieser Dokumente",
@@ -1566,9 +1568,9 @@
 			"texts": "Textvorschläge"
 		},
 		"system": {
-			"CID": "Einkauf System vorbereitete Kundennummer",
-			"ECR": "Einkauf System vorbereiteter Zertifikatsablauf",
-			"PRD": "Einkauf System vorbereitete Produktliste"
+			"CUSTOMERID": "Einkauf System vorbereitete Kundennummer",
+			"EXPIREDDOCUMENTS": "Einkauf System vorbereiteter Zertifikatsablauf",
+			"PRODUCTS": "Einkauf System vorbereitete Produktliste"
 		},
 		"template": {
 			"all": "Beliebige Textvorlage von :unit bearbeiten",
@@ -1591,6 +1593,7 @@
 		"use": {
 			"blocks": "Genutzte Abschnitte innerhalb eines Absatzes",
 			"fill_placeholder": "Gib einen Wert für den undefinierten Platzhalter an",
+			"disclaimer": "Die Textsynthese ist nicht perfekt, bitte lies Korrektur und verbessere bei Bedarf.",
 			"genus": ["Mädchen", "Junge", "Kind", "Frau", "Mann", "Person", "persönlich (du)", "förmlich (Sie)"],
 			"import": "Vorbereitete Werte für :placeholders übernehmen",
 			"person": "Adressat / Ansprechpartner",

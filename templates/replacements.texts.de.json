@@ -7,14 +7,14 @@
 		"name": "DIE_PATIENTIN_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "die Patientin\nder Patient\nder Patient\ndie Patientinder Patient\n\nder Patient\nDu\nSie"
+		"content": "die Patientin\nder Patient\nder Patient\ndie Patientin\nder Patient\nder Patient\nDu\nSie"
 	},
 	{
 		"type": "replacement",
 		"name": "DER_PATIENTIN_AKKUSATIV",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "der Patientin\nden Patienten\nden Patienten\nder Patientinden Patienten\n\nden Patienten\nDich\nSie"
+		"content": "der Patientin\nden Patienten\nden Patienten\nder Patientin\nden Patienten\nden Patienten\nDich\nSie"
 	},
 	{
 		"type": "replacement",
