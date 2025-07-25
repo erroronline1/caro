@@ -133,7 +133,7 @@ export const api = {
 			const b = new Blob([sanitizedpayload], {
 				type: "application/json",
 			});
-			_client.application.debug(payload, sanitizedpayload, b.size);
+			//_client.application.debug(payload, sanitizedpayload, b.size);
 			payload.append("_user_post_validation", await _.sha256(api._settings.user.fingerprint + b.size.toString()));
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload)
