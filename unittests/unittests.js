@@ -1827,8 +1827,12 @@ export function rendertest(element) {
 
 export async function screenshot(lang = null) {
 	// import templates in available languages within dev environment and update the database ids for the respective usecases
+	// ensure switching languages in your profile in advance to calling function
 
-	const timeout = 10;
+	const timeout = .5;
+	let iterator,
+		value,
+		s;
 
 	// yield functions
 	function* menucall(index) {
@@ -1887,6 +1891,72 @@ export async function screenshot(lang = null) {
 		}
 	}
 
+	function* apicalls3(index) {
+		// just apicalls to create temp files
+		const targets = [
+			{
+				en: async function () {
+					const data = new FormData();
+					data.append(api._lang.GET("record.create_identifier"), "Jane Doe *01.02.2003");
+					data.append(api._lang.GET("_type"), "label");
+					api.record("post", "identifier", "appendDate", data);
+					console.log(`sample identifier code ${lang}.png`);
+				},
+				de: async function () {
+					const data = new FormData();
+					data.append(api._lang.GET("record.create_identifier"), "Erika Musterfrau *01.02.2003");
+					data.append(api._lang.GET("_type"), "label");
+					api.record("post", "identifier", "appendDate", data);
+					console.log(`sample identifier code ${lang}.png`);
+				},
+			},
+			{
+				en: async function () {
+					api.record("get", "document", "Basic data"); // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
+					await _.sleep(2000);
+					api.document("post", "export");
+					console.log(`document export ${lang}.png`);
+				},
+				de: async function () {
+					api.record("get", "document", "Basisdaten"); // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
+					await _.sleep(2000);
+					api.document("post", "export");
+					console.log(`document export ${lang}.png`);
+				},
+			},
+			{
+				en: async function () {
+					api.calendar("get", "appointment");
+					await _.sleep(2000);
+					document.getElementsByName(api._lang.GET("calendar.appointment.date"))[0].value = "2025-07-27";
+					document.getElementsByName(api._lang.GET("calendar.appointment.time"))[0].value = "10:00";
+					document.getElementsByName(api._lang.GET("calendar.appointment.occasion"))[0].value = "Cast for orthosis";
+					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Remember bringing shoes";
+					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
+					await _.sleep(500);
+					api.calendar("post", "appointment");
+					console.log(`appointment ${lang}.png`);
+				},
+				de: async function () {
+					api.calendar("get", "appointment");
+					await _.sleep(2000);
+					document.getElementsByName(api._lang.GET("calendar.appointment.date"))[0].value = "2025-07-27";
+					document.getElementsByName(api._lang.GET("calendar.appointment.time"))[0].value = "10:00";
+					document.getElementsByName(api._lang.GET("calendar.appointment.occasion"))[0].value = "Gipsabdruck für Orthese";
+					document.getElementsByName(api._lang.GET("calendar.appointment.reminder"))[0].value = "Bringen Sie Schuhe mit";
+					document.getElementsByName(api._lang.GET("calendar.appointment.duration"))[0].value = "1";
+					await _.sleep(500);
+					api.calendar("post", "appointment");
+					console.log(`appointment ${lang}.png`);
+				},
+			},
+		];
+		while (index < targets.length) {
+			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
+			index++;
+		}
+	}
+
 	// instructions
 	if (!lang) {
 		console.log(
@@ -1899,10 +1969,8 @@ export async function screenshot(lang = null) {
 	console.log(`starting in in ${timeout} seconds. we'll start with menu items, after whose we'll iterate over provided endpoints. in the meantime the menu will be set to unfixed for longer contents.`);
 	console.log(`menu items will pop up every ${timeout} seconds, copy and repaste the :screenshot command to have proper prepared filenames.`);
 	await _.sleep(timeout * 1000);
-
-	let iterator = menucall(0),
-		value,
-		s;
+	
+	iterator = menucall(0);
 	while ((value = iterator.next().value)) {
 		s = timeout;
 		value.checked = true;
@@ -1960,16 +2028,20 @@ export async function screenshot(lang = null) {
 		}
 		console.clear();
 	}
+
+	//
+	console.clear();
+	console.log("now preparing some exports. don't mind modals. fetch the files from ./fileserver/tmp and convert to:");
+	await _.sleep(timeout * 1000);
+	iterator = apicalls3(0);
+	while ((value = iterator.next().value)) {
+		await value();
+		await _.sleep(1000);
+	}
+
 	console.log("done. reload to return to normal.");
-	console.log("manually image updates may contain:");
-	console.table([
-		`sample identifier code ${lang}.png`,
-		`record screen.png ${lang}`,
-		`record full summary ${lang}.png`,
-		`record reduced summary ${lang}.png`,
-		`document export ${lang}.png`,
-		`appointment ${lang}.png`
-	]);
+	console.log("manual image updates may contain:");
+	console.table([`record screen.png ${lang}`, `record full summary ${lang}.png`, `record reduced summary ${lang}.png`]);
 }
 
 export function request_param() {
