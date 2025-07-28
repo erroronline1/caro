@@ -2514,7 +2514,7 @@ Variables for _stresstest.php can be adjusted within the top class variables in 
 
 ## Deployment process
 * For **installation** see [installation](#installation).
-* **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Before altering tables a backup (BACKUP_caro_table) is created. On creation failure the update is supposed to be aborted. Code files are simply to be uploaded to the server to be available. 
+* **Updates** to the database structure are supposed to be executed by _databaseupdate.php. This ensures queries are well crafted and tested in advance in a development environment. Before altering tables a backup (BACKUP_caro_table) of the most recent version is created, overwriting potential previous updates. On creation failure the update is supposed to be aborted. Code files are simply to be uploaded to the server to be available. 
 * The operator of the infrastructure is responsible for a sufficient **deletion / uninstallation** of the software, especially backend, database and backups.
 
 [Content](#content)
