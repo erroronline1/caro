@@ -33,9 +33,6 @@ Things are still in motion. Images may be outdated.
 
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* refactor vendor immutable fileserver to vendor id
-    * change folder names manually for iis is an asshole 
-* texttemplates updates fail with 400
 
 ## Content
 * [Aims](#aims)
