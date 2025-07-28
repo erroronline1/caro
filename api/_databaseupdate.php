@@ -175,10 +175,7 @@ class UPDATE{
 				"ALTER TABLE caro_consumables_vendors DROP COLUMN certificate, DROP COLUMN immutable_fileserver; "
 			],
 			'sqlsrv' => [
-				"USE [caro]" .
-				" GO" .
-				" ALTER TABLE [dbo].[caro_consumables_vendors] DROP COLUMN [certificate], [immutable_fileserver]" .
-				" GO;"
+				"ALTER TABLE caro_consumables_vendors DROP COLUMN certificate, immutable_fileserver; "
 			]
 		];
 	}
