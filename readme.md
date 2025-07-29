@@ -4775,6 +4775,34 @@ Sample response
 {"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
 ```
 
+> GET ./api/api.php/tool/csvmdconversion
+
+Returns a form with file option and textarea to convert csv to markup-table and vice versa.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":"csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
+```
+
+> POST ./api/api.php/tool/csvmdconversion
+
+Returns a form with file option and textarea to convert csv to markup-table and vice versa - prefilled with processed results.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | defined fields from previous GET fetch |
+
+Sample response
+```
+{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":"csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
+```
+
 > GET ./api/api.php/tool/image
 
 Returns a form to select images and scaling options.
