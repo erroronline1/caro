@@ -1928,6 +1928,13 @@ class AUDIT extends API {
 					[
 						'type' => 'textsection',
 						'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->convertFromServerTime($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : $this->_lang->GET('audit.managementreview.last_version'))
+					],
+					[
+						'type' => 'button',
+						'attributes' => [
+							'value' => $this->_lang->GET('tool.csvmdconversion.conversion'),
+							'onclick' => "api.tool('get', 'csvmdconversion')"
+						]
 					]
 				];
 				// display issue inputs

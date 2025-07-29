@@ -1643,9 +1643,17 @@
 			"code_select_type": "Create a",
 			"qrcode_text": "QR text / URL"
 		},
+		"csvmdconversion": {
+			"conversion":"Convert CSV to markdown and vice versa",
+			"csverror": "Conversion error",
+			"csverror_description": "Conversion has been aborted, most likely due to a CSV formatting issue. Please adhere: :format",
+			"csvdownload": "Download CSV-file",
+			"csvupload": "Select CSV-file for conversion",
+			"markdown": "Convert markdown-table"
+		},
 		"image": {
 			"export": "Export",
-			"label": "Beschriftung",
+			"label": "Label",
 			"options": "Options",
 			"options_watermark": "Watermark",
 			"size": "Maximum size",

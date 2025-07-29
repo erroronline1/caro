@@ -455,6 +455,115 @@ class TOOL extends API {
 	}
 
 	/**
+	 *                       _                             _         
+	 *   ___ ___ _ _ _____ _| |___ ___ ___ _ _ ___ ___ ___|_|___ ___ 
+	 *  |  _|_ -| | |     | . |  _| . |   | | | -_|  _|_ -| | . |   |
+	 *  |___|___|\_/|_|_|_|___|___|___|_|_|\_/|___|_| |___|_|___|_|_|
+	 *
+	 * 
+	 */
+	public function csvmdconversion(){
+		$response = ['render' => ['content' => []]];
+		$csv = [];
+		$md = '';
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				if (isset($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]) && $_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name']) {
+					// convert csv to md
+					$csvfile = fopen($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name'], 'r');
+					if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
+					$rownum = 0;
+					while(($row = fgetcsv($csvfile, null,
+						CONFIG['csv']['dialect']['separator'],
+						CONFIG['csv']['dialect']['enclosure'],
+						CONFIG['csv']['dialect']['escape'])) !== false) {
+						if ($rownum < 1){
+							if (count($row) < 2){
+								$response['response'] = ['msg' => $this->_lang->GET('maintenance.record_datalist.update_error'), 'type' => 'error'];
+								$response['render']['content'][] = [
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('tool.csvmdconversion.csverror'),
+									],
+									'content' => $this->_lang->GET('tool.csvmdconversion.csverror_description', [':format' => "\n" . UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . mb_convert_encoding(implode(', ', $row), 'UTF-8', mb_detect_encoding(implode(', ', $row), ['ASCII', 'UTF-8', 'ISO-8859-1'])),
+								];
+								return $response;
+							}
+							// set header as data keys
+							foreach($row as &$column){
+								if ($column) {
+									$bom = pack('H*','EFBBBF'); //coming from excel this is utf8
+									// delete bom, convert linebreaks to space
+									$column = preg_replace(["/^$bom/", '/\n/'], ['',' '], $column);
+								}
+							}
+							$md = implode('|', $row);
+							$md .= implode('|', array_fill(0, count($row) - 1, ' ----- '));
+						}
+						else {
+							$md = implode('|', $row);
+						}
+						$rownum++;
+					}
+					fclose($csvfile);
+					$md .= "\n";
+				}
+				elseif(($md = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.csvmdconversion.markdown'))) !== false ) {
+					// convert md to csv
+					$data = [];
+					$rows = explode("\n", $md);
+					foreach($rows as $row){
+						$row = preg_replace('/\r/', '', $row);
+						preg_match('/^(\|.+\|)$/', $row, $isrow);
+						if (!$isrow) continue;
+						preg_match('/^\|(\s|\-)+\|/', $row, $headseparator);
+						if ($headseparator) continue;
+						$row = array_map(fn($column) => trim($column), array_filter(explode('|', $row), fn($column) => boolval($column)));
+						$data[] = $row;
+					}
+					$name = preg_replace(CONFIG['forbidden']['names']['characters'], '_', implode('_', $data[0]));
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $name . '.csv';
+					$file = fopen($tempFile, 'w');
+					fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+					foreach($data as $row){
+						fputcsv($file, $row,
+						CONFIG['csv']['dialect']['separator'],
+						CONFIG['csv']['dialect']['enclosure'],
+						CONFIG['csv']['dialect']['escape']);
+					}
+					fclose($file);
+					// provide downloadfile
+					$csv[pathinfo($tempFile)['basename']] = [
+						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'download' => pathinfo($tempFile)['basename']
+					];
+				}
+				break;
+			}
+			$response['render']['content'][] = [
+				'type' => 'file',
+				'attributes' => [
+					'name' => $this->_lang->GET('tool.csvmdconversion.csvupload'),
+					'accept' => '.csv'
+				]
+			];
+			$response['render']['content'][] = [
+				'type' => 'textarea',
+				'attributes' => [
+					'name' => $this->_lang->GET('tool.csvmdconversion.markdown'),
+					'value' => $md
+				]
+			];
+			if ($csv) {
+				$response['render']['content'][] = [
+					'type' => 'links',
+					'description' => $this->_lang->GET('tool.csvmdconversion.csvdownload'),
+					'content' => $csv
+				];
+			}
+		$this->response($response);
+	}
+	/**
 	 *   _                   
 	 *  |_|_____ ___ ___ ___ 
 	 *  | |     | .'| . | -_|

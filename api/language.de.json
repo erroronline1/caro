@@ -1643,6 +1643,14 @@
 			"code_select_type": "Generiere einen",
 			"qrcode_text": "QR Text / URL"
 		},
+		"csvmdconversion": {
+			"conversion":"Konvertiere CSV zu Markdown und umgekehrt",
+			"csverror": "Konvertierungsfehler",
+			"csverror_description": "Die Konvertierung wurde aufgrund einer wahrscheinlich fehlerhaften CSV-Formatierung abgebrochen. Bitte beachten: :format",
+			"csvdownload": "CSV-Datei herunterladen",
+			"csvupload": "CSV-Datei für Konvertierung wählen",
+			"markdown": "Markdown-Tabelle konvertieren"
+		},
 		"image": {
 			"export": "Exportiere",
 			"label": "Beschriftung",

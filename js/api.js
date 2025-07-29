@@ -2120,6 +2120,21 @@ export const api = {
 			};
 		switch (method) {
 			case "get":
+				switch (request[1]) {
+					case "csvmdconversion":
+						successFn = function (data) {
+							if (data.render) {
+								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }).then((response) => {
+									let submission = _client.application.dialogToFormdata(response);
+									if (submission) api.tool("post", "csvmdconversion", submission);
+									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
+								});
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
+					default:
+				}
 				break;
 			case "post":
 				switch (request[1]) {
@@ -2128,6 +2143,20 @@ export const api = {
 						break;
 					case "code":
 						payload = _.getInputs("[data-usecase=tool_create_code]", true);
+						break;
+					case "csvmdconversion":
+						payload = request[2];
+						delete request[2];
+						successFn = function (data) {
+							if (data.render) {
+								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }).then((response) => {
+									let submission = _client.application.dialogToFormdata(response);
+									if (submission) api.tool("post", "csvmdconversion", submission);
+									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
+								});
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
 						break;
 					case "image":
 						payload = _.getInputs("[data-usecase=tool_image]", true);
