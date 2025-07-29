@@ -448,16 +448,15 @@ class APPLICATION extends API {
 					$last = new \DateTime($row['last_touch']);
 					$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
 					if ($row['notified'] < $diff){
-						// get last considered document
-						$lastdocument = $documents[array_search($row['last_document'], array_column($documents, 'id'))] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)];
 						$this->alertUserGroup(
 							[
+								// limit recipients to specialized workforce only, exclude admin, office and common
 								'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
 							],
 							$this->_lang->GET('record.reminder_message', [
 								':days' => $last->diff($this->_date['servertime'])->days,
 								':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
-								':document' => $lastdocument['name'],			
+								':document' => $row['last_document'] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)],			
 								':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
 							], true)
 						);
@@ -477,8 +476,9 @@ class APPLICATION extends API {
 					if ($row['notified'] < $diff && !$row['lifespan']){
 						$this->alertUserGroup(
 							[
+								// limit recipients to specialized workforce only, exclude admin and common. typically matches supervisors and office members
 								'permission' => PERMISSION::permissionFor('recordscasestate', true),
-								'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
+								'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin']))
 							],
 							$this->_lang->GET('record.lifespan.reminder_message', [
 								':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
