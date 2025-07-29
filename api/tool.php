@@ -468,6 +468,9 @@ class TOOL extends API {
 		$md = '';
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+
+				// TODO: _client.application.dialogToFormdata handling files
+
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]) && $_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name']) {
 					// convert csv to md
 					$csvfile = fopen($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name'], 'r');
