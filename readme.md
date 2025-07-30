@@ -34,6 +34,23 @@ Things are still in motion. Images may be outdated.
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
 
+* alter consumables_products protected to has_files for comprehensible reasons
+* simplified pdf markdown? (e.g. for management review)
+    * italic, bold (\*+)([^\s])([^\n\*]+?)([^\s])(\*+) count $1, concatenate $2,$3,$4
+    * list ^(\s){0,}(\*|-) (.+?)$ if 4 matches count $1 for intendation
+    * numbered list ^(\s){0,}(\d\.) (.+?)$ if 4 matches count $1 for intendation
+    * header ^(#+) (.+?)$ count $1
+    * citation ^> (.+)
+    * table (^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+
+        * explode /n to rows, explode (|, row) to columns and trim cells
+    * code ^( +)(.+)
+    * hr ^[_\-]+$
+    * table import, export and csv<->md conversion?
+    * modal with instructions and examples
+* _client.application.dialogToFormdata handling files
+    * create FormData and JSON as dialog response?
+    * text with tool->csvmdconversion() but affects everything
+
 ## Content
 * [Aims](#aims)
     * [Key aspects](#key-aspects)
@@ -574,12 +591,12 @@ The identifier is always a QR-code with additional readable content that will ap
 
 On display of any record appear recommendations to complete records according to bundles that match the last recording users units as well as the current viewing user, assuming cases are processed by members of the same unit in general. Checking for completeness of any document bundles can be applied as well.
 
-Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.
+Records can be marked as closed to disappear from the records overview and not being taken into account for open cases on the landing page summary, but still can be accessed after filtering/searching any keyword within the identifier. On further contribution the closed state is revoked by default. This applies to records containing complaints too. Complaints must be closed by all [defined roles](#runtime-variables), repeatedly if any data is appended to the respective record.  
 Unclosed records will be reminded of periodically after a [defined timespan](#runtime-variables) to all users of the most recent recording users organisational units.
 
 Case documentations allow a setting of the current case state (like reimbursement granted, production tasked, etc.). Records within the overview can be filtered according to case states. Users changing the state have the option to inform other users, units or respective supervisors via message. There is also an option to message an inquiry to anybody with a direct link embedded for quick access.
 
-If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.
+If a record is marked as a complaint by accident it can be assigned another type by defined roles. Retyping will be recorded as well.  
 Records can be assigned a new identifier, e.g. on typing errors or accidentally duplicate creation. In the latter case if the new identifier is already in use all records will be merged with the existing one. This action as well as assigning a new identifier will be recorded as well.
 
 If records contain data from restricted documents, summaries will only contain these data if the requesting user has the permission to handle the document as well. It is up to you if it is reasonable to handle document bundles this way:
@@ -665,7 +682,7 @@ Exported reduced record summary
 ### Risk management
 The risk management supports describing risks according to ISO 14971 and in accordance to [DGIHV](https://www.dgihv.org) proposals. Identified risks, that may have to be taken into account for any process are defined within the [language file](#customisation) (also see [here](#runtime-variables)).
 
-As required with ISO 14971 you can describe characteristics for medical devices and applicable risks. Since the DGIHV fortunately decided defining characteristics and risks on a group of medical devices (e.g. prostheses and orthoses in general) as reasonable, all evaluations are based and grouped by a process.
+As required with ISO 14971 you can describe characteristics for medical devices and applicable risks. Since the DGIHV fortunately decided defining characteristics and risks on a group of medical devices (e.g. prostheses and orthoses in general) as reasonable, all evaluations are based and grouped by a process.  
 Furthermore you are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels. To proof your regulatory compliance you can link any of your documents containing measures as defined.
 
 Entries are persistent and can be exported if desired through the [evaluation and summary-module](#regulatory-evaluations-and-summaries). Available entries store and display the user name and date of the last edit. 
@@ -675,7 +692,7 @@ Entries are persistent and can be exported if desired through the [evaluation an
 [Content](#content)
 
 ### Audit
-The application enables you to prepare internal audits, including programme objectives, audit method and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted, reordered by [dragging and dropping](#miscellaneous) and reimported. The summary of a previous audit for the respective unit can be imported for upcoming reference.
+The application enables you to prepare internal audits, including programme objectives, audit method and an import of previous summaries for selected units. Question phrasing from other templates can be reused and every question can be assigned fitting regulatory issues. On editing the audit programme questions can be added, deleted, reordered by [dragging and dropping](#miscellaneous) and reimported. The summary of a previous audit for the respective unit can be imported for upcoming reference.  
 Audits can be added to the calendar from the form as well, informing selected units.
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20en.png)
@@ -841,8 +858,8 @@ Order operations rely on a vendor and product database. Also this is related to 
 
 Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default.
 
-Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Without provided date and for vendor evaluation document file uploads the validity is set to one year after the upload by default. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. Files matching the filename convention for this type will be rejected.
-The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily. 
+Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Without provided date and for vendor evaluation document file uploads the validity is set to one year after the upload by default. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. Files matching the filename convention for this type will be rejected.  
+The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily.  
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
 > Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
 
@@ -933,21 +950,21 @@ graph TD;
 
 ### Order
 The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
-Products are intended to be selected from the database populated by pricelist imports. Manual ordering is possible though. But only products within the database can provide additional information:
-Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up. Delivered products get an update on the last ordered date.
+Products are intended to be selected from the database populated by pricelist imports. Manual ordering is possible though. But only products within the database can provide additional information:  
+Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up. Delivered products get an update on the last ordered date.  
 Manual orders allow a quick import to the products database.
 
 Sometimes purchase knows better about favourable terms. If an ordering user doesn't mind about the delivering vendor they can tell purchase to order something similar as well.
 
 Orders may have to be approved; pending approvals sum up and can be batch approved by users with an order authentification pin, personal access token or signature, based on [configuration settings](#runtime-variables).
 
-Approved orders can be marked as *ordered*, *partially received*, *received*, *partially delivered*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.
+Approved orders can be marked as *ordered*, *partially received*, *received*, *partially delivered*, *delivered* and *archived*. Delivered orders which are not archived will be deleted by default after a set timespan. Also purchase can disapprove an order for any suitable reason. In this case a message can be appended and all users of the assigned organizational unit will be informed about the lack of order processing. Ordered but not yet received items will periodically be reminded of as per [config.ini](#runtime-variables), for purchase to enquire a shipping date from the vendor.  
 If purchase is allowed to order something similar there will be a reminder to update the order for the correct product if necessary, to not mess up the system im terms of incorporation, sample checks or traceability. 
 
-Information can be added anytime.
-Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.
-A reason for return must be provided. Critical return reasons alert incorporation authorized users and append an incorporation review.
-All actions offer to append a message.
+Information can be added anytime.  
+Processed but not yet received orders can have a order state change in which case the ordering unit will be send a message. These are also cancelable, in which case the order will be sorted to unprocessed with a cancellation flag and message to purchase; a processed cancellation will be deleted. Received products can be marked to be returned. Returns create a new order without changing the original one and without dedicated authorization. Processing return orders flags as received simultaneously - this does not track refunds intentionally, as this happens in other software most of the time and to reduce load on purchase staff a double edit is to be avoided.  
+A reason for return must be provided. Critical return reasons alert incorporation authorized users and append an incorporation review.  
+All actions offer to append a message.  
 A label can be created directly from the commission field to support allocation of products during internal delivery.
 
 A label can be created directly from the article number field supplemented by a suitable batch or delivery note number to create a scannable code for material traceability.
@@ -1042,8 +1059,8 @@ graph TD;
     mark_bulk-.->|no|prepared_orders;
     prepared_orders-.->add_product;
 ```
-Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.
-Sample checks are added to the records. New checks trigger a sytem message to these users. Defined authorized users can revoke the sample check from within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
+Initialized incorporations are marked as approved by all applicable permissions/roles of the starting user. They may still have to be fully approved by defined authorized roles.  
+Sample checks are added to product. New checks trigger a system message to these users. Defined authorized users can revoke the sample check from within the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and the [product editor](#vendor-and-product-management).
 
 [Content](#content)
 
@@ -1898,7 +1915,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
 [Content](#content)
 
 ## Customisation
-There are a few JSON-files, for language (language.XX.json) and as templates for swift installation. Every JSON-file can be extended with an ENV-file to override default settings or append entries. It is highly recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one. The JSON-files serve as a default fallback, are necessary to detect available languages and serve required values in case of future updates of the original repository.
+There are a few JSON-files, for language (language.XX.json) and as templates for swift installation. Every JSON-file can be extended with an ENV-file to override default settings or append entries. It is highly recommended to to create language.XX.**env** files that alter or append to selected keys, without deleting a probably needed one. The JSON-files serve as a default fallback, are necessary to detect available languages and serve required values in case of future updates of the original repository.  
 As an example you could override the default language setting
 
 ```json
@@ -2084,7 +2101,7 @@ Products are deleted by default on update of the pricelist unless
 * or it has been ordered.
 
 ### Product incorporation
-In case of transfer of the last order date being part of the filter, an incorporation will be initiated with the last order date noted.
+In case of transfer of the last order date being part of the filter, an incorporation will be initiated with the last order date noted. Differing from a regular incorporation the approval only applies to the user role independently of other roles assigned to the updating user.
 
 ### Sample check, expiry dates and special attention
 *modify.add* and *modify.conditional* define trading goods for the MDR §14 sample check and the expiry date attribute or special attention. *conditional* can be applied after rewrite on article_name as well if this is a concatenation of multiple original columns. If all products qualify as trading goods *add* trading_good as 1 and omit *conditional*. If none qualify skip this, as trading_good is set to 0 by default. Same applies to expiry dates and special attention.
@@ -4786,7 +4803,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":"csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
+{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":".csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
 ```
 
 > POST ./api/api.php/tool/csvmdconversion
@@ -4800,7 +4817,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":"csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
+{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":".csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
 ```
 
 > GET ./api/api.php/tool/image
