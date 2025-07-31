@@ -964,7 +964,14 @@ export const api = {
 						if (!(payload = _client.calendar.longtermplanning())) payload = _.getInputs("[data-usecase=longtermplanning]", true);
 						break;
 					default:
-						payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()
+						payload = request[2];
+						delete request[2];
+						// set unit language keys instead of values
+						let units = [];
+						for (const [key, value] of payload.entries()) {
+							if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
+						}
+						if (units.length) payload.set(api._lang.GET("calendar.schedule.organizational_unit"), units.join(","));
 				}
 				break;
 			case "put":
@@ -972,7 +979,14 @@ export const api = {
 					case "complete":
 						break;
 					default:
-						payload = window.calendarFormData; // as prepared by utility.js _client.calendar.createFormData()
+						payload = request[2];
+						delete request[2];
+						// set unit language keys instead of values
+						let units = [];
+						for (const [key, value] of payload.entries()) {
+							if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
+						}
+						if (units.length) payload.set(api._lang.GET("calendar.schedule.organizational_unit"), units.join(","));
 				}
 				break;
 			case "delete":
