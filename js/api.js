@@ -169,13 +169,15 @@ export const api = {
 						value: false,
 						type: "button",
 					};
-					await new Dialog({
-						type: "input",
-						render: data.body.render,
-						options: options,
-					}).then((response) => {
-						let token = _client.application.dialogToFormdata(response);
-						api.application("post", "authentify", token);
+					await new Dialog(
+						{
+							type: "input",
+							render: data.body.render,
+							options: options,
+						},
+						"FormData"
+					).then((response) => {
+						api.application("post", "authentify", response);
 					});
 					return;
 				}
@@ -1575,14 +1577,16 @@ export const api = {
 					case "incorporation":
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({
-									type: "input",
-									header: api._lang.GET("order.incorporation.incorporation"),
-									render: data.render.content,
-									options: data.render.options,
-								}).then((response) => {
-									let submission = _client.application.dialogToFormdata(response);
-									if (submission) api.purchase("post", "incorporation", data.render.productid, submission);
+								new Dialog(
+									{
+										type: "input",
+										header: api._lang.GET("order.incorporation.incorporation"),
+										render: data.render.content,
+										options: data.render.options,
+									},
+									"FormData"
+								).then((response) => {
+									if (response) api.purchase("post", "incorporation", data.render.productid, response);
 									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
 							}
@@ -1592,14 +1596,16 @@ export const api = {
 					case "mdrsamplecheck":
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({
-									type: "input",
-									header: api._lang.GET("order.sample_check.sample_check"),
-									render: data.render.content,
-									options: data.render.options,
-								}).then((response) => {
-									let submission = _client.application.dialogToFormdata(response);
-									if (submission) api.purchase("post", "mdrsamplecheck", data.render.productid, submission);
+								new Dialog(
+									{
+										type: "input",
+										header: api._lang.GET("order.sample_check.sample_check"),
+										render: data.render.content,
+										options: data.render.options,
+									},
+									"FormData"
+								).then((response) => {
+									if (response) api.purchase("post", "mdrsamplecheck", data.render.productid, response);
 									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
 								});
 							}
@@ -2124,7 +2130,18 @@ export const api = {
 					case "csvmdconversion":
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }, "FormData").then((response) => {
+								const options = {};
+								options[api._lang.GET("tool.csvmdconversion.cancel")] = false;
+								options[api._lang.GET("tool.csvmdconversion.convert")] = { value: true, class: "reducedCTA" };
+								new Dialog(
+									{
+										type: "input",
+										header: api._lang.GET("tool.csvmdconversion.conversion"),
+										render: data.render,
+										options: options,
+									},
+									"FormData"
+								).then((response) => {
 									if (response) api.tool("post", "csvmdconversion", response);
 								});
 							}
@@ -2147,7 +2164,18 @@ export const api = {
 						delete request[2];
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }, "FormData").then((response) => {
+								const options = {};
+								options[api._lang.GET("tool.csvmdconversion.cancel")] = false;
+								options[api._lang.GET("tool.csvmdconversion.convert")] = { value: true, class: "reducedCTA" };
+								new Dialog(
+									{
+										type: "input",
+										header: api._lang.GET("tool.csvmdconversion.conversion"),
+										render: data.render,
+										options: options,
+									},
+									"FormData"
+								).then((response) => {
 									if (response) api.tool("post", "csvmdconversion", response);
 								});
 							}
@@ -2230,14 +2258,16 @@ export const api = {
 								const options = {};
 								options[api._lang.GET("general.ok_button")] = { value: true, class: "reducedCTA" };
 								options[api._lang.GET("general.cancel_button")] = false;
-								new Dialog({
-									type: "input",
-									render: data.render,
-									options: options,
-								}).then((response) => {
+								new Dialog(
+									{
+										type: "input",
+										render: data.render,
+										options: options,
+									},
+									"FormData"
+								).then((response) => {
 									if (!response) return;
-									let submission = _client.application.dialogToFormdata(response);
-									api.user(2 in request && request[2] !== "null" ? "put" : "post", "training", 2 in request && request[2] ? request[2] : "null", submission);
+									api.user(2 in request && request[2] !== "null" ? "put" : "post", "training", 2 in request && request[2] ? request[2] : "null", response);
 								});
 							}
 						};

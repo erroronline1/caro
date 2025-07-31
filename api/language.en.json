@@ -1644,7 +1644,9 @@
 			"qrcode_text": "QR text / URL"
 		},
 		"csvmdconversion": {
-			"conversion":"Convert CSV to markdown and vice versa",
+			"cancel": "Cancel",
+			"conversion": "Convert CSV to markdown and vice versa",
+			"convert": "Convert",
 			"csverror": "Conversion error",
 			"csverror_description": "Conversion has been aborted, most likely due to a CSV formatting issue. Please adhere: :format",
 			"csvdownload": "Download CSV-file",
