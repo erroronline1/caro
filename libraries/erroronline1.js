@@ -186,13 +186,15 @@ const _ = {
 			document.getElementById(data).remove();
 		},
 	},
-	getInputs: function (querySelector, form_data = false) {
+	getInputs: function (target, form_data = false) {
+		// target can either be a querySelector or a passed node object
 		let fields;
-		if (form_data && document.querySelector(querySelector)) {
-			fields = new FormData(document.querySelector(querySelector));
+		let form = typeof target === 'string' ? document.querySelector(target) : target;
+		if (form_data && form) {
+			fields = new FormData(form);
 
 			// prepared inputs having data-wrap="some___thing" inserting value on the three underscores
-			for (const input of Object.values(document.querySelector(querySelector))) {
+			for (const input of Object.values(form)) {
 				if (input.dataset.wrap && input.value) {
 					fields.set(input.name, input.dataset.wrap.replace("___", input.value));
 				}
@@ -202,7 +204,7 @@ const _ = {
 			const grouped = document.querySelectorAll("[data-grouped]"),
 				groups = {};
 			for (const checkbox of grouped) {
-				if (checkbox.form === document.querySelector(querySelector) && checkbox.checked) {
+				if (checkbox.form === form && checkbox.checked) {
 					if (groups[checkbox.dataset.grouped]) groups[checkbox.dataset.grouped].push(checkbox.name);
 					else groups[checkbox.dataset.grouped] = [checkbox.name];
 				}
@@ -212,7 +214,7 @@ const _ = {
 			}
 		} else {
 			fields = {};
-			let inputs = document.querySelectorAll(querySelector), // inputs must have their own grouping querySelector
+			let inputs = document.querySelectorAll(target), // inputs must have their own grouping querySelector
 				sanitizedname;
 			for (const input of inputs) {
 				input.value = encodeURIComponent(input.value);
