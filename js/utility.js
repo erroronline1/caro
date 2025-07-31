@@ -321,21 +321,6 @@ export const _client = {
 	},
 	calendar: {
 		/**
-		 * creates FormData from a calendar form for new events
-		 * @requires api
-		 * @param {object} data Dialog response
-		 */
-		createFormData: (data) => {
-			window.calendarFormData = new FormData();
-			let units = [];
-			for (const [key, value] of Object.entries(data)) {
-				if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
-				else window.calendarFormData.append(key, value);
-			}
-			if (units.length) window.calendarFormData.append(api._lang.GET("calendar.schedule.organizational_unit"), units.join(","));
-		},
-
-		/**
 		 * toggles inputs visibility on conditional request
 		 * @param {string} inputs json stringified {'input name' : {required: bool, display: bool}
 		 * @param {bool} display
@@ -464,12 +449,9 @@ export const _client = {
 				header: dialogheader,
 				render: body,
 				options: options,
-			}).then((response) => {
-				if (response[api._lang.GET("message.message.message")]) {
-					const formdata = new FormData();
-					formdata.append(api._lang.GET("message.message.to"), response[api._lang.GET("message.message.to")]);
-					formdata.append(api._lang.GET("message.message.message"), response[api._lang.GET("message.message.message")]);
-					api.message("post", "message", formdata);
+			}, "FormData").then((response) => {
+				if (response) {
+					api.message("post", "message", response);
 				}
 			});
 		},
