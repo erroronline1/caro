@@ -371,6 +371,7 @@ export class Dialog {
 	/**
 	 * @requires api, Html5QrcodeScanner, StlViewer, Assemble
 	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}} options
+	 * @param {string} returntype object or formdata
 	 * @returns promise, prepared answer on resolve according to type
 	 * @example ```js
 	 * new Dialog({options}).then(response => {
@@ -411,7 +412,7 @@ export class Dialog {
 	 * ```
 	 * true options must be assigned {value: true}. false can be assigned without other properties.
 	 */
-	constructor(options = {}) {
+	constructor(options = {}, returntype = "object") {
 		this.type = options.type || null;
 		this.icon = options.icon || null;
 		this.header = options.header || null;
@@ -637,17 +638,33 @@ export class Dialog {
 						return result;
 					default:
 						if (response.target.returnValue !== "false" && (response.returnValue || response.target.returnValue === "true")) {
-							result = dialogForm2Obj(this.dialog);
-							// check for empty object
 							let empty = true;
-							for (const prop in result) {
-								if (Object.hasOwn(result, prop)) {
-									empty = false;
+							switch (returntype.toLowerCase()){
+								case  "formdata":
+									result = _.getInputs(this.form, true);
+									// check for empty object
+									for (const prop in result.values()) {
+										if (prop) {
+											empty = false;
+											break;
+										}
+									}
+									if (empty) result = false;
 									break;
-								}
+								default:
+									result= dialogForm2Obj(this.dialog);
+									// check for empty object
+									for (const prop in result) {
+										if (Object.hasOwn(result, prop)) {
+											empty = false;
+											break;
+										}
+									}
+									if (empty) result = false;
 							}
 							this.dialog.remove();
-							return empty ? false : result;
+							console.log(result);
+							return result;
 						}
 						this.dialog.remove();
 						return false;
