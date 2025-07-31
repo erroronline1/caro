@@ -47,9 +47,8 @@ Things are still in motion. Images may be outdated.
     * hr ^[_\-]+$
     * table import, export and csv<->md conversion?
     * modal with instructions and examples
-* _client.application.dialogToFormdata handling files
-    * create FormData and JSON as dialog response?
-    * text with tool->csvmdconversion() but affects everything
+* implement dialog response type formdata where applicable
+* drop _client.application.dialogToFormdata
 
 ## Content
 * [Aims](#aims)
