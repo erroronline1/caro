@@ -2124,10 +2124,8 @@ export const api = {
 					case "csvmdconversion":
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }).then((response) => {
-									let submission = _client.application.dialogToFormdata(response);
-									if (submission) api.tool("post", "csvmdconversion", submission);
-									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
+								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }, "FormData").then((response) => {
+									if (response) api.tool("post", "csvmdconversion", response);
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -2149,10 +2147,8 @@ export const api = {
 						delete request[2];
 						successFn = function (data) {
 							if (data.render) {
-								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }).then((response) => {
-									let submission = _client.application.dialogToFormdata(response);
-									if (submission) api.tool("post", "csvmdconversion", submission);
-									else new Toast(api._lang.GET("order.incorporation.failure"), "error");
+								new Dialog({ type: "input", header: api._lang.GET("tool.csvmdconversion.conversion"), render: data.render }, "FormData").then((response) => {
+									if (response) api.tool("post", "csvmdconversion", response);
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
