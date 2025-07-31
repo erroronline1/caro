@@ -512,8 +512,8 @@ class CALENDARUTILITY {
 				break;
 		}
 
-		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.schedule.cancel') . "': false, '" . $this->_lang->GET('calendar.schedule.submit') . "': {'value': true, class: 'reducedCTA'}}})" .
-			".then(response => {if (response) {_client.calendar.createFormData(response); api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "');}})";
+		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.schedule.cancel') . "': false, '" . $this->_lang->GET('calendar.schedule.submit') . "': {'value': true, class: 'reducedCTA'}}}, 'FormData')" .
+			".then(response => {if (response) {api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "', response);}})";
 	}
 	
 	/**
