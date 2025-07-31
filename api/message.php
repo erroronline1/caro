@@ -158,7 +158,7 @@ class MESSAGE extends API {
 						)
 						."'), options:{".
 							"'".$this->_lang->GET('general.ok_button')."': {value: true},".
-						"}}).then(response => {if (Object.keys(response).length) { api.message('post', 'announcement', 0, _client.application.dialogToFormdata(response));}});"
+						"}}, 'FormData').then(response => {if (response) { api.message('post', 'announcement', 0, response);}});"
 				]
 			];
 		}
@@ -209,7 +209,7 @@ class MESSAGE extends API {
 							)
 							."'), options:{".
 								"'".$this->_lang->GET('general.ok_button')."': {value: true},".
-							"}}).then(response => {if (Object.keys(response).length) { api.message('put', 'announcement', " . $announcement['id'] . ", _client.application.dialogToFormdata(response)); this.disabled = true;}});"
+							"}}, 'FormData').then(response => {if (response) { api.message('put', 'announcement', " . $announcement['id'] . ", response); this.disabled = true;}});"
 					]
 				];
 				$content[] = [

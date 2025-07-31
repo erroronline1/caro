@@ -172,8 +172,8 @@ class MEASURE extends API {
 								."'), options:{".
 									"'".$this->_lang->GET('general.ok_button')."': {value: true},".
 									"'".$this->_lang->GET('general.cancel_button')."': {value: false, class: 'reducedCTA'},".
-								"}}).then(response => {if (Object.keys(response).length) {".
-									"api.measure('post', 'measure', null, _client.application.dialogToFormdata(response));}})"
+								"}}, 'FormData').then(response => {if (response) {".
+									"api.measure('post', 'measure', null, response);}})"
 						]
 					]
 				]];
@@ -264,7 +264,7 @@ class MEASURE extends API {
 									])
 									."'), options:{".
 										"'".$this->_lang->GET('general.ok_button')."': {value: true},".
-									"}}).then(response => {if (Object.keys(response).length) { api.measure('put', 'measure', " . $measure['id'] . ", _client.application.dialogToFormdata(response)); this.disabled = true;}});"
+									"}}, 'FormData').then(response => {if (response) { api.measure('put', 'measure', " . $measure['id'] . ", response); this.disabled = true;}});"
 							]
 						];
 					}

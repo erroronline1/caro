@@ -45,10 +45,7 @@ Things are still in motion. Images may be outdated.
         * explode /n to rows, explode (|, row) to columns and trim cells
     * code ^( +)(.+)
     * hr ^[_\-]+$
-    * table import, export and csv<->md conversion?
     * modal with instructions and examples
-* implement dialog response type formdata where applicable
-* drop _client.application.dialogToFormdata
 
 ## Content
 * [Aims](#aims)
@@ -3958,7 +3955,7 @@ Parameters
 
 Sample response
 ```
-{"render": {"content": [[{"type": "button","attributes": {"value": "New suggestion","onpointerup": "new _client.Dialog({type: 'input', header: 'New suggestion', render: JSON.parse('[[{\"type\":\"textarea\",\"attributes\":{\"name\":\"Suggestion\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"submit anonymous\"},\"content\":{\"submit anonymous\":[]},\"hint\":\"Your name will not be stored nor displayed, your suggestion yet remains public.\"}]]'), options:{'Ok': true,'No, I am not done yet': {value: false, class: 'reducedCTA'},}}).then(response => {if (Object.keys(response).length)....
+{"render": {"content": [[{"type": "button","attributes": {"value": "New suggestion","onpointerup": "new _client.Dialog({type: 'input', header: 'New suggestion', render: JSON.parse('[[{\"type\":\"textarea\",\"attributes\":{\"name\":\"Suggestion\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"submit anonymous\"},\"content\":{\"submit anonymous\":[]},\"hint\":\"Your name will not be stored nor displayed, your suggestion yet remains public.\"}]]'), options:{'Ok': true,'No, I am not done yet': {value: false, class: 'reducedCTA'},}}).then(response => {if (response)....
 ```
 
 > PUT ./api/api.php/measure/vote/{id}/{vote}
@@ -4032,7 +4029,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"button","attributes":{"value":"New announcement","onclick":"if (!this.disabled) new _client.Dialog({type: 'input', header: 'New announcement', render: JSON.parse('[[{\"type\":\"text\",\"attributes\":{\"name\":\"Subject\",\"required\":true,\"value\":\"\"}},{\"type\":\"textarea\",\"attributes\":{\"name\":\"Description\",\"value\":\"\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Starts\",\"value\":\"2025-07-05\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Valid until\",\"value\":\"\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"Concerns just\"},\"content\":{\"Common\":[],\"Orthotics I\":[],\"Orthotics II\":[],\"Prosthetics I\":[],\"Prosthetics II\":[],\"CAD\":[],\"Polymer Tech\":[],\"Silicone Lab\":[],\"Office/Purchase\":[],\"Administration\":[]}}]]'), options:{'Ok': {value: true},}}).then(response => {if (Object.keys(response).length) { api.message('post', 'announcement', 0, _client.application.dialogToFormdata(response));}});"}},[{"type":"announcementsection","attributes":{"name":"This is a test announcement"},"content":....
+{"render":{"content":[{"type":"button","attributes":{"value":"New announcement","onclick":"if (!this.disabled) new _client.Dialog({type: 'input', header: 'New announcement', render: JSON.parse('[[{\"type\":\"text\",\"attributes\":{\"name\":\"Subject\",\"required\":true,\"value\":\"\"}},{\"type\":\"textarea\",\"attributes\":{\"name\":\"Description\",\"value\":\"\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Starts\",\"value\":\"2025-07-05\"}},{\"type\":\"date\",\"attributes\":{\"name\":\"Valid until\",\"value\":\"\"}},{\"type\":\"checkbox\",\"attributes\":{\"name\":\"Concerns just\"},\"content\":{\"Common\":[],\"Orthotics I\":[],\"Orthotics II\":[],\"Prosthetics I\":[],\"Prosthetics II\":[],\"CAD\":[],\"Polymer Tech\":[],\"Silicone Lab\":[],\"Office/Purchase\":[],\"Administration\":[]}}]]'), options:{'Ok': {value: true},}}, 'FormData').then(response => {if (response) { api.message('post', 'announcement', 0, response);}});"}},[{"type":"announcementsection","attributes":{"name":"This is a test announcement"},"content":....
 ```
 
 > DELETE ./api/api.php/message/conversation/{message ids}
@@ -4816,7 +4813,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":".csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
+{"render":{"content": [{"type": "file", "attributes": {"name": "Select CSV-file for conversion", "accept": ".csv"}}, {"type": "textarea", "attributes": {"name": "Convert markdown-table", "value": "| Header Column 1 | Header Column 2 | Header Column 3 |\n|  -----  |  -----  |  -----  |\n| Value R1C1 | Value R1C2 | Value R1C3 |\n| Value R2C1 | Value R2C2 | Value R2C3 |\n\n"}}]}}
 ```
 
 > GET ./api/api.php/tool/image

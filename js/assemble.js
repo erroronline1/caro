@@ -371,7 +371,7 @@ export class Dialog {
 	/**
 	 * @requires api, Html5QrcodeScanner, StlViewer, Assemble
 	 * @param {type: str, icon: str, header: str, render: str|array, options:{displayText: value str|bool|{value, class}}} options
-	 * @param {string} returntype object or formdata
+	 * @param {string} returntype object (default) or formdata
 	 * @returns promise, prepared answer on resolve according to type
 	 * @example ```js
 	 * new Dialog({options}).then(response => {
@@ -663,7 +663,6 @@ export class Dialog {
 									if (empty) result = false;
 							}
 							this.dialog.remove();
-							console.log(result);
 							return result;
 						}
 						this.dialog.remove();

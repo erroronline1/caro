@@ -1079,7 +1079,7 @@ class RECORD extends API {
 						$this->_lang->GET('general.cancel_button') => false,
 						$this->_lang->GET('general.submit_button') => ['value' => true, 'class' => 'reducedCTA']
 					])
-					."')}).then((response) => { if (response) { response.casestate = this.dataset.casestate; response.casestatestate = this.checked; api.record('post', 'casestatealert', null, _client.application.dialogToFormdata(response)); }});"
+					."')}).then((response) => { if (response) { response.casestate = this.dataset.casestate; response.casestatestate = this.checked; api.record('post', 'casestatealert', null, response); }});"
 					], $content['case_state'])){
 
 					// retention period selection
@@ -1121,7 +1121,7 @@ class RECORD extends API {
 								$this->_lang->GET('general.cancel_button') => false,
 								$this->_lang->GET('general.submit_button') => ['value' => true, 'class' => 'reducedCTA']
 							])
-							."')}).then((response) => { if (response) { api.record('post', 'casestatealert', null, _client.application.dialogToFormdata(response)); }});"
+							."')}, 'FormData').then((response) => { if (response) { api.record('post', 'casestatealert', null, response); }});"
 					]
 				];
 
@@ -1287,7 +1287,7 @@ class RECORD extends API {
 						) . "'), options:{".
 						"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 						"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-						"}}).then(response => { if (response) api.record('post', 'retype', null, _client.application.dialogToFormdata(response))})"
+						"}}, 'FormData').then(response => { if (response) api.record('post', 'retype', null, response)})"
 						. "\">" . $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . '</a>';
 					}
 					$response['render']['content'][] = [
@@ -1350,7 +1350,7 @@ class RECORD extends API {
 							) .
 							"'), options:{'" . $this->_lang->GET('general.cancel_button') . "': false,".
 							"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-							"}}).then(response => { if (response) api.record('post', 'reidentify', null, _client.application.dialogToFormdata(response))})"
+							"}}, 'FormData').then(response => { if (response) api.record('post', 'reidentify', null, response)})"
 						]
 					];
 				}
@@ -1684,7 +1684,7 @@ class RECORD extends API {
 							) .
 							"'), options:{'" . $this->_lang->GET('general.cancel_button') . "': false,".
 							"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-							"}}).then(response => { if (response) api.record('post', 'reidentify', null, _client.application.dialogToFormdata(response))})"
+							"}}, 'FormData').then(response => { if (response) api.record('post', 'reidentify', null, response)})"
 						]
 					]
 				]]];

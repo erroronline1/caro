@@ -261,27 +261,6 @@ export const _client = {
 		},
 
 		/**
-		 * converts an object to formdata
-		 * @requires _
-		 * @param {object} dialogData
-		 * @returns {object} FormData
-		 */
-		dialogToFormdata: (dialogData = {}) => {
-			let formdata;
-			if (!Object.keys(dialogData).length) {
-				// currently legacy code because dialogs are closed and removed as of 7/25, dialogData has to be passed
-				formdata = _.getInputs('[method="dialog"]', true);
-				if (!formdata) return false;
-			} else {
-				formdata = new FormData();
-				for (const [key, value] of Object.entries(dialogData)) {
-					formdata.append(key, value);
-				}
-			}
-			return formdata;
-		},
-
-		/**
 		 * requests a pdf identifier label from backend
 		 * @requires api
 		 * @param {string} value
@@ -988,8 +967,8 @@ export const _client = {
 										},
 									],
 									options: buttons,
-								}).then((response) => {
-									if (response) api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
+								}, 'FormData').then((response) => {
+									if (response) api.purchase("put", "approved", "element.id", "addinformation", response);
 								});
 							}
 								.toString()
@@ -1103,8 +1082,8 @@ export const _client = {
 									},
 								],
 								options: buttons,
-							}).then((response) => {
-								if (response) api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
+							}, 'FormData').then((response) => {
+								if (response) api.purchase("put", "approved", "element.id", "addinformation", response);
 							});
 					}
 						.toString()
@@ -1132,9 +1111,9 @@ export const _client = {
 									},
 								],
 								options: buttons,
-							}).then((response) => {
+							}, 'FormData').then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", "element.id", "disapproved", _client.application.dialogToFormdata(response));
+									api.purchase("put", "approved", "element.id", "disapproved", response);
 									this.disabled = true;
 									this.setAttribute("data-disapproved", "true");
 								} else this.checked = false;
@@ -1166,9 +1145,9 @@ export const _client = {
 									},
 								],
 								options: buttons,
-							}).then((response) => {
+							}, 'FormData').then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", "element.id", "cancellation", _client.application.dialogToFormdata(response));
+									api.purchase("put", "approved", "element.id", "cancellation", response);
 									this.disabled = true;
 									this.setAttribute("data-cancellation", "true");
 								} else this.checked = false;
@@ -1220,9 +1199,9 @@ export const _client = {
 									},
 								],
 								options: buttons,
-							}).then((response) => {
+							}, 'FormData').then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", "element.id", "return", _client.application.dialogToFormdata(response));
+									api.purchase("put", "approved", "element.id", "return", response);
 									this.disabled = true;
 									this.setAttribute("data-return", "true");
 								} else this.checked = false;
@@ -1262,10 +1241,10 @@ export const _client = {
 										},
 									],
 									options: buttons,
-								}).then((response) => {
+								}, 'FormData').then((response) => {
 									if (response) {
 										response[api._lang.GET("order.additional_info")] = api._lang.GET("order.orderstate_description") + " - " + this.value + ": " + response[api._lang.GET("order.additional_info")];
-										api.purchase("put", "approved", "element.id", "addinformation", _client.application.dialogToFormdata(response));
+										api.purchase("put", "approved", "element.id", "addinformation", response);
 									}
 								});
 							}
