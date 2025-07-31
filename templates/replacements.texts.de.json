@@ -103,13 +103,6 @@
 	},
 	{
 		"type": "replacement",
-		"name": "SEHR_GEEHRTE",
-		"unit": "common",
-		"author": "Caro App",
-		"content": "Liebe\nLieber\n\nSehr geehrte Frau\nSehr geehrter Herr\nSehr geehrte\nLiebe\nSehr geehrte"
-	},
-	{
-		"type": "replacement",
 		"name": "FRAU_NOMINATIV",
 		"unit": "common",
 		"author": "Caro App",

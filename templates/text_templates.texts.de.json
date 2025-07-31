@@ -7,7 +7,7 @@
 		"name": "Versandschreiben_Empfangsbestätigung_Einleitung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": ":SEHR_GEEHRTE :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST_, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n"
+		"content": ":Anrede :Name,\n\nanbei :ERHÄLT :DIE_PATIENTIN_NOMINATIV ein orthopädisches Hilfsmittel unserer Technischen Orthopädie.\n\nFür die Abrechnung mit :IHREM_GENITIV Kostenträger benötigen wir :IHRE_GENITIV Unterschrift, bzw. :IHRES_GENITIV gesetzlichen Vertreters auf der beiliegenden Empfangsbestätigung. Hiermit :BESTÄTIGT :DIE_PATIENTIN_NOMINATIV den ordnungsgemäßen Erhalt\n• :IHRES_GENITIV orthopädischen Hilfsmittels,\n• der Gebrauchsanweisung und dass :DIE_PATIENTIN_NOMINATIV\n• in die Handhabung, Funktionsweise und die Risiken :IHRES_GENITIV Hilfsmittels eingewiesen :WURDE und\n• mit dem Sitz, der Ausführung, Funktion und der Einwisung zufrieden :IST_, soweit :DIE_PATIENTIN_NOMINATIV dies zur Zeit beurteilen :KANN,\n\nbitte :SCHICKEN die unterschriebene Empfangsbestätigung in dem beigefügten und frankierten Rückumschlag wieder an uns zurück.\n"
 	},
 	{
 		"type": "text",
@@ -35,7 +35,7 @@
 		"name": "Besuchsbestätigung",
 		"unit": "common",
 		"author": "Caro App",
-		"content": "Besuchsbestätigung für :FRAU_AKKUSATIV :Name\n\n:SEHR_GEEHRTE :Name,\n\nhiermit bestätigen wir :DER_PATIENTIN_DATIV den Besuch für :Anlass :IHRER_GENITIV :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen"
+		"content": "Besuchsbestätigung für :FRAU_AKKUSATIV :Name\n\n:Anrede :Name,\n\nhiermit bestätigen wir :DER_PATIENTIN_DATIV den Besuch für :Anlass :IHRER_GENITIV :Hilfsmittel am :Datum.\n\nMit freundlichen Grüßen"
 	},
 	{
 		"type": "template",
@@ -77,7 +77,7 @@
 		"name": "Fragenkatalog_Einleitung_deutsch",
 		"unit": "prosthetics2",
 		"author": "Caro App",
-		"content": ":SEHR_GEEHRTE :Name,\n\num ein Versorgungskonzept zu erstellen, benötigen wir zusätzliche Informationen. Bitte erschrecken Sie nicht angesichts der Vielzahl an Fragen, aber wir benötigen möglichst genaue Angaben zu den Lebensumständen, dem Gesundheitszustand und dem Zustand des Stumpfes. Auf Grundlage dieser Informationen bemühen wir uns ein Versorgungskonzept zu erstellen, welches den Erwartungen zu entsprechen versucht und neben dem Nutzen auch die Nachhaltigkeit und Zuverlässigkeit der Versorgung berücksichtigt.\n"
+		"content": ":Anrede :Name,\n\num ein Versorgungskonzept zu erstellen, benötigen wir zusätzliche Informationen. Bitte erschrecken Sie nicht angesichts der Vielzahl an Fragen, aber wir benötigen möglichst genaue Angaben zu den Lebensumständen, dem Gesundheitszustand und dem Zustand des Stumpfes. Auf Grundlage dieser Informationen bemühen wir uns ein Versorgungskonzept zu erstellen, welches den Erwartungen zu entsprechen versucht und neben dem Nutzen auch die Nachhaltigkeit und Zuverlässigkeit der Versorgung berücksichtigt.\n"
 	},
 	{
 		"type": "text",
