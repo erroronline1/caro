@@ -470,7 +470,7 @@ class TOOL extends API {
 			case 'POST':
 				if (isset($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]) && $_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name']) {
 					// convert csv to md
-					$csvfile = fopen($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name'], 'r');
+					$csvfile = fopen($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name'][0], 'r');
 					if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
 					$rownum = 0;
 					while(($row = fgetcsv($csvfile, null,
@@ -497,11 +497,12 @@ class TOOL extends API {
 									$column = preg_replace(["/^$bom/", '/\n/'], ['',' '], $column);
 								}
 							}
-							$md = implode('|', $row);
-							$md .= implode('|', array_fill(0, count($row) - 1, ' ----- '));
+							$md .= '| ' . implode(' | ', $row) . " |\n";
+							$md .= '| ' . implode(' | ', array_fill(0, count($row), ' ----- ')) . " |\n";
 						}
 						else {
-							$md = implode('|', $row);
+							$row = array_filter($row, fn($column) => $column !== null);
+							if ($row) $md .= '| ' . implode(' | ', $row) . " |\n";
 						}
 						$rownum++;
 					}
