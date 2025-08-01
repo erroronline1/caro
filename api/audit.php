@@ -1556,7 +1556,7 @@ class AUDIT extends API {
 					'name' => $document['name'],
 					'style' => 'color:rgb(' . 200 - $color . ',' . $color . ',0)'
 				],
-				'linkedcontent' => $this->_lang->GET('audit.documents.usage_info', [
+				'htmlcontent' => $this->_lang->GET('audit.documents.usage_info', [
 					':date' => $this->convertFromServerTime($document['date']),
 					':regulatory' => implode(', ', $document['regulatory_context'] ? : []),
 					':count' => $count,
@@ -1710,7 +1710,7 @@ class AUDIT extends API {
 				'attributes' => [
 					'name' => $product['article_no'] . ' ' . $product['article_name']
 				],
-				'linkedcontent' => $incorporationInfo . "\n" . '<a href="javascript:api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . $this->_lang->GET('audit.incorporation.link') . '</a>'
+				'mdcontent' => $incorporationInfo . "\n" . '<a href="javascript:api.purchase(\'get\', \'product\', ' . $product['id'] . ')">' . $this->_lang->GET('audit.incorporation.link') . '</a>'
 			];
 		}
 		ksort($incorporations);
@@ -1747,12 +1747,12 @@ class AUDIT extends API {
 
 		for($i = 3; $i<count($documents); $i++){
 			foreach ($documents[$i] as $item){
-				if (isset($item['content']) || isset($item['linkedcontent'])){
+				if (isset($item['content']) || isset($item['htmlcontent'])){
 					if (isset($item['content']) && isset($item['attributes']['name']))
 						$summary['content'][$item['attributes']['name']] = $item['content'];
-					elseif (isset($item['linkedcontent']) && isset($item['attributes']['name']))
+					elseif (isset($item['htmlcontent']) && isset($item['attributes']['name']))
 						// remove link to product to be only displayed onscreen
-						$summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation.link') . '$/m', '', strip_tags($item['linkedcontent']));
+						$summary['content'][$item['attributes']['name']] = preg_replace('/' . $this->_lang->GET('audit.incorporation.link') . '$/m', '', strip_tags($item['htmlcontent']));
 				}
 			}
 		}

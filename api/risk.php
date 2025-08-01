@@ -714,7 +714,7 @@ class RISK extends API {
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.proof'),
 									],
-									'linkedcontent' => implode("\n", array_values(array_map(fn($d) => $d ? '<a href="javascript:api.record(\'get\', \'document\', \'' . $d . '\')">' . $d . '</a>': null, explode(', ', $risk['proof'] ? : ''))))
+									'htmlcontent' => implode("\n", array_values(array_map(fn($d) => $d ? '<a href="javascript:api.record(\'get\', \'document\', \'' . $d . '\')">' . $d . '</a>': null, explode(', ', $risk['proof'] ? : ''))))
 								]
 							];
 						}

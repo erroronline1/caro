@@ -2497,42 +2497,10 @@ export class Assemble {
 		p.append(date);
 		message.append(p);
 
-		let display = this.currentElement.content.text.split(/\r|\n/);
-		for (const line of display) {
-			p = document.createElement("p");
-			if (mark_deletion) p.onclick = mark_deletion;
-			// extract and convert links
-			// this assumes links are always preceded by some text!!!!
-			let textbetween = line.split(/<a.+?\/a>/),
-				links = [...line.matchAll(/<a.+?\/a>/g)],
-				link,
-				a;
-
-			for (let i = 0; i < textbetween.length; i++) {
-				p.append(document.createTextNode(textbetween[i]));
-				if (i in links) {
-					link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
-					a = document.createElement("a");
-					a.href = link[2];
-					if (link[4]) a.onclick = new Function("event.stopPropagation(); " + link[4]);
-					a.classList.add("inline");
-					a.appendChild(document.createTextNode(link[5]));
-					p.append(a);
-				}
-			}
-			if (links.length > textbetween.length) {
-				for (let j = i; j < links.length; j++) {
-					link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
-					a = document.createElement("a");
-					a.href = link[2];
-					if (link[4]) a.onclick = new Function("event.stopPropagation(); " + link[4]);
-					a.classList.add("inline");
-					a.appendChild(document.createTextNode(link[5]));
-					p.append(a);
-				}
-			}
-			message.append(p);
-		}
+		p = document.createElement("p");
+		if (mark_deletion) p.onclick = mark_deletion;
+		p.innerHTML=this.currentElement.content.text;
+		message.append(p);
 
 		// display notif of unread messages in overview mode
 		if (this.currentElement.content.unseen != undefined && this.currentElement.content.unseen) {
@@ -3482,7 +3450,7 @@ export class Assemble {
 	 * 	{
 	 * 		"type": "textsection",
 	 * 		"content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-	 * 		"linkedcontent": "may contain simple links that are parsed. sourcecode only, no user input <a href="javascript:somefunction()">lorem ipsum</a>"
+	 * 		"mdcontent": "serverside preparsed <strong>html</strong>"
 	 * 		"attributes": {
 	 * 			"name": "very informative, content of header, former description"
 	 * 			"otherattribute": "value applies to header"
@@ -3492,7 +3460,6 @@ export class Assemble {
 	textsection() {
 		let result = [],
 			p,
-			content,
 			imagealigned = false;
 		if (this.currentElement.attributes && this.currentElement.attributes.name) {
 			this.currentElement.description = this.currentElement.attributes.name;
@@ -3504,44 +3471,10 @@ export class Assemble {
 			p.append(...this.linebreak(this.currentElement.content));
 			result.push(p);
 		}
-		if (this.currentElement.linkedcontent) {
-			content = this.currentElement.linkedcontent.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
+		if (this.currentElement.htmlcontent) {
 			p = document.createElement("p");
 			p.id = getNextElementID();
-			for (const part of content) {
-				if (!part[1].length) continue;
-				// extract and convert links
-				// this assumes links are always preceded by some text!!!!
-				let textbetween = part[1].split(/<a.+?\/a>/),
-					links = [...part[1].matchAll(/<a.+?\/a>/g)],
-					link,
-					a;
-
-				for (let i = 0; i < textbetween.length; i++) {
-					p.append(document.createTextNode(textbetween[i]));
-					if (i in links) {
-						link = links[i][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
-						a = document.createElement("a");
-						a.href = link[2];
-						if (link[4]) a.onclick = new Function(link[4]);
-						a.classList.add("inline");
-						a.appendChild(document.createTextNode(link[5]));
-						p.append(a);
-					}
-				}
-				if (links.length > textbetween.length) {
-					for (let j = i; j < links.length; j++) {
-						link = links[j][0].match(/(href="(.+?)")( onclick="(.+?)")*>(.+?)</);
-						a = document.createElement("a");
-						a.href = link[2];
-						if (link[4]) a.onclick = new Function(link[4]);
-						a.classList.add("inline");
-						a.appendChild(document.createTextNode(link[5]));
-						p.append(a);
-					}
-				}
-				p.append(document.createElement("br"));
-			}
+			p.innerHTML = this.currentElement.htmlcontent;
 			result.push(p);
 		}
 

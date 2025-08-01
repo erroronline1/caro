@@ -1170,7 +1170,7 @@ class RECORD extends API {
 								'attributes' => [
 									'name' => $key
 								],
-								'linkedcontent' => trim($display)
+								'htmlcontent' => trim($display)
 							]);
 						if ($files) array_push($body[count($body) -1][0]['content'], [
 							'type' => 'links',
@@ -1255,7 +1255,7 @@ class RECORD extends API {
 								'attributes' => [
 									'name' => $key
 								],
-								'linkedcontent' => implode("\n", $value)
+								'htmlcontent' => implode("\n", $value)
 							]); 
 					}
 				}
@@ -1296,7 +1296,7 @@ class RECORD extends API {
 							'attributes' => [
 								'name' => $this->_lang->_USER['record']['type'][$content['record_type']],
 							],
-							'linkedcontent' => $typeaction
+							'htmlcontent' => $typeaction
 						]
 					];
 					// add training button if type would possibly suggest one
