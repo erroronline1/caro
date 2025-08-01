@@ -46,6 +46,8 @@ Things are still in motion. Images may be outdated.
     * code ^( +)(.+)
     * hr ^[_\-]+$
     * modal with instructions and examples
+    * textsection mdcontent
+    * pdf- and assemble-method for converting
 
 ## Content
 * [Aims](#aims)
@@ -2533,7 +2535,7 @@ Variables for _stresstest.php can be adjusted within the top class variables in 
 [Content](#content)
 
 # API documentation
-All REST-api endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions, returning 511 Network Authentication Required or 401 Unauthorized if not logged in.
+All REST-API endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions, returning 511 Network Authentication Required or 401 Unauthorized if not logged in.
 Response properties are
 * *render* (for assemble or toast)
 * *title* (dynamic page title updates)
@@ -5089,238 +5091,410 @@ I welcome any constructive input on this topic.
 This application can be considered using a monolithic architecture. Yet a separation of frontend and backend may technically be possible.
 
 ### 3.1.1 Objective (1): Intended use
-* O.Purp_1 The developer MUST disclose the lawful purposes of the web application and the processing of personal data (e.g. in the terms and condition of use) and inform the user of this at least when the application is first used.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Purp_2 The web application MUST NOT collect and process data that does not serve the legitimate purpose of the application.
-    > Only active and intentional user input is processed and stored.
-* O.Purp_3 The web application MUST obtain an active and unambiguous declaration of consent from the user prior to any collection or processing of personal data.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Purp_4 Data that the user has not expressly consented to be processed MUST NOT be collected, received or used by the web application or the backend system.
-    > Only active and intentional user input is processed and stored.
-* O.Purp_5 The web application MUST allow the user to withdraw consent that has already been given. The user MUST be informed about the possibility of withdrawal and the resulting changes in the behavior of the application before consent is given.
-    > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login.
-* O.Purp_6 The developer MUST maintain a directory that shows which user consents have been given. The user-specific part of the directory MUST be automatically accessible to the user. It SHOULD be possible to request a history of this directory.
-    > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login. All individual system information can be accessed through the profile.
-* O.Purp_7 If the web application uses third-party software, all functions used MUST be necessary for the legitimate purposes of the web application. The web application SHOULD safely disable other functions. If only a single or very few functions of the third-party software are required, it MUST be balanced whether the inclusion of all the third-party software is proportionate to the increase in the attack surface caused by the third-party software used.
-    > [List of third party software](#ressources)
-* O.Purp_8 Unless it is necessary for the primary or legitimate purpose of a web application, sensitive data MUST NOT be shared with third parties. The web application MUST fully inform the user of the consequences of any sharing of web application data that serves the primary or legitimate purpose and obtain the user's consent (OPT-IN)
-    > [List of third party software](#ressources)
-* O.Purp_9 The web application MUST NOT display sensitive data on the screen unless this is necessary for the primary purpose of the application.
-    > Sensitive data is displayed only on intended and active user request.
+> O.Purp_1 The developer MUST disclose the lawful purposes of the web application and the processing of personal data (e.g. in the terms and condition of use) and inform the user of this at least when the application is first used.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+> O.Purp_2 The web application MUST NOT collect and process data that does not serve the legitimate purpose of the application.
+
+* Only active and intentional user input is processed and stored.
+
+> O.Purp_3 The web application MUST obtain an active and unambiguous declaration of consent from the user prior to any collection or processing of personal data.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+> O.Purp_4 Data that the user has not expressly consented to be processed MUST NOT be collected, received or used by the web application or the backend system.
+
+* Only active and intentional user input is processed and stored.
+
+> O.Purp_5 The web application MUST allow the user to withdraw consent that has already been given. The user MUST be informed about the possibility of withdrawal and the resulting changes in the behavior of the application before consent is given.
+
+* The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login.
+
+> O.Purp_6 The developer MUST maintain a directory that shows which user consents have been given. The user-specific part of the directory MUST be automatically accessible to the user. It SHOULD be possible to request a history of this directory.
+
+* The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. Permissions regarding camera and notifications are described within the [terms of service](#terms-of-service-for-using-the-application), to be acknowledged on login. All individual system information can be accessed through the profile.
+
+> O.Purp_7 If the web application uses third-party software, all functions used MUST be necessary for the legitimate purposes of the web application. The web application SHOULD safely disable other functions. If only a single or very few functions of the third-party software are required, it MUST be balanced whether the inclusion of all the third-party software is proportionate to the increase in the attack surface caused by the third-party software used.
+
+* [List of third party software](#ressources)
+
+> O.Purp_8 Unless it is necessary for the primary or legitimate purpose of a web application, sensitive data MUST NOT be shared with third parties. The web application MUST fully inform the user of the consequences of any sharing of web application data that serves the primary or legitimate purpose and obtain the user's consent (OPT-IN)
+
+* [List of third party software](#ressources)
+
+> O.Purp_9 The web application MUST NOT display sensitive data on the screen unless this is necessary for the primary purpose of the application.
+
+* Sensitive data is displayed only on intended and active user request.
 
 [Content](#content)
 
 ### 3.1.2 Objective (2): Architecture
-* O.Arch_1 Security MUST be an integral part of the software development and life cycle for the entire web application and backend system.
-    > User login and permissions have been mandatory from the early stages on.
-* O.Arch_2 Already in the design phase of the web application and the background system, it MUST be taken into account that the application will process sensitive data in the production phase. The architecture of the application MUST ensure the secure collection, processing, storage and deletion of the sensitive data in a data life cycle.
-    > User login and permissions have been mandatory from the early stages on.
-* O.Arch_3 The life cycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057].
-    > [Encryption statement](#encryption-statement)
-* O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art. This includes the persistence of sensitive data by the browser, for example in its cache.
-    > [Encryption statement](#encryption-statement)
-* O.Arch_5 If the web application uses third-party software, the developer MUST ensure that only such third-party software is used whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The developer MUST also ensure that unused functions cannot be activated by third parties
-    > [List of third party software](#ressources)
-* O.Arch_6 The architecture of the web application SHOULD follow a minimalist approach and be realized with a server-side localized processing logic, i.e. no complex active content (Java applets, ActiveX plugin, etc.) SHOULD be used.
-    > Used languages and are solely limited to HTML, CSS, JavaScript and PHP. Contents are delivered by the backend only.
-* O.Arch_7 The manufacturer MUST provide the user with a low-barrier way to report security issues. Communication SHOULD take place via an encrypted channel.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These contain an eMail address.
-* O.Arch_8 The web application MUST check that the web browser used is up-to-date when it is started. If a security-relevant update has not yet been installed, the web application MUST NOT allow access to sensitive data.
-    > The operator of the infrastructure is responsible for browser actuality. How is that supposed to work anyway?
-* O.Arch_9 The web application SHOULD use HTTP server headers that correspond to the current state of the art and increase the security of the application. These include HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) and X Frame Options.
-    > [Prerequisites](#prerequisites)
+> O.Arch_1 Security MUST be an integral part of the software development and life cycle for the entire web application and backend system.
+
+* User login and permissions have been mandatory from the early stages on.
+
+> O.Arch_2 Already in the design phase of the web application and the background system, it MUST be taken into account that the application will process sensitive data in the production phase. The architecture of the application MUST ensure the secure collection, processing, storage and deletion of the sensitive data in a data life cycle.
+
+* User login and permissions have been mandatory from the early stages on.
+
+> O.Arch_3 The life cycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057].
+
+* [Encryption statement](#encryption-statement)
+
+> O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art. This includes the persistence of sensitive data by the browser, for example in its cache.
+
+* [Encryption statement](#encryption-statement)
+
+> O.Arch_5 If the web application uses third-party software, the developer MUST ensure that only such third-party software is used whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The developer MUST also ensure that unused functions cannot be activated by third parties
+
+* [List of third party software](#ressources)
+
+> O.Arch_6 The architecture of the web application SHOULD follow a minimalist approach and be realized with a server-side localized processing logic, i.e. no complex active content (Java applets, ActiveX plugin, etc.) SHOULD be used.
+
+* Used languages and are solely limited to HTML, CSS, JavaScript and PHP. Contents are delivered by the backend only.
+
+> O.Arch_7 The manufacturer MUST provide the user with a low-barrier way to report security issues. Communication SHOULD take place via an encrypted channel.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These are supposed to contain an eMail address by default.
+
+> O.Arch_8 The web application MUST check that the web browser used is up-to-date when it is started. If a security-relevant update has not yet been installed, the web application MUST NOT allow access to sensitive data.
+
+* The operator of the infrastructure is responsible for browser actuality. How is that supposed to work anyway?
+
+> O.Arch_9 The web application SHOULD use HTTP server headers that correspond to the current state of the art and increase the security of the application. These include HTTP Strict Transport Security (HSTS), Content Security Policy (CSP) and X Frame Options.
+
+* [Prerequisites](#prerequisites)
 
 [Content](#content)
 
 ### 3.1.3 Objective (3): Source code
-* O.Source_1 The application MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
-    > Inputs are masked as strings by the backend by default.
-* O.Source_2 The application MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
-    > Outputs on the front end are parsed as text nodes or unexecuted input values.
-* O.Source_3 Error messages and log files MUST NOT contain sensitive data (e.g. user identifiers or session IDs).
-    > Default error messages do not contain this data.
-* O.Source_4 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
-    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
-* O.Source_5 In the event of exceptions during program execution, the web application SHOULD cancel access to sensitive data and securely delete it from memory.
-    > Sensitive data is passed to callbacks only and is not available after occuring exceptions, the programming languages garbage collector clears the memory by default.
-* O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
-    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
-* O.Source_7 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the application.
-    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
-* O.Source_8 Tools for static code analysis SHOULD be used for the development of the application.
-    > [Code design patterns](#code-design-patterns)
-* O.Source_9 If the web application uses URL redirects, this MUST be done in a controlled manner.
-    > Redirects are not used.
-* O.Source_10 The web application MUST provide mechanisms to prevent functionalities that are not within the manufacturer's development sovereignty from being injected into the web application and executed.
-    > Inputs are sanitized and masked by default.
-* O.Source_11 Sensitive data MUST NOT be included in the URL. The web application MUST process such data in HTTP request headers or POST parameters.
-    > Sensitive data is always handled as PUT or POST. [API documentation](#api-documentation)
+> O.Source_1 The application MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
+
+* Inputs are masked as strings by the backend by default.
+
+> O.Source_2 The application MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
+
+* Outputs on the front end are parsed as text nodes or unexecuted input values.
+
+> O.Source_3 Error messages and log files MUST NOT contain sensitive data (e.g. user identifiers or session IDs).
+
+* Default error messages do not contain this data.
+
+> O.Source_4 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
+
+* Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
+
+> O.Source_5 In the event of exceptions during program execution, the web application SHOULD cancel access to sensitive data and securely delete it from memory.
+
+* Sensitive data is passed to callbacks only and is not available after occuring exceptions, the programming languages garbage collector clears the memory by default.
+
+> O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
+
+* Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
+
+> O.Source_7 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the application.
+
+* This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
+
+> O.Source_8 Tools for static code analysis SHOULD be used for the development of the application.
+
+* [Code design patterns](#code-design-patterns)
+
+> O.Source_9 If the web application uses URL redirects, this MUST be done in a controlled manner.
+
+* Redirects are not used.
+
+> O.Source_10 The web application MUST provide mechanisms to prevent functionalities that are not within the manufacturer's development sovereignty from being injected into the web application and executed.
+
+* Inputs are sanitized and masked by default.
+
+> O.Source_11 Sensitive data MUST NOT be included in the URL. The web application MUST process such data in HTTP request headers or POST parameters.
+
+* Sensitive data is always handled as PUT or POST. [API documentation](#api-documentation)
 
 [Content](#content)
 
 ### 3.1.4 Objective (4): Third-party software
-* O.TrdP_1 The provider MUST maintain a centralized and complete list of dependencies on third-party software.
-    > [List of third party software](#ressources)
-* O.TrdP_2 Third-party software MUST be used in the latest version or the previous version intended for publication.
-    > [List of third party software](#ressources)
-* O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
-    > [List of third party software](#ressources)
-* O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the web application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the web application MUST NOT be offered for use.
-    > The operator of the infrastructure is responsible for fulfilling os, browser and driver requirements.
-* O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
-    > [List of third party software](#ressources)
-* O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
-    > [List of third party software](#ressources)
-* O.TrdP_7 Data received via third party software MUST be validated.
-    > Third party libraries but *html5-code* do not deliver data. The result of scanned qr-codes are displayed to the user and masked by default on processing database queries.
-* O.TrdP_8 Third party software that is no longer maintained, MUST NOT be used.
-    > [List of third party software](#ressources)
+> O.TrdP_1 The provider MUST maintain a centralized and complete list of dependencies on third-party software.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_2 Third-party software MUST be used in the latest version or the previous version intended for publication.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
+
+* [List of third party software](#ressources)
+> O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the web application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the web application MUST NOT be offered for use.
+
+* The operator of the infrastructure is responsible for fulfilling os, browser and driver requirements.
+
+> O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_7 Data received via third party software MUST be validated.
+
+* Third party libraries but *html5-code* do not deliver data. The result of scanned qr-codes are displayed to the user and masked by default on processing database queries.
+
+> O.TrdP_8 Third party software that is no longer maintained, MUST NOT be used.
+
+* [List of third party software](#ressources)
 
 [Content](#content)
 
 ### 3.1.5 Objective (5): Cryptography
 > [Encryption statement](#encryption-statement)
 
-* O.Cryp_1 When using encryption in the web application, permanently programmed secret or private keys MUST NOT be used.
-    > Encrypted data uses a server-side SHA-encrypted key for user validation.
-* O.Cryp_2 The application MUST rely on proven implementations for the realization of cryptographic primitives and protocols (cf. [TR02102-2]).
-    > Encryption, where applicable, uses SHA-256 algorithm for encryption.
-* O.Cryp_3 The choice of cryptographic primitives MUST be appropriate to the use case and reflect the current state of the art (see [TR02102-1]).
-    > Encrypted data uses a server-side SHA-encrypted key for user validation.
-* O.Cryp_4 Cryptographic keys MUST NOT be used for more than exactly one purpose.
-    > Encrypted data uses a server-side SHA-encrypted key for user validation.
-* O.Cryp_5 The strength of the cryptographic keys MUST correspond to the current state of the art (see [TR02102-1]).
-    > Encryption, where applicable, uses SHA-256 algorithm for encryption.
+> O.Cryp_1 When using encryption in the web application, permanently programmed secret or private keys MUST NOT be used.
+
+* Encrypted data uses a server-side SHA-encrypted key for user validation.
+
+> O.Cryp_2 The application MUST rely on proven implementations for the realization of cryptographic primitives and protocols (cf. [TR02102-2]).
+
+* Encryption, where applicable, uses SHA-256 algorithm for encryption.
+
+> O.Cryp_3 The choice of cryptographic primitives MUST be appropriate to the use case and reflect the current state of the art (see [TR02102-1]).
+
+* Encrypted data uses a server-side SHA-encrypted key for user validation.
+
+> O.Cryp_4 Cryptographic keys MUST NOT be used for more than exactly one purpose.
+
+* Encrypted data uses a server-side SHA-encrypted key for user validation.
+
+> O.Cryp_5 The strength of the cryptographic keys MUST correspond to the current state of the art (see [TR02102-1]).
+
+* Encryption, where applicable, uses SHA-256 algorithm for encryption.
 
 [Content](#content)
 
 ### 3.1.6 Objective (6): Authentication
-* O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session.
-    > User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
-* O.Auth_2 The application SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
-    > Every request matches the session and user permissions.
-* O.Auth_3 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
-    > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device. 
-* O.Auth_4 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
-    > This is not applicable.
-* O.Auth_5 Additional information (e.g. the end device used, the IP address or the time of access) SHOULD be included in the evaluation of an authentication process.
-    > This is not reasonable for the application used within a closed environment.
-* O.Auth_6 The user SHOULD be given the option of being informed about unusual login processes.
-    > This is not reasonable for the application used within a closed environment. Users can see their logins for the past (customizable) days though.
-* O.Auth_7 The application MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
-    > This is not reasonable for the application used within a closed environment and on shared devices.
-* O.Auth_8 If the application was interrupted (put into backend operation), a new authentication MUST be carried out after an appropriate period (grace period) has expired.
-    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_9 The application MUST request re-authentication after an appropriate period of inactivity (idle time).
-    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_10 The application MUST request re-authentication to reactivate the server session after an appropriate period of active use (active time).
-    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_11 The authentication data MUST NOT be changed without re-authenticating the user.
-    > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
-* O.Auth_12 The application MUST use state-of-the-art authentication for the connection of a backend system.
-    > This is not reasonable for the application used within a closed environment.
-* O.Auth_13 Authentication data, such as session identifiers or authentication tokens, MUST be protected as sensitive data.
-    > [Installation](#installation)
-* O.Auth_14 The application MUST allow the user to invalidate one or all previously issued session identifiers or authentication tokens.
-    > Sessions will allways be destroyed on logout.
-* O.Auth_15 If an application session is properly terminated, the application MUST inform the backend system so that session identifiers or authentication tokens are securely deleted. This applies to active termination by the user (log-out) as well as to automatic termination by the application (cf. O.Auth_9 and O.Auth_10).
-    > Sessions will allways be destroyed on logout.
-* O.Auth_16 If the login credentials are changed, the user SHOULD be informed of the change via the last valid contact details stored. In this way, the user SHOULD be offered the option of blocking the reported change and setting new login credentials after authentication.
-    > Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
-* O.Auth_17 The user MUST be made aware of the residual risk associated with the storage of login credentials in the web browser or another external application for a more comfortable login process in the terms of use of the web application.
-    > The input form for the login token is set to one-time-code and can not be stored.
+> O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session.
+
+* User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
+
+> O.Auth_2 The application SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
+
+* Every request matches the session and user permissions.
+
+> O.Auth_3 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
+
+* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device. 
+
+> O.Auth_4 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
+
+* This is not applicable.
+
+> O.Auth_5 Additional information (e.g. the end device used, the IP address or the time of access) SHOULD be included in the evaluation of an authentication process.
+
+* This is not reasonable for the application used within a closed environment.
+
+> O.Auth_6 The user SHOULD be given the option of being informed about unusual login processes.
+
+* This is not reasonable for the application used within a closed environment. Users can see their logins for the past (customizable) days though.
+
+> O.Auth_7 The application MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
+
+* This is not reasonable for the application used within a closed environment and on shared devices.
+
+> O.Auth_8 If the application was interrupted (put into backend operation), a new authentication MUST be carried out after an appropriate period (grace period) has expired.
+
+* The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
+
+> O.Auth_9 The application MUST request re-authentication after an appropriate period of inactivity (idle time).
+
+* The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
+
+> O.Auth_10 The application MUST request re-authentication to reactivate the server session after an appropriate period of active use (active time).
+
+* The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
+
+> O.Auth_11 The authentication data MUST NOT be changed without re-authenticating the user.
+
+* Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
+
+> O.Auth_12 The application MUST use state-of-the-art authentication for the connection of a backend system.
+
+* This is not reasonable for the application used within a closed environment.
+
+> O.Auth_13 Authentication data, such as session identifiers or authentication tokens, MUST be protected as sensitive data.
+
+* [Installation](#installation)
+
+> O.Auth_14 The application MUST allow the user to invalidate one or all previously issued session identifiers or authentication tokens.
+
+* Sessions will allways be destroyed on logout.
+
+> O.Auth_15 If an application session is properly terminated, the application MUST inform the backend system so that session identifiers or authentication tokens are securely deleted. This applies to active termination by the user (log-out) as well as to automatic termination by the application (cf. O.Auth_9 and O.Auth_10).
+
+* Sessions will allways be destroyed on logout.
+
+> O.Auth_16 If the login credentials are changed, the user SHOULD be informed of the change via the last valid contact details stored. In this way, the user SHOULD be offered the option of blocking the reported change and setting new login credentials after authentication.
+
+* Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
+
+> O.Auth_17 The user MUST be made aware of the residual risk associated with the storage of login credentials in the web browser or another external application for a more comfortable login process in the terms of use of the web application.
+
+* The input form for the login token is set to one-time-code and can not be stored.
 
 [Content](#content)
 
 ### 3.1.6.1 Passwords
-* O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
-    > Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters.
-* O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
-    > Login tokens are always generated by the system on request of an authorized administrative user.
-* O.Pass_3 The user MUST have the option to change their password.
-    > Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
-* O.Pass_4 The changing and resetting of passwords MUST be logged.
-    > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
-* O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
-    > The frontend does not store passwords.
+> O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
+
+* Login tokens are a sha256 hash encrypting a random number amongst others, 64 characters long and consist of numbers and characters.
+
+> O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
+
+* Login tokens are always generated by the system on request of an authorized administrative user.
+
+> O.Pass_3 The user MUST have the option to change their password.
+
+* Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
+
+> O.Pass_4 The changing and resetting of passwords MUST be logged.
+
+* Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
+
+> O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
+
+* The frontend does not store passwords.
 
 [Content](#content)
 
 ### 3.1.7 Objective (7): Data security
-* O.Data_1 The factory setting of the web application MUST provide maximum security.
-    > The application has no prefilled sensitive data on installation. New users have to be assigned roles actively. There is no data on opening the application without bein logged in.
-* O.Data_2 If the user exports sensitive data without encryption, the web application MUST inform the user that the user is responsible for the data security of this exported data.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. On any export there is a additional reminder by default.
-* O.Data_3 The web application MUST NOT make resources that allow access to sensitive data available to third parties.
-    > There are no interfaces outside of the closed environment.
-* O.Data_4 All sensitive data collected MUST NOT be kept in the application beyond the duration of their respective processing.
-    > Sensitive data is passed to callbacks only, rendered on request and not available on every next GET request.
-* O.Data_5 The application MUST comply with the principles of data minimization and purpose limitation.
-    > Only active and intentional user input is processed and stored.
-* O.Data_6 Sensitive data SHOULD be stored and processed in the backend system.
-    > This is the case, storing sensitive data within the frontend occurs only as offline fallback within same-origin IndexedDB, the storage is cleared as soon as the cached requests have been submitted.
-* O.Data_7 When using recording devices (e.g. camera), all metadata with data protection relevance, such as GPS coordinates of the recording location, hardware used, etc. MUST be removed.
-    > All photos are processed and resized. Meta data is lost during this process.
-* O.Data_8 When collecting sensitive data through the use of recording devices (e.g. camera), it MUST be prevented that other applications gain access to it.
-    > Camera pictures are not stored in shared folders and exist only as form data before submission.
-* O.Data_9 When entering sensitive data via the keyboard, the application SHOULD prevent recordings from becoming recognizable to third parties.
-    > The operator of the infrastructure is responsible to prevent malware on terminal devices.
-* O.Data_10 When entering sensitive data, the export to the clipboard SHOULD be prevented. Alternatively, the application MAY implement its own clipboard, which is protected from access by other applications.
-    > Dedicated clipboard activites are implemented on insensitive data only.
-* O.Data_11 Sensitive data such as biometric data or private keys MUST NOT be exported from the component on which they were generated.
-    > Data exports happen in other modules than inputs. Data is always sanitized and processed before exports.
-* O.Data_12 The web application cannot prevent third parties from accessing and saving the screen (e.g. screenshots and views for app switching). The user MUST be informed via the terms of use that sensitive data can be compromised via screenshots or views for app switching.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Data_13 The terms of use of the web application MUST inform the user of the risk associated with the fact that the connection to the background system is still open when the end device is locked if the user has not explicitly logged out.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Data_14 The web application SHOULD ensure that all sensitive data and application-specific login information is no longer accessible in the web browser when it is terminated. This includes cookies and web storage in particular.
-    > The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss. [Network connection handling](#network-connection-handling). However this is an issue of the operator of the infrastructure.
-* O.Data_15 The web application MUST give the user the option to have all sensitive data and application-specific login information completely deleted or made inaccessible upon final termination.
-    > Authorized users can delete users permanently.
-* O.Data_16 The HTTP-only flag MUST be used for all cookies that are not accessed via JavaScript.
-    > Only a session cookie is created. Respective flags are set.
-* O.Data_17 The secure flag MUST be set for all cookies that contain sensitive data
-    > [Installation](#installation)
-* O.Data_18 The autocomplete function MUST be switched off for all form fields with sensitive input data.
-    > All inputs are rendered without native autocomplete by default. Datalists may be provided with former inputs to ensure a consistent documentation. Datalists are provided by the backend and relate only fields namewise. The browser is instructed to not store single and collections of inputs.
-* O.Data_19 Data persisted in the browser SHOULD be unreadable for other hosts of a domain (i.e. avoidance of domain cookies).
-    > Only a session cookie is created, IndexedDB has same-origin principle by default.
+> O.Data_1 The factory setting of the web application MUST provide maximum security.
+
+* The application has no prefilled sensitive data on installation. New users have to be assigned roles actively. There is no data on opening the application without bein logged in.
+> O.Data_2 If the user exports sensitive data without encryption, the web application MUST inform the user that the user is responsible for the data security of this exported data.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. On any export there is a additional reminder by default.
+
+> O.Data_3 The web application MUST NOT make resources that allow access to sensitive data available to third parties.
+
+* There are no interfaces outside of the closed environment.
+
+> O.Data_4 All sensitive data collected MUST NOT be kept in the application beyond the duration of their respective processing.
+
+* Sensitive data is passed to callbacks only, rendered on request and not available on every next GET request.
+
+> O.Data_5 The application MUST comply with the principles of data minimization and purpose limitation.
+
+* Only active and intentional user input is processed and stored.
+
+> O.Data_6 Sensitive data SHOULD be stored and processed in the backend system.
+
+* This is the case, storing sensitive data within the frontend occurs only as offline fallback within same-origin IndexedDB, the storage is cleared as soon as the cached requests have been submitted.
+
+> O.Data_7 When using recording devices (e.g. camera), all metadata with data protection relevance, such as GPS coordinates of the recording location, hardware used, etc. MUST be removed.
+
+* All photos are processed and resized. Meta data is lost during this process.
+
+> O.Data_8 When collecting sensitive data through the use of recording devices (e.g. camera), it MUST be prevented that other applications gain access to it.
+
+* Camera pictures are not stored in shared folders and exist only as form data before submission.
+
+> O.Data_9 When entering sensitive data via the keyboard, the application SHOULD prevent recordings from becoming recognizable to third parties.
+
+* The operator of the infrastructure is responsible to prevent malware on terminal devices.
+
+> O.Data_10 When entering sensitive data, the export to the clipboard SHOULD be prevented. Alternatively, the application MAY implement its own clipboard, which is protected from access by other applications.
+
+* Dedicated clipboard activites are implemented on insensitive data only.
+
+> O.Data_11 Sensitive data such as biometric data or private keys MUST NOT be exported from the component on which they were generated.
+
+* Data exports happen in other modules than inputs. Data is always sanitized and processed before exports.
+
+> O.Data_12 The web application cannot prevent third parties from accessing and saving the screen (e.g. screenshots and views for app switching). The user MUST be informed via the terms of use that sensitive data can be compromised via screenshots or views for app switching.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+> O.Data_13 The terms of use of the web application MUST inform the user of the risk associated with the fact that the connection to the background system is still open when the end device is locked if the user has not explicitly logged out.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+> O.Data_14 The web application SHOULD ensure that all sensitive data and application-specific login information is no longer accessible in the web browser when it is terminated. This includes cookies and web storage in particular.
+
+* The offline fallback storing user input within indexedDB outweigh this recommendation to avoid data loss. [Network connection handling](#network-connection-handling). However this is an issue of the operator of the infrastructure.
+
+> O.Data_15 The web application MUST give the user the option to have all sensitive data and application-specific login information completely deleted or made inaccessible upon final termination.
+
+* Authorized users can delete users permanently.
+
+> O.Data_16 The HTTP-only flag MUST be used for all cookies that are not accessed via JavaScript.
+
+* Only a session cookie is created. Respective flags are set.
+
+> O.Data_17 The secure flag MUST be set for all cookies that contain sensitive data
+
+* [Installation](#installation)
+
+> O.Data_18 The autocomplete function MUST be switched off for all form fields with sensitive input data.
+
+* All inputs are rendered without native autocomplete by default. Datalists may be provided with former inputs to ensure a consistent documentation. Datalists are provided by the backend and relate only fields namewise. The browser is instructed to not store single and collections of inputs.
+
+> O.Data_19 Data persisted in the browser SHOULD be unreadable for other hosts of a domain (i.e. avoidance of domain cookies).
+
+* Only a session cookie is created, IndexedDB has same-origin principle by default.
 
 [Content](#content)
 
 ### 3.1.8 Objective (8): Paid resources
-> Not applicable, as there are no paid ressources.
+* Not applicable, as there are no paid ressources.
 
 ### 3.1.9 Objective (9): Network communication
-> The operator of the infrastructure is responsible for fulfilling these requirements. Caro App [requires SSL](#prerequisites) consistently though.
+* The operator of the infrastructure is responsible for fulfilling these requirements. CARO App [requires SSL](#prerequisites) consistently though.
 
 [Content](#content)
 
 ### 3.1.10 Objective (10): Platform-specific interactions
-* O.Plat_1 To use the web application, the end device SHOULD have activated device protection (password, pattern lock, etc.). If device protection is not activated, the manufacturer MUST inform the user of the associated risks.
-    > The operator of the infrastructure is responsible for fulfilling this requirement.
-* O.Plat_2 The web application MUST NOT request permissions that are not necessary for the fulfillment of its primary purpose.
-    > Requested permissions involve camera access for scanning qr-codes and occasionally adding pictures for medical device documentation, as well as notifications to alert on new messages within the application.
-* O.Plat_3 The web application MUST NOT request permissions that are not necessary for the fulfillment of its primary purpose.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Plat_4 The web application MUST NOT include sensitive data in messages or notifications that have not been explicitly enabled by the user (see O.Plat_5).
-    > Notifications only alert on a number of new messages and contain no further data.
-* O.Plat_5 The web application MAY offer the option of displaying messages and notifications the user, including those containing sensitive content. This MUST be deactivated by default.
-    > This is not applicable. Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
-* O.Plat_6 The web application MUST restrict the reloading of content to sources that are under the manufacturer's control or have been authorized by the manufacturer.
-    > All contents are delivered by the backend only.
-* O.Plat_7 The web application MUST inform the user of the risk that user-specific data may remain in the RAM after the web application is closed.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Plat_8 The user MUST be informed about security measures, as long as they can be realized by the user.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+> O.Plat_1 To use the web application, the end device SHOULD have activated device protection (password, pattern lock, etc.). If device protection is not activated, the manufacturer MUST inform the user of the associated risks.
+
+* The operator of the infrastructure is responsible for fulfilling this requirement.
+
+> O.Plat_2 The web application MUST NOT request permissions that are not necessary for the fulfillment of its primary purpose.
+
+* Requested permissions involve camera access for scanning qr-codes and occasionally adding pictures for medical device documentation, as well as notifications to alert on new messages within the application.
+
+> O.Plat_3 The web application MUST NOT request permissions that are not necessary for the fulfillment of its primary purpose.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+> O.Plat_4 The web application MUST NOT include sensitive data in messages or notifications that have not been explicitly enabled by the user (see O.Plat_5).
+
+* Notifications only alert on a number of new messages and contain no further data.
+
+> O.Plat_5 The web application MAY offer the option of displaying messages and notifications the user, including those containing sensitive content. This MUST be deactivated by default.
+
+* This is not applicable. Notifications contain only numbers. Notifications have to be actively permitted by the user within the browser.
+> O.Plat_6 The web application MUST restrict the reloading of content to sources that are under the manufacturer's control or have been authorized by the manufacturer.
+
+* All contents are delivered by the backend only.
+
+> O.Plat_7 The web application MUST inform the user of the risk that user-specific data may remain in the RAM after the web application is closed.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+> O.Plat_8 The user MUST be informed about security measures, as long as they can be realized by the user.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 
 [Content](#content)
 
 ### 3.1.11 Objective (11): Resilience
-* O.Resi_1 The web application MUST provide the user with accessible best practice recommendations for the safe use of the application and its configuration.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Resi_2 The web application MUST inform the user via the terms of use of the risks that exist for the user's data when using devices whose operating system is not in an operating state intended by the operating system manufacturer.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+> O.Resi_1 The web application MUST provide the user with accessible best practice recommendations for the safe use of the application and its configuration.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+> O.Resi_2 The web application MUST inform the user via the terms of use of the risks that exist for the user's data when using devices whose operating system is not in an operating state intended by the operating system manufacturer.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
 
 [Content](#content)
 
@@ -5330,209 +5504,348 @@ This application can be considered using a monolithic architecture. Yet a separa
 This application can be considered using a monolithic architecture. Yet a separation of frontend and backend may technically be possible.
 
 ### 3.1.1 Objective (1): Intended use
-* O.Purp_1 The backend system MUST NOT collect and process data that does not serve the legitimate purpose of the application.
-    > Only active and intentional user input is processed and stored.
-* O.Purp_2 The backend system MUST obtain an active and unambiguous declaration of consent from the user prior to any collection or processing of personal data.
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
-* O.Purp_3 Data that the user has not expressly consented to be processed MUST NOT be collected, received or used by the backend system.
-    > Only active and intentional user input is processed and stored.
-* O.Purp_4 The backend system MUST allow the user to withdraw consent that has already been given. The user MUST be informed about the possibility of withdrawal and the resulting changes in the behavior of the application before consent is given.
-    > The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. The backend does not request special user consent.
-* O.Purp_5 The provider MUST maintain a directory that shows which user consents have been given. The user-specific part of the directory MUST be automatically accessible to the user. It SHOULD be possible to request a history of this directory.
-    > All user settings are displayed within the profile.
-* O.Purp_6 If the backend system uses third-party software, all functions used SHOULD be necessary for the legitimate purposes of the application. The backend system SHOULD safely disable other functions. If only a single or very few functions of the third-party software are required, it MUST be balanced whether the inclusion of all the third-party software is proportionate to the increase in the attack surface caused by the third-party software used.
-    > [List of third party software](#ressources)
-* O.Purp_7 Unless it is necessary for the primary or legitimate purpose of an application, sensitive data MUST NOT be shared with third parties. This includes storing data in parts of the file system to which other applications have access. The application MUST fully inform the user of the consequences of any sharing of application data that serves the primary or legitimate purpose and obtain the user's consent (OPT-IN).
-    > [List of third party software](#ressources)
+> O.Purp_1 The backend system MUST NOT collect and process data that does not serve the legitimate purpose of the application.
+
+* Only active and intentional user input is processed and stored.
+
+> O.Purp_2 The backend system MUST obtain an active and unambiguous declaration of consent from the user prior to any collection or processing of personal data.
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login.
+
+> O.Purp_3 Data that the user has not expressly consented to be processed MUST NOT be collected, received or used by the backend system.
+
+* Only active and intentional user input is processed and stored.
+
+> O.Purp_4 The backend system MUST allow the user to withdraw consent that has already been given. The user MUST be informed about the possibility of withdrawal and the resulting changes in the behavior of the application before consent is given.
+
+* The application is intended as a tool to fulfill regulatory requirements. Use may be assigned and a mandatory official task. The backend does not request special user consent.
+
+> O.Purp_5 The provider MUST maintain a directory that shows which user consents have been given. The user-specific part of the directory MUST be automatically accessible to the user. It SHOULD be possible to request a history of this directory.
+
+* All user settings are displayed within the profile.
+
+> O.Purp_6 If the backend system uses third-party software, all functions used SHOULD be necessary for the legitimate purposes of the application. The backend system SHOULD safely disable other functions. If only a single or very few functions of the third-party software are required, it MUST be balanced whether the inclusion of all the third-party software is proportionate to the increase in the attack surface caused by the third-party software used.
+
+* [List of third party software](#ressources)
+
+> O.Purp_7 Unless it is necessary for the primary or legitimate purpose of an application, sensitive data MUST NOT be shared with third parties. This includes storing data in parts of the file system to which other applications have access. The application MUST fully inform the user of the consequences of any sharing of application data that serves the primary or legitimate purpose and obtain the user's consent (OPT-IN).
+
+* [List of third party software](#ressources)
 
 [Content](#content)
 
 ### 3.1.2 Objective (2): Architecture
-* O.Arch_1 Security MUST be an integral part of the software development and life cycle for the entire application.
-    > User login and permissions have been mandatory from the early stages on.
-* O.Arch_2 Already in the design phase of the backend system, it MUST be taken into account that the backend system will process sensitive data in the production phase. The architecture of the backend system MUST ensure the secure collection, processing, storage and deletion of sensitive data in a data lifecycle.
-    > User login and permissions have been mandatory from the early stages on.
-* O.Arch_3 The lifecycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057] should be used.
-    > [Encryption statement](#encryption-statement)
-* O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art.
-    > [Encryption statement](#encryption-statement), if the operator of the infrastructure is able to encrypt backups, they are responsible.
-* O.Arch_5 Security functions MUST always be implemented on all external interfaces and API endpoints.
-    > User matching and permission handling happens with every api request.
-* O.Arch_6 If the backend system uses third-party software, the manufacturer MUST ensure that only such third-party software is used, whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The manufacturer MUST also ensure that unused functions cannot be activated by third parties.
-    > The operator of the infrastructure is responsible for fulfilling these requirements.
-* O.Arch_7 The backend system MUST receive any requests made by the application via a fully documented API. It MUST NOT contain any undocumented access options.
-    > [Api documentation](#api-documentation)
-* O.Arch_8 The manufacturer MUST provide the user with a low-barrier way to report security issues. Communication SHOULD take place via an encrypted channel
-    > [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These contain an eMail address.
-* O.Arch_9 The backend system MUST be implemented in such a way, that unwanted access through management interfaces is effectively prevented. In particular, external hosting (see chapter 2.3.2) and cloud services (see chapter 2.3.3) MUST ensure that the operator eliminates access possibilities between different customers.
-    > The operator of the infrastructure is responsible for fulfilling these requirements.
-* O.Arch_10 Any service the backend system provides SHOULD run only with privileges necessary. Services reachable from the outside MUST NOT run with administrative, system or root privileges.
-    > The application does not provide services.
-* O.Arch_11 The backend system MUST have a central logging system, collecting all log-messages from any service. Protocols/logs SHOULD be collected on a dedicated system (so-called log server) to counteract any deletion or manipulation on source systems.
-    > The operator of the infrastructure is responsible for fulfilling these requirements.
-* O.Arch_12 The backend system MUST inform the application of safety-related updates and prohibits the use of an outdated application after a transitional period (Grace Period).
-    > The operator of the infrastructure is responsible for fulfilling these requirements.
+> O.Arch_1 Security MUST be an integral part of the software development and life cycle for the entire application.
+
+* User login and permissions have been mandatory from the early stages on.
+
+> O.Arch_2 Already in the design phase of the backend system, it MUST be taken into account that the backend system will process sensitive data in the production phase. The architecture of the backend system MUST ensure the secure collection, processing, storage and deletion of sensitive data in a data lifecycle.
+
+* User login and permissions have been mandatory from the early stages on.
+
+> O.Arch_3 The lifecycle of cryptographic key material MUST follow an elaborate policy that includes properties such as the random number source, detailed key segregation of duties, key certificate expiration, integrity assurance through hashing algorithms, etc. The policy SHOULD be based on recognized standards such as [TR02102-2] and [NIST80057] should be used.
+
+* [Encryption statement](#encryption-statement)
+
+> O.Arch_4 Sensitive data stored in backups MUST be encrypted according to the current state of the art.
+
+* [Encryption statement](#encryption-statement), if the operator of the infrastructure is able to encrypt backups, they are responsible.
+
+> O.Arch_5 Security functions MUST always be implemented on all external interfaces and API endpoints.
+
+* User matching and permission handling happens with every api request.
+
+> O.Arch_6 If the backend system uses third-party software, the manufacturer MUST ensure that only such third-party software is used, whose functions can be used safely and that information about the scope of use and the security mechanisms used is clearly presented to the user. The application MUST use these functions securely. The manufacturer MUST also ensure that unused functions cannot be activated by third parties.
+
+* The operator of the infrastructure is responsible for fulfilling these requirements.
+
+> O.Arch_7 The backend system MUST receive any requests made by the application via a fully documented API. It MUST NOT contain any undocumented access options.
+
+* [Api documentation](#api-documentation)
+
+> O.Arch_8 The manufacturer MUST provide the user with a low-barrier way to report security issues. Communication SHOULD take place via an encrypted channel
+
+* [Terms of service](#terms-of-service-for-using-the-application) have to be confirmed on login. These contain an eMail address.
+
+> O.Arch_9 The backend system MUST be implemented in such a way, that unwanted access through management interfaces is effectively prevented. In particular, external hosting (see chapter 2.3.2) and cloud services (see chapter 2.3.3) MUST ensure that the operator eliminates access possibilities between different customers.
+
+* The operator of the infrastructure is responsible for fulfilling these requirements.
+
+> O.Arch_10 Any service the backend system provides SHOULD run only with privileges necessary. Services reachable from the outside MUST NOT run with administrative, system or root privileges.
+
+* The application does not provide services.
+> O.Arch_11 The backend system MUST have a central logging system, collecting all log-messages from any service. Protocols/logs SHOULD be collected on a dedicated system (so-called log server) to counteract any deletion or manipulation on source systems.
+
+* The operator of the infrastructure is responsible for fulfilling these requirements.
+
+> O.Arch_12 The backend system MUST inform the application of safety-related updates and prohibits the use of an outdated application after a transitional period (Grace Period).
+
+* The operator of the infrastructure is responsible for fulfilling these requirements.
 
 [Content](#content)
 
 ### 3.1.3 Objective (3): Source code
-* O.Source_1 The backend system MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
-    > Inputs are masked as strings by the backend by default.
-* O.Source_2 The backend system MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
-    > Outputs on the front end are parsed as text nodes or unexecuted input values.
-* O.Source_3 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
-    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
-* O.Source_4 In the event of exceptions during program execution, the backend system SHOULD cancel access to sensitive data and instruct the application to securely delete it from memory.
-    > Exceptions exit the code execution, the programming languages garbage collector clears the memory by default.
-* O.Source_5 In program environments with manual memory management (i.e. the application itself can specify exactly when and where memory is read and written), the backend system MUST use secure function alternatives (e.g. printf_s instead of printf) for read and write access to memory segments.
-    > Storage is handled by the backend exclusively.
-* O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
-    > Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file. Also see [Stress test and performance](#stress-test-and-performance) note
-* O.Source_7 The backend system MUST ensure that all sensitive data is securely deleted immediately after its processing purpose has been fulfilled.
-    > *Currently there is no deletion possible for audit safety reasons and an expected data lifespan of up to 30 years. Once a deletion process has been established (feedback of authorities regarding GDPR has yet to be received ever since 9/24) a deletion occurs on the database level. The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
-* O.Source_8 The manufacturer MUST establish a deployment process for the deployment, updating and shutdown of the backend system, so in any given time, the sensitive data is protected at any time regarding publication or manipulation.
-    > [Deployment process](#deployment-process)
-* O.Source_9 The manufacturer SHOULD use automatic tools to identify program errors and best practice violations in the build process. Any warnings MUST be mitigated by the manufacturer prior to deployment.
-    > [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint vor VSC, PHPIntelephense for VSC
-* O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
-    > This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
-* O.Source_11 Tools for static code analysis SHOULD be used for the development of the application.
-    > [Code design patterns](#code-design-patterns)
+> O.Source_1 The backend system MUST check all inputs before processing them in order to filter out potentially malicious values before processing.
+
+* Inputs are masked as strings by the backend by default.
+
+> O.Source_2 The backend system MUST mask incoming and outgoing data or clean it of potentially malicious characters or refuse to process it.
+
+* Outputs on the front end are parsed as text nodes or unexecuted input values.
+> O.Source_3 Potential exceptions in the program flow MUST be caught, handled in a controlled manner and documented. Technical error descriptions (e.g. stack traces) MUST NOT be displayed to the user.
+
+* Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file.
+> O.Source_4 In the event of exceptions during program execution, the backend system SHOULD cancel access to sensitive data and instruct the application to securely delete it from memory.
+
+* Exceptions exit the code execution, the programming languages garbage collector clears the memory by default.
+
+> O.Source_5 In program environments with manual memory management (i.e. the application itself can specify exactly when and where memory is read and written), the backend system MUST use secure function alternatives (e.g. printf_s instead of printf) for read and write access to memory segments.
+
+* Storage is handled by the backend exclusively.
+
+> O.Source_6 All options to support development (e.g. developer URLs, test methods, remnants of debug mechanisms, etc.) MUST be completely removed in production.
+
+* Error reporting, console-logging and -tracing can and are supposed to be turned off in the applications configuration file. Also see [Stress test and performance](#stress-test-and-performance) note
+
+> O.Source_7 The backend system MUST ensure that all sensitive data is securely deleted immediately after its processing purpose has been fulfilled.
+
+* [Record deletion](#record-deletion). The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.*
+
+> O.Source_8 The manufacturer MUST establish a deployment process for the deployment, updating and shutdown of the backend system, so in any given time, the sensitive data is protected at any time regarding publication or manipulation.
+
+* [Deployment process](#deployment-process)
+
+> O.Source_9 The manufacturer SHOULD use automatic tools to identify program errors and best practice violations in the build process. Any warnings MUST be mitigated by the manufacturer prior to deployment.
+
+* [Code design patterns](#code-design-patterns). Also this is part of the IDE, e.g. ESLint vor VSC, PHPIntelephense for VSC
+
+> O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
+
+* This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
+
+> O.Source_11 Tools for static code analysis SHOULD be used for the development of the application.
+
+* [Code design patterns](#code-design-patterns)
 
 [Content](#content)
 
 ### 3.1.4 Objective (4): Third-party software
-* O.TrdP_1 The manufacturer MUST maintain centralized and complete list of dependencies on third-party software.
-    > [List of third party software](#ressources)
-* O.TrdP_2 Third-party software MUST be used in the latest version or the previous version intended for publication.
-    > [List of third party software](#ressources)
-* O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
-    > [List of third party software](#ressources)
-* O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the application MUST refuse operation.
-    > The operator of the infrastructure is responsible for fulfilling os, browser and driver requirements.
-* O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
-    > [List of third party software](#ressources)
-* O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
-    > [List of third party software](#ressources)
-* O.TrdP_7 Data received via third third-party software MUST be validated.
-    > Third party libraries for the backend do not deliver data
-* O.TrdP_8 Third party software that is no longer maintained, MUST NOT be used.
-    > [List of third party software](#ressources)
-* O.TrdP_9 If the backend system uses external services that are not controlled by the manufacturer, the user MUST be informed about the data shared with these services. This also applies if the backend system or parts thereof are realized as a cloud solution.
-    > Data sharing does not occur.
-* O.TrdP_10 Any interface between the manufacturer’s backend systems and an external service MUST be protected according to O.Arch_5.
-    > Data sharing does not occur.
+> O.TrdP_1 The manufacturer MUST maintain centralized and complete list of dependencies on third-party software.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_2 Third-party software MUST be used in the latest version or the previous version intended for publication.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_3 Third-party software MUST be regularly checked for vulnerabilities by the developer (by evaluating publicly available information or by static/dynamic test methods). Remnants of options to support development (cf. O.Source_6) are to be considered a vulnerability. For all publicly known vulnerabilities, the manufacturer MUST analyze the extent to which the vulnerability affects the security of the overall system. Software or functions from third-party software MUST NOT be used for known vulnerabilities that affect the security of the overall system.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_4 Security updates for third-party software MUST be integrated promptly and made available to the user via an update. The manufacturer MUST submit a security concept that defines the tolerated continued use for the application or the backend system based on the criticality of exploitable vulnerabilities. After the grace period has expired, the application MUST refuse operation.
+
+* The operator of the infrastructure is responsible for fulfilling os, browser and driver requirements.
+
+> O.TrdP_5 Before using third-party software, its source MUST be checked for trustworthiness.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_6 The application SHOULD not pass on sensitive data to third-party software.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_7 Data received via third third-party software MUST be validated.
+
+* Third party libraries for the backend do not deliver data
+
+> O.TrdP_8 Third party software that is no longer maintained, MUST NOT be used.
+
+* [List of third party software](#ressources)
+
+> O.TrdP_9 If the backend system uses external services that are not controlled by the manufacturer, the user MUST be informed about the data shared with these services. This also applies if the backend system or parts thereof are realized as a cloud solution.
+
+* Data sharing does not occur.
+
+> O.TrdP_10 Any interface between the manufacturer’s backend systems and an external service MUST be protected according to O.Arch_5.
+
+* Data sharing does not occur.
 
 [Content](#content)
 
 ### 3.1.5 Objective (5): Cryptography
-> [Encryption statement](#encryption-statement), also see [cryptographic measures for frontend](#315-prüfaspekt-5-kryptographische-umsetzung)
-
-O.Cryp_1 When using encryption in the application, permanently programmed secret or private keys MUST NOT be used.
-O.Cryp_2 The application MUST rely on proven implementations for the realization of cryptographic primitives and protocols (cf. [TR02102-2]).
-O.Cryp_3 The choice of cryptographic primitives MUST be appropriate to the use case and reflect the current state of the art (see [TR02102-1]).
-O.Cryp_4 Cryptographic keys MUST NOT be used for more than exactly one purpose. The manufacturer of the backend system MUST provide an encryption concept showing all the keys used and their hierarchies.
-O.Cryp_5 The strength of the cryptographic keys MUST correspond to the current state of the art (see [TR02102-1]).
-O.Cryp_6 All cryptographic keys SHOULD be stored in an environment protected against manipulation and disclosure.
-O.Cryp_7 All cryptographic operations SHOULD take place in an environment protected from manipulation and disclosure.
+> O.Cryp_1 When using encryption in the application, permanently programmed secret or private keys MUST NOT be used.  
+O.Cryp_2 The application MUST rely on proven implementations for the realization of cryptographic primitives and protocols (cf. [TR02102-2]).  
+O.Cryp_3 The choice of cryptographic primitives MUST be appropriate to the use case and reflect the current state of the art (see [TR02102-1]).  
+O.Cryp_4 Cryptographic keys MUST NOT be used for more than exactly one purpose. The manufacturer of the backend system MUST provide an encryption concept showing all the keys used and their hierarchies.  
+O.Cryp_5 The strength of the cryptographic keys MUST correspond to the current state of the art (see [TR02102-1]).  
+O.Cryp_6 All cryptographic keys SHOULD be stored in an environment protected against manipulation and disclosure.  
+O.Cryp_7 All cryptographic operations SHOULD take place in an environment protected from manipulation and disclosure.  
 O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3.1 has to be used. Any connection not using one of these suits, MUS NOT be established
+
+* [Encryption statement](#encryption-statement), also see [cryptographic measures for frontend](#315-prüfaspekt-5-kryptographische-umsetzung)
 
 [Content](#content)
 
 ### 3.1.5.1 Random numbers
-* O.Rand_1 All random values MUST be generated by a strong cryptographic random number generator which has been seeded with sufficient entropy (cf. [TR02102-1]).
-    > Random values for tokens are created by PHPs [random_int()](#https://www.php.net/manual/en/function.random-int.php) and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
+> O.Rand_1 All random values MUST be generated by a strong cryptographic random number generator which has been seeded with sufficient entropy (cf. [TR02102-1]).
+
+* Random values for tokens are created by PHPs [random_int()](#https://www.php.net/manual/en/function.random-int.php) and SHA256, considered cryptographically secure. Other random values are not used in context of sensitive data.
 
 [Content](#content)
 
 ### 3.1.6 Objective (6): Authentication
-* O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session. This concept MUST consider internal network connections within the backend system as well.
-    > User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
-* O.Auth_2 The backend system MUST support an appropriate authentication for linking the application.
-    > This is not reasonable for the application used within a closed environment.
-* O.Auth_3 The backend system SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
-    > Every request matches the session and user permissions.
-* O.Auth_4 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
-    > Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device.
-* O.Auth_5 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
-    > This is not applicable.
-* O.Auth_6 Additional information (e.g. the end device used, the WiFi access node used or the time of access) SHOULD be included in the evaluation of an authentication process.
-    > This is not reasonable for the application used within a closed environment.
-* O.Auth_7 The backend system MUST authenticates and authorizes each request according to the rights and privileges according the role concept (cf. O.Auth_1).
-    > Every request matches the session and user permissions.
-* O.Auth_8 The user SHOULD be given the option of being informed about unusual login processes
-    > The user can view their login history e.g. to spot deviations from work schedule.
-* O.Auth_9 The backend system MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
-    > Failed authentification reponds delayed which reasonably prevents brute-force-attacks. 
-* O.Auth_10 The backend system MUST request re-authentication after an appropriate period of inactivity (idle time).
-    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_11 The backend system MUST request re-authentication to reactivate the server session after an appropriate period of active use (active time).
-    > The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
-* O.Auth_12 The authentication data MUST NOT be changed without re-authenticating the user.
-    > Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
-* O.Auth_13 Whenever changing access parameters, the backend system SHOULD inform the user via last known valid contact details Therefore the user SHOULD get the opportunity to block the change and reset access parameters after successful authentication.
-    > Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
-* O.Auth_14 The manufacturer MUST submit a concept concerning privilege management (e.g. user roles).
-    > Permission settings are an integral part of the application.
-* O.Auth_15 All identifiers associated with a user or a session MUST be generated by a number generator according to O.Rand_1 have an appropriate length.
-    > This is not reasonable for the application used within a closed environment and on shared devices. PHPs session_start() is considered suitable enough. Libraries contributing to randomness would bloat third party software without a sensible benefit.
-* O.Auth_16 The backend system MUST allow the user to invalidate one or all previously issued session identifiers or authentication tokens.
-    > Sessions will allways be destroyed on logout or invalid login tokens (due to updates).
-* O.Auth_17 If any session is terminated, the backend system MUST securely delete authentication token and session identifier. This applies both to active termination by the user (log-out) and to automatic termination through the application (cf. O.Auth_9 and O.Auth_10).
-    > Sessions will allways be destroyed on logout.
-* O.Auth_18 Session identifiers MUST be protected as sensitive data.
-    > [Installation](#installation)
-* O.Auth_19 Sensitive data MUST NOT be embedded in any authentication token.
-    > Login tokens only include a generated partially random hash.
-* O.Auth_20 Any authentication token MUST contain only the expected fields.
-    > Login tokens consist of a 64 byte string only. PHPSESSID-cookies are default.
-* O.Auth_21 Authentication token MUST be signed using an appropriate procedure (see [TR02102-1]). The backend system MUST check the authentication token’s signature. The type of signature MUST NOT be none and the backend system MUST reject requests using invalid or expired authentication token.
-    > This is not reasonable for the application used within a closed environment.
+> O.Auth_1 The manufacturer MUST provide a concept for authentication at an appropriate level of trust (cf. [TR03107-1]), for authorization (role concept) and for terminating an application session. This concept MUST consider internal network connections within the backend system as well.
+
+* User log in via token, have permissions granted by an administrative user that are updated with every request; sessions are destroyed on logout.
+
+> O.Auth_2 The backend system MUST support an appropriate authentication for linking the application.
+
+* This is not reasonable for the application used within a closed environment.
+
+> O.Auth_3 The backend system SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
+
+* Every request matches the session and user permissions.
+
+> O.Auth_4 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
+
+* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device.
+
+> O.Auth_5 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
+
+* This is not applicable.
+
+> O.Auth_6 Additional information (e.g. the end device used, the WiFi access node used or the time of access) SHOULD be included in the evaluation of an authentication process.
+
+* This is not reasonable for the application used within a closed environment.
+
+> O.Auth_7 The backend system MUST authenticates and authorizes each request according to the rights and privileges according the role concept (cf. O.Auth_1).
+
+* Every request matches the session and user permissions.
+
+> O.Auth_8 The user SHOULD be given the option of being informed about unusual login processes
+
+* The user can view their login history e.g. to spot deviations from work schedule.
+
+> O.Auth_9 The backend system MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
+
+* Failed authentification reponds delayed which reasonably prevents brute-force-attacks. 
+
+> O.Auth_10 The backend system MUST request re-authentication after an appropriate period of inactivity (idle time).
+
+* The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
+
+> O.Auth_11 The backend system MUST request re-authentication to reactivate the server session after an appropriate period of active use (active time).
+
+* The backend handles idle time based on last request by an authorized user and enforces a reauthentication or logout.
+
+> O.Auth_12 The authentication data MUST NOT be changed without re-authenticating the user.
+
+* Every request matches the login token with the database (server side only). If the token is not found, the user is logged out and the session destroyed.
+
+> O.Auth_13 Whenever changing access parameters, the backend system SHOULD inform the user via last known valid contact details Therefore the user SHOULD get the opportunity to block the change and reset access parameters after successful authentication.
+
+* Login tokens are created and changed by authorized administrative users only. This also enables to lock any user out if necessary.
+
+> O.Auth_14 The manufacturer MUST submit a concept concerning privilege management (e.g. user roles).
+
+* Permission settings are an integral part of the application.
+
+> O.Auth_15 All identifiers associated with a user or a session MUST be generated by a number generator according to O.Rand_1 have an appropriate length.
+
+* This is not reasonable for the application used within a closed environment and on shared devices. PHPs session_start() is considered suitable enough. Libraries contributing to randomness would bloat third party software without a sensible benefit.
+
+> O.Auth_16 The backend system MUST allow the user to invalidate one or all previously issued session identifiers or authentication tokens.
+
+* Sessions will allways be destroyed on logout or invalid login tokens (due to updates).
+
+> O.Auth_17 If any session is terminated, the backend system MUST securely delete authentication token and session identifier. This applies both to active termination by the user (log-out) and to automatic termination through the application (cf. O.Auth_9 and O.Auth_10).
+
+* Sessions will allways be destroyed on logout.
+
+> O.Auth_18 Session identifiers MUST be protected as sensitive data.
+
+* [Installation](#installation)
+
+> O.Auth_19 Sensitive data MUST NOT be embedded in any authentication token.
+
+* Login tokens only include a generated partially random hash.
+
+> O.Auth_20 Any authentication token MUST contain only the expected fields.
+
+* Login tokens consist of a 64 byte string only. PHPSESSID-cookies are default.
+
+> O.Auth_21 Authentication token MUST be signed using an appropriate procedure (see [TR02102-1]). The backend system MUST check the authentication token’s signature. The type of signature MUST NOT be none and the backend system MUST reject requests using invalid or expired authentication token.
+
+* This is not reasonable for the application used within a closed environment.
 
 [Content](#content)
 
 ### 3.1.6.1 Passwords
-* O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
-    > Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
-* O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
-    > Login tokens are always generated by the system on request of an authorized administrative user.
-* O.Pass_3 The user MUST have the option to change their password.
-    > Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
-* O.Pass_4 Changing and resetting passwords MUST be logged without logging the password itself.
-    > Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
-* O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
-    > As per the [encryption statement](#encryption-statement), sensitive data is not suitable for encryption in the described use case. It is not sensible to apply this to passwords for the risk of data breaches remains the same.
+> O.Pass_1 Strong password guidelines MUST exist for authentication using a user name and password. These SHOULD be based on current best practices.
+
+* Login tokens are a sha256 hash encrypting a random number amongst others, are 64 characters long and consist of numbers and characters.
+
+> O.Pass_2 To set up authentication using username and password, the strength of the password used MAY be displayed to the user. Information about the strength of the chosen password MUST NOT be saved.
+
+* Login tokens are always generated by the system on request of an authorized administrative user.
+
+> O.Pass_3 The user MUST have the option to change their password.
+
+* Login tokens can be renewed by authorized administrative users only. Login tokens are exportable as a physical qr-code. To prevent unwanted spread or misuse, this option is only available to authorized users. An updated token may be basically one phone call away if necessary.
+
+> O.Pass_4 Changing and resetting passwords MUST be logged without logging the password itself.
+
+* Login tokens can be renewed by authorized administrative users. Logging changes is not reasonable.
+
+> O.Pass_5 If passwords are stored, they MUST be hashed using a hash function that complies with current security standards and using suitable salts.
+
+* As per the [encryption statement](#encryption-statement), sensitive data is not suitable for encryption in the described use case. It is not sensible to apply this to passwords for the risk of data breaches remains the same.
 
 [Content](#content)
 
 ### 3.1.7 Objective (7): Data security
-* O.Data_1 The application MUST store sensitive data in encrypted form. The backend system SHOULD store sensitive data, encrypted in a way, so that it can only be decrypted by the user itself.
-    > [Encryption statement](#encryption-statement)
-* O.Data_2 All sensitive data collected MUST NOT be kept in the backend system beyond the duration of their respective processing.
-    > User deletion considers all data including calendar-entries, time tracking and trainings. It is a [legitimate interest](#terms-of-service-for-using-the-application) to keep names within records for audit safety. Records are deleted after exceeding their [retention period](#record-deletion). The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.
-* O.Data_3 The backend system MUST take into account the principles of data minimization and limitation due to the purpose.
-    > Only active and intentional user input is processed and stored.
-* O.Data_4 The backend system MUST remove all metadata with data protection relevance, such the GPS coordinates of the location, used hardware, etc., whenever these data is not needed for the legitimate purpose of the application.
-    > All photos are processed and resized. Meta data is lost during this process.
-* O.Data_5 Unless necessary for the legitimate purpose of the application, sensitive data like private keys MUST BE exported from the component they were generated from (see Table15).
-    > Login tokens are to be exported as a qr-code, for scanning login credentials. There are no other keys to be exported.
-* O.Data_6 The backend system MUST NOT write sensitive data in messages or notifications the user did not explicitly gave permission for.
-    > Notifications only return integers, no sensitive data. Messages contain an identifier at best.
-* O.Data_7 The backend system MUST provide the user with the option to delete or make all sensitive data and application-specific credentials completely non accessible from the backend system, whenever the application is uninstalled by the user. If the user does not use this option, the backend system MUST define a maximum and for the application purpose appropriate duration, in which the data remains stored in the backend system. The Backend system MUST inform the user about the duration, in which the sensitive data remains stored in the backend system. After the maximum length of time, the backend system MUST delete or make all sensitive data and application-specific credentials non accessible. Additionally, the backend system MUST provide the user with an option to delete these information within the defined duration, in which the data may remain stored in the backend system.
-    > The operator of the infrastructure is responsible for fulfilling this requirement.
-* O.Data_8 To counteract the misuse of sensitive data after a device loss, the application MAY implement a kill switch, i.e. a deliberate, secure overwriting of user data in the device at application level, triggered by the backend system. The manufacturer MUST protect the triggering of the kill switch by the user via the backend system against misuse by means of strong authentication mechanisms.
-    > This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access. However new login credentials can be generated by authorized users at any time.
+> O.Data_1 The application MUST store sensitive data in encrypted form. The backend system SHOULD store sensitive data, encrypted in a way, so that it can only be decrypted by the user itself.
+
+* [Encryption statement](#encryption-statement)
+
+> O.Data_2 All sensitive data collected MUST NOT be kept in the backend system beyond the duration of their respective processing.
+
+* User deletion considers all data including calendar-entries, time tracking and trainings. It is a [legitimate interest](#terms-of-service-for-using-the-application) to keep names within records for audit safety. Records are deleted after exceeding their [retention period](#record-deletion). The operator of the infrastructure is responsible for a secure deletion of data on the disk and backups.
+
+> O.Data_3 The backend system MUST take into account the principles of data minimization and limitation due to the purpose.
+
+* Only active and intentional user input is processed and stored.
+
+> O.Data_4 The backend system MUST remove all metadata with data protection relevance, such the GPS coordinates of the location, used hardware, etc., whenever these data is not needed for the legitimate purpose of the application.
+
+* All photos are processed and resized. Meta data is lost during this process.
+
+> O.Data_5 Unless necessary for the legitimate purpose of the application, sensitive data like private keys MUST BE exported from the component they were generated from (see Table15).
+
+* Login tokens are to be exported as a qr-code, for scanning login credentials. There are no other keys to be exported.
+
+> O.Data_6 The backend system MUST NOT write sensitive data in messages or notifications the user did not explicitly gave permission for.
+
+* Notifications only return integers, no sensitive data. Messages contain an identifier at best.
+
+> O.Data_7 The backend system MUST provide the user with the option to delete or make all sensitive data and application-specific credentials completely non accessible from the backend system, whenever the application is uninstalled by the user. If the user does not use this option, the backend system MUST define a maximum and for the application purpose appropriate duration, in which the data remains stored in the backend system. The Backend system MUST inform the user about the duration, in which the sensitive data remains stored in the backend system. After the maximum length of time, the backend system MUST delete or make all sensitive data and application-specific credentials non accessible. Additionally, the backend system MUST provide the user with an option to delete these information within the defined duration, in which the data may remain stored in the backend system.
+
+* The operator of the infrastructure is responsible for fulfilling this requirement.
+
+> O.Data_8 To counteract the misuse of sensitive data after a device loss, the application MAY implement a kill switch, i.e. a deliberate, secure overwriting of user data in the device at application level, triggered by the backend system. The manufacturer MUST protect the triggering of the kill switch by the user via the backend system against misuse by means of strong authentication mechanisms.
+
+* This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access. However new login credentials can be generated by authorized users at any time.
 
 [Content](#content)
 
 ### 3.1.8 Objective (8): Paid resources
-> Not applicable, as there are no paid ressources.
+* Not applicable, as there are no paid ressources.
 
 ### 3.1.9 Objective (9): Network communication
-> The operator of the infrastructure is responsible for fulfilling these requirements.
+* The operator of the infrastructure is responsible for fulfilling these requirements.
 
 ### 3.1.10 Objective (10): Organizational security
-> The operator of the infrastructure is responsible for fulfilling these requirements.
+* The operator of the infrastructure is responsible for fulfilling these requirements.
 
 [Content](#content)
 
@@ -5548,13 +5861,13 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * [https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
 * [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
     * creates PDF-files on the server side
-    * Justification: this library enables consistent and correct creation of the widely accessible PDF-format for data transfers from the application.
+    * Justification: this library enables consistent and correct creation of the widely used PDF-format for data transfers from the application.
     * v6.10.0
     * \> 4k stars
     * \> 1k forks
 * [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
     * creates XLSX-files on the server side
-    * Justification: this library enables consistent and correct creation of the widely accessible XLSX-format for data transfers from the application.
+    * Justification: this library enables consistent and correct creation of the widely used XLSX-format for data transfers from the application.
     * v0.39
     * \> 1k stars
     * \> 650 forks
@@ -5588,6 +5901,8 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * original author has professional license
 
 All libraries are embedded locally to avoid external, probably prohibited web requests and ensure availability of tested and approved functionality, do not request outside ressources and do not interfere with the actual database. Minimalistic libraries were chosen on purpose to reduce their intended function and dependencies to the most neccessary and are tested as sufficient. All libraries are reviewed to adhere to the current code language standards, this applies to libraries without recent contributions too. None of the libraries affect the security of the application.
+
+There are **no** dependency install routines for [composer](https://getcomposer.org/) or [npm](https://www.npmjs.com/) and alike by intent to ensure availability of tested and approved functionality.
 
 ## Kudos on additional help on
 * [restful api](https://www.9lessons.info/2012/05/create-restful-services-api-in-php.html)
