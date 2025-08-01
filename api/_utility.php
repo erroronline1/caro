@@ -727,7 +727,6 @@ class UTILITY {
 
 /**
  * permission handling, checking if necessary permissions have been given
- * 
  */
 class PERMISSION {
 
@@ -842,5 +841,214 @@ class PERMISSION {
 		return false;
 	}
 
+}
+
+class MARKDOWN {
+	/*
+	simplified markdown parser.
+	nesting is very limited to a, em and strong
+	didn't get indentation to work yet
+
+* unordered 1
+* unordered 2
+1. ordered sublist item 1
+2. ordered sublist item 2
+* unordered 3
+3. sdfsdf
+
+1. one
+2. two
+3. three
+
+---
+| header 1 | header 2 | header 3 |
+| --- | --- | --- |
+| *italic* | **bold** | ***italicbold*** |
+
+---
+
+# header
+
+sdfasdf [displayed](javascript:asdlfköalskdmf('asd')) asasdf
+
+> citationdfs sdfsdfb sg sfg sfg
+
+sdfg sdfg sfgsdfg  
+
+-
+
+ code
+	*/
+	private $_a = '/(?:\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
+	private $_br = '/ +\n/';
+	private $_cite = '/^> (.+)/m';
+	private $_code = '/^$\n^ +([^\*].+)/m'; // must have a linebreak before
+	private $_em_strong = '/(\*+)([^\s][^\n\*]+?[^\s])(\*+)/';
+	private $_header = '/^(#+ )(.+?)$/m';
+	private $_hr = '/^[_\-]+$/m';
+	private $_ol = '/(^( ){0,}(\d\.) (.+?\n))+/m';
+	private $_p = '/^$\n((?:\n|.)+?)^$/m';
+	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
+	private $_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
+
+	private $content = null;
+
+	public function __construct($content)
+	{
+		$this->content = $content;
+	}
+
+	public function converted(){
+		$this->content = $this->a($this->content);
+		$this->content = $this->br($this->content);
+		$this->content = $this->cite($this->content);
+		$this->content = $this->code($this->content);
+		$this->content = $this->em_strong($this->content);
+		$this->content = $this->header($this->content);
+		$this->content = $this->hr($this->content);
+		$this->content = $this->list($this->content);
+		$this->content = $this->table($this->content);
+		$this->content = $this->p($this->content); // must come last
+
+		return $this->content;
+	}
+
+	private function a($content){
+		// replace links
+		return preg_replace($this->_a,
+			'<a href="$2">$1</a>$3',
+			$content);
+	}
+
+	private function br($content){
+		// replace linebreaks
+		return preg_replace($this->_br,
+			'<br />',
+			$content);
+	}
+	private function cite($content){
+		// replace citations
+		return preg_replace($this->_cite,
+			"<cite>\"$1\"</cite><br />\n",
+			$content);
+	}
+
+	private function code($content){
+		// replace code
+		return preg_replace($this->_code,
+			"<pre>$1</pre>\n",
+			$content);
+	}
+
+	private function em_strong($content){
+		// replace all em and strong formatting
+		preg_match_all($this->_em_strong, $content, $em_strong);
+		if (isset($em_strong[0]) && $em_strong[0]) {
+			// iterate through matches
+			for ($i = 0; $i < count($em_strong[0]); $i++){
+				// check whether **opening and closing*** match
+				$wrapper = min(strlen($em_strong[1][$i]), strlen($em_strong[3][$i]));
+				$tags = [
+					[], // wrapper offset, easier than reducing index
+					['<em>', '</em>'],
+					['<strong>', '</strong>'],
+					['<em><strong>', '</strong></em>']
+				];
+				$content = preg_replace('/' . preg_quote(str_repeat('*', $wrapper) . $em_strong[2][$i] . str_repeat('*', $wrapper), '/') . '/',
+					$tags[$wrapper][0] . $em_strong[2][$i] . $tags[$wrapper][1],
+					$content);
+			}
+		}
+		return $content;
+	}
+
+	private function header($content){
+		// replace headers
+		preg_match_all($this->_header, $content, $header);
+		if (isset($header[0]) && $header[0]){
+			// iterate through matches
+			for ($i = 0; $i < count($header[0]); $i++){
+				$content = preg_replace('/' . preg_quote($header[0][$i], '/') . '/',
+					'<h' . strlen($header[1][$i]) - 1 . '>' . $header[2][$i] . '</h' . strlen($header[1][$i]) - 1 . ">\n",
+					$content);
+			}
+		}
+		return $content;
+	}
+
+	private function hr($content){
+		// replace hr	
+		return preg_replace($this->_hr,
+			"<hr>\n",
+			$content);
+	}
+	
+	private function list($content){
+		//replace unordered lists
+		preg_match_all($this->_ul, $content, $unorderedlist);
+		if (isset($unorderedlist[0]) && $unorderedlist[0]){
+			for ($i = 0; $i < count($unorderedlist[0]); $i++){
+				$output = '<ul>';
+				foreach (explode("\n", $unorderedlist[0][$i]) as $item){
+					if ($item) $output .= '<li>' . substr($item, 1 + strlen($unorderedlist[2][$i])) . "</li>\n";
+				}
+				$output .= "</ul>\n";
+
+				$content = preg_replace('/' . preg_quote($unorderedlist[0][$i], '/') . '/',
+					$output,
+					$content);
+			}
+		}
+		// replace ordered lists 
+		preg_match_all($this->_ol, $content, $orderedlist);
+		if (isset($orderedlist[0]) && $orderedlist[0]){
+			for ($i = 0; $i < count($orderedlist[0]); $i++){
+				$output = '<ol>';
+				foreach (explode("\n", $orderedlist[0][$i]) as $item){
+					if ($item) $output .= '<li>' . substr($item, 2 + strlen($orderedlist[2][$i])) . "</li>\n";
+				}
+				$output .= "</ol>\n";
+
+				$content = preg_replace('/' . preg_quote($orderedlist[0][$i], '/') . '/',
+					$output,
+					$content);
+			}
+		}
+		return $content;
+	}
+
+	private function p($content){
+		// replace p	
+		return preg_replace($this->_p,
+			"<p>$1</p>",
+			$content);
+	}
+
+	private function table($content){
+		// replace tables
+		preg_match_all($this->_table, $content, $table);
+		if (isset($table[0]) && $table[0]){
+			// iterate through matches
+			for ($i = 0; $i < count($table[0]); $i++){
+				$output = '<table>';
+				foreach(explode("\n", $table[0][$i]) as $rowindex => $row){
+					switch($rowindex){
+						case 1:
+							break;
+						case 0:
+							$output .= '<tr>' . implode('', array_map(fn($column) => '<th>' . trim($column) . '</th>', explode('|', substr($row, 1, -1)))) . '</tr>';
+							break;
+						default:
+							$output .= '<tr>' . implode('', array_map(fn($column) => '<td>' . trim($column) . '</td>', explode('|', substr($row, 1, -1)))) . '</tr>';
+					}
+				}
+				$output .= '</table>';
+				$content = preg_replace('/' . preg_quote($table[0][$i], '/') . '/',
+					$output,
+					$content);
+			}
+		}
+		return $content;
+	}
 }
 ?>
