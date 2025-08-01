@@ -877,6 +877,9 @@ article:has(> article) {
 		a::before {
 			margin: 0 0.2em !important;
 		}
+		a {
+			display: inline;
+		}
 	}
 }
 .message.conversation {
