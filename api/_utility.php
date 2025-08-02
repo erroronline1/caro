@@ -867,7 +867,9 @@ class MARKDOWN {
 
 ---
 
-# header
+# h1
+## h2
+### h3
 
 sdfasdf [displayed](javascript:asdlfköalskdmf('asd')) asasdf
 
