@@ -619,17 +619,19 @@ Opposed to regular markdown escaping is not supported
 ## Lists (h2 header)
 
 1. Ordered list items start with a number and a period
-    1. Sublist nesting
-    2. is possible
-    3. by indentating with four spaces
-        * and list types
-        * are interchangeable
-            3. lju
-            4. poipoi
+    * Sublist nesting
+    * is possible
+    * by indentating with four spaces
+        1. and list types
+        2. are interchangeable
 2. Ordered list item 2
 3. Ordered list item 3
 
 * Unordered list items start with asterisk or dash
+    1. the number
+    1. of ordered lists
+    2. actually doesn't
+    3. matter at all
 * Unordered list item 2
 * Unordered list item 3
 

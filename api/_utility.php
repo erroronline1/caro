@@ -860,7 +860,7 @@ class MARKDOWN {
 	private $_hr = '/^[_\-]+$/m';
 	private $_list_any = '/(^( {0,})(\*|\-|\d+\.) (.+?\n)+)(?:^$)*/m';
 	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\d+\.|(?:^$)*)/m';
-	private $_list_ol = '/(^( ){0,}(\d\.) (.+?\n))+/m';
+	private $_list_ol = '/(^( ){0,}(\d+\.) (.+?\n))+/m';
 	private $_list_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
 	private $_p = '/^$\n((?:\n|.)+?)\n^$/m';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
@@ -999,7 +999,7 @@ class MARKDOWN {
 			for ($i = 0; $i < count($unorderedlist[0]); $i++){
 				$output = '<ul>';
 				foreach (explode("\n", $unorderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . substr($item, 2 + strlen($unorderedlist[2][$i])) . "</li>";
+					if ($item) $output .= '<li>' . preg_replace('/^ *\* /m','', $item) . "</li>";
 				}
 				$output .= "</ul>";
 				$content = preg_replace('/' . preg_quote($unorderedlist[0][$i], '/') . '/',
@@ -1013,7 +1013,7 @@ class MARKDOWN {
 			for ($i = 0; $i < count($orderedlist[0]); $i++){
 				$output = '<ol>';
 				foreach (explode("\n", $orderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . substr($item, 2 + strlen($orderedlist[2][$i])) . "</li>";
+					if ($item) $output .= '<li>' . preg_replace('/^ *\d+\. /m','', $item) . "</li>";
 				}
 				$output .= "</ol>";
 				$content = preg_replace('/' . preg_quote($orderedlist[0][$i], '/') . '/',
