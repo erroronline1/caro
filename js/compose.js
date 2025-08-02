@@ -2446,6 +2446,14 @@ export class Compose extends Assemble {
 			},
 		};
 		result = result.concat(...this.button());
+		this.currentElement = {
+			attributes: {
+				value: api._lang.GET("tool.csvmdconversion.conversion"),
+				class: "inlinebutton",
+				onclick: "api.tool('get', 'csvmdconversion')",
+			},
+		};
+		result = result.concat(...this.button());
 
 		this.currentElement = {
 			attributes: {
