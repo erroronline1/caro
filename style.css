@@ -809,6 +809,10 @@ article:has(> article) {
 	object-fit: contain;
 }
 
+pre {
+	font-family: monospace;
+}
+
 /*************************** calendar ******************************/
 
 .day {

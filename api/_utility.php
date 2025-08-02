@@ -856,7 +856,7 @@ class MARKDOWN {
 	private $_code_block = '/^```\n((?:.+?\n)+)^```/m';
 	private $_code_inline = '/`(.+?)`/';
 	private $_emphasis = '/(\*+)([^\s\*\n][^\n\*]*?[^\s\*\n])(\*+)/';
-	private $_header = '/^\n^(#+ )(.+?)$/m'; // must have a linebreak before
+	private $_header = '/^\n*^(#+ )(.+?)$/m'; // must have a linebreak before
 	private $_hr = '/^[_\-]+$/m';
 	private $_list_any = '/(^( {0,})(\*|\-|\d+\.) (.+?\n)+)(?:^$)*/m';
 	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\d+\.|(?:^$)*)/m';
@@ -928,7 +928,7 @@ class MARKDOWN {
 			'<pre>$1</pre>',
 			$content);
 		$content = preg_replace($this->_code_inline,
-			'<code>$1</code>',
+			'<span style="font-family: monospace;">$1</span>', // i'd rather use code, but tcpdf does not support that
 			$content);
 		return $content;
 	}
@@ -1013,7 +1013,7 @@ class MARKDOWN {
 			for ($i = 0; $i < count($orderedlist[0]); $i++){
 				$output = '<ol>';
 				foreach (explode("\n", $orderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . preg_replace('/^ *\d+\. /m','', $item) . "</li>";
+					if ($item) $output .= '<li>' . str_repeat('&nbsp;', 3) . preg_replace('/^ *\d+\. /m','', $item) . "</li>"; // &nbsp; looks a bit weird on screen but improves pdfs
 				}
 				$output .= "</ol>";
 				$content = preg_replace('/' . preg_quote($orderedlist[0][$i], '/') . '/',
