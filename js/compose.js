@@ -2454,6 +2454,14 @@ export class Compose extends Assemble {
 			},
 		};
 		result = result.concat(...this.button());
+		this.currentElement = {
+			attributes: {
+				value: api._lang.GET("tool.navigation.markdownpreview"),
+				class: "inlinebutton",
+				onclick: "api.tool('get', 'markdownpreview')",
+			},
+		};
+		result = result.concat(...this.button());
 
 		this.currentElement = {
 			attributes: {

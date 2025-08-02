@@ -1945,6 +1945,14 @@ class AUDIT extends API {
 							'onclick' => "api.tool('get', 'csvmdconversion')",
 							'class' => 'inlinebutton'
 						]
+					],
+					[
+						'type' => 'button',
+						'attributes' => [
+							'value' => $this->_lang->GET('tool.navigation.markdownpreview'),
+							'onclick' => "api.tool('get', 'markdownpreview')",
+							'class' => 'inlinebutton'
+						]
 					]
 				];
 				// display issue inputs
