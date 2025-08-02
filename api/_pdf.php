@@ -111,7 +111,12 @@ class PDF{
 			if (gettype($value) === 'array') {
 				$value = implode("\n", array_keys($value));
 			}
-			$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+
+			$markdown = new MARKDOWN(preg_replace('/\r/', '', $value));
+			$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->converted(), 0, 1, 0, true, '', true);
+
+			//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
 			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
 			$this->_pdf->Ln(($offset - 1) * $this->_setup['fontsize'] / 2);

@@ -2073,12 +2073,13 @@ class AUDIT extends API {
 				$currentquestion = $key;
 				$currentanswer = $review . "\n";
 
+				$markdown = new MARKDOWN(preg_replace('/\r/', '', $currentanswer));
 				$current[] = [
 					'type' => 'auditsection',
 					'attributes' => [
 						'name' => $currentquestion
 					],
-					'content' => $currentanswer
+					'htmlcontent' => $markdown->converted()
 				];
 			}
 
