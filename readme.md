@@ -1147,11 +1147,12 @@ Lines should end with two or more spaces
 to have an intentional linebreak
 and not just continuing.
 
-Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.
+Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
+Some escaping of formatting characters is possible with a leading \ as in
+**bold \* asterisk**, ~~striked \~~ through~~ as long as it is in the middle of the pattern.
 
-http://some.url not particularly styled  
+http://some.url, not particularly styled  
 [Styled link to markdown information](https://www.markdownguide.org)  
-Opposed to regular markdown escaping is not supported
 
 --------
 
@@ -1217,11 +1218,12 @@ Lines should end with two or more spaces
 to have an intentional linebreak
 and not just continuing.
 
-Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.
+Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
+Some escaping of formatting characters is possible with a leading \ as in
+**bold \* asterisk**, ~~striked \~~ through~~ as long as it is in the middle of the pattern.
 
-http://some.url not particularly styled  
+http://some.url, not particularly styled  
 [Styled link to markdown information](https://www.markdownguide.org)  
-Opposed to regular markdown escaping is not supported
 
 --------
 

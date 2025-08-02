@@ -855,7 +855,8 @@ class MARKDOWN {
 	private $_br = '/ +\n/';
 	private $_code_block = '/^```\n((?:.+?\n)+)^```/m';
 	private $_code_inline = '/`(.+?)`/';
-	private $_emphasis = '/(\*+)([^\s\*\n][^\n\*]*?[^\s\*\n])(\*+)/';
+	private $_emphasis = '/(?<!\\)(\*+)([^\s\*\n][^\n]*?[^\s\*\n])(\*+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+	private $_escape = '/\\(\*|-|~)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_header = '/^\n*^(#+ )(.+?)$/m'; // must have a linebreak before
 	private $_hr = '/^[_\-]+$/m';
 	private $_list_any = '/(^( {0,})(\*|\-|\d+\.) (.+?\n)+)(?:^$)*/m';
@@ -864,7 +865,7 @@ class MARKDOWN {
 	private $_list_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
 	private $_p = '/^$\n((?:\n|.)+?)\n^$/m';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
-	private $_s = '/~~([^\s][^\n\*]+?[^\s])~~/';
+	private $_s = '/(?<!\\)~~([^\s][^\n\*]+?[^\s\\])~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
 
 	private $content = null;
@@ -872,6 +873,10 @@ class MARKDOWN {
 	public function __construct($content)
 	{
 		$this->content = $content;
+
+		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')(\*+)([^\s\*\n][^\n]*?[^\s\*\n' . preg_quote('\\','/'). '])(\*+)/';
+		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~)/';
+		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\s][^\n\*]+?[^\s' . preg_quote('\\','/'). '])~~/';
 	}
 
 	public function converted(){
@@ -887,6 +892,7 @@ class MARKDOWN {
 		$this->content = $this->s($this->content);
 		$this->content = $this->table($this->content);
 		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions relying on linebreaks
+		$this->content = $this->escape($this->content); // should come after other stylings have been applied
 
 		return $this->content;
 	}
@@ -908,6 +914,7 @@ class MARKDOWN {
 			'<br />',
 			$content);
 	}
+
 	private function blockquote($content){
 		// replace blockquotes
 		preg_match_all($this->_blockquote, $content, $blockquote);
@@ -953,6 +960,13 @@ class MARKDOWN {
 			}
 		}
 		return $content;
+	}
+
+	private function escape($content){
+		// replace escaped characters
+		return preg_replace($this->_escape,
+			'$1',
+			$content);
 	}
 
 	private function header($content){
