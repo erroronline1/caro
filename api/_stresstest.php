@@ -618,17 +618,20 @@ Opposed to regular markdown escaping is not supported
 
 ## Lists (h2 header)
 
-* Unordered list item 1
-* Unordered list item 2
-* Unordered list item 3
-
-- Another unordered list item 1
-- Another unordered list item 2
-- Another unordered list item 3
-
-1. Ordered list item 1
+1. Ordered list items start with a number and a period
+    1. Sublist nesting
+    2. is possible
+    3. by indentating with four spaces
+        * and list types
+        * are interchangeable
+            3. lju
+            4. poipoi
 2. Ordered list item 2
 3. Ordered list item 3
+
+* Unordered list items start with asterisk or dash
+* Unordered list item 2
+* Unordered list item 3
 
 ______
 
@@ -637,6 +640,7 @@ ______
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
 | --- | --- | --- | --- |
 | *emphasis* | **is** | ***possible*** | `too` |
+| linebreaks | are | not | though |
 
 _-_-_-_
 
@@ -649,9 +653,9 @@ _-_-_-_
 > * List within blockquote 1
 > * List within blockquote 2
 > 
-> | Table within | blockquote |
+> | Table nested | within |
 > | ---------- | ----- |
-> | nesting is | possible |
+> | blockquotes are | possible |
 
     preformatted text/code must
     start with 4 spaces
@@ -660,11 +664,9 @@ _-_-_-_
 or being surrounded by
 three single backquotes
 ```
-
 END;
 		$markdown = new MARKDOWN($sample);
 		echo $markdown->converted();
-
 	}
 }
 

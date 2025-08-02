@@ -846,10 +846,7 @@ class PERMISSION {
 class MARKDOWN {
 	/*
 	markdown flavoured parser.
-	paragraph nesting is not clean but output appears to be fine
-
-	nesting is limited
-	didn't get indentation for lists to work yet
+	paragraph nesting is not exactly clean but output appears to be fine
 	*/
 
 	private $_a_auto = '/(?<!\]\()http[^\n\s\)]+/'; // auto url linking
@@ -861,12 +858,14 @@ class MARKDOWN {
 	private $_emphasis = '/(\*+)([^\s\*\n][^\n\*]*?[^\s\*\n])(\*+)/';
 	private $_header = '/^\n^(#+ )(.+?)$/m'; // must have a linebreak before
 	private $_hr = '/^[_\-]+$/m';
-	private $_ol = '/(^( ){0,}(\d\.) (.+?\n))+/m';
+	private $_list_any = '/(^( {0,})(\*|\-|\d+\.) (.+?\n)+)(?:^$)*/m';
+	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\d+\.|(?:^$)*)/m';
+	private $_list_ol = '/(^( ){0,}(\d\.) (.+?\n))+/m';
+	private $_list_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
 	private $_p = '/^$\n((?:\n|.)+?)\n^$/m';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
 	private $_s = '/~~([^\s][^\n\*]+?[^\s])~~/';
 	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
-	private $_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
 
 	private $content = null;
 
@@ -978,31 +977,45 @@ class MARKDOWN {
 	}
 	
 	private function list($content){
+		//detect any lists
+		preg_match_all($this->_list_any, $content, $list);
+		if (isset($list[0]) && $list[0]){
+			for ($i = 0; $i < count($list[0]); $i++){
+				// check lists for sublists
+				preg_match_all($this->_list_nested, $list[0][$i], $nested);
+				for ($j = 0; $j < count($nested[0]); $j++){
+					$nested[0][$j] = preg_replace('/' . preg_quote($nested[4][$j], '/') . '$/m', '', $nested[0][$j]); // strip next list item delimiter
+					// recursively replace nested lists
+					$content = preg_replace('/' . preg_quote($nested[0][$j], '/') . '/',
+						substr($this->list(preg_replace('/^ {4}/m', '', $nested[0][$j])), 1) . "\n",  // substr to drop leading linebreak, but add one to end pr pattern recognition
+						$content);
+				}
+			}
+		}
+
 		//replace unordered lists
-		preg_match_all($this->_ul, $content, $unorderedlist);
+		preg_match_all($this->_list_ul, $content, $unorderedlist);
 		if (isset($unorderedlist[0]) && $unorderedlist[0]){
 			for ($i = 0; $i < count($unorderedlist[0]); $i++){
 				$output = '<ul>';
 				foreach (explode("\n", $unorderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . substr($item, 2 + strlen($unorderedlist[2][$i])) . "</li>\n";
+					if ($item) $output .= '<li>' . substr($item, 2 + strlen($unorderedlist[2][$i])) . "</li>";
 				}
 				$output .= "</ul>";
-
 				$content = preg_replace('/' . preg_quote($unorderedlist[0][$i], '/') . '/',
 					$output,
 					$content);
 			}
 		}
 		// replace ordered lists 
-		preg_match_all($this->_ol, $content, $orderedlist);
+		preg_match_all($this->_list_ol, $content, $orderedlist);
 		if (isset($orderedlist[0]) && $orderedlist[0]){
 			for ($i = 0; $i < count($orderedlist[0]); $i++){
 				$output = '<ol>';
 				foreach (explode("\n", $orderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . substr($item, 3 + strlen($orderedlist[2][$i])) . "</li>\n";
+					if ($item) $output .= '<li>' . substr($item, 2 + strlen($orderedlist[2][$i])) . "</li>";
 				}
 				$output .= "</ol>";
-
 				$content = preg_replace('/' . preg_quote($orderedlist[0][$i], '/') . '/',
 					$output,
 					$content);
