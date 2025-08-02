@@ -589,6 +589,76 @@ Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten 
 ### Managementbericht
 Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umwandeln. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Derzeit sind die Bewertungen reinweg textbasiert, ohne Bilder, Anhänge oder Tabellen. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen)umgesetzt. Abgeschlossene Managementberichts können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
 
+Der Managementbericht unterstützt einen vereinfachten Markdown-Interpreter. Der Großteil der CARO ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung möglich.  
+Unterstütze Formate beinhalten:
+
+```
+# Überschrift h1
+## Überschrift h2
+### Überschrift h3
+
+> Zitat einer weisen Person
+
+---
+
+* Ungeordneter Listeneintrag 1
+* Ungeordneter Listeneintrag 2
+* Ungeordneter Listeneintrag 3
+
+1. Geordneter Listeneintrag 1
+2. Geordneter Listeneintrag 2
+3. Geordneter Listeneintrag 3
+
+---
+
+| Tabelle header 1 | Tabelle header 2 | Tabelle header 3 |
+| --- | --- | --- |
+| *kursiv* | **fett** | ***kursiv und fett*** |
+
+---
+
+[Verknüpfung zu (m)einem Betriebssystem](https://www.linuxmint.com/)
+
+einfacher Text 
+
+    Code
+```
+
+und werden in etwa so dargestellt
+
+# Überschrift h1
+## Überschrift h2
+### Überschrift h3
+
+> Zitat einer weisen Person
+
+---
+
+* Ungeordneter Listeneintrag 1
+* Ungeordneter Listeneintrag 2
+* Ungeordneter Listeneintrag 3
+
+1. Geordneter Listeneintrag 1
+2. Geordneter Listeneintrag 2
+3. Geordneter Listeneintrag 3
+
+---
+
+| Tabelle header 1 | Tabelle header 2 | Tabelle header 3 |
+| --- | --- | --- |
+| *kursiv* | **fett** | ***kursiv und fett*** |
+
+---
+
+[Verknüpfung zu (m)einem Betriebssystem](https://www.linuxmint.com/)
+
+einfacher Text 
+
+    Code
+
+
+Der individuelle Markdown-Parser ist auf diese Optionen beschränkt. Tabellen können von Markdown nach CSV und andersherum konvertiert werden um der Bequemlichkeit halber in einer Drittanwendung bearbeitet zu werden.
+
 [Übersicht](#übersicht)
 
 ## Kalender

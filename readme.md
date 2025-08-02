@@ -36,18 +36,9 @@ Things are still in motion. Images may be outdated.
 
 * alter consumables_products protected to has_files for comprehensible reasons
 * simplified pdf markdown? (e.g. for management review)
-    * italic, bold (\*+)([^\s])([^\n\*]+?)([^\s])(\*+) count $1, concatenate $2,$3,$4
-    * list ^(\s){0,}(\*|-) (.+?)$ if 4 matches count $1 for intendation
-    * numbered list ^(\s){0,}(\d\.) (.+?)$ if 4 matches count $1 for intendation
-    * header ^(#+) (.+?)$ count $1
-    * citation ^> (.+)
-    * table (^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+
-        * explode /n to rows, explode (|, row) to columns and trim cells
-    * code ^( +)(.+)
-    * hr ^[_\-]+$
+    * strip_tags for managementreviews only allowing for markdown
     * modal with instructions and examples
-    * textsection mdcontent
-    * pdf- and assemble-method for converting
+    * textsection mdcontent -> document composer ?
 
 ## Content
 * [Aims](#aims)
@@ -703,6 +694,76 @@ Executing an audit starts by selecting one of the prepared templates. Answers an
 
 ### Management review
 Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. A new review always starts with the input of the last saved one to begin with. The default language-files contain all required issues, so no topic is forgotten. Currently reviews are text only, so no images, attachments or tables. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
+
+The management review supports a simplified markdown interpreter. Most of the CARO App is data driven, a management review may be adressed to third parties though. Therefore a bit of styling is possible.  
+Supported formatting options contain:
+
+```
+# Header h1
+## Header h2
+### Header h3
+
+> Citation of a wise person
+
+---
+
+* Unordered list item 1
+* Unordered list item 2
+* Unordered list item 3
+
+1. Ordered list item 1
+2. Ordered list item 2
+3. Ordered list item 3
+
+---
+
+| Table header 1 | Table header 2 | Table header 3 |
+| --- | --- | --- |
+| *italic* | **bold** | ***italic bold*** |
+
+---
+
+[link to my favourite os](https://www.linuxmint.com/)
+
+plain text  
+
+    code
+```
+
+rendered to something as
+
+# Header h1
+## Header h2
+### Header h3
+
+> Citation of a wise person
+
+---
+
+* Unordered list item 1
+* Unordered list item 2
+* Unordered list item 3
+
+1. Ordered list item 1
+2. Ordered list item 2
+3. Ordered list item 3
+
+---
+
+| Table header 1 | Table header 2 | Table header 3 |
+| --- | --- | --- |
+| *italic* | **bold** | ***italic bold*** |
+
+---
+
+[link to my favourite os](https://www.linuxmint.com/)
+
+plain text  
+
+    code
+
+
+The custom markdown parser is limited to these options. Tables can be converted from markdown to csv and vice versa to edit the contents in a third party application for convenience.
 
 [Content](#content)
 
