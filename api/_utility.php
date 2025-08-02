@@ -1060,6 +1060,7 @@ class MARKDOWN {
 			for ($i = 0; $i < count($table[0]); $i++){
 				$output = '<table>';
 				foreach(explode("\n", $table[0][$i]) as $rowindex => $row){
+					if (!$row) continue;
 					switch($rowindex){
 						case 1:
 							break;
