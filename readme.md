@@ -35,6 +35,8 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 
 * alter consumables_products protected to has_files for comprehensible reasons
+* markdown styling
+    * anchor display inline for textsection htmlcontent
 
 ## Content
 * [Aims](#aims)
