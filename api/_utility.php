@@ -846,20 +846,24 @@ class PERMISSION {
 class MARKDOWN {
 	/*
 	markdown flavoured parser.
+	paragraph nesting is not clean but output appears to be fine
+
 	nesting is limited
 	didn't get indentation for lists to work yet
 	*/
 
-	private $_a = '/(?:\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
+	private $_a_auto = '/(?<!\]\()http[^\n\s\)]+/'; // auto url linking
+	private $_a_md = '/(?:\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/'; // regular md links
 	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
-	private $_code = '/`(.+?)`/';
+	private $_code_block = '/^```\n((?:.+?\n)+)^```/m';
+	private $_code_inline = '/`(.+?)`/';
 	private $_emphasis = '/(\*+)([^\s\*\n][^\n\*]*?[^\s\*\n])(\*+)/';
 	private $_header = '/^\n^(#+ )(.+?)$/m'; // must have a linebreak before
 	private $_hr = '/^[_\-]+$/m';
 	private $_ol = '/(^( ){0,}(\d\.) (.+?\n))+/m';
-	private $_p = '/^$\n((?:\n|.)+?)^$/m';
-	private $_pre = '/^\n^ {4}([^\*\-\d].+)+/m'; // must have a linebreak before
+	private $_p = '/^$\n((?:\n|.)+?)\n^$/m';
+	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
 	private $_s = '/~~([^\s][^\n\*]+?[^\s])~~/';
 	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
 	private $_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
@@ -872,7 +876,7 @@ class MARKDOWN {
 	}
 
 	public function converted(){
-		$this->content = $this->blockquote($this->content); // should come first to enble nesting
+		$this->content = $this->blockquote($this->content); // should come first to enable nesting
 		$this->content = $this->a($this->content);
 		$this->content = $this->br($this->content);
 		$this->content = $this->code($this->content);
@@ -883,16 +887,20 @@ class MARKDOWN {
 		$this->content = $this->pre($this->content);
 		$this->content = $this->s($this->content);
 		$this->content = $this->table($this->content);
-		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions
+		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions relying on linebreaks
 
 		return $this->content;
 	}
 
 	private function a($content){
-		// replace links
-		return preg_replace($this->_a,
+		// replace links in this order
+		$content = preg_replace($this->_a_auto,
+			'<a href="$0">$0</a>',
+			$content);
+		$content = preg_replace($this->_a_md,
 			'<a href="$2">$1</a>$3',
 			$content);
+		return $content;
 	}
 
 	private function br($content){
@@ -916,10 +924,14 @@ class MARKDOWN {
 	}
 
 	private function code($content){
-		// replace links
-		return preg_replace($this->_code,
+		// replace code
+		$content = preg_replace($this->_code_block,
+			'<pre>$1</pre>',
+			$content);
+		$content = preg_replace($this->_code_inline,
 			'<code>$1</code>',
 			$content);
+		return $content;
 	}
 
 	private function emphasis($content){
@@ -1013,7 +1025,7 @@ class MARKDOWN {
 			// iterate through matches
 			for ($i = 0; $i < count($pre[0]); $i++){
 				$content = preg_replace('/' . preg_quote($pre[0][$i], '/') . '/',
-					"<pre>\n" . preg_replace('/^ {4}/m', '', $pre[0][$i]) . "</pre>\n",
+					"<pre>" . preg_replace('/^ {4}/m', '', substr($pre[0][$i], 1)) . "</pre>\n", // substr to drop leading linebreak
 					$content);
 			}
 		}

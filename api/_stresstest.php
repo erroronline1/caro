@@ -610,7 +610,9 @@ and not just continuing.
 
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.
 
-[information about markdown](https://www.markdownguide.org)
+http://some.url not particularly styled  
+[Styled link to markdown information](https://www.markdownguide.org)  
+Opposed to regular markdown escaping is not supported
 
 --------
 
@@ -638,7 +640,7 @@ ______
 
 _-_-_-_
 
-### Blockquotes and code (h4 header)
+#### Blockquotes and code (h4 header)
 
 > Blockquote  
 > with *multiple*  
@@ -651,8 +653,13 @@ _-_-_-_
 > | ---------- | ----- |
 > | nesting is | possible |
 
-    code must
+    preformatted text/code must
     start with 4 spaces
+
+```
+or being surrounded by
+three single backquotes
+```
 
 END;
 		$markdown = new MARKDOWN($sample);
