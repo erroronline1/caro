@@ -354,6 +354,7 @@
 				"link_document_display": "display only",
 				"link_document_display_button": "Display :document",
 				"links": "Add a list of links",
+				"markdown": "Markdown",
 				"multilist_add_item": "Add item value",
 				"multilist_add_item_button": "Add another item",
 				"multilist_name": "Enter name for set",
@@ -1652,7 +1653,7 @@
 			"csvdownload": "Download CSV-file",
 			"csvupload": "Select CSV-file for conversion",
 			"markdown": "Convert markdown-table",
-			"syntax": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\nSee handbook for more information",
+			"syntax": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\nStyling will be processed by server after saving\\nSee handbook for more information",
 			"syntax_help": "Markdown help"
 		},
 		"image": {

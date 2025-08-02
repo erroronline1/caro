@@ -1660,6 +1660,13 @@ button[data-type="file"]::before {
 	mask-image: url("./media/filter.svg");
 }
 
+[data-type="helpbutton"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./media/question-circle.svg");
+	mask-image: url("./media/question-circle.svg");
+}
+
 [data-type="hr"]::before {
 	background-color: var(--foreground);
 	-webkit-mask-image: url("./media/horizontal-rule.svg");

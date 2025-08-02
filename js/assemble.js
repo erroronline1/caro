@@ -3450,11 +3450,12 @@ export class Assemble {
 	 * 	{
 	 * 		"type": "textsection",
 	 * 		"content": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua."
-	 * 		"mdcontent": "serverside preparsed <strong>html</strong>"
+	 * 		"htmlcontent": "serverside preparsed <strong>html</strong>"
 	 * 		"attributes": {
 	 * 			"name": "very informative, content of header, former description"
 	 * 			"otherattribute": "value applies to header"
-	 * 		}
+	 * 		},
+	 * 		"markdown": boolean, actually only used by the backend for preprocessing if document components are supposed to be parsed as such
 	 * 	}
 	 */
 	textsection() {

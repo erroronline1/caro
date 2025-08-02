@@ -36,9 +36,7 @@ Things are still in motion. Images may be outdated.
 
 * alter consumables_products protected to has_files for comprehensible reasons
 * simplified pdf markdown? (e.g. for management review)
-    * strip_tags for managementreviews only allowing for markdown
-    * modal with instructions and examples
-    * textsection mdcontent -> document composer ?
+    * markdown preview tool
 
 ## Content
 * [Aims](#aims)
@@ -439,7 +437,7 @@ Documents are modular. To create tracked and versioned documents, create reusabl
 #### Component editing
 Available elements for components or rather documents are:
 * scanner field, optional as multiple and context identifier
-* text section for information purpose without input
+* text section for information purpose without input, optional with [Markdown](#markdown). On record export the content will be prefixed with `::MARKDWON::` to render accordingly. This works in theory if contents begin with this character set in general. This possible adverse behaviour is recognized within the [risk assessment](#risk-assessment)
 * image for including e.g. infographics
 * single line text input, optional as multiple and with former inputs recommended
 * multi line text input, optional access to text templates and with former inputs recommended
@@ -2524,6 +2522,7 @@ Stakeholder identification:
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 | Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 | Lost attributes on widgets during regular editing of JSON-imported custom document components | Low | Low (unexpected rendering of content) | Most important properties remain, the manual [warns](#component-editing) about this usage |
+| Adverse rendering of record values as Markdown | Low | Low (unexpected rendering of content) | None | Prefixing textsection content with `::MARKDOWN::` has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 
 [Content](#content)
 

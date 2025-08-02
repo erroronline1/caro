@@ -191,7 +191,7 @@ class DOCUMENT extends API {
 				// display selected element for review
 				if ($this->_requestedID){
 					$alert = '';
-					// recursively delete required attributes
+					// recursively delete required attributes and parse markdown if applicable
 					function unrequire($element){
 						$result = [];
 						foreach ($element as $sub){
@@ -201,6 +201,11 @@ class DOCUMENT extends API {
 								if (isset($sub['attributes'])){
 									unset ($sub['attributes']['required']);
 									unset ($sub['attributes']['data-required']);
+								}
+								if (isset($sub['markdown']) && isset($sub['content'])){
+									$markdown = new MARKDOWN($sub['content']);
+									$sub['htmlcontent'] = $markdown->converted();
+									unset ($sub['content']);
 								}
 								if ($sub) $result[] = $sub;
 							}
@@ -1272,12 +1277,13 @@ class DOCUMENT extends API {
 		}
 
 		/**
+		 * recursive content setting according to the most recent document, markdown parsing if applicable
 		 * @param array $element component and subsets
 		 * @param array $payload
 		 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
 		 * @param array $enumerate names of elements that have to be enumerated
 		 * 
-		 * also see record.php summarizeRecord()
+		 * also see record.php summarizeRecord() 
 		 */
 		function printable($element, $payload, $_lang, $enumerate = []){
 			$content = ['content' => [], 'images' => [], 'fillable' => false];
@@ -1343,7 +1349,11 @@ class DOCUMENT extends API {
 						}
 					}
 					elseif ($subs['type'] === 'textsection'){
-						$content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
+						if (isset($subs['markdown']) && isset($subs['content'])){
+							$markdown = new MARKDOWN($subs['content']);
+							$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->converted()];
+						}
+						else $content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
 					}
 					elseif ($subs['type'] === 'textarea'){
 						$content['content'][$name] = ['type' => 'multiline', 'value' => UTILITY::propertySet($payload, $postname) ? : ''];

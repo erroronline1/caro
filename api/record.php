@@ -261,7 +261,7 @@ class RECORD extends API {
 			'content' => []
 		]];
 
-		// prefill identify if passed, prepare calendar button and autocomplete if part of the document
+		// prefill identify if passed, prepare calendar button and autocomplete if part of the document, parse markdown if applicable
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$datalists = SQLQUERY::EXECUTE($this->_pdo, 'records_datalist_get', ['values' => [':unit' => $document['unit']]]);
 		function setidentifier($element, $identify, $calendar, $_lang, $datalists){
@@ -290,6 +290,12 @@ class RECORD extends API {
 						}
 						else unset($subs['autocomplete']);
 					}
+					if (isset($subs['markdown']) && isset($subs['content'])){
+						$markdown = new MARKDOWN($subs['content']);
+						$subs['htmlcontent'] = $markdown->converted();
+						unset ($subs['content']);
+					}
+
 					if (in_array($subs['type'], [
 							'checkbox',
 							'date',
@@ -1956,7 +1962,7 @@ class RECORD extends API {
 			}
 	
 			/**
-			 * recursive content setting according to the most recent document
+			 * recursive content setting according to the most recent document, markdown parsing if applicable
 			 * @param array $element component and subsets
 			 * @param array $payload
 			 * @param object $_lang $this->_lang can not be referred within the function and has to be passed
@@ -1987,7 +1993,11 @@ class RECORD extends API {
 						}
 
 						if ($subs['type'] === 'textsection'){
-							$value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
+							if (isset($subs['markdown']) && isset($subs['content'])){
+								$markdown = new MARKDOWN($subs['content']);
+								$value  = '::MARKDOWN::' . $markdown->converted();
+							}
+							else $value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
 							 : ' ';
 						}
 						elseif (isset($payload[$name])) {

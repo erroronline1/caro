@@ -347,7 +347,7 @@ Dokumente sind modular. Um gelenkte und versionierte Dokumente anzulegen, müsse
 #### Komponentenbearbeitung
 Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
 * Scannerfeld, optional als Mehrfachauswahl und Identifikator
-* Textabschnitt für informative Zwecke ohne Eingabe
+* Textabschnitt für informative Zwecke ohne Eingabe, optional mit [Markdown](#markdown). Bei dem Export von Aufzeichnungen wird dem Inhalt `::MARKDOWN::`vorangestellt um den Inhalt entsprechend darzustellen. Theoretisch geschieht das auch wenn diese Zeichenketten manuell vorangestellt wird. Dieses möglicherweise unerwünschte Verhalten wird in der [Risikoanalyse](#risikoanalyse) berücksichtigt
 * Bild um beispielsweise Informationgrafiken einzubinden
 * einfaches Textfeld, optional als Mehrfachauswahl und mit Vorschlag vorheriger Eingaben
 * mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge und mit Vorschlag vorheriger Eingaben

@@ -354,6 +354,7 @@
 				"link_document_display": "nur anzeigen",
 				"link_document_display_button": ":document anzeigen",
 				"links": "Füge eine Liste von Verknüpfungen hinzu",
+				"markdown": "Markdown",
 				"multilist_add_item": "Gib den Wert für den Eintrag an",
 				"multilist_add_item_button": "Ergänze einen weiteren Eintrag",
 				"multilist_name": "Gib einen Namen für eine Sammlung an",
@@ -1652,7 +1653,7 @@
 			"csvdownload": "CSV-Datei herunterladen",
 			"csvupload": "CSV-Datei für Konvertierung wählen",
 			"markdown": "Markdown-Tabelle konvertieren",
-			"syntax": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\nFür mehr Informationen siehe Handbuch",
+			"syntax": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\nDie Darstellung wird nach dem Speichern serverseitig überarbeitet\\nFür mehr Informationen siehe Handbuch",
 			"syntax_help": "Markdown Hilfe"
 		},
 		"image": {

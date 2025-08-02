@@ -111,11 +111,10 @@ class PDF{
 			if (gettype($value) === 'array') {
 				$value = implode("\n", array_keys($value));
 			}
-			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 
 			$markdown = new MARKDOWN(preg_replace('/\r/', '', $value));
+			// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
 			$valueLines = $this->_pdf->writeHTMLCell(145, 4, 60, $this->_pdf->GetY(), $markdown->converted(), 0, 1, 0, true, '', true);
-
 			//$valueLines = $this->_pdf->MultiCell(145, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 
 			$offset = $valueLines < $nameLines ? $nameLines - 1 : 0;
@@ -176,6 +175,12 @@ class PDF{
 				switch ($value['type']){
 					case 'textsection':
 						$textsectionLines = $this->_pdf->MultiCell(140, 4, $value['value'], 0, '', 0, 1, 60, $this->_pdf->GetY(), true, 0, false, true, 0, 'T', false);
+						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
+						break;
+					case 'markdown':
+						$markdown = new MARKDOWN(preg_replace('/\r/', '', $value['value']));
+						// writeHTMLCell($w, $h, $x, $y, $html='', $border=0, $ln=0, $fill=false, $reseth=true, $align='', $autopadding=true)
+						$textsectionLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $markdown->converted(), 0, 1, 0, true, '', true);
 						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 						break;
 					case 'image':
@@ -347,6 +352,11 @@ class PDF{
 						// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 						else $valueLines += $this->_pdf->MultiCell(140, 4, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 					}
+				}
+				elseif (str_starts_with($values, '::MARKDOWN::')){
+					// textsection on full export with enabled markdown for document widget	var_dump('asdas');
+					$markdown = new MARKDOWN(preg_replace('/\r/', '', substr($values, 12)));
+					$valueLines = $this->_pdf->writeHTMLCell(140, 4, 60, $this->_pdf->GetY(), $markdown->converted(), 0, 1, 0, true, '', true);
 				}
 				else $this->_pdf->MultiCell(140, 4, $values, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
 

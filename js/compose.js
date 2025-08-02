@@ -228,6 +228,7 @@ export class Composer {
 			if (siblingName === api._lang.GET("assemble.compose.component.required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.autocomplete") && sibling.checked && !("autocomplete" in element)) element.autocomplete = true;
+			if (siblingName === api._lang.GET("assemble.compose.component.markdown") && sibling.checked && !("markdown" in element)) element.markdown = true;
 
 			// documentbutton value should have been assigned in previous loops
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
@@ -699,7 +700,7 @@ export class Composer {
 			newElements,
 			element;
 
-		type = widgetcontainer.childNodes[0].dataset.type;
+		type = document.getElementById(widgetcontainer.dataTransfer.getData("text")).childNodes[0].dataset.type;
 		if (!type) {
 			new Toast(api._lang.GET("assemble.compose.context.edit_error"), "error");
 			return;
@@ -723,8 +724,8 @@ export class Composer {
 			}
 		}
 		if (!targetform) return;
-
-		if (!(element = newElements[widgetcontainer.id])) {
+		if (!(element = newElements[widgetcontainer.dataTransfer.getData("text")])) {
+			var_dump(element, type);
 			new Toast(api._lang.GET("assemble.compose.context.edit_error"), "error");
 			return;
 		}
@@ -755,6 +756,7 @@ export class Composer {
 				if (siblingName === api._lang.GET("assemble.compose.component.required")) sibling.checked = Boolean("required" in element.attributes && element.attributes.required);
 				if (siblingName === api._lang.GET("assemble.compose.component.multiple")) sibling.checked = Boolean("multiple" in element.attributes && element.attributes.multiple);
 				if (siblingName === api._lang.GET("assemble.compose.component.autocomplete")) sibling.checked = Boolean("autocomplete" in element && element.autocomplete);
+				if (siblingName === api._lang.GET("assemble.compose.component.markdown")) sibling.checked = Boolean("markdown" in element && element.markdown);
 				if (siblingName === api._lang.GET("assemble.compose.component.context_identify")) sibling.checked = Boolean(element.type === "identify");
 
 				if (["links", "radio", "select", "checkbox"].includes(element.type)) {
@@ -1101,7 +1103,7 @@ export class Composer {
 					if (node.firstChild.localName === "section") nodechildren.call(this, node.firstChild);
 					else nodechildren.call(this, node);
 				} else {
-					if (node.dataset && node.dataset.type === 'identify'){
+					if (node.dataset && node.dataset.type === "identify") {
 						if (document.getElementById("setIdentify")) document.getElementById("setIdentify").disabled = false;
 						this.componentIdentify--;
 					}
@@ -1164,7 +1166,7 @@ export class Composer {
 	composer_component_document_reimportable(element) {
 		element.setAttribute("ondragstart", "Composer.drag(event)");
 		element.setAttribute("ondragover", "Composer.allowDrop(event)");
-		element.setAttribute("ondrop", "Composer.drop_reimport(event)");
+		element.setAttribute("ondrop", "Composer.importWidget(event)");
 	}
 }
 
@@ -1771,6 +1773,25 @@ export class Compose extends Assemble {
 	}
 
 	/**
+	 * creates editor to add an filereference
+	 * @see this.compose_simpleElement()
+	 * @example this.currentElement
+	 * ```json
+	 * 	{
+	 * 		"type" : "compose_filereference"
+	 * 	}
+	 */
+	compose_filereference() {
+		return this.compose_simpleElement({
+			type: "filereference",
+			description: api._lang.GET("assemble.compose.component.filereference"),
+			required: "optional",
+			multiple: "optional",
+			hint: api._lang.GET("assemble.compose.component.filereference_hint"),
+		});
+	}
+
+	/**
 	 * creates editor to add a hr
 	 * @returns {domNodes}
 	 * @example this.currentElement
@@ -2324,25 +2345,6 @@ export class Compose extends Assemble {
 	}
 
 	/**
-	 * creates editor to add an filereference
-	 * @see this.compose_simpleElement()
-	 * @example this.currentElement
-	 * ```json
-	 * 	{
-	 * 		"type" : "compose_filereference"
-	 * 	}
-	 */
-	compose_filereference() {
-		return this.compose_simpleElement({
-			type: "filereference",
-			description: api._lang.GET("assemble.compose.component.filereference"),
-			required: "optional",
-			multiple: "optional",
-			hint: api._lang.GET("assemble.compose.component.filereference_hint"),
-		});
-	}
-
-	/**
 	 * creates editor to add a tel input
 	 * @see this.compose_input()
 	 * @example this.currentElement
@@ -2425,6 +2427,26 @@ export class Compose extends Assemble {
 			},
 		};
 		result = result.concat(...this.textarea());
+
+		this.currentElement = {
+			type: "checkbox",
+			content: {},
+		};
+		this.currentElement.content[api._lang.GET("assemble.compose.component.markdown")] = {
+			name: api._lang.GET("assemble.compose.component.markdown"),
+			"data-loss": "prevent",
+		};
+		result = result.concat(...this.checkbox());
+		this.currentElement = {
+			attributes: {
+				value: api._lang.GET("tool.csvmdconversion.syntax_help"),
+				"data-type": "helpbutton",
+				class: "inlinebutton",
+				onclick: "new _client.Dialog({type:'alert', header:'" + api._lang.GET("tool.csvmdconversion.syntax_help") + "', render:'" + api._lang.GET("tool.csvmdconversion.syntax") + "'})",
+			},
+		};
+		result = result.concat(...this.button());
+
 		this.currentElement = {
 			attributes: {
 				value: api._lang.GET("assemble.compose.component.textsection"),
