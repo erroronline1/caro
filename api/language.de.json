@@ -1646,15 +1646,15 @@
 		},
 		"csvmdconversion": {
 			"cancel": "Abbrechen",
-			"conversion":"Konvertiere CSV zu Markdown und umgekehrt",
+			"conversion": "Konvertiere CSV zu Markdown und umgekehrt",
 			"convert": "Konvertieren",
 			"csverror": "Konvertierungsfehler",
 			"csverror_description": "Die Konvertierung wurde aufgrund einer wahrscheinlich fehlerhaften CSV-Formatierung abgebrochen. Bitte beachten: :format",
 			"csvdownload": "CSV-Datei herunterladen",
 			"csvupload": "CSV-Datei für Konvertierung wählen",
 			"markdown": "Markdown-Tabelle konvertieren",
-			"syntax": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\nDie Darstellung wird nach dem Speichern serverseitig überarbeitet\\nFür mehr Informationen siehe Handbuch",
-			"syntax_help": "Markdown Hilfe"
+			"syntax": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\n \\nDie Darstellung wird nach dem Speichern serverseitig überarbeitet\\nFür mehr Informationen siehe Handbuch",
+			"syntax_help": "Markdown Kurzübersicht"
 		},
 		"image": {
 			"export": "Exportiere",
@@ -1664,11 +1664,16 @@
 			"size": "Maximale Größe",
 			"source": "Bild"
 		},
+		"markdownpreview": {
+			"markdown": "Markdowneditor",
+			"preview": "Vorschau"
+		},
 		"navigation": {
 			"calculator": "Rechner",
 			"digital_codes": "2D-Codes erstellen",
 			"header": "Werkzeuge",
 			"image": "Bildskalierung und Wasserzeichen",
+			"markdownpreview": "Markdowneditor und Vorschau",
 			"regulatory": "Regulatorische Auswertungen und Zusammenfassungen",
 			"scanner": "2D-Scanner",
 			"zip": "Zip-Archiv erstellen / entpacken"

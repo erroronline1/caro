@@ -966,6 +966,8 @@ Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, 
 
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
+Nutzer die für Audits und Dokumentenerstellung berechtigt sind finden einen [Markdowneditor](#markdown) mit Vorschau.
+
 ## Regulatorische Auswertungen und Zusammenfassungen
 Dieses Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
 * eingeführte Produkte

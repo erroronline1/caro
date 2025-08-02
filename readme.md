@@ -35,8 +35,6 @@ Things are still in motion. Images may be outdated.
     * devops folder with prepared sheets?
 
 * alter consumables_products protected to has_files for comprehensible reasons
-* simplified pdf markdown? (e.g. for management review)
-    * markdown preview tool
 
 ## Content
 * [Aims](#aims)
@@ -1061,6 +1059,8 @@ Sample checks are added to product. New checks trigger a system message to these
 Some general tools are available to read and create 2D-barcodes, as well as support recurring calculations, image scaling and zip archiving.
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
+
+Users applicable for audits and document creation find a [Markdown](#markdown) editor and preview.
 
 ## Regulatory evaluations and summaries
 This module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
@@ -4981,6 +4981,34 @@ Parameters
 Sample response
 ```
 {"render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', 'image')"},"content":[[{"type":"file","attributes":{"name":"Bild","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Optionen"},"content":{"Wasserzeichen":{"checked":true}}},{"type":"text","attributes":{"name":"Beschriftung","value":"UKHD"}},{"type":"select","attributes":{"name":"Maximale Gr\u00f6\u00dfe"},"content":{"...":[],"800 x 600":{"selected":true},"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}],[{"type":"image","description":"800 x 600_IMG_20231012_0001.jpg","attributes":{"name":"800 x 600_IMG_20231012_0001.jpg","url":"fileserver\/tmp\/800 x 600_IMG_20231012_0001.jpg"}}]]}}
+```
+
+> GET ./api/api.php/tool/markdownpreview
+
+Returns an editor to create an Markdown preview.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"tool_markdownpreview","action":"javascript:api.tool('post', 'markdownpreview')"},"content":[[{"type":"textarea","attributes":{"name":"Markdown editor","rows":24,"value":""}},{"type":"button","attributes":{"value":"Markdown help","onclick":"new _client.Dialog({type:'alert', header:'Markdown help', render:'Headers begin with one or more #, the more the smaller\\\\nLinebreaks within paragraphs end with two or more spaces\\\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\\\nNested lists are indented with four spaces\\\\nQuotes begin with a > symbol\\\\nStyling will be processed by server after saving\\\\nSee handbook for more information'})","data-type":"helpbutton","class":"inlinebutton"}},{"type":"button","attributes":{"value":"Convert CSV to Markdown and vice versa","onclick":"api.tool('get', 'csvmdconversion')","class":"inlinebutton"}}]]}}
+```
+
+> POST ./api/api.php/tool/markdownpreview
+
+Returns an editor to create an Markdown preview - prefilled with processed results plus a preview if data is provided.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | defined fields from previous GET or POST fetch |
+
+Sample response
+```
+{"render":{"form":{"data-usecase":"tool_markdownpreview","action":"javascript:api.tool('post', 'markdownpreview')"},"content":[[{"type":"textarea","attributes":{"name":"Markdown editor","rows":24,"value":"# Test\r\n\r\nMarkdown is ***awesome***"}},{"type":"button","attributes":{"value":"Markdown help","onclick":"new _client.Dialog({type:'alert', header:'Markdown help', render:'Headers begin with one or more #, the more the smaller\\\\nLinebreaks within paragraphs end with two or more spaces\\\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\\\nNested lists are indented with four spaces\\\\nQuotes begin with a > symbol\\\\nStyling will be processed by server after saving\\\\nSee handbook for more information'})","data-type":"helpbutton","class":"inlinebutton"}},{"type":"button","attributes":{"value":"Convert CSV to Markdown and vice versa","onclick":"api.tool('get', 'csvmdconversion')","class":"inlinebutton"}}],[{"type":"textsection","attributes":{"name":"Preview"},"htmlcontent":"<h1>Test</h1>\n\nMarkdown is <em><strong>awesome</strong></em>"}]]}}
 ```
 
 > GET ./api/api.php/tool/scanner

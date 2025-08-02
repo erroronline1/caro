@@ -2137,6 +2137,7 @@ export const api = {
 				scanner: api._lang.GET("tool.navigation.scanner"),
 				zip: api._lang.GET("tool.navigation.zip"),
 				image: api._lang.GET("tool.navigation.image"),
+				markdownpreview: api._lang.GET("tool.navigation.markdownpreview"),
 			};
 		switch (method) {
 			case "get":
@@ -2198,6 +2199,9 @@ export const api = {
 						break;
 					case "image":
 						payload = _.getInputs("[data-usecase=tool_image]", true);
+						break;
+					case "markdownpreview":
+						payload = _.getInputs("[data-usecase=tool_markdownpreview]", true);
 						break;
 					case "zip":
 						payload = _.getInputs("[data-usecase=tool_zip]", true);

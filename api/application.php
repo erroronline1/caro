@@ -1016,6 +1016,7 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('consumables.navigation.header')][$this->_lang->GET('consumables.navigation.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
 		// tools
+		if (PERMISSION::permissionFor('documentcomposer') || PERMISSION::permissionFor('audit')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('tool.navigation.markdownpreview')] =['onclick' => "api.tool('get', 'markdownpreview')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('tool.navigation.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('maintenance')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('maintenance.navigation.maintenance')] =['onclick' => "api.maintenance('get', 'task')"];

@@ -656,6 +656,65 @@ class TOOL extends API {
 	}
 
 	/**
+	 *                 _     _                               _           
+	 *   _____ ___ ___| |_ _| |___ _ _ _ ___ ___ ___ ___ _ _|_|___ _ _ _ 
+	 *  |     | .'|  _| '_| . | . | | | |   | . |  _| -_| | | | -_| | | |
+	 *  |_|_|_|__,|_| |_,_|___|___|_____|_|_|  _|_| |___|\_/|_|___|_____|
+	 *                                      |_|
+	 */
+	public function markdownpreview(){
+		$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdownpreview.markdown'));
+		$response = ['render' => [
+			'form' => [
+			'data-usecase' => 'tool_markdownpreview',
+			'action' => "javascript:api.tool('post', 'markdownpreview')"
+		],
+		'content' => [
+			[
+				[
+					'type' => 'textarea',
+					'attributes' => [
+						'name' => $this->_lang->get('tool.markdownpreview.markdown'),
+						'rows' => 24,
+						'value' => $markdown ? : ''
+					]
+				],
+				[
+					'type' => 'button',
+					'attributes' => [
+						'value' => $this->_lang->GET('tool.csvmdconversion.syntax_help'),
+						'onclick' => "new _client.Dialog({type:'alert', header:'" . $this->_lang->GET('tool.csvmdconversion.syntax_help') . "', render:'" . addslashes($this->_lang->GET('tool.csvmdconversion.syntax')) . "'})",
+						'data-type' => 'helpbutton',
+						'class' => 'inlinebutton'
+					]
+				],
+				[
+					'type' => 'button',
+					'attributes' => [
+						'value' => $this->_lang->GET('tool.csvmdconversion.conversion'),
+						'onclick' => "api.tool('get', 'csvmdconversion')",
+						'class' => 'inlinebutton'
+					]
+				]
+			]
+		]]];
+		if ($markdown) {
+			$preview = new MARKDOWN(preg_replace('/\r/', '', $markdown));
+			$response['render']['content'][] = [
+				[
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->get('tool.markdownpreview.preview')
+					],
+					'htmlcontent' => $preview->converted()
+				]
+			];
+		}
+
+		$this->response($response);
+	}
+
+	/**
 	 *
 	 *   ___ ___ ___ ___ ___ ___ ___
 	 *  |_ -|  _| .'|   |   | -_|  _|
