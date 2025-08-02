@@ -1651,7 +1651,9 @@
 			"csverror_description": "Conversion has been aborted, most likely due to a CSV formatting issue. Please adhere: :format",
 			"csvdownload": "Download CSV-file",
 			"csvupload": "Select CSV-file for conversion",
-			"markdown": "Convert markdown-table"
+			"markdown": "Convert markdown-table",
+			"syntax": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\nSee handbook for more information",
+			"syntax_help": "Markdown help"
 		},
 		"image": {
 			"export": "Export",

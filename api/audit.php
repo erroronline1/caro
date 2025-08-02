@@ -1932,6 +1932,13 @@ class AUDIT extends API {
 					[
 						'type' => 'button',
 						'attributes' => [
+							'value' => $this->_lang->GET('tool.csvmdconversion.syntax_help'),
+							'onclick' => "new _client.Dialog({type:'alert', header:'" . $this->_lang->GET('tool.csvmdconversion.syntax_help') . "', render:'" . addslashes($this->_lang->GET('tool.csvmdconversion.syntax')) . "'})"
+						]
+					],
+					[
+						'type' => 'button',
+						'attributes' => [
 							'value' => $this->_lang->GET('tool.csvmdconversion.conversion'),
 							'onclick' => "api.tool('get', 'csvmdconversion')"
 						]

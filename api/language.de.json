@@ -1651,7 +1651,9 @@
 			"csverror_description": "Die Konvertierung wurde aufgrund einer wahrscheinlich fehlerhaften CSV-Formatierung abgebrochen. Bitte beachten: :format",
 			"csvdownload": "CSV-Datei herunterladen",
 			"csvupload": "CSV-Datei für Konvertierung wählen",
-			"markdown": "Markdown-Tabelle konvertieren"
+			"markdown": "Markdown-Tabelle konvertieren",
+			"syntax": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\nFür mehr Informationen siehe Handbuch",
+			"syntax_help": "Markdown Hilfe"
 		},
 		"image": {
 			"export": "Exportiere",
