@@ -900,10 +900,10 @@ class MARKDOWN {
 	private function a($content){
 		// replace links in this order
 		$content = preg_replace($this->_a_auto,
-			'<a href="$0">$0</a>',
+			'<a href="$0" target="_blank">$0</a>',
 			$content);
 		$content = preg_replace($this->_a_md,
-			'<a href="$2">$1</a>$3',
+			'<a href="$2" target="_blank">$1</a>$3',
 			$content);
 		return $content;
 	}
