@@ -469,7 +469,7 @@ export class Dialog {
 					header.append(h3);
 				}
 				if (this.render && this.render.constructor.name === "String") {
-					for (const line of this.render.split(/\r\n|\n/)) {
+					for (const line of this.render.split(/\r\n|\n|\\n/)) {
 						header.append(document.createTextNode(line));
 						header.append(document.createElement("br"));
 					}
