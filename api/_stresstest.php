@@ -594,6 +594,71 @@ class STRESSTEST extends INSTALL{
 		}
 		echo '[*] ' . $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the vendor fileserver directories, head over directly to the file system and don\'t mess up production server!';
 	}
+
+	/**
+	 * 
+	 */
+	public function markdown(){
+		$sample  = <<<'END'
+
+# Plain text (h1 header)
+
+This is a markdown flavour for basic text styling.  
+Lines should end with two or more spaces  
+to have an intentional linebreak
+and not just continuing.
+
+Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.
+
+[information about markdown](https://www.markdownguide.org)
+
+--------
+
+## Lists (h2 header)
+
+* Unordered list item 1
+* Unordered list item 2
+* Unordered list item 3
+
+- Another unordered list item 1
+- Another unordered list item 2
+- Another unordered list item 3
+
+1. Ordered list item 1
+2. Ordered list item 2
+3. Ordered list item 3
+
+______
+
+### Tables (h3 header)
+
+| Table header 1 | Table header 2 | Table header 3 | and 4 |
+| --- | --- | --- | --- |
+| *emphasis* | **is** | ***possible*** | `too` |
+
+_-_-_-_
+
+### Blockquotes and code (h4 header)
+
+> Blockquote  
+> with *multiple*  
+> lines
+
+> * List within blockquote 1
+> * List within blockquote 2
+> 
+> | Table within | blockquote |
+> | ---------- | ----- |
+> | nesting is | possible |
+
+    code must
+    start with 4 spaces
+
+END;
+		$markdown = new MARKDOWN($sample);
+		echo $markdown->converted();
+
+	}
 }
 
 $stresstest = new STRESSTEST();

@@ -845,51 +845,22 @@ class PERMISSION {
 
 class MARKDOWN {
 	/*
-	simplified markdown parser.
-	nesting is very limited to a, em and strong
-	didn't get indentation to work yet
-
-* unordered 1
-* unordered 2
-1. ordered sublist item 1
-2. ordered sublist item 2
-* unordered 3
-3. sdfsdf
-
-1. one
-2. two
-3. three
-
----
-| header 1 | header 2 | header 3 |
-| --- | --- | --- |
-| *italic* | **bold** | ***italicbold*** |
-
----
-
-# h1
-## h2
-### h3
-
-sdfasdf [displayed](javascript:asdlfköalskdmf('asd')) asasdf
-
-> citationdfs sdfsdfb sg sfg sfg
-
-sdfg sdfg sfgsdfg  
-
--
-
- code
+	markdown flavoured parser.
+	nesting is limited
+	didn't get indentation for lists to work yet
 	*/
+
 	private $_a = '/(?:\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
+	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
-	private $_cite = '/^> (.+)/m';
-	private $_code = '/^$\n^ +([^\*].+)/m'; // must have a linebreak before
-	private $_em_strong = '/(\*+)([^\s][^\n\*]+?[^\s])(\*+)/';
-	private $_header = '/^(#+ )(.+?)$/m';
+	private $_code = '/`(.+?)`/';
+	private $_emphasis = '/(\*+)([^\s\*\n][^\n\*]*?[^\s\*\n])(\*+)/';
+	private $_header = '/^\n^(#+ )(.+?)$/m'; // must have a linebreak before
 	private $_hr = '/^[_\-]+$/m';
 	private $_ol = '/(^( ){0,}(\d\.) (.+?\n))+/m';
 	private $_p = '/^$\n((?:\n|.)+?)^$/m';
+	private $_pre = '/^\n^ {4}([^\*\-\d].+)+/m'; // must have a linebreak before
+	private $_s = '/~~([^\s][^\n\*]+?[^\s])~~/';
 	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
 	private $_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
 
@@ -901,16 +872,18 @@ sdfg sdfg sfgsdfg
 	}
 
 	public function converted(){
+		$this->content = $this->blockquote($this->content); // should come first to enble nesting
 		$this->content = $this->a($this->content);
 		$this->content = $this->br($this->content);
-		$this->content = $this->cite($this->content);
 		$this->content = $this->code($this->content);
-		$this->content = $this->em_strong($this->content);
+		$this->content = $this->emphasis($this->content);
 		$this->content = $this->header($this->content);
 		$this->content = $this->hr($this->content);
 		$this->content = $this->list($this->content);
+		$this->content = $this->pre($this->content);
+		$this->content = $this->s($this->content);
 		$this->content = $this->table($this->content);
-		$this->content = $this->p($this->content); // must come last
+		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions
 
 		return $this->content;
 	}
@@ -928,36 +901,43 @@ sdfg sdfg sfgsdfg
 			'<br />',
 			$content);
 	}
-	private function cite($content){
-		// replace citations
-		return preg_replace($this->_cite,
-			"<cite>\"$1\"</cite><br />\n",
-			$content);
+	private function blockquote($content){
+		// replace blockquotes
+		preg_match_all($this->_blockquote, $content, $blockquote);
+		if (isset($blockquote[0]) && $blockquote[0]){
+			// iterate through matches
+			for ($i = 0; $i < count($blockquote[0]); $i++){
+				$content = preg_replace('/' . preg_quote($blockquote[0][$i], '/') . '/',
+					"<blockquote>\n" . preg_replace('/^> /m', '', $blockquote[0][$i]) . "</blockquote>\n",
+					$content);
+			}
+		}
+		return $content;
 	}
 
 	private function code($content){
-		// replace code
+		// replace links
 		return preg_replace($this->_code,
-			"<pre>$1</pre>\n",
+			'<code>$1</code>',
 			$content);
 	}
 
-	private function em_strong($content){
+	private function emphasis($content){
 		// replace all em and strong formatting
-		preg_match_all($this->_em_strong, $content, $em_strong);
-		if (isset($em_strong[0]) && $em_strong[0]) {
+		preg_match_all($this->_emphasis, $content, $emphasis);
+		if (isset($emphasis[0]) && $emphasis[0]) {
 			// iterate through matches
-			for ($i = 0; $i < count($em_strong[0]); $i++){
+			for ($i = 0; $i < count($emphasis[0]); $i++){
 				// check whether **opening and closing*** match
-				$wrapper = min(strlen($em_strong[1][$i]), strlen($em_strong[3][$i]));
+				$wrapper = min(strlen($emphasis[1][$i]), strlen($emphasis[3][$i]));
 				$tags = [
 					[], // wrapper offset, easier than reducing index
 					['<em>', '</em>'],
 					['<strong>', '</strong>'],
 					['<em><strong>', '</strong></em>']
 				];
-				$content = preg_replace('/' . preg_quote(str_repeat('*', $wrapper) . $em_strong[2][$i] . str_repeat('*', $wrapper), '/') . '/',
-					$tags[$wrapper][0] . $em_strong[2][$i] . $tags[$wrapper][1],
+				$content = preg_replace('/' . preg_quote(str_repeat('*', $wrapper) . $emphasis[2][$i] . str_repeat('*', $wrapper), '/') . '/',
+					$tags[$wrapper][0] . $emphasis[2][$i] . $tags[$wrapper][1],
 					$content);
 			}
 		}
@@ -971,7 +951,7 @@ sdfg sdfg sfgsdfg
 			// iterate through matches
 			for ($i = 0; $i < count($header[0]); $i++){
 				$content = preg_replace('/' . preg_quote($header[0][$i], '/') . '/',
-					'<h' . strlen($header[1][$i]) - 1 . '>' . $header[2][$i] . '</h' . strlen($header[1][$i]) - 1 . ">\n",
+					'<h' . strlen($header[1][$i]) - 1 . '>' . $header[2][$i] . '</h' . strlen($header[1][$i]) - 1 . ">",
 					$content);
 			}
 		}
@@ -981,7 +961,7 @@ sdfg sdfg sfgsdfg
 	private function hr($content){
 		// replace hr	
 		return preg_replace($this->_hr,
-			"<hr>\n",
+			"<hr>",
 			$content);
 	}
 	
@@ -992,9 +972,9 @@ sdfg sdfg sfgsdfg
 			for ($i = 0; $i < count($unorderedlist[0]); $i++){
 				$output = '<ul>';
 				foreach (explode("\n", $unorderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . substr($item, 1 + strlen($unorderedlist[2][$i])) . "</li>\n";
+					if ($item) $output .= '<li>' . substr($item, 2 + strlen($unorderedlist[2][$i])) . "</li>\n";
 				}
-				$output .= "</ul>\n";
+				$output .= "</ul>";
 
 				$content = preg_replace('/' . preg_quote($unorderedlist[0][$i], '/') . '/',
 					$output,
@@ -1007,9 +987,9 @@ sdfg sdfg sfgsdfg
 			for ($i = 0; $i < count($orderedlist[0]); $i++){
 				$output = '<ol>';
 				foreach (explode("\n", $orderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . substr($item, 2 + strlen($orderedlist[2][$i])) . "</li>\n";
+					if ($item) $output .= '<li>' . substr($item, 3 + strlen($orderedlist[2][$i])) . "</li>\n";
 				}
-				$output .= "</ol>\n";
+				$output .= "</ol>";
 
 				$content = preg_replace('/' . preg_quote($orderedlist[0][$i], '/') . '/',
 					$output,
@@ -1023,6 +1003,27 @@ sdfg sdfg sfgsdfg
 		// replace p	
 		return preg_replace($this->_p,
 			"<p>$1</p>",
+			$content);
+	}
+
+	private function pre($content){
+		// replace code/pre
+		preg_match_all($this->_pre, $content, $pre);
+		if (isset($pre[0]) && $pre[0]){
+			// iterate through matches
+			for ($i = 0; $i < count($pre[0]); $i++){
+				$content = preg_replace('/' . preg_quote($pre[0][$i], '/') . '/',
+					"<pre>\n" . preg_replace('/^ {4}/m', '', $pre[0][$i]) . "</pre>\n",
+					$content);
+			}
+		}
+		return $content;
+	}
+
+	private function s($content){
+		// replace s
+		return preg_replace($this->_s,
+			"<s>$1</s>",
 			$content);
 	}
 
