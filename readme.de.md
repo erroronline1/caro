@@ -42,6 +42,7 @@
     * [Erinnerungen und automatische Aufgabenplanung](#erinnerungen-und-automatische-aufgabenplanung)
     * [Schulungen](#schulungen)
     * [Suche](#suche)
+    * [Markdown](#markdown)
     * [CSV Prozessor](#csv-prozessor)
 * [Löschung von Aufzeichnungen](#löschung-von-aufzeichnungen)
 * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
@@ -589,75 +590,8 @@ Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten 
 ### Managementbericht
 Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umwandeln. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Derzeit sind die Bewertungen reinweg textbasiert, ohne Bilder, Anhänge oder Tabellen. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen)umgesetzt. Abgeschlossene Managementberichts können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
 
-Der Managementbericht unterstützt einen vereinfachten Markdown-Interpreter. Der Großteil der CARO ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung möglich.  
-Unterstütze Formate beinhalten:
-
-```
-# Überschrift h1
-## Überschrift h2
-### Überschrift h3
-
-> Zitat einer weisen Person
-
----
-
-* Ungeordneter Listeneintrag 1
-* Ungeordneter Listeneintrag 2
-* Ungeordneter Listeneintrag 3
-
-1. Geordneter Listeneintrag 1
-2. Geordneter Listeneintrag 2
-3. Geordneter Listeneintrag 3
-
----
-
-| Tabelle header 1 | Tabelle header 2 | Tabelle header 3 |
-| --- | --- | --- |
-| *kursiv* | **fett** | ***kursiv und fett*** |
-
----
-
-[Verknüpfung zu (m)einem Betriebssystem](https://www.linuxmint.com/)
-
-einfacher Text 
-
-    Code
-```
-
-und werden in etwa so dargestellt
-
-# Überschrift h1
-## Überschrift h2
-### Überschrift h3
-
-> Zitat einer weisen Person
-
----
-
-* Ungeordneter Listeneintrag 1
-* Ungeordneter Listeneintrag 2
-* Ungeordneter Listeneintrag 3
-
-1. Geordneter Listeneintrag 1
-2. Geordneter Listeneintrag 2
-3. Geordneter Listeneintrag 3
-
----
-
-| Tabelle header 1 | Tabelle header 2 | Tabelle header 3 |
-| --- | --- | --- |
-| *kursiv* | **fett** | ***kursiv und fett*** |
-
----
-
-[Verknüpfung zu (m)einem Betriebssystem](https://www.linuxmint.com/)
-
-einfacher Text 
-
-    Code
-
-
-Der individuelle Markdown-Parser ist auf diese Optionen beschränkt. Tabellen können von Markdown nach CSV und andersherum konvertiert werden um der Bequemlichkeit halber in einer Drittanwendung bearbeitet zu werden.
+Der Großteil der CARO ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung mittles [Markdown](#markdown)-Syntax möglich.  
+Tabellen können von Markdown nach CSV und andersherum konvertiert werden um der Bequemlichkeit halber in einer Drittanwendung bearbeitet zu werden.
 
 [Übersicht](#übersicht)
 
@@ -1100,6 +1034,152 @@ Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zu
 * die Kalender-Suche, Artikel-Suche und der Filter für Bestellungen suchen aus Leistungsgründen buchstäblich nach dem angegebenen Begriff als Teil der Datenbankinformation. Es muss gegebenenfalls genauer gesucht werden um das gewünschte Ergebnis zu erzielen.
 * Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden.
 * alle anderen Such-Möglichkeiten (z.B. Dateien, Aufzeichnungs-Identifikatoren, Dokumentensuche) erlauben Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position und berücksichtigen zumeist [ähnliche Schreibweisen](#laufzeitvariablen) bei den Ergebnissen.
+
+[Übersicht](#übersicht)
+
+## Markdown
+
+Unterstütze Formatierungsoptionen beinhalten:
+
+```
+# Einfacher Text (h1 Überschrift)
+
+Dies ist eine Markdown-Variante für einfache Textgestaltung.  
+Zeilen sollten mit zwei oder mehr Leerzeichen enden  
+um einen beabsichtigten Zeilenumbruch zu erzeugen
+und nicht einfach fortgeführt zu werden.
+
+Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im `quelltextstil` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.
+
+
+http://eine.url nicht besonders gestaltet  
+[Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  
+Im Gegensatz zu normalem Markdown können Zeichen nicht maskiert werden
+
+--------
+
+## Listen (h2 Überschrift)
+
+1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
+    * Verschachtelte Listen
+    * sind möglich
+    * mit einer Einrückung von vier Leerzeichen
+        1. und Listenarten
+        2. können kombiniert werden
+2. geordneter Listeneintrag 2
+3. geordneter Listeneintrag 3
+
+* Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
+    1. die Nummerierung
+    1. von geordneten Listen
+    2. spielt eigentlich
+    3. keine Rolle
+* ungeordneter Listeneintrag 2
+* ungeordneter Listeneintrag 3
+
+______
+
+### Tabellen (h3 Überschrift)
+
+| Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
+| --- | --- | --- | --- |
+| *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
+| Zeilenumbrüche | sind es | jedoch | nicht |
+
+_-_-_-_
+
+#### Zitatblöcke und Code (h4 Überschrift)
+
+> Zitatblock  
+> mit *mehreren*  
+> Zeilen
+
+> * Listeneintrag innerhalb eines Zitatblocks 1
+> * Listeneintrag innerhalb eines Zitatblocks 2
+> 
+> | In Zitatblöcken | verschachtelte |
+> | ---------- | ----- |
+> | Tabellen sind | möglich |
+
+    Vorformatierter Text/Code muss
+    mit 4 Leerzeichen eingerückt werden
+
+/```
+oder von drei Gravis'
+eingefasst sein
+(die Striche an dieser Stelle bitte ignorieren)
+/```
+```
+
+und werden in etwa folgendermaßen angezeigt:
+
+# Einfacher Text (h1 Überschrift)
+
+Dies ist eine Markdown-Variante für einfache Textgestaltung.  
+Zeilen sollten mit zwei oder mehr Leerzeichen enden  
+um einen beabsichtigten Zeilenumbruch zu erzeugen
+und nicht einfach fortgeführt zu werden.
+
+Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im `quelltextstil` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.
+
+
+http://eine.url nicht besonders gestaltet  
+[Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  
+Im Gegensatz zu normalem Markdown können Zeichen nicht maskiert werden
+
+--------
+
+## Listen (h2 Überschrift)
+
+1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
+    * Verschachtelte Listen
+    * sind möglich
+    * mit einer Einrückung von vier Leerzeichen
+        1. und Listenarten
+        2. können kombiniert werden
+2. geordneter Listeneintrag 2
+3. geordneter Listeneintrag 3
+
+* Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
+    1. die Nummerierung
+    1. von geordneten Listen
+    2. spielt eigentlich
+    3. keine Rolle
+* ungeordneter Listeneintrag 2
+* ungeordneter Listeneintrag 3
+
+______
+
+### Tabellen (h3 Überschrift)
+
+| Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
+| --- | --- | --- | --- |
+| *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
+| Zeilenumbrüche | sind es | jedoch | nicht |
+
+----
+
+#### Zitatblöcke und Code (h4 Überschrift)
+
+> Zitatblock  
+> mit *mehreren*  
+> Zeilen
+
+> * Listeneintrag innerhalb eines Zitatblocks 1
+> * Listeneintrag innerhalb eines Zitatblocks 2
+> 
+> | In Zitatblöcken | verschachtelte |
+> | ---------- | ----- |
+> | Tabellen sind | möglich |
+
+    Vorformatierter Text/Code muss
+    mit 4 Leerzeichen eingerückt werden
+
+```
+oder von drei Gravis'
+eingefasst sein
+(die Striche hier bitte ignorieren)
+```
 
 [Übersicht](#übersicht)
 

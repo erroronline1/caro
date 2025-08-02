@@ -81,6 +81,7 @@ Things are still in motion. Images may be outdated.
     * [Reminders and automated schedules](#reminders-and-automated-schedules)
     * [User trainings](#user-trainings)
     * [Search](#search)
+    * [Markdown](#markdown)
     * [CSV processor](#csv-processor)
 * [Record deletion](#record-deletion)
 * [Intended regulatory goals](#intended-regulatory-goals)
@@ -695,75 +696,8 @@ Executing an audit starts by selecting one of the prepared templates. Answers an
 ### Management review
 Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. A new review always starts with the input of the last saved one to begin with. The default language-files contain all required issues, so no topic is forgotten. Currently reviews are text only, so no images, attachments or tables. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
-The management review supports a simplified markdown interpreter. Most of the CARO App is data driven, a management review may be adressed to third parties though. Therefore a bit of styling is possible.  
-Supported formatting options contain:
-
-```
-# Header h1
-## Header h2
-### Header h3
-
-> Citation of a wise person
-
----
-
-* Unordered list item 1
-* Unordered list item 2
-* Unordered list item 3
-
-1. Ordered list item 1
-2. Ordered list item 2
-3. Ordered list item 3
-
----
-
-| Table header 1 | Table header 2 | Table header 3 |
-| --- | --- | --- |
-| *italic* | **bold** | ***italic bold*** |
-
----
-
-[link to my favourite os](https://www.linuxmint.com/)
-
-plain text  
-
-    code
-```
-
-rendered to something as
-
-# Header h1
-## Header h2
-### Header h3
-
-> Citation of a wise person
-
----
-
-* Unordered list item 1
-* Unordered list item 2
-* Unordered list item 3
-
-1. Ordered list item 1
-2. Ordered list item 2
-3. Ordered list item 3
-
----
-
-| Table header 1 | Table header 2 | Table header 3 |
-| --- | --- | --- |
-| *italic* | **bold** | ***italic bold*** |
-
----
-
-[link to my favourite os](https://www.linuxmint.com/)
-
-plain text  
-
-    code
-
-
-The custom markdown parser is limited to these options. Tables can be converted from markdown to csv and vice versa to edit the contents in a third party application for convenience.
+Most of the CARO App is data driven, a management review may be adressed to third parties though. Therefore a bit of styling is possible using the [Markdown](#markdown) syntax.  
+Tables can be converted from Markdown to csv and vice versa to edit the contents in a third party application for convenience.
 
 [Content](#content)
 
@@ -1198,6 +1132,149 @@ Search functionality across the application may differ slightly depending of con
 * Calendar search, product search and order filter search literally for the provided term as part of the database information for performance reasons. You may have to be more specific to get the desired result.
 * Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext.
 * All other searches (e.g. files, record identifiers, document search) allow wildcards as `*` for any amount of any characters or `?` as any character on the given position and often take [similar spelling](#runtime-variables) into account within the displayed results.
+
+[Content](#content)
+
+## Markdown
+
+Supported formatting options contain:
+
+```
+# Plain text (h1 header)
+
+This is a markdown flavour for basic text styling.  
+Lines should end with two or more spaces  
+to have an intentional linebreak
+and not just continuing.
+
+Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.
+
+http://some.url not particularly styled  
+[Styled link to markdown information](https://www.markdownguide.org)  
+Opposed to regular markdown escaping is not supported
+
+--------
+
+## Lists (h2 header)
+
+1. Ordered list items start with a number and a period
+    * Sublist nesting
+    * is possible
+    * by indentating with four spaces
+        1. and list types
+        2. are interchangeable
+2. Ordered list item 2
+3. Ordered list item 3
+
+* Unordered list items start with asterisk or dash
+    1. the number
+    1. of ordered lists
+    2. actually doesn't
+    3. matter at all
+* Unordered list item 2
+* Unordered list item 3
+
+______
+
+### Tables (h3 header)
+
+| Table header 1 | Table header 2 | Table header 3 | and 4 |
+| --- | --- | --- | --- |
+| *emphasis* | **is** | ***possible*** | `too` |
+| linebreaks | are | not | though |
+
+_-_-_-_
+
+#### Blockquotes and code (h4 header)
+
+> Blockquote  
+> with *multiple*  
+> lines
+
+> * List within blockquote 1
+> * List within blockquote 2
+> 
+> | Table nested | within |
+> | ---------- | ----- |
+> | blockquotes are | possible |
+
+    preformatted text/code must
+    start with 4 spaces
+
+/```
+or being surrounded by
+three single backquotes
+(ignore the slashes)
+/```
+```
+
+rendered to something as
+
+# Plain text (h1 header)
+
+This is a markdown flavour for basic text styling.  
+Lines should end with two or more spaces  
+to have an intentional linebreak
+and not just continuing.
+
+Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.
+
+http://some.url not particularly styled  
+[Styled link to markdown information](https://www.markdownguide.org)  
+Opposed to regular markdown escaping is not supported
+
+--------
+
+## Lists (h2 header)
+
+1. Ordered list items start with a number and a period
+    * Sublist nesting
+    * is possible
+    * by indentating with four spaces
+        1. and list types
+        2. are interchangeable
+2. Ordered list item 2
+3. Ordered list item 3
+
+* Unordered list items start with asterisk or dash
+    1. the number
+    1. of ordered lists
+    2. actually doesn't
+    3. matter at all
+* Unordered list item 2
+* Unordered list item 3
+
+______
+
+### Tables (h3 header)
+
+| Table header 1 | Table header 2 | Table header 3 | and 4 |
+| --- | --- | --- | --- |
+| *emphasis* | **is** | ***possible*** | `too` |
+| linebreaks | are | not | though |
+
+-----
+
+#### Blockquotes and code (h4 header)
+
+> Blockquote  
+> with *multiple*  
+> lines
+
+> * List within blockquote 1
+> * List within blockquote 2
+> 
+> | Table nested | within |
+> | ---------- | ----- |
+> | blockquotes are | possible |
+
+    preformatted text/code must
+    start with 4 spaces
+
+```
+or being surrounded by
+three single backquotes
+```
 
 [Content](#content)
 
