@@ -1149,7 +1149,7 @@ and not just continuing.
 
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ as long as it is in the middle of the pattern.
+**bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character` if it is not exactly beside the formatting symbols
 
 http://some.url, not particularly styled  
 [Styled link to markdown information](https://www.markdownguide.org)  
@@ -1202,81 +1202,17 @@ _-_-_-_
     preformatted text/code must
     start with 4 spaces
 
-/```
+\```
 or being surrounded by
 three single backquotes
 (ignore the slashes)
-/```
+\```
 ```
 
 rendered to something as
 
-# Plain text (h1 header)
+![markdown screenshot](http://toh.erroronline.one/caro/markdown%20en.png)
 
-This is a markdown flavour for basic text styling.  
-Lines should end with two or more spaces  
-to have an intentional linebreak
-and not just continuing.
-
-Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
-Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ as long as it is in the middle of the pattern.
-
-http://some.url, not particularly styled  
-[Styled link to markdown information](https://www.markdownguide.org)  
-
---------
-
-## Lists (h2 header)
-
-1. Ordered list items start with a number and a period
-    * Sublist nesting
-    * is possible
-    * by indentating with four spaces
-        1. and list types
-        2. are interchangeable
-2. Ordered list item 2
-3. Ordered list item 3
-
-* Unordered list items start with asterisk or dash
-    1. the number
-    1. of ordered lists
-    2. actually doesn't
-    3. matter at all
-* Unordered list item 2
-* Unordered list item 3
-
-______
-
-### Tables (h3 header)
-
-| Table header 1 | Table header 2 | Table header 3 | and 4 |
-| --- | --- | --- | --- |
-| *emphasis* | **is** | ***possible*** | `too` |
-| linebreaks | are | not | though |
-
------
-
-#### Blockquotes and code (h4 header)
-
-> Blockquote  
-> with *multiple*  
-> lines
-
-> * List within blockquote 1
-> * List within blockquote 2
-> 
-> | Table nested | within |
-> | ---------- | ----- |
-> | blockquotes are | possible |
-
-    preformatted text/code must
-    start with 4 spaces
-
-```
-or being surrounded by
-three single backquotes
-```
 
 [Content](#content)
 

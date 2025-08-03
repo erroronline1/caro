@@ -610,7 +610,7 @@ and not just continuing.
 
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ as long as it is in the middle of the pattern.
+**bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.
 
 http://some.url, not particularly styled  
 [Styled link to markdown information](https://www.markdownguide.org)  
