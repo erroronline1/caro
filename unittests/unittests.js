@@ -1829,10 +1829,8 @@ export async function screenshot(lang = null) {
 	// import templates in available languages within dev environment and update the database ids for the respective usecases
 	// ensure switching languages in your profile in advance to calling function
 
-	const timeout = .5;
-	let iterator,
-		value,
-		s;
+	const timeout = 10;
+	let iterator, value, s;
 
 	// yield functions
 	function* menucall(index) {
@@ -1892,6 +1890,170 @@ export async function screenshot(lang = null) {
 	}
 
 	function* apicalls3(index) {
+		// dynamic views
+		const targets = [
+			{
+				en: async function () {
+					await api.tool("get", "markdownpreview");
+					await _.sleep(2000);
+					document.getElementsByName(api._lang.GET("tool.markdownpreview.markdown"))[0].value = `
+# Plain text (h1 header)
+
+This is a markdown flavour for basic text styling.  
+Lines should end with two or more spaces  
+to have an intentional linebreak
+and not just continuing.
+
+Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and \`code style\` with two ore more characters between the symbols.  
+Some escaping of formatting characters is possible with a leading \ as in
+**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\` if it is not exactly beside the formatting symbols
+
+http://some.url, not particularly styled  
+[Styled link to markdown information](https://www.markdownguide.org)  
+
+--------
+
+## Lists (h2 header)
+
+1. Ordered list items start with a number and a period
+    * Sublist nesting
+    * is possible
+    * by indentating with four spaces
+        1. and list types
+        2. are interchangeable
+2. Ordered list item 2
+3. Ordered list item 3
+
+* Unordered list items start with asterisk or dash
+    1. the number
+    1. of ordered lists
+    2. actually doesn't
+    3. matter at all
+* Unordered list item 2
+* Unordered list item 3
+
+______
+
+### Tables (h3 header)
+
+| Table header 1 | Table header 2 | Table header 3 | and 4 |
+| --- | --- | --- | --- |
+| *emphasis* | **is** | ***possible*** | \`too\` |
+| linebreaks | are | not | though |
+
+_-_-_-_
+
+#### Blockquotes and code (h4 header)
+
+> Blockquote  
+> with *multiple*  
+> lines
+
+> * List within blockquote 1
+> * List within blockquote 2
+> 
+> | Table nested | within |
+> | ---------- | ----- |
+> | blockquotes are | possible |
+
+    preformatted text/code must
+    start with 4 spaces
+
+\`\`\`
+or being surrounded by
+three single backquotes
+\`\`\`
+`;
+					await _.sleep(500);
+
+					api.tool("post", "markdownpreview");
+					console.log(`:screenshot --fullpage --filename "markdown ${lang}.png"`);
+				},
+				de: async function () {
+					await api.tool("get", "markdownpreview");
+					await _.sleep(2000);
+					document.getElementsByName(api._lang.GET("tool.markdownpreview.markdown"))[0].value = `
+# Einfacher Text (h1 Überschrift)
+
+Dies ist eine Markdown-Variante für einfache Textgestaltung.  
+Zeilen sollten mit zwei oder mehr Leerzeichen enden  
+um einen beabsichtigten Zeilenumbruch zu erzeugen
+und nicht einfach fortgeführt zu werden.
+
+Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im \`quelltextstil\` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
+Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`code mit einem \\\`-zeichen\` solange es es sich direkt neben den Formatierungszeichen befindet.
+
+http://eine.url, nicht besonders gestaltet  
+[Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  
+
+--------
+
+## Listen (h2 Überschrift)
+
+1. Geordnete Listeneinträge beginnen mit einer Zahl und eine Punkt
+    * Verschachtelte Listen
+    * sind möglich
+    * mit einer Einrückung von vier Leerzeichen
+        1. und Listenarten
+        2. können kombiniert werden
+2. geordneter Listeneintrag 2
+3. geordneter Listeneintrag 3
+
+* Ungeordnete Listeneinträge beginnen mit einem Sternchen oder Minus
+    1. die Nummerierung
+    1. von geordneten Listen
+    2. spielt eigentlich
+    3. keine Rolle
+* ungeordneter Listeneintrag 2
+* ungeordneter Listeneintrag 3
+
+______
+
+### Tabellen (h3 Überschrift)
+
+| Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
+| --- | --- | --- | --- |
+| *Akzentuierung* | **ist** | ***ebenfalls*** | \`möglich\` |
+| Zeilenumbrüche | sind es | jedoch | nicht |
+
+_-_-_-_
+
+#### Zitatblöcke und Code (h4 Überschrift)
+
+> Zitatblock  
+> mit *mehreren*  
+> Zeilen
+
+> * Listeneintrag innerhalb eines Zitatblocks 1
+> * Listeneintrag innerhalb eines Zitatblocks 2
+> 
+> | In Zitatblöcken | verschachtelte |
+> | ---------- | ----- |
+> | Tabellen sind | möglich |
+
+    Vorformatierter Text/Code muss
+    mit 4 Leerzeichen eingerückt werden
+
+\`\`\`
+oder von drei Gravis'
+eingefasst sein
+\`\`\`
+`;
+					await _.sleep(500);
+
+					api.tool("post", "markdownpreview");
+					console.log(`:screenshot --fullpage --filename "markdown ${lang}.png"`);
+				},
+			},
+		];
+		while (index < targets.length) {
+			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
+			index++;
+		}
+	}
+
+	function* apicalls4(index) {
 		// just apicalls to create temp files
 		const targets = [
 			{
@@ -1969,7 +2131,7 @@ export async function screenshot(lang = null) {
 	console.log(`starting in in ${timeout} seconds. we'll start with menu items, after whose we'll iterate over provided endpoints. in the meantime the menu will be set to unfixed for longer contents.`);
 	console.log(`menu items will pop up every ${timeout} seconds, copy and repaste the :screenshot command to have proper prepared filenames.`);
 	await _.sleep(timeout * 1000);
-	
+
 	iterator = menucall(0);
 	while ((value = iterator.next().value)) {
 		s = timeout;
@@ -2029,11 +2191,22 @@ export async function screenshot(lang = null) {
 		console.clear();
 	}
 
-	//
+	iterator = apicalls3(0);
+	while ((value = iterator.next().value)) {
+		s = timeout;
+		await value();
+		while (s > 0) {
+			console.log(s);
+			await _.sleep(1000);
+			s--;
+		}
+		console.clear();
+	}
+
 	console.clear();
 	console.log("now preparing some exports. don't mind modals. fetch the files from ./fileserver/tmp and convert to:");
 	await _.sleep(timeout * 1000);
-	iterator = apicalls3(0);
+	iterator = apicalls4(0);
 	while ((value = iterator.next().value)) {
 		await value();
 		await _.sleep(1000);
