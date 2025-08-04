@@ -614,9 +614,22 @@ Some escaping of formatting characters is possible with a leading \ as in
 
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
-[Styled link to markdown information](https://www.markdownguide.org)  
-[urlencoded link](https://www.markdownguide.org/test1?test2=2&test3= abc def)  
+[Styled link to markdown information](https://www.markdownguide.org)
+
+Edgecases:  
+[urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title")  
 [javascript: protocol](javascript:alert('hello there'))  
+some `code with <brackets>`  
+![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though
+
+* abc 
+  `> asdflikjlköj` 
+  adsfasdf
++ def
+- ghi
+
+123\. escaped period avoiding a list
+
 --------
 
 ## Lists (h2 header)
@@ -638,7 +651,7 @@ a phone number: tel:012345678
 * Unordered list item 2
 * Unordered list item 3
 
-______
+* * *
 
 ### Tables (h3 header)
 
@@ -647,7 +660,7 @@ ______
 | *emphasis* | **is** | ***possible*** | `too` |
 | linebreaks | are | not | though |
 
-_-_-_-_
+- - -
 
 #### Blockquotes and code (h4 header)
 

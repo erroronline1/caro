@@ -850,19 +850,20 @@ class MARKDOWN {
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:https*|mailto|ftps*|tel):(?:\/\/)*[^\n\s,]+/'; // auto url linking, including some schemes
-	private $_a_md = '/(?:\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/'; // regular md links
+	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)])/'; // regular md links
 	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
 	private $_code_block = '/^```\n((?:.+?\n)+)^```/m';
 		private $_code_inline = '/(?<!\\)`([^\n]+?)(?<!\\| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)(\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\*{1,3})/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_escape = '/\\(\*|-|~|`)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_header = '/^\n*^(#+ )(.+?)$/m'; // must have a linebreak before
-	private $_hr = '/^[_\-]+$/m';
-	private $_list_any = '/(^( {0,})(\*|\-|\d+\.) (.+?\n)+)(?:^$)*/m';
-	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\d+\.|(?:^$)*)/m';
+		private $_escape = '/\\(\*|-|~|`|\.)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
+	private $_hr = '/^(?:\-|\- |\*|\* )+$/m';
+	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
+	private $_list_any = '/(^( {0,})(\*|\-|\+|\d+\.) (.+?\n)+)(?:^$)*/m';
+	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\+|\d+\.|(?:^$)*)/m';
 	private $_list_ol = '/(^( ){0,}(\d+\.) (.+?\n))+/m';
-	private $_list_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
+	private $_list_ul = '/(^( ){0,}(\*|\-|\+) (.+?\n))+/m';
 	private $_p = '/^$\n((?:\n|.)+?)\n^$/m';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
@@ -876,7 +877,7 @@ class MARKDOWN {
 
 		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')`([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')(\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)\*{1,3})/';
-		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`)/';
+		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.)/';
 		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)~~/';
 	}
 
@@ -888,6 +889,7 @@ class MARKDOWN {
 		$this->content = $this->emphasis($this->content);
 		$this->content = $this->header($this->content);
 		$this->content = $this->hr($this->content);
+		$this->content = $this->img($this->content);
 		$this->content = $this->list($this->content);
 		$this->content = $this->pre($this->content);
 		$this->content = $this->s($this->content);
@@ -905,18 +907,20 @@ class MARKDOWN {
 			$content);
 		$content = preg_replace_callback($this->_a_md,
 			function($match){
+				var_dump($match);
 				$url = '';
 				if (str_starts_with($match[2], 'javascript:')) $url = $match[2];
 				else {
 					$component = parse_url($match[2]);
 					if (isset($component['query'])){
-						// todo: convert chars for query, but not urlencode everything
-						$url = substr($match[2], 0, strpos($match[2], '?') - 1) . '?' . $component['query'];
+						parse_str($component['query'], $query);
+						$url = substr($match[2], 0, strpos($match[2], '?')) . '?' . http_build_query($query);
 					}
 					else $url = $match[2];
 					$url .= '" target="_blank';
 				}
-				return '<a href="' . $url . '">' . $match[1] . '</a>' . $match[3];
+				if (isset($match[3]) && $match[3]) $url .= '" title="' . substr($match[3], 2, -1);
+				return '<a href="' . $url . '">' . $match[1] . '</a>' . $match[4];
 			},
 			$content);
 		return $content;
@@ -948,8 +952,10 @@ class MARKDOWN {
 		$content = preg_replace($this->_code_block,
 			'<pre>$1</pre>',
 			$content);
-		$content = preg_replace($this->_code_inline,
-			'<span style="font-family: monospace;">$1</span>', // i'd rather use code, but tcpdf does not support that
+		$content = preg_replace_callback($this->_code_inline,
+			function($match){
+				return '<span style="font-family: monospace;">' . str_replace(['<', '>'], ['&lt;', '&gt;'], $match[1]) . '</span>'; // i'd rather use code, but tcpdf does not support that
+			},
 			$content);
 		return $content;
 	}
@@ -1004,6 +1010,14 @@ class MARKDOWN {
 			$content);
 	}
 	
+	private function img($content){
+		// replace images
+		$content = preg_replace($this->_img,
+			'<img alt="$1" src="$2" />',
+			$content);
+		return $content;
+	}
+
 	private function list($content){
 		//detect any lists
 		preg_match_all($this->_list_any, $content, $list);
@@ -1027,7 +1041,7 @@ class MARKDOWN {
 			for ($i = 0; $i < count($unorderedlist[0]); $i++){
 				$output = '<ul>';
 				foreach (explode("\n", $unorderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . preg_replace('/^ *\* /m','', $item) . "</li>";
+					if ($item) $output .= '<li>' . preg_replace('/^ *[\*\+\-] /m','', $item) . "</li>";
 				}
 				$output .= "</ul>";
 				$content = preg_replace('/' . preg_quote($unorderedlist[0][$i], '/') . '/',

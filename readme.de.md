@@ -1041,6 +1041,8 @@ Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zu
 
 ## Markdown
 
+Sofern verfügbar kann text mit einer Markdown-Variante formatiert werden, die dem Original sehr nahe kommt. Siehe [Bekannte Schwachstellen](#bekannte-schwachstellen) für Unterschiede zu normalem Markdown.
+
 Unterstütze Formatierungsoptionen beinhalten:
 
 ```
@@ -1079,7 +1081,7 @@ http://eine.url, nicht besonders gestaltet
 * ungeordneter Listeneintrag 2
 * ungeordneter Listeneintrag 3
 
-______
+***
 
 ### Tabellen (h3 Überschrift)
 
@@ -1088,7 +1090,7 @@ ______
 | *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
 | Zeilenumbrüche | sind es | jedoch | nicht |
 
-_-_-_-_
+* * *
 
 #### Zitatblöcke und Code (h4 Überschrift)
 
@@ -1891,6 +1893,19 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 * Das Ziehen von Elementen für die Sortierung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Safari in iOS kann bei langen Berühren zwar verschieben, dafür jedoch nicht das Kontextmenu öffnen. Dokumente und deren Komponenten, Audits und Textvorschläge sollten daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen.
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
+* Es gibt einige Einschränkungen und Unterschiede zu regulärem Makrdown sofern man damit vertraut ist:
+    * Bilder können eingebunden werden, aber aufgrund des ServiceWorkers im CARO-Zusammenhang vermutlich nicht abgerufen werden
+    * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder meheren Leerzsichen enden
+    * Code-Blöcke werden nicht als \<code\> ausgegeben, sondern aufgrund der eingeschränkten Kompatibilität der [TCPDF](#ressources)-Einbindung statt dessen als \<span\> mit inline monospace Style
+    * diese Variante unterstützt nicht
+        * Überschriften durch Linien darunter
+        * verschachtelte Zitatblöcke
+        * Zitatblöcke innerhalb von Listeneinträgen
+        * Textmarkenanker
+        * Selbstverweise und Definitionen
+        * Unterstrich zur fett- oder kursiv-formatierung
+        * doppelte Graivs' zur Maskierung
+        * automatische eMail-Adressen-Umwandlung
 
 [Übersicht](#übersicht)
 

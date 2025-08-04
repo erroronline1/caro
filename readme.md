@@ -23,19 +23,16 @@ Things are still in motion. Images may be outdated.
 * recall option
 * post-market surveillance
 * post-market evaluation
+* complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
+    * devops folder with prepared sheets?
 
 ## to do
 * unittests
 * improve screenreader accessibility
 * templates
-* responsibilities
-    * handle hidden attribute?
-
-* complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
-    * devops folder with prepared sheets?
-
 * alter consumables_products protected to has_files for comprehensible reasons
-* markdown styling
+* alter responsibilities drop hidden
+* markdown
     * anchor display inline for textsection htmlcontent
 
 ## Content
@@ -1137,6 +1134,8 @@ Search functionality across the application may differ slightly depending of con
 
 ## Markdown
 
+Where available text can be styled by a custom Markdown flavour considered close enough. Seen [Known deficiencies](#known-deficencies) for differences to regular markdown.
+
 Supported formatting options contain:
 
 ```
@@ -1175,7 +1174,7 @@ http://some.url, not particularly styled
 * Unordered list item 2
 * Unordered list item 3
 
-______
+***
 
 ### Tables (h3 header)
 
@@ -1184,7 +1183,7 @@ ______
 | *emphasis* | **is** | ***possible*** | `too` |
 | linebreaks | are | not | though |
 
-_-_-_-_
+* * *
 
 #### Blockquotes and code (h4 header)
 
@@ -1204,7 +1203,7 @@ _-_-_-_
 
 \```
 or being surrounded by
-three single backquotes
+three single backticks
 (ignore the slashes)
 \```
 ```
@@ -1985,6 +1984,19 @@ Albeit Safari being capable of displaying most of the content and contributing r
 * Dragging elements for reordering doesn't work on Android because touch-events do not include this function. Safari in iOS triggers the drag event on longpress but is not capable of triggering the context menu in this case. Constructing document components and documents, audits and text templates most probably need devices with mice or a supported pointer.
 * Reordered images will disappear - but not being lost in the currently edited data-structure.
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
+* There are some limitations and differences as opposed to regular Markdown if you're familiar with that:
+    * images can be embedded but may lack rendering within CARO context due to the serviceworker
+    * multiple lines for list items must be end with one or more spaces on the previous line
+    * code blocks are not parsed as \<code\> due to limited compatibility with the [TCPDF](#ressources)-implementation, but \<span\> with inline monospace style instead
+    * this flavour lacks support of
+        * header by unterlining
+        * nested blockquotes
+        * blockquotes within list items
+        * anchor textmarks
+        * self references and definitions
+        * underscore as emphasis
+        * double backticks for escaping
+        * automated mail address conversion
 
 [Content](#content)
 

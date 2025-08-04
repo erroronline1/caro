@@ -1932,7 +1932,7 @@ http://some.url, not particularly styled
 * Unordered list item 2
 * Unordered list item 3
 
-______
+***
 
 ### Tables (h3 header)
 
@@ -1941,7 +1941,7 @@ ______
 | *emphasis* | **is** | ***possible*** | \`too\` |
 | linebreaks | are | not | though |
 
-_-_-_-_
+* * *
 
 #### Blockquotes and code (h4 header)
 
@@ -1961,7 +1961,7 @@ _-_-_-_
 
 \`\`\`
 or being surrounded by
-three single backquotes
+three single backticks
 \`\`\`
 `;
 					await _.sleep(500);
