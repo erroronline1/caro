@@ -849,7 +849,7 @@ class MARKDOWN {
 	paragraph nesting is not exactly clean but output appears to be fine
 	*/
 
-	private $_a_auto = '/(?<!\]\()http[^\n\s\)]+/'; // auto url linking
+	private $_a_auto = '/(?<!\]\()(?:https*|mailto|ftps*|tel):(?:\/\/)*[^\n\s,]+/'; // auto url linking, including some schemes
 	private $_a_md = '/(?:\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/'; // regular md links
 	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
@@ -903,8 +903,21 @@ class MARKDOWN {
 		$content = preg_replace($this->_a_auto,
 			'<a href="$0" target="_blank">$0</a>',
 			$content);
-		$content = preg_replace($this->_a_md,
-			'<a href="$2" target="_blank">$1</a>$3',
+		$content = preg_replace_callback($this->_a_md,
+			function($match){
+				$url = '';
+				if (str_starts_with($match[2], 'javascript:')) $url = $match[2];
+				else {
+					$component = parse_url($match[2]);
+					if (isset($component['query'])){
+						// todo: convert chars for query, but not urlencode everything
+						$url = substr($match[2], 0, strpos($match[2], '?') - 1) . '?' . $component['query'];
+					}
+					else $url = $match[2];
+					$url .= '" target="_blank';
+				}
+				return '<a href="' . $url . '">' . $match[1] . '</a>' . $match[3];
+			},
 			$content);
 		return $content;
 	}

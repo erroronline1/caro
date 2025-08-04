@@ -613,8 +613,10 @@ Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.
 
 http://some.url, not particularly styled  
+a phone number: tel:012345678  
 [Styled link to markdown information](https://www.markdownguide.org)  
-
+[urlencoded link](https://www.markdownguide.org/test1?test2=2&test3= abc def)  
+[javascript: protocol](javascript:alert('hello there'))  
 --------
 
 ## Lists (h2 header)
