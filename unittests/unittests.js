@@ -1909,6 +1909,7 @@ Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.
 
 http://some.url, not particularly styled  
+<http://someotherurl.in.brackets>  
 [Styled link to markdown information](https://www.markdownguide.org)  
 
 --------

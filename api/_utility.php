@@ -849,7 +849,7 @@ class MARKDOWN {
 	paragraph nesting is not exactly clean but output appears to be fine
 	*/
 
-	private $_a_auto = '/(?<!\]\()(?:https*|mailto|ftps*|tel):(?:\/\/)*[^\n\s,]+/'; // auto url linking, including some schemes
+	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|mailto|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/'; // auto url linking, including some schemes
 	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)])/'; // regular md links
 	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
@@ -903,7 +903,7 @@ class MARKDOWN {
 	private function a($content){
 		// replace links in this order
 		$content = preg_replace($this->_a_auto,
-			'<a href="$0" target="_blank">$0</a>',
+			'<a href="$1" target="_blank">$1</a>',
 			$content);
 		$content = preg_replace_callback($this->_a_md,
 			function($match){
@@ -954,7 +954,7 @@ class MARKDOWN {
 			$content);
 		$content = preg_replace_callback($this->_code_inline,
 			function($match){
-				return '<span style="font-family: monospace;">' . str_replace(['<', '>'], ['&lt;', '&gt;'], $match[1]) . '</span>'; // i'd rather use code, but tcpdf does not support that
+				return '<span style="font-family: monospace;">' . str_replace(['<', '>', '&'], ['&lt;', '&gt;', '&amp;'], $match[1]) . '</span>'; // i'd rather use code, but tcpdf does not support that
 			},
 			$content);
 		return $content;

@@ -617,6 +617,7 @@ a phone number: tel:012345678
 [Styled link to markdown information](https://www.markdownguide.org)
 
 Edgecases:  
+<http://some.other.url> with brackets  
 [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title")  
 [javascript: protocol](javascript:alert('hello there'))  
 some `code with <brackets>`  
@@ -624,7 +625,8 @@ some `code with <brackets>`
 
 * abc 
   `> asdflikjlköj` 
-  adsfasdf
+  adsfasdf  
+    > asdfasdf
 + def
 - ghi
 

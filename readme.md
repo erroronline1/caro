@@ -33,6 +33,10 @@ Things are still in motion. Images may be outdated.
 * alter consumables_products protected to has_files for comprehensible reasons
 * alter responsibilities drop hidden
 * markdown
+    * https://markdown.de/
+    * sanitise \<p\>
+    * check recursive option for blockquotes and code within self or lists
+    * setext- vs atx-like headings
     * anchor display inline for textsection htmlcontent
 
 ## Content
