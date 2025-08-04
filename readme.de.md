@@ -1053,7 +1053,7 @@ und nicht einfach fortgeführt zu werden.
 
 Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im `quelltextstil` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `code mit einem \`-zeichen` solange es es sich direkt neben den Formatierungszeichen befindet.
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `code mit einem \`-zeichen`.
 
 http://eine.url, nicht besonders gestaltet  
 [Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  

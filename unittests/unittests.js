@@ -1906,7 +1906,7 @@ and not just continuing.
 
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and \`code style\` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\` if it is not exactly beside the formatting symbols
+**bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.
 
 http://some.url, not particularly styled  
 [Styled link to markdown information](https://www.markdownguide.org)  
@@ -1982,7 +1982,7 @@ und nicht einfach fortgeführt zu werden.
 
 Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im \`quelltextstil\` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`code mit einem \\\`-zeichen\` solange es es sich direkt neben den Formatierungszeichen befindet.
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`code mit einem \\\`-zeichen\`.
 
 http://eine.url, nicht besonders gestaltet  
 [Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  

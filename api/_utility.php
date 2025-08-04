@@ -854,8 +854,8 @@ class MARKDOWN {
 	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
 	private $_code_block = '/^```\n((?:.+?\n)+)^```/m';
-		private $_code_inline = '/(?<!\\)`(.+?)(?<!\\)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_emphasis = '/(?<!\\)(\*+)([^\s\*\n][^\n]*?[^\s\*\n])(?<!\\)(\*+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_code_inline = '/(?<!\\)`([^\n]+?)(?<!\\| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_emphasis = '/(?<!\\)(\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\*{1,3})/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_header = '/^\n*^(#+ )(.+?)$/m'; // must have a linebreak before
 	private $_hr = '/^[_\-]+$/m';
@@ -865,7 +865,7 @@ class MARKDOWN {
 	private $_list_ul = '/(^( ){0,}(\*|-) (.+?\n))+/m';
 	private $_p = '/^$\n((?:\n|.)+?)\n^$/m';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
-		private $_s = '/(?<!\\)~~([^\s][^\n\*]+?[^\s])(?<!\\)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
 
 	private $content = null;
@@ -874,10 +874,10 @@ class MARKDOWN {
 	{
 		$this->content = $content;
 
-		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')`(.+?)(?<!' . preg_quote('\\','/'). ')`/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')(\*+)([^\s\*\n][^\n]*?[^\s\*\n])(?<!' . preg_quote('\\','/'). ')(\*+)/';
+		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')`([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')(\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)\*{1,3})/';
 		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`)/';
-		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\s][^\n\*]+?[^\s])(?<!' . preg_quote('\\','/'). ')~~/';
+		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)~~/';
 	}
 
 	public function converted(){

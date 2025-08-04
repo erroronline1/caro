@@ -668,7 +668,7 @@ or being surrounded by
 three single backquotes
 ```
 END;
-		$markdown = new MARKDOWN($sample);
+		$markdown = new MARKDOWN(preg_replace("/\r/", '', $sample));
 		echo $markdown->converted();
 	}
 }
