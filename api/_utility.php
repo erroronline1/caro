@@ -849,7 +849,7 @@ class MARKDOWN {
 	paragraph nesting is not exactly clean but output appears to be fine
 	*/
 
-	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|mailto|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/'; // auto url linking, including some schemes
+	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
 	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)])/'; // regular md links
 	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
@@ -865,7 +865,7 @@ class MARKDOWN {
 	private $_list_ol = '/(^( ){0,}(\d+\.) (.+?\n))+/m';
 	private $_list_ul = '/(^( ){0,}(\*|\-|\+) (.+?\n))+/m';
 		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$))+?)\n^$^$\n((?<!^<table|<ul|<ol|<h\d)(?:(\n|.)(?!>$))+?)\n^$/m';
+	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/m';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
@@ -896,8 +896,8 @@ class MARKDOWN {
 		$this->content = $this->pre($this->content);
 		$this->content = $this->s($this->content);
 		$this->content = $this->table($this->content);
-		$this->content = $this->br($this->content);
 		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions relying on linebreaks and filtering out previously converted tags
+		$this->content = $this->br($this->content);
 		$this->content = $this->escape($this->content); // should come after other stylings have been applied
 
 		return $this->content;
@@ -1045,7 +1045,7 @@ class MARKDOWN {
 			for ($i = 0; $i < count($unorderedlist[0]); $i++){
 				$output = '<ul>';
 				foreach (explode("\n", $unorderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . preg_replace('/^ *[\*\+\-] /m','', $item) . "</li>";
+					if ($item) $output .= "<li>" . preg_replace('/^ *[\*\+\-] /m','', $item) . "</li>";
 				}
 				$output .= "</ul>";
 				$content = preg_replace('/' . preg_quote($unorderedlist[0][$i], '/') . '/',
@@ -1059,7 +1059,7 @@ class MARKDOWN {
 			for ($i = 0; $i < count($orderedlist[0]); $i++){
 				$output = '<ol>';
 				foreach (explode("\n", $orderedlist[0][$i]) as $item){
-					if ($item) $output .= '<li>' . str_repeat('&nbsp;', 3) . preg_replace('/^ *\d+\. /m','', $item) . "</li>"; // &nbsp; looks a bit weird on screen but improves pdfs
+					if ($item) $output .= "<li>" . str_repeat('&nbsp;', 3) . preg_replace('/^ *\d+\. /m','', $item) . "</li>"; // &nbsp; looks a bit weird on screen but improves pdfs
 				}
 				$output .= "</ol>";
 				$content = preg_replace('/' . preg_quote($orderedlist[0][$i], '/') . '/',
@@ -1086,9 +1086,11 @@ class MARKDOWN {
 	}
 
 	private function p($content){
-		// replace p	
+		// replace p
+		//preg_match_all($this->_p, $content, $m);
+		//var_dump($m);
 		return preg_replace($this->_p,
-			"<p>$1$2</p>",
+			"<p>$1</p>\n",
 			$content);
 	}
 

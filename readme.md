@@ -35,7 +35,6 @@ Things are still in motion. Images may be outdated.
 * markdown
     * https://markdown.de/
     * check recursive option for blockquotes and code within self or lists
-    * review p after mail ? differs between regex101 and php
     * setext- vs atx-like headings
     * anchor display inline for textsection htmlcontent
     * track [known deficiencies](#known-deficencies)

@@ -617,24 +617,11 @@ a phone number: tel:012345678
 [Styled link to markdown information](https://www.markdownguide.org)
 
 Edgecases:  
-<http://some.other.url> with brackets  
-[urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title")  
-[javascript: protocol](javascript:alert('hello there'))  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
 some `code with <brackets>`  
-mid*word*emphasis  
-__underscore emphasis__
-some@mail.address  
-no\@mail.address  
-
-![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though
-
-* abc 
-  `> asdflikjlköj` 
-  adsfasdf  
-    > asdfasdf
-+ def
-- ghi
-
+mid*word*emphasis and __underscore emphasis__  
+some@mail.address and no\@mail.address  
+![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
 123\. escaped period avoiding a list
 
 --------
