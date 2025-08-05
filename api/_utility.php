@@ -855,8 +855,8 @@ class MARKDOWN {
 	private $_br = '/ +\n/';
 	private $_code_block = '/^```\n((?:.+?\n)+)^```/m';
 		private $_code_inline = '/(?<!\\)`([^\n]+?)(?<!\\| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_emphasis = '/(?<!\\)(\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\*{1,3})/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_escape = '/\\(\*|-|~|`|\.)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)(?:\_{1,3}(?!\S)|\*{1,3}))/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_escape = '/\\(\*|-|~|`|\.|@)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
 	private $_hr = '/^(?:\-|\- |\*|\* )+$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
@@ -864,7 +864,8 @@ class MARKDOWN {
 	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\+|\d+\.|(?:^$)*)/m';
 	private $_list_ol = '/(^( ){0,}(\d+\.) (.+?\n))+/m';
 	private $_list_ul = '/(^( ){0,}(\*|\-|\+) (.+?\n))+/m';
-	private $_p = '/^$\n((?:\n|.)+?)\n^$/m';
+		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$))+?)\n^$^$\n((?<!^<table|<ul|<ol|<h\d)(?:(\n|.)(?!>$))+?)\n^$/m';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
@@ -876,25 +877,27 @@ class MARKDOWN {
 		$this->content = $content;
 
 		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')`([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')(\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)\*{1,3})/';
-		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.)/';
+		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?:_{1,3}|\*{1,3})(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)(?:_{1,3}|\*{1,3}))/';
+		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@)/';
+		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\','/'). ')@[^\s<]+\.[^\s<]+)/';
 		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)~~/';
 	}
 
 	public function converted(){
 		$this->content = $this->blockquote($this->content); // should come first to enable nesting
 		$this->content = $this->a($this->content);
-		$this->content = $this->br($this->content);
 		$this->content = $this->code($this->content);
 		$this->content = $this->emphasis($this->content);
 		$this->content = $this->header($this->content);
 		$this->content = $this->hr($this->content);
 		$this->content = $this->img($this->content);
 		$this->content = $this->list($this->content);
+		$this->content = $this->mail($this->content);
 		$this->content = $this->pre($this->content);
 		$this->content = $this->s($this->content);
 		$this->content = $this->table($this->content);
-		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions relying on linebreaks
+		$this->content = $this->br($this->content);
+		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions relying on linebreaks and filtering out previously converted tags
 		$this->content = $this->escape($this->content); // should come after other stylings have been applied
 
 		return $this->content;
@@ -907,7 +910,6 @@ class MARKDOWN {
 			$content);
 		$content = preg_replace_callback($this->_a_md,
 			function($match){
-				var_dump($match);
 				$url = '';
 				if (str_starts_with($match[2], 'javascript:')) $url = $match[2];
 				else {
@@ -929,7 +931,7 @@ class MARKDOWN {
 	private function br($content){
 		// replace linebreaks
 		return preg_replace($this->_br,
-			'<br />',
+			"<br />",
 			$content);
 	}
 
@@ -949,12 +951,14 @@ class MARKDOWN {
 
 	private function code($content){
 		// replace code
-		$content = preg_replace($this->_code_block,
-			'<pre>$1</pre>',
+		$content = preg_replace_callback($this->_code_block,
+			function($match){
+				return '<pre>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[1]) . '</pre>'; // i'd rather use code, but tcpdf does not support that
+			},
 			$content);
 		$content = preg_replace_callback($this->_code_inline,
 			function($match){
-				return '<span style="font-family: monospace;">' . str_replace(['<', '>', '&'], ['&lt;', '&gt;', '&amp;'], $match[1]) . '</span>'; // i'd rather use code, but tcpdf does not support that
+				return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[1]) . '</span>'; // i'd rather use code, but tcpdf does not support that
 			},
 			$content);
 		return $content;
@@ -974,7 +978,7 @@ class MARKDOWN {
 					['<strong>', '</strong>'],
 					['<em><strong>', '</strong></em>']
 				];
-				$content = preg_replace('/' . preg_quote(str_repeat('*', $wrapper) . $emphasis[2][$i] . str_repeat('*', $wrapper), '/') . '/',
+				$content = preg_replace('/' . preg_quote(str_repeat(substr($emphasis[1][$i], 0, 1), $wrapper) . $emphasis[2][$i] . str_repeat(substr($emphasis[1][$i], 0, 1), $wrapper), '/') . '/',
 					$tags[$wrapper][0] . $emphasis[2][$i] . $tags[$wrapper][1],
 					$content);
 			}
@@ -1066,24 +1070,35 @@ class MARKDOWN {
 		return $content;
 	}
 
+	private function mail($content){
+		// replace code
+		$content = preg_replace_callback($this->_mail,
+			function($match){
+				$encoded_email = '';
+				for ($a = 0, $b = strlen($match[0]); $a < $b; $a++)
+				{
+					$encoded_email .= '&#' . (mt_rand(0, 1) == 0  ? 'x' . dechex(ord($match[0][$a])) : ord($match[0][$a])) . ';';
+				}
+				return '<a href="mailto:' . $encoded_email . '">' . $encoded_email . '</a>';
+			},
+			$content);
+		return $content;
+	}
+
 	private function p($content){
 		// replace p	
 		return preg_replace($this->_p,
-			"<p>$1</p>",
+			"<p>$1$2</p>",
 			$content);
 	}
 
 	private function pre($content){
 		// replace code/pre
-		preg_match_all($this->_pre, $content, $pre);
-		if (isset($pre[0]) && $pre[0]){
-			// iterate through matches
-			for ($i = 0; $i < count($pre[0]); $i++){
-				$content = preg_replace('/' . preg_quote($pre[0][$i], '/') . '/',
-					"<pre>" . preg_replace('/^ {4}/m', '', substr($pre[0][$i], 1)) . "</pre>\n", // substr to drop leading linebreak
-					$content);
-			}
-		}
+		$content = preg_replace_callback($this->_pre,
+			function($match){
+				return "<pre>" . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], preg_replace('/^ {4}/m', '', substr($match[0], 1))) . "</pre>\n";
+			},
+			$content);
 		return $content;
 	}
 

@@ -621,6 +621,11 @@ Edgecases:
 [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title")  
 [javascript: protocol](javascript:alert('hello there'))  
 some `code with <brackets>`  
+mid*word*emphasis  
+__underscore emphasis__
+some@mail.address  
+no\@mail.address  
+
 ![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though
 
 * abc 
@@ -678,11 +683,11 @@ some `code with <brackets>`
 > | blockquotes are | possible |
 
     preformatted text/code must
-    start with 4 spaces
+    start with 4 spaces <code>
 
 ```
 or being surrounded by
-three single backquotes
+three single backquotes <code>
 ```
 END;
 		$markdown = new MARKDOWN(preg_replace("/\r/", '', $sample));

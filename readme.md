@@ -34,10 +34,11 @@ Things are still in motion. Images may be outdated.
 * alter responsibilities drop hidden
 * markdown
     * https://markdown.de/
-    * sanitise \<p\>
     * check recursive option for blockquotes and code within self or lists
+    * review p after mail ? differs between regex101 and php
     * setext- vs atx-like headings
     * anchor display inline for textsection htmlcontent
+    * track [known deficiencies](#known-deficencies)
 
 ## Content
 * [Aims](#aims)
@@ -1998,9 +1999,7 @@ Albeit Safari being capable of displaying most of the content and contributing r
         * blockquotes within list items
         * anchor textmarks
         * self references and definitions
-        * underscore as emphasis
         * double backticks for escaping
-        * automated mail address conversion
 
 [Content](#content)
 

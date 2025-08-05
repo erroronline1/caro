@@ -1903,9 +1903,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
         * Zitatblöcke innerhalb von Listeneinträgen
         * Textmarkenanker
         * Selbstverweise und Definitionen
-        * Unterstrich zur fett- oder kursiv-formatierung
-        * doppelte Graivs' zur Maskierung
-        * automatische eMail-Adressen-Umwandlung
+        * doppelte Gravis' zur Maskierung
 
 [Übersicht](#übersicht)
 
