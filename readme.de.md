@@ -1058,6 +1058,7 @@ Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich,
 **fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `code mit einem \`-zeichen`.
 
 http://eine.url, nicht besonders gestaltet  
+eine Telefonnummer: tel:012345678  
 [Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  
 
 --------
@@ -1108,11 +1109,18 @@ http://eine.url, nicht besonders gestaltet
     Vorformatierter Text/Code muss
     mit 4 Leerzeichen eingerückt werden
 
-\```
-oder von drei Gravis'
+~~~
+oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
-(die Striche an dieser Stelle bitte ignorieren)
-\```
+~~~
+
+## Besonderheiten:  
+<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
+ein `code mit <Klammern>`  
+Betonung*im*Wort und __Betonung mit Unterstrich__  
+eine@email.addresse und maskierte\@email.addresse  
+![ein Bild](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) wird im CARO Kontext wegen des Service-Workers nicht dargestellt  
+123\. maskierter Punkt um eine Liste zu vermeiden
 ```
 
 und werden in etwa folgendermaßen angezeigt:
@@ -1509,7 +1517,7 @@ Anwendungsunterstützung Legende:
 * Server mit
     * PHP >= 8.2
     * MySQL/MariaDB oder SQL Server (oder einer anderen Datenbanklösung, dann müssen die Abfragen angepasst/ergänzt werden)
-    * SSL (Kamerazugriff für den Scanner, ServiceWorker und SHA256-Verschlüsselung können sonst technisch nicht genutzt werden)
+    * SSL (Kamerazugriff für den Scanner, Service-Worker und SHA256-Verschlüsselung können sonst technisch nicht genutzt werden)
 * Netzwerkzugriff für Endgeräte und einen Browser
     * Desktop PCs
     * mobile Geräte
@@ -1846,11 +1854,11 @@ Das Leben, das medizinische Feld und regulatorische Anforderungen sind komplizie
 
 ### Handhabe der Netzwerkverbindung
 * Die Anwendung speichert Serveranfragen im Cache. GET-Anfragen erhalten die letzte erfolgreich übermittelte Version, die im Falle eines Verbindungabbruchs möglicherweise nicht die neueste des Systems sein kann, aber besser als keine Antwort. Von einem Risikostandpunkt aus betrachtet ist es zuverlässiger eine leicht veraltete Dokumentenversion zu verwenden als keine Aufzeichnungen machen zu können. POST-, PUT- und DELETE-Anfragen werden in einer indexedDB gespeichert und ein Ausführungsversuch unternommen sobald eine erfolgreiche GET-Anfrage auf eine Wiederherstellung einer Serververbindung schließen lässt. Dies kann zu einer Verzögerung von Daten im System führen, ist aber besser als ein Datenverlust. Es ist aber zu beachten, dass dies nur zuverlässig funktioniert, so lange der Browser beim Beenden keine Daten löscht. Dies kann von der Anwendung nicht beeinflusst werden und hängt von der Systemeinstellung ab. Hier kann gegebenenfalls nur die EDV-Abteilung behilflich sein.
-* POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die ServiceWorker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von (zwischengespeicherten) Aufzeichnungen sicher.
+* POST- und PUT-Anfragen fügen dem Datenpaket eine verschlüsselte Nutzeridentifikation hinzu. Diese Identifikation überschreibt im Falle einer erfolgreichen Validierung die Daten des angemeldeten Nutzers (incl. der festgelegten Berechtigungen) für die Service-Worker-Anfragen und stellen eine ordnungsgemäße Identität für das Hinzufügen von (zwischengespeicherten) Aufzeichnungen sicher.
 
 ### Verschiedenes
 * Eine Festlegung der Paketgröße für die SQL-Umgebung auf einen größeren Wert als die Standardkonfiguration neben der Anpassung des Wertes in der config.ini ist sinnvoll. Es ist vorgesehen, dass Stapel-Abfragen aufgeteilt werden, es kann aber vorkommen, dass einzelne Anfragen mit gelegentlich Base64-codierten Bildern die Standardbegrenzung überschreiten.
-* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des ServiceWorkers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den ServiceWorker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden. Benachrichtigungen funktionieren nicht im Privatsphären-Modus und [Safari](#safaris-besondere-bedürfnisse).
+* Benachrichtigungen über neue Mitteilungen sind so zuverlässig wie der Lebenszyklus des Service-Workers, welcher kurz ist. Daher gibt es wiederkehrende Anfragen mit einem kleinen Datenpaket um den Service-Worker wieder aufzuwecken, zumindest so lange der Browser geöffnet ist. Es ist keine Implementierung einer Push-Api vorgesehen um die Nutzung von Drittanbieter-Servern und Web-Diensten zu vermeiden. Benachrichtigungen funktionieren nicht im Privatsphären-Modus und [Safari](#safaris-besondere-bedürfnisse).
 * Dokumente, welche Artikeln hinzugefügt wurden werden gemäß einer Ähnlichkeit der Artikelnummer zugeordnet. Dies ist unter Umständen etwas ungenau, passt aber möglicherweise zu ähnlichen Artikeln (z.B. bei unterschiedlichen Größen). Es kann aber vorkommen, dass die Dokumente nicht wirklich zum ausgewählten Artikel gehören.
 * Unterstützte Bildformate sind JPG, JPEG, GIF und PNG. Sofern andere Bildformate Einzug in die Aufzeichnungen finden sollen, müssen diese als Datei-Upload angefügt werden.
 
@@ -1874,7 +1882,7 @@ Tests:
 * rendertest **bestanden**
 * toast **bestanden**
 * dialog **bestanden**
-* serviceworker **bestanden**
+* Service-Worker **bestanden**
 * document composer **bestanden**
 * notifications **fehlgeschlagen auf macOS Desktop und iOS aufgrund fehlender Notification-API Unterstützung, nicht integrierter Push-API**
 * notification indicators **bestanden**
@@ -1893,12 +1901,12 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 * Das Ziehen von Elementen für die Sortierung funktioniert nicht auf mobilen Geräten, da Berührungsereignisse diese Funktion nicht unterstützen. Safari in iOS kann bei langen Berühren zwar verschieben, dafür jedoch nicht das Kontextmenu öffnen. Dokumente und deren Komponenten, Audits und Textvorschläge sollten daher auf einem Gerät mit Maus oder anderen unterstützen Eingabegeräten erfolgen.
 * Verschobene Bildelemente werden im Anschluss nicht länger angezeigt, verschwinden aber nicht vollständig und sind in der Datenstruktur des aktuell bearbeiteten Dokuments weiterhin vorhanden.
 * Der Kalender reicht von 1970-01-01 bis 2079-06-06 aufgrund von Einschränkungen von SQL-Server zum Zeitpunkt der Erstellung.
-* Es gibt einige Einschränkungen und Unterschiede zu regulärem Makrdown sofern man damit vertraut ist:
-    * Bilder können eingebunden werden, aber aufgrund des ServiceWorkers im CARO-Zusammenhang vermutlich nicht abgerufen werden
-    * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder meheren Leerzsichen enden
-    * Code-Blöcke werden nicht als \<code\> ausgegeben, sondern aufgrund der eingeschränkten Kompatibilität der [TCPDF](#ressources)-Einbindung statt dessen als \<span\> mit inline monospace Style
-    * diese Variante unterstützt nicht
-        * Überschriften durch Linien darunter
+* Es gibt einige Einschränkungen und Unterschiede zu [regulärem](https://www.rfc-editor.org/rfc/rfc7763.html) bzw. [GitHub-flavoured](https://github.github.com/gfm/) Markdown sofern man damit vertraut ist:
+    * Bilder können eingebunden werden, aber aufgrund des Service-Workers im CARO-Zusammenhang nicht abgerufen werden
+    * Code-Blöcke werden nicht als \<code\>, sondern aufgrund der eingeschränkten Kompatibilität der [TCPDF](#ressources)-Einbindung statt dessen als \<span\> mit inline monospace Style ausgegeben
+    * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder mehreren Leerzeichen enden
+    * diese Variante unterstützt derzeit keine
+        * Setext Überschriften durch Linien darunter
         * verschachtelte Zitatblöcke
         * Zitatblöcke innerhalb von Listeneinträgen
         * Textmarkenanker

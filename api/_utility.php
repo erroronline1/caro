@@ -845,20 +845,31 @@ class PERMISSION {
 
 class MARKDOWN {
 	/*
-	markdown flavoured parser.
-	paragraph nesting is not exactly clean but output appears to be fine
+	markdown parser.
+	supposed to match github-flavour (https://github.github.com/gfm/) to a reasonable amount
+
+	current limitations:
+	* code blocks are not parsed as \<code\> due to limited compatibility with the [TCPDF](#ressources)-implementation, but \<span\> with inline monospace style instead
+    * multiple lines for list items must be end with one or more spaces on the previous line
+    * this flavour currently lacks support of
+        * setext headers by unterlining
+        * nested blockquotes
+        * blockquotes within list items
+        * anchor textmarks
+        * self references and definitions
+        * double backticks for escaping
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
 	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)])/'; // regular md links
 	private $_blockquote = '/(^> (.*)\n)+/m';
 	private $_br = '/ +\n/';
-	private $_code_block = '/^```\n((?:.+?\n)+)^```/m';
+	private $_code_block = '/^ {0,3}([`~]{3})\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
 		private $_code_inline = '/(?<!\\)`([^\n]+?)(?<!\\| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)(?:\_{1,3}(?!\S)|\*{1,3}))/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
-	private $_hr = '/^(?:\-|\- |\*|\* )+$/m';
+	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
 	private $_list_any = '/(^( {0,})(\*|\-|\+|\d+\.) (.+?\n)+)(?:^$)*/m';
 	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\+|\d+\.|(?:^$)*)/m';
@@ -887,16 +898,16 @@ class MARKDOWN {
 		$this->content = $this->blockquote($this->content); // should come first to enable nesting
 		$this->content = $this->a($this->content);
 		$this->content = $this->code($this->content);
+		$this->content = $this->hr($this->content); // before emphasis avoiding matching *** as emphasis
 		$this->content = $this->emphasis($this->content);
 		$this->content = $this->header($this->content);
-		$this->content = $this->hr($this->content);
 		$this->content = $this->img($this->content);
 		$this->content = $this->list($this->content);
 		$this->content = $this->mail($this->content);
 		$this->content = $this->pre($this->content);
 		$this->content = $this->s($this->content);
 		$this->content = $this->table($this->content);
-		$this->content = $this->p($this->content); // must come last to not mess up previous pattern recognitions relying on linebreaks and filtering out previously converted tags
+		$this->content = $this->p($this->content); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
 		$this->content = $this->br($this->content);
 		$this->content = $this->escape($this->content); // should come after other stylings have been applied
 
@@ -953,7 +964,8 @@ class MARKDOWN {
 		// replace code
 		$content = preg_replace_callback($this->_code_block,
 			function($match){
-				return '<pre>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[1]) . '</pre>'; // i'd rather use code, but tcpdf does not support that
+				if ($match[1] == $match[3])	return '<pre>' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</pre>'; // i'd rather use code, but tcpdf does not support that
+				return $match[0];
 			},
 			$content);
 		$content = preg_replace_callback($this->_code_inline,

@@ -1909,8 +1909,8 @@ Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and \`code with a \\\`-character\`.
 
 http://some.url, not particularly styled  
-<http://someotherurl.in.brackets>  
-[Styled link to markdown information](https://www.markdownguide.org)  
+a phone number: tel:012345678  
+[Styled link to Markdown information](https://www.markdownguide.org)  
 
 --------
 
@@ -1960,10 +1960,18 @@ http://some.url, not particularly styled
     preformatted text/code must
     start with 4 spaces
 
-\`\`\`
+~~~
 or being surrounded by
-three single backticks
-\`\`\`
+three \` or ~
+~~~
+
+## Edgecases:  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
+some \`code with <brackets>\`  
+mid*word*emphasis and __underscore emphasis__  
+some@mail.address and escaped\@mail.address  
+![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
+123\. escaped period avoiding a list
 `;
 					await _.sleep(500);
 
@@ -1986,6 +1994,7 @@ Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich,
 **fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`code mit einem \\\`-zeichen\`.
 
 http://eine.url, nicht besonders gestaltet  
+eine Telefonnummer: tel:012345678  
 [Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  
 
 --------
@@ -2009,7 +2018,7 @@ http://eine.url, nicht besonders gestaltet
 * ungeordneter Listeneintrag 2
 * ungeordneter Listeneintrag 3
 
-______
+***
 
 ### Tabellen (h3 Überschrift)
 
@@ -2018,7 +2027,7 @@ ______
 | *Akzentuierung* | **ist** | ***ebenfalls*** | \`möglich\` |
 | Zeilenumbrüche | sind es | jedoch | nicht |
 
-_-_-_-_
+* * *
 
 #### Zitatblöcke und Code (h4 Überschrift)
 
@@ -2036,10 +2045,18 @@ _-_-_-_
     Vorformatierter Text/Code muss
     mit 4 Leerzeichen eingerückt werden
 
-\`\`\`
-oder von drei Gravis'
+~~~
+oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
-\`\`\`
+~~~
+
+## Besonderheiten:  
+<http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
+ein \`code mit <Klammern>\`  
+Betonung*im*Wort und __Betonung mit Unterstrich__  
+eine@email.addresse und maskierte\@email.addresse  
+![ein Bild](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) wird im CARO Kontext wegen des ServiceWorkers nicht dargestellt  
+123\. maskierter Punkt um eine Liste zu vermeiden
 `;
 					await _.sleep(500);
 

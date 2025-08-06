@@ -616,14 +616,6 @@ http://some.url, not particularly styled
 a phone number: tel:012345678  
 [Styled link to markdown information](https://www.markdownguide.org)
 
-Edgecases:  
-<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
-some `code with <brackets>`  
-mid*word*emphasis and __underscore emphasis__  
-some@mail.address and no\@mail.address  
-![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
-123\. escaped period avoiding a list
-
 --------
 
 ## Lists (h2 header)
@@ -672,10 +664,18 @@ some@mail.address and no\@mail.address
     preformatted text/code must
     start with 4 spaces <code>
 
-```
+~~~
 or being surrounded by
-three single backquotes <code>
-```
+three \` or ~
+~~~
+
+## Edgecases:  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
+some `code with <brackets>`  
+mid*word*emphasis and __underscore emphasis__  
+some@mail.address and escaped\@mail.address  
+![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
+123\. escaped period avoiding a list
 END;
 		$markdown = new MARKDOWN(preg_replace("/\r/", '', $sample));
 		echo $markdown->converted();

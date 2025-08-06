@@ -33,11 +33,11 @@ Things are still in motion. Images may be outdated.
 * alter consumables_products protected to has_files for comprehensible reasons
 * alter responsibilities drop hidden
 * markdown
-    * https://markdown.de/
+    * https://markdown.de/, https://github.github.com/gfm/
     * check recursive option for blockquotes and code within self or lists
     * setext- vs atx-like headings
-    * anchor display inline for textsection htmlcontent
-    * track [known deficiencies](#known-deficencies)
+    * anchor display inline for textsection htmlcontent onscreen
+    * track [known deficiencies](#known-deficiencies), comment in class too
 
 ## Content
 * [Aims](#aims)
@@ -88,7 +88,7 @@ Things are still in motion. Images may be outdated.
     * [Installation](#installation)
     * [Runtime variables](#runtime-variables)
     * [Useage notes and caveats](#useage-notes-and-caveats)
-    * [Known deficencies](#known-deficencies)
+    * [Known deficiencies](#known-deficiencies)
     * [Customisation](#customisation)
     * [User acceptance considerations](#user-acceptance-considerations)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
@@ -1138,7 +1138,7 @@ Search functionality across the application may differ slightly depending of con
 
 ## Markdown
 
-Where available text can be styled by a custom Markdown flavour considered close enough. Seen [Known deficiencies](#known-deficencies) for differences to regular markdown.
+Where available text can be styled by a custom Markdown flavour to a reasonable amount. See [Known deficiencies](#known-deficiencies) for differences to regular Markdown.
 
 Supported formatting options contain:
 
@@ -1155,7 +1155,8 @@ Some escaping of formatting characters is possible with a leading \ as in
 **bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.
 
 http://some.url, not particularly styled  
-[Styled link to markdown information](https://www.markdownguide.org)  
+a phone number: tel:012345678  
+[Styled link to Markdown information](https://www.markdownguide.org)  
 
 --------
 
@@ -1205,11 +1206,18 @@ http://some.url, not particularly styled
     preformatted text/code must
     start with 4 spaces
 
-\```
+~~~
 or being surrounded by
-three single backticks
-(ignore the slashes)
-\```
+three \` or ~
+~~~
+
+## Edgecases:  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
+some `code with <brackets>`  
+mid*word*emphasis and __underscore emphasis__  
+some@mail.address and escaped\@mail.address  
+![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
+123\. escaped period avoiding a list
 ```
 
 rendered to something as
@@ -1606,7 +1614,7 @@ Application support legend:
 * Server with
     * PHP >= 8.2
     * MySQL/MariaDB or SQL Server (or some other database, but queries may have to be adjusted/extended)
-    * SSL (camera access for qr-scanner, serviceworker and sha256 encryption don't work otherwise)
+    * SSL (camera access for qr-scanner, Service-Worker and sha256 encryption don't work otherwise)
 * Network access for endpoints and a browser
     * Desktop pcs
     * Mobile devices
@@ -1942,11 +1950,11 @@ Life, the medical field and regulatory requirements are complicated, agile and u
 
 ### Network connection handling
 * The application caches requests. Get requests return the latest successful retrieved version, which might not always be the recent system state on connection loss, but is considered better than nothing. From a risk point of view it is more reliable to have a record on a slightly outdated form than no record at all. POST, PUT and DELETE requests however are stored within an indexedDB and trying to be executed once a successful GET request indicates reconnection to the server. This might lead to a delay of data but is better than nothing. However note that this only is reliable if the browser does not delete session content on closing. This is not a matter of the app but your system environment. You may have to contact your IT department.
-* POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for service-worker-requests and ensures a valid identity for contributing (cached) records.
+* POST and PUT requests add an encoded user identifier to the payload. This identifier, if successfully validated, overrides the logged in user (including assigned permissions) for Service-Worker-requests and ensures a valid identity for contributing (cached) records.
 
 ### Miscellaneous
 * Setting the package size for the SQL environment to a higher value than default is useful beside the packagesize within config.ini. Batch-queries are supposed to be split in chunks, but single queries with occasionally base64 encoded images might exceed the default limit.
-* Notifications on new messages are as reliable as the timespan of a service-worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services. Notifications will not work in private modes and [Safari](#safaris-special-needs).
+* Notifications on new messages are as reliable as the timespan of a Service-Worker. Which is short. Therefore there will be an periodic fetch request with a tiny payload to wake it up once in a while - at least as long as the app is opened. There will be no implementation of push-api to avoid usage of third party servers and web services. Notifications will not work in private modes and [Safari](#safaris-special-needs).
 * Product documents are displayed in accordance with their article number, but with a bit of fuzziness to provide information for similar products (e.g. different sizes). It is possible to have documents displayed that do not really match the product. 
 * Supported image types are JPG, JPEG, GIF and PNG. If other image types are supposed to be part of a documentation provide them using file uploads.
 
@@ -1969,7 +1977,7 @@ Tests:
 * rendertest **passed**
 * toast **passed**
 * dialog **passed**
-* serviceworker **passed**
+* Service-Worker **passed**
 * document composer **passed**
 * notifications **failed on macOS desktop and iOS due to unsupported Notification-API, unintegrated Push-API**
 * notification indicators **passed**
@@ -1984,16 +1992,16 @@ Albeit Safari being capable of displaying most of the content and contributing r
 
 [Content](#content)
 
-## Known deficencies
+## Known deficiencies
 * Dragging elements for reordering doesn't work on Android because touch-events do not include this function. Safari in iOS triggers the drag event on longpress but is not capable of triggering the context menu in this case. Constructing document components and documents, audits and text templates most probably need devices with mice or a supported pointer.
 * Reordered images will disappear - but not being lost in the currently edited data-structure.
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
-* There are some limitations and differences as opposed to regular Markdown if you're familiar with that:
-    * images can be embedded but may lack rendering within CARO context due to the serviceworker
-    * multiple lines for list items must be end with one or more spaces on the previous line
+* There are some limitations and differences as opposed to [regular](https://www.rfc-editor.org/rfc/rfc7763.html) or rather [GitHub-flavoured](https://github.github.com/gfm/) Markdown if you're familiar with that:
+    * images can be embedded but lack proper fetching within CARO context due to the Service-Worker
     * code blocks are not parsed as \<code\> due to limited compatibility with the [TCPDF](#ressources)-implementation, but \<span\> with inline monospace style instead
-    * this flavour lacks support of
-        * header by unterlining
+    * multiple lines for list items must be end with one or more spaces on the previous line
+    * this flavour currently lacks support of
+        * setext headers by unterlining
         * nested blockquotes
         * blockquotes within list items
         * anchor textmarks
@@ -2533,7 +2541,7 @@ For static code analysis
 ## Frontend design
 All requests have to be routed through the api-object to ensure proper result processing, offline fallback and user validation. (./js/api.js)
 
-A service-worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
+A Service-Worker catches requests, routes if available or returns a cached response for connectivity exceptions. (./service-worker.js)
 
 Dialog-, Toast- and Assemble-classes parse accordingly prepared responses to the interface. (./js/assemble.js), examples of the frontend-syntax can be found importing unittest.js and calling `rendertest('documents')` and `rendertest('app')` from the console.
 
