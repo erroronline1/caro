@@ -1114,13 +1114,14 @@ oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
 ~~~
 
-## Besonderheiten:  
+## Sonstige Funktionen:  
 <http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
 ein `code mit <Klammern>`  
 Betonung*im*Wort und __Betonung mit Unterstrich__  
 eine@email.addresse und maskierte\@email.addresse  
 ![ein Bild](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) wird im CARO Kontext wegen des Service-Workers nicht dargestellt  
-123\. maskierter Punkt um eine Liste zu vermeiden
+123\. maskierter Punkt um eine Liste zu vermeiden  
+[erste Überschrift](#plain-text)
 ```
 
 und werden in etwa folgendermaßen angezeigt:
@@ -1907,10 +1908,8 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
     * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder mehreren Leerzeichen enden
     * diese Variante unterstützt derzeit keine
         * Setext Überschriften durch Linien darunter
-        * verschachtelte Zitatblöcke
         * Zitatblöcke innerhalb von Listeneinträgen
-        * Textmarkenanker
-        * Selbstverweise und Definitionen
+        * Definitionen
         * doppelte Gravis' zur Maskierung
 
 [Übersicht](#übersicht)

@@ -853,21 +853,19 @@ class MARKDOWN {
     * multiple lines for list items must be end with one or more spaces on the previous line
     * this flavour currently lacks support of
         * setext headers by unterlining
-        * nested blockquotes
         * blockquotes within list items
-        * anchor textmarks
-        * self references and definitions
+        * definitions
         * double backticks for escaping
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
-	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)])/'; // regular md links
-	private $_blockquote = '/(^> (.*)\n)+/m';
+	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)]|$)/m'; // regular md links
+	private $_blockquote = '/((?:^>{1,} .*\n)+)/m';
 	private $_br = '/ +\n/';
 	private $_code_block = '/^ {0,3}([`~]{3})\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
 		private $_code_inline = '/(?<!\\)`([^\n]+?)(?<!\\| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)(?:\_{1,3}(?!\S)|\*{1,3}))/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_escape = '/\\(\*|-|~|`|\.|@)/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_escape = '/\\(\*|-|~|`|\.|@|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
@@ -876,12 +874,14 @@ class MARKDOWN {
 	private $_list_ol = '/(^( ){0,}(\d+\.) (.+?\n))+/m';
 	private $_list_ul = '/(^( ){0,}(\*|\-|\+) (.+?\n))+/m';
 		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/m';
+	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/mi';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_table = '/(^(\|.+?){1,}\|$)\n(^(\|[\s\-]+?){1,}\|$)\n((^(\|.+?){1,}\|$)\n)+/m';
+	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *-+ *?){1,}\|)\n(((?:\|.+?){1,}\|\n)+)/m';
 
 	private $content = null;
+	private $headers = [];
+	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
 
 	public function __construct($content)
 	{
@@ -889,7 +889,7 @@ class MARKDOWN {
 
 		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')`([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?:_{1,3}|\*{1,3})(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)(?:_{1,3}|\*{1,3}))/';
-		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@)/';
+		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\','/'). ')@[^\s<]+\.[^\s<]+)/';
 		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)~~/';
 	}
@@ -923,6 +923,7 @@ class MARKDOWN {
 			function($match){
 				$url = '';
 				if (str_starts_with($match[2], 'javascript:')) $url = $match[2];
+				elseif (str_starts_with($match[2], '#')) $url = $match[2];
 				else {
 					$component = parse_url($match[2]);
 					if (isset($component['query'])){
@@ -947,16 +948,18 @@ class MARKDOWN {
 	}
 
 	private function blockquote($content){
-		// replace blockquotes
-		preg_match_all($this->_blockquote, $content, $blockquote);
-		if (isset($blockquote[0]) && $blockquote[0]){
-			// iterate through matches
-			for ($i = 0; $i < count($blockquote[0]); $i++){
-				$content = preg_replace('/' . preg_quote($blockquote[0][$i], '/') . '/',
-					"<blockquote>\n" . preg_replace('/^> /m', '', $blockquote[0][$i]) . "</blockquote>\n",
-					$content);
-			}
-		}
+		// replace blockquotes recursively
+		$content = preg_replace_callback($this->_blockquote,
+			function($match){
+				$match[1] = "<blockquote>\n" . preg_replace('/^>/m', '', $match[1]). "</blockquote>\n"; // remove leading blockquote character and fence with tag
+				preg_match_all($this->_blockquote, $match[1], $nested); // check if nested blockquotes remain
+				if ($nested[0]) {
+					$match[1] = $this->blockquote($match[1]);
+				}
+				$match[1] = preg_replace('/^ /m', '', $match[1]); // remove leading whitespace, convert linebreak within matches
+				return $match[1];
+			},
+			$content);
 		return $content;
 	}
 
@@ -1007,15 +1010,26 @@ class MARKDOWN {
 
 	private function header($content){
 		// replace headers
-		preg_match_all($this->_header, $content, $header);
-		if (isset($header[0]) && $header[0]){
-			// iterate through matches
-			for ($i = 0; $i < count($header[0]); $i++){
-				$content = preg_replace('/' . preg_quote($header[0][$i], '/') . '/',
-					'<h' . strlen($header[1][$i]) - 1 . '>' . $header[2][$i] . '</h' . strlen($header[1][$i]) - 1 . ">",
-					$content);
-			}
-		}
+		$content = preg_replace_callback($this->_header,
+			function($match){
+				$size = min(strlen($match[1]) - 1, 6);
+				preg_match($this->headerchars, trim($match[2]), $id);
+				if ($id[0]){
+					$id = strtolower(preg_replace(['/\s/'], ['-'], trim($id[0])));
+					// enumerate
+					$existing = array_filter($this->headers, fn($e) => str_starts_with($e, $id));
+					if ($existing) {
+						sort($existing);
+						$last = array_pop($existing);
+						preg_match('/.+?-(\d)$/m', $last, $numerate);
+						if (isset($numerate[1]) && $numerate[1]) $id .= '-' . intval($numerate[1]) + 1;
+						else $id .= '-1';
+					}
+					$this->headers[] = $id;
+				}
+				return '<h' . $size . ' id="' . $id . '">' . $match[2] . '</h' . $size . ">";
+			},
+			$content);
 		return $content;
 	}
 
@@ -1045,7 +1059,7 @@ class MARKDOWN {
 					$nested[0][$j] = preg_replace('/' . preg_quote($nested[4][$j], '/') . '$/m', '', $nested[0][$j]); // strip next list item delimiter
 					// recursively replace nested lists
 					$content = preg_replace('/' . preg_quote($nested[0][$j], '/') . '/',
-						substr($this->list(preg_replace('/^ {4}/m', '', $nested[0][$j])), 1) . "\n",  // substr to drop leading linebreak, but add one to end pr pattern recognition
+						substr($this->list(preg_replace('/^ {4}/m', '', $nested[0][$j])), 1) . "\n",  // substr to drop leading linebreak, but add one to end for pattern recognition
 						$content);
 				}
 			}
@@ -1125,29 +1139,26 @@ class MARKDOWN {
 
 	private function table($content){
 		// replace tables
-		preg_match_all($this->_table, $content, $table);
-		if (isset($table[0]) && $table[0]){
-			// iterate through matches
-			for ($i = 0; $i < count($table[0]); $i++){
+		$content = preg_replace_callback($this->_table,
+			function($match){
 				$output = '<table>';
-				foreach(explode("\n", $table[0][$i]) as $rowindex => $row){
+				foreach(explode("\n", $match[0]) as $rowindex => $row){
 					if (!$row) continue;
+					$columns = array_filter(preg_split('/(?<!' . preg_quote('\\', '/'). ')\|/', $row), fn($c) => boolval(trim($c)));
 					switch($rowindex){
 						case 1:
 							break;
 						case 0:
-							$output .= '<tr>' . implode('', array_map(fn($column) => '<th>' . trim($column) . '</th>', explode('|', substr($row, 1, -1)))) . '</tr>';
+							$output .= '<tr>' . implode('', array_map(fn($column) => '<th>' . trim($column) . '</th>', $columns)) . '</tr>';
 							break;
 						default:
-							$output .= '<tr>' . implode('', array_map(fn($column) => '<td>' . trim($column) . '</td>', explode('|', substr($row, 1, -1)))) . '</tr>';
+							$output .= '<tr>' . implode('', array_map(fn($column) => '<td>' . trim($column) . '</td>', $columns)) . '</tr>';
 					}
 				}
 				$output .= '</table>';
-				$content = preg_replace('/' . preg_quote($table[0][$i], '/') . '/',
-					$output,
-					$content);
-			}
-		}
+				return $output;
+			},
+			$content);
 		return $content;
 	}
 }

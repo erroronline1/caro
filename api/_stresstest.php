@@ -616,6 +616,8 @@ http://some.url, not particularly styled
 a phone number: tel:012345678  
 [Styled link to markdown information](https://www.markdownguide.org)
 
+# Plain text (h1 header)
+
 --------
 
 ## Lists (h2 header)
@@ -654,8 +656,20 @@ a phone number: tel:012345678
 > with *multiple*  
 > lines
 
+* list item with  
+> blockquote
+* lext list item with  
+|table|
+|---|
+|row|
+
 > * List within blockquote 1
 > * List within blockquote 2
+>     * nested list
+> ~~~
+> code within blockquote
+> ~~~
+>> blockquote within blockquote
 > 
 > | Table nested | within |
 > | ---------- | ----- |
@@ -669,13 +683,15 @@ or being surrounded by
 three \` or ~
 ~~~
 
-## Edgecases:  
+## Other features:  
 <http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
 some `code with <brackets>`  
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
 ![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
-123\. escaped period avoiding a list
+123\. escaped period avoiding a list  
+[top header](#plain-text)  
+[second header](#plain-text-1)
 END;
 		$markdown = new MARKDOWN(preg_replace("/\r/", '', $sample));
 		echo $markdown->converted();

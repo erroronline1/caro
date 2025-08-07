@@ -1965,13 +1965,14 @@ or being surrounded by
 three \` or ~
 ~~~
 
-## Edgecases:  
-<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
+## Other features:  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
 some \`code with <brackets>\`  
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
 ![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
-123\. escaped period avoiding a list
+123\. escaped period avoiding a list  
+[top header](#plain-text)
 `;
 					await _.sleep(500);
 
@@ -2050,13 +2051,14 @@ oder von drei Gravis' oder Tilde-Zeichen
 eingefasst sein
 ~~~
 
-## Besonderheiten:  
+## Sonstige Funktionen:  
 <http://eine.internet.adresse> mit Klammern, [urlencoded Link mit Titel](http://some.url?test2=2&test3=a=(/bcdef "ein Titel") und [javascript: protocol](javascript:alert('hello world'))  
 ein \`code mit <Klammern>\`  
 Betonung*im*Wort und __Betonung mit Unterstrich__  
 eine@email.addresse und maskierte\@email.addresse  
 ![ein Bild](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) wird im CARO Kontext wegen des ServiceWorkers nicht dargestellt  
-123\. maskierter Punkt um eine Liste zu vermeiden
+123\. maskierter Punkt um eine Liste zu vermeiden  
+[erste Überschrift](#plain-text)
 `;
 					await _.sleep(500);
 

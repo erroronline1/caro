@@ -1211,13 +1211,14 @@ or being surrounded by
 three \` or ~
 ~~~
 
-## Edgecases:  
+## Other features:  
 <http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
 some `code with <brackets>`  
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
 ![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
-123\. escaped period avoiding a list
+123\. escaped period avoiding a list  
+[top header](#plain-text)
 ```
 
 rendered to something as
@@ -2002,10 +2003,8 @@ Albeit Safari being capable of displaying most of the content and contributing r
     * multiple lines for list items must be end with one or more spaces on the previous line
     * this flavour currently lacks support of
         * setext headers by unterlining
-        * nested blockquotes
         * blockquotes within list items
-        * anchor textmarks
-        * self references and definitions
+        * definitions
         * double backticks for escaping
 
 [Content](#content)
