@@ -877,16 +877,13 @@ class MARKDOWN {
 	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/mi';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *-+ *?){1,}\|)\n(((?:\|.+?){1,}\|\n)+)/m';
+	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *-+ *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
 
-	private $content = null;
 	private $headers = [];
 	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
 
-	public function __construct($content)
+	public function __construct()
 	{
-		$this->content = $content;
-
 		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')`([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?:_{1,3}|\*{1,3})(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)(?:_{1,3}|\*{1,3}))/';
 		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@|\|)/';
@@ -894,24 +891,110 @@ class MARKDOWN {
 		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)~~/';
 	}
 
-	public function converted(){
-		$this->content = $this->blockquote($this->content); // should come first to enable nesting
-		$this->content = $this->a($this->content);
-		$this->content = $this->code($this->content);
-		$this->content = $this->hr($this->content); // before emphasis avoiding matching *** as emphasis
-		$this->content = $this->emphasis($this->content);
-		$this->content = $this->header($this->content);
-		$this->content = $this->img($this->content);
-		$this->content = $this->list($this->content);
-		$this->content = $this->mail($this->content);
-		$this->content = $this->pre($this->content);
-		$this->content = $this->s($this->content);
-		$this->content = $this->table($this->content);
-		$this->content = $this->p($this->content); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-		$this->content = $this->br($this->content);
-		$this->content = $this->escape($this->content); // should come after other stylings have been applied
+	/**
+	 * @param string $text as Markdown
+	 * @return string as HTML
+	 */
+	public function txt2md($text){
+		$text = preg_replace("/\r/", '', $text);
 
-		return $this->content;
+		$text = $this->blockquote($text); // should come first to enable nesting
+		$text = $this->a($text);
+		$text = $this->code($text);
+		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
+		$text = $this->emphasis($text);
+		$text = $this->header($text);
+		$text = $this->img($text);
+		$text = $this->list($text);
+		$text = $this->mail($text);
+		$text = $this->pre($text);
+		$text = $this->s($text);
+		$text = $this->table($text);
+		$text = $this->p($text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+		$text = $this->br($text);
+		$text = $this->escape($text); // should come after other stylings have been applied
+
+		return $text;
+	}
+
+	/**
+	 * @param string $path filepath to csv
+	 * @param array $csv dialect options
+	 * @return string|exception Marktown table or exception for lack of rows
+	 */
+	public function csv2md($path, $csv = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
+		$csvfile = fopen($path, 'r');
+		if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
+		$rownum = 0;
+		$md = '';
+		while(($row = fgetcsv(
+			$csvfile,
+			null,
+			$csv['separator'],
+			$csv['enclosure'],
+			$csv['escape']
+			)) !== false) {
+			if ($rownum < 1){
+				if (count($row) < 2){
+					throw new \Exception(mb_convert_encoding(implode(', ', $row), 'UTF-8', mb_detect_encoding(implode(', ', $row), ['ASCII', 'UTF-8', 'ISO-8859-1'])));
+					return;
+				}
+				// set header as data keys
+				foreach($row as &$column){
+					if ($column) {
+						$bom = pack('H*','EFBBBF'); //coming from excel this is utf8
+						// delete bom, convert linebreaks to space
+						$column = preg_replace(["/^$bom/", '/\n/'], ['',' '], $column);
+					}
+				}
+				$md .= '| ' . implode(' | ', $row) . " |\n";
+				$md .= '| ' . implode(' | ', array_fill(0, count($row), ' ----- ')) . " |\n";
+			}
+			else {
+				$row = array_filter($row, fn($column) => $column !== null);
+				if ($row) $md .= '| ' . implode(' | ', $row) . " |\n";
+			}
+			$rownum++;
+		}
+		fclose($csvfile);
+		$md .= "\n";
+		return $md;
+	}
+
+	/**
+	 * @param string $markdown Markdown table
+	 * @param array $csv dialect options
+	 * @return array [tempfile => string, headers => string]
+	 */
+	public function md2csv($markdown, $csv = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
+		$data = [];
+		$rows = explode("\n", $markdown);
+		foreach($rows as $row){
+			$row = preg_replace('/\r/', '', $row);
+			preg_match('/^(\|.+\|)$/', $row, $isrow);
+			if (!$isrow) continue;
+			preg_match('/^\|(\s|\-)+\|/', $row, $headseparator);
+			if ($headseparator) continue;
+			$row = array_map(fn($column) => trim($column), array_filter(explode('|', $row), fn($column) => boolval($column)));
+			$data[] = $row;
+		}
+
+		@$tmp_name = tempnam( sys_get_temp_dir(), preg_replace('/\W/', '', implode('_', $data[0])));
+		$file = fopen($tmp_name, 'w');
+		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+		foreach($data as $row){
+			fputcsv(
+				$file,
+				$row,
+				$csv['separator'],
+				$csv['enclosure'],
+				$csv['escape']
+			);
+		}
+		fclose($file);
+		return [
+			'tmpfile' => $tmp_name, 
+			'headers' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', implode('_', $data[0]))];
 	}
 
 	private function a($content){
