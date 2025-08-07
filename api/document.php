@@ -203,8 +203,8 @@ class DOCUMENT extends API {
 									unset ($sub['attributes']['data-required']);
 								}
 								if (isset($sub['markdown']) && isset($sub['content'])){
-									$markdown = new MARKDOWN($sub['content']);
-									$sub['htmlcontent'] = $markdown->converted();
+									$markdown = new MARKDOWN();
+									$sub['htmlcontent'] = $markdown->txt2md($sub['content']);
 									unset ($sub['content']);
 								}
 								if ($sub) $result[] = $sub;
@@ -1350,8 +1350,8 @@ class DOCUMENT extends API {
 					}
 					elseif ($subs['type'] === 'textsection'){
 						if (isset($subs['markdown']) && isset($subs['content'])){
-							$markdown = new MARKDOWN($subs['content']);
-							$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->converted()];
+							$markdown = new MARKDOWN();
+							$content['content'][$name] = ['type' => 'markdown', 'value' => $markdown->txt2md($subs['content'])];
 						}
 						else $content['content'][$name] = ['type' => 'textsection', 'value' => isset($subs['content']) ? $subs['content'] : ''];
 					}

@@ -693,8 +693,8 @@ some@mail.address and escaped\@mail.address
 [top header](#plain-text)  
 [second header](#plain-text-1)
 END;
-		$markdown = new MARKDOWN(preg_replace("/\r/", '', $sample));
-		echo $markdown->converted();
+		$markdown = new MARKDOWN();
+		echo $markdown->txt2md($sample);
 	}
 }
 
