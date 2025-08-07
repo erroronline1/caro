@@ -1181,8 +1181,6 @@ class ORDER extends API {
 
 				break;
 			case 'DELETE':
-				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $row['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
-				// delete attachments
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_prepared_order', [
 					'values' => [
 						':id' => intval($this->_requestedID)
@@ -1191,6 +1189,8 @@ class ORDER extends API {
 				$order = $order ? $order[0] : null;
 				if (!$order) $this->response([], 404);
 				$order = json_decode($order['order_data'], true);
+				if (!(PERMISSION::permissionFor('orderprocessing') || array_intersect(explode(',', $order['organizational_unit']), $_SESSION['user']['units']))) $this->response([], 401);
+				// delete attachments
 				if (isset($order['attachments'])){
 					$files = explode(',', $order['attachments']);
 					UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
