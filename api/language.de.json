@@ -679,8 +679,9 @@
 		},
 		"navigation": {
 			"audit": "Internes Audit",
-			"templates": "Audit vorbereiten",
-			"management_review": "Managementbericht"
+			"management_review": "Managementbericht",
+			"regulatory": "Regulatorische Auswertungen und Zusammenfassungen",
+			"templates": "Audit vorbereiten"
 		},
 		"orderstatistics": {
 			"delivery_time_column": "Lieferzeit in Tagen",
@@ -1674,7 +1675,6 @@
 			"header": "Werkzeuge",
 			"image": "Bildskalierung und Wasserzeichen",
 			"markdownpreview": "Markdowneditor und Vorschau",
-			"regulatory": "Regulatorische Auswertungen und Zusammenfassungen",
 			"scanner": "2D-Scanner",
 			"zip": "Zip-Archiv erstellen / entpacken"
 		},

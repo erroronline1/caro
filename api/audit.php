@@ -1804,7 +1804,7 @@ class AUDIT extends API {
 				])) {
 					if ($managementreview[':closed']){
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
-							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'managementreviews\')">' . $this->_lang->GET('tool.navigation.regulatory', [], true). '</a>'],
+							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'managementreviews\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true). '</a>'],
 							true )
 						);
 					}
@@ -1845,7 +1845,7 @@ class AUDIT extends API {
 				])) {
 				if ($managementreview['closed']){
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
-							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\',  \'managementreviews\')">' . $this->_lang->GET('tool.navigation.regulatory', [], true). '</a>'],
+							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\',  \'managementreviews\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true). '</a>'],
 							true )
 						);
 					}

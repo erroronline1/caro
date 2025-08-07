@@ -783,7 +783,7 @@ export const api = {
 			title = {
 				audit: api._lang.GET("audit.navigation.audit"),
 				audittemplate: api._lang.GET("audit.navigation.templates"),
-				checks: api._lang.GET("tool.navigation.regulatory"),
+				checks: api._lang.GET("audit.navigation.regulatory"),
 				managementreview: api._lang.GET("audit.navigation.management_review"),
 			};
 		switch (method) {

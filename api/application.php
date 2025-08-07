@@ -589,7 +589,7 @@ class APPLICATION extends API {
 						$subject = $this->_lang->GET('audit.userskills.notification_message', [
 							':user' => $users[$user]['name'],
 							':training' => $training['name'],
-							':module' => $this->_lang->GET('tool.navigation.regulatory', [], true),
+							':module' => $this->_lang->GET('audit.navigation.regulatory', [], true),
 							':date' => $this->convertFromServerTime($training['date'], true)
 						], true);
 						$reminders = $calendar->search($subject);
@@ -1018,7 +1018,7 @@ class APPLICATION extends API {
 		// tools
 		if (PERMISSION::permissionFor('documentcomposer') || PERMISSION::permissionFor('audit')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('tool.navigation.markdownpreview')] =['onclick' => "api.tool('get', 'markdownpreview')"];
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('tool.navigation.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
+		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('audit.navigation.regulatory')] =['onclick' => "api.audit('get', 'checks')"];
 		if (PERMISSION::permissionFor('maintenance')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('maintenance.navigation.maintenance')] =['onclick' => "api.maintenance('get', 'task')"];
 
 		$this->response(['render' => $menu]);

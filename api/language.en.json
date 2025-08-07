@@ -679,8 +679,9 @@
 		},
 		"navigation": {
 			"audit": "Internal audit",
-			"templates": "Prepare audit",
-			"management_review": "Management review"
+			"management_review": "Management review",
+			"regulatory": "Regulatory evaluations and summaries",
+			"templates": "Prepare audit"
 		},
 		"orderstatistics": {
 			"delivery_time_column": "Delivery time (days)",
@@ -1674,7 +1675,6 @@
 			"header": "Tools",
 			"image": "Image resizing and watermark",
 			"markdownpreview": "Markdown editor and preview",
-			"regulatory": "Regulatory evaluations and summaries",
 			"scanner": "2D-scanner",
 			"zip": "Create or unpack a ZIP-archive"
 		},
