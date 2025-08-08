@@ -2097,7 +2097,7 @@ class AUDIT extends API {
 					'attributes' => [
 						'name' => $currentquestion
 					],
-					'htmlcontent' => $markdown->txt2md($currentanswer)
+					'htmlcontent' => $markdown->md2html($currentanswer)
 				];
 			}
 

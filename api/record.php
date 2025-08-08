@@ -292,7 +292,7 @@ class RECORD extends API {
 					}
 					if (isset($subs['markdown']) && isset($subs['content'])){
 						$markdown = new MARKDOWN();
-						$subs['htmlcontent'] = $markdown->txt2md($subs['content']);
+						$subs['htmlcontent'] = $markdown->md2html($subs['content']);
 						unset ($subs['content']);
 					}
 
@@ -1995,7 +1995,7 @@ class RECORD extends API {
 						if ($subs['type'] === 'textsection'){
 							if (isset($subs['markdown']) && isset($subs['content'])){
 								$markdown = new MARKDOWN();
-								$value  = '::MARKDOWN::' . $markdown->txt2md($subs['content']);
+								$value  = '::MARKDOWN::' . $markdown->md2html($subs['content']);
 							}
 							else $value = isset($subs['content']) ? str_replace('\n', "\n", $subs['content']) // format linebreaks
 							 : ' ';

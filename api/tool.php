@@ -672,7 +672,7 @@ class TOOL extends API {
 					'attributes' => [
 						'name' => $this->_lang->get('tool.markdownpreview.preview')
 					],
-					'htmlcontent' => $preview->txt2md($markdown)
+					'htmlcontent' => $preview->md2html($markdown)
 				]
 			];
 		}

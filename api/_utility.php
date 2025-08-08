@@ -892,10 +892,10 @@ class MARKDOWN {
 	}
 
 	/**
-	 * @param string $text as Markdown
+	 * @param string $text Markdown styled
 	 * @return string as HTML
 	 */
-	public function txt2md($text){
+	public function md2html($text){
 		$text = preg_replace("/\r/", '', $text);
 
 		$text = $this->blockquote($text); // should come first to enable nesting

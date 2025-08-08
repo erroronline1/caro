@@ -694,7 +694,7 @@ some@mail.address and escaped\@mail.address
 [second header](#plain-text-1)
 END;
 		$markdown = new MARKDOWN();
-		echo $markdown->txt2md($sample);
+		echo $markdown->md2html($sample);
 	}
 }
 
