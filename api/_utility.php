@@ -868,13 +868,13 @@ class MARKDOWN {
 	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
-	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (.+?\n)+?)(?:^(?! |\*|\-|\+|\d+\.)|$)/mi';
+	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>)/mi';
 	private $_list_nested = '/\n(^ {4}.+?\n)+/m';
 	private $_list_ol = '/(^( ){0,3}(\d+\.) (.+?\n))+/m';
 	private $_list_ul = '/(^( ){0,3}(\*|\-|\+) (.+?\n))+/m';
 		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/mi';
-	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
+	private $_pre = '/^ {4}([^\*\-\d].+)+/m';
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *-+ *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
 
@@ -1046,10 +1046,8 @@ class MARKDOWN {
 		// replace blockquotes recursively
 		$content = preg_replace_callback($this->_blockquote,
 			function($match){
-				//var_dump ($match[0]);
-				$match[0] = $this->blockquote(preg_replace('/^> {0,1}/m', '', $match[0])); // remove blockquote character and possible whitespace and check recursively for nested blockquotes 
-				$match[0] = preg_replace(['/^\n/', '/^ /m'], '', $match[0]); // remove leading linebreak and whitespace
-				return "<blockquote>" . $match[0] . "</blockquote>" . "\n"; // fence with tag, add linebreak for pattern recognition
+				$match[0] = $this->blockquote(preg_replace(['/^\n/', '/\n$/', '/^> {0,1}/m', '/^ /m'], '', $match[0])); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
+				return "<blockquote>" . $match[0] . "</blockquote>"; // fence with tag, add linebreak for pattern recognition
 			},
 			$content
 		);
@@ -1147,30 +1145,29 @@ class MARKDOWN {
 		return $content;
 	}
 
-	private function list($content){
+	private function list($content, $sub = false){
 		// detect any lists
-		// recursively replace nested lists and other nested blocks
+		// recursively replace nested lists
 		$content = preg_replace_callback($this->_list_any,
 			function($list){
 				// check lists for subelements, lists, blockquote, code, table or pre
 				return preg_replace_callback($this->_list_nested,
 					function($nested){
-						$nested[0] = preg_replace('/' . preg_quote($nested[0], '/') . '/',
-							preg_replace('/^\n/', '', $this->list(preg_replace('/^ {4}/m', '', $nested[0]))) . "\n",  // drop leading linebreak, but add one to end for pattern recognition
-							$nested[0]
-						);
-						$nested[0] = $this->blockquote($nested[0]);
-						$nested[0] = $this->code($nested[0]);
-						$nested[0] = $this->table($nested[0]);
-						$nested[0] = $this->pre($nested[0]);
-
-						return $nested[0];
+						return preg_replace('/^\n/', '', $this->list(preg_replace('/^ {4}/m', '', $nested[0] . "\n"), true));  // drop leading linebreak, but add one to end for pattern recognition
 					},
 					$list[1]
 				);
 			},
 			$content
 		);
+
+		if ($sub){
+			// replace possible nested blocks in advance to list matching
+			$content = $this->blockquote($content);
+			$content = $this->code($content);
+			$content = $this->table($content);
+			$content = $this->pre($content);
+		}
 
 		//replace unordered lists
 		$content = preg_replace_callback($this->_list_ul,
@@ -1196,7 +1193,7 @@ class MARKDOWN {
 			},
 			$content
 		);
-		return preg_replace('/^\n/', '', $content);
+		return $content;//preg_replace('/^\n/', '', $content);
 	}
 
 	private function mail($content){
@@ -1226,7 +1223,7 @@ class MARKDOWN {
 		// replace code/pre
 		$content = preg_replace_callback($this->_pre,
 			function($match){
-				return "<pre>" . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], preg_replace('/^ {4}/m', '', substr($match[0], 1))) . "</pre>\n";
+				return "<pre>" . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], preg_replace('/^ {4}/m', '', $match[0])) . "</pre>";
 			},
 			$content
 		);
