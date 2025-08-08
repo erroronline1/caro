@@ -600,7 +600,6 @@ class STRESSTEST extends INSTALL{
 	 */
 	public function markdown(){
 		$sample  = <<<'END'
-
 # Plain text (h1 header)
 
 This is a markdown flavour for basic text styling.  
@@ -610,7 +609,8 @@ and not just continuing.
 
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.
+**bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.  
+also ``code with ` escaped by double backticks``
 
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
@@ -639,8 +639,6 @@ a phone number: tel:012345678
 * Unordered list item 2
 * Unordered list item 3
 
-* * *
-
 ### Tables (h3 header)
 
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
@@ -656,25 +654,6 @@ a phone number: tel:012345678
 > with *multiple*  
 > lines
 
-* list item with  
-> blockquote
-* lext list item with  
-|table|
-|---|
-|row|
-
-> * List within blockquote 1
-> * List within blockquote 2
->     * nested list
-> ~~~
-> code within blockquote
-> ~~~
->> blockquote within blockquote
-> 
-> | Table nested | within |
-> | ---------- | ----- |
-> | blockquotes are | possible |
-
     preformatted text/code must
     start with 4 spaces <code>
 
@@ -689,7 +668,32 @@ some `code with <brackets>`
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
 ![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
-123\. escaped period avoiding a list  
+123\. escaped period avoiding a list
+
+## Nested items in lists
+
+1. List item with
+    > Blockquote as item
+2. Next list item with
+    |Table|Column2|
+    |---|---|
+    |R1C1|R1C2|
+4. Last item
+
+## Nested items in blockquotes
+
+> * List within blockquote 1
+> * List within blockquote 2
+>     * Nested list
+> ~~~
+> Code within blockquote
+> ~~~
+>> Blockquote within blockquote
+> 
+> | Table nested | within |
+> | ---------- | ----- |
+> | blockquotes are | also possible |
+
 [top header](#plain-text)  
 [second header](#plain-text-1)
 END;

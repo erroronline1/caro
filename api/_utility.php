@@ -848,13 +848,13 @@ class MARKDOWN {
 	markdown parser.
 	supposed to match github-flavour (https://github.github.com/gfm/) to a reasonable amount
 
-	current limitations:
+	Current limitations:
 	* code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
-	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different
+	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
 	* this flavour currently lacks support of
-		* setext headers by unterlining
+		* setext headers by unterlining due to h1 and h2 being to big in context of this application
 		* definitions
-		* double backticks for escaping
+		* multiline code within lists
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
@@ -862,7 +862,7 @@ class MARKDOWN {
 	private $_blockquote = '/(^>{1,} .*(?:\n|$))+/m';
 	private $_br = '/ +\n/';
 	private $_code_block = '/^ {0,3}([`~]{3})\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
-		private $_code_inline = '/(?<!\\)`([^\n]+?)(?<!\\| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)(?:\_{1,3}(?!\S)|\*{1,3}))/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
@@ -883,7 +883,7 @@ class MARKDOWN {
 
 	public function __construct()
 	{
-		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')`([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?:_{1,3}|\*{1,3})(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)(?:_{1,3}|\*{1,3}))/';
 		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\','/'). ')@[^\s<]+\.[^\s<]+)/';
@@ -1042,11 +1042,12 @@ class MARKDOWN {
 		);
 	}
 
-	private function blockquote($content){
+	private function blockquote($content, $sub = false){
 		// replace blockquotes recursively
 		$content = preg_replace_callback($this->_blockquote,
-			function($match){
+			function($match) use ($sub){
 				$match[0] = $this->blockquote(preg_replace(['/^\n/', '/\n$/', '/^> {0,1}/m', '/^ /m'], '', $match[0])); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
+				if (!$sub) return "<blockquote>\n" . $match[0] . "\n</blockquote>"; // fence with tag, add linebreak for pattern recognition
 				return "<blockquote>" . $match[0] . "</blockquote>"; // fence with tag, add linebreak for pattern recognition
 			},
 			$content
@@ -1064,7 +1065,7 @@ class MARKDOWN {
 			$content);
 		$content = preg_replace_callback($this->_code_inline,
 			function($match){
-				return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[1]) . '</span>'; // i'd rather use code, but tcpdf does not support that
+				return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[2]) . '</span>'; // i'd rather use code, but tcpdf does not support that
 			},
 			$content
 		);
@@ -1163,7 +1164,7 @@ class MARKDOWN {
 
 		if ($sub){
 			// replace possible nested blocks in advance to list matching
-			$content = $this->blockquote($content);
+			$content = $this->blockquote($content, true);
 			$content = $this->code($content);
 			$content = $this->table($content);
 			$content = $this->pre($content);

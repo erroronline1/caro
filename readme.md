@@ -34,8 +34,6 @@ Things are still in motion. Images may be outdated.
 * alter responsibilities drop hidden
 * markdown
     * https://markdown.de/, https://github.github.com/gfm/
-    * check recursive option for blockquotes and code within self or lists
-    * setext- vs atx-like headings
     * anchor display inline for textsection htmlcontent onscreen
     * track [known deficiencies](#known-deficiencies), comment in class too
 
@@ -1152,11 +1150,12 @@ and not just continuing.
 
 Text can be *italic*, **bold**, ***italic and bold***, ~~striked through~~, and `code style` with two ore more characters between the symbols.  
 Some escaping of formatting characters is possible with a leading \ as in
-**bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.
+**bold \* asterisk**, ~~striked \~~ through~~ and `code with a \`-character`.  
+Also ``code with ` escaped by double backticks``
 
 http://some.url, not particularly styled  
 a phone number: tel:012345678  
-[Styled link to Markdown information](https://www.markdownguide.org)  
+[Styled link to Markdown information](https://www.markdownguide.org)
 
 --------
 
@@ -1179,8 +1178,6 @@ a phone number: tel:012345678
 * Unordered list item 2
 * Unordered list item 3
 
-***
-
 ### Tables (h3 header)
 
 | Table header 1 | Table header 2 | Table header 3 | and 4 |
@@ -1188,7 +1185,7 @@ a phone number: tel:012345678
 | *emphasis* | **is** | ***possible*** | `too` |
 | linebreaks | are | not | though |
 
-* * *
+- - -
 
 #### Blockquotes and code (h4 header)
 
@@ -1196,15 +1193,8 @@ a phone number: tel:012345678
 > with *multiple*  
 > lines
 
-> * List within blockquote 1
-> * List within blockquote 2
-> 
-> | Table nested | within |
-> | ---------- | ----- |
-> | blockquotes are | possible |
-
     preformatted text/code must
-    start with 4 spaces
+    start with 4 spaces <code>
 
 ~~~
 or being surrounded by
@@ -1217,8 +1207,34 @@ some `code with <brackets>`
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
 ![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
-123\. escaped period avoiding a list  
-[top header](#plain-text)
+123\. escaped period avoiding a list
+
+### Nested items in lists
+
+1. List item with
+    > Blockquote as item
+2. Next list item with
+    |Table|Column2|
+    |---|---|
+    |R1C1|R1C2|
+4. Last item
+
+### Nested items in blockquotes
+
+> * List within blockquote 1
+> * List within blockquote 2
+>     * Nested list
+> ~~~
+> Code within blockquote
+> ~~~
+>> Blockquote within blockquote
+> 
+> | Table nested | within |
+> | ---------- | ----- |
+> | blockquotes are | also possible |
+
+[top header](#plain-text)  
+[second header](#plain-text-1)
 ```
 
 rendered to something as
@@ -1999,13 +2015,12 @@ Albeit Safari being capable of displaying most of the content and contributing r
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * There are some limitations and differences as opposed to [regular](https://www.rfc-editor.org/rfc/rfc7763.html) or rather [GitHub-flavoured](https://github.github.com/gfm/) Markdown if you're familiar with that:
     * images can be embedded but lack proper fetching within CARO context due to the Service-Worker
-    * code blocks are not parsed as \<code\> due to limited compatibility with the [TCPDF](#ressources)-implementation, but \<span\> with inline monospace style instead
-    * multiple lines for list items must be end with one or more spaces on the previous line
-    * this flavour currently lacks support of
-        * setext headers by unterlining
-        * blockquotes within list items
-        * definitions
-        * double backticks for escaping
+	* code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
+	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
+	* this flavour currently lacks support of
+		* setext headers by unterlining due to h1 and h2 being to big in context of this application
+		* definitions
+		* multiline code within lists
 
 [Content](#content)
 

@@ -1040,8 +1040,10 @@ Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zu
 [Übersicht](#übersicht)
 
 ## Markdown
+Sofern verfügbar kann text mit einer Markdown-Variante formatiert werden, die dem Original sehr nahe kommt.  
+Das ist keine Raketenwissenschaft, eine grundlegende Formatierung kann schnell erzielt werden. Bearbeitungsmasken haben eine Kurzübersicht, eine Schaltfläche um zum Markdowneditor mit Vorschau zu gelangen, sowie eine Umwandlung von CSV-Tabellen in das Markdown-Format und andersherum.
 
-Sofern verfügbar kann text mit einer Markdown-Variante formatiert werden, die dem Original sehr nahe kommt. Siehe [Bekannte Schwachstellen](#bekannte-schwachstellen) für Unterschiede zu normalem Markdown.
+Siehe [Bekannte Schwachstellen](#bekannte-schwachstellen) für Unterschiede zu normalem Markdown.
 
 Unterstütze Formatierungsoptionen beinhalten:
 
@@ -1055,11 +1057,12 @@ und nicht einfach fortgeführt zu werden.
 
 Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im `quelltextstil` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `code mit einem \`-zeichen`.
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und `Code mit einem \`-Zeichen`.  
+Außerdem ``Code mit ` maskiert durch umgebende doppelte Gravis'``
 
 http://eine.url, nicht besonders gestaltet  
 eine Telefonnummer: tel:012345678  
-[Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  
+[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)  
 
 --------
 
@@ -1082,8 +1085,6 @@ eine Telefonnummer: tel:012345678
 * ungeordneter Listeneintrag 2
 * ungeordneter Listeneintrag 3
 
-***
-
 ### Tabellen (h3 Überschrift)
 
 | Tabellenüberschrift 1 | Tabellenüberschrift 2 | Tabellenüberschrift 3 | und 4 |
@@ -1091,20 +1092,13 @@ eine Telefonnummer: tel:012345678
 | *Akzentuierung* | **ist** | ***ebenfalls*** | `möglich` |
 | Zeilenumbrüche | sind es | jedoch | nicht |
 
-* * *
+- - -
 
 #### Zitatblöcke und Code (h4 Überschrift)
 
 > Zitatblock  
 > mit *mehreren*  
 > Zeilen
-
-> * Listeneintrag innerhalb eines Zitatblocks 1
-> * Listeneintrag innerhalb eines Zitatblocks 2
-> 
-> | In Zitatblöcken | verschachtelte |
-> | ---------- | ----- |
-> | Tabellen sind | möglich |
 
     Vorformatierter Text/Code muss
     mit 4 Leerzeichen eingerückt werden
@@ -1121,7 +1115,32 @@ Betonung*im*Wort und __Betonung mit Unterstrich__
 eine@email.addresse und maskierte\@email.addresse  
 ![ein Bild](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) wird im CARO Kontext wegen des Service-Workers nicht dargestellt  
 123\. maskierter Punkt um eine Liste zu vermeiden  
-[erste Überschrift](#plain-text)
+
+### Verschachtelte Elemente in Listen
+
+1. Listeneintrag mit
+    > Zitatblock
+2. Ein weiterer Listeneintrag mit einer
+    |Tabelle|Spalte 2|
+    |---|---|
+    |Z1S1|Z1S2|
+4. Letzter Eintrag
+
+### Verschachtelte Elemente in Zitatblöcken
+
+> * Listeneintrag innerhalb eines Zitatblocks 1
+> * Listeneintrag innerhalb eines Zitatblocks 2
+>     * Unterliste
+> ~~~
+> Code innerhalb eines Zitatblocks
+> ~~~
+>> Zitatblock im Zitatblock
+> 
+> | In Zitatblöcken | verschachtelte |
+> | ---------- | ----- |
+> | Tabellen sind | möglich |
+
+[erste Überschrift](#einfacher-text)
 ```
 
 und werden in etwa folgendermaßen angezeigt:
@@ -1905,12 +1924,11 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
 * Es gibt einige Einschränkungen und Unterschiede zu [regulärem](https://www.rfc-editor.org/rfc/rfc7763.html) bzw. [GitHub-flavoured](https://github.github.com/gfm/) Markdown sofern man damit vertraut ist:
     * Bilder können eingebunden werden, aber aufgrund des Service-Workers im CARO-Zusammenhang nicht abgerufen werden
     * Code-Blöcke werden nicht als \<code\>, sondern aufgrund der eingeschränkten Kompatibilität der [TCPDF](#ressources)-Einbindung statt dessen als \<span\> mit inline monospace Style ausgegeben
-    * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder mehreren Leerzeichen enden
+    * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder mehreren Leerzeichen enden, das Verhalten von Zeilenumbrüchen innerhalb von Listen unterscheidet sich leicht
     * diese Variante unterstützt derzeit keine
         * Setext Überschriften durch Linien darunter
-        * Zitatblöcke innerhalb von Listeneinträgen
         * Definitionen
-        * doppelte Gravis' zur Maskierung
+        * Mehrzeiliger Code innerhalb von Listen
 
 [Übersicht](#übersicht)
 

@@ -1950,15 +1950,8 @@ a phone number: tel:012345678
 > with *multiple*  
 > lines
 
-> * List within blockquote 1
-> * List within blockquote 2
-> 
-> | Table nested | within |
-> | ---------- | ----- |
-> | blockquotes are | possible |
-
     preformatted text/code must
-    start with 4 spaces
+    start with 4 spaces <code>
 
 ~~~
 or being surrounded by
@@ -1966,12 +1959,37 @@ three \` or ~
 ~~~
 
 ## Other features:  
-<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello there'))  
+<http://some.other.url> with brackets, [urlencoded link with title](http://some.url?test2=2&test3=a=(/bcdef "some title") and [javascript: protocol](javascript:alert('hello world'))  
 some \`code with <brackets>\`  
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
 ![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
-123\. escaped period avoiding a list  
+123\. escaped period avoiding a list
+
+### Nested items in lists
+
+1. List item with
+    > Blockquote as item
+2. Next list item with
+    |Table|Column2|
+    |---|---|
+    |R1C1|R1C2|
+4. Last item
+
+### Nested items in blockquotes
+
+> * List within blockquote 1
+> * List within blockquote 2
+>     * Nested list
+> ~~~
+> Code within blockquote
+> ~~~
+>> Blockquote within blockquote
+> 
+> | Table nested | within |
+> | ---------- | ----- |
+> | blockquotes are | also possible |
+
 [top header](#plain-text)
 `;
 					await _.sleep(500);
@@ -1992,11 +2010,11 @@ und nicht einfach fortgeführt zu werden.
 
 Text kann *kursiv*, **fett**, **kursiv und fett, ~~durchgestrichen~~ und im \`quelltextstil\` mit je zwei oder mehr Zeichen zwischen den Symbolen dargestellt werden.  
 Das Maskieren von Formatierungszeichen ist mit einem vorangestellten \ möglich, wie in
-**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`code mit einem \\\`-zeichen\`.
+**fettes \* Sternchen**, ~~durch \~~ gestrichen~~ und \`Code mit einem \\\`-Zeichen\`.
 
 http://eine.url, nicht besonders gestaltet  
 eine Telefonnummer: tel:012345678  
-[Angepasster Link für weitere Markdown informationen](https://www.markdownguide.org)  
+[Angepasster Link für weitere Markdown Informationen](https://www.markdownguide.org)  
 
 --------
 
@@ -2036,13 +2054,6 @@ eine Telefonnummer: tel:012345678
 > mit *mehreren*  
 > Zeilen
 
-> * Listeneintrag innerhalb eines Zitatblocks 1
-> * Listeneintrag innerhalb eines Zitatblocks 2
-> 
-> | In Zitatblöcken | verschachtelte |
-> | ---------- | ----- |
-> | Tabellen sind | möglich |
-
     Vorformatierter Text/Code muss
     mit 4 Leerzeichen eingerückt werden
 
@@ -2057,7 +2068,32 @@ ein \`code mit <Klammern>\`
 Betonung*im*Wort und __Betonung mit Unterstrich__  
 eine@email.addresse und maskierte\@email.addresse  
 ![ein Bild](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) wird im CARO Kontext wegen des ServiceWorkers nicht dargestellt  
-123\. maskierter Punkt um eine Liste zu vermeiden  
+123\. maskierter Punkt um eine Liste zu vermeiden
+
+### Verschachtelte Elemente in Listen
+
+1. Listeneintrag mit
+    > Zitatblock
+2. Ein weiterer Listeneintrag mit einer
+    |Tabelle|Spalte 2|
+    |---|---|
+    |Z1S1|Z1S2|
+4. Letzter Eintrag
+
+### Verschachtelte Elemente in Zitatblöcken
+
+> * Listeneintrag innerhalb eines Zitatblocks 1
+> * Listeneintrag innerhalb eines Zitatblocks 2
+>     * Unterliste
+> ~~~
+> Code innerhalb eines Zitatblocks
+> ~~~
+>> Zitatblock im Zitatblock
+> 
+> | In Zitatblöcken | verschachtelte |
+> | ---------- | ----- |
+> | Tabellen sind | möglich |
+
 [erste Überschrift](#plain-text)
 `;
 					await _.sleep(500);
