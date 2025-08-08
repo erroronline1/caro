@@ -1030,7 +1030,8 @@ class MARKDOWN {
 				if (isset($match[3]) && $match[3]) $url .= '" title="' . substr($match[3], 2, -1);
 				return '<a href="' . $url . '">' . $match[1] . '</a>' . $match[4];
 			},
-			$content);
+			$content
+		);
 		return $content;
 	}
 
@@ -1038,7 +1039,8 @@ class MARKDOWN {
 		// replace linebreaks
 		return preg_replace($this->_br,
 			"<br />",
-			$content);
+			$content
+		);
 	}
 
 	private function blockquote($content){
@@ -1053,7 +1055,8 @@ class MARKDOWN {
 				$match[1] = preg_replace('/^ /m', '', $match[1]); // remove leading whitespace, convert linebreak within matches
 				return $match[1];
 			},
-			$content);
+			$content
+		);
 		return $content;
 	}
 
@@ -1069,7 +1072,8 @@ class MARKDOWN {
 			function($match){
 				return '<span style="font-family: monospace;">' . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], $match[1]) . '</span>'; // i'd rather use code, but tcpdf does not support that
 			},
-			$content);
+			$content
+		);
 		return $content;
 	}
 
@@ -1089,7 +1093,8 @@ class MARKDOWN {
 				];
 				$content = preg_replace('/' . preg_quote(str_repeat(substr($emphasis[1][$i], 0, 1), $wrapper) . $emphasis[2][$i] . str_repeat(substr($emphasis[1][$i], 0, 1), $wrapper), '/') . '/',
 					$tags[$wrapper][0] . $emphasis[2][$i] . $tags[$wrapper][1],
-					$content);
+					$content
+				);
 			}
 		}
 		return $content;
@@ -1099,7 +1104,8 @@ class MARKDOWN {
 		// replace escaped characters
 		return preg_replace($this->_escape,
 			'$1',
-			$content);
+			$content
+		);
 	}
 
 	private function header($content){
@@ -1123,7 +1129,8 @@ class MARKDOWN {
 				}
 				return '<h' . $size . ' id="' . $id . '">' . $match[2] . '</h' . $size . ">";
 			},
-			$content);
+			$content
+		);
 		return $content;
 	}
 
@@ -1131,14 +1138,16 @@ class MARKDOWN {
 		// replace hr	
 		return preg_replace($this->_hr,
 			"<hr>",
-			$content);
+			$content
+		);
 	}
 	
 	private function img($content){
 		// replace images
 		$content = preg_replace($this->_img,
 			'<img alt="$1" src="$2" />',
-			$content);
+			$content
+		);
 		return $content;
 	}
 
@@ -1160,33 +1169,29 @@ class MARKDOWN {
 		}
 
 		//replace unordered lists
-		preg_match_all($this->_list_ul, $content, $unorderedlist);
-		if (isset($unorderedlist[0]) && $unorderedlist[0]){
-			for ($i = 0; $i < count($unorderedlist[0]); $i++){
+		$content = preg_replace_callback($this->_list_ul,
+			function($match){
 				$output = '<ul>';
-				foreach (explode("\n", $unorderedlist[0][$i]) as $item){
+				foreach (explode("\n", $match[0]) as $item){
 					if ($item) $output .= "<li>" . preg_replace('/^ *[\*\+\-] /m','', $item) . "</li>";
 				}
 				$output .= "</ul>";
-				$content = preg_replace('/' . preg_quote($unorderedlist[0][$i], '/') . '/',
-					$output,
-					$content);
-			}
-		}
+				return $output;
+			},
+			$content
+		);
 		// replace ordered lists 
-		preg_match_all($this->_list_ol, $content, $orderedlist);
-		if (isset($orderedlist[0]) && $orderedlist[0]){
-			for ($i = 0; $i < count($orderedlist[0]); $i++){
+		$content = preg_replace_callback($this->_list_ol,
+			function($match) {
 				$output = '<ol>';
-				foreach (explode("\n", $orderedlist[0][$i]) as $item){
+				foreach (explode("\n", $match[0]) as $item){
 					if ($item) $output .= "<li>" . str_repeat('&nbsp;', 3) . preg_replace('/^ *\d+\. /m','', $item) . "</li>"; // &nbsp; looks a bit weird on screen but improves pdfs
 				}
 				$output .= "</ol>";
-				$content = preg_replace('/' . preg_quote($orderedlist[0][$i], '/') . '/',
-					$output,
-					$content);
-			}
-		}
+				return $output;
+			},
+			$content
+		);
 		return $content;
 	}
 
@@ -1201,7 +1206,8 @@ class MARKDOWN {
 				}
 				return '<a href="mailto:' . $encoded_email . '">' . $encoded_email . '</a>';
 			},
-			$content);
+			$content
+		);
 		return $content;
 	}
 
@@ -1220,7 +1226,8 @@ class MARKDOWN {
 			function($match){
 				return "<pre>" . str_replace(['&', '<', '>'], ['&amp;', '&lt;', '&gt;'], preg_replace('/^ {4}/m', '', substr($match[0], 1))) . "</pre>\n";
 			},
-			$content);
+			$content
+		);
 		return $content;
 	}
 
@@ -1228,7 +1235,8 @@ class MARKDOWN {
 		// replace s
 		return preg_replace($this->_s,
 			"<s>$1</s>",
-			$content);
+			$content
+		);
 	}
 
 	private function table($content){
@@ -1252,7 +1260,8 @@ class MARKDOWN {
 				$output .= '</table>';
 				return $output;
 			},
-			$content);
+			$content
+		);
 		return $content;
 	}
 }
