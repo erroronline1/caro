@@ -863,7 +863,7 @@ class MARKDOWN {
 	private $_br = '/ +\n/';
 	private $_code_block = '/^ {0,3}([`~]{3})\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)(?:\_{1,3}(?!\S)|\*{1,3}))/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
@@ -884,7 +884,7 @@ class MARKDOWN {
 	public function __construct()
 	{
 		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
-		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?:_{1,3}|\*{1,3})(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)(?:_{1,3}|\*{1,3}))/';
+		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)\1)/';
 		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\','/'). ')@[^\s<]+\.[^\s<]+)/';
 		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)~~/';
@@ -1074,25 +1074,20 @@ class MARKDOWN {
 
 	private function emphasis($content){
 		// replace all em and strong formatting
-		preg_match_all($this->_emphasis, $content, $emphasis);
-		if (isset($emphasis[0]) && $emphasis[0]) {
-			// iterate through matches
-			for ($i = 0; $i < count($emphasis[0]); $i++){
+		return preg_replace_callback($this->_emphasis, 
+			function($match) {
 				// check whether **opening and closing*** match
-				$wrapper = min(strlen($emphasis[1][$i]), strlen($emphasis[3][$i]));
+				$wrapper = strlen($match[1]);
 				$tags = [
 					[], // wrapper offset, easier than reducing index
 					['<em>', '</em>'],
 					['<strong>', '</strong>'],
 					['<em><strong>', '</strong></em>']
 				];
-				$content = preg_replace('/' . preg_quote(str_repeat(substr($emphasis[1][$i], 0, 1), $wrapper) . $emphasis[2][$i] . str_repeat(substr($emphasis[1][$i], 0, 1), $wrapper), '/') . '/',
-					$tags[$wrapper][0] . $emphasis[2][$i] . $tags[$wrapper][1],
-					$content
-				);
-			}
-		}
-		return $content;
+				return $tags[$wrapper][0] . $match[2] . $tags[$wrapper][1];
+			},
+			$content
+		);
 	}
 
 	private function escape($content){
