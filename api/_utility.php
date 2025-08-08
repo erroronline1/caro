@@ -1010,7 +1010,7 @@ class MARKDOWN {
 	private function a($content){
 		// replace links in this order
 		$content = preg_replace($this->_a_auto,
-			'<a href="$1" target="_blank">$1</a>',
+			'<a href="$1" target="_blank" class="inline">$1</a>',
 			$content);
 		$content = preg_replace_callback($this->_a_md,
 			function($match){
@@ -1027,7 +1027,7 @@ class MARKDOWN {
 					$url .= '" target="_blank';
 				}
 				if (isset($match[3]) && $match[3]) $url .= '" title="' . substr($match[3], 2, -1);
-				return '<a href="' . $url . '">' . $match[1] . '</a>' . $match[4];
+				return '<a href="' . $url . '" class="inline">' . $match[1] . '</a>' . $match[4];
 			},
 			$content
 		);

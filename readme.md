@@ -34,8 +34,6 @@ Things are still in motion. Images may be outdated.
 * alter responsibilities drop hidden
 * markdown
     * https://markdown.de/, https://github.github.com/gfm/
-    * anchor display inline for textsection htmlcontent onscreen
-    * track [known deficiencies](#known-deficiencies), comment in class too
 
 ## Content
 * [Aims](#aims)
@@ -1135,8 +1133,10 @@ Search functionality across the application may differ slightly depending of con
 [Content](#content)
 
 ## Markdown
+Where available text can be styled by a custom Markdown flavour to a reasonable amount.  
+This is no rocket science, basic formatting can be easily achieved. Editors provide a quick reference, a button to access a preview editor and a converter for CSV to Markdown table format and vice versa.
 
-Where available text can be styled by a custom Markdown flavour to a reasonable amount. See [Known deficiencies](#known-deficiencies) for differences to regular Markdown.
+See [Known deficiencies](#known-deficiencies) for differences to regular Markdown.
 
 Supported formatting options contain:
 
