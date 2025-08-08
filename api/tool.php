@@ -484,7 +484,7 @@ class TOOL extends API {
 							'attributes' => [
 								'name' => $this->_lang->GET('tool.csvmdconversion.csverror'),
 							],
-							'content' => $this->_lang->GET('tool.csvmdconversion.csverror_description', [':format' => "\n" . UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . $e->getMessage(),
+							'content' => $this->_lang->GET('tool.csvmdconversion.csv2md_error', [':format' => "\n" . UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . $e->getMessage(),
 						];
 						$this->response($response);
 					}
@@ -492,11 +492,24 @@ class TOOL extends API {
 				elseif(($md = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.csvmdconversion.markdown'))) !== false ) {
 					// convert markdown table to csv
 					$markdown = new MARKDOWN();
-					$result = $markdown->md2csv($md, [
-						'separator' => CONFIG['csv']['dialect']['separator'],
-						'enclosure' => CONFIG['csv']['dialect']['enclosure'],
-						'escape' => CONFIG['csv']['dialect']['escape']
-					]);
+					try {
+						$result = $markdown->md2csv($md, [
+							'separator' => CONFIG['csv']['dialect']['separator'],
+							'enclosure' => CONFIG['csv']['dialect']['enclosure'],
+							'escape' => CONFIG['csv']['dialect']['escape']
+						]);
+					}
+					catch (\Exception $e){
+						$response['render']['content'][] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.csvmdconversion.csverror'),
+							],
+							'content' => $this->_lang->GET('tool.csvmdconversion.md2csv_error'),
+						];
+						$this->response($response);
+					}
+
 					$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $result['headers'] . '.csv';
 					rename( $result['tmpfile'], $tempFile);
 					// provide downloadfile
@@ -518,7 +531,7 @@ class TOOL extends API {
 				'type' => 'textarea',
 				'attributes' => [
 					'name' => $this->_lang->GET('tool.csvmdconversion.markdown'),
-					'value' => $md
+					'value' => $md ? : ''
 				]
 			];
 			if ($csv) {

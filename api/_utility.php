@@ -892,32 +892,6 @@ class MARKDOWN {
 	}
 
 	/**
-	 * @param string $text Markdown styled
-	 * @return string as HTML
-	 */
-	public function md2html($text){
-		$text = preg_replace("/\r/", '', $text);
-
-		$text = $this->blockquote($text); // should come first to enable nesting
-		$text = $this->a($text);
-		$text = $this->code($text);
-		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
-		$text = $this->emphasis($text);
-		$text = $this->header($text);
-		$text = $this->img($text);
-		$text = $this->list($text);
-		$text = $this->mail($text);
-		$text = $this->pre($text);
-		$text = $this->s($text);
-		$text = $this->table($text);
-		$text = $this->p($text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
-		$text = $this->br($text);
-		$text = $this->escape($text); // should come after other stylings have been applied
-
-		return $text;
-	}
-
-	/**
 	 * @param string $path filepath to csv
 	 * @param array $csv dialect options
 	 * @return string|exception Marktown table or exception for lack of rows
@@ -962,21 +936,32 @@ class MARKDOWN {
 	}
 
 	/**
-	 * @param string $markdown Markdown table
+	 * @param string $content Markdown table
 	 * @param array $csv dialect options
-	 * @return array [tempfile => string, headers => string]
+	 * @return array|exception [tempfile => string, headers => string] or exception due to lack of identified tables
 	 */
-	public function md2csv($markdown, $csv = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
+	public function md2csv($content, $csv = ['separator' => ';', 'enclosure' => '"', 'escape' => '']){
 		$data = [];
-		$rows = explode("\n", $markdown);
-		foreach($rows as $row){
-			$row = preg_replace('/\r/', '', $row);
-			preg_match('/^(\|.+\|)$/', $row, $isrow);
-			if (!$isrow) continue;
-			preg_match('/^\|(\s|\-)+\|/', $row, $headseparator);
-			if ($headseparator) continue;
-			$row = array_map(fn($column) => trim($column), array_filter(explode('|', $row), fn($column) => boolval($column)));
-			$data[] = $row;
+		$content = preg_replace('/\r/', '', $content);
+		preg_match_all($this->_table, $content, $table);
+		if (isset($table[0]) && $table[0]) {
+			for ($i = 0; $i < count($table[0]); $i++){
+				foreach(explode("\n", $table[0][$i]) as $rowindex => $row){
+					if (!$row) continue;
+					$columns = array_filter(preg_split('/(?<!' . preg_quote('\\', '/'). ')\|/', $row), fn($c) => boolval(trim($c)));
+					switch($rowindex){
+						case 1:
+							break;
+						default:
+							$data[] = array_map(fn($column) => trim($column), array_filter($columns, fn($column) => boolval($column)));
+					}
+				}
+			}
+		}
+
+		if (!$data) {
+			throw new \Exception('no table identified');
+			return;
 		}
 
 		@$tmp_name = tempnam( sys_get_temp_dir(), preg_replace('/\W/', '', implode('_', $data[0])));
@@ -995,6 +980,32 @@ class MARKDOWN {
 		return [
 			'tmpfile' => $tmp_name, 
 			'headers' => preg_replace(CONFIG['forbidden']['names']['characters'], '_', implode('_', $data[0]))];
+	}
+
+	/**
+	 * @param string $text Markdown styled
+	 * @return string as HTML
+	 */
+	public function md2html($text){
+		$text = preg_replace("/\r/", '', $text);
+
+		$text = $this->blockquote($text); // should come first to enable nesting
+		$text = $this->a($text);
+		$text = $this->code($text);
+		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
+		$text = $this->emphasis($text);
+		$text = $this->header($text);
+		$text = $this->img($text);
+		$text = $this->list($text);
+		$text = $this->mail($text);
+		$text = $this->pre($text);
+		$text = $this->s($text);
+		$text = $this->table($text);
+		$text = $this->p($text); // must come after anything previous to not mess up pattern recognitions relying on linebreaks and filtering out previously converted tags
+		$text = $this->br($text);
+		$text = $this->escape($text); // should come after other stylings have been applied
+
+		return $text;
 	}
 
 	private function a($content){

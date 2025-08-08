@@ -1649,12 +1649,13 @@
 			"cancel": "Cancel",
 			"conversion": "Convert CSV to Markdown and vice versa",
 			"convert": "Convert",
+			"csv2md_error": "Conversion has been aborted, most likely due to a CSV formatting issue. Please adhere: :format",
 			"csverror": "Conversion error",
-			"csverror_description": "Conversion has been aborted, most likely due to a CSV formatting issue. Please adhere: :format",
 			"csvdownload": "Download CSV-file",
 			"csvupload": "Select CSV-file for conversion",
 			"markdown": "Convert Markdown-table",
-			"syntax": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee handbook for more information",
+			"md2csv_error": "Conversion has been aborted. Valid Markdown table format has not been found:\n \n| Header 1 | Header 2 | Header 3 |\n| -------- | -------- | -------- |\n| Column 1 | Column 2 | Column 3 |\n \nSee manual for more information",
+			"syntax": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information",
 			"syntax_help": "Markdown quick reference"
 		},
 		"image": {
