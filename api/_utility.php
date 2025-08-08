@@ -849,18 +849,17 @@ class MARKDOWN {
 	supposed to match github-flavour (https://github.github.com/gfm/) to a reasonable amount
 
 	current limitations:
-	* code blocks are not parsed as \<code\> due to limited compatibility with the [TCPDF](#ressources)-implementation, but \<span\> with inline monospace style instead
-    * multiple lines for list items must be end with one or more spaces on the previous line
-    * this flavour currently lacks support of
-        * setext headers by unterlining
-        * blockquotes within list items
-        * definitions
-        * double backticks for escaping
+	* code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
+	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different
+	* this flavour currently lacks support of
+		* setext headers by unterlining
+		* definitions
+		* double backticks for escaping
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
 	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)]|$)/m'; // regular md links
-	private $_blockquote = '/((?:^>{1,} .*\n)+)/m';
+	private $_blockquote = '/(^>{1,} .*(?:\n|$))+/m';
 	private $_br = '/ +\n/';
 	private $_code_block = '/^ {0,3}([`~]{3})\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
 		private $_code_inline = '/(?<!\\)`([^\n]+?)(?<!\\| |\n)`/'; // rewrite working regex101.com expression on construction for correct escaping of \
@@ -869,10 +868,10 @@ class MARKDOWN {
 	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
-	private $_list_any = '/(^( {0,})(\*|\-|\+|\d+\.) (.+?\n)+)(?:^$)*/m';
-	private $_list_nested = '/\n(^( {4,})(.+?\n))+(\*|\-|\+|\d+\.|(?:^$)*)/m';
-	private $_list_ol = '/(^( ){0,}(\d+\.) (.+?\n))+/m';
-	private $_list_ul = '/(^( ){0,}(\*|\-|\+) (.+?\n))+/m';
+	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (.+?\n)+?)(?:^(?! |\*|\-|\+|\d+\.)|$)/mi';
+	private $_list_nested = '/\n(^ {4}.+?\n)+/m';
+	private $_list_ol = '/(^( ){0,3}(\d+\.) (.+?\n))+/m';
+	private $_list_ul = '/(^( ){0,3}(\*|\-|\+) (.+?\n))+/m';
 		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/mi';
 	private $_pre = '/^\n^ {4}([^\*\-\d].+)+\n/m'; // must have a linebreak before
@@ -1047,13 +1046,10 @@ class MARKDOWN {
 		// replace blockquotes recursively
 		$content = preg_replace_callback($this->_blockquote,
 			function($match){
-				$match[1] = "<blockquote>\n" . preg_replace('/^>/m', '', $match[1]). "</blockquote>\n"; // remove leading blockquote character and fence with tag
-				preg_match_all($this->_blockquote, $match[1], $nested); // check if nested blockquotes remain
-				if ($nested[0]) {
-					$match[1] = $this->blockquote($match[1]);
-				}
-				$match[1] = preg_replace('/^ /m', '', $match[1]); // remove leading whitespace, convert linebreak within matches
-				return $match[1];
+				//var_dump ($match[0]);
+				$match[0] = $this->blockquote(preg_replace('/^> {0,1}/m', '', $match[0])); // remove blockquote character and possible whitespace and check recursively for nested blockquotes 
+				$match[0] = preg_replace(['/^\n/', '/^ /m'], '', $match[0]); // remove leading linebreak and whitespace
+				return "<blockquote>" . $match[0] . "</blockquote>" . "\n"; // fence with tag, add linebreak for pattern recognition
 			},
 			$content
 		);
@@ -1152,26 +1148,34 @@ class MARKDOWN {
 	}
 
 	private function list($content){
-		//detect any lists
-		preg_match_all($this->_list_any, $content, $list);
-		if (isset($list[0]) && $list[0]){
-			for ($i = 0; $i < count($list[0]); $i++){
-				// check lists for sublists
-				preg_match_all($this->_list_nested, $list[0][$i], $nested);
-				for ($j = 0; $j < count($nested[0]); $j++){
-					$nested[0][$j] = preg_replace('/' . preg_quote($nested[4][$j], '/') . '$/m', '', $nested[0][$j]); // strip next list item delimiter
-					// recursively replace nested lists
-					$content = preg_replace('/' . preg_quote($nested[0][$j], '/') . '/',
-						substr($this->list(preg_replace('/^ {4}/m', '', $nested[0][$j])), 1) . "\n",  // substr to drop leading linebreak, but add one to end for pattern recognition
-						$content);
-				}
-			}
-		}
+		// detect any lists
+		// recursively replace nested lists and other nested blocks
+		$content = preg_replace_callback($this->_list_any,
+			function($list){
+				// check lists for subelements, lists, blockquote, code, table or pre
+				return preg_replace_callback($this->_list_nested,
+					function($nested){
+						$nested[0] = preg_replace('/' . preg_quote($nested[0], '/') . '/',
+							preg_replace('/^\n/', '', $this->list(preg_replace('/^ {4}/m', '', $nested[0]))) . "\n",  // drop leading linebreak, but add one to end for pattern recognition
+							$nested[0]
+						);
+						$nested[0] = $this->blockquote($nested[0]);
+						$nested[0] = $this->code($nested[0]);
+						$nested[0] = $this->table($nested[0]);
+						$nested[0] = $this->pre($nested[0]);
+
+						return $nested[0];
+					},
+					$list[1]
+				);
+			},
+			$content
+		);
 
 		//replace unordered lists
 		$content = preg_replace_callback($this->_list_ul,
 			function($match){
-				$output = '<ul>';
+				$output = "<ul>";
 				foreach (explode("\n", $match[0]) as $item){
 					if ($item) $output .= "<li>" . preg_replace('/^ *[\*\+\-] /m','', $item) . "</li>";
 				}
@@ -1183,7 +1187,7 @@ class MARKDOWN {
 		// replace ordered lists 
 		$content = preg_replace_callback($this->_list_ol,
 			function($match) {
-				$output = '<ol>';
+				$output = "<ol>";
 				foreach (explode("\n", $match[0]) as $item){
 					if ($item) $output .= "<li>" . str_repeat('&nbsp;', 3) . preg_replace('/^ *\d+\. /m','', $item) . "</li>"; // &nbsp; looks a bit weird on screen but improves pdfs
 				}
@@ -1192,7 +1196,7 @@ class MARKDOWN {
 			},
 			$content
 		);
-		return $content;
+		return preg_replace('/^\n/', '', $content);
 	}
 
 	private function mail($content){
@@ -1213,8 +1217,6 @@ class MARKDOWN {
 
 	private function p($content){
 		// replace p
-		//preg_match_all($this->_p, $content, $m);
-		//var_dump($m);
 		return preg_replace($this->_p,
 			"<p>$1</p>\n",
 			$content);
