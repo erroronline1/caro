@@ -1046,7 +1046,7 @@ class MARKDOWN {
 		// replace blockquotes recursively
 		$content = preg_replace_callback($this->_blockquote,
 			function($match) use ($sub){
-				$match[0] = $this->blockquote(preg_replace(['/^\n/', '/\n$/', '/^> {0,1}/m', '/^ /m'], '', $match[0])); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
+				$match[0] = $this->blockquote(preg_replace(['/^\n/', '/\n$/', '/^>/m', '/^ /m'], '', $match[0])); // remove leading and trailing linebreak, blockquote character and possible whitespace and check recursively for nested blockquotes
 				if (!$sub) return "<blockquote>\n" . $match[0] . "\n</blockquote>"; // fence with tag, add linebreak for pattern recognition
 				return "<blockquote>" . $match[0] . "</blockquote>"; // fence with tag, add linebreak for pattern recognition
 			},
