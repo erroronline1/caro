@@ -1135,7 +1135,7 @@ class MARKDOWN {
 	private function img($content){
 		// replace images
 		$content = preg_replace($this->_img,
-			'<img alt="$1" src="$2" />',
+			'<img alt="$1" src="$2" style="float:left; max-width:100%" />',
 			$content
 		);
 		return $content;

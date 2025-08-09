@@ -1206,7 +1206,7 @@ three \` or ~
 some `code with <brackets>`  
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
-![an image](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) may not work in caro context because of service worker though  
+![an external image](./media/favicon/android/android-launchericon-48-48.png) could, but may not work in caro context because of the Service-Worker though  
 123\. escaped period avoiding a list
 
 ### Nested items in lists

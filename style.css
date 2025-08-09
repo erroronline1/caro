@@ -813,6 +813,12 @@ pre {
 	font-family: monospace;
 }
 
+blockquote {
+	border-left:.5em solid var(--cta);
+	border-radius: .5em;
+	padding-left:1em;
+}
+
 /*************************** calendar ******************************/
 
 .day {

@@ -1113,7 +1113,7 @@ eingefasst sein
 ein `code mit <Klammern>`  
 Betonung*im*Wort und __Betonung mit Unterstrich__  
 eine@email.addresse und maskierte\@email.addresse  
-![ein Bild](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg) wird im CARO Kontext wegen des Service-Workers nicht dargestellt  
+![ein externes Bild](./media/favicon/android/android-launchericon-48-48.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
 123\. maskierter Punkt um eine Liste zu vermeiden  
 
 ### Verschachtelte Elemente in Listen
