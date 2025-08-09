@@ -141,7 +141,7 @@ Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftli
 # Module
 
 ## Anwendung
-![sample application menu](http://toh.erroronline.one/caro/application%20menu%20de.png)
+![sample application menu](http://toh.erroronline.one/caro/anwendung%20menu%20de.png)
 
 ### Nutzer
 Die Anwendung stellt ein zugeordnetes Rollen-Management für registrierte Nutzer zur Verfügung. Der gesamte Inhalt ist nur für angemeldete Nutzer zugänglich. Nutzer können unterschiedliche Berechtigungen erhalten. Diese Berechtigungen steuern, welche Inhalte erreichbar sind oder welche Änderungen erlaubt sind. Die Grundlage basiert auf den für das Unternehmen anpassbaren [Laufzeitvariablen](#laufzeitvariablen). Die Beispiele stellen eine angemessene Einstellung dar, sind aber frei wählbar.
@@ -227,7 +227,7 @@ Nutzer können im Sinne der Transparenz alle persönlichen Informationen in ihre
 Die Anleitung kann gemäß technischem Verständnis und sprachlicher Gepflogenheiten individuell angepasst werden. Einzelne Abschnitte können dabei entsprechend der Berechtigungen markiert werden um diese zugunsten einer vereinfachten Übersicht auf der Startseite für alle anderen auszublenden. Bei der Installation wird eine Standard-Anleitung in der [voreingestellten Systemsprache](#laufzeitvariablen) angelegt. Die Anleitung und die Bearbeitungsschaltfläche (für berechtigte Nutzer) wird in dem Bereich *Über CARO App* angezeigt.
 
 ## Kommunikation
-![sample communication menu](http://toh.erroronline.one/caro/communication%20menu%20de.png)
+![sample communication menu](http://toh.erroronline.one/caro/kommunikation%20menu%20de.png)
 
 ### Unterhaltungen
 Systeminterne Nachrichten dienen ausschließlich der internen Kommunikation und haben keinen Aufzeichnungscharakter. Nachrichten werden als Unterhaltungen mit dem jeweiligen Gesprächspartner gruppiert. Dabei kann abgesehen von der Systemnutzerin und sich selbst jeder andere angeschrieben und die Unterhaltungen jederzeit gelöscht werden. Mehrere Adressaten können durch Komma oder Semikolon getrennt angesprochen werden. Ein Druck oder Klick auf das Profilbild einer Nachricht erlaubt eine Weiterleitung an andere Mitarbeiter. Neue Nachrichten lösen eine Systembenachrichtigung aus. Die Anwendung sendet im Bedarfsfall auch Nachrichten an Nutzergruppen.
@@ -333,7 +333,7 @@ Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, k
 [Übersicht](#übersicht)
 
 ## Aufzeichnungen
-![sample records menu](http://toh.erroronline.one/caro/records%20menu%20de.png)
+![sample records menu](http://toh.erroronline.one/caro/aufzeichnungen%20menu%20de.png)
 
 ### Dokumente
 Andere Anwendungen behaupten eine Dokumentenverwaltung und Versionierung zu unterstützen. Tatsächlich importieren viele davon lediglich PDF-Dateien, die außerhalb erstellt werden müssen. Es ist (ohne größere Nachforschungen betrieben zu haben) nicht erkenntlich, wie die Dokumentenlenkung und Versionierung tatsächlich erfolgt. Die CARO App verfolgt einen vollkommen anderen Ansatz: die Dokumente und internen Dokumente sollen bevorzugt innerhalb der Anwendung selbst erzeugt werden. Dies dient dem Ziel einer papierlosen Lösung bereits ausreichend, dennoch sind zusätzlich Exporte als beschreibbare oder vorausgefüllte PDF-Dateien innerhalb festgelegter Grenzen möglich.
@@ -596,7 +596,7 @@ Tabellen können von Markdown nach CSV und andersherum konvertiert werden um der
 [Übersicht](#übersicht)
 
 ## Kalender
-![sample calendar menu](http://toh.erroronline.one/caro/calendar%20menu%20de.png)
+![sample calendar menu](http://toh.erroronline.one/caro/kalender%20menu%20de.png)
 
 ### Terminvereinbarung
 Es kann eine Terminerinnerung für Kunden erstellt werden. Nach der Eingabe der relevanten Daten kann entweder eine ausgedruckte Version mit den Daten sowie einem QR-Code für den Import in einen Kalender auf einem Mobilgerät, oder direkt eine ICS-Datei für den Versand per eMail oder Nachrichtendienst verwendet werden.
@@ -724,7 +724,7 @@ Exporte sind nach Nutzernamen alphabetisch aufsteigend sortiert, mit dem exporti
 [Übersicht](#übersicht)
 
 ## Dateien
-![sample files menu](http://toh.erroronline.one/caro/files%20menu%20de.png)
+![sample files menu](http://toh.erroronline.one/caro/dateien%20menu%20de.png)
 
 Berechtigte Nutzer können Dateien für alle bereitstellen. Alle Nutzer können zudem zum öffentlichen Sharepoint beitragen. Hier haben Dateien nur eine begrenzte Verweildauer und werden automatisch gelöscht.
 
@@ -739,7 +739,7 @@ Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werd
 [Übersicht](#übersicht)
 
 ## Einkauf
-![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu%20de.png)
+![sample purchase menu](http://toh.erroronline.one/caro/einkauf%20menu%20de.png)
 
 ### Lieferanten- und Artikelverwaltung
 Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der [Import von Preislisten](#importierung-von-lieferantenpreislisten) nutzt den [CSV-Prozessor](#csv-prozessor).
@@ -960,7 +960,7 @@ Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lös
 [Übersicht](#übersicht)
 
 ## Werkzeuge
-![sample tools menu](http://toh.erroronline.one/caro/tools%20menu%20de.png)
+![sample tools menu](http://toh.erroronline.one/caro/werkzeuge%20menu%20de.png)
 
 Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, sowie der Unterstützung bei wiederkehrenden Berechnungen, Bildskalierung und ZIP-Archivierung zur Verfügung.
 
