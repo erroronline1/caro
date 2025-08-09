@@ -1929,6 +1929,7 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
         * Setext Überschriften durch Linien darunter
         * Definitionen
         * Mehrzeiliger Code innerhalb von Listen
+        * HTML Direkteingabe (absichtlich)
 
 [Übersicht](#übersicht)
 

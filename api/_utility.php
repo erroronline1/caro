@@ -855,6 +855,7 @@ class MARKDOWN {
 		* setext headers by unterlining due to h1 and h2 being to big in context of this application
 		* definitions
 		* multiline code within lists
+		* inline HTML on purpose
 	*/
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes

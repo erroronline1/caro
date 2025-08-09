@@ -34,6 +34,7 @@ Things are still in motion. Images may be outdated.
 * alter responsibilities drop hidden
 * markdown
     * https://markdown.de/, https://github.github.com/gfm/
+    * table cell aligning?
 
 ## Content
 * [Aims](#aims)
@@ -2015,12 +2016,13 @@ Albeit Safari being capable of displaying most of the content and contributing r
 * The calendar is usable from 1970-01-01 until 2079-06-06. This is due to limitations of SQL-Server as time of writing.
 * There are some limitations and differences as opposed to [regular](https://www.rfc-editor.org/rfc/rfc7763.html) or rather [GitHub-flavoured](https://github.github.com/gfm/) Markdown if you're familiar with that:
     * images can be embedded but lack proper fetching within CARO context due to the Service-Worker
-	* code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
-	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
-	* this flavour currently lacks support of
-		* setext headers by unterlining due to h1 and h2 being to big in context of this application
-		* definitions
-		* multiline code within lists
+    * code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
+    * multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
+    * this flavour currently lacks support of
+        * setext headers by unterlining due to h1 and h2 being to big in context of this application
+        * definitions
+        * multiline code within lists
+        * inline HTML on purpose
 
 [Content](#content)
 
