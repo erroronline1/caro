@@ -814,9 +814,9 @@ pre {
 }
 
 blockquote {
-	border-left:.5em solid var(--cta);
-	border-radius: .5em;
-	padding-left:1em;
+	border-left: 0.5em solid var(--cta);
+	border-radius: 0.5em;
+	padding-left: 1em;
 }
 
 /*************************** calendar ******************************/
@@ -915,7 +915,30 @@ input[type="radio"]:checked + .message.conversation {
 /*************************** general elements ******************************/
 
 h1 {
-	color: var(--foreground);
+	font-size: 1.5em;
+}
+h2 {
+	font-size: 1.333em;
+}
+h3 {
+	font-size: 1.166em;
+}
+h4 {
+	font-size: 1em;
+}
+h5 {
+	font-size: 0.833em;
+}
+h6 {
+	font-size: 0.666em;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0.5em auto;
 }
 
 br {
