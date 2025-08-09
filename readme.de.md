@@ -474,7 +474,7 @@ Eine vollständig papierlose Lösung könnte für feuchte Umgebungen ungeeignet 
 
 Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesbarer Form steht und der sich auch auf Exporten wiederfindet. Um den Arbeitsfluss zu verbessern können Aufkleberbögen erstellt werden, mit deren Hilfe zum Beispiel Produkte und exportierte Fomulare manuell gekennzeichnet werden können. Das Scannen des Codes reduziert eine Fehlerwahrscheinlichkeit bei der Zuordnung. Der Identifikator kann ebenfalls genutzt werden um Daten von anderen Aufzeichnungen zu importieren, beispielsweise bei der Übernahme von vergleichbaren Datensätzen anderer Versorgungsbereiche.
 
-![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code.png)
+![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code%20de.png)
 
 Bei der Anzeige von Zusammenfassungen erscheinen Empfehlungen für die Vervollständigung von Aufzeichnungen gemäß der Dokumenten-Pakete, die sowohl mit den Bereichen des letzten eintragenden Nutzers als auch des aktuellen Nutzers übereinstimmen; dabei wird davon ausgegangen, dass Vorgägnge typischerweise von Mitgliedern eines Bereichs bearbeitet werden. Die Vollständigkeit kann jedoch auch gegen jedes andere Dokumenten-Paket geprüft werden.
 

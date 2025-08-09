@@ -572,7 +572,7 @@ Paperless might not be suitable in humid environments. Thus single documents can
 
 The identifier is always a QR-code with additional readable content that will appear on any export of identifiable records. To improve workflow identifier labels can be generated to mark product components, exported documents, etc. By scanning the QR-code errors and mix-ups are unlikely. The identifier can also be used to import data from other records in case of comprehensive cases in different organizational units.
 
-![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code.png)
+![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code%20en.png)
 
 On display of any record appear recommendations to complete records according to bundles that match the last recording users units as well as the current viewing user, assuming cases are processed by members of the same unit in general. Checking for completeness of any document bundles can be applied as well.
 
