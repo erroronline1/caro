@@ -1723,6 +1723,13 @@ button[data-type="import"]::before {
 	mask-image: url("./media/link.svg");
 }
 
+button[data-type="markdown"]::before {
+	background-image: none;
+	background-color: var(--article);
+	-webkit-mask-image: url("./media/markdown.svg");
+	mask-image: url("./media/markdown.svg");
+}
+
 button[data-type="merge"]::before {
 	background-image: none;
 	background-color: var(--article);

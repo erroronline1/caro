@@ -1907,9 +1907,11 @@ export async function screenshot(lang = null) {
 		const targets = [
 			{
 				en: async function () {
-					await api.tool("get", "markdownpreview");
-					await _.sleep(2000);
-					document.getElementsByName(api._lang.GET("tool.markdownpreview.markdown"))[0].value = `
+					await api.application("get", "start");
+					const data = new FormData();
+					data.append(
+						api._lang.GET("tool.markdown.editor"),
+						`
 # Plain text (h1 header)
 
 This is a markdown flavour for basic text styling.  
@@ -2005,16 +2007,17 @@ some@mail.address and escaped\@mail.address
 > | like | aligning | colums |
 
 [top header](#plain-text)
-`;
-					await _.sleep(500);
-
-					api.tool("post", "markdownpreview");
+`
+					);
+					await api.tool("post", "markdown", null, data);
 					console.log(`:screenshot --fullpage --filename "markdown ${lang}.png"`);
 				},
 				de: async function () {
-					await api.tool("get", "markdownpreview");
-					await _.sleep(2000);
-					document.getElementsByName(api._lang.GET("tool.markdownpreview.markdown"))[0].value = `
+					await api.application("get", "start");
+					const data = new FormData();
+					data.append(
+						api._lang.GET("tool.markdown.editor"),
+						`
 # Einfacher Text (h1 Überschrift)
 
 Dies ist eine Markdown-Variante für einfache Textgestaltung.  
@@ -2110,10 +2113,9 @@ eine@email.addresse und maskierte\@email.addresse
 > | so wie | spaltenweise | Ausrichtung |
 
 [erste Überschrift](#plain-text)
-`;
-					await _.sleep(500);
-
-					api.tool("post", "markdownpreview");
+`
+					);
+					await api.tool("post", "markdown", null, data);
 					console.log(`:screenshot --fullpage --filename "markdown ${lang}.png"`);
 				},
 			},

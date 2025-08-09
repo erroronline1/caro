@@ -2137,27 +2137,26 @@ export const api = {
 				scanner: api._lang.GET("tool.navigation.scanner"),
 				zip: api._lang.GET("tool.navigation.zip"),
 				image: api._lang.GET("tool.navigation.image"),
-				markdownpreview: api._lang.GET("tool.navigation.markdownpreview"),
 			};
 		switch (method) {
 			case "get":
 				switch (request[1]) {
-					case "csvmdconversion":
+					case "markdown":
 						successFn = function (data) {
 							if (data.render) {
 								const options = {};
-								options[api._lang.GET("tool.csvmdconversion.cancel")] = false;
-								options[api._lang.GET("tool.csvmdconversion.convert")] = { value: true, class: "reducedCTA" };
+								options[api._lang.GET("tool.markdown.cancel")] = false;
+								options[api._lang.GET("tool.markdown.convert")] = { value: true, class: "reducedCTA" };
 								new Dialog(
 									{
 										type: "input",
-										header: api._lang.GET("tool.csvmdconversion.conversion"),
+										header: request[2] && request[2] === "table" ? api._lang.GET("tool.markdown.csv_conversion") : api._lang.GET("tool.markdown.playground"),
 										render: data.render,
 										options: options,
 									},
 									"FormData"
 								).then((response) => {
-									if (response) api.tool("post", "csvmdconversion", response);
+									if (response) api.tool("post", "markdown", request[2] || null, response);
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -2174,24 +2173,24 @@ export const api = {
 					case "code":
 						payload = _.getInputs("[data-usecase=tool_create_code]", true);
 						break;
-					case "csvmdconversion":
-						payload = request[2];
-						delete request[2];
+					case "markdown":
+						payload = request[3];
+						delete request[3];
 						successFn = function (data) {
 							if (data.render) {
 								const options = {};
-								options[api._lang.GET("tool.csvmdconversion.cancel")] = false;
-								options[api._lang.GET("tool.csvmdconversion.convert")] = { value: true, class: "reducedCTA" };
+								options[api._lang.GET("tool.markdown.cancel")] = false;
+								options[api._lang.GET("tool.markdown.convert")] = { value: true, class: "reducedCTA" };
 								new Dialog(
 									{
 										type: "input",
-										header: api._lang.GET("tool.csvmdconversion.conversion"),
+										header: request[2] && request[2] === "table" ? api._lang.GET("tool.markdown.csv_conversion") : api._lang.GET("tool.markdown.playground"),
 										render: data.render,
 										options: options,
 									},
 									"FormData"
 								).then((response) => {
-									if (response) api.tool("post", "csvmdconversion", response);
+									if (response) api.tool("post", "markdown", request[2] || null, response);
 								});
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
@@ -2199,9 +2198,6 @@ export const api = {
 						break;
 					case "image":
 						payload = _.getInputs("[data-usecase=tool_image]", true);
-						break;
-					case "markdownpreview":
-						payload = _.getInputs("[data-usecase=tool_markdownpreview]", true);
 						break;
 					case "zip":
 						payload = _.getInputs("[data-usecase=tool_zip]", true);
