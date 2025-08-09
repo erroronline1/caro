@@ -1986,9 +1986,10 @@ some@mail.address and escaped\@mail.address
 > ~~~
 >> Blockquote within blockquote
 > 
-> | Table nested | within |
-> | ---------- | ----- |
-> | blockquotes are | also possible |
+> | Tables nested | within | blockquotes |
+> | :---------- | :-----: | ---: |
+> | are | possible | as well |
+> | like | aligning | colums |
 
 [top header](#plain-text)
 `;
@@ -2090,9 +2091,10 @@ eine@email.addresse und maskierte\@email.addresse
 > ~~~
 >> Zitatblock im Zitatblock
 > 
-> | In Zitatblöcken | verschachtelte |
-> | ---------- | ----- |
-> | Tabellen sind | möglich |
+> | In Zitatblöcken | verschachtelte | Tabellen |
+> | :---------- | :-----: | -----: |
+> | sind | auch | möglich |
+> | so wie | spaltenweise | Ausrichtung |
 
 [erste Überschrift](#plain-text)
 `;

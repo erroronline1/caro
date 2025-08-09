@@ -1136,9 +1136,10 @@ eine@email.addresse und maskierte\@email.addresse
 > ~~~
 >> Zitatblock im Zitatblock
 > 
-> | In Zitatblöcken | verschachtelte |
-> | ---------- | ----- |
-> | Tabellen sind | möglich |
+> | In Zitatblöcken | verschachtelte | Tabellen |
+> | :---------- | :-----: | -----: |
+> | sind | auch | möglich |
+> | so wie | spaltenweise | Ausrichtung |
 
 [erste Überschrift](#einfacher-text)
 ```

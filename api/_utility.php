@@ -877,7 +877,7 @@ class MARKDOWN {
 	private $_p = '/^$\n((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/mi';
 	private $_pre = '/^ {4}([^\*\-\d].+)+/m';
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *-+ *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
+	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
 
 	private $headers = [];
 	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
@@ -1239,18 +1239,29 @@ class MARKDOWN {
 		// replace tables
 		$content = preg_replace_callback($this->_table,
 			function($match){
+				$rows = explode("\n", $match[0]);
+				// get possible alignments for colums from delimiter row
+				$columns = array_filter(preg_split('/(?<!' . preg_quote('\\', '/'). ')\|/', $rows[1]), fn($c) => boolval(trim($c)));
+				$alignment = [null]; // offset for array_keys($columns) later 
+				foreach($columns as $column){
+					preg_match('/(:{0,1})-+(:{0,1})/', trim($column), $align);
+					if ($align[1] && $align[2]) $alignment[] = ' align="center"';
+					elseif ($align[1]) $alignment[] = ' align="left"';
+					elseif ($align[2]) $alignment[] = ' align="right"';
+					else $alignment[] = '';
+				}
 				$output = '<table>';
-				foreach(explode("\n", $match[0]) as $rowindex => $row){
+				foreach($rows as $rowindex => $row){
 					if (!$row) continue;
 					$columns = array_filter(preg_split('/(?<!' . preg_quote('\\', '/'). ')\|/', $row), fn($c) => boolval(trim($c)));
 					switch($rowindex){
 						case 1:
 							break;
 						case 0:
-							$output .= '<tr>' . implode('', array_map(fn($column) => '<th>' . trim($column) . '</th>', $columns)) . '</tr>';
+							$output .= '<tr>' . implode('', array_map(fn($i, $column) => '<th' . (isset($alignment[$i]) ? $alignment[$i] : '') . '>' . trim($column) . '</th>', array_keys($columns), $columns)) . '</tr>';
 							break;
 						default:
-							$output .= '<tr>' . implode('', array_map(fn($column) => '<td>' . trim($column) . '</td>', $columns)) . '</tr>';
+							$output .= '<tr>' . implode('', array_map(fn($i, $column) => '<td' . (isset($alignment[$i]) ? $alignment[$i] : '') . '>' . trim($column) . '</td>', array_keys($columns), $columns)) . '</tr>';
 					}
 				}
 				$output .= '</table>';
