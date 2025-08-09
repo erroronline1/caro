@@ -1827,7 +1827,15 @@ export function rendertest(element) {
 
 export async function screenshot(lang = null) {
 	// import templates in available languages within dev environment and update the database ids for the respective usecases
-	// ensure switching languages in your profile in advance to calling function
+	// ensure switching languages in your profile AND in config.env or .ini in advance to calling function
+
+	// preferred initial viewport is 1000x1333 pixels in responsive design view with iOS as initial device for styling reasons (firefox)
+	// make sure having ressources prepared (ids, identifier, unprocessed orders), scroll to top on landing page
+
+	// one run takes about 5 minutes (default timeout of 10s * 23 screenshots, 4 viewport changes and some...)
+	// cut, resize and sanitize names afterwards
+
+	// you may have to adjust announcements for an expressive screenshot in between
 
 	const timeout = 10;
 	let iterator, value, s;
@@ -1836,7 +1844,7 @@ export async function screenshot(lang = null) {
 	function* menucall(index) {
 		const targets = document.querySelectorAll("nav > input");
 		while (index < targets.length) {
-			console.log(`:screenshot --fullpage --filename "${targets[index].title.toLowerCase()} menu ${lang}.png"`);
+			console.log(`:screenshot --filename "${targets[index].title.toLowerCase()} menu ${lang}.png"`);
 			yield targets[index];
 			index++;
 		}
@@ -1845,10 +1853,11 @@ export async function screenshot(lang = null) {
 	function* apicalls1(index) {
 		// with still fixed navigation
 		const targets = [
-			{ en: "api.file('get', 'files')", de: "", screenshot: `:screenshot --fullpage --filename "files ${lang}.png"` },
-			{ en: "api.measure('get', 'measure')", de: "", screenshot: `:screenshot --fullpage --filename "measure management ${lang}.png"` },
-			{ en: "api.message('get', 'conversation')", de: "", screenshot: `:screenshot --fullpage --filename "conversation ${lang}.png"` },
-			{ en: "api.responsibility('get', 'responsibilities')", de: "", screenshot: `:screenshot --fullpage --filename "responsibility ${lang}.png"` },
+			{ en: "api.file('get', 'files')", de: "", screenshot: `:screenshot --filename "files ${lang}.png"` },
+			{ en: "api.measure('get', 'measure')", de: "", screenshot: `:screenshot --filename "measure management ${lang}.png"` },
+			{ en: "api.message('get', 'announcements')", de: "", screenshot: `:screenshot --filename "announcements ${lang}.png"` },
+			{ en: "api.message('get', 'conversation')", de: "", screenshot: `:screenshot --filename "conversation ${lang}.png"` },
+			{ en: "api.responsibility('get', 'responsibilities')", de: "", screenshot: `:screenshot --filename "responsibility ${lang}.png"` },
 		];
 		while (index < targets.length) {
 			console.log(targets[index].screenshot);
@@ -1862,20 +1871,24 @@ export async function screenshot(lang = null) {
 		const targets = [
 			{ en: "rendertest('documents')", de: "rendertest('documents_de')", screenshot: `:screenshot --fullpage --filename "sample document elements ${lang}.png"` },
 			{ en: "api.application('get', 'start')", de: "", screenshot: `:screenshot --fullpage --filename "dashboard ${lang}.png"` },
-			{ en: "api.audit('get', 'audit', 11)", de: "", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
+			{ en: "api.audit('get', 'audit', 12)", de: "api.audit('get', 'audit', 11)", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
 			{ en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
 			{ en: "api.audit('get', 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
-			{ en: "api.calendar('get', 'longtermplanning', 11)", de: "", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
+			{ en: "api.calendar('get', 'longtermplanning', 11)", de: "api.calendar('get', 'longtermplanning', 58)", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
 			{ en: "api.calendar('get', 'schedule')", de: "", screenshot: `:screenshot --fullpage --filename "calendar ${lang}.png"` },
-			{ en: "api.document('get', 'document_editor', 127)", de: "", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
-			{ en: "api.message('get', 'announcements')", de: "", screenshot: `:screenshot --fullpage --filename "announcements ${lang}.png"` },
+			{ en: "api.document('get', 'document_editor', 3168)", de: "api.document('get', 'document_editor', 127)", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
 			{ en: "api.purchase('get', 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
 			{ en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
 			{ en: "api.record('get', 'document', 'Basic data')", de: "api.record('get', 'document', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document screen ${lang}.png"` }, // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
 			{ en: "api.risk('get', 'risk')", de: "", screenshot: `:screenshot --fullpage --filename "risks ${lang}.png"` },
-			{ en: "api.texttemplate('get', 'text', 40)", de: "", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
+			{ en: "api.texttemplate('get', 'text', 40)", de: "api.texttemplate('get', 'text', 38)", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
 			{ en: "api.user('get', 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
 			{ en: "api.user('get', 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
+			{
+				en: "api.record('get', 'record', 'Jane Doe *01.02.2003 DAFO 2025-08-09 15:52')",
+				de: "api.record('get', 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese 2025-08-09 16:02')",
+				screenshot: `:screenshot --fullpage --filename "record screen ${lang}.png"`,
+			}, // customize identifier
 		];
 		const rendertesttitle = [
 			{ en: "Sample application elements", de: "Beispiel Anwendungs-Elemente" },
@@ -2117,15 +2130,15 @@ eine@email.addresse und maskierte\@email.addresse
 			{
 				en: async function () {
 					const data = new FormData();
-					data.append(api._lang.GET("record.create_identifier"), "Jane Doe *01.02.2003");
-					data.append(api._lang.GET("_type"), "label");
+					data.append(api._lang.GET("record.create_identifier"), "Jane Doe *01.02.2003 DAFO");
+					data.append("_type", "label");
 					api.record("post", "identifier", "appendDate", data);
 					console.log(`sample identifier code ${lang}.png`);
 				},
 				de: async function () {
 					const data = new FormData();
-					data.append(api._lang.GET("record.create_identifier"), "Erika Musterfrau *01.02.2003");
-					data.append(api._lang.GET("_type"), "label");
+					data.append(api._lang.GET("record.create_identifier"), "Erika Musterfrau *01.02.2003 UA-Prothese");
+					data.append("_type", "label");
 					api.record("post", "identifier", "appendDate", data);
 					console.log(`sample identifier code ${lang}.png`);
 				},
@@ -2170,6 +2183,30 @@ eine@email.addresse und maskierte\@email.addresse
 					console.log(`appointment ${lang}.png`);
 				},
 			},
+			{
+				en: async function () {
+					api.record("get", "fullexport", "Jane Doe *01.02.2003 DAFO 2025-08-09 15:52"); // customize identifier
+					await _.sleep(2000);
+					console.log(`record full summary ${lang}.png`);
+				},
+				de: async function () {
+					api.record("get", "fullexport", "Erika Musterfrau *01.02.2003 UA-Prothese 2025-08-09 16:02"); // customize identifier
+					await _.sleep(2000);
+					console.log(`record full summary ${lang}.png`);
+				},
+			},
+			{
+				en: async function () {
+					api.record("get", "simplifiedexport", "Jane Doe *01.02.2003 DAFO 2025-08-09 15:52"); // customize identifier
+					await _.sleep(2000);
+					console.log(`record reduced summary ${lang}.png`);
+				},
+				de: async function () {
+					api.record("get", "simplifiedexport", "Erika Musterfrau *01.02.2003 UA-Prothese 2025-08-09 16:02"); // customize identifier
+					await _.sleep(2000);
+					console.log(`record reduced summary ${lang}.png`);
+				},
+			},
 		];
 		while (index < targets.length) {
 			yield targets[index][lang] ? targets[index][lang] : targets[index].en;
@@ -2202,7 +2239,7 @@ eine@email.addresse und maskierte\@email.addresse
 		console.clear();
 	}
 
-	console.log(`menu will be cleared in ${timeout} seconds. endpoints will load every ${timeout} seconds, type or preferrably copy and repaste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen.`);
+	console.log(`menu will be cleared in ${timeout} seconds. endpoints will load every ${timeout} seconds, copy and repaste ':screenshot --filename xyz.png' into console during the countdown to capture the screen.`);
 	await _.sleep(timeout * 1000);
 	for (const item of document.querySelectorAll("nav > input")) {
 		item.checked = false;
@@ -2221,7 +2258,7 @@ eine@email.addresse und maskierte\@email.addresse
 		console.clear();
 	}
 
-	console.log(`menu will be set to unfixed in ${timeout} seconds. endpoints will load every ${timeout} seconds, type or preferrably copy and repaste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen.`);
+	console.log(`menu will be set to unfixed in ${timeout} seconds. endpoints will load every ${timeout} seconds, copy and repaste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen.`);
 	await _.sleep(timeout * 1000);
 
 	// modify nav styling
@@ -2271,8 +2308,7 @@ eine@email.addresse und maskierte\@email.addresse
 	}
 
 	console.log("done. reload to return to normal.");
-	console.log("manual image updates may contain:");
-	console.table([`record screen.png ${lang}`, `record full summary ${lang}.png`, `record reduced summary ${lang}.png`]);
+	console.log("you may have to trigger " + `record reduced summary ${lang}.png` + " manually though for record summaries are timestamped by the minute only.");
 }
 
 export function request_param() {
