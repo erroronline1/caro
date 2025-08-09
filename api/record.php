@@ -1940,11 +1940,11 @@ class RECORD extends API {
 						switch ($type){
 							case 'document':
 							case 'full':
-								$summary['content'][$document][$key][] = $displayvalue . ' (' . $entry['author'] . ")";
+								$summary['content'][$document][$key][] = $displayvalue . ' (' . $entry['author'] . ")"; // append all entries
 								break;
 							case 'simplified':
 							case 'simplifieddocument':
-								$summary['content'][$document][$key][] = $displayvalue;
+								$summary['content'][$document][$key] = [$displayvalue]; // overwrite with the most recent only
 								break;
 						}
 						$value = $entry['value'];
