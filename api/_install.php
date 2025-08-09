@@ -134,7 +134,7 @@ define('DEFAULTSQL', [
 				"	`article_ean` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`article_info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`protected` tinyint NULL DEFAULT NULL," .
+				"	`has_files` tinyint NULL DEFAULT NULL," .
 				"	`trading_good` tinyint NULL DEFAULT NULL," .
 				"	`checked` datetime NULL DEFAULT NULL," .
 				"	`sample_checks` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
@@ -325,7 +325,6 @@ define('DEFAULTSQL', [
 				"	`span_end` datetime NOT NULL," .
 				"	`responsibility` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	`description` text COLLATE utf8mb4_unicode_ci NULL," .
-				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 				.
@@ -440,7 +439,7 @@ define('DEFAULTSQL', [
 				"	article_ean varchar(255) NULL DEFAULT NULL," .
 				"	article_info varchar(MAX) NULL DEFAULT NULL," .
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
-				"	protected tinyint NULL DEFAULT NULL," .
+				"	has_files tinyint NULL DEFAULT NULL," .
 				"	trading_good tinyint NULL DEFAULT NULL," .
 				"	checked smalldatetime NULL DEFAULT NULL," .
 				"	sample_checks varchar(MAX) NULL DEFAULT NULL," .
@@ -632,8 +631,7 @@ define('DEFAULTSQL', [
 				"	span_start date NOT NULL," .
 				"	span_end date NOT NULL," .
 				"	responsibility varchar(MAX) NULL DEFAULT NULL," .
-				"	description varchar(MAX) NULL DEFAULT NULL," .
-				"	hidden varchar(MAX) NULL DEFAULT NULL" .
+				"	description varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'dbo.caro_user_training', N'U') IS NULL " .

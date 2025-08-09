@@ -30,10 +30,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * improve screenreader accessibility
 * templates
-* alter consumables_products protected to has_files for comprehensible reasons
-* alter responsibilities drop hidden
-* markdown
-    * https://markdown.de/, https://github.github.com/gfm/
 
 ## Content
 * [Aims](#aims)

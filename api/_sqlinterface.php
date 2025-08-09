@@ -372,12 +372,12 @@ class SQLQUERY {
 		],
 
 		'consumables_post_product' => [
-			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :protected, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)",
-			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, protected, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :protected, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)"
+			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)",
+			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)"
 		],
 		'consumables_put_product' => [
-			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, protected = :protected, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id"
+			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id"
 		],
 		'consumables_put_product_pricelist_import' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id",
@@ -434,12 +434,12 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE CONVERT(VARCHAR, caro_consumables_vendors.id) IN (:ids)"
 		],
 		'consumables_delete_all_unprotected_products' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND (protected IS NULL OR protected = 0) AND last_order IS NULL",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND (protected IS NULL OR protected = 0) AND last_order IS NULL"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND (has_files IS NULL OR has_files = 0) AND last_order IS NULL",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE vendor_id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND (has_files IS NULL OR has_files = 0) AND last_order IS NULL"
 		],
 		'consumables_delete_unprotected_product' => [
-			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL",
-			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND protected IS NULL"
+			'mysql' => "DELETE FROM caro_consumables_products WHERE id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND has_files IS NULL",
+			'sqlsrv' => "DELETE FROM caro_consumables_products WHERE id = :id AND (article_alias IS NULL OR article_alias = '') AND checked IS NULL AND (incorporated IS NULL OR incorporated = '') AND has_files IS NULL"
 		],
 
 
@@ -872,12 +872,12 @@ class SQLQUERY {
 
 
 		'user_responsibility_post' => [
-			'mysql' => "INSERT INTO caro_user_responsibility (id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description, hidden) VALUES ( NULL, :user_id, :units, :assigned_users, :proxy_users, :span_start, :span_end, :responsibility, :description, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_user_responsibility (user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description, hidden) VALUES ( :user_id, :units, :assigned_users, :proxy_users, CONVERT(DATE, :span_start, 23), CONVERT(DATE, :span_end, 23), :responsibility, :description, :hidden)"
+			'mysql' => "INSERT INTO caro_user_responsibility (id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) VALUES ( NULL, :user_id, :units, :assigned_users, :proxy_users, :span_start, :span_end, :responsibility, :description)",
+			'sqlsrv' => "INSERT INTO caro_user_responsibility (user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) VALUES ( :user_id, :units, :assigned_users, :proxy_users, CONVERT(DATE, :span_start, 23), CONVERT(DATE, :span_end, 23), :responsibility, :description)"
 		],
 		'user_responsibility_put' => [
-			'mysql' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start = :span_start, span_end = :span_end, responsibility = :responsibility, description = :description, hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start =  CONVERT(DATE, :span_start, 23),  span_end = CONVERT(DATE, :span_end, 23), responsibility = :responsibility, description = :description, hidden = :hidden WHERE id = :id"
+			'mysql' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start = :span_start, span_end = :span_end, responsibility = :responsibility, description = :description WHERE id = :id",
+			'sqlsrv' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start =  CONVERT(DATE, :span_start, 23),  span_end = CONVERT(DATE, :span_end, 23), responsibility = :responsibility, description = :description WHERE id = :id"
 		],
 		'user_responsibility_accept' => [
 			'mysql' => "UPDATE caro_user_responsibility SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id",
