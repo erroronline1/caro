@@ -242,7 +242,7 @@ Berechtigte Nutzer können Ankündigungen für jedermann anlegen und bearbeiten 
 * das aktuelle Datum innerhalb der gewählten Zeitspanne liegt oder
 * keine Zeitspanne gesetzt wurde
 
-Alle Nutzer können alle Ankündigen unter dem entsprechenden Menüpunkt einsehen wobei die betroffenen Bereiche ausgewiesen sind. Ankündigungen sind keine dauerhaften Aufzeichnungen und können jederzeit bearbeitet und gelöscht werden. Die letzten Berabeitung und der entsprechende Nutzer werden angezeigt.
+Alle Nutzer können alle Ankündigen unter dem entsprechenden Menüpunkt einsehen wobei die betroffenen Bereiche ausgewiesen sind. Ankündigungen sind keine dauerhaften Aufzeichnungen und können jederzeit bearbeitet und gelöscht werden. Die letzten Berabeitung und der entsprechende Nutzer werden angezeigt. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung.
 
 ![announcements screenshot](http://toh.erroronline.one/caro/announcements%20de.png)
 
@@ -347,7 +347,7 @@ Dokumente sind modular. Um gelenkte und versionierte Dokumente anzulegen, müsse
 #### Komponentenbearbeitung
 Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
 * Scannerfeld, optional als Mehrfachauswahl und Identifikator
-* Textabschnitt für informative Zwecke ohne Eingabe, optional mit [Markdown](#markdown). Bei dem Export von Aufzeichnungen wird dem Inhalt `::MARKDOWN::`vorangestellt um den Inhalt entsprechend darzustellen. Theoretisch geschieht das auch wenn diese Zeichenketten manuell vorangestellt wird. Dieses möglicherweise unerwünschte Verhalten wird in der [Risikoanalyse](#risikoanalyse) berücksichtigt
+* Textabschnitt für informative Zwecke ohne Eingabe, standardmäßig mit [Markdown](#markdown) für eine Formatierung. Bei dem Export von Aufzeichnungen wird dem Inhalt `::MARKDOWN::`vorangestellt um den Inhalt entsprechend darzustellen. Theoretisch geschieht das auch wenn diese Zeichenketten manuell vorangestellt wird. Dieses möglicherweise unerwünschte Verhalten wird in der [Risikoanalyse](#risikoanalyse) berücksichtigt
 * Bild um beispielsweise Informationgrafiken einzubinden
 * einfaches Textfeld, optional als Mehrfachauswahl und mit Vorschlag vorheriger Eingaben
 * mehrzeiliges Textfeld, optional mit Zugriff auf Textvorschläge und mit Vorschlag vorheriger Eingaben
@@ -590,8 +590,7 @@ Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten 
 ### Managementbericht
 Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umwandeln. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Derzeit sind die Bewertungen reinweg textbasiert, ohne Bilder, Anhänge oder Tabellen. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen)umgesetzt. Abgeschlossene Managementberichts können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
 
-Der Großteil der CARO ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung mittles [Markdown](#markdown)-Syntax möglich.  
-Tabellen können von Markdown nach CSV und andersherum konvertiert werden um der Bequemlichkeit halber in einer Drittanwendung bearbeitet zu werden.
+Der Großteil der CARO ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung mittels [Markdown](#markdown)-Syntax möglich.  
 
 [Übersicht](#übersicht)
 
@@ -1041,7 +1040,7 @@ Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zu
 
 ## Markdown
 Sofern verfügbar kann text mit einer Markdown-Variante formatiert werden, die dem Original sehr nahe kommt.  
-Das ist keine Raketenwissenschaft, eine grundlegende Formatierung kann schnell erzielt werden. Bearbeitungsmasken haben eine Kurzübersicht, eine Schaltfläche um zum Markdowneditor mit Vorschau zu gelangen, sowie eine Umwandlung von CSV-Tabellen in das Markdown-Format und andersherum.
+Das ist keine Raketenwissenschaft, eine grundlegende Formatierung kann schnell erzielt werden. Bearbeitungsmasken haben eine Schaltfläche mit Kurzübersicht, Markdowneditor mit Vorschau, sowie eine Umwandlung von CSV-Tabellen in das Markdown-Format und andersherum.
 
 Siehe [Bekannte Schwachstellen](#bekannte-schwachstellen) für Unterschiede zu normalem Markdown.
 
@@ -1927,7 +1926,6 @@ Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Au
     * Code-Blöcke werden nicht als \<code\>, sondern aufgrund der eingeschränkten Kompatibilität der [TCPDF](#ressources)-Einbindung statt dessen als \<span\> mit inline monospace Style ausgegeben
     * mehrzeilige Listeneinträge müssen in der vorausgehenden Zeile mit einem oder mehreren Leerzeichen enden, das Verhalten von Zeilenumbrüchen innerhalb von Listen unterscheidet sich leicht
     * diese Variante unterstützt derzeit keine
-        * Setext Überschriften durch Linien darunter
         * Definitionen
         * Mehrzeiliger Code innerhalb von Listen
         * HTML Direkteingabe (absichtlich)

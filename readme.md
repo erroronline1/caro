@@ -327,7 +327,7 @@ Authorized users can add, edit and delete announcements for everyone to see and 
 * current date is in the selected time span or
 * no timespan is set
 
-All users can see all announcements within the distinct menu option though, declaring concerned units if set. Announcements are not a persistent record and can be deleted and edited at any time. The last edit and editing user is displayed.
+All users can see all announcements within the distinct menu option though, declaring concerned units if set. Announcements are not a persistent record and can be deleted and edited at any time. The last edit and editing user is displayed. [Markdown](#markdown) is available.
 
 ![announcements screenshot](http://toh.erroronline.one/caro/announcements%20en.png)
 
@@ -430,7 +430,7 @@ Documents are modular. To create tracked and versioned documents, create reusabl
 #### Component editing
 Available elements for components or rather documents are:
 * scanner field, optional as multiple and context identifier
-* text section for information purpose without input, optional with [Markdown](#markdown). On record export the content will be prefixed with `::MARKDWON::` to render accordingly. This works in theory if contents begin with this character set in general. This possible adverse behaviour is recognized within the [risk assessment](#risk-assessment)
+* text section for information purpose without input, [Markdown](#markdown) by default. On record export the content will be prefixed with `::MARKDWON::` to render accordingly. This works in theory if contents begin with this character set in general. This possible adverse behaviour is recognized within the [risk assessment](#risk-assessment)
 * image for including e.g. infographics
 * single line text input, optional as multiple and with former inputs recommended
 * multi line text input, optional access to text templates and with former inputs recommended
@@ -688,7 +688,6 @@ Executing an audit starts by selecting one of the prepared templates. Answers an
 Similar to audits you can enter management reviews, save and edit later, make them a permanent system record by closing them. A new review always starts with the input of the last saved one to begin with. The default language-files contain all required issues, so no topic is forgotten. Currently reviews are text only, so no images, attachments or tables. On finishing a management review an alert is distributed via [messenger](#conversations) toward all users with the [`regulatory`-permission](#runtime-variables). Closed management reviews can be displayed and exported within the [evaluation and summary-module](#regulatory-evaluations-and-summaries).
 
 Most of the CARO App is data driven, a management review may be adressed to third parties though. Therefore a bit of styling is possible using the [Markdown](#markdown) syntax.  
-Tables can be converted from Markdown to csv and vice versa to edit the contents in a third party application for convenience.
 
 [Content](#content)
 
@@ -1130,7 +1129,7 @@ Search functionality across the application may differ slightly depending of con
 
 ## Markdown
 Where available text can be styled by a custom Markdown flavour to a reasonable amount.  
-This is no rocket science, basic formatting can be easily achieved. Editors provide a quick reference, a button to access a preview editor and a converter for CSV to Markdown table format and vice versa.
+This is no rocket science, basic formatting can be easily achieved. Editors provide a button with quick reference, a preview editor and a converter for CSV to Markdown table format and vice versa.
 
 See [Known deficiencies](#known-deficiencies) for differences to regular Markdown.
 
@@ -2015,7 +2014,6 @@ Albeit Safari being capable of displaying most of the content and contributing r
     * code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
     * multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
     * this flavour currently lacks support of
-        * setext headers by unterlining due to h1 and h2 being to big in context of this application
         * definitions
         * multiline code within lists
         * inline HTML on purpose

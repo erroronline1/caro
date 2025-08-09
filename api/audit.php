@@ -1928,31 +1928,6 @@ class AUDIT extends API {
 					[
 						'type' => 'textsection',
 						'content' => ($managementreview['id'] ? "\n \n" . $this->_lang->GET('audit.managementreview.last_edit', [':date' => $this->convertFromServerTime($managementreview['last_touch'], true), ':user' => $managementreview['last_user']]) : $this->_lang->GET('audit.managementreview.last_version'))
-					],
-					[
-						'type' => 'button',
-						'attributes' => [
-							'value' => $this->_lang->GET('tool.csvmdconversion.syntax_help'),
-							'onclick' => "new _client.Dialog({type:'alert', header:'" . $this->_lang->GET('tool.csvmdconversion.syntax_help') . "', render:'" . addslashes($this->_lang->GET('tool.csvmdconversion.syntax')) . "'})",
-							'data-type' => 'helpbutton',
-							'class' => 'inlinebutton'
-						]
-					],
-					[
-						'type' => 'button',
-						'attributes' => [
-							'value' => $this->_lang->GET('tool.csvmdconversion.conversion'),
-							'onclick' => "api.tool('get', 'csvmdconversion')",
-							'class' => 'inlinebutton'
-						]
-					],
-					[
-						'type' => 'button',
-						'attributes' => [
-							'value' => $this->_lang->GET('tool.navigation.markdownpreview'),
-							'onclick' => "api.tool('get', 'markdownpreview')",
-							'class' => 'inlinebutton'
-						]
 					]
 				];
 				// display issue inputs
@@ -1966,6 +1941,14 @@ class AUDIT extends API {
 								'data-loss' => 'prevent'
 							],
 							'autocomplete' => isset($datalist[$key]) ? array_values($datalist[$key]) : null
+						], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('tool.markdown.button'),
+								'data-type' => 'markdown',
+								'class' => 'floatright',
+								'onclick' => 'api.tool("get", "markdown")'
+							]
 						]
 					];
 				}
