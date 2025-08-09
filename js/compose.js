@@ -180,6 +180,7 @@ export class Composer {
 				}
 				if (siblingName === api._lang.GET("assemble.compose.component.textsection_content") && siblingValue) {
 					element["content"] = siblingValue;
+					element.markdown = true;
 				}
 			} else if (["documentbutton"].includes(element.type)) {
 				if (siblingName === api._lang.GET("assemble.compose.component.link_document")) {
@@ -228,7 +229,6 @@ export class Composer {
 			if (siblingName === api._lang.GET("assemble.compose.component.required") && sibling.checked && !("required" in element.attributes)) element.attributes.required = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.multiple") && sibling.checked && !("multiple" in element.attributes)) element.attributes.multiple = true;
 			if (siblingName === api._lang.GET("assemble.compose.component.autocomplete") && sibling.checked && !("autocomplete" in element)) element.autocomplete = true;
-			if (siblingName === api._lang.GET("assemble.compose.component.markdown") && sibling.checked && !("markdown" in element)) element.markdown = true;
 
 			// documentbutton value should have been assigned in previous loops
 			if (siblingName === api._lang.GET("assemble.compose.component.link_document_choice") && siblingValue === api._lang.GET("assemble.compose.component.link_document_display") && sibling.checked) {
@@ -756,7 +756,6 @@ export class Composer {
 				if (siblingName === api._lang.GET("assemble.compose.component.required")) sibling.checked = Boolean("required" in element.attributes && element.attributes.required);
 				if (siblingName === api._lang.GET("assemble.compose.component.multiple")) sibling.checked = Boolean("multiple" in element.attributes && element.attributes.multiple);
 				if (siblingName === api._lang.GET("assemble.compose.component.autocomplete")) sibling.checked = Boolean("autocomplete" in element && element.autocomplete);
-				if (siblingName === api._lang.GET("assemble.compose.component.markdown")) sibling.checked = Boolean("markdown" in element && element.markdown);
 				if (siblingName === api._lang.GET("assemble.compose.component.context_identify")) sibling.checked = Boolean(element.type === "identify");
 
 				if (["links", "radio", "select", "checkbox"].includes(element.type)) {
@@ -2432,33 +2431,12 @@ export class Compose extends Assemble {
 			type: "checkbox",
 			content: {},
 		};
-		this.currentElement.content[api._lang.GET("assemble.compose.component.markdown")] = {
-			name: api._lang.GET("assemble.compose.component.markdown"),
-			"data-loss": "prevent",
-		};
-		result = result.concat(...this.checkbox());
 		this.currentElement = {
 			attributes: {
-				value: api._lang.GET("tool.csvmdconversion.syntax_help"),
-				"data-type": "helpbutton",
-				class: "inlinebutton",
-				onclick: "new _client.Dialog({type:'alert', header:'" + api._lang.GET("tool.csvmdconversion.syntax_help") + "', render:'" + api._lang.GET("tool.csvmdconversion.syntax") + "'})",
-			},
-		};
-		result = result.concat(...this.button());
-		this.currentElement = {
-			attributes: {
-				value: api._lang.GET("tool.csvmdconversion.conversion"),
-				class: "inlinebutton",
-				onclick: "api.tool('get', 'csvmdconversion')",
-			},
-		};
-		result = result.concat(...this.button());
-		this.currentElement = {
-			attributes: {
-				value: api._lang.GET("tool.navigation.markdownpreview"),
-				class: "inlinebutton",
-				onclick: "api.tool('get', 'markdownpreview')",
+				value: api._lang.GET("tool.markdown.button"),
+				"data-type": "markdown",
+				class: "floatright",
+				onclick: "api.tool('get', 'markdown')",
 			},
 		};
 		result = result.concat(...this.button());
