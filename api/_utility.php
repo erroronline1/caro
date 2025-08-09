@@ -852,7 +852,6 @@ class MARKDOWN {
 	* code blocks are not parsed as <code> due to limited compatibility with the [TCPDF](#ressources)-implementation, but <span> with inline monospace style instead
 	* multiple lines for list items must end with one or more spaces on the previous line, linebreaks within lists behave a bit different than regular Markdown
 	* this flavour currently lacks support of
-		* setext headers by unterlining due to h1 and h2 being to big in context of this application
 		* definitions
 		* multiline code within lists
 		* inline HTML on purpose
@@ -866,7 +865,7 @@ class MARKDOWN {
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_header = '/^\n*^(#+ )(.+?)(#*)$/m'; // must have a linebreak before
+	private $_headings = '/^\n*^(#+ )(.+?)(#*)$|(?:^\n*)(.*?)\n(={3,}|-{3,})$/m'; // must have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
 	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>)/mi';
@@ -879,7 +878,7 @@ class MARKDOWN {
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
 
-	private $headers = [];
+	private $headings = [];
 	private $headerchars = '/[\w\d\-\sÄÖÜäöüßêÁáÉéÍíÓóÚúÀàÈèÌìÒòÙù]+/';
 
 	public function __construct()
@@ -992,9 +991,9 @@ class MARKDOWN {
 		$text = $this->blockquote($text); // should come first to enable nesting
 		$text = $this->a($text);
 		$text = $this->code($text);
+		$text = $this->headings($text); // before hr avoiding conversion of ----
 		$text = $this->hr($text); // before emphasis avoiding matching *** as emphasis
 		$text = $this->emphasis($text);
-		$text = $this->header($text);
 		$text = $this->img($text);
 		$text = $this->list($text);
 		$text = $this->mail($text);
@@ -1099,16 +1098,25 @@ class MARKDOWN {
 		);
 	}
 
-	private function header($content){
+	private function headings($content){
 		// replace headers
-		$content = preg_replace_callback($this->_header,
+		return preg_replace_callback($this->_headings,
 			function($match){
-				$size = min(strlen($match[1]) - 1, 6);
-				preg_match($this->headerchars, trim($match[2]), $id);
+				if (!isset($match[4])){
+					// atx heading
+					$size = min(strlen($match[1]) - 1, 6);
+					$heading = trim($match[2]);
+				}
+				else {
+					// setext heading
+					$size = str_starts_with($match[5], '=') ? 1 : 2;
+					$heading = trim($match[4]);
+				}
+				preg_match($this->headerchars, $heading, $id);
 				if ($id[0]){
 					$id = strtolower(preg_replace(['/\s/'], ['-'], trim($id[0])));
 					// enumerate
-					$existing = array_filter($this->headers, fn($e) => str_starts_with($e, $id));
+					$existing = array_filter($this->headings, fn($e) => str_starts_with($e, $id));
 					if ($existing) {
 						sort($existing);
 						$last = array_pop($existing);
@@ -1116,13 +1124,12 @@ class MARKDOWN {
 						if (isset($numerate[1]) && $numerate[1]) $id .= '-' . intval($numerate[1]) + 1;
 						else $id .= '-1';
 					}
-					$this->headers[] = $id;
+					$this->headings[] = $id;
 				}
-				return '<h' . $size . ' id="' . $id . '">' . $match[2] . '</h' . $size . ">";
+				return '<h' . $size . ' id="' . $id . '">' . $heading . '</h' . $size . ">";
 			},
 			$content
 		);
-		return $content;
 	}
 
 	private function hr($content){

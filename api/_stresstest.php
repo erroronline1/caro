@@ -616,8 +616,8 @@ http://some.url, not particularly styled
 a phone number: tel:012345678  
 [Styled link to markdown information](https://www.markdownguide.org)
 
-# Plain text (h1 header)
-
+Plain text (h1 header)
+-------------------
 --------
 
 ## Lists (h2 header)
