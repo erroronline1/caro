@@ -547,7 +547,6 @@ class APPLICATION extends API {
 			// schedule renewal of expired responsibilities
 			$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
 			foreach ($responsibilities as $row){
-				if ($row['hidden']) continue;
 				if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 					// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
 					$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true));

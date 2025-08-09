@@ -87,7 +87,7 @@ class RESPONSIBILITY extends API {
 
 				// prepare existing responsibilities filtered by unit
 				foreach ($responsibilities as $row){
-					if (!PERMISSION::permissionFor('responsibilities') && $row['hidden']) continue;
+					if (!PERMISSION::permissionFor('responsibilities')) continue;
 					$row['units'] = explode(',', $row['units']);
 					$row['assigned_users'] = json_decode($row['assigned_users'], true);
 					$row['proxy_users'] = json_decode($row['proxy_users'], true);
@@ -245,7 +245,6 @@ class RESPONSIBILITY extends API {
 					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end'))),
 					':responsibility' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.task')),
 					':description' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.context')),
-					':hidden' => null,
 				];
 				// process selected units
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
@@ -307,7 +306,6 @@ class RESPONSIBILITY extends API {
 					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end'))),
 					':responsibility' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.task')),
 					':description' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.context')),
-					':hidden' => null,
 				];
 				// process selected units
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
@@ -382,7 +380,6 @@ class RESPONSIBILITY extends API {
 					'span_end' => '',
 					'responsibility' => '',
 					'description' => '',
-					'hidden' => null,
 				];
 				$responsibility['units'] = explode(',', $responsibility['units']);
 				$responsibility['assigned_users'] = json_decode($responsibility['assigned_users'], true);
