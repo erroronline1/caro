@@ -1270,41 +1270,44 @@ class RECORD extends API {
 
 				// add option for retyping if permitted
 				if ($content['record_type']) {
-					$typeaction = '';
-					if (PERMISSION::permissionFor('recordsretyping')){
-						$options = [];
-						foreach ($this->_lang->_USER['record']['type'] as $record_type => $description){
-							$options[$description] = ['value' => $record_type];
-						}						
-						$typeaction = "<a href=\"javascript:void(0);\" onclick=\"new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . UTILITY::json_encode(
-							[[
-								'type' => 'radio',
-								'attributes' => [
-									'name' => 'DEFAULT_' . $this->_lang->GET('record.type_description')
-								],
-								'content' => $options
-							], [
-								'type' => 'hidden',
-								'attributes' => [
-									'name' => 'entry_id',
-									'value' => $content['identifier']
-								]
-							]]
-						) . "'), options:{".
-						"'" . $this->_lang->GET('general.cancel_button') . "': false,".
-						"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
-						"}}, 'FormData').then(response => { if (response) api.record('post', 'retype', null, response)})"
-						. "\">" . $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . '</a>';
-					}
 					$response['render']['content'][] = [
 						[
 							'type' => 'textsection',
 							'attributes' => [
 								'name' => $this->_lang->_USER['record']['type'][$content['record_type']],
-							],
-							'htmlcontent' => $typeaction
+							]
 						]
-					];
+					];	
+					if (PERMISSION::permissionFor('recordsretyping')){
+						$options = [];
+						foreach ($this->_lang->_USER['record']['type'] as $record_type => $description){
+							$options[$description] = ['value' => $record_type];
+						}						
+						$response['render']['content'][count($response['render']['content']) - 1][] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]),
+								'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('record.retype_header', [':type' => $this->_lang->_USER['record']['type'][$content['record_type']]]) . "', render: JSON.parse('" . addslashes(UTILITY::json_encode(
+									[[
+										'type' => 'radio',
+										'attributes' => [
+											'name' => 'DEFAULT_' . $this->_lang->GET('record.type_description')
+										],
+										'content' => $options
+									], [
+										'type' => 'hidden',
+										'attributes' => [
+											'name' => 'entry_id',
+											'value' => $content['identifier']
+										]
+									]]
+								)) . "'), options:{".
+								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
+								"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".
+								"}}, 'FormData').then(response => { if (response) api.record('post', 'retype', null, response)})"
+							]
+						];
+					}
 					// add training button if type would possibly suggest one
 					if (in_array($content['record_type'], ['complaint'])) {
 						$response['render']['content'][count($response['render']['content']) - 1][] = [
