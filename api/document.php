@@ -301,7 +301,8 @@ class DOCUMENT extends API {
 					$response['render']['form'] = [
 						'data-usecase' => 'approval',
 						'action' => "javascript: api.document('put', 'approval', " . $this->_requestedID . ")",
-						'data-confirm' => true
+						'data-confirm' => true,
+						'novalidate' => true
 					];
 					if ($approve['name']) $response['header'] = $approve['name'];
 				}
