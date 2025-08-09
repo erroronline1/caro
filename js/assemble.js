@@ -1344,6 +1344,8 @@ export class Assemble {
 			} else if (element.nextElementSibling) element.nextElementSibling.classList.remove("input_required_alert");
 		}
 
+		if (event.target.form && event.target.form.noValidate) missing_required = false;
+		
 		// submit form after confirmation if applicable
 		if (!missing_required) {
 			if (!event.target.form.dataset.confirm) {
