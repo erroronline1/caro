@@ -455,95 +455,6 @@ class TOOL extends API {
 	}
 
 	/**
-	 *                       _                             _         
-	 *   ___ ___ _ _ _____ _| |___ ___ ___ _ _ ___ ___ ___|_|___ ___ 
-	 *  |  _|_ -| | |     | . |  _| . |   | | | -_|  _|_ -| | . |   |
-	 *  |___|___|\_/|_|_|_|___|___|___|_|_|\_/|___|_| |___|_|___|_|_|
-	 *
-	 * 
-	 */
-	public function csvmdconversion(){
-		$response = ['render' => ['content' => []]];
-		$csv = [];
-		$md = '';
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'POST':
-				if (isset($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]) && $_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name']) {
-					// convert csv to markdown table
-					$markdown = new MARKDOWN();
-					try {
-						$md = $markdown->csv2md($_FILES[$this->_lang->PROPERTY('tool.csvmdconversion.csvupload')]['tmp_name'][0], [
-							'separator' => CONFIG['csv']['dialect']['separator'],
-							'enclosure' => CONFIG['csv']['dialect']['enclosure'],
-							'escape' => CONFIG['csv']['dialect']['escape']
-						]);
-					}
-					catch(\Exception $e){
-						$response['render']['content'][] = [
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('tool.csvmdconversion.csverror'),
-							],
-							'content' => $this->_lang->GET('tool.csvmdconversion.csv2md_error', [':format' => "\n" . UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . $e->getMessage(),
-						];
-						$this->response($response);
-					}
-				}
-				elseif(($md = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.csvmdconversion.markdown'))) !== false ) {
-					// convert markdown table to csv
-					$markdown = new MARKDOWN();
-					try {
-						$result = $markdown->md2csv($md, [
-							'separator' => CONFIG['csv']['dialect']['separator'],
-							'enclosure' => CONFIG['csv']['dialect']['enclosure'],
-							'escape' => CONFIG['csv']['dialect']['escape']
-						]);
-					}
-					catch (\Exception $e){
-						$response['render']['content'][] = [
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('tool.csvmdconversion.csverror'),
-							],
-							'content' => $this->_lang->GET('tool.csvmdconversion.md2csv_error'),
-						];
-						$this->response($response);
-					}
-
-					$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $result['headers'] . '.csv';
-					rename( $result['tmpfile'], $tempFile);
-					// provide downloadfile
-					$csv[pathinfo($tempFile)['basename']] = [
-						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
-						'download' => pathinfo($tempFile)['basename']
-					];
-				}
-				break;
-			}
-			$response['render']['content'][] = [
-				'type' => 'file',
-				'attributes' => [
-					'name' => $this->_lang->GET('tool.csvmdconversion.csvupload'),
-					'accept' => '.csv'
-				]
-			];
-			$response['render']['content'][] = [
-				'type' => 'textarea',
-				'attributes' => [
-					'name' => $this->_lang->GET('tool.csvmdconversion.markdown'),
-					'value' => $md ? : ''
-				]
-			];
-			if ($csv) {
-				$response['render']['content'][] = [
-					'type' => 'links',
-					'description' => $this->_lang->GET('tool.csvmdconversion.csvdownload'),
-					'content' => $csv
-				];
-			}
-		$this->response($response);
-	}
-	/**
 	 *   _                   
 	 *  |_|_____ ___ ___ ___ 
 	 *  | |     | .'| . | -_|
@@ -635,61 +546,136 @@ class TOOL extends API {
 	}
 
 	/**
-	 *                 _     _                               _           
-	 *   _____ ___ ___| |_ _| |___ _ _ _ ___ ___ ___ ___ _ _|_|___ _ _ _ 
-	 *  |     | .'|  _| '_| . | . | | | |   | . |  _| -_| | | | -_| | | |
-	 *  |_|_|_|__,|_| |_,_|___|___|_____|_|_|  _|_| |___|\_/|_|___|_____|
-	 *                                      |_|
+	 *                 _     _
+	 *   _____ ___ ___| |_ _| |___ _ _ _ ___ 
+	 *  |     | .'|  _| '_| . | . | | | |   |
+	 *  |_|_|_|__,|_| |_,_|___|___|_____|_|_|
+	 * 
 	 */
-	public function markdownpreview(){
-		$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdownpreview.markdown'));
-		$response = ['render' => [
-			'form' => [
-			'data-usecase' => 'tool_markdownpreview',
-			'action' => "javascript:api.tool('post', 'markdownpreview')"
-		],
-		'content' => [
-			[
-				[
+	public function markdown(){
+		switch ($this->_requestedType){
+			case "table":
+				// table conversion
+				$response = ['render' => ['content' => []]];
+				$csv = [];
+				$md = '';
+				if (isset($_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]) && $_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]['tmp_name']) {
+					// convert csv to markdown table
+					$markdown = new MARKDOWN();
+					try {
+						$md = $markdown->csv2md($_FILES[$this->_lang->PROPERTY('tool.markdown.csvupload')]['tmp_name'][0], [
+							'separator' => CONFIG['csv']['dialect']['separator'],
+							'enclosure' => CONFIG['csv']['dialect']['enclosure'],
+							'escape' => CONFIG['csv']['dialect']['escape']
+						]);
+					}
+					catch(\Exception $e){
+						$response['render']['content'][] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.markdown.csverror'),
+							],
+							'content' => $this->_lang->GET('tool.markdown.csv2md_error', [':format' => "\n" . UTILITY::json_encode(CONFIG['csv']['dialect'], JSON_PRETTY_PRINT)]) . "\n" . $e->getMessage(),
+						];
+						$this->response($response);
+					}
+				}
+				elseif(($md = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'))) !== false ) {
+					// convert markdown table to csv
+					$markdown = new MARKDOWN();
+					try {
+						$result = $markdown->md2csv($md, [
+							'separator' => CONFIG['csv']['dialect']['separator'],
+							'enclosure' => CONFIG['csv']['dialect']['enclosure'],
+							'escape' => CONFIG['csv']['dialect']['escape']
+						]);
+					}
+					catch (\Exception $e){
+						$response['render']['content'][] = [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.markdown.csverror'),
+							],
+							'content' => $this->_lang->GET('tool.markdown.md2csv_error'),
+						];
+						$this->response($response);
+					}
+
+					$tempFile = UTILITY::directory('tmp') . '/' . $this->_date['usertime']->format('Y-m-d H-i-s ') . $result['headers'] . '.csv';
+					rename( $result['tmpfile'], $tempFile);
+					// provide downloadfile
+					$csv[pathinfo($tempFile)['basename']] = [
+						'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+						'download' => pathinfo($tempFile)['basename']
+					];
+				}
+				$response['render']['content'][] = [
+					'type' => 'file',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.markdown.csvupload'),
+						'accept' => '.csv'
+					]
+				];
+				$response['render']['content'][] = [
 					'type' => 'textarea',
 					'attributes' => [
-						'name' => $this->_lang->get('tool.markdownpreview.markdown'),
-						'rows' => 24,
-						'value' => $markdown ? : ''
+						'name' => $this->_lang->GET('tool.markdown.editor'),
+						'value' => $md ? : ''
 					]
+				];
+				if ($csv) {
+					$response['render']['content'][] = [
+						'type' => 'links',
+						'description' => $this->_lang->GET('tool.markdown.csvdownload'),
+						'content' => $csv
+					];
+				}
+				break;
+			default: // quick reference and editor
+				$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'));
+				$response = ['render' => [
+					'form' => [
+					'data-usecase' => 'tool_markdownpreview',
+					'action' => "javascript:api.tool('post', 'markdownpreview')"
 				],
-				[
-					'type' => 'button',
-					'attributes' => [
-						'value' => $this->_lang->GET('tool.csvmdconversion.syntax_help'),
-						'onclick' => "new _client.Dialog({type:'alert', header:'" . $this->_lang->GET('tool.csvmdconversion.syntax_help') . "', render:'" . addslashes($this->_lang->GET('tool.csvmdconversion.syntax')) . "'})",
-						'data-type' => 'helpbutton',
-						'class' => 'inlinebutton'
+				'content' => [
+					[
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('tool.markdown.quick_reference_header')
+							],
+							'content' => $this->_lang->GET('tool.markdown.quick_reference')
+						], [
+							'type' => 'textarea',
+							'attributes' => [
+								'name' => $this->_lang->get('tool.markdown.editor'),
+								'rows' => 24,
+								'value' => $markdown ? : ''
+							]
+						], [
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('tool.markdown.csv_conversion'),
+								'onclick' => "api.tool('get', 'markdown', 'table')",
+								'class' => 'inlinebutton'
+							]
+						]
 					]
-				],
-				[
-					'type' => 'button',
-					'attributes' => [
-						'value' => $this->_lang->GET('tool.csvmdconversion.conversion'),
-						'onclick' => "api.tool('get', 'csvmdconversion')",
-						'class' => 'inlinebutton'
-					]
-				]
-			]
-		]]];
-		if ($markdown) {
-			$preview = new MARKDOWN();
-			$response['render']['content'][] = [
-				[
-					'type' => 'textsection',
-					'attributes' => [
-						'name' => $this->_lang->get('tool.markdownpreview.preview')
-					],
-					'htmlcontent' => $preview->md2html($markdown)
-				]
-			];
+				]]];
+				if ($markdown) {
+					$preview = new MARKDOWN();
+					$response['render']['content'][] = [
+						[
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->get('tool.markdown.preview')
+							],
+							'htmlcontent' => $preview->md2html($markdown)
+						]
+					];
+				}
 		}
-
 		$this->response($response);
 	}
 

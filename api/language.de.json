@@ -1645,19 +1645,6 @@
 			"code_select_type": "Generiere einen",
 			"qrcode_text": "QR Text / URL"
 		},
-		"csvmdconversion": {
-			"cancel": "Abbrechen",
-			"conversion": "Konvertiere CSV zu Markdown und umgekehrt",
-			"convert": "Konvertieren",
-			"csv2md_error": "Die Konvertierung wurde aufgrund einer wahrscheinlich fehlerhaften CSV-Formatierung abgebrochen. Bitte beachten: :format",
-			"csverror": "Konvertierungsfehler",
-			"csvdownload": "CSV-Datei herunterladen",
-			"csvupload": "CSV-Datei für Konvertierung wählen",
-			"markdown": "Markdown-Tabelle konvertieren",
-			"md2csv_error": "Die konvertierung wurde abgebrochen. Es wurde kein gültiges Markdown-Tabellenformat gefunden:\n \n| Kopf 1 | Kopf 2 | Kopf 3 |\n| -------- | -------- | -------- |\n| Spalte 1 | Spalte 2 | Spalte 3 |\n \nFür mehr Informationen siehe Handbuch",
-			"syntax": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\n \\nDie Darstellung wird nach dem Speichern serverseitig überarbeitet\\nFür mehr Informationen siehe Handbuch",
-			"syntax_help": "Markdown Kurzübersicht"
-		},
 		"image": {
 			"export": "Exportiere",
 			"label": "Beschriftung",
@@ -1666,16 +1653,27 @@
 			"size": "Maximale Größe",
 			"source": "Bild"
 		},
-		"markdownpreview": {
-			"markdown": "Markdowneditor",
-			"preview": "Vorschau"
+		"markdown":{
+			"button": "Markdown",
+			"cancel": "Abbrechen",
+			"convert": "Konvertieren",
+			"csv_conversion": "Konvertiere CSV zu Markdown und umgekehrt",
+			"csv2md_error": "Die Konvertierung wurde aufgrund einer wahrscheinlich fehlerhaften CSV-Formatierung abgebrochen. Bitte beachten: :format",
+			"csverror": "Konvertierungsfehler",
+			"csvdownload": "CSV-Datei herunterladen",
+			"csvupload": "CSV-Datei für Konvertierung wählen",
+			"editor": "Markdown-Tabelle konvertieren",
+			"md2csv_error": "Die konvertierung wurde abgebrochen. Es wurde kein gültiges Markdown-Tabellenformat gefunden:\n \n| Kopf 1 | Kopf 2 | Kopf 3 |\n| -------- | -------- | -------- |\n| Spalte 1 | Spalte 2 | Spalte 3 |\n \nFür mehr Informationen siehe Handbuch",
+			"playground":"Markdown Spielplatz",
+			"preview": "Vorschau",
+			"quick_reference": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\n \\nDie Darstellung wird nach dem Speichern serverseitig überarbeitet\\nFür mehr Informationen siehe Handbuch",
+			"quick_reference_header": "Kurzübersicht"
 		},
 		"navigation": {
 			"calculator": "Rechner",
 			"digital_codes": "2D-Codes erstellen",
 			"header": "Werkzeuge",
 			"image": "Bildskalierung und Wasserzeichen",
-			"markdownpreview": "Markdowneditor und Vorschau",
 			"scanner": "2D-Scanner",
 			"zip": "Zip-Archiv erstellen / entpacken"
 		},

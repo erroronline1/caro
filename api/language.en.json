@@ -1645,19 +1645,6 @@
 			"code_select_type": "Create a",
 			"qrcode_text": "QR text / URL"
 		},
-		"csvmdconversion": {
-			"cancel": "Cancel",
-			"conversion": "Convert CSV to Markdown and vice versa",
-			"convert": "Convert",
-			"csv2md_error": "Conversion has been aborted, most likely due to a CSV formatting issue. Please adhere: :format",
-			"csverror": "Conversion error",
-			"csvdownload": "Download CSV-file",
-			"csvupload": "Select CSV-file for conversion",
-			"markdown": "Convert Markdown-table",
-			"md2csv_error": "Conversion has been aborted. Valid Markdown table format has not been found:\n \n| Header 1 | Header 2 | Header 3 |\n| -------- | -------- | -------- |\n| Column 1 | Column 2 | Column 3 |\n \nSee manual for more information",
-			"syntax": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information",
-			"syntax_help": "Markdown quick reference"
-		},
 		"image": {
 			"export": "Export",
 			"label": "Label",
@@ -1666,16 +1653,27 @@
 			"size": "Maximum size",
 			"source": "Image"
 		},
-		"markdownpreview": {
-			"markdown": "Markdown editor",
-			"preview": "Preview"
+		"markdown":{
+			"button": "Markdown",
+			"cancel": "Cancel",
+			"convert": "Convert",
+			"csv_conversion": "Convert CSV to Markdown and vice versa",
+			"csv2md_error": "Conversion has been aborted, most likely due to a CSV formatting issue. Please adhere: :format",
+			"csverror": "Conversion error",
+			"csvdownload": "Download CSV-file",
+			"csvupload": "Select CSV-file for conversion",
+			"editor": "Markdown editor",
+			"md2csv_error": "Conversion has been aborted. Failed to identify Markdown table format:\n \n| Header 1 | Header 2 | Header 3 |\n| -------- | -------- | -------- |\n| Column 1 | Column 2 | Column 3 |\n \nSee manual for more information",
+			"playground":"Markdown playground",
+			"preview": "Preview",
+			"quick_reference": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information",
+			"quick_reference_header": "Quick reference"
 		},
 		"navigation": {
 			"calculator": "Calculator",
 			"digital_codes": "Create 2D-codes",
 			"header": "Tools",
 			"image": "Image resizing and watermark",
-			"markdownpreview": "Markdown editor and preview",
 			"scanner": "2D-scanner",
 			"zip": "Create or unpack a ZIP-archive"
 		},
