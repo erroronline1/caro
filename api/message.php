@@ -163,6 +163,7 @@ class MESSAGE extends API {
 			];
 		}
 
+		$markdown = new MARKDOWN();
 		foreach($announcements as $announcement){
 			$announcementunits = $units;
 			$concerns = [];
@@ -187,7 +188,7 @@ class MESSAGE extends API {
 					'attributes' => [
 						'name' => $announcement['subject']
 					],
-					'content' => implode("\n", $announcementcontent), 
+					'htmlcontent' => $markdown->md2html(implode("\n", $announcementcontent)), 
 				]
 			];
 			if (PERMISSION::permissionFor('announcements')){
@@ -252,6 +253,16 @@ class MESSAGE extends API {
 						'name' => $this->_lang->GET('message.announcement.text'),
 						'value' => isset($preset['text']) ? $preset['text'] : ''
 					]
+				], [
+					'type' => 'button',
+					'attributes' => [
+						'value' => $this->_lang->GET('tool.markdown.button'),
+						'data-type' => 'markdown',
+						'class' => 'floatright',
+						'onclick' => 'api.tool(\\"get\\", \\"markdown\\")'
+					]
+				], [
+					'type' => 'br'
 				], [
 					'type' => 'date',
 					'attributes' => [
