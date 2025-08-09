@@ -370,14 +370,14 @@ class CONSUMABLES extends API {
 					foreach ($_FILES as $input => $files){
 						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':id' => $currentproduct['vendor_id']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
 					}
-					// set protected
+					// set has_files
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
 							':value' => 1,
 						],
 						'replacements' => [
 							':ids' => intval($this->_requestedID),
-							':field' => 'protected',
+							':field' => 'has_files',
 						]
 					]);
 				}
@@ -644,14 +644,14 @@ class CONSUMABLES extends API {
 					foreach ($_FILES as $input => $files){
 						UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_products', [':id' => $currentproduct['vendor_id']]), [$currentproduct['vendor_name'] . '_' . $this->_date['servertime']->format('Ymd') . '_' . $currentproduct['article_no']]);
 					}
-					// set protected
+					// set has_files
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 						'values' => [
 							':value' => 1,
 						],
 						'replacements' => [
 							':ids' => intval($this->_requestedID),
-							':field' => 'protected',
+							':field' => 'has_files',
 						]
 					]);
 				}
@@ -805,8 +805,6 @@ class CONSUMABLES extends API {
 	 * 
 	 * only unprotected products can be deleted, otherwise only hidden
 	 * 
-	 * adding documents sets protected flag
-	 * 
 	 * revoking incorporation state results in a caro_check entry
 	 * 
 	 * $this->_payload as genuine form data
@@ -826,7 +824,7 @@ class CONSUMABLES extends API {
 					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
 					'article_info' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null,
 					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-					'protected' => null,
+					'has_files' => null,
 					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
 					'incorporated' => null,
 					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
@@ -847,7 +845,7 @@ class CONSUMABLES extends API {
 
 				// fileuploads happen on success only, but providing files protects this document from removal
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
-					$product['protected'] = 1;
+					$product['has_files'] = 1;
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_product', [
@@ -860,7 +858,7 @@ class CONSUMABLES extends API {
 						':article_ean' => $product['article_ean'],
 						':article_info' => $product['article_info'],
 						':hidden' => $product['hidden'],
-						':protected' => $product['protected'],
+						':has_files' => $product['has_files'],
 						':trading_good' => $product['trading_good'],
 						':incorporated' => $product['incorporated'],
 						':has_expiry_date' => $product['has_expiry_date'],
@@ -986,7 +984,7 @@ class CONSUMABLES extends API {
 					$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
 					$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
 					UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.product.documents_update')], UTILITY::directory('vendor_products', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry . '_' . $product['article_no']]);
-					$product['protected'] = 1;
+					$product['has_files'] = 1;
 				}
 
 				// apply settings on similar products if selected
@@ -1078,7 +1076,7 @@ class CONSUMABLES extends API {
 						':article_ean' => $product['article_ean'],
 						':article_info' => $product['article_info'],
 						':hidden' => $product['hidden'],
-						':protected' => $product['protected'],
+						':has_files' => $product['has_files'],
 						':trading_good' => $product['trading_good'],
 						':incorporated' => $product['incorporated'] ? : null,
 						':has_expiry_date' => $product['has_expiry_date'],
@@ -1129,7 +1127,7 @@ class CONSUMABLES extends API {
 					'article_ean' => '',
 					'article_info' => '',
 					'hidden' => null,
-					'protected' => null,
+					'has_files' => null,
 					'trading_good' => null,
 					'incorporated' => '',
 					'sample_checks' => '',
@@ -1651,7 +1649,7 @@ class CONSUMABLES extends API {
 					}
 
 					// add delete button for eligible products
-					if ($product['id'] && !$product['protected'] && !$product['article_alias'] && !$product['checked'] && !$product['incorporated'] && !PERMISSION::permissionFor('productslimited')) array_push($response['render']['content'],
+					if ($product['id'] && !$product['has_files'] && !$product['article_alias'] && !$product['checked'] && !$product['incorporated'] && !PERMISSION::permissionFor('productslimited')) array_push($response['render']['content'],
 						[
 							[
 								'type' => 'deletebutton',
@@ -1870,7 +1868,7 @@ class CONSUMABLES extends API {
 					':article_ean' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_ean']) ? : null,
 					':article_info' => null,
 					':hidden' => null,
-					':protected' => null,
+					':has_files' => null,
 					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) && intval($pricelist->_list[1][$index]['trading_good']) ? 1 : null,
 					':incorporated' => isset($pricelist->_list[1][$index]['last_order']) && $pricelist->_list[1][$index]['last_order'] 
 						? UTILITY::json_encode([[
