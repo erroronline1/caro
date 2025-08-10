@@ -634,35 +634,32 @@ class TOOL extends API {
 			default: // quick reference and editor
 				$markdown = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.markdown.editor'));
 				$response = ['render' => [
-					'form' => [
-					'data-usecase' => 'tool_markdownpreview',
-					'action' => "javascript:api.tool('post', 'markdownpreview')"
-				],
-				'content' => [
-					[
+					'content' => [
 						[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('tool.markdown.quick_reference_header')
-							],
-							'content' => $this->_lang->GET('tool.markdown.quick_reference')
-						], [
-							'type' => 'textarea',
-							'attributes' => [
-								'name' => $this->_lang->get('tool.markdown.editor'),
-								'rows' => 24,
-								'value' => $markdown ? : ''
-							]
-						], [
-							'type' => 'button',
-							'attributes' => [
-								'value' => $this->_lang->GET('tool.markdown.csv_conversion'),
-								'onclick' => "api.tool('get', 'markdown', 'table')",
-								'class' => 'inlinebutton'
+							[
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => $this->_lang->GET('tool.markdown.quick_reference_header')
+								],
+								'content' => $this->_lang->GET('tool.markdown.quick_reference')
+							], [
+								'type' => 'textarea',
+								'attributes' => [
+									'name' => $this->_lang->get('tool.markdown.editor'),
+									'rows' => 24,
+									'value' => $markdown ? : ''
+								]
+							], [
+								'type' => 'button',
+								'attributes' => [
+									'value' => $this->_lang->GET('tool.markdown.csv_conversion'),
+									'onclick' => "api.tool('get', 'markdown', 'table')",
+									'class' => 'inlinebutton'
+								]
 							]
 						]
 					]
-				]]];
+				]];
 				if ($markdown) {
 					$preview = new MARKDOWN();
 					$response['render']['content'][] = [
