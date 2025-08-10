@@ -865,7 +865,7 @@ class MARKDOWN {
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_headings = '/^\n*^(#+ )(.+?)(#*)$|(?:^\n*)(.*?)\n(={3,}|-{3,})$/m'; // must have a linebreak before
+	private $_headings = '/^\n*^(#+ )(.+?)(#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
 	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>)/mi';
@@ -1113,7 +1113,7 @@ class MARKDOWN {
 					$heading = trim($match[4]);
 				}
 				preg_match($this->headerchars, $heading, $id);
-				if ($id[0]){
+				if (isset($id[0])){
 					$id = strtolower(preg_replace(['/\s/'], ['-'], trim($id[0])));
 					// enumerate
 					$existing = array_filter($this->headings, fn($e) => str_starts_with($e, $id));
