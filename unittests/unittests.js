@@ -1825,27 +1825,37 @@ export function rendertest(element) {
 	render.processAfterInsertion();
 }
 
-export async function screenshot(lang = null) {
+export async function screenshot(lang = null, distinct = null) {
 	// import templates in available languages within dev environment and update the database ids for the respective usecases
 	// ensure switching languages in your profile AND in config.env or .ini in advance to calling function
 
 	// preferred initial viewport is 1000x1333 pixels in responsive design view with iOS as initial device for styling reasons (firefox)
 	// make sure having ressources prepared (ids, identifier, unprocessed orders), scroll to top on landing page
 
-	// one run takes about 5 minutes (default timeout of 10s * 23 screenshots, 4 viewport changes and some...)
+	// one run takes about 5 minutes (default timeout of 10s * 34 screenshots, 4 viewport changes and some...)
 	// cut, resize and sanitize names afterwards
 
 	// you may have to adjust announcements for an expressive screenshot in between
 
+	if (!lang) {
+		console.log(
+			"language en or de have not been specified. call by screenshot('en') or screenshot('de') - optional with distinct index - and copy and repaste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen after preparing custom language and screen view."
+		);
+		return;
+	}
+
 	const timeout = 10;
-	let iterator, value, s;
+	let iterator,
+		value,
+		s,
+		index = 0;
 
 	// yield functions
 	function* menucall(index) {
 		const targets = document.querySelectorAll("nav > input");
 		while (index < targets.length) {
 			console.log(`:screenshot --filename "${targets[index].title.toLowerCase()} menu ${lang}.png"`);
-			yield targets[index];
+			/* 0-6 */ yield targets[index];
 			index++;
 		}
 	}
@@ -1853,11 +1863,11 @@ export async function screenshot(lang = null) {
 	function* apicalls1(index) {
 		// with still fixed navigation
 		const targets = [
-			{ en: "api.file('get', 'files')", de: "", screenshot: `:screenshot --filename "files ${lang}.png"` },
-			{ en: "api.measure('get', 'measure')", de: "", screenshot: `:screenshot --filename "measure management ${lang}.png"` },
-			{ en: "api.message('get', 'announcements')", de: "", screenshot: `:screenshot --filename "announcements ${lang}.png"` },
-			{ en: "api.message('get', 'conversation')", de: "", screenshot: `:screenshot --filename "conversation ${lang}.png"` },
-			{ en: "api.responsibility('get', 'responsibilities')", de: "", screenshot: `:screenshot --filename "responsibility ${lang}.png"` },
+			/* 7 */ { en: "api.file('get', 'files')", de: "", screenshot: `:screenshot --filename "files ${lang}.png"` },
+			/* 8 */ { en: "api.measure('get', 'measure')", de: "", screenshot: `:screenshot --filename "measure management ${lang}.png"` },
+			/* 9 */ { en: "api.message('get', 'announcements')", de: "", screenshot: `:screenshot --filename "announcements ${lang}.png"` },
+			/* 10 */ { en: "api.message('get', 'conversation')", de: "", screenshot: `:screenshot --filename "conversation ${lang}.png"` },
+			/* 11 */ { en: "api.responsibility('get', 'responsibilities')", de: "", screenshot: `:screenshot --filename "responsibility ${lang}.png"` },
 		];
 		while (index < targets.length) {
 			console.log(targets[index].screenshot);
@@ -1869,22 +1879,22 @@ export async function screenshot(lang = null) {
 	function* apicalls2(index) {
 		// after unfixing navigation
 		const targets = [
-			{ en: "rendertest('documents')", de: "rendertest('documents_de')", screenshot: `:screenshot --fullpage --filename "sample document elements ${lang}.png"` },
-			{ en: "api.application('get', 'start')", de: "", screenshot: `:screenshot --fullpage --filename "dashboard ${lang}.png"` },
-			{ en: "api.audit('get', 'audit', 12)", de: "api.audit('get', 'audit', 11)", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
-			{ en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
-			{ en: "api.audit('get', 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
-			{ en: "api.calendar('get', 'longtermplanning', 11)", de: "api.calendar('get', 'longtermplanning', 58)", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
-			{ en: "api.calendar('get', 'schedule')", de: "", screenshot: `:screenshot --fullpage --filename "calendar ${lang}.png"` },
-			{ en: "api.document('get', 'document_editor', 3168)", de: "api.document('get', 'document_editor', 127)", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
-			{ en: "api.purchase('get', 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
-			{ en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
-			{ en: "api.record('get', 'document', 'Basic data')", de: "api.record('get', 'document', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document screen ${lang}.png"` }, // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
-			{ en: "api.risk('get', 'risk')", de: "", screenshot: `:screenshot --fullpage --filename "risks ${lang}.png"` },
-			{ en: "api.texttemplate('get', 'text', 40)", de: "api.texttemplate('get', 'text', 38)", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
-			{ en: "api.user('get', 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
-			{ en: "api.user('get', 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
-			{
+			/* 12 */ { en: "rendertest('documents')", de: "rendertest('documents_de')", screenshot: `:screenshot --fullpage --filename "sample document elements ${lang}.png"` },
+			/* 13 */ { en: "api.application('get', 'start')", de: "", screenshot: `:screenshot --fullpage --filename "dashboard ${lang}.png"` },
+			/* 14 */ { en: "api.audit('get', 'audit', 12)", de: "api.audit('get', 'audit', 11)", screenshot: `:screenshot --fullpage --filename "audit ${lang}.png"` }, // customize to appropriate caro_audit_and_management id
+			/* 15 */ { en: "api.audit('get', 'audittemplate', 12)", de: "api.audit('get', 'audittemplate', 11)", screenshot: `:screenshot --fullpage --filename "audit template ${lang}.png"` }, // customize to appropriate caro_audit_templates id
+			/* 16 */ { en: "api.audit('get', 'checks', 'risks')", de: "", screenshot: `:screenshot --fullpage --filename "regulatory ${lang}.png"` },
+			/* 17 */ { en: "api.calendar('get', 'longtermplanning', 11)", de: "api.calendar('get', 'longtermplanning', 58)", screenshot: `:screenshot --fullpage --filename "longtermplanning ${lang}.png"` }, // customize id to appropriate caro_calendar id
+			/* 18 */ { en: "api.calendar('get', 'schedule')", de: "", screenshot: `:screenshot --fullpage --filename "calendar ${lang}.png"` },
+			/* 19 */ { en: "api.document('get', 'document_editor', 3168)", de: "api.document('get', 'document_editor', 127)", screenshot: `:screenshot --fullpage --filename "document manager ${lang}.png"` }, // customize id to approprate caro_documents id
+			/* 20 */ { en: "api.purchase('get', 'approved')", de: "", screenshot: `:screenshot --fullpage --filename "orders ${lang}.png"` },
+			/* 21 */ { en: "api.purchase('get', 'vendor', 'Ortho-Reha%20Neuhof%20GmbH')", de: "", screenshot: `:screenshot --fullpage --filename "vendor manager ${lang}.png"` }, // customize vendor name to appropriate caro_consumables_vendors name
+			/* 22 */ { en: "api.record('get', 'document', 'Basic data')", de: "api.record('get', 'document', 'Basisdaten')", screenshot: `:screenshot --fullpage --filename "document screen ${lang}.png"` }, // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
+			/* 23 */ { en: "api.risk('get', 'risk')", de: "", screenshot: `:screenshot --fullpage --filename "risks ${lang}.png"` },
+			/* 24 */ { en: "api.texttemplate('get', 'text', 40)", de: "api.texttemplate('get', 'text', 38)", screenshot: `:screenshot --fullpage --filename "text recommendation ${lang}.png"` }, // customize id to appropriate caro_texttemplates id
+			/* 25 */ { en: "api.user('get', 'user', 'error%20on%20line%201')", de: "", screenshot: `:screenshot --fullpage --filename "user ${lang}.png"` }, // customize user name to appropriate caro_user name
+			/* 26 */ { en: "api.user('get', 'profile')", de: "", screenshot: `:screenshot --fullpage --filename "profile ${lang}.png"` },
+			/* 27 */ {
 				en: "api.record('get', 'record', 'Jane Doe *01.02.2003 DAFO 2025-08-09 15:52')",
 				de: "api.record('get', 'record', 'Erika Musterfrau *01.02.2003 UA-Prothese 2025-08-09 16:02')",
 				screenshot: `:screenshot --fullpage --filename "record screen ${lang}.png"`,
@@ -1902,7 +1912,7 @@ export async function screenshot(lang = null) {
 		}
 	}
 
-	function* apicalls3(index) {
+	/* 28 */ function* apicalls3(index) {
 		// dynamic views
 		const targets = [
 			{
@@ -2010,6 +2020,11 @@ some@mail.address and escaped\@mail.address
 `
 					);
 					await api.tool("post", "markdown", null, data);
+					await _.sleep(500);
+					const dialog = document.querySelectorAll("dialog")[0];
+					dialog.style.transform = "translateY(34%)";
+					dialog.style.maxHeight = "none";
+					document.querySelector("main").style.height = dialog.offsetHeight - 100 + "px";
 					console.log(`:screenshot --fullpage --filename "markdown ${lang}.png"`);
 				},
 				de: async function () {
@@ -2116,6 +2131,11 @@ eine@email.addresse und maskierte\@email.addresse
 `
 					);
 					await api.tool("post", "markdown", null, data);
+					await _.sleep(500);
+					const dialog = document.querySelectorAll("dialog")[0];
+					dialog.style.transform = "translateY(34%)";
+					dialog.style.maxHeight = "none";
+					document.querySelector("main").style.height = dialog.offsetHeight - 100 + "px";
 					console.log(`:screenshot --fullpage --filename "markdown ${lang}.png"`);
 				},
 			},
@@ -2129,7 +2149,7 @@ eine@email.addresse und maskierte\@email.addresse
 	function* apicalls4(index) {
 		// just apicalls to create temp files
 		const targets = [
-			{
+			/* 29 */ {
 				en: async function () {
 					const data = new FormData();
 					data.append(api._lang.GET("record.create_identifier"), "Jane Doe *01.02.2003 DAFO");
@@ -2145,7 +2165,7 @@ eine@email.addresse und maskierte\@email.addresse
 					console.log(`sample identifier code ${lang}.png`);
 				},
 			},
-			{
+			/* 30 */ {
 				en: async function () {
 					api.record("get", "document", "Basic data"); // customize document name to appropriate caro_documents name, also see templates - import in respective language within dev environment
 					await _.sleep(2000);
@@ -2159,7 +2179,7 @@ eine@email.addresse und maskierte\@email.addresse
 					console.log(`document export ${lang}.png`);
 				},
 			},
-			{
+			/* 31*/ {
 				en: async function () {
 					api.calendar("get", "appointment");
 					await _.sleep(2000);
@@ -2185,7 +2205,7 @@ eine@email.addresse und maskierte\@email.addresse
 					console.log(`appointment ${lang}.png`);
 				},
 			},
-			{
+			/* 32 */ {
 				en: async function () {
 					api.record("get", "fullexport", "Jane Doe *01.02.2003 DAFO 2025-08-09 15:52"); // customize identifier
 					await _.sleep(2000);
@@ -2197,7 +2217,7 @@ eine@email.addresse und maskierte\@email.addresse
 					console.log(`record full summary ${lang}.png`);
 				},
 			},
-			{
+			/* 33 */ {
 				en: async function () {
 					api.record("get", "simplifiedexport", "Jane Doe *01.02.2003 DAFO 2025-08-09 15:52"); // customize identifier
 					await _.sleep(2000);
@@ -2217,51 +2237,53 @@ eine@email.addresse und maskierte\@email.addresse
 	}
 
 	// instructions
-	if (!lang) {
-		console.log(
-			"language en or de have not been specified. call by screenshot('en') or screenshot('de') and copy and repaste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen after preparing custom language and screen view."
-		);
-		return;
-	}
-
 	console.log(`copy and repaste the :screenshot command to have proper prepared filenames`);
 	console.log(`starting in in ${timeout} seconds. we'll start with menu items, after whose we'll iterate over provided endpoints. in the meantime the menu will be set to unfixed for longer contents.`);
 	console.log(`menu items will pop up every ${timeout} seconds, copy and repaste the :screenshot command to have proper prepared filenames.`);
-	await _.sleep(timeout * 1000);
+	if (!distinct) await _.sleep(timeout * 1000);
 
+	console.clear();
 	iterator = menucall(0);
 	while ((value = iterator.next().value)) {
-		s = timeout;
-		value.checked = true;
-		while (s > 0) {
-			console.log(s);
-			await _.sleep(1000);
-			s--;
+		if (!distinct || distinct == index) {
+			s = timeout;
+			value.checked = true;
+			while (s > 0) {
+				console.log(s);
+				await _.sleep(1000);
+				s--;
+			}
+			console.clear();
 		}
-		console.clear();
+		index++;
 	}
+	if (distinct && index > distinct) return;
 
 	console.log(`menu will be cleared in ${timeout} seconds. endpoints will load every ${timeout} seconds, copy and repaste ':screenshot --filename xyz.png' into console during the countdown to capture the screen.`);
-	await _.sleep(timeout * 1000);
+	if (!distinct) await _.sleep(timeout * 1000);
 	for (const item of document.querySelectorAll("nav > input")) {
 		item.checked = false;
 	}
 
+	console.clear();
 	iterator = apicalls1(0);
 	while ((value = iterator.next().value)) {
-		s = timeout;
-		console.log(value);
-		eval(value);
-		while (s > 0) {
-			console.log(s);
-			await _.sleep(1000);
-			s--;
+		if (!distinct || distinct == index) {
+			s = timeout;
+			eval(value);
+			while (s > 0) {
+				console.log(s);
+				await _.sleep(1000);
+				s--;
+			}
+			console.clear();
 		}
-		console.clear();
+		index++;
 	}
+	if (distinct && index > distinct) return;
 
 	console.log(`menu will be set to unfixed in ${timeout} seconds. endpoints will load every ${timeout} seconds, copy and repaste ':screenshot --fullpage --filename xyz.png' into console during the countdown to capture the screen.`);
-	await _.sleep(timeout * 1000);
+	if (!distinct) await _.sleep(timeout * 1000);
 
 	// modify nav styling
 	const body = document.querySelector("body"),
@@ -2275,38 +2297,52 @@ eine@email.addresse und maskierte\@email.addresse
 	body.append(nav2);
 	nav.remove();
 
+	console.clear();
 	iterator = apicalls2(0);
 	while ((value = iterator.next().value)) {
-		s = timeout;
-		console.log(value);
-		eval(value);
-		while (s > 0) {
-			console.log(s);
-			await _.sleep(1000);
-			s--;
+		if (!distinct || distinct == index) {
+			s = timeout;
+			eval(value);
+			while (s > 0) {
+				console.log(s);
+				await _.sleep(1000);
+				s--;
+			}
+			console.clear();
 		}
-		console.clear();
+		index++;
 	}
+	if (distinct && index > distinct) return;
 
+	console.clear();
 	iterator = apicalls3(0);
 	while ((value = iterator.next().value)) {
-		s = timeout;
-		await value();
-		while (s > 0) {
-			console.log(s);
-			await _.sleep(1000);
-			s--;
+		if (!distinct || distinct == index) {
+			s = timeout;
+			await value();
+			while (s > 0) {
+				console.log(s);
+				await _.sleep(1000);
+				s--;
+			}
+			console.clear();
 		}
-		console.clear();
+		index++;
 	}
+	if (distinct && index > distinct) return;
 
 	console.clear();
 	console.log("now preparing some exports. don't mind modals. fetch the files from ./fileserver/tmp and convert to:");
-	await _.sleep(timeout * 1000);
+	if (!distinct) await _.sleep(timeout * 1000);
+
+	console.clear();
 	iterator = apicalls4(0);
 	while ((value = iterator.next().value)) {
-		await value();
-		await _.sleep(1000);
+		if (!distinct || distinct == index) {
+			await value();
+			await _.sleep(1000);
+		}
+		index++;
 	}
 
 	console.log("done. reload to return to normal.");
