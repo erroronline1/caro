@@ -183,11 +183,11 @@ class UPDATE{
 	private function _2025_08_09(){
 		return [
 			'mysql' => [
-				"ALTER TABLE caro_consumables_products CHANGE protected has_files TINYINT(1) NULL DEFAULT NULL; " .
+				"ALTER TABLE caro_consumables_products CHANGE protected has_files TINYINT(1) NULL DEFAULT NULL; ",
 				"ALTER TABLE caro_user_responsibility DROP COLUMN hidden; "
 			],
 			'sqlsrv' => [
-				"EXEC sp_rename 'dbo.caro_consumables_products.protected', 'has_files', 'COLUMN'; " .
+				"EXEC sp_rename 'dbo.caro_consumables_products.protected', 'has_files', 'COLUMN'; ",
 				"ALTER TABLE caro_user_responsibility DROP COLUMN hidden; "
 			]
 		];
