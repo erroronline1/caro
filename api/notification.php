@@ -331,7 +331,6 @@ class NOTIFICATION extends API {
 		$number = 0;
 		$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
 		foreach ($responsibilities as $row){
-			if ($row['hidden']) continue;
 			$row['assigned_users'] = json_decode($row['assigned_users'], true);
 			if (isset($row['assigned_users'][$_SESSION['user']['id']]) && !$row['assigned_users'][$_SESSION['user']['id']]) {
 				$number++;
