@@ -4897,34 +4897,6 @@ Sample response
 {"render": {"form": {"data-usecase": "tool_create_code","action": "javascript:api.tool('post', 'code', 'qrcode_text')"},"content": [[{"type": "select","attributes": {"name": "Create a","onchange": "api.tool('get', 'code', this.value)"},"content": {"QR text / URL": {"value": "qrcode_text","selected": true},"Barcode CODE128": {"value": "barcode_code128"},"Barcode EAN13": {"value": "barcode_ean13"}}},[{"type": "textarea","attributes": {"name": "QR text / URL","value": "asdf"}}]],[{"type": "image","description": "Download created code","attributes": {"name": "QR text / URL","qrcode": "asdf"}}]]}}
 ```
 
-> GET ./api/api.php/tool/csvmdconversion
-
-Returns a form with file option and textarea to convert csv to markup-table and vice versa.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none | | | |
-
-Sample response
-```
-{"render":{"content":[{"type":"file","attributes":{"name":"Select CSV-file for conversion","accept":".csv"}},{"type":"textarea","attributes":{"name":"Convert markdown-table","value":""}}]}}
-```
-
-> POST ./api/api.php/tool/csvmdconversion
-
-Returns a form with file option and textarea to convert csv to markup-table and vice versa - prefilled with processed results.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | defined fields from previous GET fetch |
-
-Sample response
-```
-{"render":{"content": [{"type": "file", "attributes": {"name": "Select CSV-file for conversion", "accept": ".csv"}}, {"type": "textarea", "attributes": {"name": "Convert markdown-table", "value": "| Header Column 1 | Header Column 2 | Header Column 3 |\n|  -----  |  -----  |  -----  |\n| Value R1C1 | Value R1C2 | Value R1C3 |\n| Value R2C1 | Value R2C2 | Value R2C3 |\n\n"}}]}}
-```
-
 > GET ./api/api.php/tool/image
 
 Returns a form to select images and scaling options.
@@ -4953,32 +4925,43 @@ Sample response
 {"render":{"form":{"data-usecase":"tool_image","action":"javascript:api.tool('post', 'image')"},"content":[[{"type":"file","attributes":{"name":"Bild","multiple":true,"accept":".jpg,.jpeg,.png,.gif"}},{"type":"br"},{"type":"checkbox","attributes":{"name":"Optionen"},"content":{"Wasserzeichen":{"checked":true}}},{"type":"text","attributes":{"name":"Beschriftung","value":"UKHD"}},{"type":"select","attributes":{"name":"Maximale Gr\u00f6\u00dfe"},"content":{"...":[],"800 x 600":{"selected":true},"1024 x 768":[],"1280 x 1024":[],"1600 x 1200":[],"3200 x 2400":[]}}],[{"type":"image","description":"800 x 600_IMG_20231012_0001.jpg","attributes":{"name":"800 x 600_IMG_20231012_0001.jpg","url":"fileserver\/tmp\/800 x 600_IMG_20231012_0001.jpg"}}]]}}
 ```
 
-> GET ./api/api.php/tool/markdownpreview
+> GET ./api/api.php/tool/markdown/{table}
 
-Returns an editor to create an Markdown preview.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none | | | |
-
-Sample response
-```
-{"render":{"form":{"data-usecase":"tool_markdownpreview","action":"javascript:api.tool('post', 'markdownpreview')"},"content":[[{"type":"textarea","attributes":{"name":"Markdown editor","rows":24,"value":""}},{"type":"button","attributes":{"value":"Markdown help","onclick":"new _client.Dialog({type:'alert', header:'Markdown help', render:'Headers begin with one or more #, the more the smaller\\\\nLinebreaks within paragraphs end with two or more spaces\\\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\\\nNested lists are indented with four spaces\\\\nQuotes begin with a > symbol\\\\nStyling will be processed by server after saving\\\\nSee handbook for more information'})","data-type":"helpbutton","class":"inlinebutton"}},{"type":"button","attributes":{"value":"Convert CSV to Markdown and vice versa","onclick":"api.tool('get', 'csvmdconversion')","class":"inlinebutton"}}]]}}
-```
-
-> POST ./api/api.php/tool/markdownpreview
-
-Returns an editor to create an Markdown preview - prefilled with processed results plus a preview if data is provided.
+Returns a quick reference and an editor to create an Markdown preview. 
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {table} | path parameter| optional | literally "table" returns a form for CSV to Markdown table conversion and vice versa |
+
+Sample response without "table"
+```
+{"render": {"content": [[{"type": "textsection","attributes": {"name": "Quick reference"},"content": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information"},{"type": "textarea","attributes": {"name": "Markdown editor","rows": 24,"value": ""}},{"type": "button","attributes": {"value": "Convert CSV to Markdown and vice versa","onclick": "api.tool('get', 'markdown', 'table')","class": "inlinebutton"}}]]}}
+```
+
+Sample response with "table"
+```
+{"content": [{"type": "file","attributes": {"name": "Select CSV-file for conversion","accept": ".csv"}},{"type": "textarea","attributes": {"name": "Markdown editor","value": ""}}]}
+```
+
+> POST ./api/api.php/tool/markdown/{table}
+
+Returns a quick reference and an editor to create an Markdown preview - prefilled with processed results plus a preview if data is provided.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {table} | path parameter| optional | literally "table" returns a form for CSV to Markdown table conversion and vice versa with processed results |
 | payload | form data | required | defined fields from previous GET or POST fetch |
 
-Sample response
+Sample response without "table"
 ```
-{"render":{"form":{"data-usecase":"tool_markdownpreview","action":"javascript:api.tool('post', 'markdownpreview')"},"content":[[{"type":"textarea","attributes":{"name":"Markdown editor","rows":24,"value":"# Test\r\n\r\nMarkdown is ***awesome***"}},{"type":"button","attributes":{"value":"Markdown help","onclick":"new _client.Dialog({type:'alert', header:'Markdown help', render:'Headers begin with one or more #, the more the smaller\\\\nLinebreaks within paragraphs end with two or more spaces\\\\nOrdered lists start with numbers and a point, unordered lists with asterisk or dash\\\\nNested lists are indented with four spaces\\\\nQuotes begin with a > symbol\\\\nStyling will be processed by server after saving\\\\nSee handbook for more information'})","data-type":"helpbutton","class":"inlinebutton"}},{"type":"button","attributes":{"value":"Convert CSV to Markdown and vice versa","onclick":"api.tool('get', 'csvmdconversion')","class":"inlinebutton"}}],[{"type":"textsection","attributes":{"name":"Preview"},"htmlcontent":"<h1>Test</h1>\n\nMarkdown is <em><strong>awesome</strong></em>"}]]}}
+{"content": [[{"type": "textsection","attributes": {"name": "Quick reference"},"content": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information"},{"type": "textarea","attributes": {"name": "Markdown editor","rows": 24,"value": "# Header\r\n\r\nParagraph with *italic*, **bold** and ~~striked through~~ formatting"}},{"type": "button","attributes": {"value": "Convert CSV to Markdown and vice versa","onclick": "api.tool('get', 'markdown', 'table')","class": "inlinebutton"}}],[{"type": "textsection","attributes": {"name": "Preview"},"htmlcontent": "<h1 id=\"header\">Header</h1>\n\nParagraph with <em>italic</em>, <strong>bold</strong> and <s>striked through</s> formatting"}]]}
+```
+
+Sample response with "table"
+```
+{"content": [{"type": "file","attributes": {"name": "Select CSV-file for conversion","accept": ".csv"}},{"type": "textarea","attributes": {"name": "Markdown editor","value": "| Table header 1 | Table header 2 | Table header 3 | and 4 |\r\n|  -----  |  -----  |  -----  |  -----  |\r\n| *emphasis* | **is** | ***possible*** | `too` |\r\n| linebreaks | are | not | though |"}},{"type": "links","description": "Download CSV-file","content": {"2025-08-11 07-43-51 Table header 1_Table header 2_Table header 3_and 4.csv": {"href": "./api/api.php/file/stream/./fileserver/tmp/2025-08-11 07-43-51 Table header 1_Table header 2_Table header 3_and 4.csv","download": "2025-08-11 07-43-51 Table header 1_Table header 2_Table header 3_and 4.csv"}}}]}
 ```
 
 > GET ./api/api.php/tool/scanner
