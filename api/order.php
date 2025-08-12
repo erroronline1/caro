@@ -933,7 +933,7 @@ class ORDER extends API {
 				foreach ($this->_lang->_USER['units'] as $unit => $description){
 					$organizational_units[$description] = ['name' => $this->_lang->PROPERTY('order.organizational_unit'), 'required' => true];
 					if (isset($order['organizational_unit']) && in_array($unit, explode(',', $order['organizational_unit']))) $organizational_units[$description]['checked'] = true;
-					elseif (isset($_SESSION['user']['app_settings']['primaryUnit'])) $organizational_units[$this->_lang->GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
+					elseif (isset($_SESSION['user']['app_settings']['primaryUnit']) && $_SESSION['user']['app_settings']['primaryUnit'] === $unit) $organizational_units[$this->_lang->GET('units.' . $_SESSION['user']['app_settings']['primaryUnit'])]['checked'] = true;
 				}
 
 				// prepare order type selection
