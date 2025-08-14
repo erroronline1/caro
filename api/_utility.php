@@ -859,21 +859,21 @@ class MARKDOWN {
 
 	private $_a_auto = '/(?<!\]\()(?:\<{0,1})((?:https*|ftps*|tel):(?:\/\/)*[^\n\s,>]+)(?:\>{0,1})/i'; // auto url linking, including some schemes
 	private $_a_md = '/(?:(?<!!)\[)(.+?)(?:\])(?:\()(.+?)((?: \").+(?:\"))*(?:\))([^\)]|$)/m'; // regular md links
-	private $_blockquote = '/(^>{1,} .*(?:\n|$))+/m';
+	private $_blockquote = '/(^>{1,} .*(?:\n|$|\Z))+/m';
 	private $_br = '/ +\n/';
 	private $_code_block = '/^ {0,3}([`~]{3})\n((?:.+?\n)+)^ {0,3}([`~]{3})/m';
 		private $_code_inline = '/(?<!\\)(`{1,2})([^\n]+?)(?<!\\| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_emphasis = '/(?<!\\)((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!\\| |\n)\1)/'; // rewrite working regex101.com expression on construction for correct escaping of \
 		private $_escape = '/\\(\*|-|~|`|\.|@|\|)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_headings = '/^\n*^(#+ )(.+?)(#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must have a linebreak before
+	private $_headings = '/(?:\A|^\n+^)(#+ )(.+?)(#*)$|(?:^\n*)(.+?)\n(={3,}|-{3,})$/m'; // must be first line or have a linebreak before
 	private $_hr = '/^ {0,3}(?:\-|\- |\*|\* ){3,}$/m';
 	private $_img = '/(?:!\[)(.+?)(?:\])(?:\()(.+?)(?:\))([^\)])/';
-	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>)/mi';
+	private $_list_any = '/(?:^ {0,3}|<blockquote>)((\*|\-|\+|\d+\.) (?:.|\n)+?)(?:^(?! |\* |\- |\+ |\d+\. )|<blockquote>|\Z)/mi';
 	private $_list_nested = '/\n(^ {4}.+?\n)+/m';
-	private $_list_ol = '/(^( ){0,3}(\d+\.) (.+?\n))+/m';
-	private $_list_ul = '/(^( ){0,3}(\*|\-|\+) (.+?\n))+/m';
+	private $_list_ol = '/(^( ){0,3}(\d+\.) (.+?(?:\n|\Z)))+/m';
+	private $_list_ul = '/(^( ){0,3}(\*|\-|\+) (.+?(?:\n|\Z)))+/m';
 		private $_mail = '/([^\s<]+(?<!\\)@[^\s<]+\.[^\s<]+)/'; // rewrite working regex101.com expression on construction for correct escaping of \
-	private $_p = '/(?:^$\n|^)((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)\n^$/mi';
+	private $_p = '/(?:^$\n|\A)((?<!^<table|^<ul|^<ol|^<h\d|^<blockquote|^<pre)(?:(\n|.)(?!table>$|ul>$|ol>$|h\d>$|blockquote>$|pre>$))+?)(?:\n^$|\Z)/mi';
 	private $_pre = '/^ {4}([^\*\-\d].+)+/m';
 		private $_s = '/(?<!\\)~~([^\n]+?)(?<!\\| |\n)~~/'; // rewrite working regex101.com expression on construction for correct escaping of \
 	private $_table = '/^((?:\|.+?){1,}\|)\n((?:\| *:{0,1}-+:{0,1} *?){1,}\|)\n(((?:\|.+?){1,}\|(?:\n|$))+)/m';
@@ -883,7 +883,8 @@ class MARKDOWN {
 
 	public function __construct()
 	{
-		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)\1/'; // rewrite working regex101.com expression on construction for correct escaping of \
+		 // rewrite working regex101.com expression on construction for correct escaping of \
+		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)\1/';
 		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)\1)/';
 		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@|\|)/';
 		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\','/'). ')@[^\s<]+\.[^\s<]+)/';
