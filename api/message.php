@@ -175,7 +175,7 @@ class MESSAGE extends API {
 			$announcementcontent = [];
 			if ($announcement['text']) {
 				$announcementcontent[] = $announcement['text'];
-				$announcementcontent[] = ' ';
+				$announcementcontent[] = '';
 			}
 			if ($announcement['span_start']) $announcementcontent[] = $this->_lang->GET('message.announcement.start') . ' ' . $this->convertFromServerTime(substr($announcement['span_start'], 0 ,10));
 			if ($announcement['span_end']) $announcementcontent[] = $this->_lang->GET('message.announcement.end') . ' ' . $this->convertFromServerTime(substr($announcement['span_end'], 0 ,10));
@@ -188,7 +188,7 @@ class MESSAGE extends API {
 					'attributes' => [
 						'name' => $announcement['subject']
 					],
-					'htmlcontent' => $markdown->md2html(implode("\n", $announcementcontent)), 
+					'htmlcontent' => $markdown->md2html(implode("  \n", $announcementcontent)), 
 				]
 			];
 			if (PERMISSION::permissionFor('announcements')){
@@ -251,7 +251,7 @@ class MESSAGE extends API {
 					'type' => 'textarea',
 					'attributes' => [
 						'name' => $this->_lang->GET('message.announcement.text'),
-						'value' => isset($preset['text']) ? $preset['text'] : ''
+						'value' => isset($preset['text']) ? str_replace('\\\\n', '\n', addslashes($preset['text'])) : ''
 					]
 				], [
 					'type' => 'button',
