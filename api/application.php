@@ -1135,7 +1135,7 @@ class APPLICATION extends API {
 						'attributes' => [
 							'name' => $announcement['subject']
 						],
-						'htmlcontent' => $markdown->md2html(implode("\n", $announcementcontent)), 
+						'htmlcontent' => $markdown->md2html(implode("  \n", $announcementcontent)), 
 					]
 				];
 			}
