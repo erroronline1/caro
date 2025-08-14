@@ -30,6 +30,17 @@ Things are still in motion. Images may be outdated.
 * unittests
 * improve screenreader accessibility
 * templates
+* identifier utility method
+    * timestamp as unixtime to hex to save up 8 characters and improve readability
+    * possible translation method for decoding creation date
+* readme token sample image
+* management review dismiss saving on selected closing if fields remain empty
+* consider something else instead of "Identifikator" e.g. Kennung
+* document bundles considering external documents?
+* csv2md linebreaks to br?
+* what if an erp-connection is available?
+    * prepare skeleton interface, define prepared response, output
+    * integrate conditions
 
 ## Content
 * [Aims](#aims)
@@ -456,6 +467,8 @@ Available elements for components or rather documents are:
 Most input types can be optional declared as required. *Multiple* means another input will be appear after input. In case of file uploads the selector allows multiple files at once. Users with [*admistration*-privileges](#users) can directly import and export components as JSON-notation. In theory this allows for the creation of documents with more detailed properties but these will not be able to be fully edited the standard way.
 Form fields declared as multiple will only show up in document exports if they have a value. Their name will be extended by a numeration in parentheses.
 
+Recomendations of former inputs are stored with a reference to the assigned unit of the used document to ensure a topical relevance. The recommendation database can be updated through the [maintenance](#maintenance) module.
+
 > [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) allow for an export of records data. This export contains the most recent data of distinct document issues in their respective table column. It is beneficial and recommended that document issues do not repeat themself within components and documents. Repetitions do not harm the documentation per se, but may limit the analytical possibilities for the data dump.
 
 #### *Caveat:*
@@ -479,7 +492,7 @@ Documents can have alternative search terms. A context must be provided to ensur
 
 Documents can have a restricted access to be only visible to defined roles. This way records are possible that are not meant to be public (e.g. job interviews or staff appraisals). Documents can be marked as accessible for patients as well. Users with `Patient`-permission can access these documents from the landing page and can contribute to records with self reports.
 
-Documents can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Photo- and upload-options as well as buttons are replaced by a hint, identifiers are embedded in the header. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized document creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable document), while in the latter case any searchability and quick overviews suffer.
+Documents can be exported as an editable PDF in hopefully rare scenarios where a digital record is somehow an issue. Photo- and upload-options as well as buttons are replaced by a hint, identifiers are embedded in the header. Permission to export is restricted by default to defined authorized users to prevent distribution of outdated versions and support an improved data collection within the application. Authorized document creators can decide for general permission though. It is recommended to transfer the data later or at least append the scanned or photographed document to the applicable record (given a suitable document), while in the latter case any searchability, quick overviews and statistical analyzability suffer.
 
 The respective manager provides a selection for recent approved elements as well as a selection for all entries within the database.
 
@@ -952,7 +965,7 @@ A label can be created directly from the commission field to support allocation 
 
 A label can be created directly from the article number field supplemented by a suitable batch or delivery note number to create a scannable code for material traceability.
 
-The layout of orders can be selected within the [user profile](#users) from full view and tile layout with reduced information. This is intended to accomodate to different needs, e.g. purchase having all neccessary information directly available whereas other users may prefer less information load.
+The layout of orders can be selected within the [user profile](#users) from full view, tile layout with reduced information and table view. This is intended to accomodate to different needs, e.g. purchase having all neccessary information directly available whereas other users may prefer less information load.
 
 Processed orders are also added to a second database with reduced data. This data can be exported through the [evaluation and summary-module](#regulatory-evaluations-and-summaries) and used for vendor evaluation.
 
@@ -1098,7 +1111,7 @@ The application handles some automated reminders and schedules
 * received but not delivered orders trigger a message to ask procurement to deliver or mark as delivered
 * trainings will be scheduled for evaluation
 * expiring trainings will be scheduled for re-training
-* expired vendor certificates will be scheduled for renewal
+* expired vendor documents will be scheduled for renewal
 * product documents will be scheduled for reevaluation or update
 
 Beside these the dashboard and the menu notify about open topics and tasks. Timespans for notifications and schedules can be set within the [configuration](#runtime-variables).
@@ -1700,7 +1713,8 @@ The default provides [template files](#https://github.com/erroronline1/caro/tree
     * vendors
 * the default language of the application as specified within the [runtime variables](#runtime-variables)
 * the extension being `.json` by default with the option to extended by `.env` files (also see [customisation](#customisation))
-* the default user is set to *CARO App* and should be changed in advance to a justified name for document creation to avoid confusion with auditors
+
+> the default user is set to *CARO App* and should be changed in advance to a justified name for document creation to avoid confusion with auditors
 
 If you are going to prepare the deployment you are free to create multiple files of one type with a choosable name part for enhanced comprehensibility (before this design choice default risks had about 30k lines which was an even worse of a mess to track). This is optional and if you feel comfortable enough only. Also approvals, evaluations and pricelist imports have to be done the regular way after installation though. The templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
 
@@ -2056,7 +2070,7 @@ If you ever fiddle around with the sourcecode:
 * [CSV Processor](#csv-processor) only returns a named array, so you'll have to implement postprocessing of the data by yourself.
 * Changing the database structure during runtime may be a pita using sqlsrv for default preventing changes to the db structure (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Adding columns to the end appears to be easier instad of insertions between. Dynamically added columns must be nullable, keep in mind if NULL should have a meaning. During development altering tables [can be enabled if disabled by default](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
 * Settings to access a local server on the development machine: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
-* See available frontend render options importing unittest.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
+* See available frontend render options importing unittests.js and calling `rendertest('documents')` or `rendertest('app')` from the console.
 * The checkbox2text-widget chains selected items by `, ` (comma and a space). Options therefore must not contain these characters (e.g. regulatory issues for audit-templates) or option handling needs an own handler (products-manager). Otherwise reselecting may lead to unexpected results. Options best have a value independent on their label.
 * UTILITY::parsePayload:
     * Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
