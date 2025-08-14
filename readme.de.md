@@ -132,7 +132,7 @@ Zeitstempel sind nicht qualifiziert. Eine geringere Validität als handschriftli
 ## Tips
 * Ein Kalender-Element kann in die Überwachungs-Dokumente eingebunden werden um während der Bearbeitung direkt das nächste Fälligkeitdatum festzulegen.
 * Die Option einer "Großväterregelung" in der Produkteinführung kann insbesondere beim Übergang von einem anderen Qualitätsmanagementsystem in die CARO App die Dinge vereinfachen. Es muss dabei aber sichergestellt sein, dass die Anforderungen zuvor wirklich erfüllt wurden. Sofern im Import-Filter abgefragt, wird basierend auf der letzten Bestellung im ERP-System eine Produkteinführung initiiert.
-* Die Flussdiagramme dieser Beschreibung können als Darstellung innerhalb der Proszessbeschreibungen / Verfahrensanweisungen zur Darstellung genutzt werden, sofern die Abläufe durch die Anwendung festgelegt sind.
+* Die Flussdiagramme dieser Beschreibung können als Darstellung innerhalb der Prozessbeschreibungen / Verfahrensanweisungen zur Darstellung genutzt werden, sofern die Abläufe durch die Anwendung festgelegt sind.
 
 ![sample document elements screenshot](http://toh.erroronline.one/caro/sample%20document%20elements%20de.png)
 
@@ -242,7 +242,7 @@ Berechtigte Nutzer können Ankündigungen für jedermann anlegen und bearbeiten 
 * das aktuelle Datum innerhalb der gewählten Zeitspanne liegt oder
 * keine Zeitspanne gesetzt wurde
 
-Alle Nutzer können alle Ankündigen unter dem entsprechenden Menüpunkt einsehen wobei die betroffenen Bereiche ausgewiesen sind. Ankündigungen sind keine dauerhaften Aufzeichnungen und können jederzeit bearbeitet und gelöscht werden. Die letzten Berabeitung und der entsprechende Nutzer werden angezeigt. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung.
+Alle Nutzer können alle Ankündigen unter dem entsprechenden Menüpunkt einsehen wobei die betroffenen Bereiche ausgewiesen sind. Ankündigungen sind keine dauerhaften Aufzeichnungen und können jederzeit bearbeitet und gelöscht werden. Die letzten Bearbeitung und der entsprechende Nutzer werden angezeigt. Für eine Formatierung steht [Markdown](#markdown) zur Verfügung.
 
 ![announcements screenshot](http://toh.erroronline.one/caro/announcements%20de.png)
 
@@ -317,7 +317,7 @@ graph TD;
 [Übersicht](#übersicht)
 
 ### Verantwortlichkeiten
-Berechtigte Nutzer können Verantwortlichkeiten für Aufgaben erstellen und Nutzer und deren Stellvertreter zuordnen. Zugeordnete Nutzer erhalten eine Nachricht und Menü-Benachrichtigung um die Zuordnung zu prüfen und die Verantwortlichkeit zu akzeptieren. Verantwortlichkeiten haben eine verpflichtende Dauer, nach deren Ablauf ein Kalendereintrag die Leitung daran erinnert die Abgelaufenen Einträge zu erneuern. Verantwortlichkeiten können jederzeit geändert werden, aus Transparenzgründen müssen die Nutzer ihre Akzeptanz jedoch erneut bestätigen. Verantwortlichkeiten sind keine Aufzeichnungen, da sie primär der operativen Information dienen. Die Übersicht kann nach Bereichen gefiltert werden oder auch nur die eigenen Verantwortlichkeiten darstellen.
+Berechtigte Nutzer können Verantwortlichkeiten für Aufgaben erstellen und Nutzer und deren Stellvertreter zuordnen. Zugeordnete Nutzer erhalten eine Nachricht und Menü-Benachrichtigung um die Zuordnung zu prüfen und die Verantwortlichkeit zu akzeptieren. Verantwortlichkeiten haben eine verpflichtende Dauer, nach deren Ablauf ein Kalendereintrag die Leitung daran erinnert die abgelaufenen Einträge zu erneuern. Verantwortlichkeiten können jederzeit geändert werden, aus Transparenzgründen müssen die Nutzer ihre Akzeptanz jedoch erneut bestätigen. Verantwortlichkeiten sind keine Aufzeichnungen, da sie primär der operativen Information dienen. Die Übersicht kann nach Bereichen gefiltert werden oder auch nur die eigenen Verantwortlichkeiten darstellen.
 
 ![responsibilities screenshot](http://toh.erroronline.one/caro/responsibility%20de.png)
 
@@ -342,7 +342,7 @@ Nur nicht so. Bitte vorher Hilfe aufsuchen:
 
 ![cloud storage meme](http://toh.erroronline.one/caro/cloudstoragememe.jpg)
 
-Dokumente sind modular. Um gelenkte und versionierte Dokumente anzulegen, müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Dokumente anschließend zusammensetzen lassen. Komponenten und Dokumente werden Bereichen zugeordnet. Dies verbessert die Übersicht im Editor und reduziert die Ablenkung während der regulären Nutzung da Nutzer die zur Auswahl stehenden Dokumente Bereichweise filtern können.
+Dokumente sind modular. Um gelenkte und versionierte Dokumente anzulegen, müssen zunächst deren wiederverwendbare Komponenten erstellt werden, aus denen sich die Dokumente anschließend zusammensetzen lassen. Komponenten und Dokumente werden Bereichen zugeordnet. Dies verbessert die Übersicht im Editor und reduziert die Ablenkung während der regulären Nutzung da Nutzer die zur Auswahl stehenden Dokumente bereichsweise filtern können.
 
 #### Komponentenbearbeitung
 Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
@@ -373,6 +373,8 @@ Verfügbare Elemente für Komponenten beziehungsweise Dokumente sind:
 Die meisten Eingabetypen können zusätzlich optional als erforderlich gekennzeichnet werden. *Mehrfachauswahl* bedeutet, dass ein weiters Eingabefeld nach der Eingabe erscheint. Bei Datei-Uploads erlaubt die Dateiauswahl das Markieren mehrerer Dateien. Nutzer mit [*Administrator*-Berechtigung](#nutzer) können Komponenten direkt als JSON-Notation importieren und exportieren. Theoretisch erlaubt dies Dokumente mit detaillierteren Eigenschaften, diese können jedoch nicht vollständig auf normalem Wege bearbeitet werden.  
 Formularfelder die als Mehrfachauswahl gekennzeichnet sind erscheinen in Exporten nur bei gesetztem Wert. Der jeweilige Name wird um einen Zähler in Klammern erweitert.
 
+Vorschläge vorheriger Eingaben werden in der Datenbank mit Verweis auf den zugewiesenen Bereich des Dokuments abgelegt um eine thematische Relevanz sicherzustellen. Die Datenbank für Vorschläge kann über das [Wartungsmodul](#wartung) aktualisiert werden.
+
 > [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) erlauben einen Export von Aufzeichnungsdaten. Dieser Export beinhaltet die jeweils neusten Daten der verschiedenen Fragestellungen innerhalb der Dokumente in einer entsprechenden Tabellenspalte. Es ist hilfreich und empfohlen Fragestellungen innerhalb der Komponenten und Dokumente nicht zu wiederholen. Wiederholungen schaden den Aufzeichnungen an sich nicht, beschränken aber die analytischen Optionen des Datenauszugs.
 
 #### *Caveat:*
@@ -383,20 +385,20 @@ Einige Elemente können nur als normale Aufzeichnungen verarbeitet werden.
 
 sind nicht verwertbar für Dokumenten-Kontexts innerhalb der [Sprachdateigruppe](#anpassung) documentcontext.notdisplayedinrecords (Standard: MDR §14 Stichprobenprüfung, Produkteinführung, Schulungsbewertung und Lieferantenbewertung). Diese Eingabefelder werden ignoriert. Vorschläge vorheriger Eingaben sind hier nicht verfügbar.
 
-Elemente können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Die meisten Elemente können bearbeitet werden - ihr Inhalt kann in den entsprechenden Editor importiert werden um geändert oder ergänzt und anschießend wieder hinzugefügt zu werden. Das Original-Element verbleibt dabei und muss manuell entfernt werden.
+Elemente können mit der [Maus sortiert und positioniert](#verschiedenes) werden. Die meisten Elemente können bearbeitet werden - ihr Inhalt kann in den entsprechenden Editor importiert werden um geändert oder ergänzt und anschließend wieder hinzugefügt zu werden. Das Original-Element verbleibt dabei und muss manuell entfernt werden.
 
 Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
 
 siehe auch [Erwägungen zur Nutzerakzeptanz](#erwägungen-zur-nutzerakzeptanz)
 
 #### Dokumentenbearbeitung
-Dokument können durch die Auswahl beliebiger freigegebener Komponenten zusammengestellt werden. Komponenten können mit der [Maus sortiert und positioniert](#verschiedenes) werden.
+Dokumente können durch die Auswahl beliebiger freigegebener Komponenten zusammengestellt werden. Komponenten können mit der [Maus sortiert und positioniert](#verschiedenes) werden.
 
 Dokumente können alternative Suchbegriffe erhalten. Es muss ein Kontext gewählt werden um eine Plausibilitätsprüfung für die Verwendung gegebenenfalls erforderlicher Elemente durchführen zu können. Die Angabe eines regulatorischen Zusammenhangs wird empfohlen.
 
-Dokumente können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche). Dokumente können auch als für Patienten zugänglich markiert werden. Nutzer mit `Patient`-Berechtigung können von der Starseite aus auf diese Dokumente zugreifen und mit Selbsteinschätzungen zu Aufzeichnungen beitragen.
+Dokumente können einen eingeschränkten Zugang erhalten um eine Verwendbarkeit nur durch berechtigte Nutzer zuzulassen. Auf diesem Weg sind Aufzeichnungen möglich, die nicht für die Öffentlichkeit bestimmt sind (z.B. Bewerbungs- oder Mitarbeitergespräche). Dokumente können auch als für Patienten zugänglich markiert werden. Nutzer mit `Patient`-Berechtigung können von der Startseite aus auf diese Dokumente zugreifen und mit Selbsteinschätzungen zu Aufzeichnungen beitragen.
 
-Dokumente können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Foto- und Dateiuploads sowie Bedienfelder durch Hinweise ersetzt und Identifikatoren in der Kopfzeile implementiert. Dokumente können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden und eine bessere Datensammlung innerhalb der Anwendung zu fördern. Ersteller der Dokumente können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird), wobei in diesem Fall die Durchsuchbarkeit und Übersicht leidet.
+Dokumente können als bearbeitbare PDF-Dateien für die hoffentlich seltene Fälle, in denen eine digitale Bearbeitung problematisch sein könnte, exportiert werden. In diesem Fall werden Foto- und Dateiuploads sowie Bedienfelder durch Hinweise ersetzt und Identifikatoren in der Kopfzeile implementiert. Dokumente können primär nur von berechtigten Nutzern exportiert werden um eine Verbreitung veralteter Versionsstände zu vermeiden und eine bessere Datensammlung innerhalb der Anwendung zu fördern. Ersteller der Dokumente können jedoch eine allgemeine Erlaubnis erteilen. Es wird empfohlen die Daten zu einem späteren Zeitpunkt nachzutragen oder als Foto oder Scan zum Vorgang beizufügen (sofern ein geeignetes Formularfeld bereitgestellt wird), wobei in diesem Fall die Durchsuchbarkeit, Übersicht und statistische Auswertbarkeit leidet.
 
 Die jeweiligen Bearbeitungsmasken zeigen eine Auswahl der neuesten freigegebenen Elemente an, in einer zusätzlichen Auswahl kann aber jedes beliebige Element für die Bearbeitung gewählt werden.
 
@@ -476,7 +478,7 @@ Ein Identifikator ist immer ein QR-Code neben dem der Inhalt zusätzlich in lesb
 
 ![sample identifier code](http://toh.erroronline.one/caro/sample%20identifier%20code%20de.png)
 
-Bei der Anzeige von Zusammenfassungen erscheinen Empfehlungen für die Vervollständigung von Aufzeichnungen gemäß der Dokumenten-Pakete, die sowohl mit den Bereichen des letzten eintragenden Nutzers als auch des aktuellen Nutzers übereinstimmen; dabei wird davon ausgegangen, dass Vorgägnge typischerweise von Mitgliedern eines Bereichs bearbeitet werden. Die Vollständigkeit kann jedoch auch gegen jedes andere Dokumenten-Paket geprüft werden.
+Bei der Anzeige von Zusammenfassungen erscheinen Empfehlungen für die Vervollständigung von Aufzeichnungen gemäß der Dokumenten-Pakete, die sowohl mit den Bereichen des letzten eintragenden Nutzers als auch des aktuellen Nutzers übereinstimmen; dabei wird davon ausgegangen, dass Vorgänge typischerweise von Mitgliedern eines Bereichs bearbeitet werden. Die Vollständigkeit kann jedoch auch gegen jedes andere Dokumenten-Paket geprüft werden.
 
 Aufzeichnungen können als abgeschlossen markiert werden. Damit werden sie in der Übersicht und auf der Startseite nicht mehr angezeigt, sind aber mit der Filter-/Suchfunktion und dem entsprechenden Identifikator weiterhin erreichbar. Bei nachfolgenden Eingaben wird der Status als "abgeschlossen" wieder entzogen. Dies betrifft auch Aufzeichnungen die Reklamationen beinhalten. Reklamationen müssen von allen [definierten Rollen](#laufzeitvariablen) abgeschlossen werden, auch wiederholt, sofern zusätzliche Daten zu den Aufzeichnungen hinzugefügt werden.  
 An nicht abgeschlossene Aufzeichnungen wird regelmäßig in [definierten Abständen](#laufzeitvariablen) erinnert. Dies erfolgt über eine Nachricht an alle Nutzer der Bereiche des letzten eintragenden Nutzers.
@@ -581,14 +583,14 @@ Audits können direkt von diesem Formular aus auch zum Kalender hinzugefügt wer
 
 ![audit template screenshot](http://toh.erroronline.one/caro/audit%20template%20de.png)
 
-Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten und Stellungnahme werden zunächst aus dem lezten abgeschlossenen Audit des gewählten Bereichs übernommen. Unterbrechungen, und Bearbeitungen laufender Audits sind jederzeit möglich solange das Audit nicht als abgeschlossen markiert ist. Danach ist eine Bearbeitung oder Löschung des Audits nicht mehr möglich und es wird zu einer systemseitigen Aufzeichnung. Bei Abschluss eines Audits wird der Auditbericht über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) und alle Mitglieder des auditierten Bereichs umgesetzt. Abgeschlossene Audits können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
+Die Durchführung eines Audits beginnt mit der Auswahl einer Vorlage. Antworten und Stellungnahme werden zunächst aus dem letzten abgeschlossenen Audit des gewählten Bereichs übernommen. Unterbrechungen, und Bearbeitungen laufender Audits sind jederzeit möglich solange das Audit nicht als abgeschlossen markiert ist. Danach ist eine Bearbeitung oder Löschung des Audits nicht mehr möglich und es wird zu einer systemseitigen Aufzeichnung. Bei Abschluss eines Audits wird der Auditbericht über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen) und alle Mitglieder des auditierten Bereichs umgesetzt. Abgeschlossene Audits können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
 
 ![audit screenshot](http://toh.erroronline.one/caro/audit%20de.png)
 
 [Übersicht](#übersicht)
 
 ### Managementbericht
-Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umwandeln. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen)umgesetzt. Abgeschlossene Managementberichts können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
+Ähnlich wie für die Audits kann auch eine Managementbericht erstellt, gespeichert und später bearbeitet sowie durch das Abschließen zu einer systemseitigen Aufzeichnung umgewandelt werden. Ein neuer Bericht startet als Basis mit den Eingaben des letzten. Die Standard-Sprachdateien beinhalten alle erforderlichen Themen, damit keines vergessen wird. Bei Abschluss eines Managementberichts wird ein Hinweis über eine [Systemnachricht](#unterhaltungen) an alle Nutzer mit [`regulatory`-Berechtigung](#laufzeitvariablen)umgesetzt. Abgeschlossene Managementberichte können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) eingesehen werden.
 
 Der Großteil der CARO ist datenorientiert, Managementberichte können jedoch auch dritte betreffen. Daher ist eine gewisse Layoutbearbeitung mittels [Markdown](#markdown)-Syntax möglich.  
 
@@ -854,7 +856,7 @@ Aus der in der Bestellung angegebenen Kommission kann direkt ein Aufkleberbogen 
 
 Mit der Bestellnummer kann direkt ein Aufkleberbogen mit Ergänzung einer geeigneten Chargen- oder Lieferscheinnummer erstellt werden um einen scanbaren Code für eine Rückverfolgung zu erhalten.
 
-Die Darstellung von Bestellungen kann innerhalb des [Nutzer-Profils](#nutzer) aus Volldarstellung und kompakten Kacheln mit eingeschränktem Informationsgehalt gewählt werden. Dies soll eine Anpassung an unterschiedliche Bedürfnisse ermöglichen, z.B. der Warenwirtschaft alle erforderlichen Informationen anzeigen, während andere Nutzer eine geringere Informationsfülle bevorzugen.
+Die Darstellung von Bestellungen kann innerhalb des [Nutzer-Profils](#nutzer) aus Volldarstellung, kompakten Kacheln mit eingeschränktem Informationsgehalt und tabellarischer Ansicht gewählt werden. Dies soll eine Anpassung an unterschiedliche Bedürfnisse ermöglichen, z.B. der Warenwirtschaft alle erforderlichen Informationen anzeigen, während andere Nutzer eine geringere Informationsfülle bevorzugen.
 
 Bearbeitete Bestellungen werden zusätzlich in reduzierter Form zu einer zusätzlichen Datenbank hinzugefügt. Diese Daten können im [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) exportiert und für die Lieferantenbewertung genutzt werden.
 
@@ -954,7 +956,7 @@ graph TD;
     prepared_orders-.->add_product;
 ```
 Begonnene Produkteinführungen werden von allen Rollen als freigegeben markiert, die dem initial bewertenden Nutzer innewohnen. Eine vollständige Freigabe kann jedoch durch weitere Rollen erforderlich sein.  
-Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus. Berechtigte Nutzer können die Prüfung innerhalb des [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) und der [Artieklverwaltung](#lieferanten--und-artikelverwaltung) widerrufen.
+Stichprobenprüfungen werden den Aufzeichnungen beigefügt. Neue Prüfungen lösen eine Benachrichtigung an die berechtigten Nutzer aus. Berechtigte Nutzer können die Prüfung innerhalb des [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) und der [Artikelverwaltung](#lieferanten--und-artikelverwaltung) widerrufen.
 
 [Übersicht](#übersicht)
 
@@ -1009,7 +1011,7 @@ Die Anwendung vearbeitet einige automatische Erinnerungen und Aufgabenplanungen
 * erhaltene aber nicht ausgelieferte Bestellungen erbitten die Nachfrage bei der Warenwirtschaft oder die Markierung als ausgeliefert
 * Schulungsbewertungen werden in den Kalender eingetragen
 * ablaufende Schulungen werden für die Folgeschulung geplant
-* abgelaufene Lieferantenzertifikate werden für eine Erneuerung in den Kalender eingetragen
+* abgelaufene Lieferantendokumente werden für eine Erneuerung in den Kalender eingetragen
 * es wird an eine Reevaluierung oder Erneuerung der Dateien in der Artikelverwaltung erinnert 
 
 Daneben informiert die Startseite und das Menü über offene Themen und Aufgaben. Zeiträume für Benachrichtigungen und Aufgabenplanung können in der [Konfiguration](#laufzeitvariablen) angepasst werden.
@@ -1037,7 +1039,7 @@ Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zu
 [Übersicht](#übersicht)
 
 ## Markdown
-Sofern verfügbar kann text mit einer Markdown-Variante formatiert werden, die dem Original sehr nahe kommt.  
+Sofern verfügbar kann Text mit einer Markdown-Variante formatiert werden, die dem Original sehr nahe kommt.  
 Das ist keine Raketenwissenschaft, eine grundlegende Formatierung kann schnell erzielt werden. Bearbeitungsmasken haben eine Schaltfläche mit Kurzübersicht, Markdowneditor mit Vorschau, sowie eine Umwandlung von CSV-Tabellen in das Markdown-Format und andersherum.
 
 Siehe [Bekannte Schwachstellen](#bekannte-schwachstellen) für Unterschiede zu normalem Markdown.
@@ -1145,11 +1147,10 @@ und werden in etwa folgendermaßen angezeigt:
 
 ![markdown screenshot](http://toh.erroronline.one/caro/markdown%20de.png)
 
-
 [Übersicht](#übersicht)
 
 ## CSV Prozessor
-Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON), [regulärer Ausdrücke](https://regex101.com/) und [PHP-Datetime-Formate](https://www.php.net/manual/en/datetime.format.php).
+Der CSV Prozessor ist Bestandteil des CSV-Filter-Moduls und wird für den Artikelimport über die Lieferantenpreislisten genutzt. Es ist ein vielseitiges Werkzeug, erfordert aber Kenntnisse der [JavaScript Object Notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON), [regulärer Ausdrücke](https://regex101.com/) und [PHP-Datetime-Formate](https://www.php.net/manual/en/datetime.format.php).
 
 Filter und Änderungen werden in der angegebenen Reihenfolge ausgeführt. Änderungen werden zugunsten einer Leistungsoptimierung erst in der gefilterten Liste durchgeführt. Vergleichslisten können genauso gefiltert und geändert werden. Aufgrund einer rekursiven Implementierung kann die ursprüngliche Liste auch als Filterkriterium genutzt werden.
 
@@ -1608,11 +1609,12 @@ Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronlin
 	* texts
 	* users
     * vendors
-* die Standardsprache der Anwendung, wie sie in der  [Laufzeitvariablen](#laufzeitvariablen) festgelegt ist
+* die Standardsprache der Anwendung, wie sie in den [Laufzeitvariablen](#laufzeitvariablen) festgelegt ist
 * die Dateinamenerweiterung `.json` optional von `.env`-Dateien erweitert wird (siehe auch [Anpassung](#anpassung))
-* die Standardautorin von Inhalten *CARO App* ist und diese in einen berechtigten Nutzer geändert werden sollte um Verwirrungen bei Auditoren zu vermeiden
 
-Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können mehrere Dateien eines Typs mit einem frei wählbaren Namensteil angelegt werden um die Übersicht zu behalten (vor dieser Designentscheidung hatten die Risiken 30.000 Zeilen, die noch unüberisichtlicher waren). Das ist jedoch nur eine Option, sofern keine Berührungsängste bestehen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch in jedem Fall nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
+> die Standardautorin von Inhalten ist *CARO App* und sollte in einen berechtigten Nutzer geändert werden um Verwirrungen bei Auditoren zu vermeiden
+
+Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können mehrere Dateien eines Typs mit einem frei wählbaren Namensteil angelegt werden um die Übersicht zu behalten (vor dieser Designentscheidung hatten die Risiken 30.000 Zeilen, die noch unübersichtlicher waren). Das ist jedoch nur eine Option, sofern keine Berührungsängste bestehen. Freigaben, Evaluierungen und Preislistenimporte müssen jedoch in jedem Fall nach der Installation weiterhin ordnungsgemäß umgesetzt werden. Templates beinhalten überdies keine Bilder; diese sollten vor der Freigabe manuell eingepflegt werden um eine revisionssichere Speicherung und Verwaltung sicherzustellen.
 
 * Bereitstellung von Firmenlogos (JPG, PNG) für Aufzeichnungsexporte (z.B. Firmenlogo für obere rechte Ecke, Abteilungslogo für untere rechte Ecke, Wasserzeichen-Logo am besten mit transparentem Hintergrund) z.B. im Verzeichnis media/favicon/
 * Konfiguration der [Laufzeitvariablen](#laufzeitvariablen), insbesondere das genutzte SQL-Set und dessen Anmeldedaten, Paketgröße gemäß SQL-Konfiguration, Logo-Pfade. Abgleich der Berechtigungen in Manual-Vorlagen.
@@ -1866,7 +1868,7 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 ## Anmerkungen und Hinweise zur Nutzung
 
 ### Allgemein
-Diese Software wurde in bester Absicht entwickelt. Sie soll die Bearbeitung regulatorischer Anforderungen etwas weniger anstrengend machen. Das Nutzungsszenario ist jedoch auf die persönlichen Erfahrungen des [Teams](#das-team) in einem Medizinprodukte herstellenden Betrieb zugeschnitten, hoffentlich aber auch an jemand anderens Grundbedürfnisse anpassbar.
+Diese Software wurde in bester Absicht entwickelt. Sie soll die Bearbeitung regulatorischer Anforderungen etwas weniger anstrengend machen. Das Nutzungsszenario ist jedoch auf die persönlichen Erfahrungen des [Teams](#das-team) in einem Medizinprodukte herstellenden Betrieb zugeschnitten, hoffentlich aber auch an jemandes anderen Grundbedürfnisse anpassbar.
 
 Das Leben, das medizinische Feld und regulatorische Anforderungen sind kompliziert, agil und unvorhersehbar. Hinter jeder Ecke verbirgt sich möglicherweise eine neue Anordnung. Daher versucht die CARO App ebenso agil zu sein um auch den nächsten Einfall der Auditorin schnell abbilden zu können. Dies kann kaum vollständig in eine einfach verständliche Nutzeroberfläche eingebunden werden. Die persönliche Erfahrung zeigt, dass weniger als ein Prozent der Beschäftigten reguläre Ausdrücke und die bloße Menge and Einstellungen, die eine solche Software zur Bewältigung der vorgesehenen Aufgaben benötigt, verstehen können. Daher wurde nach etlichen fruchtlosen Versuchen letztlich die Entscheidung getroffen diese Stellrädchen so zu belassen. Insbesondere die Datenverarbeitung unterschiedlichster Tabellen mit dem [CSV Prozessor](#csv-prozessor) und die Definition der [Laufzeitvariablen](#laufzeitvariablen) benötigen wahrscheinlich eine einigermaßen fortgeschrittene computerbegeisterte Person.
 
@@ -1968,7 +1970,7 @@ Im Falle einer Anpassung des Quelltexts:
 * der [CSV-Prozessor](#csv-prozessor) liefert ein assoziatives Array, daher muss eine nachgelagerte Verarbeitung der Daten selbst implementiert werden.
 * Änderungen der Datenbankstruktur während der Laufzeit ist bei Nutzung von SQL Server eine Herausforderung, da hier Änderungen an der Struktur verhindert werden (https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table). Das Hinzufügen von Spalten an das Ende erscheint einfacher als zwischen vorhandene. Dynamisch hinzugefügte Spalten müssen nullbar sein, was zu beachten ist, sollen Null-Werte eine Bedeutung erhalten. Während der Entwicklung kann die Änderung von Tabellen [aktiviert werden, falls sie standardmäßig deaktiviert ist](https://learn.microsoft.com/en-us/troubleshoot/sql/ssms/error-when-you-save-table).
 * Einstellungen um einen lokalen Server der Entwicklungsumgebung zu erreichen: https://stackoverflow.com/questions/21896534/accessing-a-local-website-from-another-computer-inside-the-local-network-in-iis
-* Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittest.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
+* Verfügbare Frontend-Anzeigeoptionen können durch den Import von unittests.js und den Aufruf von `rendertest('documents_de')` oder `rendertest('app_de')` in der Konsole angezeigt werden.
 * Das checkbox2text-Widget verkettet die gewählten Optionen mit `, ` (Komma und ein Leerzeichen). Optionen dürfen diese Zeichen daher nicht enthalten (z.B. regulatorische Anforderungen für Audit-Vorlagen) oder das Verarbeiten der Optionen benätigt einen eigenen Handler (Produktverwaltung). Anderfalls kann eine erneute Auswahl zu unerwarteten Ergebnissen führen. Falls möglich sollten die gewählten Optionen einen Wert zugewiesen bekommen, unabhängig von der Bezeichnung.
 * UTILITY::parsePayload:
     * Arrays können als GET und DELETE Anforderung nicht mit ?var[]=1&var[]=2 verwendet werden. Nur das letzte Vorkommen wird auf diese Weise verwendet.
