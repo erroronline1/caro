@@ -1246,13 +1246,7 @@ class DOCUMENT extends API {
 				$identifier = $value;
 				if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
 				unset ($this->_payload->$key);
-				try {
-					$possibledate = substr($identifier, -16);
-					new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
-				}
-				catch (\Exception $e){
-					$identifier .= ' ' . $entry_timestamp;
-				}
+				$identifier = UTILITY::identifier($identifier, $entry_timestamp);
 			}
 			if (gettype($value) === 'array') $value = trim(implode(' ', $value));
 			/////////////////////////////////////////

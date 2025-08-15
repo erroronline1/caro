@@ -30,9 +30,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * improve screenreader accessibility
 * templates
-* identifier utility method
-    * timestamp as unixtime to hex to save up 8 characters and improve readability
-    * possible translation method for decoding creation date
 * readme token sample image
 * management review dismiss saving on selected closing if fields remain empty
 * consider something else instead of "Identifikator" e.g. Kennung

@@ -537,13 +537,7 @@ class RECORD extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				if ($content = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.create_identifier'))) {
-					$possibledate = substr($content, -16);
-					try {
-						new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
-					}
-					catch (\Exception $e){
-						if ($this->_appendDate) $content .= ' ' . $this->_date['usertime']->format('Y-m-d H:i');
-					}
+					$content = UTILITY::identifier($content, $this->_appendDate ? $this->_date['usertime']->format('Y-m-d H:i:s') : null);
 				}
 				if ($content){
 					$downloadfiles = [];
@@ -813,13 +807,7 @@ class RECORD extends API {
 						$identifier = $value;
 						if (gettype($identifier) !== 'string') $identifier = ''; // empty value is passed as array by frontend
 						unset ($this->_payload->$key);
-						$possibledate = substr($identifier, -16);
-						try {
-							new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
-						}
-						catch (\Exception $e){
-							$identifier .= ' ' . $entry_timestamp;
-						}
+						$identifier = UTILITY::identifier($identifier, $entry_timestamp);
 					}
 					if (gettype($value) === 'array') {
 						// empty file arrays to be skipped
@@ -1630,26 +1618,14 @@ class RECORD extends API {
 		if (!($entry_id && $new_id && $confirmation)) $this->response([], 406);
 
 		// append timestamp to new id if applicable
-		$possibledate = substr($new_id, -16);
-		try {
-			new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
-		}
-		catch (\Exception $e){
-			$new_id .= ' ' . $this->_date['usertime']->format('Y-m-d H:i');
-		}
+		$new_id = UTILITY::identifier($new_id, $this->_date['usertime']->format('Y-m-d H:i:s'));
 
 		// compare identifiers, warn if similarity is too low
 		// strip dates for comparison
-		$similar_new_id = substr($new_id, 0, -16);
-		$possibledate = substr($entry_id, -16);
-		try {
-			new \DateTime($possibledate, new \DateTimeZone($this->_date['timezone']));
-			$similar_entry_id = substr($entry_id, 0, -16);
-		}
-		catch (\Exception $e){
-			$similar_entry_id = $entry_id;
-		}
+		$similar_new_id = UTILITY::identifier($new_id, null, false);
+		$similar_entry_id = UTILITY::identifier($entry_id, null, false);
 		similar_text($similar_new_id, $similar_entry_id, $percent);
+
 		if (!$thresholdconfirmation && $percent < CONFIG['likeliness']['record_reidentify_similarity']) {
 				// similar dialog on reidentify button within record method
 				$response = ['render' => ['content' => [

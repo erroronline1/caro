@@ -334,6 +334,43 @@ class UTILITY {
 	}
 
 	/**
+	 * handle the identifier format globally
+	 * if the passed identifier does not have a valid trailing base 36 unix timestamp the default date will be appended accordingly
+	 * @param string passed $identifier
+	 * @param string $default_date
+	 * @param bool $strip_date
+	 * @return string
+	 */
+	public static function identifier($identifier = '', $default_date = '', $strip_date = false){
+		if (!$identifier) return $identifier;
+
+		preg_match('/(.+?)(?: \.([a-z0-9]+))*$/', $identifier, $components);
+		if ($components && isset($components[2]) && $components[2]);
+		try {
+			// try to convert to unixtime int
+			@$unixtime = intval(base_convert($components[2], 36, 10));
+			// narrow down to recent time
+			if ($unixtime && 1755208800 < $unixtime && $unixtime < 3453317999) {// 2025-08-15 - 2079-06-06
+				$datetime = new \DateTime();
+				$datetime->setTimestamp($unixtime);
+				// if no error has risen the identifier is likely valid
+
+				if ($strip_date){
+					if (isset($components[1]) && $components[1]) return $components[1];
+				}
+				return $identifier;
+			}
+		}
+		catch (\Exception $e){
+		}
+		if ($default_date) {
+			$unixtime = strtotime($default_date);
+			$identifier .= ' .' . base_convert($unixtime, 10, 36);
+		}
+		return $identifier;
+	}
+
+	/**
 	 *     _                                     _     
 	 *    |_|___ ___ ___       ___ ___ ___ ___ _| |___ 
 	 *    | |_ -| . |   |     | -_|   |  _| . | . | -_|
@@ -884,11 +921,11 @@ class MARKDOWN {
 	public function __construct()
 	{
 		 // rewrite working regex101.com expression on construction for correct escaping of \
-		$this->_code_inline = '/(?<!' . preg_quote('\\','/'). ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)\1/';
-		$this->_emphasis = '/(?<!' . preg_quote('\\','/'). ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\','/'). '| |\n)\1)/';
-		$this->_escape = '/' . preg_quote('\\','/'). '(\*|-|~|`|\.|@|\|)/';
-		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\','/'). ')@[^\s<]+\.[^\s<]+)/';
-		$this->_s = '/(?<!' . preg_quote('\\','/'). ')~~([^\n]+?)(?<!' . preg_quote('\\','/'). '| |\n)~~/';
+		$this->_code_inline = '/(?<!' . preg_quote('\\', '/') . ')(`{1,2})([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)\1/';
+		$this->_emphasis = '/(?<!' . preg_quote('\\', '/') . ')((?<!\S)\_{1,3}|\*{1,3}(?! ))([^\n]+?)((?<!' . preg_quote('\\', '/') . '| |\n)\1)/';
+		$this->_escape = '/' . preg_quote('\\', '/') . '(\*|-|~|`|\.|@|\|)/';
+		$this->_mail = '/([^\s<]+(?<!' . preg_quote('\\', '/') . ')@[^\s<]+\.[^\s<]+)/';
+		$this->_s = '/(?<!' . preg_quote('\\', '/') . ')~~([^\n]+?)(?<!' . preg_quote('\\', '/') . '| |\n)~~/';
 	}
 
 	/**
