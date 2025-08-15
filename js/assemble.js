@@ -683,8 +683,7 @@ export class Dialog {
 		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
 		for (const match of content) {
-			if (!match[1].length) continue;
-			result.push(document.createTextNode(match[1]));
+			result.push(document.createTextNode(match[1] || ""));
 			result.push(document.createElement("br"));
 		}
 		return result;
@@ -1513,8 +1512,7 @@ export class Assemble {
 		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
 		for (const match of content) {
-			if (!match[1].length) continue;
-			result.push(document.createTextNode(match[1]));
+			result.push(document.createTextNode(match[1] || ""));
 			result.push(document.createElement("br"));
 		}
 		result.pop(); // drop last br
