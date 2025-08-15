@@ -639,8 +639,8 @@ export class Dialog {
 					default:
 						if (response.target.returnValue !== "false" && (response.returnValue || response.target.returnValue === "true")) {
 							let empty = true;
-							switch (returntype.toLowerCase()){
-								case  "formdata":
+							switch (returntype.toLowerCase()) {
+								case "formdata":
 									result = _.getInputs(this.form, true);
 									// check for empty object
 									for (const prop in result.values()) {
@@ -652,7 +652,7 @@ export class Dialog {
 									if (empty) result = false;
 									break;
 								default:
-									result= dialogForm2Obj(this.dialog);
+									result = dialogForm2Obj(this.dialog);
 									// check for empty object
 									for (const prop in result) {
 										if (Object.hasOwn(result, prop)) {
@@ -922,7 +922,14 @@ export class Toast {
 	 */
 	constructor(message = "", type = "", duration = 5000, forcedId = null) {
 		const openmodal = document.querySelector("dialog[open]");
-		if (openmodal) duration = duration / 2;
+		if (openmodal) {
+			// compare messages from probably open modals, stop toast creation if similar message is already being displayed
+			const openmodals = document.querySelectorAll("dialog[open]>span");
+			for (let i = 0; i < openmodals.length; i++) {
+				if (openmodals[i].innerHTML === message) return;
+			}
+			duration = duration / 2;
+		}
 
 		this.message = message || undefined;
 		this.duration = duration;
@@ -954,7 +961,7 @@ export class Toast {
 			pauseimg.onclick = () => {
 				window.clearTimeout(api._settings.session.toasttimeout[this.toast.id]);
 			};
-			msg.innerHTML = message;
+			msg.innerHTML = this.message;
 			this.toast.append(closeimg, pauseimg, msg, div);
 			// append to dom before initializing following library functions to avoid errors
 			document.body.append(this.toast);
@@ -1345,7 +1352,7 @@ export class Assemble {
 		}
 
 		if (event.target.form && event.target.form.noValidate) missing_required = false;
-		
+
 		// submit form after confirmation if applicable
 		if (!missing_required) {
 			if (!event.target.form.dataset.confirm) {
@@ -1427,7 +1434,7 @@ export class Assemble {
 	header() {
 		if (!this.currentElement.description) return [];
 		let header = document.createElement("header");
-		
+
 		for (const line of this.currentElement.description.replace(/\[\]|DEFAULT_/g, "").split(/\r\n|\n/)) {
 			header.append(document.createTextNode(line));
 			header.append(document.createElement("br"));
@@ -2501,7 +2508,7 @@ export class Assemble {
 
 		p = document.createElement("p");
 		if (mark_deletion) p.onclick = mark_deletion;
-		p.innerHTML=this.currentElement.content.text;
+		p.innerHTML = this.currentElement.content.text;
 		message.append(p);
 
 		// display notif of unread messages in overview mode
