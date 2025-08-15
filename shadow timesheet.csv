@@ -232,47 +232,47 @@
 12.01.25,1,ui
 13.01.25,1,"install routine, ui-composer"
 14.01.25,1,"risk-api, ui"
-17.01.25,4,"install routine, ui-assembler, risk-api"
+17.01.25,6,"install routine, ui-assembler, risk-api"
 18.01.25,8,"ui, audit-api"
 19.01.25,2,"risk-api, audit-api"
 22.01.25,2,"documentation, config handling"
 23.01.25,2,file-api
-24.01.25,8,"file-api, install routine, api, ui-assembler, texttemplates-api, consumables-api"
+24.01.25,10,"file-api, install routine, api, ui-assembler, texttemplates-api, consumables-api"
 25.01.25,11,"consumables-api, audit-api, documentation"
 26.01.25,2,"documentation, language"
 28.01.25,1,language-handler
 29.01.25,2,document-api
-31.01.25,8,"consumables-api, audit-api"
+31.01.25,10,"consumables-api, audit-api"
 01.02.25,11,audit-api
 04.02.25,2,measure-api
 05.02.25,2,"install routine, stress test, templates, documentation"
 06.02.25,1,ui-assembler
-07.02.25,8,ui-assembler
+07.02.25,10,ui-assembler
 08.02.25,8,"ui-assembler, documentation, ui-composer"
 09.02.25,1,ui-composer
 13.02.25,2,pdf-library
-14.02.25,3,"pdf-library, tool-api"
+14.02.25,5,"pdf-library, tool-api"
 15.02.25,6,"ui-composer, audit-api, consumables-api"
 16.02.25,2,code maintenance
 17.02.25,1,order-api
 18.02.25,2,"ui-assembler, tool-api"
 19.02.25,1,"order-api, consumables-api"
-21.02.25,7,"documentation, templates"
+21.02.25,9,"documentation, templates"
 22.02.23,5,"documentation, ui, templates"
 24.02.25,1,code maintenance
-28.02.25,7,"ui, csv-processor, unittests, audit-api"
+28.02.25,9,"ui, csv-processor, unittests, audit-api"
 01.03.25,8,"audit-api, record-api, user-api"
 04.03.25,2,"server config"
-14.03.25,7,"consumables-api, document-api, tool-api, calendar-api, audit-api"
+14.03.25,9,"consumables-api, document-api, tool-api, calendar-api, audit-api"
 15.03.25,3,"audit-api, notifications"
 28.03.25,6,"ui-assembler, calendar-api"
 29.03.25,6,"ui-assembler, calendar-api, documentation"
 03.04.25,2,responsibility-api
-04.04.25,5,"responsibility-api, ui"
+04.04.25,7,"responsibility-api, ui"
 06.04.25,3,ui
-11.04.25,9,api
+11.04.25,11,api
 12.04.25,8,"api, ui-assembler"
-17.04.25,7,"api, ui, bug-fixes, tool-api"
+17.04.25,9,"api, ui, bug-fixes, tool-api"
 18.04.25,9,"tool-api, calendar-api, ui"
 19.04.25,8,"ui, calendar-api, unittests"
 20.04.25,10,"ui, documentation"
@@ -282,21 +282,21 @@
 25.04.25,2,ui
 26.04.25,7,ui
 30.04.25,8,"ui, order-api, tool-api, record-api, document-api"
-02.05.25,5,"tool-api, file-api, ui-assembler"
+02.05.25,7,"tool-api, file-api, ui-assembler"
 03.05.25,6,"documentation, document-api, ui-composer, ui-assembler, code maintenance"
-10.05.25,4,documentation
-16.05.25,9,"ui, consumables-api, templates, csv-processor"
+10.05.25,6,documentation
+16.05.25,11,"ui, consumables-api, templates, csv-processor"
 17.05.25,7,"ui, file-api, documentation"
 18.05.25,2,templates
-23.05.25,7,"audit-api, ui, api"
+23.05.25,9,"audit-api, ui, api"
 24.05.25,8,"api, audit-api"
 28.05.25,7,"audit-api, user-api, consumables-api"
-30.05.25,7,"notification-api, audit-api, file-api, user-api, documentation"
+30.05.25,9,"notification-api, audit-api, file-api, user-api, documentation"
 31.05.25,7,"documentation, code maintenance"
-06.06.25,4,"order-api, consumables-api, audit-api"
+06.06.25,6,"order-api, consumables-api, audit-api"
 07.06.25,5,"notification-api, documentation"
 10.06.25,1,cron
-13.06.25,7,"notification-api, application-api, calendar-api, code maintenance"
+13.06.25,9,"notification-api, application-api, calendar-api, code maintenance"
 14.06.25,5,"message-api, templates"
 15.06.25,7,"templates, install routine, stress-test"
 16.06.25,6,templates
@@ -308,24 +308,25 @@
 23.06.25,1,api
 24.06.25,1,api
 25.06.25,3,"api, install routine"
-27.06.25,1,"merging feature branch"
+27.06.25,3,"merging feature branch"
 28.06.25,1,consumables-api
 29.06.25,1,"consumables-api, order-api, message-api"
 30.06.25,1,api
 02.07.25,3,"order-api, ui-assembler"
-04.07.25,5,"ui-assembler"
+04.07.25,7,"ui-assembler"
 05.07.23,9,"message-api, install routine, database-update process, code maintenance"
 10.07.25,1,api
-11.07.25,6,"order-api, consumables-api, maintenance-api"
+11.07.25,8,"order-api, consumables-api, maintenance-api"
 12.07.25,8,"maintenance-api, unittests, documentation"
 15.07.25,1,documentation
 18.07.25,4,"code maintenance, record-api, pdf-library"
 19.07.25,6,"record-api"
-25.07.25,6,"consumables-api, install routine, audit-api, texttemplate-api, code maintenance"
+25.07.25,8,"consumables-api, install routine, audit-api, texttemplate-api, code maintenance"
 27.07.25,1,unittests
 29.07.25,2,"tool-api"
-01.08.25,7,"markdown"
+01.08.25,9,"markdown"
 02.08.25,11,"markdown, ui-composer, record-api, document-api, tool-api"
 03.08.25,1,markdown
-08.08.25,8,markdown
+08.08.25,10,markdown
 09.08.24,10,"markdown, unittests, documentation, purchase-api"
+15.08.24,9,"document-api, record-api, file-api, audit-api"
