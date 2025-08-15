@@ -2508,7 +2508,7 @@ export class Assemble {
 
 		p = document.createElement("p");
 		if (mark_deletion) p.onclick = mark_deletion;
-		p.innerHTML = this.currentElement.content.text;
+		p.innerHTML = this.currentElement.content.text.replaceAll(/\n|\r\n/g, '<br />');
 		message.append(p);
 
 		// display notif of unread messages in overview mode
