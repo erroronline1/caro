@@ -349,7 +349,7 @@ class UTILITY {
 	public static function identifier($identifier = '', $default_date = '', $strip_date = false){
 		if (!$identifier) return $identifier;
 
-		preg_match('/(.+?)(?: \.([a-z0-9]+))*$/', $identifier, $components);
+		preg_match('/(.+?)(?: \|([a-z0-9]+))*$/', $identifier, $components);
 		if ($components && isset($components[2]) && $components[2]);
 		try {
 			// try to convert to unixtime int
@@ -370,7 +370,7 @@ class UTILITY {
 		}
 		if ($default_date) {
 			$unixtime = strtotime($default_date);
-			$identifier .= ' .' . base_convert($unixtime, 10, 36); // separator must be a valid character for urls, # and alike are forbidden
+			$identifier .= ' |' . base_convert($unixtime, 10, 36); // separator must be a valid character for urls, # and alike are forbidden
 		}
 		return $identifier;
 	}
