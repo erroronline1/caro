@@ -1063,7 +1063,7 @@ export const api = {
 	 * displays and manages provided files, either administrative managed or open sharepoint
 	 *
 	 * @param {string} method get|post|delete
-	 * @param  {array} request api method, search term / bundle name | requested directory name, requested filename
+	 * @param  {array} request api method, search term  | requested directory name, requested filename
 	 * @returns request
 	 */
 	file: async (method, ...request) => {
@@ -1084,10 +1084,8 @@ export const api = {
 			payload,
 			title = {
 				files: api._lang.GET("file.navigation.files"),
-				bundle: api._lang.GET("file.navigation.bundles"),
 				sharepoint: api._lang.GET("file.navigation.sharepoint"),
 				filemanager: api._lang.GET("file.navigation.file_manager"),
-				bundlemanager: api._lang.GET("file.navigation.bundle_manager"),
 				externalfilemanager: api._lang.GET("file.navigation.external_file_manager"),
 			};
 
@@ -1124,26 +1122,12 @@ export const api = {
 								if (data.data) {
 									const all = document.querySelectorAll("[data-filtered]");
 									for (const file of all) {
-										if (request[1] === "bundle") {
-											file.parentNode.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.parentNode.localName) : "none";
-										} else file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
+										file.style.display = data.data.includes(file.dataset.filtered) ? api.filter(file.localName) : "none";
 									}
 								}
 								if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							};
 						}
-						break;
-					case "bundlefilter":
-						successFn = function (data) {
-							if (data.data) {
-								const all = document.querySelectorAll("[data-filtered]");
-								for (const list of all) {
-									if (isNaN(list.dataset.filtered)) continue;
-									list.parentNode.style.display = data.data.includes(list.dataset.filtered) ? api.filter(list.parentNode.localName) : "none";
-								}
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
 						break;
 				}
 				break;
