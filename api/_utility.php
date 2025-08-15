@@ -334,7 +334,12 @@ class UTILITY {
 	}
 
 	/**
-	 * handle the identifier format globally
+	 *   _   _         _   _ ___ _         
+	 *  |_|_| |___ ___| |_|_|  _|_|___ ___ 
+	 *  | | . | -_|   |  _| |  _| | -_|  _|
+	 *  |_|___|___|_|_|_| |_|_| |_|___|_|  
+	 *
+	 * handles the identifier format globally
 	 * if the passed identifier does not have a valid trailing base 36 unix timestamp the default date will be appended accordingly
 	 * @param string passed $identifier
 	 * @param string $default_date
@@ -350,7 +355,7 @@ class UTILITY {
 			// try to convert to unixtime int
 			@$unixtime = intval(base_convert($components[2], 36, 10));
 			// narrow down to recent time
-			if ($unixtime && 1755208800 < $unixtime && $unixtime < 3453317999) {// 2025-08-15 - 2079-06-06
+			if ($unixtime && 1755208800 < $unixtime && $unixtime < 3453317999) { // 2025-08-15 - 2079-06-06
 				$datetime = new \DateTime();
 				$datetime->setTimestamp($unixtime);
 				// if no error has risen the identifier is likely valid
@@ -365,7 +370,7 @@ class UTILITY {
 		}
 		if ($default_date) {
 			$unixtime = strtotime($default_date);
-			$identifier .= ' .' . base_convert($unixtime, 10, 36);
+			$identifier .= ' .' . base_convert($unixtime, 10, 36); // separator must be a valid character for urls, # and alike are forbidden
 		}
 		return $identifier;
 	}
