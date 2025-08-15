@@ -30,7 +30,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * improve screenreader accessibility
 * templates
-* consider something else instead of "Identifikator" e.g. Kennung
 * what if an erp-connection is available?
     * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class
     * integrate conditions
@@ -2506,6 +2505,7 @@ Stakeholder identification:
 | Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 | Lost attributes on widgets during regular editing of JSON-imported custom document components | Low | Low (unexpected rendering of content) | Most important properties remain, the manual [warns](#component-editing) about this usage |
 | Adverse rendering of record values as Markdown | Low | Low (unexpected rendering of content) | None | Prefixing textsection content with `::MARKDOWN::` has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
+| Markdown has HTML enabled, malicious insertions are possible | Low | High (application unstable, corrupted data) | None | Markdown is permitted to responsible roles only. It is very unlikely these roles corrupting the application |
 
 [Content](#content)
 
