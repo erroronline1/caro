@@ -1392,8 +1392,7 @@ class APPLICATION extends API {
 					$matches = [];
 					foreach ($records as $contextkey => $context){
 						foreach ($context as $record){
-							$display = $this->_lang->GET('record.list_touched', [
-								':identifier' => $record['identifier'],
+							$display = $record['identifier'] . ', ' . $this->_lang->GET('record.list_touched', [
 								':date' => $this->convertFromServerTime($record['last_touch']),
 								':document' => $record['last_document']
 							]);
