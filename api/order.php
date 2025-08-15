@@ -19,6 +19,8 @@
 
 namespace CARO\API;
 
+include_once("./_erpinterface.php");
+
 // place and process orders
 class ORDER extends API {
 	// processed parameters for readability

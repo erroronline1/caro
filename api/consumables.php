@@ -19,9 +19,10 @@
 
 namespace CARO\API;
 
-// add, edit and delete vendors and products
 require_once('./_csvprocessor.php');
+include_once("./_erpinterface.php");
 
+// add, edit and delete vendors and products
 class CONSUMABLES extends API {
     // processed parameters for readability
     public $_requestedMethod = REQUEST[1];

@@ -39,8 +39,13 @@ Things are still in motion. Images may be outdated.
 * document bundles considering external documents?
 * csv2md linebreaks to br?
 * what if an erp-connection is available?
-    * prepare skeleton interface, define prepared response, output
+    * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class
     * integrate conditions
+        * customer data import record.php
+        * casestate record.php
+        * order state order.php
+        * product matching instead of csv comparison consumables.php
+        * product import instead of pricelists consumables.php
 
 ## Content
 * [Aims](#aims)

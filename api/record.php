@@ -23,6 +23,7 @@ namespace CARO\API;
 // Y U NO DELETE? because of audit safety, that's why!
 require_once('./_pdf.php');
 require_once('./_calendarutility.php');
+include_once("./_erpinterface.php");
 
 class RECORD extends API {
 	// processed parameters for readability
