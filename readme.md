@@ -30,7 +30,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * improve screenreader accessibility
 * templates
-* readme token sample image
 * management review dismiss saving on selected closing if fields remain empty
 * consider something else instead of "Identifikator" e.g. Kennung
 * document bundles considering external documents?
@@ -276,6 +275,8 @@ Timesheets are accessible only if weekly hours are defined for the user - even t
 Users can have multiple assigned organizational units and permissions.
 
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
+
+![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
 
 Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user. The profile picture will always be overwritten with the default image following a name change.
 
