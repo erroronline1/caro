@@ -970,7 +970,6 @@ class APPLICATION extends API {
 			$this->_lang->GET('file.navigation.header') => [
 				$this->_lang->GET('file.navigation.sharepoint') => ['onclick' => "api.file('get', 'sharepoint')"],
 				$this->_lang->GET('file.navigation.files') => ['onclick' => "api.file('get', 'files')"],
-				$this->_lang->GET('file.navigation.bundles') => ['onclick' => "api.file('get', 'bundle')"],
 			],
 			$this->_lang->GET('consumables.navigation.header') => [
 				$this->_lang->GET('order.navigation.order') => ['onclick' => "api.purchase('get', 'order')"],

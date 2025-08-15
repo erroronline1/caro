@@ -402,6 +402,7 @@ class DOCUMENT extends API {
 				$options = ['...' . $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$alloptions = ['...' . $this->_lang->GET('assemble.compose.bundle.edit_existing_bundle_new') => (!$this->_requestedID) ? ['value' => '0', 'selected' => true] : ['value' => '0']];
 				$insertdocument = ['...' . $this->_lang->GET('assemble.compose.bundle.insert_default') => ['value' => ' ']];
+				$insertexternaldocument = ['...' . $this->_lang->GET('assemble.compose.bundle.insert_default') => ['value' => ' ']];
 				$response = [];
 
 				// get selected bundle
@@ -464,6 +465,15 @@ class DOCUMENT extends API {
 					}
 				}
 				ksort($insertdocument);
+
+				// get active external files
+				$externaldocuments = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
+				if ($externaldocuments) {
+					foreach(array_column($externaldocuments, 'path') as $path){
+						$insertexternaldocument[$path] = ['value' => $path . "\n"];
+					}
+				}
+				ksort($insertexternaldocument);
 
 				// gather applicable units
 				$units = [];
@@ -532,6 +542,13 @@ class DOCUMENT extends API {
 								],
 								'content' => $insertdocument
 							], [
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('assemble.compose.bundle.insert_external_name'),
+									'onchange' => "if (this.value.length > 1) _.insertChars(this.value, 'content'); this.selectedIndex = 0;"
+								],
+								'content' => $insertexternaldocument
+							], [
 								'type' => 'textarea',
 								'hint' => $this->_lang->GET('assemble.compose.bundle.content_hint'),
 								'attributes' => [
@@ -586,12 +603,15 @@ class DOCUMENT extends API {
 		$available_units = [];
 		$this->_requestedID = $this->_requestedID ? urldecode($this->_requestedID) : null;
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
+
+		$externaldocuments = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
+		if ($externaldocuments) $externaldocuments = array_column($externaldocuments, 'path');
+
 		$hidden = $bundles = [];
 		foreach ($bd as $row) {
 			if ($row['hidden']) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
-			if (in_array($row['name'], $hidden)) continue;
+			if (in_array($row['name'], $hidden) || isset($bundles[$row['name']])) continue;
 			$available_units[] = $row['unit'];
-
 			// filter by unit
 			if ($this->_unit && $this->_unit != $row['unit']) continue;
 			if (!$this->_unit && !in_array($row['unit'], $_SESSION['user']['units'])) continue;
@@ -603,8 +623,13 @@ class DOCUMENT extends API {
 					if (!isset($bundles[$row['name']])) $bundles[$row['name']] = [];
 					foreach ($documents as $documentname){
 						// recurring queries to make sure linked forms are permitted
-						if ($document = $this->latestApprovedName('document_document_get_by_name', $documentname))
+						if ($document = $this->latestApprovedName('document_document_get_by_name', $documentname)){
 							if (!$document['hidden']) $bundles[$row['name']][$document['name']] = ['href' => "javascript:api.record('get', 'document', '" . $document['name'] . "')", 'data-filtered' => $row['id']];
+						}
+						elseif (in_array($documentname, $externaldocuments)){
+							$documentname = substr($documentname, 1);
+							$bundles[$row['name']][$documentname] = UTILITY::link(['href' => './api/api.php/file/stream/' . $documentname, 'data-filtered' => $row['id']]);
+						}
 					}
 				}
 			}

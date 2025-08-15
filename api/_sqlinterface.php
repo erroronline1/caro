@@ -467,26 +467,6 @@ class SQLQUERY {
 
 
 
-		'file_bundles_post' => [
-			'mysql' => "INSERT INTO caro_file_bundles (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
-			'sqlsrv' => "INSERT INTO caro_file_bundles (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
-		],
-		'file_bundles_put' => [
-			'mysql' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_file_bundles SET date = CURRENT_TIMESTAMP, author = :author, content = :content, hidden = :hidden WHERE id = :id"
-		],
-		'file_bundles_datalist' => [
-			'mysql' => "SELECT DISTINCT name, hidden FROM caro_file_bundles ORDER BY name ASC",
-			'sqlsrv' => "SELECT DISTINCT name, hidden FROM caro_file_bundles ORDER BY name ASC"
-		],
-		'file_bundles_get' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC LIMIT 1",
-			'sqlsrv' => "SELECT TOP 1 * FROM caro_file_bundles WHERE name = :name ORDER BY id DESC"
-		],
-		'file_bundles_get_active' => [
-			'mysql' => "SELECT * FROM caro_file_bundles WHERE hidden IS NULL GROUP BY name",
-			'sqlsrv' => "SELECT * FROM caro_file_bundles WHERE id IN (SELECT MAX(id) AS id FROM caro_file_bundles WHERE hidden IS NULL GROUP BY name) ORDER BY name"
-		],
 		'file_external_documents_get' => [
 			'mysql' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC",
 			'sqlsrv' => "SELECT * FROM caro_file_external_documents ORDER BY path ASC"

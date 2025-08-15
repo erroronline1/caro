@@ -411,7 +411,7 @@ Komponenten und Dokumente müssen von berechtigten Nutzern freigegeben werden be
 
 Die Versionierung findet über einen Zeitstempel statt.
 
-Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Dokumente für den jeweiligen Anwendungsfall berücksichtigt wurden. Dokumentenpakete unterliegen keiner Freigabe oder Versionierung, können aber auch nicht gelöscht sondern nur verborgen werden.
+Zusätzlich können Dokumentenpakete erstellt werden. Auf diese Weise kann jeder prüfen ob alle beabsichtigen Dokumente für den jeweiligen Anwendungsfall berücksichtigt wurden. Dokumentenpakete unterliegen keiner Freigabe oder Versionierung, können aber auch nicht gelöscht sondern nur verborgen werden. Auch externe Dokumente können Teil der Pakete sein. Eine Überwachung der Nutzung kann jedoch nicht erfolgen.
 
 ```mermaid
 graph TD;
@@ -1773,7 +1773,6 @@ complaintclosing = "supervisor, qmo, prrc" ; obige Warnung beachten - Dokumentat
 csvfilter = "ceo, qmo, purchase, office" ; Zugriff und Anwendung von CSV-Filtern
 csvrules = "qmo" ; neue CSV-Filter anlegen
 externaldocuments = "office, ceo, qmo" ; Bereitstellung und Verwaltung externer Dokumente
-filebundles = "ceo, qmo" ; Dateipakete erstellen
 files = "office, ceo, qmo" ; Dateien bereitstellen und Verwalten
 formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Dokumenten und ihrer Komponenten
 documentcomposer = "ceo, qmo" ; Dokumente und Komponenten erstellen

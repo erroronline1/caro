@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * templates
 * management review dismiss saving on selected closing if fields remain empty
 * consider something else instead of "Identifikator" e.g. Kennung
-* document bundles considering external documents?
 * what if an erp-connection is available?
     * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class
     * integrate conditions
@@ -505,7 +504,7 @@ Components and documents have to be approved by defined authorized users to take
 
 Versioning is achieved by a timestamp. 
 
-Furthermore documents can be grouped to document bundles. This way anyone can check if all necessary documents have been taken into account for defined use cases. Document bundles are not subject to approval and versioning but also can not be deleted, only hidden.
+Furthermore documents can be grouped to document bundles. This way anyone can check if all necessary documents have been taken into account for defined use cases. Document bundles are not subject to approval and versioning but also can not be deleted, only hidden. Document bundles may contain external documents as well, these are not subject to fulfillment supervision though.
 
 ```mermaid
 graph TD;
@@ -1874,7 +1873,6 @@ complaintclosing = "supervisor, qmo, prrc" ; SEE WARNING ABOVE - close case docu
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
 csvrules = "qmo" ; add csv filter
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
-filebundles = "ceo, qmo" ; create file bundles
 files = "office, ceo, qmo" ; upload and delete files
 documentapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve documents and components
 documentcomposer = "ceo, qmo" ; compose documents
@@ -3764,62 +3762,6 @@ Sample response
 [Content](#content)
 
 ### File endpoints
-
-> GET ./api/api.php/file/bundle
-
-Returns lists of file paths grouped by bundle names.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none |  |  |  |
-
-Sample response
-```
-{"render":{"content":[[{"type":"filtered","attributes":{"name":"Filter by bundle name","onkeydown":"if (event.key ==='Enter'){api.file('get','bundlefilter', this.value); return false;}","onblur":"api.file('get','bundlefilter', this.value); return false;","id":"filesearch"}}],[{"type":"links","description":"einkauf","content":{"einkauf.png":{"href":"./fileserver/documents/test2/....
-```
-
-> GET ./api/api.php/file/bundlefilter/{query}
-
-Returns a list of bundle ids whose name have a similarity to query.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {query} | path parameter | optional | search string, returns all ids if null |
-
-Sample response
-```
-{"data":["9"]}
-```
-
-> POST ./api/api.php/file/bundlemanager
-
-Creates a database entry for a new bundle or updates active state.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | including selected file paths, bundle name, active state |
-
-Sample response
-```
-{"response":{"name":"external","msg":"Bundle external has been saved","type":"success"}}
-```
-
-> GET ./api/api.php/file/bundlemanager/{bundle}
-
-Returns a form to define a new bundle or revise bundle if provided.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {bundle} | path parameter | optional | if provided current setting are selected |
-
-Sample response
-```
-{"render":{"form":{"data-usecase":"file","action":"javascript:api.file('post', 'bundlemanager')"},"content":[[{"type":"select","attributes":{"name":"Edit existing bundle","onchange":"api.file('get', 'bundlemanager', this.value)"},"content":{"...":[]}},{"type":"search","attributes":{"name":"Search by name","onkeydown":"if (event.key === 'Enter') {api.file('get', 'bundlemanager', this.value); return false;}"},"datalist":[]}],[[{"type":"checkbox","attributes":{"name":"Files within ..\/fileserver\/documents\/stl_files"},....
-```
 
 > GET ./api/api.php/file/externalfilemanager
 

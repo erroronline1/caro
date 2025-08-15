@@ -44,7 +44,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_08_09'] as $update){
+		foreach (['_2025_08_15'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -189,6 +189,17 @@ class UPDATE{
 			'sqlsrv' => [
 				"EXEC sp_rename 'dbo.caro_consumables_products.protected', 'has_files', 'COLUMN'; ",
 				"ALTER TABLE caro_user_responsibility DROP COLUMN hidden; "
+			]
+		];
+	}
+
+	private function _2025_08_15(){
+		return [
+			'mysql' => [
+				"DROP TABLE caro_file_bundles; "
+			],
+			'sqlsrv' => [
+				"DROP TABLE caro_file_bundles; "
 			]
 		];
 	}

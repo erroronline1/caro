@@ -303,7 +303,8 @@
 				"hidden": "verborgen",
 				"availability_hint": "Verborgene Pakete sind nicht erreichbar.",
 				"insert_default": "Auswahl",
-				"insert_name": "Füge Dokumentennamen an der Cursorposition oder Auswahl ein.",
+				"insert_external_name": "Füge Pfad zum externen Dokument an der Cursorposition oder Auswahl ein",
+				"insert_name": "Füge Dokumentennamen an der Cursorposition oder Auswahl ein",
 				"name": "Name",
 				"not_found": "Das Paket :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
 				"not_saved": "Das Paket konnte nicht gespeichert werden",
@@ -1027,19 +1028,6 @@
 		}
 	},
 	"file": {
-		"bundle": {
-			"availability": "Verfügbarkeit",
-			"available": "verfügbar",
-			"bundle_not_saved": "Das Paket konnte nicht gespeichert werden",
-			"bundle_saved": "Das Paket :name wurde gespeichert",
-			"existing_bundle": "Suche nach Namen",
-			"existing_bundle_select": "Bearbeite ein Paket",
-			"hidden": "verborgen",
-			"last_edit": "letzte Änderung: :user am :date",
-			"save_bundle": "Paket speichern"
-		},
-		"bundle_error_not_found": "Paket :name konnte in der Datenbank nicht gefunden werden, bitte versuche etwas anderes.",
-		"bundle_filter_label": "Filtere nach Paketnamen",
 		"external_file": {
 			"available": "verfügbar",
 			"available_success": "Diese Datei ist wieder verfügbar",
@@ -1073,8 +1061,6 @@
 			"no_external_files": "Hier sollten keine externen Dokumente verwaltet werden, bitte berücksichtige den richtigen Menüpunkt um eine korrekte Registrierung sicherzustellen.."
 		},
 		"navigation": {
-			"bundle_manager": "Dateipakete verwalten",
-			"bundles": "Dateipakete",
 			"external_file_manager": "Externe Dokumente verwalten",
 			"file_manager": "Dateien verwalten",
 			"files": "Alle Dateien",

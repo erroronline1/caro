@@ -303,6 +303,7 @@
 				"availability_hint": "Hidden bundles are not reachable",
 				"available": "available",
 				"insert_default": "Select",
+				"insert_external_name": "Insert external document path on cursor position or selection",
 				"insert_name": "Insert document name on cursor position or selection",
 				"name": "Name",
 				"not_found": "Bundle :name could not be found in database, please try something else.",
@@ -1027,19 +1028,6 @@
 		}
 	},
 	"file": {
-		"bundle": {
-			"availability": "Availability",
-			"available": "available",
-			"bundle_not_saved": "Bundle could not been saved",
-			"bundle_saved": "Bundle :name has been saved",
-			"existing_bundle": "Search by name",
-			"existing_bundle_select": "Edit existing bundle",
-			"hidden": "hidden",
-			"last_edit": "Last edit: :user on :date",
-			"save_bundle": "Save bundle"
-		},
-		"bundle_error_not_found": "Bundle :name could not be found in database, please try something else.",
-		"bundle_filter_label": "Filter by bundle name",
 		"external_file": {
 			"available": "available",
 			"available_success": "This file is accessible again",
@@ -1073,8 +1061,6 @@
 			"no_external_files": "This is not meant for external documents, please adhere to the respective category to ensure a proper registration."
 		},
 		"navigation": {
-			"bundle_manager": "Manage file bundles",
-			"bundles": "File bundles",
 			"external_file_manager": "Manage external documents",
 			"file_manager": "Manage files",
 			"files": "All files",
