@@ -963,6 +963,7 @@ class MARKDOWN {
 			}
 			else {
 				$row = array_filter($row, fn($column) => $column !== null);
+				$row = array_map(fn($column) => preg_replace('/\n/', '<br />', $column), $row);
 				if ($row) $md .= '| ' . implode(' | ', $row) . " |\n";
 			}
 			$rownum++;
@@ -990,7 +991,7 @@ class MARKDOWN {
 						case 1:
 							break;
 						default:
-							$data[] = array_map(fn($column) => trim($column), array_filter($columns, fn($column) => boolval($column)));
+							$data[] = array_map(fn($column) => preg_replace('/<br {0,1}\/{0,1}>/', "\n", trim($column)), array_filter($columns, fn($column) => boolval($column)));
 					}
 				}
 			}

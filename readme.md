@@ -33,7 +33,6 @@ Things are still in motion. Images may be outdated.
 * management review dismiss saving on selected closing if fields remain empty
 * consider something else instead of "Identifikator" e.g. Kennung
 * document bundles considering external documents?
-* csv2md linebreaks to br?
 * what if an erp-connection is available?
     * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class
     * integrate conditions
