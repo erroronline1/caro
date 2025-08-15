@@ -319,6 +319,27 @@ export const _client = {
 			imageelement.style["-webkit-mask-image"] = imageelement.style["mask-image"] = image;
 		},
 	},
+	audit : {
+		/**
+		 * enables the closing button if all fields are filled
+		 */
+		managementreview:() => {
+			let input,
+			clear=true,
+			complete = document.getElementsByName(api._lang._USER.audit.managementreview.close);
+			for (const [key, issue] of Object.entries(api._lang._USER.audit.managementreview.required)){
+				input=document.getElementsByName(issue);
+				if (input && input[0] && !input[0].value) {
+					clear=false;
+					break;
+				}
+			}
+			if (complete && complete[0]){
+				if (clear) complete[0].removeAttribute('disabled');
+				else complete[0].setAttribute('disabled', true);
+			}
+		}
+	},
 	calendar: {
 		/**
 		 * toggles inputs visibility on conditional request

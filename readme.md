@@ -30,7 +30,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * improve screenreader accessibility
 * templates
-* management review dismiss saving on selected closing if fields remain empty
 * consider something else instead of "Identifikator" e.g. Kennung
 * what if an erp-connection is available?
     * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class

@@ -797,6 +797,7 @@ export const api = {
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
+								_client.audit.managementreview();
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 							api.preventDataloss.start();

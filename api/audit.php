@@ -1938,7 +1938,8 @@ class AUDIT extends API {
 							'attributes' => [
 								'name' => $issue,
 								'value' => isset($managementreview['content'][$key]) ? $managementreview['content'][$key] : '',
-								'data-loss' => 'prevent'
+								'data-loss' => 'prevent',
+								'onblur' => '_client.audit.managementreview()'
 							],
 							'autocomplete' => isset($datalist[$key]) ? array_values($datalist[$key]) : null
 						], [
