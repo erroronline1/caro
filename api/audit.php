@@ -2501,6 +2501,7 @@ class AUDIT extends API {
 		$keys = [];
 		$defaultColumn = [
 			'identifier' => '_' . $this->_lang->GET('audit.records.identifier', [], true),
+			'erp_case_number' => '_' . $this->_lang->GET('audit.records.erp_case_number', [], true),
 			'units' => '_' . $this->_lang->GET('audit.records.units', [], true),
 			'from' => '_' . $this->_lang->GET('audit.records.start_date', [], true),
 			'until' => '_' . $this->_lang->GET('audit.records.end_date', [], true),
@@ -2543,6 +2544,7 @@ class AUDIT extends API {
 
 			// complete default columns and append to result
 			$line[$defaultColumn['identifier']] = $row['identifier'];
+			$line[$defaultColumn['erp_case_number']] = $row['erp_case_number'] ? : '';
 			$line[$defaultColumn['units']] = implode(', ', array_map(fn($v) => isset($this->_lang->_DEFAULT['units'][$v]) ? $this->_lang->_DEFAULT['units'][$v] : $v, explode(',', $row['units'])));
 			$line[$defaultColumn['type']] = isset($this->_lang->_DEFAULT['record']['type'][$row['record_type']]) ? $this->_lang->_DEFAULT['record']['type'][$row['record_type']] : '';
 			$result[] = $line;
@@ -2552,6 +2554,7 @@ class AUDIT extends API {
 		sort($keys, SORT_REGULAR);
 		array_unshift($keys,
 			$defaultColumn['identifier'],
+			$defaultColumn['erp_case_number'],
 			$defaultColumn['units'],
 			$defaultColumn['from'],
 			$defaultColumn['until'],
@@ -2576,6 +2579,7 @@ class AUDIT extends API {
 			ksort($line, SORT_REGULAR);
 			$line = array_merge([
 				$defaultColumn['identifier'] => $line[$defaultColumn['identifier']],
+				$defaultColumn['erp_case_number'] => $line[$defaultColumn['erp_case_number']],
 				$defaultColumn['units'] => $line[$defaultColumn['units']],
 				$defaultColumn['from'] => $this->convertFromServerTime($line[$defaultColumn['from']]),
 				$defaultColumn['until'] => $this->convertFromServerTime($line[$defaultColumn['until']]),

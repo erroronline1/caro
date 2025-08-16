@@ -303,6 +303,15 @@ class PDF{
 		// set cell padding
 		$this->_pdf->setCellPaddings(5, 5, 5, 5);
 
+		if ($content['erp_case_number']){
+			// name column
+			$this->_pdf->SetFont('helvetica', 'B', $this->_setup['fontsize']);
+			$this->_pdf->MultiCell(50, 4, $_lang->GET('record.erp_case_number', [], true), 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
+			// values column
+			$this->_pdf->SetFont('helvetica', '', $this->_setup['fontsize']);
+			$this->_pdf->MultiCell(140, 4, $content['erp_case_number'], 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
+		}
+
 		// MultiCell($w, $h, $txt, $border=0, $align='J', $fill=false, $ln=1, $x=null, $y=null, $reseth=true, $stretch=0, $ishtml=false, $autopadding=true, $maxh=0, $valign='T', $fitcell=false)
 		// Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='', $align='', $resize=false, $dpi=300, $palign='', $ismask=false, $imgmask=false, $border=0, $fitbox=false, $hidden=false, $fitonpage=false, $alt=false, $altimgs=array())
 		foreach ($content['content'] as $document => $entries){
