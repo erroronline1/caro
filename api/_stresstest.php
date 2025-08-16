@@ -196,7 +196,8 @@ class STRESSTEST extends INSTALL{
 						':last_document' => $document['name'],
 						':content' => UTILITY::json_encode($records),
 						':id' => $exists['id'],
-						':lifespan' => $exists['lifespan']
+						':lifespan' => $exists['lifespan'],
+						':erp_case_number' => null
 					]
 				]);
 			}

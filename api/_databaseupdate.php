@@ -196,10 +196,16 @@ class UPDATE{
 	private function _2025_08_15(){
 		return [
 			'mysql' => [
-				"DROP TABLE caro_file_bundles; "
+				"DROP TABLE caro_file_bundles; ",
+				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS erp_case_number tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
 			],
 			'sqlsrv' => [
-				"DROP TABLE caro_file_bundles; "
+				"DROP TABLE caro_file_bundles; ",
+				"IF COL_LENGTH('caro_records', 'erp_case_number') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_records" .
+				"    ADD erp_case_number varchar(255) NULL DEFAULT NULL" .
+				" END; "
 			]
 		];
 	}
