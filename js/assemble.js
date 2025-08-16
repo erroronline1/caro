@@ -2264,7 +2264,7 @@ export class Assemble {
 		input.type = type;
 		const inputClone = structuredClone(this.currentElement);
 		if (type === "password") this.currentElement.type = "password";
-		if (type === "search") this.currentElement.hint = (this.currentElement.hint || "") + " \u21B5" + api._lang.GET("assemble.render.search_hint");
+		if (type === "search" || "onkeydown" in this.currentElement.attributes) this.currentElement.hint = (this.currentElement.hint || "") + " \u21B5" + api._lang.GET("assemble.render.search_hint");
 		hint = this.hint();
 		input.id = this.currentElement.attributes && this.currentElement.attributes.id ? this.currentElement.attributes.id : getNextElementID();
 		input.autocomplete = (this.currentElement.attributes && this.currentElement.attributes.type) === "password" ? "one-time-code" : "off";
