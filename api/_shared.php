@@ -186,6 +186,7 @@ class SHARED {
 				if ($percent < CONFIG['likeliness']['records_search_similarity'] // considering typos
 					&& !fnmatch($parameter['search'], $row['identifier'], FNM_CASEFOLD) // considering wildcards
 					&& !stristr($row['content'], $parameter['search']) // literal search e.g. for serial numbers
+					&& $row['erp_case_number'] !== $parameter['search'] // literal comparison of erp_case_number
 				) continue;
 			}
 
