@@ -680,7 +680,7 @@ export class Dialog {
 	 * @returns {domNodes}
 	 */
 	linebreak(string) {
-		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
+		let content = string.matchAll(/(.*?)(?:\\r\\n|\r\n|\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
 		for (const match of content) {
 			result.push(document.createTextNode(match[1] || ""));
@@ -1509,7 +1509,7 @@ export class Assemble {
 	 * @returns {domNodes}
 	 */
 	linebreak(string) {
-		let content = string.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm),
+		let content = string.matchAll(/(.*?)(?:\\r\\n|\r\n|\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
 		for (const match of content) {
 			result.push(document.createTextNode(match[1] || ""));
