@@ -103,12 +103,6 @@
 						"attributes": {
 							"name": "FIBU Nummer"
 						}
-					},
-					{
-						"type": "text",
-						"attributes": {
-							"name": "EVA Vorgangsnummer"
-						}
 					}
 				]
 			]

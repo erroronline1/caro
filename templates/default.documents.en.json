@@ -103,12 +103,6 @@
 						"attributes": {
 							"name": "Patient number"
 						}
-					},
-					{
-						"type": "text",
-						"attributes": {
-							"name": "ERP case number"
-						}
 					}
 				]
 			]
