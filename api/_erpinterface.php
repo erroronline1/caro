@@ -31,15 +31,15 @@ class _ERPINTERFACE {
 
 	/**
 	 * retrieve current case states based on passed case numbers
-	 * @param array $casenumbers
+	 * @param array $erp_case_numbers
 	 * @return null|array 
 	 */
-	public function casestate($casenumbers = []){
+	public function casestate($erp_case_numbers = []){
 
 		/**
 		 * return [
 		 * 		[
-		 * 			'casenumber' => string,
+		 * 			'erp_case_number' => string,
 		 * 			'reimbursement'=> Y-m-d,
 		 *			'inquiry'=> Y-m-d,
 		 *			'partiallygranted'=> Y-m-d,
