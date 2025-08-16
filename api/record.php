@@ -93,6 +93,25 @@ class RECORD extends API {
 							'type' => 'error'
 						]]);
 					}
+					elseif ($this->_caseState ==='erp_case_number'){
+						if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+							'values' => [
+								':case_state' => $case['case_state'],
+								':record_type' => $case['record_type'],
+								':identifier' => $this->_requestedID,
+								':last_user' => $case['last_user'],
+								':last_document' => $case['last_document'],
+								':content' => $case['content'],
+								':id' => $case['id'],
+								':lifespan' => $case['lifespan'],
+								':erp_case_number' => $this->_caseStateValue
+							]
+						])) $this->response([
+							'response' => [
+								'msg' => $this->_caseState ==='lifespan' ? $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue]) : ($this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]])),
+								'type' => 'success'
+							]]);
+					}
 					else{
 						$current_record = [
 							'author' => $_SESSION['user']['name'],
@@ -118,7 +137,8 @@ class RECORD extends API {
 							':last_document' => null,
 							':content' => UTILITY::json_encode($records),
 							':id' => $case['id'],
-							':lifespan' => ($this->_caseState ==='lifespan' && in_array(strval($this->_caseStateValue), array_keys($this->_lang->_USER['record']['lifespan']['years']))) ? intval($this->_caseStateValue) : $case['lifespan']
+							':lifespan' => ($this->_caseState ==='lifespan' && in_array(strval($this->_caseStateValue), array_keys($this->_lang->_USER['record']['lifespan']['years']))) ? intval($this->_caseStateValue) : $case['lifespan'],
+							':erp_case_number' => $case['erp_case_number']
 						]
 					])) $this->response([
 						'response' => [
@@ -935,7 +955,8 @@ class RECORD extends API {
 								':last_document' => $document_name,
 								':content' => UTILITY::json_encode($records),
 								':id' => $case['id'],
-								':lifespan' => $case['lifespan']
+								':lifespan' => $case['lifespan'],
+								':erp_case_number' => $case['erp_case_number']
 							]
 						]);
 					}
@@ -1066,7 +1087,7 @@ class RECORD extends API {
 						'datalist' => $datalist
 					]
 				];
-				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', this.dataset.casestate, this.checked);"
+				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID . "', this.dataset.casestate, this.checked);"
 					. " new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.casestate_change_message') . "', render: JSON.parse('"
  					. UTILITY::json_encode($notification_recipients)
 					. "'), options: JSON.parse('"
@@ -1082,20 +1103,38 @@ class RECORD extends API {
 					foreach($this->_lang->_USER['record']['lifespan']['years'] as $years => $description){
 						$retention[$description] = [
 							'value' => $years,
-							'onchange' => "api.record('put', 'casestate', '" . $this->_requestedID. "', 'lifespan', this.value);"
+							'onchange' => "api.record('put', 'casestate', '" . $this->_requestedID . "', 'lifespan', this.value);"
 						];
 						if ($content['lifespan'] == $years) $retention[$description]['checked'] = true;
 						if(!PERMISSION::permissionFor('recordscasestate')) $retention[$description]['disabled'] = true;
 					}
 
-					$body[] = [$casestate, [
-						'type' => 'radio',
+					// erp_case_number
+					$erp_case_number = [
+						'type' => 'text',
 						'attributes' => [
-							'name' => $this->_lang->GET('record.lifespan.description')
+							'name' => $this->_lang->GET('record.erp_case_number'),
+							'value' => $content['erp_case_number'] ? : '',
+							'onkeydown' => "if (event.key==='Enter') api.record('put', 'casestate', '" . $this->_requestedID . "', 'erp_case_number', this.value)",
+						]
+					];
+					if(!PERMISSION::permissionFor('recordscasestate')){
+						unset($erp_case_number['attributes']['onkeydown']);
+						$erp_case_number['attributes']['readonly'] = true;
+					}
+
+					$body[] = [
+						$casestate,
+						[
+							'type' => 'radio',
+							'attributes' => [
+								'name' => $this->_lang->GET('record.lifespan.description')
+							],
+							'content' => $retention,
+							'hint' => $this->_lang->GET('record.lifespan.hint')
 						],
-						'content' => $retention,
-						'hint' => $this->_lang->GET('record.lifespan.hint')
-					]];
+						$erp_case_number
+					];
 				}
 				// append general request button
 				$body[count($body) - 1][] = [
@@ -1712,7 +1751,8 @@ class RECORD extends API {
 					':last_document' => $merge['last_document'],
 					':content' => UTILITY::json_encode($merge['content']),
 					':id' => $merge['id'],
-					':lifespan' => max($original['lifespan'], $merge['lifespan'])
+					':lifespan' => max($original['lifespan'], $merge['lifespan']),
+					':erp_case_number' => $merge['erp_case_number']
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.reidentify_success'),
@@ -1737,7 +1777,8 @@ class RECORD extends API {
 					':last_document' => $original['content'][count($original['content']) - 2]['document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),
 					':content' => UTILITY::json_encode($original['content']),
 					':id' => $original['id'],
-					':lifespan' => max($original['lifespan'], $merge['lifespan'])
+					':lifespan' => max($original['lifespan'], $merge['lifespan']),
+					':erp_case_number' => $original['erp_case_number']
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
 				'values' => [
 					':id' => $merge['id']
@@ -1796,7 +1837,8 @@ class RECORD extends API {
 					':last_document' => $original['last_document'],
 					':content' => UTILITY::json_encode($original['content']),
 					':id' => $original['id'],
-					':lifespan' => $original['lifespan']
+					':lifespan' => $original['lifespan'],
+					':erp_case_number' => $original['erp_case_number']
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.saved'),
@@ -1866,7 +1908,8 @@ class RECORD extends API {
 			'units' => $data['units'] ? explode(',', $data['units']) : [],
 			'context' => $data['context'],
 			'case_state' => $data['case_state'],
-			'lifespan' => $data['lifespan']
+			'lifespan' => $data['lifespan'],
+			'erp_case_number' => $data['erp_case_number']
 		];
 		$accumulatedcontent = [];
 
@@ -1895,8 +1938,15 @@ class RECORD extends API {
 				if (!$accumulatedcontent[$useddocument]['last_record'] || $accumulatedcontent[$useddocument]['last_record'] > $record['date']) $accumulatedcontent[$useddocument]['last_record'] = $this->convertFromServerTime($record['date'], $export);
 			}
 		}
-
 		ksort($accumulatedcontent);
+
+		// shift pseudodocument to end
+		if (isset($accumulatedcontent[$this->_lang->GET('record.altering_pseudodocument_name', [], $export)])){
+			$pseudodocument = $accumulatedcontent[$this->_lang->GET('record.altering_pseudodocument_name', [], $export)];
+			unset($accumulatedcontent[$this->_lang->GET('record.altering_pseudodocument_name', [], $export)]);
+			$accumulatedcontent[$this->_lang->GET('record.altering_pseudodocument_name', [], $export)] = $pseudodocument;
+		}
+
 		foreach ($accumulatedcontent as $document => $entries){
 			$summary['content'][$document] = [];
 			foreach ($entries['content'] as $key => $data){
