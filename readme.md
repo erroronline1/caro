@@ -34,8 +34,17 @@ Things are still in motion. Images may be outdated.
     * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class
     * integrate conditions
         * customer data import record.php
+            * combination with import?
+            * modal listing results via select, store data somewhere, onchange set somehow
+            * selections, name is response value, options are document fields
+            * onclose update selected fields 
         * casestate record.php
+            * if ERPINTERFACE
+            * depending on performance cron or get record->records()
         * order state order.php
+            * ask purchase on case number reference, if, decipher erp case number for commissions on orders
+            * if ERPINTERFACE
+            * depending on performance cron or get order->orders()
         * product matching instead of csv comparison consumables.php
         * product import instead of pricelists consumables.php
 
