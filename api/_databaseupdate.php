@@ -63,7 +63,7 @@ class UPDATE{
 	}
 
 	private function backup($query){
-		preg_match("/ALTER TABLE (.+?) /m", $query, $table);
+		preg_match("/ALTER TABLE (\w+)|DROP TABLE (\w+)/m", $query, $table);
 		if (!isset($table[1]) || !$table[1]) return false;
 		return [
 			'mysql' => [
