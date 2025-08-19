@@ -529,10 +529,10 @@ class TOOL extends API {
 						$dimensions = getimagesize($image);
 						$response['render']['content'][count($response['render']['content']) - 1][] = [
 							'type' => 'image',
-							'description' => pathinfo($image)['filename'],
+							'description' => pathinfo($image)['basename'],
 							'attributes' => [
-								'name' => pathinfo($image)['filename'],
-								'url' => substr($image, 3)
+								'name' => pathinfo($image)['basename'],
+								'url' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($image)['basename']
 							],
 							'dimensions' => [
 								'width' => $dimensions[0],
@@ -752,11 +752,11 @@ class TOOL extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$downloadfiles = [];
-				if (isset($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]) && $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name']
+				if (isset($_FILES[$this->_lang->PROPERTY('tool.zip.extract')])
 					&& $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'][0] && str_ends_with($_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['name'][0], 'zip')) {
 					$file = $_FILES[$this->_lang->PROPERTY('tool.zip.extract')]['tmp_name'][0];
 					//unpack an archive
-					$zip = new \ZipArchive;
+					$zip = new \ZipArchive();
 					if ($zip->open($file)){
 						for($i = 0; $i < $zip->numFiles; $i++) {
 							$filename = $zip->getNameIndex($i);
@@ -775,8 +775,9 @@ class TOOL extends API {
 					// create filename by concatenation
 					$zipname = '';
 					foreach ($_FILES[$this->_lang->PROPERTY('tool.zip.add')]['name'] as $filename){
-						$zipname .= preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $filename);
+						$zipname .= $filename;
 					}
+					$zipname = substr(preg_replace('/[^\w\.]/', '', $zipname), 0, 240);
 					// create zip
 					$zip = new \ZipArchive();
 					$zip->open(UTILITY::directory('tmp') . '/' . $zipname .'.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
