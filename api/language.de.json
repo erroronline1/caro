@@ -1620,8 +1620,13 @@
 			"result": "Ergebnis",
 			"select_type": "Berechne",
 			"thread": "Kernlochbohrung",
-			"thread_core": "Metrische Gewindegröße",
-			"thread_fine": "Feingewinde"
+			"thread_core": "Gewindegröße",
+			"thread_hint": "z.B. M12x1,5 oder 1/2\"20. Bei BSW-Gewinden muss die Gewindezahl pro Zoll mit angegeben werden, das Ergebnis für metrische Gewinde ohne Angabe der Steigung fällt ab M6 eher zu klein aus.",
+			"thread_type": {
+				"bsw": "Whitworth",
+				"m": "metrisch"
+			},
+			"thread_type_description": "Gewindeart"
 		},
 		"code": {
 			"barcode_code128": "Barcode CODE128",
@@ -1641,7 +1646,7 @@
 			"size": "Maximale Größe",
 			"source": "Bild"
 		},
-		"markdown":{
+		"markdown": {
 			"button": "Markdown",
 			"cancel": "Abbrechen",
 			"convert": "Konvertieren",
@@ -1651,8 +1656,8 @@
 			"csvdownload": "CSV-Datei herunterladen",
 			"csvupload": "CSV-Datei für Konvertierung wählen",
 			"editor": "Markdown-Tabelle konvertieren",
-			"md2csv_error": "Die konvertierung wurde abgebrochen. Es wurde kein gültiges Markdown-Tabellenformat gefunden:\n \n| Kopf 1 | Kopf 2 | Kopf 3 |\n| -------- | -------- | -------- |\n| Spalte 1 | Spalte 2 | Spalte 3 |\n \nFür mehr Informationen siehe Handbuch",
-			"playground":"Markdown Spielplatz",
+			"md2csv_error": "Die Konvertierung wurde abgebrochen. Es wurde kein gültiges Markdown-Tabellenformat gefunden:\n \n| Kopf 1 | Kopf 2 | Kopf 3 |\n| -------- | -------- | -------- |\n| Spalte 1 | Spalte 2 | Spalte 3 |\n \nFür mehr Informationen siehe Handbuch",
+			"playground": "Markdown Spielplatz",
 			"preview": "Vorschau",
 			"quick_reference": "Überschriften beginnen mit einem oder mehreren #, me mehr, desto kleiner\\nZeilenümbrüche inerhlab von Ansätzen enden mit zwei oder mehr Lerzeichen\\nGeordnete Listen beginnen mit einer Zahl und einem Punkt, ungeordnete Listen mit einem Stern oder Minus\\nVerschachtelte Listen werden mit viel Leerzeichen eingerückt\\nZitate beginnen mit >\\n \\nDie Darstellung wird nach dem Speichern serverseitig überarbeitet\\nFür mehr Informationen siehe Handbuch",
 			"quick_reference_header": "Kurzübersicht"

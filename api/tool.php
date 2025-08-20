@@ -144,11 +144,33 @@ class TOOL extends API {
 		 * @param float $thread
 		 * @return float
 		 * 
-		 * reasonable approximation for default crafts, doesn't fit for all fine thread types through but e.g. 12x1.5 
+		 * reasonable approximations for default crafts
+		 * according to https://www.sandvik.coromant.com/en-us/knowledge/machining-formulas-definitions/threading-formulas-definitions
 		 */
-		function thread($thread = 0, $fine = false){
-			$thread = floatval(str_replace(',', '.', $thread));
-			return strval(round($thread * ($fine ? .875 : .825), 1));
+		function thread($thread = 0, $type = 'm'){
+			switch ($type){
+				case 'bsw':
+					preg_match('/^(\d*(?:(?!\/)\D*))(?:(\d*)\/*(\d*)\D*)(\d*)$/', $thread, $numbers);
+					if (!$numbers[1] || !$numbers[2] || ($numbers[3] && !$numbers[4])) return null;
+
+					if (!$numbers[3] && !$numbers[4]){
+						$inch = intval($numbers[1]); // eg. 1"-8 TPI
+						$thread = $numbers[2];
+					}
+					else {
+						$inch = floatval((intval($numbers[1]) + ($numbers[3] ? intval($numbers[2]) / intval($numbers[3]): 0)));
+						$thread = $numbers[4];
+					}
+					return strval(round(($inch - .975 / $thread) * 25.4, 1)) . ' mm';
+				default:
+					$thread = str_replace(',', '.', $thread);
+					preg_match('/^\D*([\d,\.]+)\D*([\d,\.]*).*$/', $thread, $numbers);
+					if ($numbers[1] && $numbers[2]){
+						return strval(round(floatval($numbers[1]) - floatval($numbers[2]), 1)) . ' mm';
+					}
+					// approximation to small above M6
+					return strval(round(floatval($numbers[1]) * .825, 1)) . ' mm';
+			}
 		}
 
 		$types = [
@@ -253,23 +275,34 @@ class TOOL extends API {
 			],
 			'thread' => [
 				[
-					'type' => 'number',
+					'type' => 'text',
 					'attributes' => [
 						'name' => $this->_lang->GET('tool.calculator.thread_core'),
 						'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_core')) ? : ''
-					]
+					],
+					'hint' =>$this->_lang->GET('tool.calculator.thread_hint')
 				],
 				[
-					'type' => 'checkbox',
+					'type' => 'radio',
+					'attributes' => [
+						'name' => $this->_lang->GET('tool.calculator.thread_type_description'),
+					],
 					'content' => [
-						$this->_lang->PROPERTY('tool.calculator.thread_fine') => []
+						$this->_lang->PROPERTY('tool.calculator.thread_type.m') => ['value' => 'm', 'checked' => true],
+						$this->_lang->PROPERTY('tool.calculator.thread_type.bsw') => ['value' => 'bsw'],
 					]
 				],
 			],
 		];
 
-		if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_fine'))) {
-			$types['thread'][1]['content'][$this->_lang->PROPERTY('tool.calculator.thread_fine')]['checked'] = true;
+		$selected_thread = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_type_description'));
+		if ($selected_thread){
+			foreach($this->_lang->_USER['tool']['calculator']['thread_type'] as $key => $value){
+				if ($selected_thread === $key) {
+					$types['thread'][1]['content'][$this->_lang->PROPERTY('tool.calculator.thread_type.' . $key)]['checked'] = true;
+				}
+				else unset($types['thread'][1]['content'][$this->_lang->PROPERTY('tool.calculator.thread_type.' . $key)]['checked']);
+			}
 		}
 
 		$response['render'] = ['form' => [
@@ -334,7 +367,7 @@ class TOOL extends API {
 						$calculation = price(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_net')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_tax')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.price_surcharge')));
 						break;
 					case 'thread':
-						$calculation = thread(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_core')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_fine')));
+						$calculation = thread(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_core')), UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('tool.calculator.thread_type_description')));
 						break;
 				}
 				$response['render']['content'][] = [

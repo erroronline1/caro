@@ -1620,8 +1620,13 @@
 			"result": "Result",
 			"select_type": "Calculate",
 			"thread": "Core Hole",
-			"thread_core": "Metric thread",
-			"thread_fine": "Fine thread"
+			"thread_core": "Thread",
+			"thread_hint": "e.g. M12x1,5 or 1/2\"20. BSW-threads require the thread count per inch, the result for metric threads without thread pitch is likely too small above M6.",
+			"thread_type": {
+				"bsw": "Whitworth",
+				"m": "metric"
+			},
+			"thread_type_description": "Thread type"
 		},
 		"code": {
 			"barcode_code128": "Barcode CODE128",
@@ -1641,7 +1646,7 @@
 			"size": "Maximum size",
 			"source": "Image"
 		},
-		"markdown":{
+		"markdown": {
 			"button": "Markdown",
 			"cancel": "Cancel",
 			"convert": "Convert",
@@ -1652,7 +1657,7 @@
 			"csvupload": "Select CSV-file for conversion",
 			"editor": "Markdown editor",
 			"md2csv_error": "Conversion has been aborted. Failed to identify Markdown table format:\n \n| Header 1 | Header 2 | Header 3 |\n| -------- | -------- | -------- |\n| Column 1 | Column 2 | Column 3 |\n \nSee manual for more information",
-			"playground":"Markdown playground",
+			"playground": "Markdown playground",
 			"preview": "Preview",
 			"quick_reference": "Headers begin with one or more #, the more the smaller\\nLinebreaks within paragraphs end with two or more spaces\\nOrdered lists start with numbers and a period, unordered lists with asterisk or dash\\nNested lists are indented with four spaces\\nQuotes begin with a > symbol\\n \\nStyling will be processed by server after saving\\nSee manual for more information",
 			"quick_reference_header": "Quick reference"
