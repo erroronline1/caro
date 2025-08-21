@@ -252,7 +252,9 @@
 		},
 		"navigation": {
 			"about": "Über CARO App",
-			"ariaSkipMenu": "Menü überspringen",
+			"ariaSkipMenuOption": "nächste Menüoptionen für :option",
+			"ariaSkipToMain": "Menü überspringen",
+			"ariaSkipToMenu": "zum Anfang des Menüs",
 			"header": "Anwendung",
 			"manual_manager": "Anleitungen verwalten",
 			"signin": "Bitte melde dich an",

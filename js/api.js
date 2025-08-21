@@ -245,6 +245,10 @@ export const api = {
 			top: 0,
 			behavior: "smooth",
 		});
+		const top = document.getElementById('menustart');
+		top.setAttribute('tabindex', '-1');
+		top.focus();
+		top.removeAttribute('tabindex');
 	},
 
 	/**
@@ -512,14 +516,18 @@ export const api = {
 				successFn = async function (data) {
 					// construct backend provided application menu
 					if (!data.render) return;
+
+					function skip(text, href, id = null) {
+						const ariaSkip = document.createElement("a");
+						ariaSkip.append(document.createTextNode(text));
+						ariaSkip.href = href;
+						if (id) ariaSkip.id = id;
+						return ariaSkip;
+					}
 					const menu = document.querySelector("nav"),
 						elements = [],
-						icons = {},
-						ariaSkipMenu = document.createElement("a");
-					ariaSkipMenu.append(document.createTextNode(api._lang.GET("application.navigation.ariaSkipMenu")));
-					ariaSkipMenu.href = "#main";
-					ariaSkipMenu.classList.add("visually-hidden");
-					elements.push(ariaSkipMenu);
+						icons = {};
+					elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMain"), "#main", "menustart"));
 
 					// set up icons css property
 					icons[api._lang.GET("application.navigation.header")] = "url('./media/bars.svg')";
@@ -544,16 +552,21 @@ export const api = {
 					elements.push(button);
 
 					// iterate over main categories
-					for (const [group, items] of Object.entries(data.render)) {
+					let group,
+						items,
+						menuentries = Object.keys(data.render);
+					for (let i = 0; i < menuentries.length; i++) {
+						group = menuentries[i];
+						items = data.render[menuentries[i]];
 						label = document.createElement("label");
 
 						// set up label and notification element
 						label.htmlFor = "userMenu" + group;
 						label.setAttribute("data-notification", 0);
+						label.title = group;
 						div = document.createElement("div");
 						div.style.maskImage = div.style.webkitMaskImage = icons[group];
 						div.setAttribute("data-for", "userMenu" + group.replace(" ", "_"));
-						div.title = group;
 						label.append(div);
 
 						// set up radio input for css checked condition
@@ -563,7 +576,7 @@ export const api = {
 						input.id = "userMenu" + group;
 						// accessibility settings
 						input.tabIndex = -1;
-						input.setAttribute("aria-hidden", true);
+						input.setAttribute("inert", true);
 						input.title = group;
 
 						// set up div containing subsets of category
@@ -598,9 +611,15 @@ export const api = {
 								div.append(span);
 							}
 						}
+
 						elements.push(label);
+						elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMain"), "#main"));
+
+						if (menuentries[i + 1]) {
+							elements.push(skip(api._lang.GET("application.navigation.ariaSkipMenuOption", { ":option": menuentries[i + 1] }), "#userMenu" + menuentries[i + 1]));
+						}
 						elements.push(input);
-						elements.push(div);
+						elements.push(div); // div must come immidiately after input
 					}
 
 					// forth nav
@@ -613,6 +632,7 @@ export const api = {
 					};
 					button.style.maskImage = button.style.webkitMaskImage = "url('./media/angle-right.svg')";
 					elements.push(button);
+					elements.push(skip(api._lang.GET("application.navigation.ariaSkipToMenu"), "#menustart"));
 
 					const observer = new MutationObserver(async (mutations) => {
 						observer.disconnect();

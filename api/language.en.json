@@ -238,7 +238,9 @@
 		"login": "User authentification",
 		"navigation": {
 			"about": "About CARO App",
-			"ariaSkipMenu": "skip menu",
+			"ariaSkipMenuOption": "next menu option for :option",
+			"ariaSkipToMain": "skip menu",
+			"ariaSkipToMenu": "go to menu start",
 			"header": "Application",
 			"manual_manager": "Edit manual",
 			"signin": "Please sign in",
