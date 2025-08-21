@@ -247,7 +247,7 @@ class MEASURE extends API {
 												'type' => 'textarea',
 												'attributes' => [
 													'name' => $this->_lang->GET('measure.measure'),
-													'value' => $measure['measures'] ? : ''
+													'value' => $measure['measures'] ? preg_replace(['/\r/','/\n/', '/"/'],['', "\\n", '\"'], $measure['measures']): ''
 												]
 											], [
 												'type' => 'checkbox',
