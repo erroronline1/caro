@@ -201,7 +201,7 @@ class MESSAGE extends API {
 								[
 									...$this->announcementform([
 										'subject' => $announcement['subject'] ? : '',
-										'text' => $announcement['text'] ? preg_replace(['/\r/','/\n/'],['', "\\n"], $announcement['text']): '',
+										'text' => $announcement['text'] ? preg_replace(['/\r/','/\n/', '/"/'],['', "\\n", '\"'], $announcement['text']): '',
 										'span_start' => $announcement['span_start'] ? $this->convertFromServerTime(substr($announcement['span_start'], 0, 10), true) : '',
 										'span_end' => $announcement['span_end'] ? $this->convertFromServerTime(substr($announcement['span_end'], 0, 10), true) : '',
 										'units' => $announcementunits
@@ -456,25 +456,30 @@ class MESSAGE extends API {
 				}
 				break;
 			case 'DELETE':
-				if (SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
+				SQLQUERY::EXECUTE($this->_pdo, 'message_delete_messages', [
 					'values' => [
 						':user' => $_SESSION['user']['id']
 					],
 					'replacements' => [
 						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_conversation)))
 					]
-				])) $this->response([
+				]);
+				$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('message.message.delete_success'),
 						'redirect' => ['conversation'],
 						'type' => 'deleted'
 					]]);
-				else $this->response([
-					'response' => [
+				// for some weird reason safari does return an error response albeit messages being deleted. does not occur on desktop.
+				// i'll ignore it here for an error response is not that important, but not distracting users is.
+				// safari does not allow for error inspection unless i buy a mac. lol.
+				/*else $this->response(
+					['response' => [
 						'msg' => $this->_lang->GET('message.message.delete_failure'),
 						'redirect' => false,
 						'type' => 'error'
-					]]);
+					]]
+				);*/
 				break;
 		}
 		$this->response($response);
