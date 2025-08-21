@@ -404,9 +404,15 @@ nav {
 		visibility: hidden;
 	}
 
-	input {
+	input,
+	a {
 		appearance: none;
-		width: auto;
+		width: 0;
+		height: 0;
+		padding: 0;
+		margin: 0;
+		overflow: hidden;
+		display: none;
 	}
 
 	div[data-for="userMenuApplication"] {
@@ -970,13 +976,10 @@ td {
 
 /*************************** input elements and call to action *******************************/
 
-.visually-hidden {
-	/* visually hide screenreader-only components*/
-	width: 0;
-	height: 0;
-	padding: 0;
-	margin: 0;
-	overflow: hidden;
+main *:not([type="radio"], [type="checkbox"]):focus,
+dialog *:not([type="radio"], [type="checkbox"]):focus {
+	outline-offset: 0.25em;
+	outline: dashed var(--green);
 }
 
 a,
@@ -1218,11 +1221,11 @@ html[data-useragent*="safari"] body {
 /*
 specific styling of select>option appearance to make it kinda look like a button and illustrate being an interactive element
 */
-#html5-qrcode-select-camera{
+#html5-qrcode-select-camera {
 	background-color: var(--cta);
 	color: var(--article);
 	border-radius: 2em;
-	padding: .75em;
+	padding: 0.75em;
 	font-weight: bold;
 	font-size: 1em;
 }
