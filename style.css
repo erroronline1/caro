@@ -1215,6 +1215,18 @@ html[data-useragent*="safari"] body {
 	}
 }
 
+/*
+specific styling of select>option appearance to make it kinda look like a button and illustrate being an interactive element
+*/
+#html5-qrcode-select-camera{
+	background-color: var(--cta);
+	color: var(--article);
+	border-radius: 2em;
+	padding: .75em;
+	font-weight: bold;
+	font-size: 1em;
+}
+
 button {
 	margin: 1em 0;
 	padding: 0.75em;
