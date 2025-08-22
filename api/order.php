@@ -470,6 +470,9 @@ class ORDER extends API {
 				// userlist to decode orderer
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 
+				// import to determine if interface is present
+				include_once("./_erpinterface.php");
+
 				// get purchase member names passed to data['editproductrequest'] as array type for message initialization
 				// while possible to intersect with products-permission, ceo, prrc and qmo by default may not have time to handle this
 				foreach ($users as $user){
@@ -537,6 +540,7 @@ class ORDER extends API {
 						'addproduct' => null,
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
+						'identifier' => (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? UTILITY::identifier(' ', $row['approved']): null
 					];
 
 					// add identified group user

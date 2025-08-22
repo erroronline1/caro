@@ -1248,6 +1248,8 @@
 		"edit_prepared_order": "Bestellung bearbeiten",
 		"export": "Druckexport von Lagerware",
 		"export_hint": "Öffne den Link, speichere oder drucke den Export. Du bist für die Sicherheit exportierter Daten selbst verantwortlich.",
+		"identifier": "Bestellzuordnung",
+		"identifier_hint": "Füge dies dem Bestelltest in der Drittanwendung hinzu um eine automatische Statusaktualisierung zu ermöglichen.",
 		"incorporation": {
 			"accepted": "Einführung abgeschlossen",
 			"adopt": "übernehmen",

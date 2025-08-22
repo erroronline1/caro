@@ -1248,6 +1248,8 @@
 		"edit_prepared_order": "Edit order",
 		"export": "Export ordered stock items",
 		"export_hint": "Open the link, save or print the export. On exporting sensitive data you are responsible for their safety.",
+		"identifier": "Order identifier",
+		"identifier_hint": "Add this to the order text within the third party software to enable automated state updates.",
 		"incorporation": {
 			"accepted": "Incorporation accepted",
 			"adopt": "adopt",

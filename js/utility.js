@@ -319,26 +319,26 @@ export const _client = {
 			imageelement.style["-webkit-mask-image"] = imageelement.style["mask-image"] = image;
 		},
 	},
-	audit : {
+	audit: {
 		/**
 		 * enables the closing button if all fields are filled
 		 */
-		managementreview:() => {
+		managementreview: () => {
 			let input,
-			clear=true,
-			complete = document.getElementsByName(api._lang._USER.audit.managementreview.close);
-			for (const [key, issue] of Object.entries(api._lang._USER.audit.managementreview.required)){
-				input=document.getElementsByName(issue);
+				clear = true,
+				complete = document.getElementsByName(api._lang._USER.audit.managementreview.close);
+			for (const [key, issue] of Object.entries(api._lang._USER.audit.managementreview.required)) {
+				input = document.getElementsByName(issue);
 				if (input && input[0] && !input[0].value) {
-					clear=false;
+					clear = false;
 					break;
 				}
 			}
-			if (complete && complete[0]){
-				if (clear) complete[0].removeAttribute('disabled');
-				else complete[0].setAttribute('disabled', true);
+			if (complete && complete[0]) {
+				if (clear) complete[0].removeAttribute("disabled");
+				else complete[0].setAttribute("disabled", true);
 			}
-		}
+		},
 	},
 	calendar: {
 		/**
@@ -465,12 +465,15 @@ export const _client = {
 			}
 
 			// fire dialog, resolve with post request
-			new Dialog({
-				type: "input",
-				header: dialogheader,
-				render: body,
-				options: options,
-			}, "FormData").then((response) => {
+			new Dialog(
+				{
+					type: "input",
+					header: dialogheader,
+					render: body,
+					options: options,
+				},
+				"FormData"
+			).then((response) => {
 				if (response) {
 					api.message("post", "message", response);
 				}
@@ -932,6 +935,59 @@ export const _client = {
 					});
 				}
 
+				// append order identifier
+				if (element.identifier) {
+					buttons = {};
+					buttons[api._lang.GET("general.ok_button")] = true;
+					// copy-option
+					collapsible.push({
+						type: "text_copy",
+						numeration: "prevent",
+						attributes: {
+							value: element.identifier,
+							name: api._lang.GET("order.identifier"),
+							readonly: true,
+							class: "imagealigned",
+							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
+							onclick: function () {
+								new _client.Dialog({
+									type: "input",
+									header: api._lang.GET("order.identifier"),
+									render: [
+										[
+											{
+												type: "text",
+												attributes: {
+													value: "element.identifier",
+													name: api._lang.GET("order.identifier"),
+													readonly: true,
+													onclick: "_client.application.toClipboard(this)",
+												},
+												hint: api._lang.GET("order.identifier_hint") + " " + api._lang.GET("order.copy_value"),
+											},
+										],
+									],
+									options: buttons,
+								});
+							}
+								.toString()
+								._replaceArray(["element.identifier", "buttons"], [element.identifier.replaceAll('"', '\\"'), JSON.stringify(buttons)]),
+						},
+						hint: api._lang.GET("order.identifier_hint") + " " + api._lang.GET("order.copy_value"),
+					});
+
+					// display qrcode
+					collapsible.push({
+						type: "image",
+						attributes: {
+							imageonly: {},
+							qrcode: element.commission,
+							class: "order2dcode",
+							name: api._lang.GET("order.commission"),
+						},
+					});
+				}
+
 				// append information
 				if (element.information) {
 					collapsible.push({
@@ -957,20 +1013,23 @@ export const _client = {
 							value: api._lang.GET("order.add_information"),
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
-								new _client.Dialog({
-									type: "input",
-									header: api._lang.GET("order.add_information"),
-									render: [
-										{
-											type: "textarea",
-											attributes: {
-												name: api._lang.GET("order.additional_info"),
+								new _client.Dialog(
+									{
+										type: "input",
+										header: api._lang.GET("order.add_information"),
+										render: [
+											{
+												type: "textarea",
+												attributes: {
+													name: api._lang.GET("order.additional_info"),
+												},
+												hint: api._lang.GET("order.add_information_modal_body"),
 											},
-											hint: api._lang.GET("order.add_information_modal_body"),
-										},
-									],
-									options: buttons,
-								}, 'FormData').then((response) => {
+										],
+										options: buttons,
+									},
+									"FormData"
+								).then((response) => {
 									if (response) api.purchase("put", "approved", "element.id", "addinformation", response);
 								});
 							}
@@ -1072,20 +1131,23 @@ export const _client = {
 						api.purchase("put", "approved", "element.id", "partially_received", this.checked);
 						this.setAttribute("data-partially_received", this.checked.toString());
 						if (this.checked)
-							new _client.Dialog({
-								type: "input",
-								header: api._lang.GET("order.add_information"),
-								render: [
-									{
-										type: "textarea",
-										attributes: {
-											name: api._lang.GET("order.additional_info"),
+							new _client.Dialog(
+								{
+									type: "input",
+									header: api._lang.GET("order.add_information"),
+									render: [
+										{
+											type: "textarea",
+											attributes: {
+												name: api._lang.GET("order.additional_info"),
+											},
+											hint: api._lang.GET("order.add_information_modal_body"),
 										},
-										hint: api._lang.GET("order.add_information_modal_body"),
-									},
-								],
-								options: buttons,
-							}, 'FormData').then((response) => {
+									],
+									options: buttons,
+								},
+								"FormData"
+							).then((response) => {
 								if (response) api.purchase("put", "approved", "element.id", "addinformation", response);
 							});
 					}
@@ -1101,20 +1163,23 @@ export const _client = {
 						data_disapproved: "false",
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
-							new _client.Dialog({
-								type: "input",
-								header: api._lang.GET("order.disapprove"),
-								render: [
-									{
-										type: "textarea",
-										attributes: {
-											name: api._lang.GET("message.message.message"),
+							new _client.Dialog(
+								{
+									type: "input",
+									header: api._lang.GET("order.disapprove"),
+									render: [
+										{
+											type: "textarea",
+											attributes: {
+												name: api._lang.GET("message.message.message"),
+											},
+											hint: api._lang.GET("order.disapprove_message", { ":unit": api._lang.GET("units." + "element.organizationalunit") }),
 										},
-										hint: api._lang.GET("order.disapprove_message", { ":unit": api._lang.GET("units." + "element.organizationalunit") }),
-									},
-								],
-								options: buttons,
-							}, 'FormData').then((response) => {
+									],
+									options: buttons,
+								},
+								"FormData"
+							).then((response) => {
 								if (response !== false) {
 									api.purchase("put", "approved", "element.id", "disapproved", response);
 									this.disabled = true;
@@ -1135,20 +1200,23 @@ export const _client = {
 						data_cancellation: "false",
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
-							new _client.Dialog({
-								type: "input",
-								header: api._lang.GET("order.cancellation"),
-								render: [
-									{
-										type: "textarea",
-										attributes: {
-											name: api._lang.GET("message.message.message"),
+							new _client.Dialog(
+								{
+									type: "input",
+									header: api._lang.GET("order.cancellation"),
+									render: [
+										{
+											type: "textarea",
+											attributes: {
+												name: api._lang.GET("message.message.message"),
+											},
+											hint: api._lang.GET("order.cancellation_message"),
 										},
-										hint: api._lang.GET("order.cancellation_message"),
-									},
-								],
-								options: buttons,
-							}, 'FormData').then((response) => {
+									],
+									options: buttons,
+								},
+								"FormData"
+							).then((response) => {
 								if (response !== false) {
 									api.purchase("put", "approved", "element.id", "cancellation", response);
 									this.disabled = true;
@@ -1181,28 +1249,31 @@ export const _client = {
 						data_return: "false",
 						// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 						onchange: function () {
-							new _client.Dialog({
-								type: "input",
-								header: api._lang.GET("order.return"),
-								render: [
-									{
-										type: "textarea",
-										attributes: {
-											name: api._lang.GET("message.message.message"),
+							new _client.Dialog(
+								{
+									type: "input",
+									header: api._lang.GET("order.return"),
+									render: [
+										{
+											type: "textarea",
+											attributes: {
+												name: api._lang.GET("message.message.message"),
+											},
+											hint: api._lang.GET("order.return_message"),
 										},
-										hint: api._lang.GET("order.return_message"),
-									},
-									{
-										type: "select",
-										attributes: {
-											name: api._lang.GET("order.return_reason"),
-											required: true,
+										{
+											type: "select",
+											attributes: {
+												name: api._lang.GET("order.return_reason"),
+												required: true,
+											},
+											content: reasons,
 										},
-										content: reasons,
-									},
-								],
-								options: buttons,
-							}, 'FormData').then((response) => {
+									],
+									options: buttons,
+								},
+								"FormData"
+							).then((response) => {
 								if (response !== false) {
 									api.purchase("put", "approved", "element.id", "return", response);
 									this.disabled = true;
@@ -1231,20 +1302,23 @@ export const _client = {
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onchange: function () {
 								if (this.value === "...") return false;
-								new _client.Dialog({
-									type: "input",
-									header: api._lang.GET("order.orderstate_description") + " " + this.value,
-									render: [
-										{
-											type: "textarea",
-											attributes: {
-												name: api._lang.GET("order.additional_info"),
+								new _client.Dialog(
+									{
+										type: "input",
+										header: api._lang.GET("order.orderstate_description") + " " + this.value,
+										render: [
+											{
+												type: "textarea",
+												attributes: {
+													name: api._lang.GET("order.additional_info"),
+												},
+												hint: api._lang.GET("order.disapprove_message", { ":unit": api._lang.GET("units." + "element.organizationalunit") }),
 											},
-											hint: api._lang.GET("order.disapprove_message", { ":unit": api._lang.GET("units." + "element.organizationalunit") }),
-										},
-									],
-									options: buttons,
-								}, 'FormData').then((response) => {
+										],
+										options: buttons,
+									},
+									"FormData"
+								).then((response) => {
 									if (response) {
 										response[api._lang.GET("order.additional_info")] = api._lang.GET("order.orderstate_description") + " - " + this.value + ": " + response[api._lang.GET("order.additional_info")];
 										api.purchase("put", "approved", "element.id", "addinformation", response);
