@@ -346,7 +346,7 @@ class UTILITY {
 	 * @param bool $strip_date
 	 * @return string
 	 */
-	public static function identifier($identifier = '', $default_date = '', $strip_date = false){
+	public static function identifier($identifier = '', $default_date = '', $strip_date = false, $translate = false){
 		if (!$identifier) return $identifier;
 
 		preg_match('/(.+?)(?: \|([a-z0-9]+))*$/', $identifier, $components);
@@ -360,6 +360,7 @@ class UTILITY {
 				$datetime->setTimestamp($unixtime);
 				// if no error has risen the identifier is likely valid
 
+				if ($translate) return $datetime->format('Y-m-D H:i:s');
 				if ($strip_date){
 					if (isset($components[1]) && $components[1]) return $components[1];
 				}
