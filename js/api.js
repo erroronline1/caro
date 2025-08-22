@@ -735,6 +735,9 @@ export const api = {
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
+
+					if (request[2]) //search
+						document.getElementById('_landingpagesearch').scrollIntoView({block:'center'});
 				};
 				break;
 			case "manual":

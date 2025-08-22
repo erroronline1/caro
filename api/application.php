@@ -1377,6 +1377,7 @@ class APPLICATION extends API {
 					'attributes' => [
 						'name' => $this->_lang->GET('application.search'),
 						'value' => $this->_search,
+						'id' => '_landingpagesearch',
 						'onkeydown' => "if (event.key === 'Enter') {api.application('get', 'start', encodeURIComponent(this.value)); return false;}",
 					]
 				]
