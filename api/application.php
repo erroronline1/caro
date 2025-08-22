@@ -207,7 +207,7 @@ class APPLICATION extends API {
 							// update records case state if set within erp system
 							// does only update database null values
 							// also see record.php->casestate()
-							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'casestate')){
+							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'casestate') && ERPINTERFACE->casestate()){
 								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
 								if (($erpdata = ERPINTERFACE->casestate(array_filter(array_column($data, 'erp_case_number'), fn($v) => boolval($v)))) === null) break;
 								
@@ -252,7 +252,10 @@ class APPLICATION extends API {
 							}
 							break;
 						case 'erp_interface_orderdata':
-							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata')){
+							// update order state if set within erp system
+							// does only update database null values
+							// also see order.php->approved()
+							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
 								// todo: everything once it comes clear how erp data could possibly be matched with caro commissions
 							}
 							break;
