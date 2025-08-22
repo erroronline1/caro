@@ -245,10 +245,7 @@ export const api = {
 			top: 0,
 			behavior: "smooth",
 		});
-		const top = document.getElementById('menustart');
-		top.setAttribute('tabindex', '-1');
-		top.focus();
-		top.removeAttribute('tabindex');
+		document.querySelector('#menustart').focus();
 	},
 
 	/**

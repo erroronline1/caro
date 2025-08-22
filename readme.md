@@ -29,8 +29,6 @@ Things are still in motion. Images may be outdated.
 
 ## to do
 * unittests
-* improve screenreader accessibility
-    * test ot fix api.update_header focus on other browsers
 * templates
 * _shared.php
     * CRON-class
