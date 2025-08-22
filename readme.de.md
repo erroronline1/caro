@@ -53,6 +53,7 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
     * [Anmerkungen und Hinweise zur Nutzung](#anmerkungen-und-hinweise-zur-nutzung)
     * [Bekannte Schwachstellen](#bekannte-schwachstellen)
     * [Anpassung](#anpassung)
+        * [ERP Anbindung](#erp-anbindung)
     * [Erwägungen zur Nutzerakzeptanz](#erwägungen-zur-nutzerakzeptanz)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
@@ -1868,9 +1869,11 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 Es gibt zusätzliche Einstellungen in der config.ini, die hier nicht detailliert erläutert werden müssen. Diese betreffen
 * Datenbankverbindungen
 * Cron-Aufgaben Intervalle
+* ERP Interface
+* Proxy-Einstellungen für Web-Anfragen
 * Dateipfade
 
-und sind für die Person welche die Anwendung einrichtet selbsterklärend.
+und sind für die Person welche die Anwendung einrichtet prinzipiell selbsterklärend.
 
 [Übersicht](#übersicht)
 
@@ -1984,6 +1987,20 @@ Im Falle einer Anpassung des Quelltexts:
 * UTILITY::parsePayload:
     * Arrays können als GET und DELETE Anforderung nicht mit ?var[]=1&var[]=2 verwendet werden. Nur das letzte Vorkommen wird auf diese Weise verwendet.
     * $_FILES ist immer ein Array aufgrund einer individuellen Verarbeitung von POST und PUT Nutzlast.
+
+Wo wir gerade dabei sind
+
+### ERP Anbindung
+> unvollendet und experimentell Stand 9/25
+Die CARO App ist auf dem Empfang von Updates aus dem ERP-System vorbereitet. Da es viele Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung. Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Ausgabe die von CARO verarbeitet werden kann.
+
+Es können beispielsweise Web-APIs (Empfehlung `UTILITY::webrequest()`) oder regelmäßig breitgestellte CSV-Exporte (Empfehlung [CSV Prozessor](#csv-prozessor)) verarbeitet und/oder eigene Algorithmen implementiert werden, solange die aufbereiteten Daten den erwarteten Anforderungen entsprechen. Es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren.
+
+Nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden. 
+
+Die grundlegend unterstützten Integrationen beinhalten
+* Fallstatus für Aufzeichnungen sofern eine Vorgangsnummer angegeben wird
+* Aktualisierung der Bestelldaten sofern den Bestelltexten je Artikel eine Bestellidentifikation beigefügt werden kann und wurde und diese vom ERP-System zurück gegeben werden kann
 
 [Übersicht](#übersicht)
 

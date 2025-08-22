@@ -34,23 +34,16 @@ Things are still in motion. Images may be outdated.
     * max loops for avoiding runaway on improper configured replacement patterns?
     * raise exception if loopcount exceeds passed security parameter
 * what if an erp-connection is available?
-    * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class
     * integrate conditions
         * customer data import record.php
             * combination with import?
             * modal listing results via select, store data somewhere, onchange set somehow
             * selections, name is response value, options are document fields
             * onclose update selected fields 
-        * casestate record.php
-            * if ERPINTERFACE
-            * depending on performance cron or get record->records()
         * order state order.php
             * ask purchase on case number reference, if, decipher erp case number for commissions on orders
             * if ERPINTERFACE
-            * depending on performance cron or get order->orders()
             * only set if null, no overwriting
-        * product matching instead of csv comparison consumables.php
-        * product import instead of pricelists consumables.php
     * eva partial api option, partial csv again
         * if same server, go beyond root and check if respective csv-export exists with a sufficient timestamp?
 
@@ -105,6 +98,7 @@ Things are still in motion. Images may be outdated.
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Known deficiencies](#known-deficiencies)
     * [Customisation](#customisation)
+        * [ERP Interface](#erp-interface)
     * [User acceptance considerations](#user-acceptance-considerations)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
 * [Regulatory software requirements](#regulatory-software-requirements)
@@ -1980,6 +1974,8 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 There are additional settings within the config.ini that are not useful being written in detail here regarding
 * database connection
 * cron-task intervals
+* ERP interface
+* proxy settings for web requests
 * file paths
 
 but pretty much self explanatory for the person setting up the application.
@@ -2095,6 +2091,20 @@ If you ever fiddle around with the sourcecode:
 * UTILITY::parsePayload:
     * Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
     * $_FILES is always an array due to a custom processing of POST and PUT payload.
+
+and while we're at it
+
+### ERP Interface
+> still experimental and unfinished as of 9/25
+The CARO App is prepared for retrieving updates from the ERP-system. As there exist several applications there is no chance to get an out-of-the-box-solution. But it may be possible to primarily modify the _erpinterface.php file to your needs. The _ERPINTERFACE-class serves as a skeleton and provides the expected output that can be processed by CARO.
+
+You may process Web-APIs (recommendation `UTILITY::webrequest()`), regularly provided CSV-dumps (recommendation [CSV Processor](#csv-processor)) and/or implement own data processing as long as the data is prepared to be returned as expected. It is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp].
+
+Signal unavailable methods by returning `null`.
+
+Basic supported integrations include
+* case states for records given a provided ERP case number
+* updates on order data given the ordered items text can and has been added an order identification and the ERP-system is able to hand it back
 
 [Content](#content)
 
@@ -2522,12 +2532,13 @@ Stakeholder identification:
 | Libraries unstable | Low | High (application unstable) | Local embedding only | Dynamic imports of libraries are to be avoided |
 | Insufficient configuration | Medium | High (application unstable) | Documentation of config.ini, training | No dynamic application settings to raise the bar for changes and force tech savvy user interaction |
 | Faulty CSV-filter configuration | High | High (unexpected data) | Explanation within documentation | The versatility to process complex data must not suffer |
-| Memory overflow due to looping by erroneous RegEx filter for CSV | High (server unresponsive) | Since most users are unlikely to be experienced with RegEx and an development environment is recommended anyway the responsible person should test filters there in advance | The versatility to process complex data must not suffer |
+| Memory overflow due to looping by erroneous RegEx filter for CSV | Medium | High (server unresponsive) | Since most users are unlikely to be experienced with RegEx and an development environment is recommended anyway the responsible person should test filters there in advance | The versatility to process complex data must not suffer |
 | Interface incomprehensible | Medium | High (unexpected or incomplete data, lack of compliance) | Multi-language support, adaptable dynamic embedded text chunks | Users can select preferred language in custom application settings |
 | Adverse rendering of record values as link | Low | Low (unexpected rendering of content) | None | [Wrapping linked record content with *href='{VALUE}'*](#documents) has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
-| Lost attributes on widgets during regular editing of JSON-imported custom document components | Low | Low (unexpected rendering of content) | Most important properties remain, the manual [warns](#component-editing) about this usage |
+| Lost attributes on widgets during regular editing of JSON-imported custom document components | Low | Low (unexpected rendering of content) | None | Most important properties remain, the manual [warns](#component-editing) about this usage |
 | Adverse rendering of record values as Markdown | Low | Low (unexpected rendering of content) | None | Prefixing textsection content with `::MARKDOWN::` has the least data and performance impact, it is very unlikely benign users submitting this data scheme during daily use |
 | Markdown has HTML enabled, malicious insertions are possible | Low | High (application unstable, corrupted data) | None | Markdown is permitted to responsible roles only. It is very unlikely these roles corrupting the application |
+| Orders may recommend to provide an identificator for ERP-data transfers. This is an encoded timestamp and not barred from duplicates. Adverse matching might be possible | Low | Medium (faulty order states may have an impact on appointments) | Additional matching of vendor and product | Probability of two orders being approved at the same second is unlikely |
 
 [Content](#content)
 
