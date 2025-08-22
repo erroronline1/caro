@@ -30,10 +30,6 @@ Things are still in motion. Images may be outdated.
 ## to do
 * unittests
 * templates
-* _shared.php
-    * CRON-class
-        * execute automations with individual intervals
-        * if not set, daily by default
 * csvprocessor
     * max loops for avoiding runaway on improper configured replacement patterns?
     * raise exception if loopcount exceeds passed security parameter
@@ -1134,7 +1130,7 @@ The application handles some automated reminders and schedules
 
 Beside these the dashboard and the menu notify about open topics and tasks. Timespans for notifications and schedules can be set within the [configuration](#runtime-variables).
 
-Automated reminders and schedules are processed once on the first login on the day.
+Automated reminders and schedules are processed once per day by default, but can be customized within the [config.ini](#runtime-variables).
 
 ## User trainings
 User trainings can be added in the [user manager](#users) but also from the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries). In terms of ISO 13485 8.5.1 General Improvement and ISO 13485 8.5.2 Corrective measures trainings can also be added in case of a treatment record marked as complaint.
@@ -1779,7 +1775,6 @@ By default following permissions/roles are defined within the language.XX.json-f
 ```
 ; general application settings
 [application]
-cron = 1440 ; minutes for a refresh in case of landing page request after last automated cron has been initialized. choose wisely as this affects the performance.
 debugging = no ; yes, no; enables or disables error messages
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
 issue_mail = "issues@companymail.tld" ; address for application and security issues
@@ -1981,6 +1976,13 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 | codepadding | plain number in *unit*, additional space between code and text | none |
 | header | yes or no | yes |
 | footer | yes or no | yes |
+
+There are additional settings within the config.ini that are not useful being written in detail here regarding
+* database connection
+* cron-task intervals
+* file paths
+
+but pretty much self explanatory for the person setting up the application.
 
 [Content](#content)
 

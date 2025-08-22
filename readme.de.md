@@ -996,7 +996,7 @@ Ferner hoffentlich hilfreiche Informationen zu
 
 ## Wartung
 Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
-* Der Aufruf der Startseite löst den 'cron job' für die Bereinigung abgelaufener Dateien und die Erstellung automatischer Benachrichtigungen und Aufgabenplanungen aus. Die Durchführung findet frühestens nach den in den [Laufzeitvariablen](#laufzeitvariablen) angegebenen Minuten statt. Die Log-Datei `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
+* Der Aufruf der Startseite löst den 'cron job' für die Bereinigung abgelaufener Dateien und die Erstellung [automatischer Benachrichtigungen und Aufgabenplanungen](#erinnerungen-und-automatische-aufgabenplanung) aus. Die Durchführung findet frühestens nach den in den [Umgebungseinstellungen](#laufzeitvariablen) angegebenen Minuten statt. Die Log-Datei `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
 * Bestehende Lieferanten können in Bezug auf ihre Informationen und die Preislisten-Einstellungen (Importfilter und Stichproben-Intervalle) aktualisiert werden. Eine Datei gemäß [Vorlage](#anwendungseinrichtung) kann bereitgestellt werden. Die jeweiligen Aktualisierungen können für jeden übereinstimmenden Lieferanten gewählt werden.
 * Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen. Es kann eine CSV-Datei heruntergeladen, bearbeitet und wieder bereitgestellt werden, oder vorbereitete Empfehlungen bereitgestellt werden. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs. Tabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen. Ohne bereitgestellte Datei gibt es den Export.
 
@@ -1019,7 +1019,7 @@ Die Anwendung vearbeitet einige automatische Erinnerungen und Aufgabenplanungen
 
 Daneben informiert die Startseite und das Menü über offene Themen und Aufgaben. Zeiträume für Benachrichtigungen und Aufgabenplanung können in der [Konfiguration](#laufzeitvariablen) angepasst werden.
 
-Automatische Erinnerungen und Aufgabenplanungen werden einmal bei der ersten Anmeldung des Tages ausgeführt.
+Automatische Erinnerungen und Aufgabenplanungen werden standardmäßig einmal täglich ausgeführt, können aber in der [config.ini](#laufzeitvariablen) angepasst werden..
 
 ## Schulungen
 Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulunngen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
@@ -1662,7 +1662,6 @@ Standardmäßig sind folgende Berechtigungen/Rollen in der language.XX.json-Date
 ```
 ; general application settings
 [application]
-cron = 1440 ; Minuten für eine Aktualisierung bei Anfrage der Startseite nach dem letzten automatisierten Systemlauf. Mit Bedacht wählen, da es die Performance beeinflusst.
 debugging = no ; yes: ja, no: nein; erlaubt oder unterbindet Fehlerbenachrichtigungen
 defaultlanguage = "en" ; Standard Anwendungssprache: en, de, etc. entsprechend verfügbarer language.XX.json-Dateien; Nutzer können im Profil individuell wählen
 issue_mail = "issues@companymail.tld" ; Kontaktadresse für Meldungen in Bezug auf die Anwendung oder Datenschutz
@@ -1865,6 +1864,13 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 | codepadding | plain number in *unit*, zusätzlicher Abstand zwischen Code und Text | none |
 | header | yes oder no | yes |
 | footer | yes oder no | yes |
+
+Es gibt zusätzliche Einstellungen in der config.ini, die hier nicht detailliert erläutert werden müssen. Diese betreffen
+* Datenbankverbindungen
+* Cron-Aufgaben Intervalle
+* Dateipfade
+
+und sind für die Person welche die Anwendung einrichtet selbsterklärend.
 
 [Übersicht](#übersicht)
 
