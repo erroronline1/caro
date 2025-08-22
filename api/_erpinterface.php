@@ -163,6 +163,51 @@ class OD extends _ERPINTERFACE {
 	public function __construct(){
 		parent::__construct();
 	}
+
+		/**
+	 * retrieve recent data on processed orders for given timespan  
+	 * return an array of orders to compare at application level
+	 * @param string|null $from Y-m-d H:i:s
+	 * @param string|null $until Y-m-d H:i:s
+	 * @return null|array 
+	 */
+	public function orderdata($from = null, $until = 'now'){
+		// convert passed dated to DateTime objects, with default values on erroneous parameters
+		try {
+			$from = new \DateTime($from ? : '2025-01-01 00:00:00');
+		}
+		catch (\Exception $e){
+			$from = new \DateTime('2025-01-01 00:00:00');
+		}
+		try {
+			$until = new \DateTime($until);
+		}
+		catch (\Exception $e){
+			$until = new \DateTime('now');
+		}
+		// convert to erp supported date format
+		$from = $from->format('Y-m-d H:i:s');
+		$until = $until->format('Y-m-d H:i:s');
+
+		/**
+		 * [unidentifiable null] [ERPorderRecordNumber int, orderDate Y-m-d H:i:s.0] [ERPvendorCode int, ERPstorageUnit int] [ERParticleNumber int, ERPitemDescription string] [deliveryDate Y-m-d H:i:s.0] [ERPpatientNumber int] [orderAmount float] [deliveredAmount float] [openAmount float] [ERPunitCode int] [orderPrice float] [unidentifiable null] [ERPnoticeFlag int > 1, unidentifiable 0]
+		 * /^\[.+?\]\t\[(\d+),.(.*?)]\t\[(\d{1,}),.(\d{1,})\]\t\[(\d{1,}),.(.*?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?),.(.+?)\]/gms would be able to extract data from copy/pasting the dump
+
+		 * return [
+		 * 		[
+		 * 			'vendor' => string, vendorcode translateable?
+		 * 			'article_no' => string,
+		 * 			'article_name' => string, not necessarily the order text
+		 * 			'commission' => string, ERPcustomerNumber? patient or company? match with value from erp-case-number
+		 * 			'ordered' => Y-m-d H:i:s,
+		 * 			'partially_received' => Y-m-d H:i:s, receival date if order amount does not match receival amount
+		 * 			'received' => Y-m-d H:i:s,
+		 * 		],
+		 * 		...
+		 * ]
+		 */
+		return null;
+	}
 }
 
 
