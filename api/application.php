@@ -209,7 +209,7 @@ class APPLICATION extends API {
 							// also see record.php->casestate()
 							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'casestate') && ERPINTERFACE->casestate()){
 								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
-								if (($erpdata = ERPINTERFACE->casestate(array_filter(array_column($data, 'erp_case_number'), fn($v) => boolval($v)))) === null) break;
+								if (!($erpdata = ERPINTERFACE->casestate(array_filter(array_column($data, 'erp_case_number'), fn($v) => boolval($v))))) break;
 								
 								$updates = [];
 								foreach ($data as $case){
@@ -256,7 +256,21 @@ class APPLICATION extends API {
 							// does only update database null values
 							// also see order.php->approved()
 							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
-								// todo: everything once it comes clear how erp data could possibly be matched with caro commissions
+								$orders = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
+								if (!($erpdata = ERPINTERFACE->casestate(date('Y-m-d H:i:s', filemtime($logfile))))) break;
+								
+								$updates = [];
+								foreach ($orders as $order){
+									if ($identifiers = array_filter($erpdata, fn($o) => $o['identifier'] === UTILITY::identifier($order['approved']))){
+										$order['order_data'] = json_decode($order['order_data']);
+										$articles = array_filter($identifiers, fn($o) => $o['article_no'] === $order['order_data']['ordernumber_label'] && $o['vendor'] === $order['order_data']['vendor_label']);
+										if ($articles && count($articles) === 1){
+///////////////////////////////////////////////////////////////////////////////////
+// update orders, make orderstatistics shared
+///////////////////////////////////////////////////////////////////////////////////
+										}
+									}
+								}
 							}
 							break;
 
