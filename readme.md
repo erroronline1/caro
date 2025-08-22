@@ -1,5 +1,6 @@
 ![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
 # CARO - Cloud Assisted Records and Operations
+A quality management software as device agnostic web-app for local Apache- or IIS-server environments.
 
 # ...work in progress
 
@@ -29,7 +30,19 @@ Things are still in motion. Images may be outdated.
 ## to do
 * unittests
 * improve screenreader accessibility
+    * test ot fix api.update_header focus on other browsers
 * templates
+* _shared.php
+    * SEARCHHANDLER-class
+        * application, consumables, document, file, order, record.php, risk
+    * DOCUMENTHANDLER-class
+        * audit, consumables, record
+    * CRON-class
+        * execute automations with individual intervals
+        * if not set, daily by default
+* csvprocessor
+    * max loops for avoiding runaway on improper configured replacement patterns?
+    * raise exception if loopcount exceeds passed security parameter
 * what if an erp-connection is available?
     * prepare skeleton interface, define prepared response, output constant ERPINTERFACE class
     * integrate conditions
@@ -45,8 +58,11 @@ Things are still in motion. Images may be outdated.
             * ask purchase on case number reference, if, decipher erp case number for commissions on orders
             * if ERPINTERFACE
             * depending on performance cron or get order->orders()
+            * only set if null, no overwriting
         * product matching instead of csv comparison consumables.php
         * product import instead of pricelists consumables.php
+    * eva partial api option, partial csv again
+        * if same server, go beyond root and check if respective csv-export exists with a sufficient timestamp?
 
 ## Content
 * [Aims](#aims)
@@ -104,7 +120,7 @@ Things are still in motion. Images may be outdated.
 * [Regulatory software requirements](#regulatory-software-requirements)
     * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
     * [Data protection](#data-protection)
-    * [General](#general)
+    * [General](#general-1)
         * [User training recommendations](#user-training-recommendations)
     * [Information security](#information-security)
     * [Performance evaluation](#performance-evaluation)
@@ -173,7 +189,7 @@ Things are still in motion. Images may be outdated.
 The most recent documentation is available at [https://github.com/erroronline1/caro](https://github.com/erroronline1/caro)
 
 # Aims
-This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a closed network environment. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
+This software aims to support you with your ISO 13485 quality management system and support internal communication. It is supposed to run as a web application on a server. Data safety measures are designed to be used in a network environment not accessible from the web. The architecture enables staff to access and append data where other ERP-software may be limited due to licensing.
 
 Data gathering is supposed to be completely digital and finally wants to get rid of a paper based documentation. There may be other pieces of software with a similar goal but many of them come from another direction - managing rehabilitation devices, focussing on custom orthopaedic footwear, tracing productivity - instead of the primary record aspect of the CARO App for custom-made aids in small- and medium-sized companies. Let alone cumbersome UI of some programs which has also led to a goal of being consistent easy to use and recognizable.
 
@@ -1101,7 +1117,7 @@ Furthermore hopefully beneficial information on
 
 ## Maintenance
 The application has some options to be maintained by authorized users:
-* By accessing the landing page the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks is triggered. This is executed once per day. The logfile `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
+* By accessing the landing page the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks is triggered. This is executed earliest after passing of [runtime-variable-defined](#runtime-variables) minutes. The logfile `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
 * Existing vendors can be updated regarding their information and pricelist settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
 * Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
 
@@ -1769,6 +1785,7 @@ By default following permissions/roles are defined within the language.XX.json-f
 ```
 ; general application settings
 [application]
+cron = 1440 ; minutes for a refresh in case of landing page request after last automated cron has been initialized. choose wisely as this affects the performance.
 debugging = no ; yes, no; enables or disables error messages
 defaultlanguage = "en" ; default fallback application language: en, de, etc. according to available language.XX.json files; user can customize within profile
 issue_mail = "issues@companymail.tld" ; address for application and security issues
@@ -2453,9 +2470,9 @@ Stakeholder identification:
 #### Rejected requirements
 > Translation of ERP order-dump is not satisfiable given the current provided data
 * Current structure of order dump mostly identified (ERP OptaData eva 3/viva)
-* [unidentifiable null] [ERPorderRecordNumber int, orderDate Y-m-d H:i:s.0] [ERPvendorCode int, ERPstorageUnit int] [ERParticleNumber int, ERPitemDescription string] [deliveryDate Y-m-d H:i:s.0] [ERPcustomerNumber int] [orderAmount float] [deliveredAmount float] [openAmount float] [ERPunitCode int] [orderPrice float] [unidentifiable null] [ERPnoticeFlag int > 1, unidentifiable 0]
+* [unidentifiable null] [ERPorderRecordNumber int, orderDate Y-m-d H:i:s.0] [ERPvendorCode int, ERPstorageUnit int] [ERParticleNumber int, ERPitemDescription string] [deliveryDate Y-m-d H:i:s.0] [ERPpatientNumber int] [orderAmount float] [deliveredAmount float] [openAmount float] [ERPunitCode int] [orderPrice float] [unidentifiable null] [ERPnoticeFlag int > 1, unidentifiable 0]
 * /^\[.+?\]\t\[(\d+),.(.*?)]\t\[(\d{1,}),.(\d{1,})\]\t\[(\d{1,}),.(.*?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?),.(.+?)\]/gms would be able to extract data from copy/pasting the dump
-* while adding the ERPvendorCode to the vendor database might be considered reasonable, it is likely unreliable to keep ERParticleNumbers and ERPunitCodes up to date, unreasonable to link the ERPcustomerNumber to a commissioned order, and most likely impossible to match the ordered article with the dump given a mostly messy data within the ERP system and missing article numbers within the dump
+* while adding the ERPvendorCode to the vendor database might be considered reasonable, it is likely unreliable to keep ERParticleNumbers and ERPunitCodes up to date, unreasonable to link the ERPpatientNumber to a commissioned order, and most likely impossible to match the ordered article with the dump given a mostly messy data within the ERP system and missing article numbers within the dump
 * requirement rejected as this **contradicts simplifying current processes and workloads** as of 2024-12-26
 
 #### Usability tests
@@ -2492,9 +2509,9 @@ Stakeholder identification:
 #### Software risks
 | Risk | Probability | Impact | Measures | Statement |
 | ---- | ----------- | ------ | -------- | --------- |
-| Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within closed network | none |
+| Security vulnerabilities | Medium (as it’s possibly an internet-facing application)| High (could lead to data breaches and regulatory penalties) | Ensure access control policies, use within network environment not accessible from the web | none |
 | Encrypted data inaccessible | Medium (due to personnel fluctuations) | High (availability is crucial) | No encryption for guaranteed availability | [Encryption statement](#encryption-statement) |
-| Unencrypted data access | Medium | High (regulatory penalties) | Use within closed network | Bears the same risk as accessing confidential data on personal network drives |
+| Unencrypted data access | Medium | High (regulatory penalties) | Use within network environment not accessible from the web | Bears the same risk as accessing confidential data on personal network drives |
 | Unauthorized access | High (without measures) | High (corrupted data, data leaks are an offence) | Applying a strict access management, no custom, only long random access tokens | Single token only as a tradeoff regarding usability |
 | Manipulation of API requests | Medium (according to malignancy and capabilities of accessing personnel) | High (correct data is mandatory) | Evaluate submitted data with an identity hash, evalute permissions | False entries in paper based systems are possible as well |
 | No data due to connection loss | Medium (unstable network) | High (application not usable) | Caching requests | [Network connection handling](#network-connection-handling) |
@@ -5140,7 +5157,7 @@ If you experience any issues with data security or application usage contact :is
 [Content](#content)
 
 ### Encryption statement
-> **Unfortunately there appears to be no reasonable way to encrypt data by the application architecture considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for all interchangeable staff members is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures either have to depend on unreachability for the network from outside where frontend and backend are supposed to run within a closed network (LAN, restricted WiFi, VPN), or Transparent Data Encryption / Disk Level Encryption on the server and client side which both are a matter of responsibility of the operator of the infrastructure. Data in transit is encrypted for the application relies on an SSL-connection at all times.**
+> **Unfortunately there appears to be no reasonable way to encrypt data by the application architecture considering personnel fluctuations and mobile access. Public encryption key files spreading doesn't appear preferable considering shared devices. Long term data availability (up to 30 years) for all interchangeable staff members is critical. Even [key wrapping](#https://www.rfc-editor.org/rfc/rfc3394) needs a reliable main key, which is supposed to not be written down following the following statements. Data safety measures either have to depend on unreachability for the network from outside where frontend and backend are supposed to run within a network environment not accessible from the web (LAN, restricted WiFi, VPN), or Transparent Data Encryption / Disk Level Encryption on the server and client side which both are a matter of responsibility of the operator of the infrastructure. Data in transit is encrypted for the application relies on an SSL-connection at all times.**
 
 ```mermaid
 graph TD;
@@ -5278,7 +5295,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_7 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the application.
 
-* This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
+* This is not reasonable for the application used within a network environment not accessible from the web. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
 
 > O.Source_8 Tools for static code analysis SHOULD be used for the development of the application.
 
@@ -5368,7 +5385,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_3 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
 
-* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device. 
+* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web and not being able to call any method of sending tokens to any second device. 
 
 > O.Auth_4 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
 
@@ -5376,15 +5393,15 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_5 Additional information (e.g. the end device used, the IP address or the time of access) SHOULD be included in the evaluation of an authentication process.
 
-* This is not reasonable for the application used within a closed environment.
+* This is not reasonable for the application used within a network environment not accessible from the web.
 
 > O.Auth_6 The user SHOULD be given the option of being informed about unusual login processes.
 
-* This is not reasonable for the application used within a closed environment. Users can see their logins for the past (customizable) days though.
+* This is not reasonable for the application used within a network environment not accessible from the web. Users can see their logins for the past (customizable) days though.
 
 > O.Auth_7 The application MUST implement measures to make it more difficult to try out login parameters (e.g. passwords).
 
-* This is not reasonable for the application used within a closed environment and on shared devices.
+* This is not reasonable for the application used within a network environment not accessible from the web and on shared devices.
 
 > O.Auth_8 If the application was interrupted (put into backend operation), a new authentication MUST be carried out after an appropriate period (grace period) has expired.
 
@@ -5404,7 +5421,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Auth_12 The application MUST use state-of-the-art authentication for the connection of a backend system.
 
-* This is not reasonable for the application used within a closed environment.
+* This is not reasonable for the application used within a network environment not accessible from the web.
 
 > O.Auth_13 Authentication data, such as session identifiers or authentication tokens, MUST be protected as sensitive data.
 
@@ -5461,7 +5478,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Data_3 The web application MUST NOT make resources that allow access to sensitive data available to third parties.
 
-* There are no interfaces outside of the closed environment.
+* There are no interfaces outside of the network environment not accessible from the web.
 
 > O.Data_4 All sensitive data collected MUST NOT be kept in the application beyond the duration of their respective processing.
 
@@ -5705,7 +5722,7 @@ This application can be considered using a monolithic architecture. Yet a separa
 
 > O.Source_10 Modern security mechanisms such as obfuscation and stack protection SHOULD be activated to build the backend system.
 
-* This is not reasonable for the application used within a closed environment. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
+* This is not reasonable for the application used within a network environment not accessible from the web. Have you even coded once? After two weeks nobody understands whats happening anyway. [Also this is open source software](http://toh.erroronline.one/caro/jackie-chan-confused-meme.jpeg).
 
 > O.Source_11 Tools for static code analysis SHOULD be used for the development of the application.
 
@@ -5784,7 +5801,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_2 The backend system MUST support an appropriate authentication for linking the application.
 
-* This is not reasonable for the application used within a closed environment.
+* This is not reasonable for the application used within a network environment not accessible from the web.
 
 > O.Auth_3 The backend system SHOULD implement authentication mechanisms and authorization functions separately. If different roles are required for the application, authorization MUST be implemented separately for each data access.
 
@@ -5792,7 +5809,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_4 Each authentication process of the user MUST be implemented in the form of two-factor authentication.
 
-* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an enclosed network not being able to call any method of sending tokens to any second device.
+* Login occurs using a token. Beforehand the device itself is supposed to have a dedicated login and user credentials. There is no other method by any means, as the application is supposed to run within an network environment not accessible from the web not being able to call any method of sending tokens to any second device.
 
 > O.Auth_5 In addition to the information specified in O.Auth_1 defined authentication at an appropriate level of trust, the manufacturer MAY offer the user an authentication option at a lower level of trust in accordance with Section 139e (10) SGB V, following comprehensive information and consent. This includes offering additional procedures based on the digital identities in the healthcare sector in accordance with Section 291 (8) SGB V.
 
@@ -5800,7 +5817,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_6 Additional information (e.g. the end device used, the WiFi access node used or the time of access) SHOULD be included in the evaluation of an authentication process.
 
-* This is not reasonable for the application used within a closed environment.
+* This is not reasonable for the application used within a network environment not accessible from the web.
 
 > O.Auth_7 The backend system MUST authenticates and authorizes each request according to the rights and privileges according the role concept (cf. O.Auth_1).
 
@@ -5836,7 +5853,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_15 All identifiers associated with a user or a session MUST be generated by a number generator according to O.Rand_1 have an appropriate length.
 
-* This is not reasonable for the application used within a closed environment and on shared devices. PHPs session_start() is considered suitable enough. Libraries contributing to randomness would bloat third party software without a sensible benefit.
+* This is not reasonable for the application used within a network environment not accessible from the web and on shared devices. PHPs session_start() is considered suitable enough. Libraries contributing to randomness would bloat third party software without a sensible benefit.
 
 > O.Auth_16 The backend system MUST allow the user to invalidate one or all previously issued session identifiers or authentication tokens.
 
@@ -5860,7 +5877,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Auth_21 Authentication token MUST be signed using an appropriate procedure (see [TR02102-1]). The backend system MUST check the authentication token’s signature. The type of signature MUST NOT be none and the backend system MUST reject requests using invalid or expired authentication token.
 
-* This is not reasonable for the application used within a closed environment.
+* This is not reasonable for the application used within a network environment not accessible from the web.
 
 [Content](#content)
 
@@ -5918,7 +5935,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 
 > O.Data_8 To counteract the misuse of sensitive data after a device loss, the application MAY implement a kill switch, i.e. a deliberate, secure overwriting of user data in the device at application level, triggered by the backend system. The manufacturer MUST protect the triggering of the kill switch by the user via the backend system against misuse by means of strong authentication mechanisms.
 
-* This is not reasonable for the application used within a closed environment. Backend is not reachable on losing local network access. However new login credentials can be generated by authorized users at any time.
+* This is not reasonable for the application used within a network environment not accessible from the web. Backend is not reachable on losing local network access. However new login credentials can be generated by authorized users at any time.
 
 [Content](#content)
 
