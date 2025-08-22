@@ -22,13 +22,158 @@
 
 namespace CARO\API;
 
-class SEARCHHANDLER {
-    private $_pdo = null;
+class DOCUMENTHANDLER {
+	private $_pdo = null;
 	public $_lang = null;
 	public $_date = [];
 
 	public function __construct($pdo, $date){
-        $this->_pdo = $pdo;
+		$this->_pdo = $pdo;
+		$this->_lang = new LANG();
+		$this->_date = $date;
+	}
+
+	/**
+	 *                   _     _         _                           _   
+	 *   ___ ___ ___ _ _| |___| |_ ___ _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  | . | . | . | | | | .'|  _| -_| . | . |  _| | |     | -_|   |  _|
+	 *  |  _|___|  _|___|_|__,|_| |___|___|___|___|___|_|_|_|___|_|_|_|  
+	 *  |_|     |_| 
+	 * populate a document with passed payload
+	 * @param array $element document structure
+	 * @param array $values payload
+	 * 
+	 * @return array prefilled document structure
+	 */
+	public function populatedocument($element, $values){
+		$content = [];
+		foreach ($element as $subs){
+			if (!isset($subs['type'])){
+				$content[] = self::populatedocument($subs, $values);
+			}
+			else {
+				try {
+					if (!isset($subs['attributes']['name'])) throw new \ErrorException('faulty element construction', 0);
+
+					$name = $subs['attributes']['name'];
+					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$name])){
+						$settings = explode(' | ', $values[$name]);
+						foreach ($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
+							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
+							else $subs['content'][$key]['checked'] = true;
+						}
+					}
+					elseif (isset($values[$name])){
+						$subs['attributes']['value'] = $values[$name];
+					}
+					$content[] = $subs;
+				}
+				catch (\Exception $e){
+					UTILITY::debug('faulty element construction', $subs, $e);
+					die();
+				}
+			}
+		}
+		return $content;
+	}
+
+	/**
+	 *                       _     _                           _   
+	 *   ___ ___ ___ ___ ___| |_ _| |___ ___ _ _ _____ ___ ___| |_ 
+	 *  |  _| -_|  _| -_|   |  _| . | . |  _| | |     | -_|   |  _|
+	 *  |_| |___|___|___|_|_|_| |___|___|___|___|_|_|_|___|_|_|_|  
+	 *                                             
+	 * retrieves most recent approved document or component
+	 * and returns the content as body response e.g. for modal
+	 * @param string $query _sqlinterface query
+	 * @param array $parameters _ sqlinterface parameters
+	 * @param string $requestedTimestamp Y-m-d H:i:s as optional past delimiter
+	 * 
+	 * @return array document components or document names within bundles
+	 */
+	public function recentdocument($query = '', $parameters = [], $requestedTimestamp = null){
+		$requestedTimestamp = $requestedTimestamp ? : $this->_date['servertime']->format('Y-m-d H:i:59');
+
+		$result = [];
+		$contentBody = [];
+		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
+		if ($contents){
+			foreach ($contents as $content){
+				if (PERMISSION::fullyapproved('documentapproval', $content['approval'])) break;
+			}
+			$content['hidden'] = json_decode($content['hidden'] ? : '', true); 
+			if (!PERMISSION::fullyapproved('documentapproval', $content['approval']) // failsafe if none are approved
+				|| ($content['hidden'] && (!$requestedTimestamp || $content['hidden'] <= $requestedTimestamp)) // if hidden and content younger than hidden date
+				|| !PERMISSION::permissionIn($content['restricted_access']) // user lacks permission to restricted
+				|| $content['date'] > $requestedTimestamp) return []; // document date is younger than requested
+			$result = $content;
+			if ($content['context'] === 'component') {
+				$content['content'] = json_decode($content['content'], true);
+				$contentBody = $content['content']['content'];
+			}
+			elseif ($content['context'] === 'bundle') {
+				$contentBody = explode(',', $content['content']);
+			}
+			else {
+				foreach (explode(',', $content['content']) as $usedcomponent) {
+					// get latest approved by name
+					$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
+						'values' => [
+							':name' => $usedcomponent
+						]
+					]);
+					foreach ($components as $component){
+						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
+						if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('documentapproval', $component['approval'])) break;
+						else $component = [];
+					}
+					if ($component){
+						$component['content'] = json_decode($component['content'], true);
+						array_push($contentBody, ...$component['content']['content']);
+					}
+				}
+			}
+		$result['content'] = $contentBody;
+		}
+		return $result;
+	}
+
+	/**
+	 *                     _       _         _                 _           _ 
+	 *   _ _ ___ _____ ___| |_ ___| |_ ___ _| |___ ___ ___ _ _|_|___ ___ _| |
+	 *  | | |   |     | .'|  _|  _|   | -_| . |  _| -_| . | | | |  _| -_| . |
+	 *  |___|_|_|_|_|_|__,|_| |___|_|_|___|___|_| |___|_  |___|_|_| |___|___|
+	 *                                                  |_|   
+	 * check whether all required fields of a document have been considered
+	 * @param array $element document structure
+	 * @param array $values payload
+	 * 
+	 * @return array of unmatched document names
+	 */
+	public function unmatchedrequired($element, $values){
+		$content = [];
+		foreach ($element as $subs){
+			if (!isset($subs['type'])){
+				array_push($content, ...self::unmatchedrequired($subs, $values));
+			}
+			else {
+				$name = $subs['attributes']['name'];
+				if (isset($subs['attributes']['name']) && isset($subs['attributes']['required']) && !(isset($values[$name]) || isset($values[$subs['attributes']['name']]))){
+					$content[] = $subs['attributes']['name'];
+				}
+			}
+		}
+		return $content;
+	}
+}
+
+class SEARCHHANDLER {
+	private $_pdo = null;
+	public $_lang = null;
+	public $_date = [];
+
+	public function __construct($pdo, $date){
+		$this->_pdo = $pdo;
 		$this->_lang = new LANG();
 		$this->_date = $date;
 	}
@@ -305,7 +450,7 @@ class SEARCHHANDLER {
 		return [array_values($slides)];
 	}
 
-    /**
+	/**
 	 *                 _         _                       _
 	 *   ___ ___ ___ _| |_ _ ___| |_ ___ ___ ___ ___ ___| |_
 	 *  | . |  _| . | . | | |  _|  _|_ -| -_| .'|  _|  _|   |
@@ -566,151 +711,6 @@ class SEARCHHANDLER {
 				break;
 			}
 		return [array_values($slides)]; // return a proper nested article
-	}
-}
-
-class DOCUMENTHANDLER {
-    private $_pdo = null;
-	public $_lang = null;
-	public $_date = [];
-
-	public function __construct($pdo, $date){
-        $this->_pdo = $pdo;
-		$this->_lang = new LANG();
-		$this->_date = $date;
-	}
-
-	/**
-	 *                   _     _         _                           _   
-	 *   ___ ___ ___ _ _| |___| |_ ___ _| |___ ___ _ _ _____ ___ ___| |_ 
-	 *  | . | . | . | | | | .'|  _| -_| . | . |  _| | |     | -_|   |  _|
-	 *  |  _|___|  _|___|_|__,|_| |___|___|___|___|___|_|_|_|___|_|_|_|  
-	 *  |_|     |_| 
-	 * populate a document with passed payload
-	 * @param array $element document structure
-	 * @param array $values payload
-	 * 
-	 * @return array prefilled document structure
-	 */
-	public function populatedocument($element, $values){
-		$content = [];
-		foreach ($element as $subs){
-			if (!isset($subs['type'])){
-				$content[] = self::populatedocument($subs, $values);
-			}
-			else {
-				try {
-					if (!isset($subs['attributes']['name'])) throw new \ErrorException('faulty element construction', 0);
-
-					$name = $subs['attributes']['name'];
-					if (isset($subs['content']) && isset($subs['attributes']['name']) && isset($values[$name])){
-						$settings = explode(' | ', $values[$name]);
-						foreach ($subs['content'] as $key => $attributes) if (in_array($key, $settings)) {
-							if ($subs['type'] === 'select') $subs['content'][$key]['selected'] = true;
-							else $subs['content'][$key]['checked'] = true;
-						}
-					}
-					elseif (isset($values[$name])){
-						$subs['attributes']['value'] = $values[$name];
-					}
-					$content[] = $subs;
-				}
-				catch (\Exception $e){
-					UTILITY::debug('faulty element construction', $subs, $e);
-					die();
-				}
-			}
-		}
-		return $content;
-	}
-
-	/**
-	 *                       _     _                           _   
-	 *   ___ ___ ___ ___ ___| |_ _| |___ ___ _ _ _____ ___ ___| |_ 
-	 *  |  _| -_|  _| -_|   |  _| . | . |  _| | |     | -_|   |  _|
-	 *  |_| |___|___|___|_|_|_| |___|___|___|___|_|_|_|___|_|_|_|  
-	 *                                             
-	 * retrieves most recent approved document or component
-	 * and returns the content as body response e.g. for modal
-	 * @param string $query _sqlinterface query
-	 * @param array $parameters _ sqlinterface parameters
-	 * @param string $requestedTimestamp Y-m-d H:i:s as optional past delimiter
-	 * 
-	 * @return array document components or document names within bundles
-	 */
-	public function recentdocument($query = '', $parameters = [], $requestedTimestamp = null){
-		$requestedTimestamp = $requestedTimestamp ? : $this->_date['servertime']->format('Y-m-d H:i:59');
-
-		$result = [];
-		$contentBody = [];
-		$contents = SQLQUERY::EXECUTE($this->_pdo, $query, $parameters);
-		if ($contents){
-			foreach ($contents as $content){
-				if (PERMISSION::fullyapproved('documentapproval', $content['approval'])) break;
-			}
-			$content['hidden'] = json_decode($content['hidden'] ? : '', true); 
-			if (!PERMISSION::fullyapproved('documentapproval', $content['approval']) // failsafe if none are approved
-				|| ($content['hidden'] && (!$requestedTimestamp || $content['hidden'] <= $requestedTimestamp)) // if hidden and content younger than hidden date
-				|| !PERMISSION::permissionIn($content['restricted_access']) // user lacks permission to restricted
-				|| $content['date'] > $requestedTimestamp) return []; // document date is younger than requested
-			$result = $content;
-			if ($content['context'] === 'component') {
-				$content['content'] = json_decode($content['content'], true);
-				$contentBody = $content['content']['content'];
-			}
-			elseif ($content['context'] === 'bundle') {
-				$contentBody = explode(',', $content['content']);
-			}
-			else {
-				foreach (explode(',', $content['content']) as $usedcomponent) {
-					// get latest approved by name
-					$components = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
-						'values' => [
-							':name' => $usedcomponent
-						]
-					]);
-					foreach ($components as $component){
-						$component['hidden'] = json_decode($component['hidden'] ? : '', true); 
-						if ((!$component['hidden'] || $component['hidden']['date'] > $requestedTimestamp ) && PERMISSION::fullyapproved('documentapproval', $component['approval'])) break;
-						else $component = [];
-					}
-					if ($component){
-						$component['content'] = json_decode($component['content'], true);
-						array_push($contentBody, ...$component['content']['content']);
-					}
-				}
-			}
-		$result['content'] = $contentBody;
-		}
-		return $result;
-	}
-
-	/**
-	 *                     _       _         _                 _           _ 
-	 *   _ _ ___ _____ ___| |_ ___| |_ ___ _| |___ ___ ___ _ _|_|___ ___ _| |
-	 *  | | |   |     | .'|  _|  _|   | -_| . |  _| -_| . | | | |  _| -_| . |
-	 *  |___|_|_|_|_|_|__,|_| |___|_|_|___|___|_| |___|_  |___|_|_| |___|___|
-	 *                                                  |_|   
-	 * check whether all required fields of a document have been considered
-	 * @param array $element document structure
-	 * @param array $values payload
-	 * 
-	 * @return array of unmatched document names
-	 */
-	public function unmatchedrequired($element, $values){
-		$content = [];
-		foreach ($element as $subs){
-			if (!isset($subs['type'])){
-				array_push($content, ...self::unmatchedrequired($subs, $values));
-			}
-			else {
-				$name = $subs['attributes']['name'];
-				if (isset($subs['attributes']['name']) && isset($subs['attributes']['required']) && !(isset($values[$name]) || isset($values[$subs['attributes']['name']]))){
-					$content[] = $subs['attributes']['name'];
-				}
-			}
-		}
-		return $content;
 	}
 }
 ?>
