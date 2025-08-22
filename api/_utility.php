@@ -765,6 +765,32 @@ class UTILITY {
 		}
 		return $success;
 	}
+
+	/**
+	 *             _                           _   
+	 *   _ _ _ ___| |_ ___ ___ ___ _ _ ___ ___| |_ 
+	 *  | | | | -_| . |  _| -_| . | | | -_|_ -|  _|
+	 *  |_____|___|___|_| |___|_  |___|___|___|_|  
+	 *                          |_| 
+	 * does a web request and returns the response content as well as curl info
+	 * 
+	 * @param string $url
+	 * 
+	 * @return array
+	 */
+	public static function webrequest($url){
+		$request = curl_init();
+		curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($request, CURLOPT_URL, $url);
+		if (CONFIG['proxy']['proxy']) curl_setopt($request, CURLOPT_PROXY, CONFIG['proxy']['proxy']);
+		if (CONFIG['proxy']['auth']) curl_setopt($request, CURLOPT_PROXYUSERPWD, CONFIG['proxy']['auth']);
+		$response = [
+			'response' => curl_exec($request),
+			'metadata' => curl_getinfo($request)
+		];
+		curl_close($request);
+		return $response;
+	}
 }
 
 /**
