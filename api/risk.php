@@ -258,7 +258,7 @@ class RISK extends API {
 				}
 
 				require_once('_shared.php');
-				$search = new SHARED($this->_pdo, $this->_date);
+				$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 				$response = ['render' => ['content' => $search->risksearch()]];		
 				
 				// render selection of types and their content, one selection per process
@@ -735,7 +735,7 @@ class RISK extends API {
 	 */
 	public function search(){
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo, $this->_date);
+		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 		if ($result = $search->risksearch(['search' => $this->_search])) {
 			$this->response(['render' => ['content' => $result]]);
 		}

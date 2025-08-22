@@ -1053,7 +1053,7 @@ class APPLICATION extends API {
 			$documentdatalist = $displayeddocuments = [];
 			// get all documents or these fitting the search
 			require_once('_shared.php');
-			$search = new SHARED($this->_pdo, $this->_date);
+			$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 			$documents = $search->documentsearch(['search' => null]);
 			// prepare existing documents lists grouped by context
 			foreach ($documents as $row) {
@@ -1384,7 +1384,7 @@ class APPLICATION extends API {
 
 			if ($this->_search) {
 				require_once('_shared.php');
-				$search = new SHARED($this->_pdo, $this->_date);
+				$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 
 				// search records, style like record overview
 				if ($records = $search->recordsearch(['search' => $this->_search])){

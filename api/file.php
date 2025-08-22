@@ -621,7 +621,7 @@ class FILE extends API {
 	 */
 	public function filter(){
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo, $this->_date);
+		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 		$matches = [];
 		if ($files = $search->filesearch(['search' => $this->_requestedFile, 'folder' => $this->_requestedFolder === 'null' ? null : $this->_requestedFolder])){
 			foreach ($files as $file){

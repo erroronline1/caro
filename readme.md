@@ -33,10 +33,6 @@ Things are still in motion. Images may be outdated.
     * test ot fix api.update_header focus on other browsers
 * templates
 * _shared.php
-    * SEARCHHANDLER-class
-        * application, consumables, document, file, order, record.php, risk
-    * DOCUMENTHANDLER-class
-        * audit, consumables, record
     * CRON-class
         * execute automations with individual intervals
         * if not set, daily by default
@@ -2625,11 +2621,13 @@ There is an SQLQUERY class handling
 
 Using these methods is mandatory. If preprocessing statements, dynamic values must be prepared with driver-side quoting to inhibit injections. (./api/_sqlinterface.php)
 
-There is a SHARED class handling
-* inter-module used search and filter operations
-* inter-module used document and record handling
+Helper modules start with _, only endpoints do not. Helper modules are supposed to work without being reliant on other modules and expected formatted output.
 
-Helper modules start with _, only endpoints do not. Helper modules are supposed to work without being reliant on other modules and expected formatted output. _shared.php is an exception.
+_shared.php is an exception with a
+* SEARCHHANDLER class handling inter-module used search and filter operations
+* DOCUMENTHANDLER class handling inter-module used document and record handling
+
+for having application-specific patterns embedded.
 
 All requests have to be executed through the api ensuring
 * responses for logged in users only

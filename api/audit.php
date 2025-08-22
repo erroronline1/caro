@@ -3056,8 +3056,8 @@ class AUDIT extends API {
 			'content' => $options
 		];
 		require_once('_shared.php');
-		$sharedfunction = new SHARED($this->_pdo, $this->_date);
-		$evaluationdocument = $sharedfunction->recentdocument('document_document_get_by_context', [
+		$document = new DOCUMENTHANDLER($this->_pdo, $this->_date);
+		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
 			'values' => [
 				':context' => 'training_evaluation_document'
 			]])['content'];
@@ -3142,7 +3142,7 @@ class AUDIT extends API {
 						'attributes' => [
 							'value' => $this->_lang->GET('audit.checks_type.trainingevaluation'),
 							'onclick' => "new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('audit.checks_type.trainingevaluation') . " " .$row['name']. " " .$user['name'] . "', render: JSON.parse('" . UTILITY::json_encode(
-								$sharedfunction->populatedocument($evaluationdocument, $row['evaluation'] ? $row['evaluation']['content'] : [])
+								$document->populatedocument($evaluationdocument, $row['evaluation'] ? $row['evaluation']['content'] : [])
 							) . "'), options:{".
 							"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 							"'" . $this->_lang->GET('general.ok_button')  . "': {value: true, class: 'reducedCTA'},".

@@ -977,7 +977,7 @@ class ORDER extends API {
 
 				// render search and selection
 				require_once('_shared.php');
-				$search = new SHARED($this->_pdo, $this->_date);
+				$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 				$response['render'] = ['form' => [
 					'data-usecase' => 'purchase',
 					'action' => $this->_requestedID ? "javascript:api.purchase('put', 'order', '" . $this->_requestedID . "')" : "javascript:api.purchase('post', 'order')"

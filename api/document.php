@@ -2046,7 +2046,7 @@ class DOCUMENT extends API {
 
 		// get all documents or these fitting the search
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo, $this->_date);
+		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 		$documents = $search->documentsearch(['search' => ($this->_requestedID === 'null' ? null : $this->_requestedID)]);
 
 		// also see application.php start()

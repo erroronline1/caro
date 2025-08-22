@@ -806,7 +806,7 @@ class RECORD extends API {
 				if ($record_type = UTILITY::propertySet($this->_payload, 'DEFAULT_' . $this->_lang->PROPERTY('record.type_description'))) unset($this->_payload->{'DEFAULT_' . $this->_lang->PROPERTY('record.type_description')});
 
 				require_once('_shared.php');
-				$documentfinder = new SHARED($this->_pdo, $this->_date);
+				$documentfinder = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 				$useddocument = $documentfinder->recentdocument('document_get', [
 					'values' => [
 						':id' => $document_id
@@ -1509,7 +1509,7 @@ class RECORD extends API {
 		$this->_requestedID = $this->_requestedID === 'null' ? null : $this->_requestedID;
 		// get all records or these fitting the search
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo, $this->_date);
+		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 		$data = $search->recordsearch(['search' => $this->_requestedID]);
 
 		// prepare datalists, display values, available units to select and styling
@@ -1983,7 +1983,7 @@ class RECORD extends API {
 		if ($export) {
 			// reiterate over document, add textsections and empty document fields
 			require_once('_shared.php');
-			$documentfinder = new SHARED($this->_pdo, $this->_date);
+			$documentfinder = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 
 			function enumerate($name, $enumerate = [], $number = 1){
 				if (isset($enumerate[$name])) $enumerate[$name] += $number;

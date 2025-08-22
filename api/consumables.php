@@ -225,7 +225,7 @@ class CONSUMABLES extends API {
 	 */
 	public function incorporation(){
 		require_once('_shared.php');
-		$document = new SHARED($this->_pdo, $this->_date);
+		$document = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				// retrieve ids from possible multiple selected products for inforporation
@@ -564,7 +564,7 @@ class CONSUMABLES extends API {
 	 */
 	public function mdrsamplecheck(){
 		require_once('_shared.php');
-		$document = new SHARED($this->_pdo, $this->_date);
+		$document = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
@@ -1217,7 +1217,7 @@ class CONSUMABLES extends API {
 
 				// render search and selection
 				require_once('_shared.php');
-				$search = new SHARED($this->_pdo, $this->_date);
+				$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 				$response = ['render' => ['content' => $search->productsearch($this->_usecase ? : 'product')]];
 		
 				// switch between display- and edit mode 
@@ -1706,7 +1706,7 @@ class CONSUMABLES extends API {
 	 */
 	public function productsearch(){
 		require_once('_shared.php');
-		$search = new SHARED($this->_pdo, $this->_date);
+		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
 		if ($result = $search->productsearch($this->_usecase ? : 'product', ['search' => $this->_search, 'vendors' => $this->_requestedID])){
 			$this->response(['render' => ['content' => $result]]);
 		}	
@@ -1932,8 +1932,8 @@ class CONSUMABLES extends API {
 
 		// retrieve vendor evaluation document
 		require_once('_shared.php');
-		$sharedfunction = new SHARED($this->_pdo, $this->_date);
-		$evaluationdocument = $sharedfunction->recentdocument('document_document_get_by_context', [
+		$document = new DOCUMENTHANDLER($this->_pdo, $this->_date);
+		$evaluationdocument = $document->recentdocument('document_document_get_by_context', [
 			'values' => [
 				':context' => 'vendor_evaluation_document'
 			]]);
@@ -1993,7 +1993,7 @@ class CONSUMABLES extends API {
 					else $evaluation[$key] = $value;
 				}
 				// check if any required fields have been left out, else construct evaluation data
-				if ($missing = $sharedfunction->unmatchedrequired($evaluationdocument, $evaluation)) {
+				if ($missing = $document->unmatchedrequired($evaluationdocument, $evaluation)) {
 					$this->response([
 						'response' => [
 							'id' => $vendor['id'],
@@ -2159,7 +2159,7 @@ class CONSUMABLES extends API {
 					else $evaluation[$key] = $value;
 				}
 				// check if any required fields have been left out, else construct evaluation data
-				if ($missing = $sharedfunction->unmatchedrequired($evaluationdocument, $evaluation)) {
+				if ($missing = $document->unmatchedrequired($evaluationdocument, $evaluation)) {
 					$this->response([
 						'response' => [
 							'id' => $vendor['id'],
@@ -2412,7 +2412,7 @@ class CONSUMABLES extends API {
 					$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
 					$latest_vendor_evaluation = isset($vendor['evaluation'][count($vendor['evaluation']) - 1]) ? $vendor['evaluation'][count($vendor['evaluation']) - 1] : [];
 					// fill evaluation document with last vendor values
-					$evaluationdocument = $sharedfunction->populatedocument($evaluationdocument, $latest_vendor_evaluation);
+					$evaluationdocument = $document->populatedocument($evaluationdocument, $latest_vendor_evaluation);
 					if (isset($latest_vendor_evaluation['_author'])) $evaluationdocument[0][] = [
 						'type' => 'textsection',
 						'attributes' => [

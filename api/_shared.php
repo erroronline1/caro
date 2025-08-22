@@ -22,7 +22,7 @@
 
 namespace CARO\API;
 
-class SHARED {
+class SEARCHHANDLER {
     private $_pdo = null;
 	public $_lang = null;
 	public $_date = [];
@@ -83,7 +83,7 @@ class SHARED {
 	public function documentsearch($parameter = []){
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $matches = [];
-
+		$recentdocument = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
 
 		/**
@@ -137,19 +137,19 @@ class SHARED {
 					}
 					$matches[] = $row;
 				}
-				if (in_array($row, $matches)) continue;
 
 				// if not found within name, search regulatory contexts
+				if (in_array($row, $matches)) continue;
 				foreach (explode(',', $row['regulatory_context']) as $context) {
 					if (stristr($this->_lang->GET('regulatory.' . $context), $parameter['search']) !== false) {
 						$matches[] = $row;
 						break;	
 					}
 				}
-				if (in_array($row, $matches)) continue;
 
-				// if not found already search within components
-				$document = $this->recentdocument('document_document_get_by_name', [
+				// if not found already, search within components
+				if (in_array($row, $matches)) continue;
+				$document = $recentdocument->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $row['name']
 					]]);
@@ -566,6 +566,18 @@ class SHARED {
 				break;
 			}
 		return [array_values($slides)]; // return a proper nested article
+	}
+}
+
+class DOCUMENTHANDLER {
+    private $_pdo = null;
+	public $_lang = null;
+	public $_date = [];
+
+	public function __construct($pdo, $date){
+        $this->_pdo = $pdo;
+		$this->_lang = new LANG();
+		$this->_date = $date;
 	}
 
 	/**
