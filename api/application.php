@@ -189,7 +189,7 @@ class APPLICATION extends API {
 		// also see maintenance.php->cron_log()
 		$logfile = 'cron.log';
 		// return last entry if last touch has been today
-		if (file_exists($logfile) && date('Y-m-d', filemtime($logfile)) === $this->_date['servertime']->format('Y-m-d')) {
+		if (file_exists($logfile) && ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) < CONFIG['application']['cron'] * 60) {
 			$cron = file($logfile);
 			return ['last' => $cron[count($cron) - 1], 'count' => count($cron) - 1];
 		}
