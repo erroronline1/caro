@@ -744,6 +744,10 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id",
 			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id"
 		],
+		'records_get_unclosed' => [
+			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE closed IS NULL",
+			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE closed IS NULL"
+		],
 		'records_get_identifier' => [
 			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE caro_records.identifier = :identifier",
 			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE caro_records.identifier = :identifier"

@@ -38,8 +38,7 @@ class _ERPINTERFACE {
 
 		/**
 		 * return [
-		 * 		[
-		 * 			'erp_case_number' => string,
+		 * 		'{erp_case_number}' => [
 		 * 			'reimbursement'=> Y-m-d,
 		 *			'inquiry'=> Y-m-d,
 		 *			'partiallygranted'=> Y-m-d,

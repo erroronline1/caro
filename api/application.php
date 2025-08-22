@@ -197,11 +197,67 @@ class APPLICATION extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
+		include_once("./_erpinterface.php");
 
 		foreach(CONFIG['system']['cron'] as $task => $minutes){
 			try {
 				if (!file_exists($logfile) || ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) > $minutes * 60) {
 					switch($task){
+						case 'erp_interface_casestate':
+							// update records case state if set within erp system
+							// does only update database null values
+							// also see record.php->casestate()
+							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'casestate')){
+								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
+								if (($erpdata = ERPINTERFACE->casestate(array_filter(array_column($data, 'erp_case_number'), fn($v) => boolval($v)))) === null) break;
+								
+								$updates = [];
+								foreach ($data as $case){
+									if (!$case['erp_case_number'] || !array_key_exists($case['erp_case_number'], $erpdata)) continue;
+									$current_records = [];
+									$case_state = json_decode($case['case_state'] ? : '', true);
+									foreach($erpdata as $_caseState => $value){
+										if ($value && !isset($case_state[$_caseState])) $case_state[$_caseState] = true;
+										$current_records[] = [
+											'author' => $_SESSION['user']['name'],
+											'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
+											'document' => 0,
+											'content' => UTILITY::json_encode([
+												$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.casestate_set', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $_caseState, [], true)], true)
+											])
+										];
+									}
+									if ($current_records) {
+										$records = json_decode($case['content'], true);
+										array_push($records, ...$current_records);
+
+										$updates = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_put'),
+											[
+												':case_state' => UTILITY::json_encode($case_state),
+												':record_type' => $case['record_type'] ? : 'NULL',
+												':identifier' => $case['identifier'],
+												':last_user' => $_SESSION['user']['id'],
+												':last_document' => 'NULL',
+												':content' => UTILITY::json_encode($records),
+												':id' => $case['id'],
+												':lifespan' => $case['lifespan'],
+												':erp_case_number' => $case['erp_case_number']
+											]) . '; ');
+									}
+								}
+								// run updates
+								foreach ($updates as $update){
+									SQLQUERY::EXECUTE($this->_pdo, $update);
+								}
+							}
+							break;
+						case 'erp_interface_orderdata':
+							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata')){
+								// todo: everything once it comes clear how erp data could possibly be matched with caro commissions
+							}
+							break;
+
+
 						case 'alert_open_records_and_retention_periods':
 							// alert unclosed records, records not having set lifespan
 							// delete expired records including record attachments and orders that contain identifier e.g. as commission

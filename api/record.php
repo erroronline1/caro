@@ -23,7 +23,6 @@ namespace CARO\API;
 // Y U NO DELETE? because of audit safety, that's why!
 require_once('./_pdf.php');
 require_once('./_calendarutility.php');
-include_once("./_erpinterface.php");
 
 class RECORD extends API {
 	// processed parameters for readability
@@ -62,6 +61,8 @@ class RECORD extends API {
 	 * @param string $checked json-encoded case_state options from the record
 	 * 
 	 * @return response|array either result of state update or form elements
+	 * 
+	 * also see application.php->cron()
 	 */
 	public function casestate($context = null, $type = 'checkbox', $action = [], $checked = ''){
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -112,7 +113,7 @@ class RECORD extends API {
 								'type' => 'success'
 							]]);
 					}
-					else{
+					else {
 						$current_record = [
 							'author' => $_SESSION['user']['name'],
 							'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
