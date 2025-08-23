@@ -2304,7 +2304,10 @@ class AUDIT extends API {
 	private function orderstatistics(){
 		$content = [];
 
-		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+		require_once('_shared.php');
+		$orderstatistics = new ORDERSTATISTICS($this->_pdo);
+		$orders = $orderstatistics->get();
+
 		$from = $until = '-';
 		// process only valid ordered state to avoid errors
 		$fromtil = array_filter($orders, fn($o) => $o['ordered']);
@@ -2358,7 +2361,9 @@ class AUDIT extends API {
 	 * export is an xlsx file with orders grouped by vendor sheets
 	 */
 	private function exportorderstatistics(){
-		$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+		require_once('_shared.php');
+		$orderstatistics = new ORDERSTATISTICS($this->_pdo);
+		$orders = $orderstatistics->get();
 
 		$columns = [
 			'vendor_label' => $this->_lang->GET('order.vendor_label'),
@@ -2434,7 +2439,9 @@ class AUDIT extends API {
 	 * truncates the respective database
 	 */
 	private function deleteorderstatistics(){
-		SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
+		require_once('_shared.php');
+		$orderstatistics = new ORDERSTATISTICS($this->_pdo);
+		$orderstatistics->truncate();
 		$this->response([
 			'response' => [
 				'msg' => $this->_lang->GET('audit.orderstatistics.truncate_success'),

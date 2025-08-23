@@ -47,6 +47,8 @@ class ORDER extends API {
 	public function approved(){
 		require_once('notification.php');
 		require_once('./_calendarutility.php');
+		require_once('_shared.php');
+		$orderstatistics = new ORDERSTATISTICS($this->_pdo);
 		$notifications = new NOTIFICATION;
 
 		switch ($_SERVER['REQUEST_METHOD']){
@@ -67,7 +69,7 @@ class ORDER extends API {
 							case 'ordered':
 								if ($order['ordertype'] === 'cancellation'){
 									// ordered aka processed canellation orders are deleted immediately 
-									$this->orderStatistics($this->_requestedID); // write to statistics about a cancelled order
+									$orderstatistics->update($this->_requestedID); // write to statistics about a cancelled order
 									if ($this->delete_approved_order($order)) {
 										$response = [
 										'response' => [
@@ -369,7 +371,8 @@ class ORDER extends API {
 					];
 
 					// update order statistics
-					$this->orderStatistics($this->_requestedID, ($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved');
+					if (($this->_subMethod === 'ordered' && $this->_subMethodState === 'false') || $this->_subMethod === 'disapproved') $orderstatistics->delete($this->_requestedID);
+					else $orderstatistics->update($this->_requestedID);
 				}
 				break;
 			case 'GET':
@@ -1224,65 +1227,6 @@ class ORDER extends API {
 		$this->response($response);
 	}
 	
-	/**
-	 *             _             _       _   _     _   _
-	 *   ___ ___ _| |___ ___ ___| |_ ___| |_|_|___| |_|_|___ ___
-	 *  | . |  _| . | -_|  _|_ -|  _| .'|  _| |_ -|  _| |  _|_ -|
-	 *  |___|_| |___|___|_| |___|_| |__,|_| |_|___|_| |_|___|___|
-	 *
-	 * post to order statistics once an order is processed
-	 * reduces order data and updates received state
-	 * deletes entry if processed state is revoked
-	 * @param int $order_id primary database key
-	 * @param bool $delete
-	 */
-	private function orderStatistics($order_id, $delete = false){
-		if (!$order_id) return;
-		// delete from statistics if requested in case of revoked ordered state or disapproval
-		if ($delete) {
-			SQLQUERY::EXECUTE($this->_pdo, 'order_delete_order_statistics', [
-				'values' => [
-					':order_id' => intval($order_id)
-				]
-			]);
-			return;
-		}
-
-		// get approved order to gather data
-		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
-			'replacements' => [
-				':ids' => intval($order_id)
-			]
-		]);
-		$order = $order ? $order[0] : null;
-		if (!$order) return;
-		// minimize order data
-		$order['order_data'] = json_decode($order['order_data'], true);
-		foreach ($order['order_data'] as $key => $value){
-			if (!in_array($key, [
-				'quantity_label',
-				'unit_label',
-				'ordernumber_label',
-				'productname_label',
-				'vendor_label',
-				'additional_info'])) unset($order['order_data'][$key]);
-		}
-		$order['order_data'] = UTILITY::json_encode($order['order_data']);
-		
-		// update or insert order statistics
-		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
-			'values' => [
-				':order_id' => intval($order_id),
-				':order_data' => $order['order_data'],
-				':ordered' => $order['ordered'],
-				':ordertype' => $order['ordertype']
-			],
-			'replacements' => [
-				':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
-				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
-			]
-		]);
-	}
 	
 	/**
 	 *               _                                 _           _

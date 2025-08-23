@@ -167,6 +167,82 @@ class DOCUMENTHANDLER {
 	}
 }
 
+class ORDERSTATISTICS {
+	private $_pdo = null;
+
+	public function __construct($pdo){
+		$this->_pdo = $pdo;
+	}
+
+	/**
+	 * delete from statistics if requested e.g. in case of revoked ordered state or disapproval
+	 * @param int $order_id primary database key
+	 */
+	public function delete($order_id){
+		if (!$order_id) return;
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_delete_order_statistics', [
+			'values' => [
+				':order_id' => intval($order_id)
+			]
+		]);
+	}
+
+	public function get(){
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_get_order_statistics');
+	}
+
+	/**
+	 * post or put to order statistics once an order is processed
+	 * reduces order data and updates received state by copying relevant date from approved order by id to statistics table
+	 * @param int $order_id primary database key
+	 */
+	public function update($order_id){
+		if (!$order_id) return;
+
+		// get approved order to gather data
+		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
+			'replacements' => [
+				':ids' => intval($order_id)
+			]
+		]);
+		$order = $order ? $order[0] : null;
+		if (!$order) return;
+		// minimize order data
+		$order['order_data'] = json_decode($order['order_data'], true);
+		foreach ($order['order_data'] as $key => $value){
+			if (!in_array($key, [
+				'quantity_label',
+				'unit_label',
+				'ordernumber_label',
+				'productname_label',
+				'vendor_label',
+				'additional_info'])) unset($order['order_data'][$key]);
+		}
+		$order['order_data'] = UTILITY::json_encode($order['order_data']);
+		
+		// update or insert order statistics
+		SQLQUERY::EXECUTE($this->_pdo, 'order_post_order_statistics', [
+			'values' => [
+				':order_id' => intval($order_id),
+				':order_data' => $order['order_data'],
+				':ordered' => $order['ordered'],
+				':ordertype' => $order['ordertype']
+			],
+			'replacements' => [
+				':partially_received' => $order['partially_received'] ? : ($order['partially_received'] ? : 'NULL'),
+				':received' => $order['received'] ? : ($order['delivered'] ? : 'NULL'),
+			]
+		]);
+	}
+
+	/**
+	 * truncate table to initiate a new observation period
+	 */
+	public function truncate(){
+		return SQLQUERY::EXECUTE($this->_pdo, 'order_truncate_order_statistics');
+	}
+}
+
 class SEARCHHANDLER {
 	private $_pdo = null;
 	public $_lang = null;
