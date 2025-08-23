@@ -67,7 +67,7 @@ class MAINTENANCE extends API {
 					'type' => 'deletebutton',
 					'attributes' => [
 						'value' => $this->_lang->GET('maintenance.cron.delete', [':count' => count($cron) - 1]),
-						'onclick' => "api.application('delete', 'cron_log')"
+						'onclick' => "api.maintenance('delete', 'task', 'cron_log')"
 					]
 				];
 		}
