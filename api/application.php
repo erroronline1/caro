@@ -279,7 +279,7 @@ class APPLICATION extends API {
 													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_state'),
 														[
 															':id' => $order['id'],
-															':state' => $state,
+															':field' => $state,
 															':date' => $this->_pdo->quote($articles[0][$state])
 														]) . '; ');
 												}

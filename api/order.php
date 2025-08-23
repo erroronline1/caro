@@ -89,26 +89,16 @@ class ORDER extends API {
 								}
 								elseif ($order['ordertype'] === 'return') {
 									// ordered aka processed return orders are received immediately
-									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_received', [
+									SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 										'values' => [
-											':id' => intval($this->_requestedID)
+											':id' => $this->_requestedID,
+											':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 										],
 										'replacements' => [
-											':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
+											':field' => 'received'
 										]
 									]);
-									$query = 'order_put_approved_order_ordered';
 								}
-								else $query = 'order_put_approved_order_ordered';
-								break;
-							case 'partially_received':
-								$query = 'order_put_approved_order_partially_received';
-								break;
-							case 'received':
-								$query = 'order_put_approved_order_received';
-								break;
-							case 'partially_delivered':
-								$query = 'order_put_approved_order_partially_delivered';
 								break;
 							case 'delivered':
 								// sets last order date for next overview
@@ -128,19 +118,16 @@ class ORDER extends API {
 										]
 									]);
 								}
-								$query = 'order_put_approved_order_delivered';
-								break;
-							case 'archived':
-								$query = 'order_put_approved_order_archived';
 								break;
 						}
 						// generic state update
-						SQLQUERY::EXECUTE($this->_pdo, $query, [
+						SQLQUERY::EXECUTE($this->_pdo, 'order_put_approved_order_state', [
 							'values' => [
-								':id' => $this->_requestedID
+								':id' => $this->_requestedID,
+								':date' => $this->_subMethodState === 'true' ? $this->_date['servertime']->format('Y-m-d H:i:s') : null
 							],
 							'replacements' => [
-								':state' => $this->_subMethodState === 'true' ? 'CURRENT_TIMESTAMP': 'NULL'
+								':field' => $this->_subMethod // verified safe by being in above array condition
 							]
 						]);
 					}
