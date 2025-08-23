@@ -202,6 +202,7 @@ class APPLICATION extends API {
 		foreach(CONFIG['system']['cron'] as $task => $minutes){
 			try {
 				if (!file_exists($logfile) || ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) > $minutes * 60) {
+					$execution = false;
 					switch($task){
 						case 'erp_interface_casestate':
 							// update records case state if set within erp system
@@ -249,6 +250,7 @@ class APPLICATION extends API {
 								foreach ($updates as $update){
 									SQLQUERY::EXECUTE($this->_pdo, $update);
 								}
+								$execution = true;
 							}
 							break;
 						case 'erp_interface_orderdata':
@@ -293,6 +295,7 @@ class APPLICATION extends API {
 										}
 									}
 								}
+								$execution = true;
 							}
 							break;
 
@@ -406,6 +409,7 @@ class APPLICATION extends API {
 							foreach ($alerts as $alert){
 								SQLQUERY::EXECUTE($this->_pdo, $alert);
 							}
+							$execution = true;
 							break;
 						case 'alert_unclosed_audits':
 							// notify on unclosed audits
@@ -435,6 +439,7 @@ class APPLICATION extends API {
 									);
 								}
 							}
+							$execution = true;
 							break;
 						case 'alert_unreceived_orders':
 							// alert requesting unreceived orders or marking received as delivered
@@ -512,6 +517,7 @@ class APPLICATION extends API {
 							foreach ($alerts as $alert){
 								SQLQUERY::EXECUTE($this->_pdo, $alert);
 							}
+							$execution = true;
 							break;
 						case 'delete_files_and_calendar':
 							// clear up folders with limited files lifespan
@@ -519,6 +525,7 @@ class APPLICATION extends API {
 							UTILITY::tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
 							UTILITY::tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
 							$calendar->delete(null);
+							$execution = true;
 							break;
 						case 'schedule_archived_orders_review':
 							// schedule archived approved orders review
@@ -555,6 +562,7 @@ class APPLICATION extends API {
 									}
 								}
 							}
+							$execution = true;
 							break;
 						case 'schedule_outdated_consumables_documents_review':
 							// schedule consumables document reviews for vendor- and product-documents
@@ -645,6 +653,7 @@ class APPLICATION extends API {
 									}
 								}
 							}
+							$execution = true;
 							break;
 						case 'schedule_responsibilities_renewal':
 							// schedule renewal of expired responsibilities
@@ -674,6 +683,7 @@ class APPLICATION extends API {
 									}
 								}
 							}
+							$execution = true;
 							break;
 						case 'schedule_training_evaluation':
 							// schedule training evaluation
@@ -718,6 +728,7 @@ class APPLICATION extends API {
 									}
 								}
 							}
+							$execution = true;
 							break;
 						case 'schedule_retrainings':
 							// schedule retrainings
@@ -782,10 +793,11 @@ class APPLICATION extends API {
 									}
 								}
 							}
+							$execution = true;
 							break;
 					}
-
-					$log[] = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . $task . ': OK';
+					if ($execution)
+						$log[] = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . $task . ': OK';
 				}
 			}
 			catch (\Exception $e){
