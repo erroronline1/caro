@@ -976,8 +976,10 @@ td {
 
 /*************************** input elements and call to action *******************************/
 
-main *:not([type="radio"], [type="checkbox"]):focus,
-dialog *:not([type="radio"], [type="checkbox"]):focus {
+main input:not([type="radio"], [type="checkbox"]):focus,
+main textarea:focus,
+dialog input:not([type="radio"], [type="checkbox"]):focus,
+dialog textarea:focus {
 	outline-offset: 0.25em;
 	outline: dashed var(--green);
 }
