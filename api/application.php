@@ -231,7 +231,7 @@ class APPLICATION extends API {
 										$records = json_decode($case['content'], true);
 										array_push($records, ...$current_records);
 
-										$updates = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_put'),
+										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_put'),
 											[
 												':case_state' => UTILITY::json_encode($case_state),
 												':record_type' => $case['record_type'] ? : 'NULL',
@@ -259,15 +259,37 @@ class APPLICATION extends API {
 								$orders = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
 								if (!($erpdata = ERPINTERFACE->casestate(date('Y-m-d H:i:s', filemtime($logfile))))) break;
 								
+								require_once('_shared.php');
+								$orderstatistics = new ORDERSTATISTICS($this->_pdo);
 								$updates = [];
+
+								$states = [
+									'ordered',
+									'partially_received',
+									'received'
+								];
 								foreach ($orders as $order){
 									if ($identifiers = array_filter($erpdata, fn($o) => $o['identifier'] === UTILITY::identifier($order['approved']))){
 										$order['order_data'] = json_decode($order['order_data']);
 										$articles = array_filter($identifiers, fn($o) => $o['article_no'] === $order['order_data']['ordernumber_label'] && $o['vendor'] === $order['order_data']['vendor_label']);
 										if ($articles && count($articles) === 1){
-///////////////////////////////////////////////////////////////////////////////////
-// update orders, make orderstatistics shared
-///////////////////////////////////////////////////////////////////////////////////
+
+											foreach ($states as $state){
+												if ($order[$state] === null && $articles[0][$state]){
+													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_state'),
+														[
+															':id' => $order['id'],
+															':state' => $state,
+															':date' => $this->_pdo->quote($articles[0][$state])
+														]) . '; ');
+												}
+											}
+											if ($updates) {
+												foreach ($updates as $update){
+													SQLQUERY::EXECUTE($this->_pdo, $update);
+												}
+												$orderstatistics->update($order['id']);
+											}
 										}
 									}
 								}
