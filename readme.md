@@ -34,16 +34,6 @@ Things are still in motion. Images may be outdated.
     * max loops for avoiding runaway on improper configured replacement patterns?
     * raise exception if loopcount exceeds passed security parameter
 * what if an erp-connection is available?
-    * integrate conditions
-        * customer data import record.php
-            * combination with import?
-            * modal listing results via select, store data somewhere, onchange set somehow
-            * selections, name is response value, options are document fields
-            * onclose update selected fields 
-        * order state order.php
-            * ask purchase on case number reference, if, decipher erp case number for commissions on orders
-            * if ERPINTERFACE
-            * only set if null, no overwriting
     * eva partial api option, partial csv again
         * if same server, go beyond root and check if respective csv-export exists with a sufficient timestamp?
 
@@ -2095,16 +2085,19 @@ If you ever fiddle around with the sourcecode:
 and while we're at it
 
 ### ERP Interface
-> still experimental and unfinished as of 9/25
-The CARO App is prepared for retrieving updates from the ERP-system. As there exist several applications there is no chance to get an out-of-the-box-solution. But it may be possible to primarily modify the _erpinterface.php file to your needs. The _ERPINTERFACE-class serves as a skeleton and provides the expected output that can be processed by CARO.
+> still experimental as of 9/25
+The CARO App is prepared for retrieving and integrating updates from the ERP-system. As there exist several applications there is no chance to get an out-of-the-box-solution, the go-to solution for [the teams](#the-team) at best. But it may be possible to primarily modify the _erpinterface.php file to your needs. The _ERPINTERFACE-class serves as a skeleton and provides the expected data structure that can be processed by CARO, it is not necessary to deal with the whole applications structure.
 
 You may process Web-APIs (recommendation `UTILITY::webrequest()`), regularly provided CSV-dumps (recommendation [CSV Processor](#csv-processor)) and/or implement own data processing as long as the data is prepared to be returned as expected. It is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp].
 
 Signal unavailable methods by returning `null`.
 
 Basic supported integrations include
-* case states for records given a provided ERP case number
+* case state updates for records given a provided ERP case number
 * updates on order data given the ordered items text can and has been added an order identification and the ERP-system is able to hand it back
+* customer data import for records, based on name and date of birth
+
+The customer data import is executed per request, updates on case states and order data is executed via cron on request of the landing page depending on the interval configured within [config.ini](#runtime-variables).
 
 [Content](#content)
 

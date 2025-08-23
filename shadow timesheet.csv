@@ -331,3 +331,5 @@
 09.08.24,10,"markdown, unittests, documentation, purchase-api"
 15.08.24,9,"document-api, record-api, file-api, audit-api"
 16.08.25,6,"erp-interface, record-api"
+22.08.25,9,"cron, erp-interface"
+23.08.25,7,"order-api, cron, erp-interface, record-api"

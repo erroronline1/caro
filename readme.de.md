@@ -1991,16 +1991,19 @@ Im Falle einer Anpassung des Quelltexts:
 Wo wir gerade dabei sind
 
 ### ERP Anbindung
-> unvollendet und experimentell Stand 9/25
-Die CARO App ist auf dem Empfang von Updates aus dem ERP-System vorbereitet. Da es viele Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung. Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Ausgabe die von CARO verarbeitet werden kann.
+> experimentell Stand 9/25
+Die CARO App ist auf dem Empfang und die Einbindung von Updates aus dem ERP-System vorbereitet. Da es viele entsprechende Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung, bestenfalls die Lösung aus dem Alltag des [Teams](#das-team). Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Datenstruktur die von CARO verarbeitet werden kann, es ist nicht zwingend erforderlich sich mit der gesamten Programmstruktur auseinanderzusetzen.
 
 Es können beispielsweise Web-APIs (Empfehlung `UTILITY::webrequest()`) oder regelmäßig breitgestellte CSV-Exporte (Empfehlung [CSV Prozessor](#csv-prozessor)) verarbeitet und/oder eigene Algorithmen implementiert werden, solange die aufbereiteten Daten den erwarteten Anforderungen entsprechen. Es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren.
 
 Nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden. 
 
 Die grundlegend unterstützten Integrationen beinhalten
-* Fallstatus für Aufzeichnungen sofern eine Vorgangsnummer angegeben wird
+* Aktualisierung des Fallstatus für Aufzeichnungen sofern eine Vorgangsnummer angegeben wird
 * Aktualisierung der Bestelldaten sofern den Bestelltexten je Artikel eine Bestellidentifikation beigefügt werden kann und wurde und diese vom ERP-System zurück gegeben werden kann
+* Datenimport von Kundendaten für Aufzeichnungen, basierend auf Name und Geburtsdatum
+
+Der Datenimport wird beim jeweiligen Aufruf bearbeitet, die Aktualisierung der Fallstati und der Bestelldaten wird via cron bei Aufruf der Startseite mit dem in der [config.ini](#laufzeitvariablen) angegebenen Interval ausgeführt.
 
 [Übersicht](#übersicht)
 
