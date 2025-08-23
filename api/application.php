@@ -804,7 +804,7 @@ class APPLICATION extends API {
 				$log[] = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . $task . ': ' . str_replace("\n", ' ' , $e);
 			}
 		}
-		if ($log) file_put_contents($logfile, "\n" . implode("\n", $log), FILE_APPEND);
+		if ($log) file_put_contents($logfile, "\n\n" . implode("\n", $log), FILE_APPEND);
 
 		$cron = file($logfile);
 		return ['last' => $cron[count($cron) - 1], 'count' => count($cron) - 1];

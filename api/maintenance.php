@@ -61,7 +61,7 @@ class MAINTENANCE extends API {
 					'attributes' => [
 						'name' => 'CRON'
 					],
-					'content' => implode("\n", $cron)
+					'content' => implode("\n", preg_replace('/\n$/m', '', $cron))
 				];
 				$response['render']['content'][] = [
 					'type' => 'deletebutton',
