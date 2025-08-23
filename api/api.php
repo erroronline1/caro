@@ -324,7 +324,8 @@ class API {
 						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
 					],
 					'label' => CONFIG['label'],
-					'forbidden' => CONFIG['forbidden']
+					'forbidden' => CONFIG['forbidden'],
+					'system' => CONFIG['system']['erp'] ? ['erp' => CONFIG['system']['erp']] : []
 				]
 			];
 		}

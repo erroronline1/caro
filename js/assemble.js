@@ -2506,7 +2506,7 @@ export class Assemble {
 
 		p = document.createElement("p");
 		if (mark_deletion) p.onclick = mark_deletion;
-		p.innerHTML = this.currentElement.content.text.replaceAll(/\n|\r\n/g, '<br />');
+		p.innerHTML = this.currentElement.content.text.replaceAll(/\n|\r\n/g, "<br />");
 		message.append(p);
 
 		// display notif of unread messages in overview mode
@@ -2963,12 +2963,70 @@ export class Assemble {
 		result.push(button);
 
 		if (originaltype === "identify" && !api._settings.user.permissions.patient) {
-			let button = document.createElement("button");
+			let button = document.createElement("button"),
+				fieldname = this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "");
+
 			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.merge")));
 			button.type = "button";
 			button.dataset.type = "merge";
+			let options = {},
+				inputs = [
+					{
+						type: "textsection",
+						attributes: {
+							name: api._lang.GET("record.import.by_identify"),
+							"data-type": "identify",
+						},
+					},
+					{
+						type: "scanner",
+						attributes: {
+							name: fieldname,
+						},
+					},
+				];
+			if (api._settings.config.system.erp)
+				inputs.push(
+					{ type: "hr" },
+					{
+						type: "textsection",
+						attributes: {
+							name: api._lang.GET("record.import.by_name"),
+							"data-type": "identify",
+						},
+					},
+					{
+						type: "text",
+						attributes: {
+							name: api._lang.GET("record.import.name"),
+						},
+					},
+					{
+						type: "date",
+						attributes: {
+							name: api._lang.GET("record.import.dob"),
+						},
+					}
+				);
+			inputs = JSON.stringify(inputs); // something alters the objects, didn't figure out what, but this solves the problem
+			options[api._lang.GET("general.cancel_button")] = false;
+			options[api._lang.GET("record.import.import")] = { value: true, class: "reducedCTA" };
 			button.onclick = function () {
-				if (document.getElementById(inputid).value) api.record("get", "import", document.getElementById(inputid).value);
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("assemble.render.merge"),
+					options: options,
+					render: JSON.parse(inputs),
+				}).then((response) => {
+					if (Boolean(response)) {
+						if (fieldname in response && response[fieldname]) api.record("get", "import", encodeURIComponent(response[fieldname]));
+						else if (api._lang.GET("record.import.name") in response || api._lang.GET("record.import.dob") in response) {
+							let name = response[api._lang.GET("record.import.name")] || null,
+								dob = response[api._lang.GET("record.import.dob")] || null;
+							api.record("get", "import", null, encodeURIComponent(name), encodeURIComponent(dob));
+						}
+					}
+				});
 			};
 			result.push(button);
 

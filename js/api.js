@@ -245,7 +245,7 @@ export const api = {
 			top: 0,
 			behavior: "smooth",
 		});
-		document.querySelector('#menustart').focus();
+		document.querySelector("#menustart").focus();
 	},
 
 	/**
@@ -733,8 +733,9 @@ export const api = {
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
 
-					if (request[2]) //search
-						document.getElementById('_landingpagesearch').scrollIntoView({block:'center'});
+					if (request[2])
+						//search
+						document.getElementById("_landingpagesearch").scrollIntoView({ block: "center" });
 				};
 				break;
 			case "manual":
@@ -1844,23 +1845,44 @@ export const api = {
 							}
 							if (data.response.msg !== undefined) {
 								const options = {};
-								options[api._lang.GET("record.import_ok")] = false;
-								options[api._lang.GET("record.import_clear_identifier")] = {
-									value: true,
-									class: "reducedCTA",
-								};
+								options[api._lang.GET("general.cancel_button")] = false;
+								if (typeof data.response.msg === "object")
+									options[api._lang.GET("record.import.ok")] = {
+										value: true,
+										class: "reducedCTA",
+									};
 
 								new Dialog({
-									type: "confirm",
+									type: typeof data.response.msg === "object" ? "input" : "confirm",
 									header: api._lang.GET("assemble.render.merge"),
 									options: options,
 									render: data.response.msg,
 								}).then((response) => {
-									if (response) document.querySelector("input[name^=IDENTIFY_BY_]").value = "";
+									if (response && typeof data.response.msg === "object" && api._lang.GET("record.import.by_name") in response) {
+										let result = {};
+										// deconstruct key:value<br>...
+										for (const match of response[api._lang.GET("record.import.by_name")].matchAll(/(.+?): (.+?)(?:<br>|$)/gm)) {
+											result[match[1]] = match[2];
+										}
+										data = {
+											data: result,
+											response: {
+												msg: api._lang.GET("record.import.success"),
+											},
+										};
+										successFn(data);
+									}
 								});
 							}
 						};
-						payload = { IDENTIFY_BY_: request[2] };
+						payload = {
+							IDENTIFY_BY_: request[2],
+							NAMELOOKUP: request[3] || null,
+							DOBLOOKUP: request[4] || null,
+						};
+						delete request[2];
+						delete request[3];
+						delete request[4];
 						break;
 					case "displayonly":
 						// for linked documents within documents

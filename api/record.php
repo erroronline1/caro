@@ -632,43 +632,78 @@ class RECORD extends API {
 	 *          |_|
 	 * gather data for a given identifier and return form field names and recorded values
 	 * check if the respective form for a record is accessible
+	 * 
+	 * on available erpinterface respond found entries according to name and date of birth
 	 */
 	public function import(){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
-			'values' => [
-				':identifier' => UTILITY::propertySet($this->_payload, 'IDENTIFY_BY_')
-			]
-		]);
-		$data = $data ? $data[0] : null;
+		$IDENTIFY_BY_ = UTILITY::propertySet($this->_payload, 'IDENTIFY_BY_');
+		if ($IDENTIFY_BY_ === 'null') $IDENTIFY_BY_ = null;
+		$NAMELOOKUP = UTILITY::propertySet($this->_payload, 'NAMELOOKUP');
+		if ($NAMELOOKUP === 'null') $NAMELOOKUP = null;
+		$DOBLOOKUP = UTILITY::propertySet($this->_payload, 'DOBLOOKUP');
+		if ($DOBLOOKUP === 'null') $DOBLOOKUP = null;
 
-		if ($data) {
-			$result = [];
-			$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
-
-			$records = json_decode($data['content'], true);
-			foreach ($records as $record){
-				$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
-				if (!PERMISSION::permissionIn($document['restricted_access'])) continue; // check if user has access to form
-				if ($record['document'] == 0) continue; // skip pseudoforms
-				if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
-				foreach ($record['content'] as $key => $value){
-					preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
-					if ($link) $value = $link[1];
-					$result[$key] = $value;
-				}
-				$result['DEFAULT_' . $this->_lang->PROPERTY('record.type_description')] = $data['record_type'];
-			} 
-			$this->response([
-				'data' => $result,
-				'response' => [
-					'msg' => $this->_lang->GET('record.import_success'),
-					'type' => 'success'
+		if ($IDENTIFY_BY_){
+			$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
+				'values' => [
+					':identifier' => $IDENTIFY_BY_
 				]
 			]);
+			$data = $data ? $data[0] : null;
+
+			if ($data) {
+				$result = [];
+				$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+
+				$records = json_decode($data['content'], true);
+				foreach ($records as $record){
+					$document = $documents[array_search($record['document'], array_column($documents, 'id'))] ? : ['name' => null, 'restricted_access' => null];
+					if (!PERMISSION::permissionIn($document['restricted_access'])) continue; // check if user has access to form
+					if ($record['document'] == 0) continue; // skip pseudoforms
+					if (gettype($record['content']) === 'string') $record['content'] = json_decode($record['content'], true);
+					foreach ($record['content'] as $key => $value){
+						preg_match("/(?:^href=')(.+?)(?:')/", $value, $link); // link widget value
+						if ($link) $value = $link[1];
+						$result[$key] = $value;
+					}
+					$result['DEFAULT_' . $this->_lang->PROPERTY('record.type_description')] = $data['record_type'];
+				} 
+				$this->response([
+					'data' => $result,
+					'response' => [
+						'msg' => $this->_lang->GET('record.import.success'),
+						'type' => 'success'
+					]
+				]);
+			}
 		}
-		else $this->response([
+		if ($NAMELOOKUP ||$DOBLOOKUP){
+			require_once('./_erpinterface.php');
+			if (ERPINTERFACE && $result = ERPINTERFACE->customerdata($NAMELOOKUP, $DOBLOOKUP)) {
+				$options = [];
+				foreach($result as $option){
+					// construct key: value radio input content
+					$options[implode('<br>', array_map(fn($k, $v) => $k . ': ' . $v, array_keys($option), array_values($option)))] = [];
+				}
+
+				$this->response([
+					'response' => [
+						'msg' => [
+							[
+								'type' => 'radio',
+								'attributes' => [
+									'name' => $this->_lang->GET('record.import.by_name')
+								],
+								'content' => $options
+							]
+						]
+					]
+				]);
+			}
+		}
+		$this->response([
 			'response' => [
-				'msg' => $this->_lang->GET('record.import_error'),
+				'msg' => $this->_lang->GET('record.import.error'),
 				'type' => 'error'
 			]]);
 	}
