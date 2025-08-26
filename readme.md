@@ -36,6 +36,7 @@ Things are still in motion. Images may be outdated.
 * what if an erp-connection is available?
     * eva partial api option, partial csv again
         * if same server, go beyond root and check if respective csv-export exists with a sufficient timestamp?
+    * test erp_interface_casestate and erp_interface_orderstate with sample data
 
 ## Content
 * [Aims](#aims)
@@ -1091,7 +1092,7 @@ Furthermore hopefully beneficial information on
 
 ## Maintenance
 The application has some options to be maintained by authorized users:
-* By accessing the landing page the 'cron job' to clear expired files and initiate automated message alerts and scheduled tasks is triggered. This is executed earliest after passing of [runtime-variable-defined](#runtime-variables) minutes. The logfile `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
+* The 'cron job' to clear expired files and records, initiate automated message alerts and scheduled tasks is triggered during notification request. This is executed earliest after passing of [runtime-variable-defined](#runtime-variables) minutes. The logfile `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
 * Existing vendors can be updated regarding their information and pricelist settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
 * Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
 
@@ -1114,7 +1115,7 @@ The application handles some automated reminders and schedules
 
 Beside these the dashboard and the menu notify about open topics and tasks. Timespans for notifications and schedules can be set within the [configuration](#runtime-variables).
 
-Automated reminders and schedules are processed once per day by default, but can be customized within the [config.ini](#runtime-variables).
+Automated reminders and schedules are processed once per day by default, but can be customized individually within the [config.ini](#runtime-variables).
 
 ## User trainings
 User trainings can be added in the [user manager](#users) but also from the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries). In terms of ISO 13485 8.5.1 General Improvement and ISO 13485 8.5.2 Corrective measures trainings can also be added in case of a treatment record marked as complaint.
@@ -2086,6 +2087,7 @@ and while we're at it
 
 ### ERP Interface
 > still experimental as of 9/25
+
 The CARO App is prepared for retrieving and integrating updates from the ERP-system. As there exist several applications there is no chance to get an out-of-the-box-solution, the go-to solution for [the teams](#the-team) at best. But it may be possible to primarily modify the _erpinterface.php file to your needs. The _ERPINTERFACE-class serves as a skeleton and provides the expected data structure that can be processed by CARO, it is not necessary to deal with the whole applications structure.
 
 You may process Web-APIs (recommendation `UTILITY::webrequest()`), regularly provided CSV-dumps (recommendation [CSV Processor](#csv-processor)) and/or implement own data processing as long as the data is prepared to be returned as expected. It is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp].
@@ -2097,7 +2099,7 @@ Basic supported integrations include
 * updates on order data given the ordered items text can and has been added an order identification and the ERP-system is able to hand it back
 * customer data import for records, based on name and date of birth
 
-The customer data import is executed per request, updates on case states and order data is executed via cron on request of the landing page depending on the interval configured within [config.ini](#runtime-variables).
+The customer data import is executed per request, updates on case states and order data is executed via cron as part of a notification request depending on the interval configured within [config.ini](#runtime-variables).
 
 [Content](#content)
 
@@ -2808,18 +2810,6 @@ Sample response
 ```
 {"user":[],"config":{"application":{"defaultlanguage":"en"}}}
 ```
-
-> DELETE ./api/api.php/application/cron_log
-
-Deletes the cron.log file. Available only to users with admin permission, triggers new cron job execution.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none | | | |
-
-Sample response
-HTTP response codes 403, 404 or 410
 
 > GET ./api/api.php/application/info
 

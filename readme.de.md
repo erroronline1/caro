@@ -997,7 +997,7 @@ Ferner hoffentlich hilfreiche Informationen zu
 
 ## Wartung
 Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
-* Der Aufruf der Startseite löst den 'cron job' für die Bereinigung abgelaufener Dateien und die Erstellung [automatischer Benachrichtigungen und Aufgabenplanungen](#erinnerungen-und-automatische-aufgabenplanung) aus. Die Durchführung findet frühestens nach den in den [Umgebungseinstellungen](#laufzeitvariablen) angegebenen Minuten statt. Die Log-Datei `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
+* Der 'cron job' für die Bereinigung abgelaufener Dateien und Aufzeichnungen und die Erstellung [automatischer Benachrichtigungen und Aufgabenplanungen](#erinnerungen-und-automatische-aufgabenplanung) wird durch den Benachrichtigungs-Request ausgelöst. Die Durchführung findet frühestens nach den in den [Umgebungseinstellungen](#laufzeitvariablen) angegebenen Minuten statt. Die Log-Datei `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
 * Bestehende Lieferanten können in Bezug auf ihre Informationen und die Preislisten-Einstellungen (Importfilter und Stichproben-Intervalle) aktualisiert werden. Eine Datei gemäß [Vorlage](#anwendungseinrichtung) kann bereitgestellt werden. Die jeweiligen Aktualisierungen können für jeden übereinstimmenden Lieferanten gewählt werden.
 * Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen. Es kann eine CSV-Datei heruntergeladen, bearbeitet und wieder bereitgestellt werden, oder vorbereitete Empfehlungen bereitgestellt werden. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs. Tabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen. Ohne bereitgestellte Datei gibt es den Export.
 
@@ -1020,7 +1020,7 @@ Die Anwendung vearbeitet einige automatische Erinnerungen und Aufgabenplanungen
 
 Daneben informiert die Startseite und das Menü über offene Themen und Aufgaben. Zeiträume für Benachrichtigungen und Aufgabenplanung können in der [Konfiguration](#laufzeitvariablen) angepasst werden.
 
-Automatische Erinnerungen und Aufgabenplanungen werden standardmäßig einmal täglich ausgeführt, können aber in der [config.ini](#laufzeitvariablen) angepasst werden..
+Automatische Erinnerungen und Aufgabenplanungen werden standardmäßig einmal täglich ausgeführt, können aber in der [config.ini](#laufzeitvariablen) individuell angepasst werden.
 
 ## Schulungen
 Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulunngen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
@@ -1992,6 +1992,7 @@ Wo wir gerade dabei sind
 
 ### ERP Anbindung
 > experimentell Stand 9/25
+
 Die CARO App ist auf dem Empfang und die Einbindung von Updates aus dem ERP-System vorbereitet. Da es viele entsprechende Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung, bestenfalls die Lösung aus dem Alltag des [Teams](#das-team). Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Datenstruktur die von CARO verarbeitet werden kann, es ist nicht zwingend erforderlich sich mit der gesamten Programmstruktur auseinanderzusetzen.
 
 Es können beispielsweise Web-APIs (Empfehlung `UTILITY::webrequest()`) oder regelmäßig breitgestellte CSV-Exporte (Empfehlung [CSV Prozessor](#csv-prozessor)) verarbeitet und/oder eigene Algorithmen implementiert werden, solange die aufbereiteten Daten den erwarteten Anforderungen entsprechen. Es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren.
@@ -2003,7 +2004,7 @@ Die grundlegend unterstützten Integrationen beinhalten
 * Aktualisierung der Bestelldaten sofern den Bestelltexten je Artikel eine Bestellidentifikation beigefügt werden kann und wurde und diese vom ERP-System zurück gegeben werden kann
 * Datenimport von Kundendaten für Aufzeichnungen, basierend auf Name und Geburtsdatum
 
-Der Datenimport wird beim jeweiligen Aufruf bearbeitet, die Aktualisierung der Fallstati und der Bestelldaten wird via cron bei Aufruf der Startseite mit dem in der [config.ini](#laufzeitvariablen) angegebenen Interval ausgeführt.
+Der Datenimport wird beim jeweiligen Aufruf bearbeitet, die Aktualisierung der Fallstati und der Bestelldaten wird via cron als Bestandteil der Cenachrichtigungen mit dem in der [config.ini](#laufzeitvariablen) angegebenen Interval ausgeführt.
 
 [Übersicht](#übersicht)
 

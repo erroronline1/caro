@@ -43,6 +43,9 @@ class NOTIFICATION extends API {
 	 */
 	public function notifs(){
 		$result = [
+			// first call is cron, for tidying up and occasionally creating items
+			'cron' => $this->cron(),
+
 			'audit_closing' => $this->audits(),
 			'consumables_pendingincorporation' => $this->consumables(),
 			'document_approval' => $this->documents(),
@@ -153,6 +156,646 @@ class NOTIFICATION extends API {
 			}
 		}
 		return $unapproved;
+	}
+
+	/**
+	 *
+	 *   ___ ___ ___ ___
+	 *  |  _|  _| . |   |
+	 *  |___|_| |___|_|_|
+	 *
+	 * clears expired files, automated message alerts and scheduled tasks
+	 *
+	 * this was supposed to be a cron job but i did not get it to work with iis from cli because of an pdo driver import issue
+	 * however as this is handled by the application it does not rely on third party applications like cron or schtask
+	 * and is currently not much of a performance issue
+	 * 
+	 * due to using api methods for user alerts and date handling it is easier to declare as this objects method instead of some class
+	 * iterates over respective CONFIG['system]['cron']-array to execute if respective interval has been met
+	 * can be extended if additional tasks are to come
+	 */
+	private function cron(){
+		// also see maintenance.php->cron_log()
+		$logfile = 'cron.log';
+		$log = [];
+
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new \DateTime('now');
+		$today->setTime(0, 0);
+		include_once("./_erpinterface.php");
+
+		foreach(CONFIG['system']['cron'] as $task => $minutes){
+			try {
+				if (!file_exists($logfile) || ($this->_date['servertime']->getTimestamp() - filemtime($logfile)) > $minutes * 60) {
+					$execution = false;
+					switch($task){
+						case 'erp_interface_casestate':
+							// update records case state if set within erp system
+							// does only update database null values
+							// also see record.php->casestate()
+							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'casestate') && ERPINTERFACE->casestate()){
+								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
+								if (!($erpdata = ERPINTERFACE->casestate(array_filter(array_column($data, 'erp_case_number'), fn($v) => boolval($v))))) break;
+								
+								$updates = [];
+								foreach ($data as $case){
+									if (!$case['erp_case_number'] || !array_key_exists($case['erp_case_number'], $erpdata)) continue;
+									$current_records = [];
+									$case_state = json_decode($case['case_state'] ? : '', true);
+									foreach($erpdata as $_caseState => $value){
+										if ($value && !isset($case_state[$_caseState])) $case_state[$_caseState] = true;
+										$current_records[] = [
+											'author' => $_SESSION['user']['name'],
+											'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
+											'document' => 0,
+											'content' => UTILITY::json_encode([
+												$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.casestate_set', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $_caseState, [], true)], true)
+											])
+										];
+									}
+									if ($current_records) {
+										$records = json_decode($case['content'], true);
+										array_push($records, ...$current_records);
+
+										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_put'),
+											[
+												':case_state' => UTILITY::json_encode($case_state),
+												':record_type' => $case['record_type'] ? : 'NULL',
+												':identifier' => $case['identifier'],
+												':last_user' => $_SESSION['user']['id'],
+												':last_document' => 'NULL',
+												':content' => UTILITY::json_encode($records),
+												':id' => $case['id'],
+												':lifespan' => $case['lifespan'],
+												':erp_case_number' => $case['erp_case_number']
+											]) . '; ');
+									}
+								}
+								// run updates
+								foreach ($updates as $update){
+									SQLQUERY::EXECUTE($this->_pdo, $update);
+								}
+								$execution = true;
+							}
+							break;
+						case 'erp_interface_orderdata':
+							// update order state if set within erp system
+							// does only update database null values
+							// also see order.php->approved()
+							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
+								$orders = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
+								if (!($erpdata = ERPINTERFACE->casestate(date('Y-m-d H:i:s', filemtime($logfile))))) break;
+								
+								require_once('_shared.php');
+								$orderstatistics = new ORDERSTATISTICS($this->_pdo);
+								$updates = [];
+
+								$states = [
+									'ordered',
+									'partially_received',
+									'received'
+								];
+								foreach ($orders as $order){
+									if ($identifiers = array_filter($erpdata, fn($o) => $o['identifier'] === UTILITY::identifier($order['approved']))){
+										$order['order_data'] = json_decode($order['order_data']);
+										$articles = array_filter($identifiers, fn($o) => $o['article_no'] === $order['order_data']['ordernumber_label'] && $o['vendor'] === $order['order_data']['vendor_label']);
+										if ($articles && count($articles) === 1){
+
+											foreach ($states as $state){
+												if ($order[$state] === null && $articles[0][$state]){
+													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_state'),
+														[
+															':id' => $order['id'],
+															':field' => $state,
+															':date' => $this->_pdo->quote($articles[0][$state])
+														]) . '; ');
+												}
+											}
+											if ($updates) {
+												foreach ($updates as $update){
+													SQLQUERY::EXECUTE($this->_pdo, $update);
+												}
+												$orderstatistics->update($order['id']);
+											}
+										}
+									}
+								}
+								$execution = true;
+							}
+							break;
+
+
+						case 'alert_open_records_and_retention_periods':
+							// alert unclosed records, records not having set lifespan
+							// delete expired records including record attachments and orders that contain identifier e.g. as commission
+							$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
+							$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+							$alerts = [];
+							foreach ($data as $row){
+								// alert about unclosed records if difference between now and last touch is divisible by reminder-interval
+								if (($row['record_type'] === 'complaint' && !PERMISSION::fullyapproved('complaintclosing', $row['closed']))
+									|| ($row['record_type'] !== 'complaint' && !$row['closed'])){
+					
+									$last = new \DateTime($row['last_touch']);
+									$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
+									if ($row['notified'] < $diff){
+										$this->alertUserGroup(
+											[
+												// limit recipients to specialized workforce only, exclude admin, office and common
+												'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin', 'office']))
+											],
+											$this->_lang->GET('record.reminder_message', [
+												':days' => $last->diff($this->_date['servertime'])->days,
+												':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
+												':document' => $row['last_document'] ? : ['name' => $this->_lang->GET('record.retype_pseudodocument_name', [], true)],			
+												':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+											], true)
+										);
+										// prepare alert flags
+										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
+											[
+												':notified' => $diff,
+												':identifier' => $this->_pdo->quote($row['identifier'])
+											]) . '; ');
+									}
+								}
+								// alert about unassigned retention period if difference between now and last touch is divisible by reminder-interval
+								// only to set permissions within affected units, e.g. office members of orthotics1
+								else {
+									$last = new \DateTime($row['last_touch']);
+									$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
+									if ($row['notified'] < $diff && !$row['lifespan']){
+										$this->alertUserGroup(
+											[
+												// limit recipients to specialized workforce only, exclude admin and common. typically matches supervisors and office members
+												'permission' => PERMISSION::permissionFor('recordscasestate', true),
+												'unit' => array_filter(explode(',', $row['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin']))
+											],
+											$this->_lang->GET('record.lifespan.reminder_message', [
+												':identifier' => "<a href=\"javascript:javascript:api.record('get', 'record', '" . $row['identifier'] . "')\">" . $row['identifier'] . "</a>"
+											], true)
+										);
+										// prepare alert flags
+										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_notified'),
+											[
+												':notified' => $diff,
+												':identifier' => $this->_pdo->quote($row['identifier'])
+											]) . '; ');
+									}
+									elseif ($row['lifespan'] && abs($last->diff($this->_date['servertime'])->days) > intval($row['lifespan']) * 365 + ceil(intval($row['lifespan']) / 4)){ // last entry lifespan years + leap days as approximation
+										// delete record attachments that begin with the identifier
+										if (file_exists(UTILITY::directory('record_attachments'))){
+											$delete = [];
+											$fileidentifier = preg_replace('/[^\w\d]/m', '', $row['identifier']);
+											foreach (glob(UTILITY::directory('record_attachments') . '/' . $fileidentifier . '*') as $file) {
+												if($file == '.' || $file == '..') continue;
+												$delete[] = $file;
+											}
+											UTILITY::delete($delete);
+										}
+										// prepare deletion
+										$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('records_delete'),
+											[
+												':id' => intval($row['id'])
+											]) . '; ');
+
+										// delete orders containing identifier e.g. archived case related orders havong idenfier as commission
+										if (in_array($row['record_type'], array_keys($this->_lang->_DEFAULT['record']['type']))) {
+											$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+												'replacements' => [
+													':organizational_unit' => implode(',', array_keys($this->_lang->_DEFAULT['units'])), // all units
+													':orderfilter' => $row['identifier']
+												]
+											]);
+											foreach($orders as $relatedorder){
+												// DUPLICATE OF order.php->delete_approved_order()
+												$order = json_decode($relatedorder['order_data'], true);
+												if (isset($order['attachments'])){
+													$others = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_substr', [
+														'values' => [
+															':substr' => $order['attachments']
+														]
+													]);
+													if (count($others)<2){
+														$files = explode(',', $order['attachments']);
+														UTILITY::delete(array_map(fn($value) => '.' . $value, $files));
+													}
+												}
+												$alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_delete_approved_order'),
+													[
+														':id' => intval($relatedorder['id'])
+													]) . '; ');
+											}
+										}
+									}
+								}
+							}
+							// set alert flags
+							foreach ($alerts as $alert){
+								SQLQUERY::EXECUTE($this->_pdo, $alert);
+							}
+							$execution = true;
+							break;
+						case 'alert_unclosed_audits':
+							// notify on unclosed audits
+							$data = SQLQUERY::EXECUTE($this->_pdo, 'audit_get');
+							foreach ($data as $row){
+								if ($row['closed']) continue;
+								// alert if applicable
+								$last = new \DateTime($row['last_touch']);
+								$diff = intval(abs($last->diff($this->_date['servertime'])->days / CONFIG['lifespan']['records']['open_reminder']));
+								$row['notified'] = $row['notified'] || 0;
+								if ($row['notified'] < $diff){
+									$this->alertUserGroup(
+										['permission' => [...PERMISSION::permissionFor('audit', true)]],
+										$this->_lang->GET('audit.audit.reminder_message', [
+											':days' => $last->diff($this->_date['servertime'])->days,
+											':date' => $this->convertFromServerTime(substr($row['last_touch'], 0, -3), true),
+											':unit' => $this->_lang->_DEFAULT['units'][$row['unit']]
+										], true)
+									);
+									SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_notified',
+										[
+											'values' => [
+												':notified' => $diff,
+												':id' => $row['id']
+											]
+										]
+									);
+								}
+							}
+							$execution = true;
+							break;
+						case 'alert_unreceived_orders':
+							// alert requesting unreceived orders or marking received as delivered
+							$alerts = [];
+							$undelivered = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_unreceived_undelivered');
+							foreach ($undelivered as $order){
+								$update = false;
+								$decoded_order_data = null;
+
+								// alert purchase to enquire information about estimated shipping
+								// service gets an individual timespan as per config
+								// return or cancellation don't matter as these are handled different on state setting
+								$ordered = new \DateTime($order['ordered'] ? : '');
+								switch($order['ordertype']){
+									case "service":
+										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['service']['unreceived']));
+										break;
+									default:
+										$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unreceived']));
+										break;
+								}
+								$receive_interval = intval(abs($ordered->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['unreceived']));
+								if ($order['ordered'] && $order['notified_received'] < $receive_interval){
+									$decoded_order_data = json_decode($order['order_data'], true);
+									$this->alertUserGroup(
+										['permission' => ['purchase']],
+										$this->_lang->GET('order.alert_unreceived_order', [
+											':days' => $ordered->diff($this->_date['servertime'])->days,
+											':ordertype' => $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true),
+											':quantity' => $decoded_order_data['quantity_label'],
+											':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
+											':number' => isset($decoded_order_data['ordernumber_label']) ? $decoded_order_data['ordernumber_label'] : '',
+											':name' => isset($decoded_order_data['productname_label']) ? $decoded_order_data['productname_label'] : '',
+											':vendor' => isset($decoded_order_data['vendor_label']) ? $decoded_order_data['vendor_label'] : '',
+											':commission' => $decoded_order_data['commission'],
+											':orderer' => $decoded_order_data['orderer']
+										], true)
+									);
+									$update = true;
+								} else $receive_interval = $order['notified_received'];
+
+								// alert unit members to mark as received for orders and items returned from service
+								// return or cancellation don't matter as these are not received
+								$received = new \DateTime($order['received'] ? : '');
+								$delivery_interval = intval(abs($received->diff($this->_date['servertime'])->days / CONFIG['lifespan']['order']['undelivered']));
+								if ($order['received'] && in_array($order['ordertype'], ['order', 'service']) && $order['notified_delivered'] < $delivery_interval){
+									if (!$decoded_order_data) $decoded_order_data = json_decode($order['order_data'], true);
+									$this->alertUserGroup(
+										['unit' => [$order['organizational_unit']]],
+										$this->_lang->GET('order.alert_undelivered_order', [
+											':days' => $received->diff($this->_date['servertime'])->days,
+											':ordertype' => '<a href="javascript:void(0);" onclick="api.purchase(\'get\', \'approved\', \'null\', \'null\', \'received\')"> ' . $this->_lang->GET('order.ordertype.' . $order['ordertype'], [], true) . '</a>',
+											':quantity' => $decoded_order_data['quantity_label'],
+											':unit' => isset($decoded_order_data['unit_label']) ? $decoded_order_data['unit_label'] : '',
+											':number' => isset($decoded_order_data['ordernumber_label']) ? $decoded_order_data['ordernumber_label'] : '',
+											':name' => isset($decoded_order_data['productname_label']) ? $decoded_order_data['productname_label'] : '',
+											':vendor' => isset($decoded_order_data['vendor_label']) ? $decoded_order_data['vendor_label'] : '',
+											':commission' => $decoded_order_data['commission'],
+											':receival' => $this->convertFromServerTime($order['received'], true)
+										], true)
+									);
+									$update = true;
+								} else $delivery_interval = $order['notified_delivered'];
+
+								// prepare alert flags
+								if ($update) $alerts = SQLQUERY::CHUNKIFY($alerts, strtr(SQLQUERY::PREPARE('order_notified'),
+									[
+										':notified_received' => $receive_interval ? : 'NULL',
+										':notified_delivered' => $delivery_interval ? : 'NULL',
+										':id' => $order['id']
+									]) . '; ');
+
+							}
+							// set alert flags
+							foreach ($alerts as $alert){
+								SQLQUERY::EXECUTE($this->_pdo, $alert);
+							}
+							$execution = true;
+							break;
+						case 'delete_files_and_calendar':
+							// clear up folders with limited files lifespan
+							// clear up calendar entries marked as closed and for autodeletion
+							UTILITY::tidydir('tmp', CONFIG['lifespan']['files']['tmp']);
+							UTILITY::tidydir('sharepoint', CONFIG['lifespan']['files']['sharepoint']);
+							$calendar->delete(null);
+							$execution = true;
+							break;
+						case 'schedule_archived_orders_review':
+							// schedule archived approved orders review
+							$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_archived');
+							$units = [];
+							foreach ($orders as $order){
+								if (!isset($units[$order['organizational_unit']])) $units[$order['organizational_unit']] = 0;
+								$units[$order['organizational_unit']]++;
+							}
+							foreach ($units as $unit => $num){
+								if ($num > CONFIG['limits']['order_approved_archived']) {
+									$subject = $this->_lang->GET('order.alert_archived_limit', [
+										':max' => CONFIG['limits']['order_approved_archived']
+									], true);
+									$reminders = $calendar->search($subject);
+									$open = false;
+									foreach ($reminders as $reminder){
+										if (!$reminder['closed']) $open = true;
+									}
+									if (!$open){
+										$calendar->post([
+											':type' => 'schedule',
+											':span_start' => $today->format('Y-m-d H:i:s'),
+											':span_end' => $today->format('Y-m-d H:i:s'),
+											':author_id' => 1,
+											':affected_user_id' => null,
+											':organizational_unit' => $unit,
+											':subject' => $subject,
+											':misc' => null,
+											':closed' => null,
+											':alert' => 1,
+											':autodelete' => 1
+										]);		   		
+									}
+								}
+							}
+							$execution = true;
+							break;
+						case 'schedule_outdated_consumables_documents_review':
+							// schedule consumables document reviews for vendor- and product-documents
+							// at best only the most recent file by vendor and filename / productnumber.filename is processed if provided
+							$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
+							foreach ($vendors as $vendor){
+								if ($vendor['hidden']) continue;
+								// process vendor-documents
+								if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_documents', [':id' => $vendor['id']]))) {
+									$documents = [];
+									$considered = [];
+									foreach ($docfiles as $path){
+										$file = pathinfo($path);
+										// match expiry date in {vendor}_{uploaddate}-{expirydate}_{filename_with_extension}
+										preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)$/', $file['basename'], $fileNameComponents);
+										if (!isset($fileNameComponents[3]) || $fileNameComponents[3] < $this->_date['servertime']->format('Ymd')) {
+											// detect filename and continue on already considered, UTILITTY::listfiles desc by default
+											if (isset($fileNameComponents[4])) {
+												if (!in_array($fileNameComponents[4], $considered)) $considered[] = $fileNameComponents[4];
+												else continue;
+											}
+											$documents[] = $file['basename'];
+										}
+									}
+									if ($documents){
+										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
+										$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_vendor_document_expired', [':vendor' => $vendor['name']], true));
+										$open = false;
+										foreach ($reminders as $reminder){
+											if (!$reminder['closed']) $open = true;
+										}
+										if (!$open){
+											$calendar->post([
+												':type' => 'schedule',
+												':span_start' => $today->format('Y-m-d H:i:s'),
+												':span_end' => $today->format('Y-m-d H:i:s'),
+												':author_id' => 1,
+												':affected_user_id' => null,
+												':organizational_unit' => 'admin,office',
+												':subject' => $this->_lang->GET('calendar.schedule.alert_vendor_document_expired', [':vendor' => $vendor['name']], true) . " - " . implode(" | ", $documents),
+												':misc' => null,
+												':closed' => null,
+												':alert' => 1,
+												':autodelete' => 1
+												]);		   
+										}
+									}
+								}
+								// process product-documents
+								if ($docfiles = UTILITY::listFiles(UTILITY::directory('vendor_products', [':id' => $vendor['id']]))) {
+									$documents = [];
+									$considered = [];
+									foreach ($docfiles as $path){
+										$file = pathinfo($path);
+										// match expiry date in {Vendor}_{uploaddate}-{expirydate}_{articlenumber}_{filename_with_extension}
+										preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file['basename'], $fileNameComponents);
+										if (!isset($fileNameComponents[3]) || $fileNameComponents[3] < $this->_date['servertime']->format('Ymd')) {
+											// detect filename and continue on already considered, UTILITTY::listfiles desc by default
+											if (isset($fileNameComponents[4]) && isset($fileNameComponents[5])) {
+												if (!in_array($fileNameComponents[4] . $fileNameComponents[5], $considered)) $considered[] = $fileNameComponents[4] . $fileNameComponents[5];
+												else continue;
+											}
+											$documents[] = $file['basename'];
+										}
+									}
+									if ($documents){
+										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
+										$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_product_document_expired', [':vendor' => $vendor['name']], true));
+										$open = false;
+										foreach ($reminders as $reminder){
+											if (!$reminder['closed']) $open = true;
+										}
+										if (!$open){
+											$calendar->post([
+												':type' => 'schedule',
+												':span_start' => $today->format('Y-m-d H:i:s'),
+												':span_end' => $today->format('Y-m-d H:i:s'),
+												':author_id' => 1,
+												':affected_user_id' => null,
+												':organizational_unit' => 'office',
+												':subject' => $this->_lang->GET('calendar.schedule.alert_product_document_expired', [':vendor' => $vendor['name']], true) . " - " . implode(" | ", $documents),
+												':misc' => null,
+												':closed' => null,
+												':alert' => 1,
+												':autodelete' => 1
+												]);		   
+										}
+									}
+								}
+							}
+							$execution = true;
+							break;
+						case 'schedule_responsibilities_renewal':
+							// schedule renewal of expired responsibilities
+							$responsibilities = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get_all');
+							foreach ($responsibilities as $row){
+								if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
+									// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
+									$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true));
+									$open = false;
+									foreach ($reminders as $reminder){
+										if (!$reminder['closed']) $open = true;
+									}
+									if (!$open){
+										$calendar->post([
+											':type' => 'schedule',
+											':span_start' => $today->format('Y-m-d H:i:s'),
+											':span_end' => $today->format('Y-m-d H:i:s'),
+											':author_id' => 1,
+											':affected_user_id' => null,
+											':organizational_unit' => 'admin',
+											':subject' => $this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true),
+											':misc' => null,
+											':closed' => null,
+											':alert' => 1,
+											':autodelete' => 1
+										]);		   
+									}
+								}
+							}
+							$execution = true;
+							break;
+						case 'schedule_training_evaluation':
+							// schedule training evaluation
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+								'replacements' => [
+									':ids' => implode(',', array_column($users, 'id'))
+								]
+							]);
+							foreach ($trainings as $training){
+								if ($training['evaluation'] || !$training['date']) continue;
+								$trainingdate = new \DateTime($training['date']);
+								if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) > CONFIG['lifespan']['training']['evaluation']){
+									if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
+										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
+										$subject = $this->_lang->GET('audit.userskills.notification_message', [
+											':user' => $users[$user]['name'],
+											':training' => $training['name'],
+											':module' => $this->_lang->GET('audit.navigation.regulatory', [], true),
+											':date' => $this->convertFromServerTime($training['date'], true)
+										], true);
+										$reminders = $calendar->search($subject);
+										$open = false;
+										foreach ($reminders as $reminder){
+											if (!$reminder['closed']) $open = true;
+										}
+										if (!$open){
+												$calendar->post([
+												':type' => 'schedule',
+												':span_start' => $today->format('Y-m-d H:i:s'),
+												':span_end' => $today->format('Y-m-d H:i:s'),
+												':author_id' => 1,
+												':affected_user_id' => null,
+												':organizational_unit' => 'admin',
+												':subject' => $subject,
+												':misc' => null,
+												':closed' => null,
+												':alert' => 1,
+												':autodelete' => 1
+											]);		   		
+										}
+									}
+								}
+							}
+							$execution = true;
+							break;
+						case 'schedule_retrainings':
+							// schedule retrainings
+							$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+							$trainings = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get_user', [
+								'replacements' => [
+									':ids' => implode(',', array_column($users, 'id'))
+								]
+							]);
+							$reversetrainings = array_reverse($trainings); // reversed to sort out comparison from rear
+							foreach ($trainings as $training){
+								if ($training['planned']) {
+									continue;
+								}
+								if (!$training['expires']) continue;
+								$trainingdate = new \DateTime($training['expires']);
+								if (intval(abs($trainingdate->diff($this->_date['servertime'])->days)) < CONFIG['lifespan']['training']['renewal']){
+									if (($user = array_search($training['user_id'], array_column($users, 'id'))) !== false) { // no deleted users
+										$user = $users[$user];
+										// check for scheduled trainings. if none add a new.
+										$none = true;
+										foreach ($reversetrainings as $scheduled){
+											// must be of same name for this user
+											if ($scheduled['user_id'] !== $user['id'] || $scheduled['name'] != $training['name']) continue;
+											// date has been set and is newer than expiry, obviously a follow up training or already planned
+											if ($scheduled['date'] && $scheduled['date'] > $training['expires'] || $scheduled['planned']) {
+												$none = false;
+												break;
+											}
+										}
+										if ($none) {
+											// insert scheduled training and message user and supervisor
+											SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+												'values' => [
+													':name' => $training['name'],
+													':user_id' => $user['id'],
+													':date' => null,
+													':expires' => null,
+													':experience_points' => 0,
+													':file_path' => null,
+													':evaluation' => null,
+													':planned' => UTILITY::json_encode([
+														'user' => CONFIG['system']['caroapp'], // system user
+														'date' => $this->_date['servertime']->format('Y-m-d H:i'),
+														'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => $this->_lang->GET('user.training.auto_schedule', [':expires' => $this->convertFromServerTime($training['expires'], true)], true)]
+													])
+												]
+											]);
+											$this->alertUserGroup([
+													'permission' => ['supervisor'],
+													'group' => array_filter(explode(',', $user['units'] ? : ''), fn($u) => !in_array($u, ['common', 'admin'])),
+													'user' => [$user['name']]
+												],
+												$this->_lang->GET('user.training.auto_schedule_alert_message', [
+													':user' => $user['name'],
+													':training' => $training['name'],
+													':date' => $this->convertFromServerTime($training['date'], true),
+													':expires' => $this->convertFromServerTime($training['expires'], true)
+												], true)
+											);
+										}
+									}
+								}
+							}
+							$execution = true;
+							break;
+					}
+					if ($execution)
+						$log[] = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . $task . ': OK';
+				}
+			}
+			catch (\Exception $e){
+				$log[] = $this->_date['servertime']->format('Y-m-d H:i:s') . ' ' . $task . ': ' . str_replace("\n", ' ' , $e);
+			}
+		}
+		if ($log) {
+			file_put_contents($logfile, "\n\n" . implode("\n", $log), FILE_APPEND);
+			if (array_intersect(['admin'], $_SESSION['user']['permissions'])) {
+				return implode("\n", $log);
+			}
+		}
+		return null;
 	}
 
 	/**

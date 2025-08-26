@@ -161,6 +161,9 @@ export const _serviceWorker = {
 					: api._lang.GET("message.message.new_message");
 			this.showLocalNotification(api._lang.GET("message.navigation.header"), body);
 		}
+		if ("cron" in data && Boolean(data.cron)) {
+			this.showLocalNotification("CRON", data.cron);
+		}
 		this.notif.communication(data);
 		this.notif.consumables(data);
 		this.notif.calendar(data);
