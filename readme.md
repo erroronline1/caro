@@ -36,7 +36,6 @@ Things are still in motion. Images may be outdated.
 * what if an erp-connection is available?
     * eva partial api option, partial csv again
         * if same server, go beyond root and check if respective csv-export exists with a sufficient timestamp?
-    * test erp_interface_casestate and erp_interface_orderstate with sample data
 
 ## Content
 * [Aims](#aims)
@@ -2086,8 +2085,6 @@ If you ever fiddle around with the sourcecode:
 and while we're at it
 
 ### ERP Interface
-> still experimental as of 9/25
-
 The CARO App is prepared for retrieving and integrating updates from the ERP-system. As there exist several applications there is no chance to get an out-of-the-box-solution, the go-to solution for [the teams](#the-team) at best. But it may be possible to primarily modify the _erpinterface.php file to your needs. The _ERPINTERFACE-class serves as a skeleton and provides the expected data structure that can be processed by CARO, it is not necessary to deal with the whole applications structure.
 
 You may process Web-APIs (recommendation `UTILITY::webrequest()`), regularly provided CSV-dumps (recommendation [CSV Processor](#csv-processor)) and/or implement own data processing as long as the data is prepared to be returned as expected. It is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp].

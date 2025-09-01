@@ -247,8 +247,16 @@ class NOTIFICATION extends API {
 							// does only update database null values
 							// also see order.php->approved()
 							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
-								$orders = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
-								if (!($erpdata = ERPINTERFACE->casestate(date('Y-m-d H:i:s', filemtime($logfile))))) break;
+								if (!($erpdata = ERPINTERFACE->orderdata(file_exists($logfile) ? date('Y-m-d H:i:s', filemtime($logfile)) : null))) break;
+
+								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+									'values' => [
+										':orderfilter' => ''
+									],
+									'replacements' => [
+										':organizational_unit' => implode(",", array_keys($this->_lang->_USER['units']))
+									]
+								]);
 								
 								require_once('_shared.php');
 								$orderstatistics = new ORDERSTATISTICS($this->_pdo);
@@ -259,10 +267,22 @@ class NOTIFICATION extends API {
 									'partially_received',
 									'received'
 								];
+
 								foreach ($orders as $order){
-									if ($identifiers = array_filter($erpdata, fn($o) => $o['identifier'] === UTILITY::identifier($order['approved']))){
-										$order['order_data'] = json_decode($order['order_data']);
-										$articles = array_filter($identifiers, fn($o) => $o['article_no'] === $order['order_data']['ordernumber_label'] && $o['vendor'] === $order['order_data']['vendor_label']);
+									if ($order['ordered'] && $order['received']) continue;
+									
+									if ($identifiers = array_filter($erpdata, fn($o) => $o['identifier'] === UTILITY::identifier(' ', $order['approved']))){ // identifier matched
+
+										$order['order_data'] = json_decode($order['order_data'], true);
+
+										$articles = array_filter($identifiers, fn($o) => 
+											$o['vendor'] === $order['order_data']['vendor_label'] && // vendor matched
+											(
+												$o['article_no'] === $order['order_data']['ordernumber_label'] || // either article number matches
+												(!$order['order_data']['ordernumber_label'] && $o['article_name'] === $order['order_data']['productname_label']) // or if special order without article number at least the article name matches
+											)
+										);
+
 										if ($articles && count($articles) === 1){
 
 											foreach ($states as $state){
@@ -275,6 +295,7 @@ class NOTIFICATION extends API {
 														]) . '; ');
 												}
 											}
+											//file_put_contents($logfile, "\n\n" . json_encode($updates), FILE_APPEND);
 											if ($updates) {
 												foreach ($updates as $update){
 													SQLQUERY::EXECUTE($this->_pdo, $update);
