@@ -776,15 +776,24 @@ class UTILITY {
 	 * does a web request and returns the response content as well as curl info
 	 * 
 	 * @param string $url
+	 * @param string $method for PUT, DELETE, etc. - GET by default, POST by default if $postdata is provided
+	 * @param array $headers e.g. ['Accept-Encoding: gzip, deflate', 'Accept-Language: en-US,en;q=0.5', 'Cache-Control: no-cache',]
+	 * @param array $postdata e.g. ['username': 'string', 'password': 'string']
 	 * 
-	 * @return array
+	 * @return array associative with response and curl_getinfo metadata
 	 */
-	public static function webrequest($url){
+	public static function webrequest($url, $method = null, $headers = [], $postdata = []){
 		$request = curl_init();
 		curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($request, CURLOPT_URL, $url);
-		if (CONFIG['proxy']['proxy']) curl_setopt($request, CURLOPT_PROXY, CONFIG['proxy']['proxy']);
-		if (CONFIG['proxy']['auth']) curl_setopt($request, CURLOPT_PROXYUSERPWD, CONFIG['proxy']['auth']);
+
+		if ($method) curl_setopt($request, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+		if ($headers) curl_setopt($request, CURLOPT_HTTPHEADER, $headers);
+		if ($postdata) curl_setopt($request, CURLOPT_POSTFIELDS, $postdata);
+
+		if (CONFIG['system']['proxy']['proxy']) curl_setopt($request, CURLOPT_PROXY, CONFIG['proxy']['proxy']['system']);
+		if (CONFIG['system']['proxy']['auth']) curl_setopt($request, CURLOPT_PROXYUSERPWD, CONFIG['proxy']['auth']['system']);
+
 		$response = [
 			'response' => curl_exec($request),
 			'metadata' => curl_getinfo($request)
