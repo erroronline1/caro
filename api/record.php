@@ -677,7 +677,7 @@ class RECORD extends API {
 				]);
 			}
 		}
-		if ($NAMELOOKUP ||$DOBLOOKUP){
+		if ($NAMELOOKUP || $DOBLOOKUP){
 			require_once('./_erpinterface.php');
 			if (ERPINTERFACE && $result = ERPINTERFACE->customerdata($NAMELOOKUP, $DOBLOOKUP)) {
 				$options = [];
