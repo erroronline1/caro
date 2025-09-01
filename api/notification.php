@@ -200,37 +200,41 @@ class NOTIFICATION extends API {
 								$updates = [];
 								foreach ($data as $case){
 									if (!$case['erp_case_number'] || !array_key_exists($case['erp_case_number'], $erpdata)) continue;
+									if (!array_key_exists($case['context'], $this->_lang->_DEFAULT['casestate'])) continue;
 									$current_records = [];
-									$case_state = json_decode($case['case_state'] ? : '', true);
-									foreach($erpdata as $_caseState => $value){
-										if ($value && !isset($case_state[$_caseState])) $case_state[$_caseState] = true;
-										$current_records[] = [
-											'author' => $_SESSION['user']['name'],
-											'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
-											'document' => 0,
-											'content' => UTILITY::json_encode([
-												$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.casestate_set', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $_caseState, [], true)], true)
-											])
-										];
+									$case['case_state'] = json_decode($case['case_state'] ? : '', true);
+									foreach($erpdata[$case['erp_case_number']] as $_ERPcaseState => $value){
+										if (!isset($case['case_state'][$_ERPcaseState]) && $value) {
+											$case['case_state'][$_ERPcaseState] = true;
+											$current_records[] = [
+												'author' => $_SESSION['user']['name'],
+												'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
+												'document' => 0,
+												'content' => UTILITY::json_encode([
+													$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.casestate_set', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $_ERPcaseState, [], true)], true)
+												])
+											];
+										}
 									}
+
 									if ($current_records) {
 										$records = json_decode($case['content'], true);
 										array_push($records, ...$current_records);
-
 										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_put'),
 											[
-												':case_state' => UTILITY::json_encode($case_state),
-												':record_type' => $case['record_type'] ? : 'NULL',
-												':identifier' => $case['identifier'],
+												':case_state' => $this->_pdo->quote(UTILITY::json_encode($case['case_state'])),
+												':record_type' => $this->_pdo->quote($case['record_type']) ? : 'NULL',
+												':identifier' => $this->_pdo->quote($case['identifier']),
 												':last_user' => $_SESSION['user']['id'],
 												':last_document' => 'NULL',
-												':content' => UTILITY::json_encode($records),
+												':content' => $this->_pdo->quote(UTILITY::json_encode($records)),
 												':id' => $case['id'],
 												':lifespan' => $case['lifespan'],
-												':erp_case_number' => $case['erp_case_number']
+												':erp_case_number' => $this->_pdo->quote($case['erp_case_number'])
 											]) . '; ');
 									}
 								}
+								//file_put_contents($logfile, "\n\n" . json_encode($updates), FILE_APPEND);
 								// run updates
 								foreach ($updates as $update){
 									SQLQUERY::EXECUTE($this->_pdo, $update);

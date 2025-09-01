@@ -43,11 +43,11 @@ class _ERPINTERFACE {
 		 * return [
 		 * 		'{erp_case_number}' => [
 		 * 			'reimbursement'=> Y-m-d,
-		 *			'inquiry'=> Y-m-d,
-		 *			'partiallygranted'=> Y-m-d,
-		 *			'granted'=> Y-m-d,
-		 *			'production'=> Y-m-d,
-		 *			'settled'=> Y-m-d,
+		 *			'inquiry' => Y-m-d,
+		 *			'partiallygranted' => Y-m-d,
+		 *			'granted' => Y-m-d,
+		 *			'production' => Y-m-d,
+		 *			'settled' => Y-m-d,
 		 * 		],
 		 * 		...
 		 * ]
@@ -172,6 +172,40 @@ class _ERPINTERFACE {
 class TEST extends _ERPINTERFACE {
 	public function __construct(){
 		parent::__construct();
+	}
+
+	/**
+	 * retrieve current case states based on passed case numbers
+	 * @param array $erp_case_numbers
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 */
+	public function casestate($erp_case_numbers = []){
+
+		/**
+		 * return [
+		 * 		'{erp_case_number}' => [
+		 * 			'reimbursement' => Y-m-d,
+		 *			'inquiry' => Y-m-d,
+		 *			'partiallygranted' => Y-m-d,
+		 *			'granted' => Y-m-d,
+		 *			'production' => Y-m-d,
+		 *			'settled' => Y-m-d,
+		 * 		],
+		 * 		...
+		 * ]
+		 */
+		return [
+			'12345' => [
+				'reimbursement' => null,
+				'inquiry' => null,
+				'partiallygranted' => null,
+				'granted' => '2025-08-30',
+				'production' => null,
+				'settled' => '2025-09-01',
+				],
+		];
 	}
 
 	/**
