@@ -530,7 +530,7 @@ class ORDER extends API {
 						'addproduct' => null,
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
-						'identifier' => (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? UTILITY::identifier(' ', $row['approved']): null
+						'identifier' => (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? UTILITY::identifier(' ', $row['approved']) : null
 					];
 
 					// add identified group user
