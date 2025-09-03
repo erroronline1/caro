@@ -75,12 +75,14 @@ Things are still in motion. Images may be outdated.
     * [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries)
     * [Maintenance](#maintenance)
 * [Cross application integrations](#cross-application-integrations)
+    * [CRON](#cron)
     * [Reminders and automated schedules](#reminders-and-automated-schedules)
+    * [Record deletion](#record-deletion)
     * [User trainings](#user-trainings)
     * [Search](#search)
     * [Markdown](#markdown)
     * [CSV processor](#csv-processor)
-* [Record deletion](#record-deletion)
+    * [ERP Interface](#erp-interface)
 * [Intended regulatory goals](#intended-regulatory-goals)
 * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -88,7 +90,6 @@ Things are still in motion. Images may be outdated.
     * [Useage notes and caveats](#useage-notes-and-caveats)
     * [Known deficiencies](#known-deficiencies)
     * [Customisation](#customisation)
-        * [ERP Interface](#erp-interface)
     * [User acceptance considerations](#user-acceptance-considerations)
     * [Importing vendor pricelists](#importing-vendor-pricelists)
 * [Regulatory software requirements](#regulatory-software-requirements)
@@ -362,9 +363,8 @@ Such a replacement may be named *addressee*. If a generic text chunk contains :a
 
 On creating a text you can make use of predefined replacements that may contain the grammatical case (e.g. *:addresseeNominative*, *:addresseeAccusative*, *:addresseeDative*, etc.). Undefined placeholders will be rendered to an input field where it can be typed in and used repeatedly:
 
-*"We write to inform you about :addresseeAccusative, :name. We just want to tell you :name is doing fine. :addresseeNominative can make use of the aid."*
-
-rendered to *"We write to inform you about **the woman Gladys**. We just want to tell you **Gladys** is doing fine. **The woman** can make use od the aid."*
+*"The Doctor is an alien timetraveller recently portrayed by :actor. In season :season :pronoun is accompanied by :companion."*  
+rendered to *"The Doctor is an alien timetraveller recently portrayed by **Ncuti Gatwa**. In season **15** **he** is accompanied by **Belinda Chandra**."*
 
 The [vendor management](#vendor-and-product-management) makes use of system preset placeholders. Text recommendations making use of :CUSTOMERID, :PRODUCTS or :EXPIREDDOCUMENTS for example can import prepared values for these.
 
@@ -1091,13 +1091,33 @@ Furthermore hopefully beneficial information on
 
 ## Maintenance
 The application has some options to be maintained by authorized users:
-* The 'cron job' to clear expired files and records, initiate automated message alerts and scheduled tasks is triggered during notification request. This is executed earliest after passing of [runtime-variable-defined](#runtime-variables) minutes. The logfile `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
+* The [logfile](#cron) `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
 * Existing vendors can be updated regarding their information and pricelist settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
 * Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
 
 [Content](#content)
 
 # Cross application integrations
+
+## CRON
+The 'cron job' initiates automated message alerts and scheduled tasks (see below). It further clears expired files and [records](#record-deletion). It is triggered during notification requests. The configuration CONFIG[system][cron] contains interval settings for
+* [erp_interface_casestate](#erp-interface)
+* [erp_interface_orderdata](#erp-interface)
+* alert_open_records_and_retention_periods
+* alert_unclosed_audits
+* alert_unreceived_orders
+* delete_files_and_calendar
+* schedule_archived_orders_review
+* schedule_outdated_consumables_documents_review
+* schedule_responsibilities_renewal
+* schedule_training_evaluation
+* schedule_trainings
+
+Each task is executed earliest after passing of these [runtime-variable-defined](#runtime-variables) minutes based on the last attribution to the log-file.
+
+Initially this was supposed to be a proper cron job (hence the name) but it failed due to a driver import issue on IIS from CLI. However as this is handled by the application it does not rely on third party applications like *cron* or *schtask*.
+
+[Content](#content)
 
 ## Reminders and automated schedules
 The application handles some automated reminders and schedules
@@ -1116,6 +1136,17 @@ Beside these the dashboard and the menu notify about open topics and tasks. Time
 
 Automated reminders and schedules are processed once per day by default, but can be customized individually within the [config.ini](#runtime-variables).
 
+[Content](#content)
+
+## Record deletion
+Records are supposed to be assigned a retention period. Applicable lifespans are to be preset within the [language files](#customisation) (`record.lifespan.years`). Accomodate available options according to your regulatory circumstances and according to your defined customs.
+
+Lifespans are supposed to be assigned by users that are authorized to set a record state as well. If not set previously, a recurring notification will be sent once the record is marked as closed. Closed records whose last contribution exceed the set retention period will be deleted automatically and without further notice. This includes possible record attachments and orders and their attachments containing the identifier e.g. as commission.
+
+Records can not be deleted otherwise to ensure audit safety. Requests to delete personal data in advance of the expiry of the set retention period conflict with the legitimate interest of audit safety and common keeping of terms storing medical device records.
+
+[Content](#content)
+
 ## User trainings
 User trainings can be added in the [user manager](#users) but also from the [regulatory evaluations and summaries](#regulatory-evaluations-and-summaries). In terms of ISO 13485 8.5.1 General Improvement and ISO 13485 8.5.2 Corrective measures trainings can also be added in case of a treatment record marked as complaint.
 
@@ -1126,6 +1157,8 @@ Trainings will be reminded of to evaluate. Expiring trainings will be planned by
 Trainings are not persistent and can be deleted by authorized users, thus not having a record character. Remember a lack of data does not provide any proof from within the application. However discontinued certifications for phased out products could trigger unfulfillable scheduled trainings. Since editing completed trainings is not possible a possible solution would be to delete and re-add the training without expiration date.
 
 Trainings are matched by their name.
+
+[Content](#content)
 
 ## Search
 Search functionality across the application may differ slightly depending of context.
@@ -1245,7 +1278,6 @@ some@mail.address and escaped\@mail.address
 rendered to something as
 
 ![markdown screenshot](http://toh.erroronline.one/caro/markdown%20en.png)
-
 
 [Content](#content)
 
@@ -1513,12 +1545,42 @@ RegEx-patterns are processed case insensitive, however note this only applies to
 
 [Content](#content)
 
-# Record deletion
-Records are supposed to be assigned a retention period. Applicable lifespans are to be preset within the [language files](#customisation) (`record.lifespan.years`). Accomodate available options according to your regulatory circumstances and according to your defined customs.
+## ERP Interface
+The CARO App is prepared for retrieving and integrating updates from the ERP-system. As there exist several applications there is no chance to get an out-of-the-box-solution, the go-to solution for [the teams](#the-team) at best. But it may be possible to primarily modify the _erpinterface.php file to your needs. The _ERPINTERFACE-class serves as a skeleton and provides the expected data structure that can be processed by CARO, it is not necessary to deal with the whole applications structure.
 
-Lifespans are supposed to be assigned by users that are authorized to set a record state as well. If not set previously, a recurring notification will be sent once the record is marked as closed. Closed records whose last contribution exceed the set retention period will be deleted automatically and without further notice. This includes possible record attachments and orders and their attachments containing the identifier e.g. as commission.
+Basic supported integrations include
 
-Records can not be deleted otherwise to ensure audit safety. Requests to delete personal data in advance of the expiry of the set retention period conflict with the legitimate interest of audit safety and common keeping of terms storing medical device records.
+### Case state updates for records
+Case state updates occur during the [cron-job](#cron). The interval can be set within the config file with the CONFIG[system][cron][erp_interface_casestate] value. If available the ERP-data is matched with provided provided ERP case numbers and dates for the database columns
+* reimbursement
+* inquiry
+* partiallygranted
+* granted
+* production
+* settled
+
+are set if a given value ist provided and not already present within the CARO-App records.
+
+### Updates on order data
+Order data updates occur during the [cron-job](#cron). The interval can be set within the config file with the CONFIG[system][cron][erp_interface_orderdata] value. If data is generally available the application presents an identification-code within orders, that has to be appended to the order text for a future matching of order processing dates. The update inserts respective dates to the database columns
+* ordered
+* partially_received
+* received
+
+if provided and not already present within the CARO-App database.
+
+Updates affect approved orders that match the identifier, vendor name, the article number or, if not provided, the article name.
+
+### Customer data import for records
+Customer data is fetched by request if any data is to be expected. The function for records which is able to import data based on an identifier, is also able to import results of ERP-matches based on name and/or date of birth. The application will present matches too chose from and transfer the selected dataset to the respective document inputs.
+
+To prepare significant responses for customer data to import, the ERP-interface must consider the relevant document inputs by name.
+
+
+It is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp].
+You may process Web-APIs (recommendation `UTILITY::webrequest()`), regularly provided CSV-dumps (recommendation [CSV Processor](#csv-processor)) and/or implement own data processing as long as the data is prepared to be returned as expected.
+
+Signal unavailable methods by returning `null`.
 
 [Content](#content)
 
@@ -1963,8 +2025,8 @@ PDF-labels can be extended to desired formats. For labels and pdf setting follow
 
 There are additional settings within the config.ini that are not useful being written in detail here regarding
 * database connection
-* cron-task intervals
-* ERP interface
+* [cron-task](#cron) intervals
+* [ERP interface](#erp-interface)
 * proxy settings for web requests
 * file paths
 
@@ -2081,22 +2143,6 @@ If you ever fiddle around with the sourcecode:
 * UTILITY::parsePayload:
     * Arrays can not be passed with GET and DELETE request using ?var[]=1&var[]=2. Only the last occurence is preserved this way.
     * $_FILES is always an array due to a custom processing of POST and PUT payload.
-
-and while we're at it
-
-### ERP Interface
-The CARO App is prepared for retrieving and integrating updates from the ERP-system. As there exist several applications there is no chance to get an out-of-the-box-solution, the go-to solution for [the teams](#the-team) at best. But it may be possible to primarily modify the _erpinterface.php file to your needs. The _ERPINTERFACE-class serves as a skeleton and provides the expected data structure that can be processed by CARO, it is not necessary to deal with the whole applications structure.
-
-You may process Web-APIs (recommendation `UTILITY::webrequest()`), regularly provided CSV-dumps (recommendation [CSV Processor](#csv-processor)) and/or implement own data processing as long as the data is prepared to be returned as expected. It is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp].
-
-Signal unavailable methods by returning `null`.
-
-Basic supported integrations include
-* case state updates for records given a provided ERP case number
-* updates on order data given the ordered items text can and has been added an order identification and the ERP-system is able to hand it back
-* customer data import for records, based on name and date of birth
-
-The customer data import is executed per request, updates on case states and order data is executed via cron as part of a notification request depending on the interval configured within [config.ini](#runtime-variables).
 
 [Content](#content)
 

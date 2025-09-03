@@ -40,12 +40,14 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
     * [Regulatorische Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen)
     * [Wartung](#wartung)
 * [In der Anwendung verteilte Integrationen](#in-der-anwendung-verteilte-integrationen)
+    * [CRON](#cron)
     * [Erinnerungen und automatische Aufgabenplanung](#erinnerungen-und-automatische-aufgabenplanung)
+    * [Löschung von Aufzeichnungen](#löschung-von-aufzeichnungen)
     * [Schulungen](#schulungen)
     * [Suche](#suche)
     * [Markdown](#markdown)
     * [CSV Prozessor](#csv-prozessor)
-* [Löschung von Aufzeichnungen](#löschung-von-aufzeichnungen)
+    * [ERP Anbindung](#erp-anbindung)
 * [Vorgesehene regulatorische Zielsetzungen](#vorgesehene-regulatorische-zielsetzungen)
 * [Voraussetzungen](#voraussetzungen)
     * [Installation](#installation)
@@ -53,7 +55,6 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
     * [Anmerkungen und Hinweise zur Nutzung](#anmerkungen-und-hinweise-zur-nutzung)
     * [Bekannte Schwachstellen](#bekannte-schwachstellen)
     * [Anpassung](#anpassung)
-        * [ERP Anbindung](#erp-anbindung)
     * [Erwägungen zur Nutzerakzeptanz](#erwägungen-zur-nutzerakzeptanz)
     * [Importierung von Lieferantenpreislisten](#importierung-von-lieferantenpreislisten)
 * [Regulatorische Anforderungen an die Software](#regulatorische-anforderungen-an-die-software)
@@ -272,9 +273,8 @@ Eine solche Ersetzung könnte beispielsweise *Adressat* genannt werden. Sobald e
 
 Bei der Erstellung eines Textes können die jeweils passenden grammatikalische Fälle vorbereitet verden (z.B. *:AdressatNominativ, *:AdressatAkkusativ, :AdressatDativ, etc.). Undefinierte Platzhalter erzeugen im Formular ein Eingabefeld, welches im weiteren Verlauf wiederverwendet wird:
 
-*"Wir berichten über :AdressatAkkusativ :Name. Wir möchten zusammenfassen, dass die Versorgung von :Name voranschreitet und :AdressatNominativ die Nutzung gut umsetzen kann."*
-
-erzeugt *"Wir berichten über **die Patientin Gladys**. Wir möchten zusammenfassen, dass die Versorgung von **Gladys** voranschreitet und **die Patientin** die Nutzung gut umsetzen kann."*
+*"Der Doktor ist ein außerirdischer Zeitreisender der zuletzt von :actor gespielt wurde. In Staffel :season wird :pronoun von :companion begleitet."*  
+*"Der Doktor ist ein außerirdischer Zeitreisender der zuletzt von **Ncuti Gatwa** gespielt wurde. In Staffel **15** wird **er** von **Belinda Chandra** begleitet."*
 
 Die [Lieferantenverwaltung](#lieferanten--und-artikelverwaltung) nutzt systemseitig vordefinierte Platzhalter. Textvorschläge die beispielsweise :CUSTOMERID, :PRODUCTS oder :EXPIREDDOCUMENTS nutzen können für diese vorbereitete Werte importieren.
  
@@ -997,13 +997,33 @@ Ferner hoffentlich hilfreiche Informationen zu
 
 ## Wartung
 Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
-* Der 'cron job' für die Bereinigung abgelaufener Dateien und Aufzeichnungen und die Erstellung [automatischer Benachrichtigungen und Aufgabenplanungen](#erinnerungen-und-automatische-aufgabenplanung) wird durch den Benachrichtigungs-Request ausgelöst. Die Durchführung findet frühestens nach den in den [Umgebungseinstellungen](#laufzeitvariablen) angegebenen Minuten statt. Die Log-Datei `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
+* Die [Log-Datei](#cron) `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
 * Bestehende Lieferanten können in Bezug auf ihre Informationen und die Preislisten-Einstellungen (Importfilter und Stichproben-Intervalle) aktualisiert werden. Eine Datei gemäß [Vorlage](#anwendungseinrichtung) kann bereitgestellt werden. Die jeweiligen Aktualisierungen können für jeden übereinstimmenden Lieferanten gewählt werden.
 * Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen. Es kann eine CSV-Datei heruntergeladen, bearbeitet und wieder bereitgestellt werden, oder vorbereitete Empfehlungen bereitgestellt werden. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs. Tabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen. Ohne bereitgestellte Datei gibt es den Export.
 
 [Übersicht](#übersicht)
 
 # In der Anwendung verteilte Integrationen
+
+## CRON
+Der 'CRON-Job' initiiert die Erstellung [automatischer Benachrichtigungen und Aufgabenplanungen](#erinnerungen-und-automatische-aufgabenplanung) (siehe unten). Ferner bereinigt er abgelaufene Dateien und [Aufzeichnungen](#löschung-von-aufzeichnungen). Er wird durch Benachrichtigungs-Requests ausgelöst. Die Konfiguration CONFIG[system][cron] beinhaltet Intervall-Einstellungen für
+* [erp_interface_casestate](#erp-anbindung)
+* [erp_interface_orderdata](#erp-anbindung)
+* alert_open_records_and_retention_periods
+* alert_unclosed_audits
+* alert_unreceived_orders
+* delete_files_and_calendar
+* schedule_archived_orders_review
+* schedule_outdated_consumables_documents_review
+* schedule_responsibilities_renewal
+* schedule_training_evaluation
+* schedule_trainings
+
+Jeder Aufgabe findet frühestens nach diesen in den [Umgebungseinstellungen](#laufzeitvariablen) angegebenen Minuten statt, basierend auf der letzten Ergänzung in der Log-Datei.
+
+Ursprünglich sollte es ein ordnungsgemäßer CRON-Job werden (daher der Name), scheiterte aber aufgrund eines Problems beim Treiberimport unter IIS. Die Aufgaben werden nun von der Anwendung selbst erledigt und sind nicht auf Drittsoftware wie *cron* oder *schtask* angewiesen.
+
+[Übersicht](#übersicht)
 
 ## Erinnerungen und automatische Aufgabenplanung
 Die Anwendung vearbeitet einige automatische Erinnerungen und Aufgabenplanungen
@@ -1022,6 +1042,17 @@ Daneben informiert die Startseite und das Menü über offene Themen und Aufgaben
 
 Automatische Erinnerungen und Aufgabenplanungen werden standardmäßig einmal täglich ausgeführt, können aber in der [config.ini](#laufzeitvariablen) individuell angepasst werden.
 
+[Übersicht](#übersicht)
+
+## Löschung von Aufzeichnungen
+Aufzeichnungen soll eine Aufbewahrungsfrist zugeordnet werden. Anwendbare Fristen müssen innerhalb der [Sprachdateien](#anpassung) (`record.lifespan.years`) festgelegt werden. Die verfügbaren Optionen sollten an die jeweiligen regulatorischen Umstände und im Einklang mit den festgelegten Prozessen angepasst werden.
+
+Aufbewahrungsfristen sollen durch die Nutzer zugeordnet werden, welche auch für die Anpassung des Vorgangsstatus berechtigt sind. Sofern nicht vorher geschehen, wird regelmäßig an die Angabe der Frist erinnert, sobald ein Vorgang als abgeschlossen markiert wurde. Abgeschlossene Aufzeichnungen, deren letzer Beitrag die Aufbewahrungsfrist überschreitet, werden automatisch und ohne weitere Benachrichtigung gelöscht. Dies schließt auch angehängte Dateien, sowie Bestellungen und deren Anhänge, welche beispielsweise das Kennzeichen als Kommissionsangabe beinhalten, mit ein.
+
+Aufzeichnungen können aus Gründen der Revisionssicherheit nicht anders gelöscht werden. Gesuchen zur Löschung persönlicher Daten vor Ablauf der Aufbewahrungsfrist steht das berechtigte Interesse der Revisionssicherheit und übliche Aufbewahrungsfristen medizinischer Aufzeichnungen entgegen.
+
+[Übersicht](#übersicht)
+
 ## Schulungen
 Schulungen können in der [Nutzerverwaltung](#nutzer), aber auch aus den [regulatorischen Auswertungen und Zusammenfassungen](#regulatorische-auswertungen-und-zusammenfassungen) heraus eingetragen werden. In Bezug auf ISO 13485 8.5.1 Verbesserung und ISO 13485 8.5.2 Korrekturmaßnahmen können Schulunngen auch im Falle einer Versorgungsdokumentation, welche als Reklamation markiert wurde, eingetragen werden.
 
@@ -1032,6 +1063,8 @@ Es wird automatisch an die Bewertung von Schulungen erinnert. Ablaufende Schulun
 Schulungen sind keine dauerhaften Aufzeichnungen und können von berechtigten Nutzern gelöscht werden. Es ist zu beachten, dass fehlende Daten keinen Nachweis aus der Anwendung heraus erbringen können. Es kann jedoch passieren, dass eingestellte Zertifizierungen für ausgelaufene Produkte unerfüllbar geplante Folgeschulungen erzeugen. Da die Bearbeitung abgeschlossener Schulungen nicht möglich ist, wäre die Löschung und Neuanlage der Schulung ohne Ablaufdatum eine mögliche Lösung.
 
 Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
+
+[Übersicht](#übersicht)
 
 ## Suche
 Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zusammenhang unterscheiden.
@@ -1417,12 +1450,41 @@ RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es i
 
 [Übersicht](#übersicht)
 
-# Löschung von Aufzeichnungen
-Aufzeichnungen soll eine Aufbewahrungsfrist zugeordnet werden. Anwendbare Fristen müssen innerhalb der [Sprachdateien](#anpassung) (`record.lifespan.years`) festgelegt werden. Die verfügbaren Optionen sollten an die jeweiligen regulatorischen Umstände und im Einklang mit den festgelegten Prozessen angepasst werden.
+## ERP Anbindung
+Die CARO App ist auf dem Empfang und die Einbindung von Updates aus dem ERP-System vorbereitet. Da es viele entsprechende Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung, bestenfalls die Lösung aus dem Alltag des [Teams](#das-team). Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Datenstruktur die von CARO verarbeitet werden kann, es ist nicht zwingend erforderlich sich mit der gesamten Programmstruktur auseinanderzusetzen.
 
-Aufbewahrungsfristen sollen durch die Nutzer zugeordnet werden, welche auch für die Anpassung des Vorgangsstatus berechtigt sind. Sofern nicht vorher geschehen, wird regelmäßig an die Angabe der Frist erinnert, sobald ein Vorgang als abgeschlossen markiert wurde. Abgeschlossene Aufzeichnungen, deren letzer Beitrag die Aufbewahrungsfrist überschreitet, werden automatisch und ohne weitere Benachrichtigung gelöscht. Dies schließt auch angehängte Dateien, sowie Bestellungen und deren Anhänge, welche beispielsweise das Kennzeichen als Kommissionsangabe beinhalten, mit ein.
+Die grundlegend unterstützten Integrationen beinhalten
 
-Aufzeichnungen können aus Gründen der Revisionssicherheit nicht anders gelöscht werden. Gesuchen zur Löschung persönlicher Daten vor Ablauf der Aufbewahrungsfrist steht das berechtigte Interesse der Revisionssicherheit und übliche Aufbewahrungsfristen medizinischer Aufzeichnungen entgegen.
+### Aktualisierung des Fallstatus
+Die Aktualisierung von Fallstati geschieht wärend des [CRON-Jobs](#cron). Der Interval kann innerhalb der Konfigurationsdatei mit dem Wert für CONFIG[system][cron][erp_interface_casestate] bestimmt werden. Sofern verfügbar werden die ERP-Daten mit den übermittelten ERP-Fallnummern gegengeprüft und Daten für die Datenbankspalten
+* reimbursement
+* inquiry
+* partiallygranted
+* granted
+* production
+* settled
+
+eingetragen, sofern ein Wert übermittelt und nicht bereits in den CARO-App-Aufzeichnungen vorhanden ist.
+
+### Aktualisierung der Bestelldaten
+Die Aktualisierung von Bestelldaten geschieht wärend des [CRON-Jobs](#cron). Der Interval kann innerhalb der Konfigurationsdatei mit dem Wert für CONFIG[system][cron][erp_interface_orderdata] bestimmt werden. Sofern Daten grundsätzlich verfübar sind zeigt die Anwendung bei freigegebenen Bestellungen einen Identifikations-Code an, welcher dem Bestelltext beigefügt werden soll um einen späteren Abgleich der Bestelldaten zu ermöglichen. Die Aktualisierung trägt die entsprechenden Daten in die Datenbank-Spalten
+* ordered
+* partially_received
+* received
+
+ein, sofern ein Wert übermittelt und nicht bereits in der CARO-App-Datenbank vorhanden ist.
+
+Aktualisierungen betreffen freigegebene Bestellungen denen der Identifikationscode zugeordnet werden kann, bei gleichem Lieferantennamen und Bestellnummer oder, falls diese nicht Teil der Bestellung ist, gleicher Artikelbezeichnung.
+
+### Datenimport von Kundendaten für Aufzeichnungen
+Kundendaten werden je Anfrage abgeglichen. Die Funktion für Aufzeichnungen, welche in der Lage ist Werte anhand eines Kennzeichens zu importieren, ist auch in der Lage Ergebnisse eines ERP-Abgleichs basierend auf Name und/oder Geburtsdatum zu laden. Die Anwendung stellt die Auswahl da von der aus der gewählte Datensatz in die jeweiligen Dokumentenfelder geladen wird.
+
+Die ERP-Anbindung muss die relevanten Dokumentenfelder berücksichtigen um sinnvolle Ergebnisse für Kundendaten bereitzustellen.
+
+
+Es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Es können beispielsweise Web-APIs (Empfehlung `UTILITY::webrequest()`) oder regelmäßig breitgestellte CSV-Exporte (Empfehlung [CSV Prozessor](#csv-prozessor)) verarbeitet und/oder eigene Algorithmen implementiert werden, solange die aufbereiteten Daten den erwarteten Anforderungen entsprechen.
+
+Nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden. 
 
 [Übersicht](#übersicht)
 
@@ -1868,8 +1930,8 @@ PDF-Label können beliebig mit gewünschten Formaten ergänzt werden. Für Label
 
 Es gibt zusätzliche Einstellungen in der config.ini, die hier nicht detailliert erläutert werden müssen. Diese betreffen
 * Datenbankverbindungen
-* Cron-Aufgaben Intervalle
-* ERP Interface
+* [Cron-Aufgaben](#cron) Intervalle
+* [ERP Interface](#erp-anbindung)
 * Proxy-Einstellungen für Web-Anfragen
 * Dateipfade
 
@@ -1987,22 +2049,6 @@ Im Falle einer Anpassung des Quelltexts:
 * UTILITY::parsePayload:
     * Arrays können als GET und DELETE Anforderung nicht mit ?var[]=1&var[]=2 verwendet werden. Nur das letzte Vorkommen wird auf diese Weise verwendet.
     * $_FILES ist immer ein Array aufgrund einer individuellen Verarbeitung von POST und PUT Nutzlast.
-
-Wo wir gerade dabei sind
-
-### ERP Anbindung
-Die CARO App ist auf dem Empfang und die Einbindung von Updates aus dem ERP-System vorbereitet. Da es viele entsprechende Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung, bestenfalls die Lösung aus dem Alltag des [Teams](#das-team). Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Datenstruktur die von CARO verarbeitet werden kann, es ist nicht zwingend erforderlich sich mit der gesamten Programmstruktur auseinanderzusetzen.
-
-Es können beispielsweise Web-APIs (Empfehlung `UTILITY::webrequest()`) oder regelmäßig breitgestellte CSV-Exporte (Empfehlung [CSV Prozessor](#csv-prozessor)) verarbeitet und/oder eigene Algorithmen implementiert werden, solange die aufbereiteten Daten den erwarteten Anforderungen entsprechen. Es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren.
-
-Nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden. 
-
-Die grundlegend unterstützten Integrationen beinhalten
-* Aktualisierung des Fallstatus für Aufzeichnungen sofern eine Vorgangsnummer angegeben wird
-* Aktualisierung der Bestelldaten sofern den Bestelltexten je Artikel eine Bestellidentifikation beigefügt werden kann und wurde und diese vom ERP-System zurück gegeben werden kann
-* Datenimport von Kundendaten für Aufzeichnungen, basierend auf Name und Geburtsdatum
-
-Der Datenimport wird beim jeweiligen Aufruf bearbeitet, die Aktualisierung der Fallstati und der Bestelldaten wird via cron als Bestandteil der Cenachrichtigungen mit dem in der [config.ini](#laufzeitvariablen) angegebenen Interval ausgeführt.
 
 [Übersicht](#übersicht)
 
