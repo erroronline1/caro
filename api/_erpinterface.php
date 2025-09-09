@@ -285,6 +285,10 @@ class TEST extends _ERPINTERFACE {
 }
 
 class ODEVAVIVA extends _ERPINTERFACE {
+	/**
+	 * requires an sql connection to the optadata eva viva database
+	 * readonly is fine, you'll may have to add the port to the host xyz.host.url, 1234
+	 */
 	private $_pdo = null;
 	public $_instatiated = null;
 
@@ -314,31 +318,43 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * sanitize parameter according to the usecase e.g. dbo driver
 	 */
 	public function casestate($erp_case_numbers = []){
-		/**
-		 * return [
-		 * 		'{erp_case_number}' => [
-		 * 			'reimbursement' => Y-m-d,
-		 *			'inquiry' => Y-m-d,
-		 *			'partiallygranted' => Y-m-d,
-		 *			'granted' => Y-m-d,
-		 *			'production' => Y-m-d,
-		 *			'settled' => Y-m-d,
-		 * 		],
-		 * 		...
-		 * ]
-		 */
-		/*
-SELECT TOP (1000)
-[REFERENZ
-,KV_DATUM
-,GENEHMIGT_DATUM
-,GENEHMIGT_TEILSUMME
-,GELIEFERT_DATUM
-,FAKTURIERT_DATUM
-FROM vorgaenge
-ORDER BY ID DESC
-		*/
-		return null;
+		$query = <<<'END'
+			SELECT
+			REFERENZ,
+			KV_DATUM,
+			GENEHMIGT_DATUM,
+			AUFTRAGSWERT_BRUTTO,
+			GENEHMIGT_TEILSUMME,
+			FAKTURIERT_DATUM
+			FROM vorgaenge
+			WHERE REFERENZ IN (:ref)
+		END;
+
+		if (!$erp_case_numbers) return [[]];
+		try{
+			$statement = $this->_pdo->prepare(strtr($query, [
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref), $erp_case_numbers))
+			]));
+			$statement->execute();	
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+		$response = [];
+
+		foreach ($result as $row){
+			$response[$row['REFERENZ']] = [
+				'reimbursement' => $row['KV_DATUM'] ? substr($row['KV_DATUM'], 0, 10) : null,
+				'inquiry' => null,
+				'partiallygranted' => $row['GENEHMIGT_DATUM'] && $row['AUFTRAGSWERT_BRUTTO'] != $row['GENEHMIGT_TEILSUMME'] ? substr($row['GENEHMIGT_DATUM'], 0, 10) : null,
+				'granted' => $row['GENEHMIGT_DATUM'] && (!$row['GENEHMIGT_TEILSUMME'] || $row['AUFTRAGSWERT_BRUTTO'] == $row['GENEHMIGT_TEILSUMME']) ? substr($row['GENEHMIGT_DATUM'], 0, 10) : null,
+				'production' => null,
+				'settled' => $row['FAKTURIERT_DATUM'] ? substr($row['FAKTURIERT_DATUM'], 0, 10) : null,	
+			];
+		}
+		return $response;
 	}
 
 	/**
@@ -358,25 +374,6 @@ ORDER BY ID DESC
 	public function customerdata($name = null, $dob = null){
 		/**
 		 * array keys according to record document field names, drop or append reasonable options, e.g. multilanguage if applicable
-		 * return [
-		 * 		[
-		 * 			'Family name' => string,
-		 * 			'Given name' => string,
-		 * 			'Name' => string, // glued
-		 * 			'Date of Birth' => Y-m-d
-		 * 			'Street' => string,
-		 * 			'Number' => string,
-		 * 			'Postal code' => string,
-		 * 			'City' => string,
-		 * 			'Country' => string,
-		 * 			'Address' => string, // glued
-		 * 			'Phone number' => string,
-		 * 			'eMail address' => string,
-		 * 			'Insurance' => string,
-		 * 			'Patient number' => string
-		 * 		],
-		 * 		...
-		 * ]
 		 */
 		$query = <<<'END'
 		SELECT
