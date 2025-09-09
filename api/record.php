@@ -109,7 +109,7 @@ class RECORD extends API {
 							]
 						])) $this->response([
 							'response' => [
-								'msg' => $this->_caseState ==='lifespan' ? $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue]) : ($this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]])),
+								'msg' => $this->_lang->GET($this->_caseStateValue ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['record']['erp_case_number']]),
 								'type' => 'success'
 							]]);
 					}
