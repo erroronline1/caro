@@ -301,6 +301,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			$this->_instatiated = true;
 		}
 		catch(\Exception $e){
+			var_dump($e);
 			return null;
 		}
 	}
@@ -328,13 +329,13 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		 */
 		/*
 SELECT TOP (1000)
-[REFERENZ]
-,[KV_DATUM]
-,[GENEHMIGT_DATUM]
-,[GENEHMIGT_TEILSUMME]
-,[GELIEFERT_DATUM]
-,[FAKTURIERT_DATUM]
-FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+[REFERENZ
+,KV_DATUM
+,GENEHMIGT_DATUM
+,GENEHMIGT_TEILSUMME
+,GELIEFERT_DATUM
+,FAKTURIERT_DATUM
+FROM vorgaenge
 ORDER BY ID DESC
 		*/
 		return null;
@@ -377,61 +378,110 @@ ORDER BY ID DESC
 		 * 		...
 		 * ]
 		 */
-		/*
-SELECT 
-pat.*,
-KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER_NAME,
-EMAIL.EMAIL,
-PHONE.PHONE,
-MOBILE.PHONE AS MOBILE
-FROM
-(
-    SELECT a.NAME_1,
-    a.NAME_2,
-    a.NAME_3,
-    a.NAME_4,
-    a.GEBURTSNAME,
-    a.GEBURTSDATUM,
-    a.STRASSE_1,
-    a.PLZ_1,
-    a.ORT_1,
-    a.FIBU_NUMMER,
-    a.REFERENZ,
-    more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
-    FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
-    LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
-    WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
-) as pat
-LEFT JOIN
-(
-    SELECT ka.NAME_1,
-	ka.REFERENZ
-    FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
-    WHERE kia.BEZEICHNUNG = 'Kostenträger'
-) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
-LEFT JOIN
-(
-    SELECT mail.NUMMER AS EMAIL,
-	mail.ADRESSEN_REFERENZ
-    FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
-    WHERE im.BEZEICHNUNG = 'E-Mail'
-) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
-LEFT JOIN
-(
-    SELECT mail.NUMMER AS PHONE,
-	mail.ADRESSEN_REFERENZ
-    FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
-    WHERE im.BEZEICHNUNG = 'Telefonnummer'
-) AS PHONE ON pat.REFERENZ = PHONE.ADRESSEN_REFERENZ
-LEFT JOIN
-(
-    SELECT mail.NUMMER AS PHONE,
-	mail.ADRESSEN_REFERENZ
-    FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
-    WHERE im.BEZEICHNUNG = 'Telefonnummer'
-) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
-		 */
-		return null;
+		$query = <<<'END'
+		SELECT
+		pat.*,
+		KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER_NAME,
+		EMAIL.EMAIL,
+		PHONE.PHONE,
+		MOBILE.PHONE AS MOBILE
+		FROM
+		(
+			SELECT a.NAME_1,
+			a.NAME_2,
+			a.NAME_3,
+			a.NAME_4,
+			a.GEBURTSNAME,
+			a.GEBURTSDATUM,
+			a.STRASSE_1,
+			a.PLZ_1,
+			a.ORT_1,
+			a.FIBU_NUMMER,
+			a.REFERENZ,
+			more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+			FROM adressen AS a INNER JOIN inf_adressart AS ia ON a.ADRESSART = ia.REFERENZ
+			LEFT JOIN adr_kunden AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+			WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+		) as pat
+		LEFT JOIN
+		(
+			SELECT ka.NAME_1,
+			ka.REFERENZ
+			FROM adressen AS ka INNER JOIN inf_adressart AS kia ON ka.ADRESSART = kia.REFERENZ
+			WHERE kia.BEZEICHNUNG = 'Kostenträger'
+		) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+		LEFT JOIN
+		(
+			SELECT mail.NUMMER AS EMAIL,
+			mail.ADRESSEN_REFERENZ
+			FROM adz_kontakte AS mail INNER JOIN inf_kontaktart as im ON mail.KONTAKTART = im.REFERENZ
+			WHERE im.BEZEICHNUNG = 'E-Mail'
+		) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
+		LEFT JOIN
+		(
+			SELECT mail.NUMMER AS PHONE,
+			mail.ADRESSEN_REFERENZ
+			FROM adz_kontakte AS mail INNER JOIN inf_kontaktart as im ON mail.KONTAKTART = im.REFERENZ
+			WHERE im.BEZEICHNUNG = 'Telefonnummer'
+		) AS PHONE ON pat.REFERENZ = PHONE.ADRESSEN_REFERENZ
+		LEFT JOIN
+		(
+			SELECT mail.NUMMER AS PHONE,
+			mail.ADRESSEN_REFERENZ
+			FROM adz_kontakte AS mail INNER JOIN inf_kontaktart as im ON mail.KONTAKTART = im.REFERENZ
+			WHERE im.BEZEICHNUNG = 'Telefonnummer'
+		) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
+		WHERE pat.GEBURTSDATUM=:dob OR :namesearch
+		END;
+		
+		if (!trim($name) && !trim($dob)) return [];
+
+		$name = preg_split('/\s+/', $name);
+		$namesearch = [];
+		foreach(['NAME_1', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
+			foreach($name as $namepart){
+				if (!$namepart) continue;
+				$namesearch[] = 'pat.' . $column . ' LIKE' . $this->_pdo->quote($namepart);
+			}
+		}
+
+		try{
+			$statement = $this->_pdo->prepare(strtr($query, [
+				':dob' => $dob ? $this->_pdo->quote($dob . ' 00:00:00.000'): 'NULL',
+				':namesearch' => implode(' OR ', $namesearch)
+			]));
+			$statement->execute();	
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+		$response = [];
+
+		foreach ($result as $row){
+			$patient = [
+				'Nachname' =>  $row['NAME_1'],
+				'Vorname' => '',
+				'Name' => implode(' ', array_filter(array_map(fn($c) => $row[$c] ? : '', ['NAME_2', 'NAME_3', 'NAME_4', 'NAME_1']), fn($v) => boolval($v))),
+				'Straße' => $row['STRASSE_1'],
+				'Postleitzahl' => $row['PLZ_1'],
+				'Geburtsdatum' => substr($row['GEBURTSDATUM'] ? : '', 0, 10),
+				'Stadt' => $row['ORT_1'],
+				'Adresse' => $row['STRASSE_1'] . ', ' . $row['PLZ_1'] . ' ' . $row['ORT_1'],
+				'Telefonnummer' => $row['PHONE'],
+				'Mobil' => $row['MOBILE'],
+				'eMailadresse' => $row['EMAIL'],
+				'Kostenträger' => $row['KOSTENTRAEGER_NAME'],
+				'FIBU Nummer' => $row['FIBU_NUMMER'],
+			];
+			foreach(['NAME_2', 'NAME_3', 'NAME_4'] as $column){
+				if ($row[$column]) $patient['Vorname'] .= ' ' . $row[$column];
+			}
+			$patient['Vorname'] = trim($patient['Vorname']);
+			$response[] = $patient;
+		}
+		return $response;
 	}
 
 	/**
@@ -485,21 +535,21 @@ orders.WE_MENGE,
 orders.BESTELL_BELEGNUMMER,
 vendor.NAME_1 as LIEFERANTEN_NAME,
 article.BESTELL_TEXT
-FROM [eva3_02_viva_souh].[dbo].[wws_bestellung] AS orders
+FROM wws_bestellung AS orders
 LEFT JOIN
 (
     SELECT
     BESTELL_TEXT,
 	ARTIKEL_REFERENZ
-    FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten]
+    FROM wws_artikel_lieferanten
 ) AS article ON orders.ARTIKELNUMMER = article.ARTIKEL_REFERENZ
 LEFT JOIN
 (
     SELECT 
     v.NAME_1,
 	v.REFERENZ
-    FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
-    INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
+    FROM inf_adressart AS ia
+    INNER JOIN adressen AS v ON v.ADRESSART = ia.REFERENZ
     WHERE ia.BEZEICHNUNG = 'Lieferanten'
 ) AS vendor ON orders.LIEFERANTEN_REFERENZ = vendor.REFERENZ
 
@@ -512,7 +562,7 @@ ORDER BY orders.BESTELL_DATUM DESC
 	}
 }
 
-if (CONFIG['system']['erp'] && isset(CONFIG['sql'][CONFIG['system']['erp']])) {
+if (CONFIG['system']['erp']) {
 	$call = "CARO\\API\\" . strtoupper(CONFIG['system']['erp']);
 	if (class_exists($call)) {
 		define("ERPINTERFACE", new $call());
