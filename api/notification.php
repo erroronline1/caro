@@ -207,7 +207,7 @@ class NOTIFICATION extends API {
 										if (!isset($case['case_state'][$_ERPcaseState]) && $value) {
 											$case['case_state'][$_ERPcaseState] = true;
 											$current_records[] = [
-												'author' => $_SESSION['user']['name'],
+												'author' => CONFIG['system']['caroapp'],
 												'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 												'document' => 0,
 												'content' => UTILITY::json_encode([
@@ -229,7 +229,7 @@ class NOTIFICATION extends API {
 												':last_document' => 'NULL',
 												':content' => $this->_pdo->quote(UTILITY::json_encode($records)),
 												':id' => $case['id'],
-												':lifespan' => $case['lifespan'],
+												':lifespan' => $case['lifespan'] ? intval($case['lifespan']) : 'NULL',
 												':erp_case_number' => $this->_pdo->quote($case['erp_case_number'])
 											]) . '; ');
 									}
