@@ -26,6 +26,11 @@ namespace CARO\API;
 
 class _ERPINTERFACE {
 	/**
+	 * set to true if class has been successfully constructed
+	 */
+	public $_instatiated = null; 
+
+	/**
 	 * define expected methods to be overridden by actual interface class if available
 	 * the application can check whether content can be expected if a call doe not return null
 	 */
@@ -172,8 +177,132 @@ class _ERPINTERFACE {
 }
 
 class TEST extends _ERPINTERFACE {
+	/**
+	 * set to true if class has been successfully constructed
+	 */
+	public $_instatiated = null; 
+
 	public function __construct(){
-		parent::__construct();
+		try {
+			parent::__construct();
+			$this->_instatiated = true;
+		}
+		catch(\Exception $e){
+			return null;
+		}
+	}
+
+	/**
+	 * retrieve current case states based on passed case numbers
+	 * @param array $erp_case_numbers
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 */
+	public function casestate($erp_case_numbers = []){
+		return [
+			'12345' => [
+				'reimbursement' => null,
+				'inquiry' => null,
+				'partiallygranted' => null,
+				'granted' => '2025-08-30',
+				'production' => null,
+				'settled' => '2025-09-01',
+				],
+		];
+	}
+
+	/**
+	 * retrieve most recent customer data details based on matching name /dob
+	 * returns results to select from on application level
+	 * @param string|null $name
+	 * @param string|null $dob date of birth
+	 * @return null|array
+	 * 
+	 * customer data is supposed to be imported on filling out documents for records.
+	 * as the interface must be adjusted to your specific usecase it is probably the easiest
+	 * to just respond with fieldnames according to the available documents.
+	 * i currently see no way nor reason to figure out a regular user way of assigning.
+	 * 
+	 * sanitize parameters according to the usecase e.g. dbo driver
+	 */
+	public function customerdata($name = null, $dob = null){
+		return [
+			[
+				'Name' => 'Jane Doe',
+				'Geburtsdatum' => '2003-02-01',
+				'Adresse' => 'Somewhere over the Rainbow 5',
+				'Telefonnummer' => '01234 56789'
+			],
+			[
+				'Name' => 'Erika Musterfrau',
+				'Geburtsdatum' => '2003-02-01',
+				'Adresse' => 'Auf dem Holzweg 3',
+				'Telefonnummer' => '09876 54321'
+			]
+		];
+	}
+
+	/**
+	 * retrieve recent data on processed orders for given timespan  
+	 * return an array of orders to compare at application level
+	 * @param string|null $from Y-m-d H:i:s
+	 * @param string|null $until Y-m-d H:i:s
+	 * @return null|array
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable identifier display within order module
+	 */
+	public function orderdata($from = null, $until = 'now'){
+		// convert passed dated to DateTime objects, with default values on erroneous parameters
+		try {
+			$from = new \DateTime($from ? : '2025-01-01 00:00:00');
+		}
+		catch (\Exception $e){
+			$from = new \DateTime('2025-01-01 00:00:00');
+		}
+		try {
+			$until = new \DateTime($until);
+		}
+		catch (\Exception $e){
+			$until = new \DateTime('now');
+		}
+		// convert to erp supported date format
+		$from = $from->format('Y-m-d H:i:s'); // or 'd.m.Y H:i:s'
+		$until = $until->format('Y-m-d H:i:s'); // or 'd.m.Y H:i:s'
+
+		return [
+			[
+				'vendor' => 'Otto Bock HealthCare Deutschland GmbH',
+				'article_no' => '99B25',
+				'article_name' => 'Schlauch-Strumpf',
+				'identifier' => '  |sz9623',
+				'ordered' => '2025-09-01 21:00:00',
+				'partially_received' => null,
+				'received' => '2025-09-01 21:00:00',
+			],
+		];
+	}
+}
+
+class ODEVAVIVA extends _ERPINTERFACE {
+	private $_pdo = null;
+	public $_instatiated = null;
+
+	public function __construct(){
+		try {
+			parent::__construct();
+
+			$options = [
+				\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC, // always fetch assoc
+				\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
+				//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
+			];
+			$this->_pdo = new \PDO( CONFIG['sql'][CONFIG['system']['erp']]['driver'] . ':' . CONFIG['sql'][CONFIG['system']['erp']]['host'] . ';' . CONFIG['sql'][CONFIG['system']['erp']]['database']. ';' . CONFIG['sql'][CONFIG['system']['erp']]['charset'], CONFIG['sql'][CONFIG['system']['erp']]['user'], CONFIG['sql'][CONFIG['system']['erp']]['password'], $options);
+			$this->_instatiated = true;
+		}
+		catch(\Exception $e){
+			return null;
+		}
 	}
 
 	/**
@@ -209,16 +338,6 @@ FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 ORDER BY ID DESC
 		*/
 		return null;
-		return [
-			'12345' => [
-				'reimbursement' => null,
-				'inquiry' => null,
-				'partiallygranted' => null,
-				'granted' => '2025-08-30',
-				'production' => null,
-				'settled' => '2025-09-01',
-				],
-		];
 	}
 
 	/**
@@ -313,20 +432,6 @@ LEFT JOIN
 ) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
 		 */
 		return null;
-		return [
-			[
-				'Name' => 'Jane Doe',
-				'Geburtsdatum' => '2003-02-01',
-				'Adresse' => 'Somewhere over the Rainbow 5',
-				'Telefonnummer' => '01234 56789'
-			],
-			[
-				'Name' => 'Erika Musterfrau',
-				'Geburtsdatum' => '2003-02-01',
-				'Adresse' => 'Auf dem Holzweg 3',
-				'Telefonnummer' => '09876 54321'
-			]
-		];
 	}
 
 	/**
@@ -404,24 +509,15 @@ ORDER BY orders.BESTELL_DATUM DESC
 		*/
 		return null;
 		//return [[]];
-		return [
-			[
-				'vendor' => 'Otto Bock HealthCare Deutschland GmbH',
-				'article_no' => '99B25',
-				'article_name' => 'Schlauch-Strumpf',
-				'identifier' => '  |sz9623',
-				'ordered' => '2025-09-01 21:00:00',
-				'partially_received' => null,
-				'received' => '2025-09-01 21:00:00',
-			],
-		];
 	}
 }
 
-
-$call = "CARO\\API\\" . strtoupper(CONFIG['system']['erp']);
-if (CONFIG['system']['erp'] && class_exists($call)) {
-	define("ERPINTERFACE", new $call());
+if (CONFIG['system']['erp'] && isset(CONFIG['sql'][CONFIG['system']['erp']])) {
+	$call = "CARO\\API\\" . strtoupper(CONFIG['system']['erp']);
+	if (class_exists($call)) {
+		define("ERPINTERFACE", new $call());
+	}
+	else define("ERPINTERFACE", null);
 }
 else define("ERPINTERFACE", null);
 ?>
