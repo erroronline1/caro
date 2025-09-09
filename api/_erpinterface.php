@@ -197,6 +197,17 @@ class TEST extends _ERPINTERFACE {
 		 * 		...
 		 * ]
 		 */
+		/*
+SELECT TOP (1000)
+[REFERENZ]
+,[KV_DATUM]
+,[GENEHMIGT_DATUM]
+,[GENEHMIGT_TEILSUMME]
+,[GELIEFERT_DATUM]
+,[FAKTURIERT_DATUM]
+FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
+ORDER BY ID DESC
+		*/
 		return null;
 		return [
 			'12345' => [
@@ -246,6 +257,60 @@ class TEST extends _ERPINTERFACE {
 		 * 		],
 		 * 		...
 		 * ]
+		 */
+		/*
+SELECT 
+pat.*,
+KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER_NAME,
+EMAIL.EMAIL,
+PHONE.PHONE,
+MOBILE.PHONE AS MOBILE
+FROM
+(
+    SELECT a.NAME_1,
+    a.NAME_2,
+    a.NAME_3,
+    a.NAME_4,
+    a.GEBURTSNAME,
+    a.GEBURTSDATUM,
+    a.STRASSE_1,
+    a.PLZ_1,
+    a.ORT_1,
+    a.FIBU_NUMMER,
+    a.REFERENZ,
+    more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+    FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+    LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+    WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+) as pat
+LEFT JOIN
+(
+    SELECT ka.NAME_1,
+	ka.REFERENZ
+    FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
+    WHERE kia.BEZEICHNUNG = 'Kostenträger'
+) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+LEFT JOIN
+(
+    SELECT mail.NUMMER AS EMAIL,
+	mail.ADRESSEN_REFERENZ
+    FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
+    WHERE im.BEZEICHNUNG = 'E-Mail'
+) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
+LEFT JOIN
+(
+    SELECT mail.NUMMER AS PHONE,
+	mail.ADRESSEN_REFERENZ
+    FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
+    WHERE im.BEZEICHNUNG = 'Telefonnummer'
+) AS PHONE ON pat.REFERENZ = PHONE.ADRESSEN_REFERENZ
+LEFT JOIN
+(
+    SELECT mail.NUMMER AS PHONE,
+	mail.ADRESSEN_REFERENZ
+    FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
+    WHERE im.BEZEICHNUNG = 'Telefonnummer'
+) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
 		 */
 		return null;
 		return [
@@ -305,6 +370,38 @@ class TEST extends _ERPINTERFACE {
 		 * 		...
 		 * ]
 		 */
+		/*
+SELECT
+orders.BESTELLNUMMER,
+orders.BEZEICHNUNG,
+orders.BESTELL_DATUM,
+orders.BESTELL_MENGE,
+orders.WE_MENGE,
+orders.BESTELL_BELEGNUMMER,
+vendor.NAME_1 as LIEFERANTEN_NAME,
+article.BESTELL_TEXT
+FROM [eva3_02_viva_souh].[dbo].[wws_bestellung] AS orders
+LEFT JOIN
+(
+    SELECT
+    BESTELL_TEXT,
+	ARTIKEL_REFERENZ
+    FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten]
+) AS article ON orders.ARTIKELNUMMER = article.ARTIKEL_REFERENZ
+LEFT JOIN
+(
+    SELECT 
+    v.NAME_1,
+	v.REFERENZ
+    FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
+    INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
+    WHERE ia.BEZEICHNUNG = 'Lieferanten'
+) AS vendor ON orders.LIEFERANTEN_REFERENZ = vendor.REFERENZ
+
+WHERE orders.BESTELL_DATUM > '2025-01-01 00:00:00.000'
+ORDER BY orders.BESTELL_DATUM DESC
+
+		*/
 		return null;
 		//return [[]];
 		return [
