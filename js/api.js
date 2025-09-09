@@ -1861,7 +1861,7 @@ export const api = {
 									if (response && typeof data.response.msg === "object" && api._lang.GET("record.import.by_name") in response) {
 										let result = {};
 										// deconstruct key:value<br>...
-										for (const match of response[api._lang.GET("record.import.by_name")].matchAll(/(.+?): (.+?)(?:<br>|$)/gm)) {
+										for (const match of response[api._lang.GET("record.import.by_name")].matchAll(/(.+?): (.*?)(?:<br>|$)/gm)) {
 											result[match[1]] = match[2];
 										}
 										data = {
