@@ -33,9 +33,12 @@ Things are still in motion. Images may be outdated.
 * csvprocessor
     * max loops for avoiding runaway on improper configured replacement patterns?
     * raise exception if loopcount exceeds passed security parameter
-* what if an erp-connection is available?
-    * eva partial api option, partial csv again
-        * if same server, go beyond root and check if respective csv-export exists with a sufficient timestamp?
+* erp_interface, additional usecases
+    * data exports if database access is possible
+        * proper meaningful article database
+        * cases for pms
+    * optional match on pricelist import if available instead of csv upload
+    * view case estimate positions
 
 ## Content
 * [Aims](#aims)
@@ -1576,11 +1579,14 @@ Customer data is fetched by request if any data is to be expected. The function 
 
 To prepare significant responses for customer data to import, the ERP-interface must consider the relevant document inputs by name.
 
-
-It is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp].
-You may process Web-APIs (recommendation `UTILITY::webrequest()`), regularly provided CSV-dumps (recommendation [CSV Processor](#csv-processor)) and/or implement own data processing as long as the data is prepared to be returned as expected.
-
-Signal unavailable methods by returning `null`.
+### Customization recommendations
+* it is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp]. Data for the responses must match the expected structure described within the parent class
+* signal unavailable methods by returning `null`
+* signal avalable methods without current content by returning `[[]]`
+* if you process Web-APIs you can probably use `UTILITY::webrequest()`
+* if you process regularly provided CSV-dumps you can probably use the [CSV Processor](#csv-processor))
+* if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
+* use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
 
 [Content](#content)
 

@@ -1481,10 +1481,14 @@ Kundendaten werden je Anfrage abgeglichen. Die Funktion für Aufzeichnungen, wel
 
 Die ERP-Anbindung muss die relevanten Dokumentenfelder berücksichtigen um sinnvolle Ergebnisse für Kundendaten bereitzustellen.
 
-
-Es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Es können beispielsweise Web-APIs (Empfehlung `UTILITY::webrequest()`) oder regelmäßig breitgestellte CSV-Exporte (Empfehlung [CSV Prozessor](#csv-prozessor)) verarbeitet und/oder eigene Algorithmen implementiert werden, solange die aufbereiteten Daten den erwarteten Anforderungen entsprechen.
-
-Nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden. 
+### Empfehlungen für die Anpassung
+* es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Daten für die Rückgabewerte müssen der erwarteten Struktur entsprechen, die in der Elternklasse beschrieben sind.
+* nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden
+* verfügbare Methoden ohne aktuellen Inhalt können durch den Rückgabewert `[[]]` signalisiert werden
+* für die Verarbeitung von Web-APIs kann `UTILITY::webrequest()` hilfreich sein
+* für die Verarbeitung von regelmäßig breitgestellten CSV-Exporte kann der [CSV Prozessor](#csv-prozessor)) hilfreich sein
+* falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden.
+* für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten.
 
 [Übersicht](#übersicht)
 
