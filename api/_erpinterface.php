@@ -444,7 +444,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 		$name = preg_split('/\s+/', $name);
 		$namesearch = [];
-		foreach(['NAME_1', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
+		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
 				if (!$namepart) continue;
 				$namesearch[] = 'pat.' . $column . ' LIKE' . $this->_pdo->quote($namepart);
