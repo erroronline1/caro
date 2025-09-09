@@ -298,36 +298,41 @@ class API {
 					$valid = true;
 				}
 			}
-			if ($valid) return [
-				'user' => [
-					'name' => $_SESSION['user']['name'],
-					'image' => $_SESSION['user']['image'],
-					'app_settings' => $_SESSION['user']['app_settings'],
-					'fingerprint' => $this->session_get_fingerprint(),
-					'permissions' => [
-						'orderprocessing' => PERMISSION::permissionFor('orderprocessing'),
-						'patient' => boolval(array_intersect(['patient'], $_SESSION['user']['permissions']))
-					]
-				],
-				'config' => [
-					'application' => [
-						'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
-						'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode'],
-						'debugging' => CONFIG['application']['debugging'],
-					],
-					'lifespan' => [
-						'session' => [
-							'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime')),
+			if ($valid) {
+				// import to determine if interface is present
+				include_once("./_erpinterface.php");
+
+				return [
+					'user' => [
+						'name' => $_SESSION['user']['name'],
+						'image' => $_SESSION['user']['image'],
+						'app_settings' => $_SESSION['user']['app_settings'],
+						'fingerprint' => $this->session_get_fingerprint(),
+						'permissions' => [
+							'orderprocessing' => PERMISSION::permissionFor('orderprocessing'),
+							'patient' => boolval(array_intersect(['patient'], $_SESSION['user']['permissions']))
 						]
 					],
-					'limits' => [
-						'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
-					],
-					'label' => CONFIG['label'],
-					'forbidden' => CONFIG['forbidden'],
-					'system' => CONFIG['system']['erp'] ? ['erp' => CONFIG['system']['erp']] : []
-				]
-			];
+					'config' => [
+						'application' => [
+							'defaultlanguage' => isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'],
+							'order_gtin_barcode' => CONFIG['application']['order_gtin_barcode'],
+							'debugging' => CONFIG['application']['debugging'],
+						],
+						'lifespan' => [
+							'session' => [
+								'idle' => isset($_SESSION['user']['app_settings']['idle']) ? $_SESSION['user']['app_settings']['idle'] : min(CONFIG['lifespan']['session']['idle'], ini_get('session.gc_maxlifetime')),
+							]
+						],
+						'limits' => [
+							'qr_errorlevel' => CONFIG['limits']['qr_errorlevel']
+						],
+						'label' => CONFIG['label'],
+						'forbidden' => CONFIG['forbidden'],
+						'system' => ERPINTERFACE && ERPINTERFACE->_instatiated ? ['erp' => CONFIG['system']['erp']] : []
+					]
+				];
+			}
 		}
 		// append login screen
 		$response = ['render' =>
