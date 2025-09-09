@@ -193,7 +193,7 @@ class NOTIFICATION extends API {
 							// update records case state if set within erp system
 							// does only update database null values
 							// also see record.php->casestate()
-							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'casestate') && ERPINTERFACE->casestate()){
+							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casestate') && ERPINTERFACE->casestate()){
 								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
 								if (!($erpdata = ERPINTERFACE->casestate(array_filter(array_column($data, 'erp_case_number'), fn($v) => boolval($v))))) break;
 								
@@ -246,7 +246,7 @@ class NOTIFICATION extends API {
 							// update order state if set within erp system
 							// does only update database null values
 							// also see order.php->approved()
-							if (ERPINTERFACE && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
+							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
 								if (!($erpdata = ERPINTERFACE->orderdata(file_exists($logfile) ? date('Y-m-d H:i:s', filemtime($logfile)) : null))) break;
 
 								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [

@@ -679,7 +679,7 @@ class RECORD extends API {
 		}
 		if ($NAMELOOKUP || $DOBLOOKUP){
 			require_once('./_erpinterface.php');
-			if (ERPINTERFACE && $result = ERPINTERFACE->customerdata($NAMELOOKUP, $DOBLOOKUP)) {
+			if (ERPINTERFACE && ERPINTERFACE->_instatiated && $result = ERPINTERFACE->customerdata($NAMELOOKUP, $DOBLOOKUP)) {
 				$options = [];
 				foreach($result as $option){
 					// construct key: value radio input content
