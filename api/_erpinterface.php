@@ -553,7 +553,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			WHERE ia.BEZEICHNUNG = 'Lieferanten'
 		) AS vendor ON orders.LIEFERANTEN_REFERENZ = vendor.REFERENZ
 
-		WHERE orders.BESTELL_DATUM BETWEEN :from AND :until
+		WHERE orders.ORDER_DATUM BETWEEN :from AND :until
 		END;
 
 		try{
