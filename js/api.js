@@ -108,6 +108,9 @@ export const api = {
 		api.preventDataloss.stop();
 		api.loadindicator(true);
 
+		// ensure passed parameters are encoded e.g. to enable #-characters within a passed api path-parameter
+		request = request.map(i => encodeURIComponent(i));
+
 		// default reset masonry breakpoint if former call (current history has been set by recent api call) had prevented this
 		// currently masonry is counterproductive for conversations
 		if (api._settings.user.app_settings && api._settings.user.app_settings.masonry) await window.Masonry.breakpoints(true);
