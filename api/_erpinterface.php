@@ -105,10 +105,12 @@ class _ERPINTERFACE {
 	}
 
 	/**
-	 * retrieve recent data on erp consumables database
+	 * retrieve recent data of erp consumables database
+	 * @param array $vendors
+	 * @param bool $as_passed false returns the remaining vendors but the passed ones
 	 * @return null|array 
 	 */
-	public function consumables(){
+	public function consumables($vendors = [], $as_passed = true){
 		/**
 		 * return [
 		 * 		'{vendor name}' => [
@@ -487,6 +489,91 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		return $response;
 	}
 
+	/**
+	 * retrieve recent data of erp consumables database
+	 * @param array $vendors
+	 * @param bool $as_passed false returns the remaining vendors but the passed ones
+	 * @return null|array 
+	 */
+	public function consumables($vendors = [], $as_passed = true){
+		$query = <<<'END'
+		SELECT
+		vendor.NAME_1 as LIEFERANTEN_NAME,
+		article.BESTELL_NUMMER,
+		article.BESTELL_TEXT,
+		article.EAN,
+		unit.BEZEICHNUNG AS BESTELLEINHEIT,
+		article2.ZUSATZINFORMATION,
+		/*tradinggood
+		expirydate
+		specialattention*/
+		article2.MINDEST_BESTAND,
+		article.ARTIKEL_REFERENZ,
+		article.WARENEINGANGSDATUM
+
+		FROM wws_artikel_lieferanten AS article
+		left JOIN
+		(
+			SELECT BEZEICHNUNG,
+			REFERENZ
+			FROM inf_einheit
+		) AS unit ON unit.REFERENZ = article.BESTELL_EINHEIT
+		left JOIN
+		(
+			SELECT
+			REFERENZ,
+			ZUSATZINFORMATION,
+			MINDEST_BESTAND
+			FROM wws_artikelstamm
+		) AS article2 ON article2.REFERENZ = article.ARTIKEL_REFERENZ
+		left JOIN
+		(
+			SELECT 
+			v.NAME_1,
+			v.REFERENZ
+			FROM inf_adressart AS ia
+			INNER JOIN adressen AS v ON v.ADRESSART = ia.REFERENZ
+			WHERE ia.BEZEICHNUNG = 'Lieferanten'
+		) AS vendor ON article.LIEFERANTEN_REFERENZ = vendor.REFERENZ
+		
+		WHERE article.BESTELLSTOP = 0 AND article.STATUS = 0
+		AND vendor.NAME_1 in (:vendors)
+		END;
+
+		if (!$vendors) return [];
+
+		try{
+			$statement = $this->_pdo->prepare(strtr($query, [
+				':vendors' => implode(',', array_map(fn($v) => $this->_pdo->quote($v), $vendors))
+			]));
+			$statement->execute();	
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+		$response = [];
+
+		foreach ($result as $row){
+			if (!isset($response[$row['LIEFERANTEN_NAME']])) $response[$row['LIEFERANTEN_NAME']] = [];
+			$response[$row['LIEFERANTEN_NAME']][] = [
+				'article_no' => $row['BESTELL_NUMMER'],
+				'article_name' => $row['BESTELL_TEXT'],
+				'article_ean' => $row['EAN'],
+				'article_unit' => $row['BESTELLEINHEIT'],
+				'article_info' => $row['ZUSATZINFORMATION'],
+				'trading_good' => null,
+				'has_expiry_date' => null,
+				'special_attention' => null,
+				'stock_item' => $row['MINDEST_BESTAND'] ? 1 : null,
+				'erp_id' => $row['LIEFERANTEN_NAME'],
+				'last_order' => $row['WARENEINGANGSDATUM'] ? substr($row['WARENEINGANGSDATUM'], 0, 10) : null
+			];
+		}
+		return $response;
+	}
+	
 	/**
 	 * retrieve recent data on processed orders for given timespan  
 	 * return an array of orders to compare at application level

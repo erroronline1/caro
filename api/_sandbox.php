@@ -2,8 +2,9 @@
 namespace CARO\API;
 require_once('_config.php');
 require_once('_utility.php'); // general utilities
+require_once('_erpinterface.php');
 
-var_dump( UTILITY::webrequest('https://erroronline.one', null, null));
+var_dump( ERPINTERFACE->consumables(['Fior & Gentz GmbH']));
 
 //phpinfo();
 ?>
