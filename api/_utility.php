@@ -344,14 +344,14 @@ class UTILITY {
 	 * @param string passed $identifier
 	 * @param string $default_date
 	 * @param bool $strip_date returns first part of submitted identifier without timestamp appended
-	 * @param bool $translate returns Y-m-d H:i:s translation of timestamp
-	 * @param bool $verify returns the trailing timestamp if valid
+	 * @param bool $translate_timestamp returns Y-m-d H:i:s translation of timestamp
+	 * @param bool $verified_timestamp returns the trailing timestamp if valid
 	 * @return string|null
 	 */
-	public static function identifier($identifier = '', $default_date = '', $strip_date = false, $translate = false, $verify = false){
+	public static function identifier($identifier = '', $default_date = '', $strip_date = false, $translate_timestamp = false, $verified_timestamp = false){
 		if (!$identifier) return $identifier;
 
-		preg_match('/(.+?)(?: \|([a-z0-9]+))*$/', $identifier, $components);
+		preg_match('/(.+?)(?:\s*#([a-z0-9]+))*$/', $identifier, $components);
 		if ($components && isset($components[2]) && $components[2]);
 		try {
 			// try to convert to unixtime int
@@ -362,8 +362,8 @@ class UTILITY {
 				$datetime->setTimestamp($unixtime);
 				// if no error has risen the identifier is likely valid
 
-				if ($verify) return ' |' . $components[2]; // proper trailing timestamp
-				if ($translate) return $datetime->format('Y-m-d H:i:s'); // translated Y-m-d H:i:s timestamp
+				if ($verified_timestamp) return '#' . $components[2]; // proper trailing timestamp with separator
+				if ($translate_timestamp) return $datetime->format('Y-m-d H:i:s'); // translated Y-m-d H:i:s timestamp
 				if ($strip_date){
 					if (isset($components[1]) && $components[1]) return $components[1];
 				}
@@ -371,12 +371,12 @@ class UTILITY {
 			}
 		}
 		catch (\Exception $e){
-			if ($verify) return null;
-			if ($translate) return null;
+			if ($verified_timestamp) return null;
+			if ($translate_timestamp) return null;
 		}
 		if ($default_date) {
 			$unixtime = strtotime($default_date);
-			$identifier .= ' |' . base_convert($unixtime, 10, 36); // separator must be a valid character for urls, # and alike are forbidden
+			$identifier .= ' #' . base_convert($unixtime, 10, 36); // separator must be a valid character for urls, # and alike are forbidden
 		}
 		return $identifier;
 	}
