@@ -978,6 +978,8 @@
 			"not_saved": "Lieferant konnte nicht gespeichert werden",
 			"phone": "Telefon",
 			"pricelist_empty": "Es gibt keine Artikel zum exportieren",
+			"pricelist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
+			"pricelist_erp_match_selected": "Mit EVA abgleichen",
 			"pricelist_export": "Artikelliste exportieren",
 			"pricelist_export_hint": "Dies wird nur für kleine Artikellisten empfohlen, die nicht auf einen Import zurückgehen. Der Filter funktioniert nur für exportierte Listen. Vernünftige Preislisten und anständig formulierte Filter werden bevorzugt.",
 			"pricelist_filter": "Preislisten Importfilter",

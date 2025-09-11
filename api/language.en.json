@@ -978,6 +978,8 @@
 			"not_saved": "Vendor could not be saved",
 			"phone": "Phone",
 			"pricelist_empty": "There are no products to export",
+			"pricelist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
+			"pricelist_erp_match_selected": "Match with ERP database",
 			"pricelist_export": "Export article list",
 			"pricelist_export_hint": "This is recommended for small article lists that do not trace back to an import. The filter operates for exported lists only. Proper pricelists and well formulated filters are preferred.",
 			"pricelist_filter": "Pricelist import filter",
