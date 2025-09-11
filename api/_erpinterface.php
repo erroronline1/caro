@@ -572,7 +572,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'has_expiry_date' => null,
 				'special_attention' => null,
 				'stock_item' => $row['MINDEST_BESTAND'] ? 1 : null,
-				'erp_id' => $row['LIEFERANTEN_NAME'],
+				'erp_id' => $row['ARTIKEL_REFERENZ'],
 				'last_order' => $row['WARENEINGANGSDATUM'] ? substr($row['WARENEINGANGSDATUM'], 0, 10) : null
 			];
 		}
