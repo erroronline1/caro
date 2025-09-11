@@ -1226,7 +1226,7 @@ class RECORD extends API {
 								$display .= '<a href="javascript:void(0);" onclick="event.preventDefault(); window.open(\'' . $link[1] . '\', \'_blank\').focus();">' . $link[1] . "</a>\n";
 								continue;
 							}
-							$display .= $value . "\n";
+							$display .= $value . "<br />";
 							preg_match("/(.+?) (\(.+?\))/", $value, $link); // attachment value
 							$path = substr(UTILITY::directory('record_attachments'), 1) . '/' . $link[1];
 							if (isset($content['attachments'][$document]) && in_array($path, $content['attachments'][$document])){
@@ -1325,7 +1325,7 @@ class RECORD extends API {
 								'attributes' => [
 									'name' => $key
 								],
-								'htmlcontent' => implode("\n", $value)
+								'htmlcontent' => implode("<br />", $value)
 							]); 
 					}
 				}
