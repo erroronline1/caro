@@ -108,8 +108,10 @@ class _ERPINTERFACE {
 	 * retrieve recent data of erp consumables database
 	 * @param array $vendors
 	 * @param bool $as_passed false returns the remaining vendors but the passed ones
-	 * @return null|array 
-	 */
+	 * @return null|array
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	*/
 	public function consumables($vendors = [], $as_passed = true){
 		/**
 		 * return [
@@ -493,7 +495,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * retrieve recent data of erp consumables database
 	 * @param array $vendors
 	 * @param bool $as_passed false returns the remaining vendors but the passed ones
-	 * @return null|array 
+	 * @return null|array
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
 	 */
 	public function consumables($vendors = [], $as_passed = true){
 		$query = <<<'END'
@@ -537,14 +541,15 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		) AS vendor ON article.LIEFERANTEN_REFERENZ = vendor.REFERENZ
 		
 		WHERE article.BESTELLSTOP = 0 AND article.STATUS = 0
-		AND vendor.NAME_1 in (:vendors)
+		AND vendor.NAME_1 :as_passed in (:vendors)
 		END;
 
-		if (!$vendors) return [];
+		if (!$vendors) return [[]];
 
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':vendors' => implode(',', array_map(fn($v) => $this->_pdo->quote($v), $vendors))
+				':vendors' => implode(',', array_map(fn($v) => $this->_pdo->quote($v), $vendors)),
+				':as_passed' => $as_passed ? '' : 'NOT'
 			]));
 			$statement->execute();	
 		}
