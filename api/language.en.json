@@ -1023,7 +1023,7 @@
 			"select_hint": "No fitting query found? Contact a programmer to set one up."
 		},
 		"navigation": {
-			"dump": "ERP database query",
+			"erpquery": "ERP database query",
 			"filter": "CSV filter",
 			"filter_manager": "Manage CSV filter"
 		},
