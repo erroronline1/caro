@@ -1880,7 +1880,7 @@ class CONSUMABLES extends API {
 							]
 						]])
 						: null,
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ?1 : null,
+					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ? 1 : null,
 					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) && intval($pricelist->_list[1][$index]['special_attention']) ? 1 : null,
 					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) && intval($pricelist->_list[1][$index]['stock_item']) ? 1 : null,
 					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) && $pricelist->_list[1][$index]['erp_id'] ? $pricelist->_list[1][$index]['erp_id'] : null,
@@ -1897,32 +1897,42 @@ class CONSUMABLES extends API {
 				]);
 				$vendor = $vendor ? $vendor[0] : null;
 				$erp_dump = ERPINTERFACE->consumables([$vendor['name']]);
+
+				// sanitize name from surrounding whitespaces
+				foreach($erp_dump as $vendorname => $articles){
+					if (trim($vendorname) === trim($vendor['name']) && $vendorname !== $vendor['name']){
+						unset($erp_dump[$vendorname]);
+						$erp_dump[$vendor['name']] = $articles;
+						break;
+					}
+				}
+
 				if (isset($erp_dump[$vendor['name']]) && $erp_dump[$vendor['name']]){
-					$erp_matches = [];
+					$query = SQLQUERY::PREPARE('consumables_put_product_pricelist_erp_import');
 					foreach($erp_dump[$vendor['name']] as $article){
 						if (!$article['article_no']) continue;
-						$erp_matches[] = [
-							':article_unit' => preg_replace('/\n/', '', $article['article_unit']) ? : null,
-							':article_ean' => preg_replace('/\n/', '', $article['article_ean']) ? : null,
-							':trading_good' => isset($article['trading_good']) && intval($article['trading_good']) ? 1 : null,
+						$replace = [
+							':article_unit' => $article['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['article_unit'])): 'NULL',
+							':article_ean' => $article['article_ean'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['article_ean'])): 'NULL',
+							':trading_good' => isset($article['trading_good']) && intval($article['trading_good']) ? 1 : 'NULL',
 							':incorporated' => isset($article['last_order']) && $article['last_order'] 
-								? UTILITY::json_encode([[
+								?$this->_pdo->quote(UTILITY::json_encode([[
 									'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $article['last_order']], true),
 									'user' => [
 										'name' => $_SESSION['user']['name'],
 										'date' => $this->_date['servertime']->format('Y-m-d H:i')
 									]
-								]])
-								: null,
-							':has_expiry_date' => isset($article['has_expiry_date']) && intval($article['has_expiry_date']) ? 1 : null,
-							':special_attention' => isset($article['special_attention']) && intval($article['special_attention']) ? 1 : null,
-							':stock_item' => isset($article['stock_item']) && boolval(intval($article['stock_item'])) ? 1 : null,
-							':erp_id' => preg_replace('/\n/', '', $article['erp_id']) ? : null,
+								]]))
+								: 'NULL',
+							':has_expiry_date' => isset($article['has_expiry_date']) && intval($article['has_expiry_date']) ? 1 : 'NULL',
+							':special_attention' => isset($article['special_attention']) && intval($article['special_attention']) ? 1 : 'NULL',
+							':stock_item' => isset($article['stock_item']) && boolval(intval($article['stock_item'])) ? 1 : 'NULL',
+							':erp_id' => $article['erp_id'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['erp_id'] ? : '')): 'NULL',
 							':vendor_id' => $vendor['id'],
-							':article_no' => preg_replace('/\n/', '', $article['article_no']) ? : null
+							':article_no' => $this->_pdo->quote(preg_replace('/\n/', '', $article['article_no']))
 						];
+						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
 					}
-				$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_put_product_pricelist_erp_import'), $erp_matches));
 				}
 			}
 
@@ -2145,6 +2155,8 @@ class CONSUMABLES extends API {
 				$pricelistImportError = '';
 				$pricelistImportResult = [];
 				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name']) {
+					if (!$vendor['pricelist']['filter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+
 					$files = [
 						'pricelist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name'][0],
 					];
@@ -2645,7 +2657,7 @@ class CONSUMABLES extends API {
 									'name' => $this->_lang->GET('consumables.vendor.pricelist_erp_match')
 								],
 								'content' => [
-									$this->_lang->GET('consumables.vendor.pricelist_erp_match_selected')
+									$this->_lang->GET('consumables.vendor.pricelist_erp_match_selected') => []
 								]
 							];
 						}
