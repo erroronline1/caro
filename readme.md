@@ -3601,6 +3601,34 @@ Sample response
 
 ### CSV filter endpoints
 
+> GET ./api/api.php/csvfilter/erpquery/
+
+Returns the input form for requesting a query.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select query to export as CSV","onchange":"api.csvfilter('post', 'erpquery', this.value)"},"content":{"...Select query to export as CSV":{"value":"0"},"Some query":{"value":"Some query"},"Another query":{"value":"Another query"}},"hint":"No fitting query found? Contact a programmer to set one up."}]]}}
+```
+
+> POST ./api/api.php/csvfilter/erpquery/{id}
+
+Returns a CSV file for successful erp interface requests.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | filter to apply |
+
+Sample response
+```
+{"log":[],"links":{"Download Some query 2025-09-11 22-48-00.csv":{"href":"./api/api.php/file/stream/Some query 2025-09-11 22-48-00.csv","download":"Some query 2025-09-11 22-48-00.csv"}}}
+```
+
 > GET ./api/api.php/csvfilter/filter/{id}
 
 Returns the input form for applying a filter.
