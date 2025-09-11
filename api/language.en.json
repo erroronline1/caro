@@ -1388,6 +1388,7 @@
 		"create_identifier_type": "Label(s) in format :format",
 		"date": "Date of record",
 		"erp_case_number": "ERP case number",
+		"erp_case_number_hint": "multiple case numbers can be added, e.g. z.B. 12345; 12346",
 		"error": "Record could not be saved. Please try again.",
 		"export": "Export record",
 		"export_author": ":author on :date",

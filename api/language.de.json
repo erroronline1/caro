@@ -1388,6 +1388,7 @@
 		"create_identifier_type": "Etikett(en) im Format :format",
 		"date": "Datum des Eintrags",
 		"erp_case_number": "Vorgangsnummer",
+		"erp_case_number_hint": "mehrere Vorgangsnummern können getrennt eingetragen werden, z.B. 12345; 12346",
 		"error": "Die Aufzeichnung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"export": "Exportiere die Daten als PDF",
 		"export_author": ":author am :date",

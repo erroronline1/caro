@@ -195,25 +195,36 @@ class NOTIFICATION extends API {
 							// also see record.php->casestate()
 							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casestate') && ERPINTERFACE->casestate()){
 								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
-								if (!($erpdata = ERPINTERFACE->casestate(array_filter(array_column($data, 'erp_case_number'), fn($v) => boolval($v))))) break;
+								// split multiple erp case numbers within records
+								$casenumbers = [];
+								foreach ($data as $case){
+									if (!$case['erp_case_number']) continue;
+									array_push($casenumbers, ...preg_split('/[\s;,]+/', $case['erp_case_number']));
+								}
+
+								if (!($erpdata = ERPINTERFACE->casestate($casenumbers))) break;
 								
+								// case states will be merged from all case numbers if having content.
 								$updates = [];
 								foreach ($data as $case){
-									if (!$case['erp_case_number'] || !array_key_exists($case['erp_case_number'], $erpdata)) continue;
+									if (!$case['erp_case_number']) continue;
 									if (!array_key_exists($case['context'], $this->_lang->_DEFAULT['casestate'])) continue;
 									$current_records = [];
 									$case['case_state'] = json_decode($case['case_state'] ? : '', true);
-									foreach($erpdata[$case['erp_case_number']] as $_ERPcaseState => $value){
-										if (!isset($case['case_state'][$_ERPcaseState]) && $value) {
-											$case['case_state'][$_ERPcaseState] = true;
-											$current_records[] = [
-												'author' => CONFIG['system']['caroapp'],
-												'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
-												'document' => 0,
-												'content' => UTILITY::json_encode([
-													$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.casestate_set', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $_ERPcaseState, [], true)], true)
-												])
-											];
+									foreach(preg_split('/[\s;,]+/', $case['erp_case_number']) as $casenumber){
+										if (!array_key_exists($casenumber, $erpdata)) continue;
+										foreach($erpdata[$casenumber] as $_ERPcaseState => $value){
+											if (!isset($case['case_state'][$_ERPcaseState]) && $value) {
+												$case['case_state'][$_ERPcaseState] = true;
+												$current_records[] = [
+													'author' => CONFIG['system']['caroapp'],
+													'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
+													'document' => 0,
+													'content' => UTILITY::json_encode([
+														$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.casestate_set', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $_ERPcaseState, [], true)], true)
+													])
+												];
+											}
 										}
 									}
 
