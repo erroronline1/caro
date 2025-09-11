@@ -747,7 +747,7 @@ Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werd
 ![sample purchase menu](http://toh.erroronline.one/caro/einkauf%20menu%20de.png)
 
 ### Lieferanten- und Artikelverwaltung
-Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der [Import von Preislisten](#importierung-von-lieferantenpreislisten) nutzt den [CSV-Prozessor](#csv-prozessor).
+Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der [Import von Preislisten](#importierung-von-lieferantenpreislisten) nutzt den [CSV-Prozessor](#csv-prozessor) und möglicherweise die [ERP-Anbindung](#erp-anbindung). Gleiche Lieferantennamen sollten daher sichergestellt werden.
 
 Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus.
 
@@ -1480,6 +1480,21 @@ Aktualisierungen betreffen freigegebene Bestellungen denen der Identifikationsco
 Kundendaten werden je Anfrage abgeglichen. Die Funktion für Aufzeichnungen, welche in der Lage ist Werte anhand eines Kennzeichens zu importieren, ist auch in der Lage Ergebnisse eines ERP-Abgleichs basierend auf Name und/oder Geburtsdatum zu laden. Die Anwendung stellt die Auswahl da von der aus der gewählte Datensatz in die jeweiligen Dokumentenfelder geladen wird.
 
 Die ERP-Anbindung muss die relevanten Dokumentenfelder berücksichtigen um sinnvolle Ergebnisse für Kundendaten bereitzustellen.
+
+### Datenabgleich bei der Importierung von Preislisten
+Daten aus dem ERP-System werden abgerufen sofern verfügbar und aktiviert. Für Artikel mit passenden Artikelnummern für den gewählten Lieferanten werden die Daten für
+* article_unit
+* article_ean
+* trading_good
+* incorporated (likelyness by being already ordered in the past)
+* has_expiry_date
+* special_attention
+* stock_item
+* erp_id
+
+vervollständigt, sofern nicht bereits beschrieben.
+
+Unnötig auszuführen, dass Lieferantennamen und einzigartige Artikelnummern übereinstimmen müssen.
 
 ### Empfehlungen für die Anpassung
 * es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Daten für die Rückgabewerte müssen der erwarteten Struktur entsprechen, die in der Elternklasse beschrieben sind.

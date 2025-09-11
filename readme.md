@@ -37,7 +37,6 @@ Things are still in motion. Images may be outdated.
     * data exports if database access is possible
         * proper meaningful article database
         * cases for pms
-    * optional match on pricelist import if available instead of csv upload
     * view case estimate positions
 
 ## Content
@@ -851,7 +850,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu%20en.png)
 
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor).
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor) and maybe the [ERP interface](#erp-interface). Make sure, vendor names match the ERP data.
 
 Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default.
 
@@ -1578,6 +1577,21 @@ Updates affect approved orders that match the identifier, vendor name, the artic
 Customer data is fetched by request if any data is to be expected. The function for records which is able to import data based on an identifier, is also able to import results of ERP-matches based on name and/or date of birth. The application will present matches too chose from and transfer the selected dataset to the respective document inputs.
 
 To prepare significant responses for customer data to import, the ERP-interface must consider the relevant document inputs by name.
+
+### Data matching on pricelist imports
+ERP-Data is fetched during pricelist imports if available and selected. For articles with matching article numbers for the selected vendor data for
+* article_unit
+* article_ean
+* trading_good
+* incorporated (likelyness by being already ordered in the past)
+* has_expiry_date
+* special_attention
+* stock_item
+* erp_id
+
+is updated if not already set within the system.
+
+Needless to elaborate vendor names and unique article numbers must match.
 
 ### Customization recommendations
 * it is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp]. Data for the responses must match the expected structure described within the parent class
