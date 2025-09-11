@@ -749,6 +749,8 @@ Externe Dokumente gemäß ISO 13485 4.2.4 müssen identifiziert und gelenkt werd
 ### Lieferanten- und Artikelverwaltung
 Bestellvorgänge bedürfen einer Lieferanten- und Artikeldatenbank. Dies steht auch im Zusammenhang mit einer Produkteinführung, Stichprobenprüfung, Dokumenten- und Zertifikatsverwaltung. Berechtigte Nutzer können diese Kategorien verwalten, neue Lieferanten und Artikel hinzufügen oder bearbeiten, Preislisten importieren, Filter definieren oder Lieferanten und Artikel deaktivieren. Der [Import von Preislisten](#importierung-von-lieferantenpreislisten) nutzt den [CSV-Prozessor](#csv-prozessor) und möglicherweise die [ERP-Anbindung](#erp-anbindung). Gleiche Lieferantennamen sollten daher sichergestellt werden.
 
+> Auch wenn die ERP-Anbindung Daten bereitstellen oder als direkte Datenquelle für Artikeldaten dienen kann wird dies nicht passieren! Nicht jeder hat Zugriff, geschweige denn mit Schreibrechten. Die redundante Artikeldatenbank der CARO App berücksichtigt regulatorische Anforderungen, die durch ERP-Software nicht grundsätzlich erfüllt werden.
+
 Lieferanten sollen evaluiert werden. Dazu ist ein entsprechendes Dokument mit dem Kontext *Lieferantenbewertung* erforderlich. Die Evaluation ist automatisch Teil der Lieferantenansicht im Bearbeitungsmodus.
 
 Lieferantenbezogene Dateianhänge können beigefügt werden. Durch die entsprechende Eingabemaske wird dem [Dateinamen ein Ablaufdatum hinzugefügt](#dateinamenkonventionen). Ohne angegebenes Datum und für Dateiuploads innerhalb des Dokuments zur Lieferantenbewertung wird die Gültigkeit für ein Jahr ab Bereitstellung festgelegt.  
@@ -1497,6 +1499,8 @@ Daten aus dem ERP-System werden abgerufen sofern verfügbar und aktiviert. Für 
 vervollständigt, sofern nicht bereits beschrieben.
 
 Unnötig auszuführen, dass Lieferantennamen und einzigartige Artikelnummern übereinstimmen müssen.
+
+In der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung) steht eine Stellungnahme, warum dies generell nicht die CARO-App-Artikeldatenbank ersetzt.
 
 ### Angepasste Datenbankauszüge
 Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar tauch dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.

@@ -849,6 +849,8 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ### Vendor and product management
 Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor) and maybe the [ERP interface](#erp-interface). Make sure, vendor names match the ERP data.
 
+> Even if the ERP-Interface can provide data or could serve as a direct source of product data this will not happen! Not everyone may have access, let alone writing enabled. The redundant product database within the CARO App considers regulatory requirements that are not considered by default within ERP software.
+
 Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-context is required for this. The evaluation is part of the vendor view in edit mode by default.
 
 Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Without provided date and for vendor evaluation document file uploads the validity is set to one year after the upload by default. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. Files matching the filename convention for this type will be rejected.  
@@ -1591,6 +1593,8 @@ ERP-Data is fetched during pricelist imports if available and selected. For arti
 is updated if not already set within the system.
 
 Needless to elaborate vendor names and unique article numbers must match.
+
+[Vendor and product management](#vendor-and-product-management) states, why this will not replace the CARO App product database in general.
 
 ### Custom database dumps
 Your custom erp interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
@@ -2534,7 +2538,7 @@ Stakeholder identification:
 | Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 | Critical return reasons alert incorporation authorized users and append an incorporation review; 2025-07-11 |
 
 #### Rejected requirements
-> ~~Translation of ERP order-dump is not satisfiable given the current provided data~~
+> ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
 
 A solution could be established due to an erp database connection thus implementing an erp interface into the application.
 
