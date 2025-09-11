@@ -398,11 +398,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$query = <<<'END'
 			SELECT
 			REFERENZ,
-			KV_DATUM,
-			GENEHMIGT_DATUM,
+			convert(varchar(255), KV_DATUM, 104) AS KV_DATUM,
+			convert(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 			AUFTRAGSWERT_BRUTTO,
 			GENEHMIGT_TEILSUMME,
-			FAKTURIERT_DATUM
+			convert(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM
 			FROM vorgaenge
 
 			WHERE REFERENZ IN (:ref)
@@ -424,12 +424,12 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 		foreach ($result as $row){
 			$response[$row['REFERENZ']] = [
-				'reimbursement' => $row['KV_DATUM'] ? substr($row['KV_DATUM'], 0, 10) : null,
+				'reimbursement' => $row['KV_DATUM'] ? : null,
 				'inquiry' => null,
-				'partiallygranted' => $row['GENEHMIGT_DATUM'] && $row['AUFTRAGSWERT_BRUTTO'] != $row['GENEHMIGT_TEILSUMME'] ? substr($row['GENEHMIGT_DATUM'], 0, 10) : null,
-				'granted' => $row['GENEHMIGT_DATUM'] && (!$row['GENEHMIGT_TEILSUMME'] || $row['AUFTRAGSWERT_BRUTTO'] == $row['GENEHMIGT_TEILSUMME']) ? substr($row['GENEHMIGT_DATUM'], 0, 10) : null,
+				'partiallygranted' => $row['GENEHMIGT_DATUM'] && $row['AUFTRAGSWERT_BRUTTO'] != $row['GENEHMIGT_TEILSUMME'] ? $row['GENEHMIGT_DATUM'] : null,
+				'granted' => $row['GENEHMIGT_DATUM'] && (!$row['GENEHMIGT_TEILSUMME'] || $row['AUFTRAGSWERT_BRUTTO'] == $row['GENEHMIGT_TEILSUMME']) ? $row['GENEHMIGT_DATUM'] : null,
 				'production' => null,
-				'settled' => $row['FAKTURIERT_DATUM'] ? substr($row['FAKTURIERT_DATUM'], 0, 10) : null,
+				'settled' => $row['FAKTURIERT_DATUM'] ? : null,
 			];
 		}
 		return $response;
@@ -467,7 +467,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			a.NAME_3,
 			a.NAME_4,
 			a.GEBURTSNAME,
-			a.GEBURTSDATUM,
+			convert(varchar(255), a.GEBURTSDATUM, 104) as GEBURTSDATUM,
 			a.STRASSE_1,
 			a.PLZ_1,
 			a.ORT_1,
@@ -567,18 +567,94 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	*/
 	public function customcsvdump($key = null){
 		$queries = [
-			'random query' => <<<'END'
-			SELECT * from database
-			END,
-			'random query 2' => <<<'END'
-			SELECT * from database
-			END,
+			'Vorgangsexport' => <<<'END'
+				SELECT
+				vorgaenge.REFERENZ AS VORGANG,
+				convert(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+				pat.ANREDE,
+				pat.[PERSOENLICHE ANREDE],
+				pat.REFERENZ AS KUNDENNUMMER,
+				pat.NAME,
+				pat.VORNAME,
+				pat.STRASSE,
+				pat.LKZ,
+				pat.PLZ,
+				pat.ORT,
+				convert(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
+				EMAIL.EMAIL,
+				pat.STERBEDATUM,
+				vorgaenge.LEISTUNG,
+				vorgaenge.AUFTRAGSWERT_BRUTTO,
+				'geliefert' AS GELIEFERT,
+				convert(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
+				[sys].GENEHMIGT,
+				'nein' AS OHNE_SERIENBRIEF
+		
+				FROM vorgaenge
+				INNER JOIN (
+					SELECT
+					KENNZEICHEN,
+					BEZEICHNUNG AS GENEHMIGT
+
+					FROM sys_auswahl
+
+					WHERE AUSWAHLART = 'AuftragsGenehmigung'
+				) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
+				INNER JOIN
+					(
+					SELECT
+					a.NAME_1 AS NAME,
+					concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
+					a.GEBURTSDATUM,
+					a.STRASSE_1 AS STRASSE,
+					a.PLZ_1 AS PLZ,
+					a.ORT_1 AS ORT,
+					a.LKZ_1 AS LKZ,
+					a.REFERENZ,
+					more.STERBEDATUM,
+					t.ADRESS_ANREDE AS ANREDE,
+					t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE]
+
+					FROM adressen AS a
+					INNER JOIN inf_adressart AS ia ON a.ADRESSART = ia.REFERENZ
+					INNER JOIN adr_kunden AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+					INNER JOIN inf_anreden AS t ON t.REFERENZ = a.ANREDE 
+
+					WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+					AND more.STERBEDATUM IS NULL
+					AND more.OHNE_SERIENBRIEF = 0
+				) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
+				LEFT JOIN
+				(
+					SELECT
+					mail.NUMMER AS EMAIL,
+					mail.ADRESSEN_REFERENZ
+
+					FROM adz_kontakte AS mail
+					INNER JOIN inf_kontaktart AS im ON mail.KONTAKTART = im.REFERENZ
+
+					WHERE im.BEZEICHNUNG = 'E-Mail'
+				) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
+		
+				WHERE vorgaenge.GELIEFERT_DATUM IS NOT NULL
+				AND vorgaenge.AUFTRAGSWERT_BRUTTO > 10
+				AND [sys].GENEHMIGT NOT IN ('Storno')
+
+				AND vorgaenge.ANLAGEDATUM > ':date'
+				order by vorgaenge.REFERENZ ASC
+				END,
+		];
+		$variables = [
+			'Vorgangsexport' => [
+				':date' => date('Y-m-d 0:00:00.000', time()-3600*24*(365+2))
+			]
 		];
 
 		if (!$key) return array_keys($queries);
 		if (!isset($queries[$key])) return null;
 		try{
-			$statement = $this->_pdo->prepare($queries[$key]);
+			if (isset($variables[$key])) $statement = $this->_pdo->prepare(strtr($queries[$key], $variables[$key]));
+			else $statement = $this->_pdo->prepare($queries[$key]);
 			$statement->execute();
 		}
 		catch(\EXCEPTION $e){
@@ -588,10 +664,10 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$statement = null;
 
 		if ($result) {
-			$tempFile = UTILITY::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
+			$tempFile = UTILITY::directory('tmp') . '/' . $key . date(' Y-m-d H-i-s') . '.csv';
 			$file = fopen($tempFile, 'w');
 			fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
-			fputcsv($file, array_keys($result),
+			fputcsv($file, array_keys($result[0]),
 				CONFIG['csv']['dialect']['separator'],
 				CONFIG['csv']['dialect']['enclosure'],
 				CONFIG['csv']['dialect']['escape']);
@@ -629,7 +705,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			specialattention*/
 		article2.MINDEST_BESTAND,
 		article.ARTIKEL_REFERENZ,
-		article.WARENEINGANGSDATUM
+		convert(varchar(255), article.WARENEINGANGSDATUM, 23) AS WARENEINGANGSDATUM
 
 		FROM wws_artikel_lieferanten AS article
 		left JOIN
@@ -689,7 +765,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'special_attention' => null,
 				'stock_item' => $row['MINDEST_BESTAND'] ? 1 : null,
 				'erp_id' => $row['ARTIKEL_REFERENZ'],
-				'last_order' => $row['WARENEINGANGSDATUM'] ? substr($row['WARENEINGANGSDATUM'], 0, 10) : null
+				'last_order' => $row['WARENEINGANGSDATUM'] ? : null
 			];
 		}
 		return $response;
@@ -727,9 +803,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		orders.BESTELLNUMMER,
 		orders.BEZEICHNUNG AS BESTELLTEXT,
 		article.ARTIKELBEZEICHNUNG,
-		orders.ORDER_DATUM,
+		convert(varchar(255), orders.ORDER_DATUM, 120) AS ORDER_DATUM,
 		orders.MENGE,
-		orders2.WE_DATUM,
+		convert(varchar(255), orders2.WE_DATUM, 120) AS WE_DATUM,
 		orders2.WE_MENGE,
 		orders2.BESTELL_BELEGNUMMER,
 		vendor.NAME_1 as LIEFERANTEN_NAME
@@ -787,9 +863,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'article_name' =>  $row['ARTIKELBEZEICHNUNG'],
 				//'identifier' => string, part of order text previously pasted during order process generated by caro app in the scheme `  #sz9623` two space-pound-base 36 unixtime according to UTILITY::identifier(), format accordingly
 				'identifier' => '  ' . UTILITY::identifier($row['BESTELLTEXT'], null, false, false, true),
-				'ordered' => $row['ORDER_DATUM'] ? substr($row['ORDER_DATUM'], 0, -4) : null,
-				'partially_received' => $row['WE_DATUM'] && $row['WE_MENGE'] != $row['MENGE'] ? substr($row['WE_DATUM'], 0, -4) : null,
-				'received' => $row['WE_DATUM'] && $row['WE_MENGE'] == $row['MENGE'] ? substr($row['WE_DATUM'], 0, -4) : null,
+				'ordered' => $row['ORDER_DATUM'] ? : null,
+				'partially_received' => $row['WE_DATUM'] && $row['WE_MENGE'] != $row['MENGE'] ? $row['WE_DATUM'] : null,
+				'received' => $row['WE_DATUM'] && $row['WE_MENGE'] == $row['MENGE'] ? $row['WE_DATUM'] : null,
 			];
 		}
 		return $response;
