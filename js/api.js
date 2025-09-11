@@ -109,7 +109,7 @@ export const api = {
 		api.loadindicator(true);
 
 		// ensure passed parameters are encoded e.g. to enable #-characters within a passed api path-parameter
-		request = request.map(i => encodeURIComponent(i));
+		request = request.map((i) => encodeURIComponent(i));
 
 		// default reset masonry breakpoint if former call (current history has been set by recent api call) had prevented this
 		// currently masonry is counterproductive for conversations
@@ -1044,6 +1044,7 @@ export const api = {
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 				if (data.log !== undefined) {
 					const dialog = {
+						header: api._lang.GET("csvfilter.use.download"),
 						type: "input",
 						render: [
 							{ type: "textsection", content: data.log.join("\n") },
@@ -1056,6 +1057,7 @@ export const api = {
 			title = {
 				rule: api._lang.GET("csvfilter.navigation.filter_manager"),
 				filter: api._lang.GET("csvfilter.navigation.filter"),
+				erpquery: api._lang.GET("csvfilter.navigation.erpquery"),
 			};
 		switch (method) {
 			case "get":
