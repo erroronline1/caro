@@ -223,6 +223,7 @@ class _ERPINTERFACE {
 		 * 			'ordered' => Y-m-d H:i:s,
 		 * 			'partially_received' => Y-m-d H:i:s,
 		 * 			'received' => Y-m-d H:i:s,
+		 * 			'order_reference' => string, some identifier from the erp software, may make things easier for purchase on requests
 		 * 		],
 		 * 		...
 		 * ]
@@ -354,6 +355,7 @@ class TEST extends _ERPINTERFACE {
 				'ordered' => '2025-09-01 21:00:00',
 				'partially_received' => null,
 				'received' => '2025-09-01 21:00:00',
+				'order_reference' => '12345'
 			],
 		];
 	}
@@ -866,6 +868,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'ordered' => $row['ORDER_DATUM'] ? : null,
 				'partially_received' => $row['WE_DATUM'] && $row['WE_MENGE'] != $row['MENGE'] ? $row['WE_DATUM'] : null,
 				'received' => $row['WE_DATUM'] && $row['WE_MENGE'] == $row['MENGE'] ? $row['WE_DATUM'] : null,
+				'order_reference' => $row['BESTELL_BELEGNUMMER']
 			];
 		}
 		return $response;

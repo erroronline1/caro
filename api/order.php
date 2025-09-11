@@ -500,7 +500,10 @@ class ORDER extends API {
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
-						'ordertext' => ($product && $product['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') . "\n" : '') . ($product && $product['erp_id'] ? $this->_lang->GET('consumables.product.erp_id') . ": " . $product['erp_id'] . "\n" : '') . " \n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit']) . (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->convertFromServerTime(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''),
+						'ordertext' => ($product && $product['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') . "\n" : '')
+							. ($product && $product['erp_id'] ? $this->_lang->GET('consumables.product.erp_id') . ": " . $product['erp_id'] . "\n" : '')
+							. " \n" . $this->_lang->GET('order.organizational_unit') . ': ' . $this->_lang->GET('units.' . $row['organizational_unit'])
+							. (UTILITY::propertySet($decoded_order_data, 'delivery_date') ? "\n" . $this->_lang->GET('order.delivery_date') . ': ' . $this->convertFromServerTime(UTILITY::propertySet($decoded_order_data, 'delivery_date')) : ''),
 						'quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : null,
 						'unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : null,
 						'barcode' => UTILITY::propertySet($decoded_order_data, 'barcode_label') ? : null,
@@ -549,6 +552,11 @@ class ORDER extends API {
 					// add additional info
 					if ($additional_information = UTILITY::propertySet($decoded_order_data, 'additional_info')){
 						$data['information'] = preg_replace(['/\r/', '/\\\n/'], ['', "\n"], $additional_information);
+					}
+
+					// add order reference if provided by erp interface
+					if ($order_reference = UTILITY::propertySet($decoded_order_data, 'order_reference')){
+						$data['ordertext'] .= "\n" . $this->_lang->GET('order.order_reference') . ': ' . $order_reference;
 					}
 
 					// append order processing states

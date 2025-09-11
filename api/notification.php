@@ -295,6 +295,15 @@ class NOTIFICATION extends API {
 														]) . '; ');
 												}
 											}
+											if ($articles[0]['order_reference'] && !isset($order['order_data']['order_reference'])) {
+												$order['order_data']['order_reference'] = $articles[0]['order_reference'];
+													$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('order_put_approved_order_addinformation'),
+														[
+															':id' => $order['id'],
+															':order_data' => $this->_pdo->quote(UTILITY::json_encode($order['order_data']))
+														]) . '; ');
+											}
+
 											//file_put_contents($logfile, "\n\n" . json_encode($updates), FILE_APPEND);
 											if ($updates) {
 												foreach ($updates as $update){

@@ -1016,7 +1016,6 @@
 			"filter_select": "Edit latest filter"
 		},
 		"erpquery": {
-			"download": "Download file. On exporting sensitive data you are responsible for their safety.",
 			"none": "There were no results for this query",
 			"null": "This query does not exists",
 			"select": "Select query to export as CSV",
@@ -1028,6 +1027,7 @@
 			"filter_manager": "Manage CSV filter"
 		},
 		"use": {
+			"download": "Download file. On exporting sensitive data you are responsible for their safety.",
 			"filter_compare_file": "Select compare file",
 			"filter_download": "Download :file",
 			"filter_input_file": "Select input file",
@@ -1306,6 +1306,7 @@
 		"order_filter_label": "Or filter by term",
 		"order_last_ordered": "Last ordered and delivered on :date",
 		"order_type": "Order type",
+		"order_reference": "ERP order reference",
 		"order_type_revoked": "State as :type revoked",
 		"order_type_set": ":type set",
 		"orderauth_verified": " verified by pin",
