@@ -34,9 +34,6 @@ Things are still in motion. Images may be outdated.
     * max loops for avoiding runaway on improper configured replacement patterns?
     * raise exception if loopcount exceeds passed security parameter
 * erp_interface, additional usecases
-    * data exports if database access is possible
-        * proper meaningful article database
-        * cases for pms
     * view case estimate positions
 
 ## Content
@@ -1067,6 +1064,8 @@ Some general tools are available to read and create 2D-barcodes, as well as supp
 
 Also a CSV-Filter and its manager are sorted here. The CSV-filter processes respective filetypes using the [CSV processor](#csv-processor) and can be used for any kind of list matching. The filter is accessible by defined authorized users.
 
+If available, [ERP interface](#erp-interface) functions may show up here too.
+
 ## Regulatory evaluations and summaries
 This module gathers data from the application in regards of proofing lists for fulfilment of regulatory requirements:
 * complaints
@@ -1592,6 +1591,9 @@ ERP-Data is fetched during pricelist imports if available and selected. For arti
 is updated if not already set within the system.
 
 Needless to elaborate vendor names and unique article numbers must match.
+
+### Custom database dumps
+Your custom erp interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
 
 ### Customization recommendations
 * it is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp]. Data for the responses must match the expected structure described within the parent class
@@ -2513,7 +2515,7 @@ Stakeholder identification:
 | Personal token as order approval an option after all | CEO | 2024-12-12 | Implemented, also configuration option; 2024-12-20 |
 | Article number as qr-code for articles missing EAN/GTIN | CEO, Purchase | 2024-12-12 | Implemented, also forced configuration option; 2024-12-19 |
 | Commission qr-code within orders | CEO, Purchase | 2024-12-12 | Implemented; 2024-12-19 |
-| Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | **Rejected**; 2024-12-26 |
+| Possible translation of ERP order-dump for batch-update of orders | CEO, Purchase | 2024-12-12 | Implemented as erpinterface; 2025-09-10 |
 | Info field for products, e.g. why set to hidden; should result in displaying hidden products for regular users as well (not orders or productselection though) | Purchase | 2025-01-30 | Implemented; 2025-01-31 |
 | History navigation | User | 2025-04-03 | Implemented; 2025-04-05 |
 | HR option for document composer for improved structure comprehension | CEO | 2025-04-07 | Implemented; 2025-04-08 |
@@ -2532,12 +2534,9 @@ Stakeholder identification:
 | Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 | Critical return reasons alert incorporation authorized users and append an incorporation review; 2025-07-11 |
 
 #### Rejected requirements
-> Translation of ERP order-dump is not satisfiable given the current provided data
-* Current structure of order dump mostly identified (ERP OptaData eva 3/viva)
-* [unidentifiable null] [ERPorderRecordNumber int, orderDate Y-m-d H:i:s.0] [ERPvendorCode int, ERPstorageUnit int] [ERParticleNumber int, ERPitemDescription string] [deliveryDate Y-m-d H:i:s.0] [ERPpatientNumber int] [orderAmount float] [deliveredAmount float] [openAmount float] [ERPunitCode int] [orderPrice float] [unidentifiable null] [ERPnoticeFlag int > 1, unidentifiable 0]
-* /^\[.+?\]\t\[(\d+),.(.*?)]\t\[(\d{1,}),.(\d{1,})\]\t\[(\d{1,}),.(.*?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?)\]\t\[(.+?),.(.+?)\]/gms would be able to extract data from copy/pasting the dump
-* while adding the ERPvendorCode to the vendor database might be considered reasonable, it is likely unreliable to keep ERParticleNumbers and ERPunitCodes up to date, unreasonable to link the ERPpatientNumber to a commissioned order, and most likely impossible to match the ordered article with the dump given a mostly messy data within the ERP system and missing article numbers within the dump
-* requirement rejected as this **contradicts simplifying current processes and workloads** as of 2024-12-26
+> ~~Translation of ERP order-dump is not satisfiable given the current provided data~~
+
+A solution could be established due to an erp database connection thus implementing an erp interface into the application.
 
 #### Usability tests
 | Goals | Stakeholder | Time | Outcome |

@@ -971,6 +971,8 @@ Es stehen einige allgemeine Werkzeuge für das Lesen und Erzeugen von 2D-Codes, 
 
 Weiterhin sind an dieser Stelle ein CSV-Filter und dessen Verwaltung eingeordnet. Der CSV-Filter verarbeitet entsprechende Dateitypen unter Verwendung des [CSV-Prozessors](#csv-prozessor) und kann für eine Vielzahl an Datenvergleichen verwendet werden. Filter sind für berechtigte Nutzer erreichbar.
 
+Falls verfügbar, werden hier auch Funktionen der [ERP-Anbindung](#erp-anbindung) angezeigt.
+
 ## Regulatorische Auswertungen und Zusammenfassungen
 Dieses Modul sammelt verfügbare Daten aus der Anwendung und stellt damit Listen zusammen die eine Erfüllung regulatorischer Anforderungen unterstützen:
 * eingeführte Produkte
@@ -1495,6 +1497,9 @@ Daten aus dem ERP-System werden abgerufen sofern verfügbar und aktiviert. Für 
 vervollständigt, sofern nicht bereits beschrieben.
 
 Unnötig auszuführen, dass Lieferantennamen und einzigartige Artikelnummern übereinstimmen müssen.
+
+### Angepasste Datenbankauszüge
+Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar tauch dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
 
 ### Empfehlungen für die Anpassung
 * es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Daten für die Rückgabewerte müssen der erwarteten Struktur entsprechen, die in der Elternklasse beschrieben sind.
