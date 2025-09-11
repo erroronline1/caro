@@ -24,6 +24,8 @@ namespace CARO\API;
 // it might be necessary to dynamically adapt this module according to changing requirements
 // especially customerdata
 
+// UTILITY functions may be implemented within the examples, as _utility.php is included by default
+
 class _ERPINTERFACE {
 	/**
 	 * set to true if class has been successfully constructed
@@ -102,6 +104,53 @@ class _ERPINTERFACE {
 		 * ]
 		 */
 		return null;
+	}
+
+	/**
+	 * if database connection is available you can formulate queries to retrieve a custom data dump
+	 * without parameter available query keys are returned to be shown within the CARO App
+	 * @param string|null $key
+	 * @return array|string array of available query keys or path to csv dump
+	*/
+	public function customcsvdump($key = null){
+		return null;
+
+		/*
+		$queries = [
+			'random query' => 'SELECT * FROM database'
+		];
+
+		if (!$key) return array_keys($queries);
+		if (!isset($queries[$key])) return null;
+		try{
+			$statement = $this->_pdo->prepare($queries[$key]);
+			$statement->execute();
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+
+		if ($result) {
+			$tempFile = UTILITY::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
+			$file = fopen($tempFile, 'w');
+			fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+			fputcsv($file, array_keys($result),
+				CONFIG['csv']['dialect']['separator'],
+				CONFIG['csv']['dialect']['enclosure'],
+				CONFIG['csv']['dialect']['escape']);
+			foreach ($result as $line) {
+				fputcsv($file, $line,
+				CONFIG['csv']['dialect']['separator'],
+				CONFIG['csv']['dialect']['enclosure'],
+				CONFIG['csv']['dialect']['escape']);
+			}
+			fclose($file);
+			return (substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
+		}
+		return [];
+		*/
 	}
 
 	/**
@@ -249,6 +298,24 @@ class TEST extends _ERPINTERFACE {
 				'Telefonnummer' => '09876 54321'
 			]
 		];
+	}
+
+	/**
+	 * if database connection is available you can formulate queries to retrieve a custom data dump
+	 * without parameter available query keys are returned to be shown within the CARO App
+	 * @param string|null $key
+	 * @return array|string array of available query keys or path to csv dump
+	*/
+	public function customcsvdump($key = null){
+		$queries = [
+			'random query' => 'this is no a real file path',
+			'random query 2' => 'this is another unreal file path',
+		];
+
+		if (!$key) return array_keys($queries);
+		if (!isset($queries[$key])) return null;
+		return $queries[$key];
+		return [];
 	}
 
 	/**
@@ -471,14 +538,14 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 		foreach ($result as $row){
 			$patient = [
-				'Nachname' =>  $row['NACHNAME'],
-				'Vorname' => implode(' ', array_filter(array_map(fn($c) => $row[$c] ? : '', ['NAME_2', 'NAME_3', 'NAME_4']), fn($v) => boolval($v))),
+				//'Nachname' =>  $row['NACHNAME'],
+				//'Vorname' => implode(' ', array_filter(array_map(fn($c) => $row[$c] ? : '', ['NAME_2', 'NAME_3', 'NAME_4']), fn($v) => boolval($v))),
 				'Name' => implode(' ', array_filter(array_map(fn($c) => $row[$c] ? : '', ['NAME_2', 'NAME_3', 'NAME_4', 'NACHNAME']), fn($v) => boolval($v))),
-				'Straße' => $row['STRASSE_1'],
-				'Postleitzahl' => $row['PLZ_1'],
+				//'Straße' => $row['STRASSE_1'],
+				//'Postleitzahl' => $row['PLZ_1'],
 				'Geburtsdatum' => substr($row['GEBURTSDATUM'] ? : '', 0, 10),
-				'Stadt' => $row['ORT_1'],
-				'Land' => $row['LKZ_1'],
+				//'Stadt' => $row['ORT_1'],
+				//'Land' => $row['LKZ_1'],
 				'Adresse' => $row['STRASSE_1'] . ', ' . $row['LKZ_1'] . '-' . $row['PLZ_1'] . ' ' . $row['ORT_1'],
 				'Telefonnummer' => $row['PHONE'],
 				'Mobil' => $row['MOBILE'],
@@ -491,6 +558,55 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		return $response;
 	}
 
+
+	/**
+	 * if database connection is available you can formulate queries to retrieve a custom data dump
+	 * without parameter available query keys are returned to be shown within the CARO App
+	 * @param string|null $key
+	 * @return array|string array of available query keys or path to csv dump
+	*/
+	public function customcsvdump($key = null){
+		$queries = [
+			'random query' => <<<'END'
+			SELECT * from database
+			END,
+			'random query 2' => <<<'END'
+			SELECT * from database
+			END,
+		];
+
+		if (!$key) return array_keys($queries);
+		if (!isset($queries[$key])) return null;
+		try{
+			$statement = $this->_pdo->prepare($queries[$key]);
+			$statement->execute();
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+
+		if ($result) {
+			$tempFile = UTILITY::directory('tmp') . '/' . date('Y-m-d H:i:s') . $key . '.csv';
+			$file = fopen($tempFile, 'w');
+			fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
+			fputcsv($file, array_keys($result),
+				CONFIG['csv']['dialect']['separator'],
+				CONFIG['csv']['dialect']['enclosure'],
+				CONFIG['csv']['dialect']['escape']);
+			foreach ($result as $line) {
+				fputcsv($file, $line,
+				CONFIG['csv']['dialect']['separator'],
+				CONFIG['csv']['dialect']['enclosure'],
+				CONFIG['csv']['dialect']['escape']);
+			}
+			fclose($file);
+			return (substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']);
+		}
+		return [];
+	}
+	
 	/**
 	 * retrieve recent data of erp consumables database
 	 * @param array $vendors
@@ -508,9 +624,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		article.EAN,
 		unit.BEZEICHNUNG AS BESTELLEINHEIT,
 		article2.ZUSATZINFORMATION,
-		/*tradinggood
-		expirydate
-		specialattention*/
+			/*tradinggood
+			expirydate
+			specialattention*/
 		article2.MINDEST_BESTAND,
 		article.ARTIKEL_REFERENZ,
 		article.WARENEINGANGSDATUM

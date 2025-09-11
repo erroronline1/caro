@@ -1015,7 +1015,15 @@
 			"filter_saved": "The filter named :name has been saved.",
 			"filter_select": "Edit latest filter"
 		},
+		"erpquery": {
+			"download": "Download file. On exporting sensitive data you are responsible for their safety.",
+			"none": "There were no results for this query",
+			"null": "This query does not exists",
+			"select": "Select query to export as CSV",
+			"select_hint": "No fitting query found? Contact a programmer to set one up."
+		},
 		"navigation": {
+			"dump": "ERP database query",
 			"filter": "CSV filter",
 			"filter_manager": "Manage CSV filter"
 		},

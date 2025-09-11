@@ -36,6 +36,75 @@ class CSVFILTER extends API {
 	}
 
 	/**
+	 *                                   
+	 *   ___ ___ ___ ___ _ _ ___ ___ _ _ 
+	 *  | -_|  _| . | . | | | -_|  _| | |
+	 *  |___|_| |  _|_  |___|___|_| |_  |
+	 *          |_|   |_|           |___|
+	 * retrieve data dumps from the erp-interface as file
+	 * get respondes with available options to select from
+	 * post responds with a download link to the result file after processing
+	 */
+	public function erpquery(){
+		if (!PERMISSION::permissionFor('csvfilter')) $this->response([], 401);
+		include_once('./_erpinterface.php');
+		if(!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customcsvdump') && ERPINTERFACE->customcsvdump())) $this->response([], 404);
+		$response = [];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$result = ERPINTERFACE->customcsvdump($this->_requestedID);
+				if ($result === null) $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => $this->_lang->GET('csvfilter.erpquery.null'),
+						'type' => 'error'
+					]]);
+				if (!$result) $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => $this->_lang->GET('csvfilter.erpquery.none'),
+						'type' => 'error'
+					]]);
+				
+				$resultinfo = pathinfo($result);
+				$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $resultinfo['basename']])] = [
+						'href' => './api/api.php/file/stream/' . substr($result, 1),
+						'download' => $resultinfo['basename']
+					];				
+				$this->response([
+					'log' => [],
+					'links' => $downloadfiles
+				]);
+
+				break;
+			case 'GET':
+				$options = ['...' . $this->_lang->GET('csvfilter.erpquery.select') => ['value' => '0']];
+				foreach(ERPINTERFACE->customcsvdump() as $key){
+					$options[$key] = ['value' => $key];
+				}
+
+				// append filter selection
+				$response['render'] = [
+					'content' => [
+						[
+							[
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('csvfilter.erpquery.select'),
+									'onchange' => "api.csvfilter('post', 'erpquery', this.value)"
+								],
+								'content' => $options,
+								'hint' => $this->_lang->GET('csvfilter.erpquery.select_hint')
+							]
+						]
+					]
+				];
+		}
+		$this->response($response);
+	}
+
+	/**
 	 *   ___ _ _ _
 	 *  |  _|_| | |_ ___ ___
 	 *  |  _| | |  _| -_|  _|
