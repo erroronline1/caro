@@ -1636,17 +1636,6 @@ class CONSUMABLES extends API {
 									]
 								];
 						}
-						/* huh?
-						else $response['render']['content'][] = [
-							[
-								[
-									'type' => 'links',
-									'description' => $this->_lang->GET('consumables.product.documents_valid'),
-									'content' => $documents
-								]
-							]
-						];
-						*/
 					}
 
 					// add delete button for eligible products
@@ -2639,8 +2628,8 @@ class CONSUMABLES extends API {
 							];
 					}
 
-					// add pricelist upload form
-					if ($vendor['id'] && !$vendor['hidden'])
+					// add pricelist upload form if filter is available
+					if (isset($vendor['pricelist']['filter']) && !$vendor['hidden']){
 						$pricelistupdateoptions = [
 							[
 								'type' => 'file',
@@ -2650,6 +2639,8 @@ class CONSUMABLES extends API {
 								]
 							]
 						];
+
+						// match with erp interface
 						if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
 							$pricelistupdateoptions[] = [
 								'type' => 'checkbox',
@@ -2662,14 +2653,23 @@ class CONSUMABLES extends API {
 							];
 						}
 						else {
-							$pricelistupdateoptions[] = [
-								'type' => 'file',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.pricelist_match'),
-									'accept' => '.csv'
-								],
-								'hint' => $this->_lang->GET('consumables.vendor.pricelist_match_hint'),
-							];
+						// add another file upload if filter contains a comparison file
+							$filter = json_decode($vendor['pricelist']['filter'], true);
+							if (isset($filter['filter'])) {
+								foreach ($filter['filter'] as $rule) {
+									if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
+										$pricelistupdateoptions[] = [
+											'type' => 'file',
+											'attributes' => [
+												'name' => $this->_lang->GET('consumables.vendor.pricelist_match'),
+												'accept' => '.csv'
+											],
+											'hint' => $this->_lang->GET('consumables.vendor.pricelist_match_hint'),
+										];
+										break;
+									}
+								}
+							}
 						}
 
 						array_splice($response['render']['content'][3], 0, 0,
@@ -2677,6 +2677,7 @@ class CONSUMABLES extends API {
 								$pricelistupdateoptions
 							]
 						);
+					}
 
 					// add pricelist info if provided
 					if (isset($vendor['pricelist']['validity'])) array_splice($response['render']['content'][3], 0, 0,
