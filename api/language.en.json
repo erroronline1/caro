@@ -1390,6 +1390,15 @@
 		"date": "Date of record",
 		"erp_case_number": "ERP case number",
 		"erp_case_number_hint": "multiple case numbers can be added, e.g. z.B. 12345; 12346",
+		"erpinterface":{
+			"casepositions_button":"Case positions",
+			"casepositions":{
+				"amount":"Amount",
+				"contract_position":"Position",
+				"text":"Position text"
+			},
+			"null":"For the provided case number(s) are no results available."
+		},
 		"error": "Record could not be saved. Please try again.",
 		"export": "Export record",
 		"export_author": ":author on :date",

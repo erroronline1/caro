@@ -25,6 +25,8 @@ namespace CARO\API;
 // especially customerdata
 
 // UTILITY functions may be implemented within the examples, as _utility.php is included by default
+// the base class contains examples of all implemented methods. if you can only serve partially
+// drop the methods or return null from your custom class
 
 class _ERPINTERFACE {
 	/**
@@ -59,6 +61,29 @@ class _ERPINTERFACE {
 		 *			'granted' => Y-m-d,
 		 *			'production' => Y-m-d,
 		 *			'settled' => Y-m-d,
+		 * 		],
+		 * 		...
+		 * ]
+		 */
+		return null;
+	}
+
+	/**
+	 * retrieve calculatory case positions based on passed case numbers
+	 * @param array $erp_case_numbers
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 */
+	public function casepositions($erp_case_numbers = []){
+		/**
+		 * return [
+		 * 		'{erp_case_number}' => [
+		 * 			'amount' => string,
+		 * 			'text' => string,
+		 * 			'contract_position' => string
 		 * 		],
 		 * 		...
 		 * ]
@@ -436,6 +461,57 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		}
 		return $response;
 	}
+
+	/**
+	 * retrieve calculatory case positions based on passed case numbers
+	 * @param array $erp_case_numbers
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 */
+	public function casepositions($erp_case_numbers = []){
+		$query = <<<'END'
+		SELECT
+		VORGAENGE_REFERENZ,
+		POSITION,
+		ANZAHL,
+		POSITIONSTEXT
+		
+		FROM vor_positionen
+		WHERE 
+		POSITIONSTEXT IS NOT NULL AND POSITIONSTEXT != ''
+		AND VORGAENGE_REFERENZ IN (:ref)
+		
+		ORDER BY ID ASC
+		END;
+
+		if (!$erp_case_numbers) return [[]];
+		try{
+			$statement = $this->_pdo->prepare(strtr($query, [
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref), $erp_case_numbers))
+			]));
+			$statement->execute();	
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+		$response = [];
+
+		foreach ($result as $row){
+			if (!isset($response[$row['VORGAENGE_REFERENZ']])) $response[$row['VORGAENGE_REFERENZ']] = [];
+			$response[$row['VORGAENGE_REFERENZ']][] = [
+				'amount' => $row['ANZAHL'] ? : '',
+				'contract_position' => $row['POSITION'] ? : '',
+				'text' => $row['POSITIONSTEXT'] ? : '',
+			];
+		}
+		return $response;
+	}
+
 
 	/**
 	 * retrieve most recent customer data details based on matching name / dob

@@ -500,6 +500,45 @@ class RECORD extends API {
 		$this->export('document');
 	}
 	
+
+	/**
+	 *                                           _ _   _
+	 *   ___ ___ ___ ___ ___ ___ ___ ___ ___ ___|_| |_|_|___ ___ ___
+	 *  | -_|  _| . |  _| .'|_ -| -_| . | . |_ -| |  _| | . |   |_ -|
+	 *  |___|_| |  _|___|__,|___|___|  _|___|___|_|_| |_|___|_|_|___|
+	 *          |_|                 |_|
+	 */
+	public function erpcasepositions(){
+		include_once('./_erpinterface.php');
+		if (!($this->_requestedID && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions())){
+			$this->response([], 405);
+		}
+		$cases = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', $this->_requestedID));
+		if (!array_keys($cases)) $this->response(['response' => ['msg' => $this->_lang->GET('record.erpinterface.null')]]);
+
+		$body = [];
+		foreach($cases as $case => $positions){
+			$rows = [];
+
+			$rows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], array_keys($positions[0]));
+			foreach($positions as $position){
+				$rows[] = array_map(fn($v) => ['c' => $v], array_values($position));
+			}
+
+			array_push($body, [
+				'type' => 'table',
+				'attributes' => [
+					'name' => strval($case)
+				],
+				'content' => $rows
+			]);
+		}
+
+		$this->response([
+			'render' => $body
+		]);	}
+	
+	
 	/**
 	 *                       _
 	 *   ___ _ _ ___ ___ ___| |_
@@ -1152,6 +1191,7 @@ class RECORD extends API {
 							'name' => $this->_lang->GET('record.erp_case_number'),
 							'value' => $content['erp_case_number'] ? : '',
 							'onkeydown' => "if (event.key==='Enter') api.record('put', 'casestate', '" . $this->_requestedID . "', 'erp_case_number', this.value)",
+							'id' => '_erpcasenumbers'
 						]
 					];
 					if(!PERMISSION::permissionFor('recordscasestate')){
@@ -1171,6 +1211,17 @@ class RECORD extends API {
 						],
 						$erp_case_number
 					];
+
+					include_once('./_erpinterface.php');
+					if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()){
+						$body[count($body) - 1][] = [
+							'type' => 'button',
+							'attributes' => [
+								'value' => $this->_lang->GET('record.erpinterface.casepositions_button'),
+								'onclick' => "let v = document.getElementById('_erpcasenumbers').value; if (v) api.record('get', 'erpcasepositions', v);"
+							]
+						];
+					}
 				}
 				// append general request button
 				$body[count($body) - 1][] = [

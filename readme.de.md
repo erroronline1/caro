@@ -1504,6 +1504,10 @@ Unnötig auszuführen, dass Lieferantennamen und einzigartige Artikelnummern üb
 
 In der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung) steht eine Stellungnahme, warum dies generell nicht die CARO-App-Artikeldatenbank ersetzt.
 
+### Vorgangspositionen
+Vorgangspositionen werden je Anfrage verarbeitet. Sofern verfügbar werden Tabellen der Vorgangspositionen aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) angezeigt.  
+Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden. Die Schlüssel müssen zu den Sprachblöcken der `record.erpinterface.casepositions` passen.
+
 ### Angepasste Datenbankauszüge
 Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar tauch dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
 

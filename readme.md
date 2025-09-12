@@ -34,7 +34,6 @@ Things are still in motion. Images may be outdated.
     * max loops for avoiding runaway on improper configured replacement patterns?
     * raise exception if loopcount exceeds passed security parameter
 * erp_interface, additional usecases
-    * view case estimate positions
 
 ## Content
 * [Aims](#aims)
@@ -1597,6 +1596,10 @@ is updated if not already set within the system.
 Needless to elaborate vendor names and unique article numbers must match.
 
 [Vendor and product management](#vendor-and-product-management) states, why this will not replace the CARO App product database in general.
+
+### Case positions
+Case positions are fetched by request. If available, tables of the calculatory items will be displayed from within the records according to the provided ERP case number(s).  
+Data will be presented as constructed within the custom interface-class-method. Keys must match the language chunks `record.erpinterface.casepositions`.
 
 ### Custom database dumps
 Your custom erp interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
@@ -4521,6 +4524,20 @@ Parameters
 Sample response
 ```
 {"render":[{"type":"links","description":"Open the link, save or print the record summary. On exporting sensitive data you are responsible for their safety.","content":{"Dokumentationen":{"href":".\/fileserver\/tmp\/testpatient 2024-10-11 2103_2024-10-12 2006.pdf"}}}]}
+```
+
+> GET ./api/api.php/record/documentexport/{identifier}/{name}
+
+Returns a dialog table view of ERP interface case positions.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {identifier} | path parameter | required | identifier for ERP cases |
+
+Sample response
+```
+[{"type": "table","attributes": {"name": "1776368"},"content": [[{"c": "Amount"},{"c": "Position"},{"c": "Position text"}],[{"c": "1.0"},{"c": "1"},{"c": "Myoelektrische Unterarmprothese als Definitivversorgung  in Sandwichbauweise, Silikonhaftkontaktschaft mit Taska Hand nach erfolgter Testversorgung links\nAufstellung siehe Anlage"}],[{"c": ""},{"c": ""},{"c": "Zwischensumme"}]]}]
 ```
 
 > GET ./api/api.php/record/fullexport/{identifier}
