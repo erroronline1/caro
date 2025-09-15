@@ -34,6 +34,8 @@ Things are still in motion. Images may be outdated.
     * max loops for avoiding runaway on improper configured replacement patterns?
     * raise exception if loopcount exceeds passed security parameter
 * erp_interface, additional usecases
+    * std method for csv uploads to distinct folder, then show up within tools?
+    * check oldest order and submit for erp order data updates initial date on deletion of cron.log
 
 ## Content
 * [Aims](#aims)
