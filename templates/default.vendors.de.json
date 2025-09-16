@@ -2,7 +2,7 @@
 	{
 		"name": "Achim Ruthner GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"purchase_info": "Preislistenimport: ODS-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -14,14 +14,88 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 0,
-					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+					"columns": ["Artikelnummer", "Bezeichnung", "EANNummer", "Einheit"]
 				},
+				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete anything but articles",
+						"keep": true,
+						"match": {
+							"all": {
+								"Artikelnummer": ".+"
+							}
+						}
+					},
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Artikelnummer"],
+							"descending": false,
+							"column": "Artikelnummer",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrowindex": 1,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "ruthner",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Artikelnummer": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
 				"modify": {
 					"add": {
 						"trading_good": "1",
-						"stock_item": "0"
+						"has_expiry_date": "0"
 					},
-					"conditional_or": [["stock_item", "1", ["article_no", "3401|TS40"]]]
+					"rewrite": [
+						{
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Bezeichnung"],
+							"article_unit": ["Einheit"],
+							"article_ean": ["EANNummer"]
+						}
+					]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -29,9 +103,9 @@
 		}
 	},
 	{
-		"name": "AET GmbH (TSM)",
+		"name": "AET-GmbH ",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV Kopfzeile Liefereinheit anpassen, Tierbandagen löschen, mittlere Kopfzeilen und alles oberhalb der ersten Zeile löschen, Hilfsmittelbezeichnung an Optionen anhängen.",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile Liefereinheit anpassen, Tierbandagen löschen, mittlere Kopfzeilen und alles oberhalb der ersten Zeile löschen, Hilfsmittelbezeichnung an Optionen anhängen.",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -132,7 +206,7 @@
 		}
 	},
 	{
-		"name": "Aidamed",
+		"name": "AIDAMED ",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -257,7 +331,7 @@
 		}
 	},
 	{
-		"name": "Alps South",
+		"name": "ALPS SOUTH EUROPE s.r.o.",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -281,7 +355,7 @@
 	{
 		"name": "AMT Aromando Medizintechnik GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -383,9 +457,9 @@
 		}
 	},
 	{
-		"name": "Arthroven GmbH",
+		"name": "Arthroven Gmbh",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -477,7 +551,7 @@
 	{
 		"name": "Aspen Medical Products GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -579,9 +653,9 @@
 		}
 	},
 	{
-		"name": "Basko Orthopädie Handelsgesellschaft mbH",
+		"name": "Basko Healthcare",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -681,7 +755,7 @@
 		}
 	},
 	{
-		"name": "Bauerfeind",
+		"name": "Bauerfeind AG",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -703,9 +777,9 @@
 		}
 	},
 	{
-		"name": "Blatchford Europe GmbH (Endolite)",
+		"name": "Blatchford Europe GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -716,7 +790,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Artikel", "Artikelbeschreibung"]
+					"columns": ["Artikelnummer", "Produktbeschreibung"]
 				},
 				"filter": [
 					{
@@ -724,9 +798,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikel"],
+							"orderby": ["Artikelnummer"],
 							"descending": false,
-							"column": "Artikel",
+							"column": "Artikelnummer",
 							"amount": 1
 						}
 					},
@@ -766,7 +840,7 @@
 						],
 						"match": {
 							"all": {
-								"Artikel": "BESTELL_NUMMER"
+								"Artikelnummer": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -782,8 +856,8 @@
 					},
 					"rewrite": [
 						{
-							"article_no": ["Artikel"],
-							"article_name": ["Artikelbeschreibung"],
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Produktbeschreibung"],
 							"article_unit": [""],
 							"article_ean": [""]
 						}
@@ -797,7 +871,7 @@
 	{
 		"name": "Bort GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -905,7 +979,7 @@
 		}
 	},
 	{
-		"name": "BSN Jobst / Essity",
+		"name": "BSN-Jobst GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -929,7 +1003,7 @@
 	{
 		"name": "Busch Orthopädie Service GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV Kopfzeile article_no ergänzen",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile article_no ergänzen",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1031,9 +1105,9 @@
 		}
 	},
 	{
-		"name": "Heinrich Caroli GmbH",
+		"name": "Heinrich Caroli e.K.",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1124,9 +1198,9 @@
 		}
 	},
 	{
-		"name": "Cosmesil Jörn Brom",
+		"name": "Cosmesil.de",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV Kopfzeile article_no und article_name ergänzen ",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile article_no und article_name ergänzen ",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1228,9 +1302,9 @@
 		}
 	},
 	{
-		"name": "Darco GmbH",
+		"name": "Darco (Europe) GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1326,7 +1400,7 @@
 		}
 	},
 	{
-		"name": "Dirame",
+		"name": "Dirame Ortho N.V.",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -1348,9 +1422,9 @@
 		}
 	},
 	{
-		"name": "Erkodent Erich Kopp GmbH",
+		"name": "ERKODENT® Erich Kopp GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1447,9 +1521,9 @@
 		}
 	},
 	{
-		"name": "feet-control GmbH",
+		"name": "Feet Control GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV Kopfzeile article_no ergänzen",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile article_no ergänzen",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1539,9 +1613,9 @@
 		}
 	},
 	{
-		"name": "Fior und Gentz",
+		"name": "Fior & Gentz GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV Kopfzeile ",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile ",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1632,9 +1706,9 @@
 		}
 	},
 	{
-		"name": "F. Gottinger Orthopädietechnik GmbH",
+		"name": "Gottinger Handelshaus GbR",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1646,7 +1720,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 2,
-					"columns": ["Art Nr", "Bezeichnung", "Menge"]
+					"columns": ["Art. Nr.          ", "          Bezeichnung       ", "Menge"]
 				},
 				"filter": [
 					{
@@ -1654,9 +1728,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Art Nr"],
+							"orderby": ["Art. Nr.          "],
 							"descending": false,
-							"column": "Art Nr",
+							"column": "Art. Nr.          ",
 							"amount": 1
 						}
 					},
@@ -1696,7 +1770,7 @@
 						],
 						"match": {
 							"all": {
-								"Art Nr": "BESTELL_NUMMER"
+								"Art. Nr.          ": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -1708,8 +1782,8 @@
 				"modify": {
 					"rewrite": [
 						{
-							"article_no": ["Art Nr"],
-							"article_name": ["Bezeichnung"],
+							"article_no": ["Art. Nr.          "],
+							"article_name": ["          Bezeichnung       "],
 							"article_unit": ["Menge"],
 							"article_ean": [""]
 						}
@@ -1723,7 +1797,7 @@
 	{
 		"name": "Ihle Strumpf GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1735,7 +1809,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 1,
-					"columns": ["Nr", "Beschreibung 1", "Beschreibung 2", "Farbe", "Groesse", "Einheiten"]
+					"columns": ["Nr.", "Beschreibung 1", "Beschreibung 2", "Farbe", "Größe", "Einheit"]
 				},
 				"filter": [
 					{
@@ -1743,9 +1817,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Nr"],
+							"orderby": ["Nr."],
 							"descending": false,
-							"column": "Nr",
+							"column": "Nr.",
 							"amount": 1
 						}
 					},
@@ -1785,7 +1859,7 @@
 						],
 						"match": {
 							"all": {
-								"Nr": "BESTELL_NUMMER"
+								"Nr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -1801,9 +1875,9 @@
 					"conditional_or": [["trading_good", "1", ["article_name", "socke|strumpf|ckchen|kniestr|shirt|body|hose"]]],
 					"rewrite": [
 						{
-							"article_no": ["Nr"],
-							"article_name": ["Beschreibung 1", ", ", "Beschreibung 2", ", ", "Farbe", ", ", "Groesse"],
-							"article_unit": ["Einheiten"],
+							"article_no": ["Nr."],
+							"article_name": ["Beschreibung 1", ", ", "Beschreibung 2", ", ", "Farbe", ", ", "Größe"],
+							"article_unit": ["Einheit"],
 							"article_ean": [""]
 						}
 					]
@@ -1814,7 +1888,7 @@
 		}
 	},
 	{
-		"name": "Kaupo",
+		"name": "KauPo Plankenhorn e.K. ",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -1836,7 +1910,7 @@
 		}
 	},
 	{
-		"name": "Krewi",
+		"name": "KREWI Medical Produkte GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -1858,9 +1932,9 @@
 		}
 	},
 	{
-		"name": "Erwin Kowsky GmbH",
+		"name": "Erwin Kowsky GmbH & Co KG",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1871,7 +1945,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Plangruppe", "Artikelnummer", "Artikelbezeichnung", "Mengeneinheit"],
+					"columns": ["Artikelgruppe", "Artikelnummer", "Artikelbeschreibung", "Verkaufsmengeneinheit"],
 					"headerrowindex": 9
 				},
 				"filter": [
@@ -1935,13 +2009,13 @@
 					"add": {
 						"trading_good": "1"
 					},
-					"conditional_or": [["trading_good", "0", ["Plangruppe", "Ersatzteile|SOA"]]],
-					"remove": ["Plangruppe"],
+					"conditional_or": [["trading_good", "0", ["Artikelgruppe", "ersatz|griffe|zubehör|gummikapseln"]]],
+					"remove": ["Artikelgruppe"],
 					"rewrite": [
 						{
 							"article_no": ["Artikelnummer"],
-							"article_name": ["Artikelbezeichnung"],
-							"article_unit": ["Mengeneinheit"],
+							"article_name": ["Artikelbeschreibung"],
+							"article_unit": ["Verkaufsmengeneinheit"],
 							"article_ean": [""]
 						}
 					]
@@ -1974,9 +2048,9 @@
 		}
 	},
 	{
-		"name": "Lohmann und Rauscher GmbH",
+		"name": "Lohmann& Rauscher GmbH & Co. KG",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2070,6 +2144,109 @@
 		}
 	},
 	{
+		"name": "Ludwig Bertram GmbH",
+		"info": {
+			"purchase_info": "",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Im Torfstich 7, 30916 Isernhagen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"headerrowindex": 2,
+					"columns": ["Artikelnummer ", "Artikelbezeichnung", "Einheit"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete unneccessary products",
+						"keep": false,
+						"match": {
+							"all": {
+								"Einheit": "nicht mehr lieferbar"
+							}
+						}
+					},
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Artikelnummer"],
+							"descending": false,
+							"column": "Artikelnummer",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrowindex": 1,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "russka",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Artikelnummer ": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"trading_good": "0"
+					},
+					"conditional_or": [["trading_good", "1", ["Artikelbezeichnung", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|st(?:ü|Ü)tzschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]],
+					"rewrite": [
+						{
+							"article_no": ["Artikelnummer "],
+							"article_name": ["Artikelbezeichnung"],
+							"article_unit": ["Einheit"],
+							"article_ean": [""]
+						}
+					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Ludwig Leiner",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
@@ -2114,9 +2291,9 @@
 		}
 	},
 	{
-		"name": "Medi GmbH",
+		"name": "Medi GmbH & Co.KG",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2219,9 +2396,9 @@
 		}
 	},
 	{
-		"name": "Fritz Minke GmbH",
+		"name": "Minke GmbH & Co KG",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV in Excel umschreiben - Beschreibung mit Staffel verketten und als Wert neu einfügen",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV in Excel umschreiben - Beschreibung mit Staffel verketten und als Wert neu einfügen",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2325,9 +2502,9 @@
 		}
 	},
 	{
-		"name": "MMIB Mobile Mode Inge Berges",
+		"name": "MMIB",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV in Excel umschreiben - die ersten drei Spalten verketten und als Wert in article_no einfügen, article_name ergänzen, den Rest löschen",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV in Excel umschreiben - die ersten drei Spalten verketten und als Wert in article_no einfügen, article_name ergänzen, den Rest löschen",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2416,9 +2593,9 @@
 		}
 	},
 	{
-		"name": "neaTec GmbH",
+		"name": "Neatec GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2430,7 +2607,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 1,
-					"columns": ["Artikel-Nr", "Artikelbezeichnung lang", "Groesse", "Farbe", "Einheit"]
+					"columns": ["Artikel-Nr.", "Artikelbezeichnung kurz", "Größe", "Farbe", "Einheit"]
 				},
 				"filter": [
 					{
@@ -2480,7 +2657,7 @@
 						],
 						"match": {
 							"all": {
-								"article_no": "BESTELL_NUMMER"
+								"Artikel-Nr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -2497,7 +2674,7 @@
 					"rewrite": [
 						{
 							"article_no": ["Artikel-Nr."],
-							"article_name": ["Artikelbezeichnung lang", ", ", "Groesse", ", ", "Farbe"],
+							"article_name": ["Artikelbezeichnung kurz", ", ", "Größe", ", ", "Farbe"],
 							"article_unit": ["Einheit"],
 							"article_ean": [""]
 						}
@@ -2511,7 +2688,7 @@
 	{
 		"name": "Nowecare GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV Kopfzeile in Zeile 7 ergänzen: article_ean, article_name, article_no",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile in Zeile 7 ergänzen: article_ean, article_name, article_no",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2611,9 +2788,9 @@
 		}
 	},
 	{
-		"name": "Nowecor AG",
+		"name": "Nowecor",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2716,7 +2893,7 @@
 	{
 		"name": "Össur Deutschland GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: Listen zusammenführen, Produktbeschreibung anpassen für: Knit-Rite Soft Socken (1SB1XXYY3, ff)",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, Listen zusammenführen, Produktbeschreibung anpassen für: Knit-Rite Soft Socken (1SB1XXYY3, ff)",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2900,7 +3077,7 @@
 		}
 	},
 	{
-		"name": "Ormed Enovis",
+		"name": "Ormed GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -2924,7 +3101,7 @@
 	{
 		"name": "Ortho-Reha Neuhof GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3124,9 +3301,9 @@
 		}
 	},
 	{
-		"name": "ORTHO-SYSTEMS Thomas Böckh",
+		"name": "Ortho-Systems",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3137,7 +3314,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Artikel-Nr", "Einh", "EAN_UDI-DI-Nr", "Auflistung mit Menge und Inhalt-Pos"]
+					"columns": ["Artikel-Nr.", "Einh.", "EAN_UDI-DI-Nr.", "Auflistung mit Menge und Inhalt-(Pos)"]
 				},
 				"filter": [
 					{
@@ -3145,9 +3322,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikel-Nr"],
+							"orderby": ["Artikel-Nr."],
 							"descending": false,
-							"column": "Artikel-Nr",
+							"column": "Artikel-Nr.",
 							"amount": 1
 						}
 					},
@@ -3187,7 +3364,7 @@
 						],
 						"match": {
 							"all": {
-								"Artikel-Nr": "BESTELL_NUMMER"
+								"Artikel-Nr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -3199,10 +3376,10 @@
 				"modify": {
 					"rewrite": [
 						{
-							"article_no": ["Artikel-Nr"],
-							"article_name": ["Auflistung mit Menge und Inhalt-Pos"],
-							"article_unit": ["Einh"],
-							"article_ean": ["EAN_UDI-DI-Nr"]
+							"article_no": ["Artikel-Nr."],
+							"article_name": ["Auflistung mit Menge und Inhalt-(Pos)"],
+							"article_unit": ["Einh."],
+							"article_ean": ["EAN_UDI-DI-Nr."]
 						}
 					]
 				}
@@ -3214,7 +3391,7 @@
 	{
 		"name": "Orthoservice Deutschland GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3319,8 +3496,80 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+					"columns": ["Artikelgruppe", "Artikelnummer", "Artikelbeschreibung", "Verkaufsmengeneinheit", "EAN / Barcode"],
+					"headerrowindex": 9
+				},
+				"filter": [
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Artikelnummer"],
+							"descending": false,
+							"column": "Artikelnummer",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrowindex": 1,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "ossenberg",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Artikelnummer": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"trading_good": "1"
+					},
+					"conditional_or": [["trading_good", "0", ["Artikelgruppe", "ersatz|griffe|polster|tasche|zubehör|gummikapseln|sonder"]]],
+					"remove": ["Artikelgruppe"],
+					"rewrite": [
+						{
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Artikelbeschreibung"],
+							"article_unit": ["Verkaufsmengeneinheit"],
+							"article_ean": ["EAN / Barcode"]
+						}
+					]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -3328,9 +3577,9 @@
 		}
 	},
 	{
-		"name": "Otto Bock HealthCare Deutschland GmbH",
+		"name": "Otto Bock Healthcare GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: Tabellen zusammenführen, müssen eventuell spaltenweise umsortiert werden",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, Tabellen zusammenführen, müssen eventuell spaltenweise umsortiert werden",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3437,7 +3686,7 @@
 	{
 		"name": "Perpedes GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3528,9 +3777,9 @@
 		}
 	},
 	{
-		"name": "Pochert GmbH",
+		"name": "POCHERT GmbH & Co. KG",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3641,7 +3890,7 @@
 	{
 		"name": "Protheseus GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV Kopfzeile article_no, article_name und article_unit ergänzen ",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3653,7 +3902,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 0,
-					"columns": ["article_no", "article_name", "article_unit"]
+					"columns": ["Artikelnummer", "Bezeichnung", "EINH"]
 				},
 				"filter": [
 					{
@@ -3661,9 +3910,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["article_no"],
+							"orderby": ["Artikelnummer"],
 							"descending": false,
-							"column": "article_no",
+							"column": "Artikelnummer",
 							"amount": 1
 						}
 					},
@@ -3703,7 +3952,7 @@
 						],
 						"match": {
 							"all": {
-								"article_no": "BESTELL_NUMMER"
+								"Artikelnummer": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -3719,9 +3968,9 @@
 					"conditional_or": [["trading_good", "1", ["article_name", "Compression|Weste|Peron(?:ä|Ä)usschiene|Stax|liner"]]],
 					"rewrite": [
 						{
-							"article_no": ["article_no"],
-							"article_name": ["article_name"],
-							"article_unit": ["article_unit"],
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Bezeichnung"],
+							"article_unit": ["EINH"],
 							"article_ean": [""]
 						}
 					]
@@ -3732,9 +3981,9 @@
 		}
 	},
 	{
-		"name": "Pro Walk GmbH",
+		"name": "Pro-Walk  Benedikt Preisler",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3825,7 +4074,7 @@
 		}
 	},
 	{
-		"name": "Qualiserve",
+		"name": "Qualiserve Dr. Klaus Weber",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -3847,9 +4096,9 @@
 		}
 	},
 	{
-		"name": "Rebotec GmbH",
+		"name": "Rebotec Rehabilitationsmittel GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: CSV letzte Zeile löschen ",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, letzte Zeile löschen ",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3861,7 +4110,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 2,
-					"columns": ["Art-Nr", "Bezeichnung1", "Bezeichnung2", "EAN_GTIN", "ME"]
+					"columns": ["Art.-Nr. ", "Artikelbezeichnung1", "Artikelbezeichnung2", "EAN_GTIN", "ME"]
 				},
 				"filter": [
 					{
@@ -3869,9 +4118,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Art-Nr"],
+							"orderby": ["Art.-Nr. "],
 							"descending": false,
-							"column": "Art-Nr",
+							"column": "Art.-Nr. ",
 							"amount": 1
 						}
 					},
@@ -3911,7 +4160,7 @@
 						],
 						"match": {
 							"all": {
-								"Art-Nr": "BESTELL_NUMMER"
+								"Art.-Nr. ": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -3927,15 +4176,15 @@
 					},
 					"rewrite": [
 						{
-							"article_no": ["Art-Nr"],
-							"article_name": ["Bezeichnung1", ", ", "Bezeichnung2"],
+							"article_no": ["Art.-Nr. "],
+							"article_name": ["Artikelbezeichnung1", ", ", "Artikelbezeichnung2"],
 							"article_unit": ["ME"],
 							"article_ean": ["EAN_GTIN"]
 						}
 					],
 					"conditional_or": [
 						["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehst(?:ü|Ü)tze|achselst(?:ü|Ü)tze|toiletten|gehgestell|vierfuß|fischer"]],
-						["stock_item", "1", ["Art-Nr", "122.95|106.04.10"]]
+						["stock_item", "1", ["Art.-Nr. ", "122.95|106.04.10"]]
 					]
 				}
 			},
@@ -3946,7 +4195,7 @@
 	{
 		"name": "Rehaforum Medical GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4035,7 +4284,7 @@
 		}
 	},
 	{
-		"name": "Ruck medicaltec",
+		"name": "Ruck MedicalTec",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -4057,13 +4306,13 @@
 		}
 	},
 	{
-		"name": "Ludwig Bertram GmbH (Russka)",
+		"name": "Ruckgaber GmbH",
 		"info": {
 			"purchase_info": "",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
-			"address": "Im Torfstich 7, 30916 Isernhagen",
+			"address": "Roseckstraße 35, 72108 Rottenburg-Seebronn",
 			"sales_representative": "",
 			"customer_id": ""
 		},
@@ -4071,19 +4320,9 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 2,
-					"columns": ["Artikelnummer ", "Artikelbezeichnung", "Einheit"]
+					"columns": ["Artikelnummer", "Artikelbezeichnung", "Basiseinheit"]
 				},
 				"filter": [
-					{
-						"apply": "filter_by_expression",
-						"comment": "delete unneccessary products",
-						"keep": false,
-						"match": {
-							"all": {
-								"Einheit": "nicht mehr lieferbar"
-							}
-						}
-					},
 					{
 						"apply": "filter_by_duplicates",
 						"comment": "delete multiple pricelist entries",
@@ -4111,7 +4350,7 @@
 								"match": {
 									"all": {
 										"STATUS": "false",
-										"LIEFERANTENNAME": "russka",
+										"LIEFERANTENNAME": "ruckgaber",
 										"BESTELLSTOP": "false",
 										"WE_DAT_ARTIKELSTAMM": ".+"
 									}
@@ -4144,12 +4383,11 @@
 					"add": {
 						"trading_good": "0"
 					},
-					"conditional_or": [["trading_good", "1", ["Artikelbezeichnung", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|st(?:ü|Ü)tzschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]],
 					"rewrite": [
 						{
 							"article_no": ["Artikelnummer "],
 							"article_name": ["Artikelbezeichnung"],
-							"article_unit": ["Einheit"],
+							"article_unit": ["Basiseinheit"],
 							"article_ean": [""]
 						}
 					]
@@ -4159,10 +4397,11 @@
 			"samplecheck_reusable": 1095
 		}
 	},
+	
 	{
-		"name": "Schein Orthopädie Service KG",
+		"name": "Schein Orthopädie",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4257,9 +4496,9 @@
 		}
 	},
 	{
-		"name": "Sporlastic GmbH",
+		"name": "SPORLASTIC GMBH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4352,9 +4591,9 @@
 		}
 	},
 	{
-		"name": "Streifeneder KG",
+		"name": "Streifeneder ortho.production GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4469,7 +4708,7 @@
 	{
 		"name": "TASKA Prosthetics GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4562,31 +4801,9 @@
 		}
 	},
 	{
-		"name": "Wilhelm Julius Teufel",
+		"name": "Thuasne Deutschland GmbH ",
 		"info": {
-			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
-			"infotext": "",
-			"mail": "",
-			"phone": "",
-			"address": "Robert-Bosch-Str. 15, 73117 Wangen",
-			"sales_representative": "",
-			"customer_id": ""
-		},
-		"pricelist": {
-			"filter": {
-				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
-				}
-			},
-			"samplecheck_interval": 93,
-			"samplecheck_reusable": 1095
-		}
-	},
-	{
-		"name": "Thuasne Deutschland GmbH",
-		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4598,7 +4815,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 0,
-					"columns": ["Artikel-Nummer", "Art.-Bez. 1 NEU", "Art.-Bez. 2 NEU", "GTIN", "Verpackungseinheit"]
+					"columns": ["Artikel-Nummer", "Art.-Bez. 1 NEU", "Art.-Bez. 2 NEU", "GTIN-13", "Verpackungseinheit"]
 				},
 				"filter": [
 					{
@@ -4690,7 +4907,7 @@
 							"article_no": ["Artikel-Nummer"],
 							"article_name": ["Art.-Bez. 1 NEU", " ", "Art.-Bez. 2 NEU"],
 							"article_unit": ["Verpackungseinheit"],
-							"article_ean": ["GTIN"]
+							"article_ean": ["GTIN-13"]
 						}
 					]
 				}
@@ -4700,9 +4917,9 @@
 		}
 	},
 	{
-		"name": "TIGGES-Zours GmbH",
+		"name": "Tigges-Zours GmbH",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4714,7 +4931,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 0,
-					"columns": ["Bestellnr", "Artikelbezeichnung 1", "Artikelbezeichnung 2", "Artikelbezeichnung 3", "Verpackung1"]
+					"columns": ["Bestellnr.", "Artikelbezeichnung 1", "Artikelbezeichnung 2", "Artikelbezeichnung 3", "Verpackung1"]
 				},
 				"filter": [
 					{
@@ -4722,9 +4939,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Bestellnr"],
+							"orderby": ["Bestellnr."],
 							"descending": false,
-							"column": "Bestellnr",
+							"column": "Bestellnr.",
 							"amount": 1
 						}
 					},
@@ -4764,7 +4981,7 @@
 						],
 						"match": {
 							"all": {
-								"Bestellnr": "BESTELL_NUMMER"
+								"Bestellnr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -4780,7 +4997,7 @@
 					},
 					"rewrite": [
 						{
-							"article_no": ["Bestellnr"],
+							"article_no": ["Bestellnr."],
 							"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2", ", ", "Artikelbezeichnung 3"],
 							"article_unit": ["Verpackung1"],
 							"article_ean": [""]
@@ -4797,9 +5014,9 @@
 		}
 	},
 	{
-		"name": "TRICONmed GmbH",
+		"name": "Tricon med",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4889,9 +5106,9 @@
 		}
 	},
 	{
-		"name": "Uniprox GmbH",
+		"name": "Uniprox GmbH & Co. KG",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4903,7 +5120,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 0,
-					"columns": ["Artikel-Nr", "Beschreibung", "ME", "EAN"]
+					"columns": ["Artikel-Nr. ", "Beschreibung", "ME", "EAN"]
 				},
 				"filter": [
 					{
@@ -4911,9 +5128,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikel-Nr"],
+							"orderby": ["Artikel-Nr. "],
 							"descending": false,
-							"column": "Artikel-Nr",
+							"column": "Artikel-Nr. ",
 							"amount": 1
 						}
 					},
@@ -4953,7 +5170,7 @@
 						],
 						"match": {
 							"all": {
-								"article_no": "BESTELL_NUMMER"
+								"Artikel-Nr. ": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -4970,7 +5187,7 @@
 						"stock_item": "0"
 					},
 					"replace": [
-						["Artikel-Nr", "\\s+", ""],
+						["Artikel-Nr. ", "\\s+", ""],
 						["EAN", "\\s+", ""]
 					],
 					"conditional_or": [
@@ -4980,14 +5197,14 @@
 							"stock_item",
 							"1",
 							[
-								"Artikel-Nr",
+								"Artikel-Nr. ",
 								"41150100000064|41150100200084|MG201|42110600100013|45330200200340|45330200200290|45330200200260|45330200100400|45330200100260|42080200208100|42080200108100|42080200408100|42080200608100|42080200108130|46910100108130|423608000000(?:20|25|30|35|40)|423615000000(?:20|25|30|35)|423613000890(?:20|30|35|40)|423625002000(?:20|25|30|35|40)|423625001000(?:20|25|30|35|40)|423602000890(?:20|25|30|35|40|45|50)|423601000890(?:20|25|30|35|40)|423603000890(?:20|25|30|35|40)|423617000000(?:20|25|30|35)|423625004000(?:20|25|30|35|40)|423625003000(?:20|25|30|35|40)|29000021(?:20|25|30|35|40|45|50)|42362200(?:1|2|3)00000|41520100(?:3|4|5)00002|42112500500050|4211210000001(?:2|5)|42112500750050|42112500100040|42112500250050|42112501000000|42112501250100|42060100000046|42050200100150"
 							]
 						]
 					],
 					"rewrite": [
 						{
-							"article_no": ["Artikel-Nr"],
+							"article_no": ["Artikel-Nr. "],
 							"article_name": ["Beschreibung"],
 							"article_unit": ["ME"],
 							"article_ean": ["EAN"]
@@ -5000,7 +5217,7 @@
 		}
 	},
 	{
-		"name": "Unyq",
+		"name": "Unyq Design Europe, S.L.",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -5022,7 +5239,7 @@
 		}
 	},
 	{
-		"name": "Wagner Polymertechnik",
+		"name": "Wagner Polymertechnik GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
 			"infotext": "",
@@ -5044,9 +5261,9 @@
 		}
 	},
 	{
-		"name": "Werkmeister GmbH",
+		"name": "Werkmeister GmbH & Co. KG",
 		"info": {
-			"purchase_info": "",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -5134,6 +5351,28 @@
 						["trading_good", "1", ["article_name", "Arthrodesenkissen"]],
 						["stock_item", "1", ["article_name", "Arthrodesenkissen"]]
 					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Wilhelm Julius Teufel",
+		"info": {
+			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Robert-Bosch-Str. 15, 73117 Wangen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"headerrowindex": 0,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
 			"samplecheck_interval": 93,
