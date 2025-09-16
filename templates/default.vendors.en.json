@@ -2,7 +2,7 @@
 	{
 		"name": "Sample Company Ltd.",
 		"info": {
-			"purchase_info": "Pricelist import: edit the CSV as follows: ...",
+			"purchase_info": "Pricelist import: save XSL-file as CSV (comma delimited), edit the CSV as follows: ...",
 			"infotext": "",
 			"mail": "spam@saco.email",
 			"phone": "",
