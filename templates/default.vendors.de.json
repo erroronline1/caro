@@ -485,6 +485,16 @@
 						}
 					},
 					{
+						"apply": "filter_by_expression",
+						"comment": "filter articles",
+						"keep": true,
+						"match": {
+							"all": {
+								"Artikelnr.": ".+"
+							}
+						}
+					},
+					{
 						"apply": "filter_by_comparison_file",
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
@@ -666,7 +676,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Art-Nr", "Artikelname", "Groesse", "Seite", "Farbe", "EAN GTIN", "Verpackungseinheit"]
+					"columns": ["Art.-Nr.", "Artikel", "VE", "EAN/GTIN"]
 				},
 				"filter": [
 					{
@@ -674,9 +684,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Art-Nr"],
+							"orderby": ["Art.-Nr."],
 							"descending": false,
-							"column": "Art-Nr",
+							"column": "Art.-Nr.",
 							"amount": 1
 						}
 					},
@@ -716,7 +726,7 @@
 						],
 						"match": {
 							"all": {
-								"Art-Nr": "BESTELL_NUMMER"
+								"Art.-Nr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -731,21 +741,21 @@
 						"has_expiry_date": "0",
 						"stock_item": "0"
 					},
-					"replace": [["EAN GTIN", "\\s+", ""]],
+					"replace": [["EAN/GTIN", "\\s+", ""]],
 					"conditional_or": [
 						[
 							"trading_good",
 							"1",
-							["Artikelname", "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."]
+							["Artikel", "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."]
 						],
-						["stock_item", "1", ["Art-Nr", "29715-0-02|8615.201(?:R|L)-(?:XS|S|M|L|XL)|8615.2/001-(?:S|M)|8618.201R-L|8618.201L-M"]]
+						["stock_item", "1", ["Art.-Nr.", "29715-0-02|8615.201(?:R|L)-(?:XS|S|M|L|XL)|8615.2/001-(?:S|M)|8618.201R-L|8618.201L-M"]]
 					],
 					"rewrite": [
 						{
-							"article_no": ["Art-Nr"],
-							"article_name": ["Artikelname", ", ", "Groesse", ", ", "Seite", ", ", "Farbe"],
-							"article_unit": ["Verpackungseinheit"],
-							"article_ean": ["EAN GTIN"]
+							"article_no": ["Art.-Nr."],
+							"article_name": ["Artikel"],
+							"article_unit": ["VE"],
+							"article_ean": ["EAN/GTIN"]
 						}
 					]
 				}
@@ -1119,7 +1129,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 8,
-					"columns": ["Artikelnummer", "Bezeichnung", "GTIN"]
+					"columns": ["Artikelnummer", "Bezeichnung", "GTIN", "Abgabeeinheit"]
 				},
 				"filter": [
 					{
@@ -1182,12 +1192,12 @@
 					"add": {
 						"special_attention": "0"
 					},
-					"conditional_or": [["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband"]]],
+					"conditional_or": [["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband|lycra|satin|drell"]]],
 					"rewrite": [
 						{
 							"article_no": ["Artikelnummer"],
 							"article_name": ["Bezeichnung"],
-							"article_unit": [""],
+							"article_unit": ["Abgabeeinheit"],
 							"article_ean": ["GTIN"]
 						}
 					]
@@ -1615,7 +1625,7 @@
 	{
 		"name": "Fior & Gentz GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile ",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile Bezeichnung2 ergänzen",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1626,7 +1636,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Art-Nr", "Bezeichnung", "Bezeichnung 2", "ME", "EANNummer"]
+					"columns": ["Art.-Nr.", "Bezeichnung", "Bezeichnung2", "ME", "EANNummer"]
 				},
 				"filter": [
 					{
@@ -1634,9 +1644,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Art-Nr"],
+							"orderby": ["Art.-Nr."],
 							"descending": false,
-							"column": "Art-Nr",
+							"column": "Art.-Nr.",
 							"amount": 1
 						}
 					},
@@ -1676,7 +1686,7 @@
 						],
 						"match": {
 							"all": {
-								"Art-Nr": "BESTELL_NUMMER"
+								"Art.-Nr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -1693,8 +1703,8 @@
 					"conditional_or": [["trading_good", "1", ["Bezeichnung", ".+schuh"]]],
 					"rewrite": [
 						{
-							"article_no": ["Art-Nr"],
-							"article_name": ["Bezeichnung", ", ", "Bezeichnung 2"],
+							"article_no": ["Art.-Nr."],
+							"article_name": ["Bezeichnung", ", ", "Bezeichnung2"],
 							"article_unit": ["ME"],
 							"article_ean": ["EANNummer"]
 						}
@@ -4397,7 +4407,7 @@
 			"samplecheck_reusable": 1095
 		}
 	},
-	
+
 	{
 		"name": "Schein Orthopädie",
 		"info": {
@@ -4413,7 +4423,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 1,
-					"columns": ["Artikelnummer", "Artikelbezeichnung", "Artikelbezeichnung 2", "Basiseinheit"]
+					"columns": ["Artikel-Nr.:", "Artikelkurztext", "ME", "EAN"]
 				},
 				"filter": [
 					{
@@ -4421,9 +4431,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikelnummer"],
+							"orderby": ["Artikel-Nr.:"],
 							"descending": false,
-							"column": "Artikelnummer",
+							"column": "Artikel-Nr.:",
 							"amount": 1
 						}
 					},
@@ -4463,7 +4473,7 @@
 						],
 						"match": {
 							"all": {
-								"Artikelnummer": "BESTELL_NUMMER"
+								"Artikel-Nr.:": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -4479,15 +4489,15 @@
 					},
 					"rewrite": [
 						{
-							"article_no": ["Artikelnummer"],
-							"article_name": ["Artikelbezeichnung", ", ", "Artikelbezeichnung 2"],
-							"article_unit": ["Basiseinheit"],
-							"article_ean": [""]
+							"article_no": ["Artikel-Nr.:"],
+							"article_name": ["Artikelkurztext"],
+							"article_unit": ["ME"],
+							"article_ean": ["EAN"]
 						}
 					],
 					"conditional_or": [
-						["trading_good", "1", ["article_name", "einlage|schuh|orthese"]],
-						["stock_item", "1", ["Artikelnummer", "62897000|64010100"]]
+						["trading_good", "1", ["Artikelkurztext", "einlage|schuh|orthese"]],
+						["stock_item", "1", ["Artikel-Nr.:", "62897000|64010100"]]
 					]
 				}
 			},
@@ -5016,7 +5026,7 @@
 	{
 		"name": "Tricon med",
 		"info": {
-			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
+			"purchase_info": "Preislistenimport: ODS-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -5028,7 +5038,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrowindex": 0,
-					"columns": ["Artikelnr", "Artikelbeschreibung"]
+					"columns": ["Artikelnr.", "Artikelbeschreibung"]
 				},
 				"filter": [
 					{
@@ -5036,9 +5046,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikelnr"],
+							"orderby": ["Artikelnr."],
 							"descending": false,
-							"column": "Artikelnr",
+							"column": "Artikelnr.",
 							"amount": 1
 						}
 					},
@@ -5078,7 +5088,7 @@
 						],
 						"match": {
 							"all": {
-								"Artikelnr": "BESTELL_NUMMER"
+								"Artikelnr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -5093,7 +5103,7 @@
 					},
 					"rewrite": [
 						{
-							"article_no": ["Artikelnr"],
+							"article_no": ["Artikelnr."],
 							"article_name": ["Artikelbeschreibung"],
 							"article_unit": [""],
 							"article_ean": [""]
