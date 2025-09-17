@@ -1763,20 +1763,17 @@ class CONSUMABLES extends API {
 		$pricelist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
-		try {
-			if (!isset($pricelist->_list[1])) $this->response([
-				'response' => [
-					'msg' => implode("\n", $pricelist->_log),
-					'type' => 'error'
-				]]);
-		}
-		catch(\Error $e){
+
+
+		$log = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $pricelist->_log);
+
+		if (!(isset($pricelist->_list[1]) && count($pricelist->_list[1]))) {
 			$this->response([
-				'response' => [
-					'msg' => implode("\n", $pricelist->_log),
-					'type' => 'error'
-				]]);
-		}
+			'response' => [
+				'msg' => implode("\n", $log),
+				'type' => 'error'
+			]]);
+			}
 		if (count($pricelist->_list[1])){
 			// purge all unprotected products for a fresh data set
 			SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
@@ -1934,7 +1931,7 @@ class CONSUMABLES extends API {
 					die();
 				}
 			}
-			return [$date, $pricelist->_log];
+			return [$date, $log];
 		}
 		return '';
 	}
@@ -2063,7 +2060,7 @@ class CONSUMABLES extends API {
 						':hidden' => $vendor['hidden'],
 						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
 						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
-						':evaluation' => $vendor['evaluation']
+						':evaluation' => $vendor['evaluation'] ? UTILITY::json_encode($vendor['evaluation']) : null
 					]
 				])) {
 					$vendor['id'] = $this->_pdo->lastInsertId();
