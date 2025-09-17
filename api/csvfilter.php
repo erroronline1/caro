@@ -223,7 +223,7 @@ class CSVFILTER extends API {
 				}
 				
 				$this->response([
-					'log' => $datalist->_log,
+					'log' => array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $datalist->_log),
 					'links' => $downloadfiles
 				]);
 				break;
