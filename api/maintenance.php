@@ -427,7 +427,6 @@ class MAINTENANCE extends API {
 							':name' => $this->_pdo->quote($vendor['name']),
 							':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
 							':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
-							':certificate' => $vendor['certificate'] ? $this->_pdo->quote($vendor['certificate']) : 'NULL',
 							':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
 							':pricelist' => $vendor['pricelist'] ? $this->_pdo->quote($vendor['pricelist']) : 'NULL',
 						]) . '; ');
