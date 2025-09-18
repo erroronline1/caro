@@ -770,7 +770,10 @@ class ORDER extends API {
 			if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = $users[$orderer]['name'];
 			else $orderer = $this->_lang->GET('general.deleted_user');
 
-			$erp_id = array_search($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $erp_ids);
+			$erp_id = null;
+			if (isset($decoded_order_data['vendor_label']) && isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['productname_label'])){
+				$erp_id = array_search($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $erp_ids);
+			}
 			$data[$item++] = $this->_lang->GET("order.prepared_order_item", [
 				':quantity' => UTILITY::propertySet($decoded_order_data, 'quantity_label') ? : '',
 				':unit' => UTILITY::propertySet($decoded_order_data, 'unit_label') ? : '',
