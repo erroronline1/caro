@@ -637,9 +637,9 @@ class USER extends API {
 				}
 
 				// set custom idle timeout
-				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
-				if ($idle != CONFIG['lifespan']['session']['idle']){
-					$user['app_settings']['idle'] = $idle;
+				$idle_prolonging_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
+				if ($idle_prolonging_factor > 0){
+					$user['app_settings']['idle'] = ($idle_prolonging_factor + 1) * CONFIG['lifespan']['session']['idle'];
 				}
 				else unset ($user['app_settings']['idle']);
 
@@ -827,9 +827,9 @@ class USER extends API {
 				}
 
 				// set custom idle timeout
-				$idle = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
-				if ($idle != CONFIG['lifespan']['session']['idle']){
-					$user['app_settings']['idle'] = $idle;
+				$idle_prolonging_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
+				if ($idle_prolonging_factor > 0){
+					$user['app_settings']['idle'] = ($idle_prolonging_factor + 1) * CONFIG['lifespan']['session']['idle'];
 				}
 				else unset ($user['app_settings']['idle']);
 
@@ -919,7 +919,8 @@ class USER extends API {
 				$datalist = [];
 				$options = ['...' . $this->_lang->GET('user.existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
 				$response = [];
-				
+				$max_idle_prolonging_factor = 12;
+
 				// prepare existing users lists
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
 				foreach ($user as $row) {
@@ -1118,12 +1119,11 @@ class USER extends API {
 							'type' => 'range',
 							'attributes' => [
 								'name' => $this->_lang->GET('user.settings.idle'),
-								'min' => CONFIG['lifespan']['session']['idle'],
-								'max' => CONFIG['lifespan']['session']['idle'] * 3,
-								'step' => CONFIG['lifespan']['session']['idle'] / 2,
-								'value' => strval(isset($user['app_settings']['idle']) ? $user['app_settings']['idle'] : CONFIG['lifespan']['session']['idle']),
+								// having a datalist the range input takes its available steps only
+								'value' => strval(isset($user['app_settings']['idle']) ? ($user['app_settings']['idle'] / CONFIG['lifespan']['session']['idle'] - 1) : 0),
 							],
-							'hint' => $this->_lang->GET('user.settings.idle_hint', [':idle' => CONFIG['lifespan']['session']['idle']])
+							'hint' => $this->_lang->GET('user.settings.idle_hint', [':idle' => CONFIG['lifespan']['session']['idle']]),
+							'datalist' => array_map(fn($v) => intval(CONFIG['lifespan']['session']['idle']) * $v, range(1, $max_idle_prolonging_factor, 1))
 						]
 					], [
 						[
