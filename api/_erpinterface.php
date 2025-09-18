@@ -545,7 +545,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			a.NAME_3,
 			a.NAME_4,
 			a.GEBURTSNAME,
-			convert(varchar(255), a.GEBURTSDATUM, 104) as GEBURTSDATUM,
+			convert(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
 			a.STRASSE_1,
 			a.PLZ_1,
 			a.ORT_1,
@@ -621,7 +621,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'Name' => implode(' ', array_filter(array_map(fn($c) => $row[$c] ? : '', ['NAME_2', 'NAME_3', 'NAME_4', 'NACHNAME']), fn($v) => boolval($v))),
 				//'Straße' => $row['STRASSE_1'],
 				//'Postleitzahl' => $row['PLZ_1'],
-				'Geburtsdatum' => substr($row['GEBURTSDATUM'] ? : '', 0, 10),
+				'Geburtsdatum' => $row['GEBURTSDATUM'] ? : '', // must be Y-m-d to be importable into date input
 				//'Stadt' => $row['ORT_1'],
 				//'Land' => $row['LKZ_1'],
 				'Adresse' => $row['STRASSE_1'] . ', ' . $row['LKZ_1'] . '-' . $row['PLZ_1'] . ' ' . $row['ORT_1'],
