@@ -620,6 +620,9 @@ class SEARCHHANDLER {
 						$datalist = [];
 						$datalist_unit = [];
 		
+						// import to determine if interface is present
+						include_once("./_erpinterface.php");
+
 						// prepare existing vendor lists
 						$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
 						foreach ($vendors as $key => $row) {
@@ -689,6 +692,12 @@ class SEARCHHANDLER {
 													'name' => $this->_lang->GET('order.vendor_label'),
 												],
 												'datalist' => array_values(array_unique($datalist))
+											], [
+												'type' => 'textsection',
+												'attributes' => [
+													'name' => $this->_lang->GET('order.add_manually_warning_header')
+												],
+												'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
 											]
 										]
 									])

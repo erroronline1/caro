@@ -1215,6 +1215,9 @@
 		"add_manually": "Add product manually",
 		"add_manually_cancel": "Cancel",
 		"add_manually_confirm": "Add",
+		"add_manually_warning": "Manually added products may not be considered regarding incorporation and sample check:erp_interface.",
+		"add_manually_warning_erpinterface": ", as well as automated matching with order state",
+		"add_manually_warning_header": "Please consider",
 		"add_product_search_matches": "Add article from :number matches",
 		"added_confirmation": ":name has been added to the cart.",
 		"added_product": ":unit :number :name by :vendor",
@@ -1390,14 +1393,14 @@
 		"date": "Date of record",
 		"erp_case_number": "ERP case number",
 		"erp_case_number_hint": "multiple case numbers can be added, e.g. z.B. 12345; 12346",
-		"erpinterface":{
-			"casepositions_button":"Case positions",
-			"casepositions":{
-				"amount":"Amount",
-				"contract_position":"Position",
-				"text":"Position text"
+		"erpinterface": {
+			"casepositions_button": "Case positions",
+			"casepositions": {
+				"amount": "Amount",
+				"contract_position": "Position",
+				"text": "Position text"
 			},
-			"null":"For the provided case number(s) are no results available."
+			"null": "For the provided case number(s) are no results available."
 		},
 		"error": "Record could not be saved. Please try again.",
 		"export": "Export record",

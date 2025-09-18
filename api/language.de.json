@@ -1215,6 +1215,9 @@
 		"add_manually": "Artikel manuell hinzufügen",
 		"add_manually_cancel": "Abbrechen",
 		"add_manually_confirm": "Hinzufügen",
+		"add_manually_warning": "Manuell hinzugefügte Artikel können unter Umständen nicht systematisch im Sinne des Einführungsstatus und der Stichprobenprüfung:erp_interface überwacht werden.",
+		"add_manually_warning_erpinterface": ", sowie dem automatische Abgleich der Bestelldaten",
+		"add_manually_warning_header": "Bitte beachten",
 		"add_product_search_matches": "Füge einen Artikel aus :number Treffern hinzu",
 		"added_confirmation": ":name wurde zur Bestellung hinzugefügt.",
 		"added_product": ":unit :number :name von :vendor",
@@ -1390,14 +1393,14 @@
 		"date": "Datum des Eintrags",
 		"erp_case_number": "Vorgangsnummer",
 		"erp_case_number_hint": "mehrere Vorgangsnummern können getrennt eingetragen werden, z.B. 12345; 12346",
-		"erpinterface":{
-			"casepositions_button":"Vorgangspositionen",
-			"casepositions":{
-				"amount":"Anzahl",
-				"contract_position":"Position",
-				"text":"Positionstext"
+		"erpinterface": {
+			"casepositions_button": "Vorgangspositionen",
+			"casepositions": {
+				"amount": "Anzahl",
+				"contract_position": "Position",
+				"text": "Positionstext"
 			},
-			"null":"Für die angegebenden Vorgangsnummer(n) gibt es keine Ergebnisse."
+			"null": "Für die angegebenden Vorgangsnummer(n) gibt es keine Ergebnisse."
 		},
 		"error": "Die Aufzeichnung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"export": "Exportiere die Daten als PDF",
