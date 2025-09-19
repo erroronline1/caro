@@ -1416,10 +1416,17 @@ class INSTALL {
 				}
 
 				$names[] = $entry['name'];
+
+				if (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' && isset($entry['pricelist']['filter'])){
+					$pricelistfilter = null;
+					$pricelistfilter = gettype($entry['pricelist']['filter']) === 'string' ? $entry['pricelist']['filter'] : UTILITY::json_encode($entry['pricelist']['filter'], JSON_PRETTY_PRINT);
+					$entry['pricelist']['filter'] = $pricelistfilter;
+				}
+
 				$insertions[] = [
 					':name' => $entry['name'],
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
-					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode($entry['pricelist'], JSON_PRETTY_PRINT) : null,
+					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode($entry['pricelist']) : null,
 					':evaluation' => null,
 					':hidden' => null
 				];
