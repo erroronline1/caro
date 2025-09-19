@@ -109,7 +109,7 @@ export const api = {
 		api.loadindicator(true);
 
 		// ensure passed parameters are encoded e.g. to enable #-characters within a passed api path-parameter
-		request = request.map((i) => encodeURIComponent(i));
+		request = request.map((i) => encodeURIComponent(i).replace("+", "%2B"));
 
 		// default reset masonry breakpoint if former call (current history has been set by recent api call) had prevented this
 		// currently masonry is counterproductive for conversations
@@ -1907,7 +1907,7 @@ export const api = {
 					case "simplifieddocumentexport": // sorry. exports a document with records, not so paperless after all
 					case "matchbundles":
 					case "erpcasepositions":
-							// fall back to default successFn
+						// fall back to default successFn
 						break;
 					case "records":
 						successFn = function (data) {
