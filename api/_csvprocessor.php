@@ -31,7 +31,7 @@ filters and returns a named array according to setup.
 	"postProcessing": optional string as hint what to do with the result file
 	"filesetting":
 		"source": file to process or a named array (the other filesettings don't matter then)
-		"headerrowindex": offset for title row
+		"headerrow": title row
 		"dialect": settings according to php fgetcsv
 		"columns": list/array of column names to process and export to destination
 		"encoding": comma separated string of possible character encoding of sourcefile
@@ -180,6 +180,8 @@ class Listprocessor {
 		$this->_argument = $argument;
 		if (isset($this->_setting['filesetting']['dialect']['preg_delimiter'])) $this->_delimiter = $this->_setting['filesetting']['dialect']['preg_delimiter'];
 
+		$this->_setting['filesetting']['columns'] = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'], true)), $this->_setting['filesetting']['columns']);
+
 		if (!isset($this->_argument['processedMonth'])) $this->_argument['processedMonth'] = date('m');
 		if (!isset($this->_argument['processedYear'])) $this->_argument['processedYear'] = date('Y');
 
@@ -323,7 +325,7 @@ class Listprocessor {
 	 *		"keep": False,
 	 *		"filesetting": {
 	 *			"source": "excemptions.*?.csv",
-	 *			"headerrowindex": 0,
+	 *			"headerrow": 1,
 	 *			"columns": [
 	 *				"COMPAREFILEINDEX"
 	 *			]
@@ -699,7 +701,7 @@ class Listprocessor {
 		/* import file and create an associative array from rows
 		{
 			"source": "Export.csv",
-			"headerrowindex": 0,
+			"headerrow": 1,
 			"dialect": {
 				"separator": ";",
 				"enclosure": "\"",
@@ -726,7 +728,9 @@ class Listprocessor {
 		if (fgets($csvfile, 4) !== "\xef\xbb\xbf") rewind($csvfile); // BOM not found - rewind pointer to start of file.
 		while(($row = fgetcsv($csvfile, null, $this->_setting['filesetting']['dialect']['separator'], $this->_setting['filesetting']['dialect']['enclosure'], $this->_setting['filesetting']['dialect']['escape'])) !== false) {
 			// import headers
-			if ($i++ < $this->_setting['filesetting']['headerrowindex'] + 1) $this->_headers = $row;
+			if ($i++ < $this->_setting['filesetting']['headerrow']) {
+				$this->_headers = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'], true)), $row);
+			}
 			else {
 				if (boolval(array_diff($this->_setting['filesetting']['columns'], array_intersect($this->_setting['filesetting']['columns'], $this->_headers)))) {
 					$this->_log[] = '[~] File Import Error: not all required columns were found, filter aborted... Required: ' . implode(', ', $this->_setting['filesetting']['columns']) . '; Found: ' . implode(', ', $this->_headers);
