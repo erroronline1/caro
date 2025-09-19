@@ -281,7 +281,7 @@ class SEARCHHANDLER {
 		// also converting the path
 		$matches = [];
 
-		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		foreach ($files as $file){
 			similar_text($parameter['search'], pathinfo($file)['basename'], $percent);
@@ -305,7 +305,7 @@ class SEARCHHANDLER {
 		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $matches = [];
 		$recentdocument = new DOCUMENTHANDLER($this->_pdo, $this->_date);
-		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		/**
 		 * looks for names, descriptions, hints and contents similar to search string
@@ -396,7 +396,7 @@ class SEARCHHANDLER {
 	public function recordsearch($parameter = []){
 		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
 
-		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		$contexts = [];
 
@@ -455,7 +455,7 @@ class SEARCHHANDLER {
 		$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
 		$productsPerSlide = 0;
 
-		$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		$slides = [
 			[
@@ -551,19 +551,14 @@ class SEARCHHANDLER {
 
 				$search = [];
 
-				$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
+				$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 				if ($parameter['search']) {
-					// literal like appears to be the most performant way, iterating over the whole database with fnsearch and similarity is horribly slow 2025-05-16
-
-					// todo: implement an sql-method to construct queries
-					// that match different cases, replacing with wildcards
-					// to overcome limited availability for regex queries
-
 					$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 						'values' => [
 							':search' => $parameter['search'],
 						],
+						'wildcards' => 'all',
 						'replacements' => [
 							':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
 						]
