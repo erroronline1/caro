@@ -1075,9 +1075,9 @@ Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
 ## Suche
 Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zusammenhang unterscheiden.
 
-* die Kalender-Suche, Artikel-Suche und der Filter für Bestellungen suchen aus nahezu buchstäblich nach dem angegebenen Begriff als Teil der Datenbankinformation. Sie erlauben jedoch Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position.
 * Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden.
-* alle anderen Such-Möglichkeiten (z.B. Dateien, Aufzeichnungs-Kennzeichen, Dokumentensuche) erlauben Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position und berücksichtigen zumeist [ähnliche Schreibweisen](#laufzeitvariablen) bei den Ergebnissen.
+* Dateien- und Dokumentensuche erlauben Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position.
+* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "buchstäbliche Suchbegriffe".
 
 [Übersicht](#übersicht)
 

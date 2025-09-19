@@ -879,14 +879,14 @@ class CALENDAR extends API {
 			]
 		]]];
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$dbevents = $calendar->search($this->_requestedId || '');
+		$dbevents = $calendar->search($this->_requestedId ? : '');
 
 		// append filtered events
 		$events = $this->scheduledEvents($dbevents, $calendar) ? : [
 			[
 				'type' => 'textsection',
 				'attributes' => [
-					'name' => $this->_lang->GET ('calendar.events_none')
+					'name' => $this->_lang->GET ('calendar.schedule.events_none')
 				]
 			]
 		] ;

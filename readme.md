@@ -36,11 +36,6 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases
     * std method for csv uploads to distinct folder, then show up within tools?
     * check oldest order and submit for erp order data updates initial date on deletion of cron.log
-* product search consider whitespaces, similiarity?
-    * sqlinterface method to construct queries considering character replacement with whitespaces, dynamic query lengths to overcome missing regex availability limitations (sqlsrv again...)
-    * see _shared.php
-    * https://www.alphacodingskills.com/mariadb/mariadb-wildcards.php
-    * https://learn.microsoft.com/en-us/sql/t-sql/language-elements/percent-character-wildcard-character-s-to-match-transact-sql?view=sql-server-ver16
 * audit
     * auditprogramme and plan review wording
     * audit preparation hint considering external topics
@@ -1181,9 +1176,9 @@ Trainings are matched by their name.
 ## Search
 Search functionality across the application may differ slightly depending of context.
 
-* Calendar search, product search and order filter search almost literally for the provided term as part of the database information. They allow wildcards as `*` for any amount of any characters or `?` as any character on the given position though.
 * Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext.
-* All other searches (e.g. files, record identifiers, document search) allow wildcards as `*` for any amount of any characters or `?` as any character on the given position and often take [similar spelling](#runtime-variables) into account within the displayed results.
+* File- and document search allow wildcards as `*` for any amount of any characters or `?` as any character on the given position.
+* All others allow wildcards as well as +mandatory, -excluded and "literal search".
 
 [Content](#content)
 

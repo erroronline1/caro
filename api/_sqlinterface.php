@@ -31,13 +31,12 @@ class SQLQUERY {
 	}
 
 	/**
-	 * execute a query
-	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]
-	 * parameters[wildcards] true replaces ? and * with sql _ and %
+	 * execute a query  
+	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]  
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query either defined within queries below or prepared raw queries
-	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries, wildcards bool|string
+	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries, wildcards bool|string - see SEARCH()
 	 * 
 	 * @return false|int|array sql result not executed|affectedRows|selection
 	 */
@@ -45,13 +44,14 @@ class SQLQUERY {
 		// retrive query matching sql driver, else process raw query
 		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 		
-		// substitute NULL values and sanitize values
+		// substitute NULL values, sanitize values, apply self::SEARCH() on :SEARCH-key
 		if (isset($parameters['values'])){
 			foreach ($parameters['values'] as $key => $value){
 
-				if (isset($parameters['wildcards']) && str_starts_with($query, 'SELECT')){
-					if ($parameters['wildcards'] === true) $value = preg_replace(['/\?/', '/\*/'], ['_', '%'], $value);
-					if ($parameters['wildcards'] === 'all') $value = preg_replace(['/\?/', '/\*/', '/[^\w\d%]/u'], ['_', '%', '_'], $value);
+				if (str_starts_with($query, 'SELECT') && $key === ':SEARCH') {
+					$query = SELF::SEARCH($_pdo, $query, $value, (isset($parameters['wildcards']) ? $parameters['wildcards'] : false));
+					unset($parameters['values'][$key]);
+					continue;
 				}
 
 				if (gettype($value) === 'NULL' || $value === false) {
@@ -104,7 +104,58 @@ class SQLQUERY {
 
 		$statement = null;
 		return $result;
-}
+	}
+
+	/**
+	 * alters a query according to pattern of $value  
+	 * to make use of that, column comparisons have to be encapsulated within parentheses each  
+	 * SELECT FROM table WHERE (column LIKE :SEARCH) OR (column2 LIKE :SEARCH)
+	 * 
+	 * @param object $_pdo database connection, passed from main application
+	 * @param string $query either defined within queries below or prepared raw queries
+	 * @param string $value search string '"lorem ipsum" +dolor -sit amet
+	 * @param bool|string $wildcards true for ? and *, all for replacement of [^\w\d]
+	 */
+	private static function SEARCH($_pdo, $query, $value, $wildcards){
+		
+		function wildcard($value, $type){
+			if ($type === true) $value = preg_replace(['/\?/', '/\*/'], ['_', '%'], $value);
+			elseif ($type === 'all') $value = preg_replace(['/\?/', '/\*/', '/[^\w\d%]/u'], ['_', '%', '_'], $value);
+			return '%' . $value . '%';
+		}
+
+		preg_match_all('/( +(AND|OR) +)*\((([\w\d\.]+?) LIKE :SEARCH)\)/i', $query, $columns, PREG_SET_ORDER);
+		preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $value, $expressions, PREG_SET_ORDER);
+
+		foreach ($columns as $column){
+			$concatenations = [];
+			foreach ($expressions as $expression){
+				list(, $operator, $search) = $expression;
+				$search = isset($expression[3]) ? $expression[3] : $search; // quoted literal
+
+				switch(CONFIG['sql'][CONFIG['sql']['use']]['driver']){
+					case 'mysql':
+						if ($operator === '+') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						elseif ($operator === '-') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						else $concatenations[] = 'OR IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						break;
+					case 'sqlsrv':
+						if ($operator === '+') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						elseif ($operator === '-') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						else $concatenations[] = 'OR ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						break;
+				}
+			}
+			$concatenation = implode(' ', $concatenations);
+			$concatenation = substr($concatenation, strpos($concatenation, ' ')); // drop initial and/or
+
+			if ($operator === '-' && count($expressions) < 2 && $column[2] === 'OR')
+				$query = str_replace($column[0], str_replace(' OR ', ' AND ', $column[0]), $query);
+
+			$query = str_replace($column[3], $concatenation, $query);
+		}
+		return $query;
+	}
 
 	/**
 	 * creates packages of well prepared sql queries to handle sql package size
@@ -129,7 +180,7 @@ class SQLQUERY {
 	}
 
 	/**
-	 * creates packages of sql INSERTIONS to handle sql package size
+	 * creates packages of sql INSERTIONS to handle sql package size  
 	 * e.g. for multiple inserts
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
@@ -347,9 +398,9 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN :earlier AND :later OR caro_calendar.span_end BETWEEN :earlier AND :later ORDER BY caro_calendar.span_end ASC",
 			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.span_start BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) OR caro_calendar.span_end BETWEEN CONVERT(SMALLDATETIME, :earlier, 120) AND CONVERT(SMALLDATETIME, :later, 120) ORDER BY caro_calendar.span_end ASC",
 		],
-		'calendar_search' => [
-			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) OR LOWER(c_u2.name) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
-			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE LOWER(caro_calendar.subject) LIKE LOWER(CONCAT('%', :subject, '%')) OR LOWER(c_u2.name) LIKE LOWER(CONCAT('%', :subject, '%')) ORDER BY caro_calendar.span_end ASC",
+		'calendar_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
+			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE (caro_calendar.subject LIKE :SEARCH) OR (c_u2.name LIKE :SEARCH) ORDER BY caro_calendar.span_end ASC",
+			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE (caro_calendar.subject LIKE :SEARCH) OR (c_u2.name LIKE :SEARCH) ORDER BY caro_calendar.span_end ASC",
 		],
 		'calendar_delete' => [
 			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
@@ -398,7 +449,7 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)",
 			'sqlsrv' => "UPDATE caro_consumables_products SET :field = :value WHERE id IN (:ids)"
 		],
-		'consumables_put_sample_check' => [ // preprocess via strtr
+		'consumables_put_sample_check' => [
 			'mysql' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = :sample_checks WHERE id IN (:ids) AND trading_good IS NOT NULL AND trading_good != 0",
 			'sqlsrv' => "UPDATE caro_consumables_products SET checked = :checked, sample_checks = :sample_checks WHERE id IN (:ids) AND trading_good IS NOT NULL AND trading_good != 0"
 		],
@@ -414,7 +465,7 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET document_reminder = :notified WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET document_reminder = :notified WHERE id  = :id"
 		],
-		'consumables_get_product' => [ // preprocess via strtr
+		'consumables_get_product' => [
 			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.id IN (:ids)",
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE CONVERT(VARCHAR, caro_consumables_products.id) IN (:ids)"
 		],
@@ -422,9 +473,9 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id",
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id"
 		],
-		'consumables_get_product_search' => [
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)"
+		'consumables_get_product_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)"
 		],
 		'consumables_get_product_by_article_no_vendor' => [
 			'mysql' => "SELECT caro_consumables_products.id, caro_consumables_products.last_order FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.article_no LIKE :article_no AND caro_consumables_vendors.name LIKE :vendor",
@@ -622,9 +673,9 @@ class SQLQUERY {
 
 
 
-		'order_get_product_search' => [
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
+		'order_get_product_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
 		],
 		'order_post_prepared_order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",
@@ -681,9 +732,9 @@ class SQLQUERY {
 			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
-		'order_get_approved_filtered' => [
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND LOWER(order_data) LIKE LOWER(CONCAT('%', :orderfilter, '%'))"
+		'order_get_approved_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND (order_data LIKE :SEARCH)",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND (order_data LIKE :SEARCH)"
 		],
 		'order_get_approved_unprocessed' => [ // for notifications
 			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",
@@ -755,6 +806,10 @@ class SQLQUERY {
 			'mysql' => "DELETE FROM caro_records WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_records WHERE id = :id"
 		],
+		'records_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
+			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search",
+			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search"
+		],
 
 
 
@@ -788,6 +843,10 @@ class SQLQUERY {
 		'risk_datalist' => [
 			'mysql' => "SELECT * FROM caro_risks ORDER BY process, risk, cause, effect",
 			'sqlsrv' => "SELECT * FROM caro_risks ORDER BY process, risk, cause, effect"
+		],
+		'risk_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
+			'mysql' => "SELECT * FROM caro_risks WHERE (cause LIKE :SEARCH) OR (effect LIKE :SEARCH) OR (measure LIKE :SEARCH) OR (risk_benefit LIKE :SEARCH) OR (measure_remainder LIKE :SEARCH) ORDER BY process, risk, cause, effect",
+			'sqlsrv' => "SELECT * FROM caro_risks WHERE (cause LIKE :SEARCH) OR (effect LIKE :SEARCH) OR (measure LIKE :SEARCH) OR (risk_benefit LIKE :SEARCH) OR (measure_remainder LIKE :SEARCH) ORDER BY process, risk, cause, effect"
 		],
 		'risk_get' => [
 			'mysql' => "SELECT * FROM caro_risks WHERE id = :id",

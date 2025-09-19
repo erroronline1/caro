@@ -284,8 +284,7 @@ class SEARCHHANDLER {
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 		foreach ($files as $file){
-			similar_text($parameter['search'], pathinfo($file)['basename'], $percent);
-			if (!$parameter['search'] || $percent >= CONFIG['likeliness']['file_search_similarity'] || fnmatch($parameter['search'], pathinfo($file)['basename'], FNM_CASEFOLD)) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
+			if (!$parameter['search'] || fnmatch('*' . $parameter['search'] . '*', pathinfo($file)['basename'], FNM_CASEFOLD)) $matches[] = './api/api.php/file/stream/' . substr($file, 1);
 		}
 		return $matches;
 	}
@@ -334,9 +333,8 @@ class SEARCHHANDLER {
 						}
 					}
 					foreach ($comparisons as $term) {
-						similar_text($search, $term, $percent);
 						// suppress errors on long terms for fnmatch limit
-						if (stristr($term, $search) || $percent >= CONFIG['likeliness']['file_search_similarity'] || @fnmatch($search, $term, FNM_CASEFOLD)) return true;
+						if (stristr($term, $search) || @fnmatch($search, $term, FNM_CASEFOLD)) return true;
 					}
 				}
 			}
@@ -353,8 +351,7 @@ class SEARCHHANDLER {
 				foreach ($terms as $term){
 					// limit search to similarity
 					if ($parameter['search']){
-						similar_text($parameter['search'], $term, $percent);
-						if ($percent < CONFIG['likeliness']['file_search_similarity'] && !fnmatch($parameter['search'], $term, FNM_CASEFOLD)) continue;
+						if (!fnmatch($parameter['search'], $term, FNM_CASEFOLD)) continue;
 					}
 					$matches[] = $row;
 				}
@@ -394,23 +391,18 @@ class SEARCHHANDLER {
 	 * @return array of records
 	 */
 	public function recordsearch($parameter = []){
-		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_all');
-
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
+		$data = SQLQUERY::EXECUTE($this->_pdo, 'records_search', [
+			'values' => [
+				':search' => $parameter['search'] ? : '%',
+				':SEARCH' => $parameter['search'] ? : '%'
+			],
+			'wildcards' => 'all',
+		]);
+
 		$contexts = [];
-
 		foreach ($data as $row){
-			// limit search to similarity
-			if ($parameter['search']){
-				similar_text($parameter['search'], $row['identifier'], $percent);
-				if ($percent < CONFIG['likeliness']['records_search_similarity'] // considering typos
-					&& !fnmatch($parameter['search'], $row['identifier'], FNM_CASEFOLD) // considering wildcards
-					&& !stristr($row['content'], $parameter['search']) // literal search e.g. for serial numbers
-					&& $row['erp_case_number'] !== $parameter['search'] // literal comparison of erp_case_number
-				) continue;
-			}
-
 			// continue if record has been closed unless explicitly searched for
 			if (!$parameter['search'] && (($row['record_type'] !== 'complaint' && $row['closed']) ||
 				($row['record_type'] === 'complaint' && PERMISSION::fullyapproved('complaintclosing', $row['closed'])))
@@ -452,10 +444,15 @@ class SEARCHHANDLER {
 	 * @return array render content
 	 */
 	public function risksearch($parameter = []){
-		$risk_datalist = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
-		$productsPerSlide = 0;
-
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+
+		$risk_datalist = $parameter['search'] ? SQLQUERY::EXECUTE($this->_pdo, 'risk_search', [
+			'values' => [
+				':SEARCH' => $parameter['search']
+			],
+			'wildcards' => true,
+		]) : [];
+		$productsPerSlide = 0;
 
 		$slides = [
 			[
@@ -472,55 +469,47 @@ class SEARCHHANDLER {
 		foreach ($risk_datalist as $row){
 			if (!PERMISSION::permissionFor('riskmanagement') && $row['hidden']) continue;
 			$row['risk'] = implode(' ', array_values(array_map(fn($r) => $r && isset($this->_lang->_USER['risks'][$r]) ? $this->_lang->_USER['risks'][$r] : null, explode(',', $row['risk'] ? : ''))));
-			if ($parameter['search'] && 
-				(
-					stristr($row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], $parameter['search']) ||
-					// suppress errors on long terms for fnmatch limit
-					@fnmatch($parameter['search'], $row['cause'] . ' ' . $row['effect'] . ' ' . $row['measure'] . ' ' . $row['risk_benefit'] . ' ' . $row['measure_remainder'] . ' ' . $row['risk'], FNM_CASEFOLD)
-				)){
-
-				if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
-					$slides[] = [
-						[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->GET('risk.search_result', [':search' => $parameter['search']])
-							],
-						]
-					];
-				}
-				$slide = count($slides) - 1;
-				$tile = max(1, count($slides[$slide]) - 1);	
-				switch ($row['type']){
-					case 'characteristic': // implement further cases if suitable, according to languagefile
-						$content = $row['process'] . ': ' . $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
-						break;
-					default: // risk
-						$content = $row['process'] . ': ' . ($row['cause'] ? : '') . ($row['cause'] && $row['effect'] ? ': ': '') . ($row['effect'] ? : '');
-						break;
-				}
-				if ($row['hidden']) $content = UTILITY::hiddenOption($content);
-				$slides[$slide][$tile][] = [
-					'type' => 'tile',
-					'attributes' => [
-						'onclick' => "api.risk('get', 'risk', " . $row['id'] . ")",
-						'onkeydown' => "if (event.key==='Enter') api.risk('get', 'risk', " . $row['id'] . ")",
-						'role' => 'link',
-						'tabindex' => '0',
-						'title' => $this->_lang->GET('risk.tile_title', [':type' => $this->_lang->_USER['risk']['type'][$row['type']]])
-					],
-					'content' => [
-						[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $this->_lang->_USER['risk']['type'][$row['type']],
-								'class' => $row['relevance'] ? 'green' : 'red'
-							],
-							'content' => $content
-						]
+			if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+				$slides[] = [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('risk.search_result', [':search' => $parameter['search']])
+						],
 					]
 				];
 			}
+			$slide = count($slides) - 1;
+			$tile = max(1, count($slides[$slide]) - 1);	
+			switch ($row['type']){
+				case 'characteristic': // implement further cases if suitable, according to languagefile
+					$content = $row['process'] . ': ' . $row['measure'] . ($row['cause'] ? ': ' . $row['cause'] : '');
+					break;
+				default: // risk
+					$content = $row['process'] . ': ' . ($row['cause'] ? : '') . ($row['cause'] && $row['effect'] ? ': ': '') . ($row['effect'] ? : '');
+					break;
+			}
+			if ($row['hidden']) $content = UTILITY::hiddenOption($content);
+			$slides[$slide][$tile][] = [
+				'type' => 'tile',
+				'attributes' => [
+					'onclick' => "api.risk('get', 'risk', " . $row['id'] . ")",
+					'onkeydown' => "if (event.key==='Enter') api.risk('get', 'risk', " . $row['id'] . ")",
+					'role' => 'link',
+					'tabindex' => '0',
+					'title' => $this->_lang->GET('risk.tile_title', [':type' => $this->_lang->_USER['risk']['type'][$row['type']]])
+				],
+				'content' => [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->_USER['risk']['type'][$row['type']],
+							'class' => $row['relevance'] ? 'green' : 'red'
+						],
+						'content' => $content
+					]
+				]
+			];
 		}
 		if ($parameter['search'] && !isset($slides[1])) return false;
 		return [array_values($slides)];
@@ -556,6 +545,7 @@ class SEARCHHANDLER {
 				if ($parameter['search']) {
 					$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 						'values' => [
+							':SEARCH' => $parameter['search'],
 							':search' => $parameter['search'],
 						],
 						'wildcards' => 'all',

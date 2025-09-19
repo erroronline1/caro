@@ -439,9 +439,9 @@ class ORDER extends API {
 
 				// get all approved orders filtered by
 				// applicable units, state and search
-				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 					'values' => [
-						':orderfilter' => $this->_requestedID ? : ''
+						':SEARCH' => $this->_requestedID ? : '%'
 					],
 					'wildcards' => true,
 					'replacements' => [
@@ -734,10 +734,11 @@ class ORDER extends API {
 		$this->_requestedID = in_array($this->_requestedID, ['null']) ? '' : trim($this->_requestedID ? : '');
 		$this->_subMethodState = $this->_subMethodState === 'unprocessed' ? null : $this->_subMethodState;
 
-		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+		$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 			'values' => [
-				':orderfilter' => $this->_requestedID ? : ''
+				':SEARCH' => $this->_requestedID ? : '%'
 			],
+			'wildcards' => true,
 			'replacements' => [
 				':organizational_unit' => implode(",", $units)
 			]

@@ -975,7 +975,7 @@ class CALENDARUTILITY {
 	public function search($search = ''){
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			'values' => [
-				':subject' => $search
+				':SEARCH' => $search
 			],
 			'wildcards' => true
 		]);

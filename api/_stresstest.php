@@ -139,7 +139,7 @@ class STRESSTEST extends INSTALL{
 	public function removeCalendarEvents(){
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			'values' => [
-				':subject' => $this->_prefix
+				':SEARCH' => $this->_prefix
 			]
 		]);
 		foreach ($entries as $entry){
