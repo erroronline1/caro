@@ -4,7 +4,7 @@
 		"postProcessing": "Import result lists to respective vendor with default filter",
 		"filesetting": {
 			"source": "ARTIKELMANAGER\\.CSV",
-			"headerrowindex": 1,
+			"headerrow": 2,
 			"destination": "article_list.csv",
 			"columns": [
 				"REFERENZ",

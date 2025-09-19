@@ -32,7 +32,7 @@ class CONSUMABLES extends API {
 	private $filtersample = <<<'END'
 	{
 		"filesetting": {
-			"headerrowindex": 0,
+			"headerrow": 1,
 			"dialect": {
 				"separator": ";",
 				"enclosure": "\"",
@@ -58,7 +58,7 @@ class CONSUMABLES extends API {
 				"comment": "transfer erp_id. source will be set if match file is provided",
 				"filesetting": {
 					"source": "ERPDUMP.csv",
-					"headerrowindex": 1,
+					"headerrow": 2,
 					"columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO", "ORDER_STOP", "LAST_ORDER"]
 				},
 				"filter": [
@@ -192,7 +192,7 @@ class CONSUMABLES extends API {
 		$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
 		$filter = isset($vendor['pricelist']['filter']) && json_decode($vendor['pricelist']['filter'], true) ? json_decode($vendor['pricelist']['filter'], true) : [
 			'filesettings' => [
-				'headerrowindex' => 0,
+				'headerrow' => CONFIG['csv']['headerrow'],
 				'columns' => $columns
 			]
 		];
@@ -440,7 +440,7 @@ class CONSUMABLES extends API {
 				$productsPerSlide = 0;
 				$matches = [[]];
 				foreach ($vendorproducts as $vendorproduct){
-					if ($vendorproduct['article_no'] === $product['article_no']) continue;
+					if (!$vendorproduct['article_no'] || $vendorproduct['article_no'] === $product['article_no']) continue;
 					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
@@ -1165,7 +1165,7 @@ class CONSUMABLES extends API {
 				]);
 				$similarproducts = [];
 				foreach ($vendorproducts as $vendorproduct){
-					if ($vendorproduct['article_no'] === $product['article_no']) continue;
+					if (!$vendorproduct['article_no'] || $vendorproduct['article_no'] === $product['article_no']) continue;
 					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
@@ -1747,7 +1747,7 @@ class CONSUMABLES extends API {
 		$filter = json_decode($filter, true);
 		$filter['filesetting']['source'] = $files['pricelist'];
 		$filter['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
-		if (!isset($filter['filesetting']['headerrowindex'])) $filter['filesetting']['headerrowindex'] = CONFIG['csv']['headerrowindex'];
+		if (!isset($filter['filesetting']['headerrow'])) $filter['filesetting']['headerrow'] = CONFIG['csv']['headerrow'];
 		if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 
 		// update csv-filter filter_by_comparison_file if set or drop if not
@@ -1989,7 +1989,13 @@ class CONSUMABLES extends API {
 				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
-				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor['pricelist']['filter']){
+					if (!json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+					// prettify
+					else {
+						$vendor['pricelist']['filter'] = UTILITY::json_encode(json_decode($vendor['pricelist']['filter'], true), JSON_PRETTY_PRINT);
+					}
+				}
 
 				// set expiry date for provided files before unsetting the payload property 
 				$oneYearFromNow = clone $this->_date['servertime'];
@@ -2129,7 +2135,13 @@ class CONSUMABLES extends API {
 				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
-				if ($vendor['pricelist']['filter'] && !json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor['pricelist']['filter']){
+					if (!json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+					// prettify
+					else {
+						$vendor['pricelist']['filter'] = UTILITY::json_encode(json_decode($vendor['pricelist']['filter'], true), JSON_PRETTY_PRINT);
+					}
+				}
 
 				// set expiry date for provided files before unsetting the payload property 
 				$oneYearFromNow = clone $this->_date['servertime'];
