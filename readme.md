@@ -1181,7 +1181,7 @@ Trainings are matched by their name.
 ## Search
 Search functionality across the application may differ slightly depending of context.
 
-* Calendar search, product search and order filter search literally for the provided term as part of the database information for performance reasons. You may have to be more specific to get the desired result.
+* Calendar search, product search and order filter search almost literally for the provided term as part of the database information. They allow wildcards as `*` for any amount of any characters or `?` as any character on the given position though.
 * Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext.
 * All other searches (e.g. files, record identifiers, document search) allow wildcards as `*` for any amount of any characters or `?` as any character on the given position and often take [similar spelling](#runtime-variables) into account within the displayed results.
 

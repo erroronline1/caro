@@ -443,6 +443,7 @@ class ORDER extends API {
 					'values' => [
 						':orderfilter' => $this->_requestedID ? : ''
 					],
+					'wildcards' => true,
 					'replacements' => [
 						':organizational_unit' => implode(",", $units)
 					]

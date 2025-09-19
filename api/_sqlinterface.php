@@ -33,20 +33,27 @@ class SQLQUERY {
 	/**
 	 * execute a query
 	 * note: only fetchAll, so if you expect only one result make sure to handle $return[0]
+	 * parameters[wildcards] true replaces ? and * with sql _ and %
 	 * 
 	 * @param object $_pdo preset database connection, passed from main application
 	 * @param string $query either defined within queries below or prepared raw queries
-	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries
+	 * @param array $parameters values => pdo execution passing tokens, strtr tokens e.g. for IN queries, wildcards bool|string
 	 * 
 	 * @return false|int|array sql result not executed|affectedRows|selection
 	 */
-	public static function EXECUTE($_pdo, $query = '', $parameters = ['values' => [], 'replacements' => []]){
+	public static function EXECUTE($_pdo, $query = '', $parameters = ['values' => [], 'replacements' => [], 'wildcards' => false]){
 		// retrive query matching sql driver, else process raw query
 		if (isset(self::QUERIES[$query])) $query = self::QUERIES[$query][CONFIG['sql'][CONFIG['sql']['use']]['driver']];
 		
 		// substitute NULL values and sanitize values
 		if (isset($parameters['values'])){
 			foreach ($parameters['values'] as $key => $value){
+
+				if (isset($parameters['wildcards']) && str_starts_with($query, 'SELECT')){
+					if ($parameters['wildcards'] === true) $value = preg_replace(['/\?/', '/\*/'], ['_', '%'], $value);
+					if ($parameters['wildcards'] === 'all') $value = preg_replace(['/\?/', '/\*/', '/[^\w\d%]/u'], ['_', '%', '_'], $value);
+				}
+
 				if (gettype($value) === 'NULL' || $value === false) {
 					$query = strtr($query, [$key => 'NULL']);
 					unset($parameters['values'][$key]);
@@ -416,8 +423,8 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id"
 		],
 		'consumables_get_product_search' => [
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_ean) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_ean) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors)"
 		],
 		'consumables_get_product_by_article_no_vendor' => [
 			'mysql' => "SELECT caro_consumables_products.id, caro_consumables_products.last_order FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE caro_consumables_products.article_no LIKE :article_no AND caro_consumables_vendors.name LIKE :vendor",
@@ -616,8 +623,8 @@ class SQLQUERY {
 
 
 		'order_get_product_search' => [
-			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_ean) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL",
-			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_ean) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
+			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL",
+			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE (LOWER(caro_consumables_products.article_no) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(caro_consumables_products.article_alias) LIKE LOWER(CONCAT('%', :search, '%')) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
 		],
 		'order_post_prepared_order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",

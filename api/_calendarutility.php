@@ -976,7 +976,8 @@ class CALENDARUTILITY {
 		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			'values' => [
 				':subject' => $search
-			]
+			],
+			'wildcards' => true
 		]);
 	}
 }
