@@ -549,20 +549,26 @@ class SEARCHHANDLER {
 					$parameter['vendors'] = implode('_', array_values(array_column($vendors, 'id')));
 				}
 
-				$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
-
 				$search = [];
 
-				// this is appears to be the most performant way, iterating over the whole database with fnsearch and similarity is horribly slow 2025-05-16
-				if ($parameter['search']) $search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
-					'values' => [
-						':search' => $parameter['search']
-					],
-					'replacements' => [
-						':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
-					]
-				]);
+				$parameter['search'] = isset($parameter['search']) ? trim(urldecode($parameter['search'])) : null;
 
+				if ($parameter['search']) {
+					// literal like appears to be the most performant way, iterating over the whole database with fnsearch and similarity is horribly slow 2025-05-16
+
+					// todo: implement an sql-method to construct queries
+					// that match different cases, replacing with wildcards
+					// to overcome limited availability for regex queries
+
+					$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
+						'values' => [
+							':search' => $parameter['search'],
+						],
+						'replacements' => [
+							':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
+						]
+					]);
+				}
 				$productsPerSlide = 0;
 
 				// insert request specific search to first slide
