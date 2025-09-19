@@ -378,6 +378,12 @@ class AUDIT extends API {
 							'content' => $template['objectives'] .
 								(!$template['method'] ? '' : " \n" . $this->_lang->GET('audit.audit.method') . ': ' . $this->_lang->GET('audit.audit.methods.' . $template['method'])) .
 								($audit['id'] ? "\n \n" . $this->_lang->GET('audit.audit.execute.last_edit', [':date' => $this->convertFromServerTime($audit['last_touch']), ':user' => $audit['last_user']]) : '')
+						], [
+							'type' => 'textsection',
+							'attributes' => [
+								'name' => $this->_lang->GET('audit.audit.execute.consider')
+							],
+							'content' => $this->_lang->GET('audit.audit.execute.consider_content')
 						]
 					];
 
@@ -995,6 +1001,7 @@ class AUDIT extends API {
 							'maxlength' => 80,
 							'data-type' => 'auditsection' // for composer, not icon
 						],
+						'hint' => $this->_lang->GET('audit.audit.question_hint'),
 						'autocomplete' => array_values($datalist['questions']) ? : null
 					], [
 						'type' => 'checkbox2text',

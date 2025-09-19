@@ -535,6 +535,8 @@
 			"execute": {
 				"close": "completed",
 				"close_confirm": "After closing editing is not longer possible. The audited unit will be sent a message with the summary. Proceed?",
+				"consider": "Consider",
+				"consider_content": "Slips are not necessarily a deviation, only multiple faulty samples point to systematic deficiencies.",
 				"conversation_partner": "Conversation partner",
 				"delete_confirm_header": "Delete Audit for :unit permanently?",
 				"delete_confirm_ok": "Yes, delete",
@@ -579,7 +581,7 @@
 				"hint": "Hint",
 				"hint_hint": "e.g. subunit",
 				"import_summary": "Import previous summary",
-				"import_summary_hint": "Only the last finalized audit of the selected unit is processed. The planned audit is supposed to take previous results into account.",
+				"import_summary_hint": "Only the last finalized audit of the selected unit is processed. The planned audit is supposed to take previous results into account. Remember to consider third party audit results and novelties too.",
 				"new": "New template",
 				"not_found": "Template not found",
 				"not_saved": "Template could not be saved.",
@@ -589,7 +591,8 @@
 				"saved": "Template saved",
 				"used": "This template can not be deleted as it is currently in use by an unfinished audit."
 			},
-			"question": "Question"
+			"question": "Question",
+			"question_hint": "Best practice: ask questions about \"who\", \"when\", \"why\", \"where\" and \"how\" to avoid simple yes/no answers."
 		},
 		"check_description": ":check on :date by :author",
 		"checks_select_type": "Select type of data",

@@ -535,6 +535,8 @@
 			"execute": {
 				"close": "abgeschlossen",
 				"close_confirm": "Nach dem Abschluss ist eine weitere Bearbeitung nicht mehr möglich. Der auditierte Bereich erhält eine Nachricht mit der Zusammenfassung. Fortfahren?",
+				"consider": "Beachte",
+				"consider_content": "Ausrutscher stellen keine Abweichung dar, erst bei mehreren fehlerhaften Stichproben ist ein systematisches Defizit wahrscheinlich.",
 				"conversation_partner": "Gesprächspartner",
 				"delete_confirm_header": "Audit für :unit dauerhaft löschen?",
 				"delete_confirm_ok": "Ja, Audit löschen",
@@ -579,7 +581,7 @@
 				"hint": "Hinweis",
 				"hint_hint": "zum Beispiel Teilbereich",
 				"import_summary": "Vorige Zusammenfassung importieren",
-				"import_summary_hint": "Es wird nur das letzte abgeschlossene Audit für den gewählten Bereich verwendet. Im geplanten Audit sollte auf die Ergebnisse des vorherigen Audits eingegangen werden.",
+				"import_summary_hint": "Es wird nur das letzte abgeschlossene Audit für den gewählten Bereich verwendet. Im geplanten Audit sollte auf die Ergebnisse des vorherigen Audits eingegangen werden. Beachte auch Ergebnisse externer Audits und neuer Verfahren.",
 				"new": "Neue Vorlage",
 				"not_found": "Vorlage nicht gefunden",
 				"not_saved": "Vorlage konnte nicht gespeichert werden.",
@@ -589,7 +591,8 @@
 				"saved": "Vorlage gespeichert",
 				"used": "Diese Vorlage kann nicht gelöscht werden, da sie derzeit noch von einem nicht abgeschlossenen Audit verwendet wird."
 			},
-			"question": "Frage"
+			"question": "Frage",
+			"question_hint": "Frage nach \"wer\", \"wann\", \"warum\", \"wo\" und \"wie\" um einfache ja/nein Antworten zu vermeiden."
 		},
 		"check_description": ":check am :date von :author",
 		"checks_select_type": "Wähle den Datentyp aus",
