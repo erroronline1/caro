@@ -36,6 +36,14 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases
     * std method for csv uploads to distinct folder, then show up within tools?
     * check oldest order and submit for erp order data updates initial date on deletion of cron.log
+* product search consider whitespaces, similiarity?
+* audit
+    * auditprogramme and plan review wording
+    * audit preparation hint considering external topics
+    * conformity stages
+    * measures and their finalization from audit outcomes before or after closing?
+    * measures to calendar
+* calendar tour planning
 
 ## Content
 * [Aims](#aims)
@@ -1297,7 +1305,7 @@ Description of options:
 	"postProcessing": Optional string as hint what to do with the result file
 	"filesetting":
 		"source": File to process, SELF or a named array (the other filesettings don't matter then)
-		"headerrowindex": Offset for title row
+		"headerrow": Title row
 		"dialect": Settings according to php fgetcsv
 		"columns": list/array of column names to process and export to destination
 		"encoding": Comma separated string of possible character encoding of sourcefile
@@ -1387,7 +1395,7 @@ A generic sample:
     "postProcessing": "some message, e.g. do not forget to check and archive",
     "filesetting": {
         "source": "Export.+?\\.csv",
-        "headerrowindex": 0,
+        "headerrow": 1,
         "columns": [
             "ORIGININDEX",
             "SOMEDATE",
@@ -1464,7 +1472,7 @@ A generic sample:
             "keep": false,
             "filesetting": {
                 "source": "excemptions.*?.csv",
-                "headerrowindex": 0,
+                "headerrow": 1,
                 "columns": [
                     "VORGANG"
                 ]
@@ -1791,6 +1799,7 @@ It is strongly recommended to create an additional development environment to te
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv if applicable)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
+* web.config for IIS allow double escaping
 
 ### Application setup
 The default provides [template files](#https://github.com/erroronline1/caro/tree/master/templates) in the respective template folder for a swift availability of contents upon launch. Filenames follow a pattern of `{choosable name part}.{type}.{default language}.{extension}` where
@@ -1882,7 +1891,7 @@ D-BW[breaks] = "6-30, 9-45" ; law related break times, rising [hours of work]-[m
 
 ; default values for csv processing if left out of filter rules
 [csv]
-headerrowindex = 0
+headerrow = 1
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 dialect["separator"] = ";"
@@ -2201,7 +2210,7 @@ while setting up a vendor an import rule must be defined like:
 ```js
 {
     "filesetting": {
-        "headerrowindex": 0,
+        "headerrow": 1,
         "dialect": {
             "separator": ";",
             "enclosure": "\"",
@@ -2227,7 +2236,7 @@ while setting up a vendor an import rule must be defined like:
             "comment": "transfer erp_id. source will be set if match file is provided",
             "filesetting": {
                 "source": "ERPDUMP.csv",
-                "headerrowindex": 1,
+                "headerrow": 2,
                 "columns": ["INACTIVE", "ID", "VENDOR", "ARTICLE_NO", "ORDER_STOP", "LAST_ORDER"]
             },
             "filter": [
@@ -2291,7 +2300,7 @@ while setting up a vendor an import rule must be defined like:
     }
 }
 ```
-*headerrowindex* and *dialect* are added with a default value from config.ini if left out.
+*headerrow* and *dialect* are added with a default value from config.ini if left out.
 
 Some vendors list products with placeholders. Some product may be listed as *productXYYZ* where X represents a value between 0-9, YY 20-30 and Z L or R (speaking of prosthetic feet). To make things easier to select and order, a replacing filter can be applied and executed in advance of the rewrite. This fills up the article list with all respective versions. It is always the second parentheses surrounded part that will be replaced. 
 
@@ -2334,7 +2343,7 @@ If not provided a simple import filter will be generated on export of pricelists
 ```js
 {
     "filesetting": {
-        "headerrowindex": 0,
+        "headerrow": 1,
         "columns": [
             "article_no",
             "article_name",

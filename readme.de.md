@@ -1202,7 +1202,7 @@ Beschreibung der Optionen:
 	"postProcessing": optionale Zeichenkette als Hinweis, was mit der Ergebnisdatei passieren soll
 	"filesetting":
 		"source": Datei zur Verarbeitung, "SELF" oder ein assoziatives Array (hier spielen die anderen Einstellungen keine Rolle)
-		"headerrowindex": Offset für die Titelzeile
+		"headerrow": Offset für die Titelzeile
 		"dialect": Einstellungen gemäß php fgetcsv
 		"columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
 		"encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
@@ -1292,7 +1292,7 @@ Ein beliebiges Beispiel:
     "postProcessing": "some message, e.g. do not forget to check and archive",
     "filesetting": {
         "source": "Export.+?\\.csv",
-        "headerrowindex": 0,
+        "headerrow": 0,
         "columns": [
             "ORIGININDEX",
             "SOMEDATE",
@@ -1369,7 +1369,7 @@ Ein beliebiges Beispiel:
             "keep": false,
             "filesetting": {
                 "source": "excemptions.*?.csv",
-                "headerrowindex": 0,
+                "headerrow": 0,
                 "columns": [
                     "VORGANG"
                 ]
@@ -1696,6 +1696,7 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv sofern zutreffend)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
+* doppelte Escapezeichen zulassen (web.config für IIS Server)
 
 ### Anwendungseinrichtung
 Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronline1/caro/tree/master/templates) im entsprechenden *template*-Ordner bereit um eine schnelle Verfügbarkeit von Inhalten bei der Inbetriebnahme der Anwendung zu unterstützen. Dateinamen folgen dem Muster `{frei wählbar}.{Typ}.{Standardsprache}.{Dateinamenerweiterung} wobei
@@ -1787,7 +1788,7 @@ D-BW[breaks] = "6-30, 9-45" ; gesetzliche Pausenzeiten, aufsteigend [Arbeitsstun
 
 ; Standardeinstellungen für CSV-Verarbeitung falls nicht im Filter definiert
 [csv]
-headerrowindex = 0
+headerrow = 1
 csvprocessor_source_encoding = 'ISO-8859-1, ISO-8859-3, ISO-8859-15, UTF-8'
 
 dialect["separator"] = ";"
@@ -2108,7 +2109,7 @@ Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden äh
 ```js
 {
     "filesetting": {
-        "headerrowindex": 0,
+        "headerrow": 1,
         "dialect": {
             "separator": ";",
             "enclosure": "\"",
@@ -2123,7 +2124,7 @@ Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden äh
             "comment": "Übertrage ERP-ID. Source wird von der Anwendung gesetzt, sofern eine Datei bereitgestellt wird.",
             "filesetting": {
                 "source": "ERPDUMP.csv",
-                "headerrowindex": 1,
+                "headerrow": 2,
                 "columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
             },
             "filter": [
@@ -2187,7 +2188,7 @@ Bei der Bearbeitung eines Lieferanten muss eine Import-Regel erstellt werden äh
     }
 }
 ```
-*headerrowindex* und *dialect* werden mit dem Standardwert der config.ini ergänzt, falls sie nicht Teil des Filters sind.
+*headerrow* und *dialect* werden mit dem Standardwert der config.ini ergänzt, falls sie nicht Teil des Filters sind.
 
 Manche Preislisten enthalten Artikelnummern mit Platzhaltern. Manche Artikel können dabei als *ProduktXYYZ* gelistet sein, wobei Y einen Wert zwischen 0 und 9 darstellt, YY 20 bis 30 und Z für L oder R steht (wie im Falle von Prothesenfüßen). Um die Auswahl und Bestellung zu vereinfachen kann ein Ersatzfilter erstellt werden und vor der rewrite-Regel angewendet werden. Dadurch wird die Preisliste mit allen möglichen Versionen aufgefüllt. Dabei ist es stets die zweite Klammer, welche ersetzt wird. 
 
@@ -2230,7 +2231,7 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
 ```js
 {
     "filesetting": {
-        "headerrowindex": 0,
+        "headerrow": 1,
         "columns": [
             "article_no",
             "article_name",
