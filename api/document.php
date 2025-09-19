@@ -601,7 +601,7 @@ class DOCUMENT extends API {
 	public function bundles(){
 		if ($this->_requestedID === 'null') $this->_requestedID = null;
 		$available_units = [];
-		$this->_requestedID = $this->_requestedID ? urldecode($this->_requestedID) : null;
+		$this->_requestedID = $this->_requestedID ? : null;
 		$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 
 		$externaldocuments = SQLQUERY::EXECUTE($this->_pdo, 'file_external_documents_get_active');
