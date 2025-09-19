@@ -13,7 +13,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Artikelnummer", "Bezeichnung", "EANNummer", "Einheit"]
 				},
 				"filter": [
@@ -43,7 +43,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -88,6 +88,7 @@
 						"trading_good": "1",
 						"has_expiry_date": "0"
 					},
+					"conditional_or": [["trading_good", "1", ["Bezeichnung", "^heft|^flausch|^klett"]]],
 					"rewrite": [
 						{
 							"article_no": ["Artikelnummer"],
@@ -103,7 +104,7 @@
 		}
 	},
 	{
-		"name": "AET-GmbH ",
+		"name": "AET-GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile Liefereinheit anpassen, Tierbandagen löschen, mittlere Kopfzeilen und alles oberhalb der ersten Zeile löschen, Hilfsmittelbezeichnung an Optionen anhängen.",
 			"infotext": "",
@@ -116,7 +117,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["schwarz", "Bandagenbezeichnung", "Liefereinheit"]
 				},
 				"filter": [
@@ -146,7 +147,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -196,7 +197,7 @@
 							"article_no": ["schwarz"],
 							"article_name": ["Bandagenbezeichnung"],
 							"article_unit": ["Liefereinheit"],
-							"article_ean": []
+							"article_ean": [""]
 						}
 					]
 				}
@@ -206,9 +207,9 @@
 		}
 	},
 	{
-		"name": "AIDAMED ",
+		"name": "AIDAMED",
 		"info": {
-			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"purchase_info": "Preislistenimport: Artikelbezeichnungen in jede Zeit der Spalte kopieren, Zwischenüberschriften löschen, XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -219,8 +220,89 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+					"headerrow": 4,
+					"columns": ["Artikel ", "Größe", "Art.Nr.", "EAN-Code"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete anything but articles",
+						"keep": true,
+						"match": {
+							"all": {
+								"Art.Nr.": ".+"
+							}
+						}
+					},
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Art.Nr."],
+							"descending": false,
+							"column": "Art.Nr.",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "aidamed",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Art.Nr.": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"trading_good": "1",
+						"has_expiry_date": "0"
+					},
+					"rewrite": [
+						{
+							"article_no": ["Art.Nr."],
+							"article_name": ["Artikel ", ", ", "Größe"],
+							"article_unit": [""],
+							"article_ean": ["EAN-Code"]
+						}
+					]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -241,7 +323,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Artikelbezeichnung", "Artikelnummer", "EAN"]
 				},
 				"filter": [
@@ -260,9 +342,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["article_no"],
+							"orderby": ["Artikelnummer"],
 							"descending": false,
-							"column": "article_no",
+							"column": "Artikelnummer",
 							"amount": 1
 						}
 					},
@@ -271,7 +353,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -344,7 +426,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -366,8 +448,8 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Lager-Artikelnummer AMT", "Bezeichnung", "VE", "EAN/GTIN/UPC"],
-					"headerrowindex": 2
+					"columns": ["Lager-Artikelnummer AMT", "Bezeichnung", "VE", "EAN/GTIN/UDI"],
+					"headerrow": 3
 				},
 				"filter": [
 					{
@@ -385,9 +467,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["article_no"],
+							"orderby": ["Lager-Artikelnummer AMT"],
 							"descending": false,
-							"column": "article_no",
+							"column": "Lager-Artikelnummer AMT",
 							"amount": 1
 						}
 					},
@@ -396,7 +478,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -447,7 +529,7 @@
 							"article_no": ["Lager-Artikelnummer AMT"],
 							"article_name": ["Bezeichnung"],
 							"article_unit": ["VE"],
-							"article_ean": ["EAN/GTIN/UPC"]
+							"article_ean": ["EAN/GTIN/UDI"]
 						}
 					]
 				}
@@ -499,7 +581,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -573,7 +655,7 @@
 			"filter": {
 				"filesetting": {
 					"columns": ["Artikel-Nr.", "Artikelbeschreibung", "EAN/GTIN"],
-					"headerrowindex": 1
+					"headerrow": 1
 				},
 				"filter": [
 					{
@@ -602,7 +684,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -695,7 +777,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -778,7 +860,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -819,7 +901,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -923,7 +1005,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1002,7 +1084,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -1025,7 +1107,7 @@
 			"filter": {
 				"filesetting": {
 					"columns": ["article_no", "Bezeichnung", "Einheit"],
-					"headerrowindex": 14
+					"headerrow": 24
 				},
 				"filter": [
 					{
@@ -1044,7 +1126,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1115,102 +1197,9 @@
 		}
 	},
 	{
-		"name": "Heinrich Caroli e.K.",
-		"info": {
-			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
-			"infotext": "",
-			"mail": "",
-			"phone": "",
-			"address": "Eichrodtstraße 13, 77933 Lahr",
-			"sales_representative": "",
-			"customer_id": ""
-		},
-		"pricelist": {
-			"filter": {
-				"filesetting": {
-					"headerrowindex": 8,
-					"columns": ["Artikelnummer", "Bezeichnung", "GTIN", "Abgabeeinheit"]
-				},
-				"filter": [
-					{
-						"apply": "filter_by_duplicates",
-						"comment": "delete multiple pricelist entries",
-						"keep": true,
-						"duplicates": {
-							"orderby": ["Artikelnummer"],
-							"descending": false,
-							"column": "Artikelnummer",
-							"amount": 1
-						}
-					},
-					{
-						"apply": "filter_by_comparison_file",
-						"comment": "transfer erp_id. source will be set if match file is provided",
-						"filesetting": {
-							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
-							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
-						},
-						"filter": [
-							{
-								"apply": "filter_by_expression",
-								"comment": "delete inactive articles and unneccessary vendors",
-								"keep": true,
-								"match": {
-									"all": {
-										"STATUS": "false",
-										"LIEFERANTENNAME": "caroli",
-										"BESTELLSTOP": "false",
-										"WE_DAT_ARTIKELSTAMM": ".+"
-									}
-								}
-							},
-							{
-								"apply": "filter_by_monthdiff",
-								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
-								"keep": false,
-								"date": {
-									"column": "WE_DAT_ARTIKELSTAMM",
-									"format": "d.m.Y H:i",
-									"threshold": 36,
-									"bias": ">"
-								}
-							}
-						],
-						"match": {
-							"all": {
-								"Artikelnummer": "BESTELL_NUMMER"
-							}
-						},
-						"transfer": {
-							"erp_id": "REFERENZ",
-							"last_order": "WE_DAT_ARTIKELSTAMM"
-						}
-					}
-				],
-				"modify": {
-					"add": {
-						"special_attention": "0"
-					},
-					"conditional_or": [["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband|lycra|satin|drell"]]],
-					"rewrite": [
-						{
-							"article_no": ["Artikelnummer"],
-							"article_name": ["Bezeichnung"],
-							"article_unit": ["Abgabeeinheit"],
-							"article_ean": ["GTIN"]
-						}
-					]
-				}
-			},
-			"samplecheck_interval": 93,
-			"samplecheck_reusable": 1095
-		}
-	},
-	{
 		"name": "Cosmesil.de",
 		"info": {
-			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile article_no und article_name ergänzen ",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile article_no und article_name ergänzen",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -1222,7 +1211,7 @@
 			"filter": {
 				"filesetting": {
 					"columns": ["article_no", "article_name"],
-					"headerrowindex": 0
+					"headerrow": 1
 				},
 				"filter": [
 					{
@@ -1252,7 +1241,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1325,7 +1314,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Kategorie", "Produktname", "Produktbezeichnung", "Farbe", "Größenbez.", "Artikel-Nr.", "VE ", "EAN 13"]
 				},
 				"filter": [
@@ -1345,7 +1334,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1423,7 +1412,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -1432,7 +1421,7 @@
 		}
 	},
 	{
-		"name": "ERKODENT® Erich Kopp GmbH",
+		"name": "ERKODENT Erich Kopp GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
@@ -1445,8 +1434,8 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["Bestellnr.", "Beschreibung", "Inhalt"]
+					"headerrow": 1,
+					"columns": ["7_Lieferanten_Artikelnummer", "8_Lieferanten_Artikelbezeichnung"]
 				},
 				"filter": [
 					{
@@ -1455,7 +1444,7 @@
 						"keep": false,
 						"match": {
 							"any": {
-								"Beschreibung": "^$|einlage"
+								"8_Lieferanten_Artikelbezeichnung": "^$|einlage"
 							}
 						}
 					},
@@ -1464,9 +1453,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Bestellnr."],
+							"orderby": ["7_Lieferanten_Artikelnummer"],
 							"descending": false,
-							"column": "Bestellnr.",
+							"column": "7_Lieferanten_Artikelnummer",
 							"amount": 1
 						}
 					},
@@ -1475,7 +1464,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1506,7 +1495,7 @@
 						],
 						"match": {
 							"all": {
-								"Bestellnr.": "BESTELL_NUMMER"
+								"7_Lieferanten_Artikelnummer": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -1518,9 +1507,9 @@
 				"modify": {
 					"rewrite": [
 						{
-							"article_no": ["Bestellnr."],
-							"article_name": ["Beschreibung"],
-							"article_unit": ["Inhalt"],
+							"article_no": ["7_Lieferanten_Artikelnummer"],
+							"article_name": ["8_Lieferanten_Artikelbezeichnung"],
+							"article_unit": [""],
 							"article_ean": [""]
 						}
 					]
@@ -1563,7 +1552,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1623,6 +1612,99 @@
 		}
 	},
 	{
+		"name": "Feguramed GmbH",
+		"info": {
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Jahnstraße 2, 74722 Buchen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"headerrow": 3,
+					"columns": ["Artikelnummer", "Artikelbezeichnung", "Verkaufseinheit"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Artikelnummer"],
+							"descending": false,
+							"column": "Artikelnummer",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "feguramed",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Artikelnummer": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"special_attention": "1"
+					},
+					"conditional_or": [["special_attention", "0", ["Artikelbezeichnung", "polier|zirko|polish"]]],
+					"rewrite": [
+						{
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Artikelbezeichnung"],
+							"article_unit": ["Verkaufseinheit"],
+							"article_ean": [""]
+						}
+					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Fior & Gentz GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile Bezeichnung2 ergänzen",
@@ -1655,7 +1737,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1729,7 +1811,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 2,
+					"headerrow": 3,
 					"columns": ["Art. Nr.          ", "          Bezeichnung       ", "Menge"]
 				},
 				"filter": [
@@ -1749,7 +1831,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1805,6 +1887,192 @@
 		}
 	},
 	{
+		"name": "Guenther Bionics GmbH",
+		"info": {
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Am Winterhafen 1, 39114 Magdeburg",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["Art-Nr", "Beschreibung", "Einheit"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Art-Nr"],
+							"descending": false,
+							"column": "Art-Nr",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "guenther",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Art-Nr": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"special_attention": "0"
+					},
+					"conditional_or": [["special_attention", "1", ["Beschreibung", "silikon"]]],
+					"rewrite": [
+						{
+							"article_no": ["Art-Nr"],
+							"article_name": ["Beschreibung"],
+							"article_unit": ["Einheit"],
+							"article_ean": [""]
+						}
+					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Heinrich Caroli e.K.",
+		"info": {
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Eichrodtstraße 13, 77933 Lahr",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"headerrow": 9,
+					"columns": ["Artikelnummer", "Bezeichnung", "GTIN", "Abgabeeinheit"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Artikelnummer"],
+							"descending": false,
+							"column": "Artikelnummer",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "caroli",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Artikelnummer": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"special_attention": "0"
+					},
+					"conditional_or": [["special_attention", "1", ["Bezeichnung", "einfa[sß]+band|samtband|lycra|satin|drell"]]],
+					"rewrite": [
+						{
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Bezeichnung"],
+							"article_unit": ["Abgabeeinheit"],
+							"article_ean": ["GTIN"]
+						}
+					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Ihle Strumpf GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -1818,7 +2086,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 1,
+					"headerrow": 2,
 					"columns": ["Nr.", "Beschreibung 1", "Beschreibung 2", "Farbe", "Größe", "Einheit"]
 				},
 				"filter": [
@@ -1838,7 +2106,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -1911,7 +2179,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -1933,7 +2201,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -1956,7 +2224,7 @@
 			"filter": {
 				"filesetting": {
 					"columns": ["Artikelgruppe", "Artikelnummer", "Artikelbeschreibung", "Verkaufsmengeneinheit"],
-					"headerrowindex": 9
+					"headerrow": 1
 				},
 				"filter": [
 					{
@@ -1975,7 +2243,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2049,7 +2317,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -2090,7 +2358,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2167,7 +2435,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 2,
+					"headerrow": 3,
 					"columns": ["Artikelnummer ", "Artikelbezeichnung", "Einheit"]
 				},
 				"filter": [
@@ -2197,7 +2465,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2270,7 +2538,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -2292,7 +2560,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -2333,7 +2601,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2448,7 +2716,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2544,7 +2812,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2603,6 +2871,97 @@
 		}
 	},
 	{
+		"name": "M + W Dental",
+		"info": {
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Reichardsweide 40, 63654 Büdingen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"columns": ["M+W Artikelnummer", "Artikelbezeichnung", "Verkaufseinheit"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["M+W Artikelnummer"],
+							"descending": false,
+							"column": "M+W Artikelnummer",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "mmib",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"M+W Artikelnummer": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"special_attention": "1"
+					},
+					"rewrite": [
+						{
+							"article_no": ["M+W Artikelnummer"],
+							"article_name": ["Artikelbezeichnung"],
+							"article_unit": ["Verkaufseinheit"],
+							"article_ean": [""]
+						}
+					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Neatec GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -2616,7 +2975,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 1,
+					"headerrow": 2,
 					"columns": ["Artikel-Nr.", "Artikelbezeichnung kurz", "Größe", "Farbe", "Einheit"]
 				},
 				"filter": [
@@ -2636,7 +2995,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2709,7 +3068,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 6,
+					"headerrow": 7,
 					"columns": ["article_ean", "article_name", "article_no"]
 				},
 				"filter": [
@@ -2719,7 +3078,7 @@
 						"keep": true,
 						"match": {
 							"all": {
-								"ARTNR": ".+"
+								"article_no": ".+"
 							}
 						}
 					},
@@ -2739,7 +3098,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2811,7 +3170,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["MATCHCODE", "NAME1", "EANCODE", "VK_EINHEIT"]
 				},
 				"filter": [
@@ -2831,7 +3190,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -2914,7 +3273,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 4,
+					"headerrow": 5,
 					"columns": ["ART-NR", "BEZEICHNUNG"]
 				},
 				"filter": [
@@ -2944,7 +3303,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3100,7 +3459,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -3122,7 +3481,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 6,
+					"headerrow": 7,
 					"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
 				},
 				"filter": [
@@ -3152,7 +3511,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3343,7 +3702,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3431,7 +3790,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3507,7 +3866,7 @@
 			"filter": {
 				"filesetting": {
 					"columns": ["Artikelgruppe", "Artikelnummer", "Artikelbeschreibung", "Verkaufsmengeneinheit", "EAN / Barcode"],
-					"headerrowindex": 9
+					"headerrow": 1
 				},
 				"filter": [
 					{
@@ -3526,7 +3885,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3600,7 +3959,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Material", "Materialtext", "Mengeneinheit", "EAN/UPC"]
+					"columns": ["Material", "Materialbezeichnung", "Mengen-\neinheit", "EAN/UPC-Code"]
 				},
 				"filter": [
 					{
@@ -3619,7 +3978,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3667,9 +4026,9 @@
 						"stock_item": "0"
 					},
 					"conditional_or": [
-						["trading_good", "1", ["Materialtext", "knee comfort|strumpf|t(?:ü|Ü)binger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
+						["trading_good", "1", ["Materialbezeichnung", "knee comfort|strumpf|t(?:ü|Ü)binger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
 						["has_expiry_date", "1", ["Material", "633s2|617h.+|617p\\d\\d.+|617s\\d=|85h.+|636K.+|616T111|453h10|646m453"]],
-						["special_attention", "1", ["Materialtext", "ComforTex|pastasil|plastazote|trolen|innenlack|thermolyn"]],
+						["special_attention", "1", ["Materialbezeichnung", "ComforTex|pastasil|plastazote|trolen|innenlack|thermolyn"]],
 						[
 							"stock_item",
 							"1",
@@ -3682,9 +4041,9 @@
 					"rewrite": [
 						{
 							"article_no": ["Material"],
-							"article_name": ["Materialtext"],
-							"article_unit": ["Mengeneinheit"],
-							"article_ean": ["EAN/UPC"]
+							"article_name": ["Materialbezeichnung"],
+							"article_unit": ["Mengen-\neinheit"],
+							"article_ean": ["EAN/UPC-Code"]
 						}
 					]
 				}
@@ -3707,8 +4066,8 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 9,
-					"columns": ["Material", "Materialkurztext", "ME"]
+					"headerrow": 6,
+					"columns": ["Material", "Materialkurztext", "ME", "EAN-Codes"]
 				},
 				"filter": [
 					{
@@ -3727,7 +4086,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3777,7 +4136,7 @@
 							"article_no": ["Material"],
 							"article_name": ["Materialkurztext"],
 							"article_unit": ["ME"],
-							"article_ean": [""]
+							"article_ean": ["EAN-Codes"]
 						}
 					]
 				}
@@ -3800,8 +4159,8 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["Artikelnummer", "Matchcode", "Menge", "VPE"]
+					"headerrow": 1,
+					"columns": ["Artikel-Nr.", "Bezeichnung 1", "Bezeichnung 2", "Einheit_Wert"]
 				},
 				"filter": [
 					{
@@ -3810,8 +4169,7 @@
 						"keep": false,
 						"match": {
 							"any": {
-								"Menge": ".+",
-								"Matchcode": "^$|einl[ea]ge|schuh|sandale|sicherheit|rohl.|gr\\.\\d|schild|plakat|aufsteller|muster|katalog|bilderrahmen|kosten|schlag|ziel|leisten|deckso|futter|schl[oö][ßs]{1,}|abs[aäÄ]tz|sohle|fleck|g(?:ü|Ü)rtel"
+								"Bezeichnung 1": "^$|einl[ea]ge|schuh|sandale|sicherheit|rohl.|gr\\.\\d|schild|plakat|aufsteller|muster|katalog|bilderrahmen|kosten|schlag|ziel|leisten|deckso|futter|schl[oö][ßs]{1,}|abs[aäÄ]tz|sohle|fleck|g(?:ü|Ü)rtel"
 							}
 						}
 					},
@@ -3820,9 +4178,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikelnummer"],
+							"orderby": ["Artikel-Nr."],
 							"descending": false,
-							"column": "Artikelnummer",
+							"column": "Artikel-Nr.",
 							"amount": 1
 						}
 					},
@@ -3831,7 +4189,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -3862,7 +4220,7 @@
 						],
 						"match": {
 							"all": {
-								"Artikelnummer": "BESTELL_NUMMER"
+								"Artikel-Nr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -3878,16 +4236,16 @@
 						"expiry_date": "0"
 					},
 					"conditional_or": [
-						["trading_good", "1", ["Matchcode", "Compression|Weste|Peron(?:ä|Ä)usschiene|Stax|liner"]],
-						["special_attention", "1", ["Matchcode", "prosil"]],
-						["expiry_date", "1", ["Matchcode", "prosil"]]
+						["trading_good", "1", ["Bezeichnung 1", "Compression|Weste|Peron(?:ä|Ä)usschiene|Stax|liner"]],
+						["special_attention", "1", ["Bezeichnung 1", "prosil"]],
+						["expiry_date", "1", ["Bezeichnung 1", "prosil"]]
 					],
 					"remove": ["Menge"],
 					"rewrite": [
 						{
-							"article_no": ["Artikelnummer"],
-							"article_name": ["Matchcode"],
-							"article_unit": ["VPE"],
+							"article_no": ["Artikel-Nr."],
+							"article_name": ["Bezeichnung 1", ", ", "Bezeichnung 2"],
+							"article_unit": ["Einheit_Wert"],
 							"article_ean": [""]
 						}
 					]
@@ -3911,7 +4269,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 2,
 					"columns": ["Artikelnummer", "Bezeichnung", "EINH"]
 				},
 				"filter": [
@@ -3931,7 +4289,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4004,8 +4362,8 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["ArtikelNummer", "Bezeichnung 1", "Bezeichnung 2", "Farbe", "Groesse", "Menge"]
+					"headerrow": 1,
+					"columns": ["Artikelnummer", "Bezeichnung", "Bezeichnung 2", "Farbe", "Größe", "WERTLISTE.Menge"]
 				},
 				"filter": [
 					{
@@ -4013,9 +4371,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["ArtikelNummer"],
+							"orderby": ["Artikelnummer"],
 							"descending": false,
-							"column": "ArtikelNummer",
+							"column": "Artikelnummer",
 							"amount": 1
 						}
 					},
@@ -4024,7 +4382,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4055,7 +4413,7 @@
 						],
 						"match": {
 							"all": {
-								"ArtikelNummer": "BESTELL_NUMMER"
+								"Artikelnummer": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -4071,9 +4429,9 @@
 					"conditional_or": [["trading_good", "1", ["article_name", "Lagerungsschiene|orthese|helm|headmaster"]]],
 					"rewrite": [
 						{
-							"article_no": ["ArtikelNummer"],
-							"article_name": ["Bezeichnung 1", ", ", "Bezeichnung 2", ", ", "Farbe", ", ", "Groesse"],
-							"article_unit": ["Menge"],
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Bezeichnung", ", ", "Bezeichnung 2", ", ", "Farbe", ", ", "Größe"],
+							"article_unit": ["WERTLISTE.Menge"],
 							"article_ean": [""]
 						}
 					]
@@ -4097,7 +4455,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -4108,7 +4466,7 @@
 	{
 		"name": "Rebotec Rehabilitationsmittel GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, letzte Zeile löschen ",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, letzte Zeile löschen",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4119,10 +4477,20 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 2,
-					"columns": ["Art.-Nr. ", "Artikelbezeichnung1", "Artikelbezeichnung2", "EAN_GTIN", "ME"]
+					"headerrow": 3,
+					"columns": ["Art.-Nr. ", "Artikelbezeichnung1", "Artikelbezeichnung2", "EAN/GTIN", "ME"]
 				},
 				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete anything but articles",
+						"keep": true,
+						"match": {
+							"all": {
+								"Artikelbezeichnung1": ".*"
+							}
+						}
+					},
 					{
 						"apply": "filter_by_duplicates",
 						"comment": "delete multiple pricelist entries",
@@ -4139,7 +4507,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4189,7 +4557,7 @@
 							"article_no": ["Art.-Nr. "],
 							"article_name": ["Artikelbezeichnung1", ", ", "Artikelbezeichnung2"],
 							"article_unit": ["ME"],
-							"article_ean": ["EAN_GTIN"]
+							"article_ean": ["EAN/GTIN"]
 						}
 					],
 					"conditional_or": [
@@ -4235,7 +4603,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4296,7 +4664,7 @@
 	{
 		"name": "Ruck MedicalTec",
 		"info": {
-			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -4307,8 +4675,88 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+					"headerrow": 11,
+					"columns": ["Artikelnr", "Bezeichnung", "Einheit", "GTIN (EAN)"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete anything but articles",
+						"keep": true,
+						"match": {
+							"all": {
+								"Artikelnr": "^\\d+.*"
+							}
+						}
+					},
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Artikelnr"],
+							"descending": false,
+							"column": "Artikelnr",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "pro.*?walk",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Artikelnr": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"trading_good": "1"
+					},
+					"rewrite": [
+						{
+							"article_no": ["Artikelnr"],
+							"article_name": ["Bezeichnung"],
+							"article_unit": ["Einheit"],
+							"article_ean": ["GTIN (EAN)"]
+						}
+					]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -4329,7 +4777,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 2,
+					"headerrow": 2,
 					"columns": ["Artikelnummer", "Artikelbezeichnung", "Basiseinheit"]
 				},
 				"filter": [
@@ -4349,7 +4797,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4422,7 +4870,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 1,
+					"headerrow": 1,
 					"columns": ["Artikel-Nr.:", "Artikelkurztext", "ME", "EAN"]
 				},
 				"filter": [
@@ -4442,7 +4890,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4519,7 +4967,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 1,
+					"headerrow": 2,
 					"columns": ["Bestell-Nr", "ArtikelBez1", "ArtikelBez2", "Seite", "Farbe", "Groesse", "ME", "EAN_CODE"]
 				},
 				"filter": [
@@ -4539,7 +4987,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4614,7 +5062,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Artikelnummer", "Bezeichnung", "Einheit", "GTIN-Code"]
 				},
 				"filter": [
@@ -4634,7 +5082,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4716,6 +5164,111 @@
 		}
 	},
 	{
+		"name": "Storitec GmbH",
+		"info": {
+			"purchase_info": "Preislistenimport: Spalten untereinander bringen, XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Heimstrasse 8, 88348 Bad Saulgau",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"pricelist": {
+			"filter": {
+				"filesetting": {
+					"headerrow": 12,
+					"dialect": {
+						"separator": ";",
+						"enclosure": "\"",
+						"escape": "",
+						"preg_delimiter": "#"
+					},
+					"columns": ["Art.Nr.", "Gewebeart", "Breite", "g/m²", "Materialien"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete anything but articles",
+						"keep": true,
+						"match": {
+							"all": {
+								"Art.Nr.": "^\\d+$"
+							}
+						}
+					},
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Art.Nr."],
+							"descending": false,
+							"column": "Art.Nr.",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "storitec",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Art.Nr.": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"rewrite": [
+						{
+							"article_no": ["Art.Nr."],
+							"article_name": ["Gewebeart", ", ", "Breite", ", ", "g/m²", ", ", "Materialien"],
+							"article_unit": [""],
+							"article_ean": [""]
+						}
+					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "TASKA Prosthetics GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -4729,14 +5282,14 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 4,
 					"dialect": {
 						"separator": ";",
 						"enclosure": "\"",
 						"escape": "",
 						"preg_delimiter": "#"
 					},
-					"columns": ["Part", "DE"]
+					"columns": ["Part Number", "Description"]
 				},
 				"filter": [
 					{
@@ -4744,9 +5297,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Part"],
+							"orderby": ["Part Number"],
 							"descending": false,
-							"column": "Part",
+							"column": "Part Number",
 							"amount": 1
 						}
 					},
@@ -4755,7 +5308,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4786,7 +5339,7 @@
 						],
 						"match": {
 							"all": {
-								"Part": "BESTELL_NUMMER"
+								"Part Number": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -4798,8 +5351,8 @@
 				"modify": {
 					"rewrite": [
 						{
-							"article_no": ["Part"],
-							"article_name": ["DE"],
+							"article_no": ["Part Number"],
+							"article_name": ["Description"],
 							"article_unit": [""],
 							"article_ean": [""]
 						}
@@ -4811,7 +5364,7 @@
 		}
 	},
 	{
-		"name": "Thuasne Deutschland GmbH ",
+		"name": "Thuasne Deutschland GmbH",
 		"info": {
 			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
@@ -4824,7 +5377,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Artikel-Nummer", "Art.-Bez. 1 NEU", "Art.-Bez. 2 NEU", "GTIN-13", "Verpackungseinheit"]
 				},
 				"filter": [
@@ -4854,7 +5407,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -4940,7 +5493,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Bestellnr.", "Artikelbezeichnung 1", "Artikelbezeichnung 2", "Artikelbezeichnung 3", "Verpackung1"]
 				},
 				"filter": [
@@ -4960,7 +5513,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -5037,7 +5590,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Artikelnr.", "Artikelbeschreibung"]
 				},
 				"filter": [
@@ -5057,7 +5610,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -5129,7 +5682,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Artikel-Nr. ", "Beschreibung", "ME", "EAN"]
 				},
 				"filter": [
@@ -5149,7 +5702,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -5240,7 +5793,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
@@ -5251,7 +5804,7 @@
 	{
 		"name": "Wagner Polymertechnik GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -5262,8 +5815,79 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
-					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+					"headerrow": 3,
+					"columns": ["Artikelnummer", "Beschreibung", "Einheit", "UDI-DI (GTIN)"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Artikelnummer"],
+							"descending": false,
+							"column": "Artikelnummer",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "wagner",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Artikelnummer": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"trading_good": "0",
+						"stock_item": "0"
+					},
+					"rewrite": [
+						{
+							"article_no": ["Artikelnummer"],
+							"article_name": ["Beschreibung"],
+							"article_unit": ["Einheit"],
+							"article_ean": ["UDI-DI (GTIN)"]
+						}
+					]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -5284,7 +5908,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["Artikelnummer", "Farbe Groesse", "Artikelbez 1", "Artikelbez 2", "EAN"]
 				},
 				"filter": [
@@ -5304,7 +5928,7 @@
 						"comment": "transfer erp_id. source will be set if match file is provided",
 						"filesetting": {
 							"source": "ERPDUMP.csv",
-							"headerrowindex": 1,
+							"headerrow": 2,
 							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
 						},
 						"filter": [
@@ -5381,7 +6005,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},

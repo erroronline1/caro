@@ -13,7 +13,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrowindex": 0,
+					"headerrowindex": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
