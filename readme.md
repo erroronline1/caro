@@ -37,6 +37,10 @@ Things are still in motion. Images may be outdated.
     * std method for csv uploads to distinct folder, then show up within tools?
     * check oldest order and submit for erp order data updates initial date on deletion of cron.log
 * product search consider whitespaces, similiarity?
+    * sqlinterface method to construct queries considering character replacement with whitespaces, dynamic query lengths to overcome missing regex availability limitations (sqlsrv again...)
+    * see _shared.php
+    * https://www.alphacodingskills.com/mariadb/mariadb-wildcards.php
+    * https://learn.microsoft.com/en-us/sql/t-sql/language-elements/percent-character-wildcard-character-s-to-match-transact-sql?view=sql-server-ver16
 * audit
     * auditprogramme and plan review wording
     * audit preparation hint considering external topics
@@ -1752,7 +1756,7 @@ Application support legend:
 Tested server environments:
 * Apache [Uniform Server Zero XV](https://uniformserver.com/) with PHP 8.2, MySQL 8.0.31 (until 2024-05-30)
 * Apache (native) with PHP 8.2, MariaDB 15.1 (from 2024-05-30)
-* Microsoft IIS with PHP 8.2, SQL Express (SQL Server 22)
+* Microsoft IIS with PHP 8.2, SQL Express (SQL Server 2022)
 
 Tested operating systems, browsers and devices:
 * Win 10 Edge 123

@@ -1649,7 +1649,7 @@ Anwendungsunterstützung Legende:
 Getestete Serverumgebungen:
 * Apache [Uniform Server Zero XV](https://uniformserver.com) mit PHP 8.2, MySQL 8.0.31 (bis 2024-05-30)
 * Apache (nativ) mit PHP 8.2, MariaDB 15.1 (seit 2024-05-30)
-* Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 22)
+* Microsoft IIS mit PHP 8.2, SQL Express (SQL Server 2022)
 
 Getestete Betriebssysteme, Browser und Geräte:
 * Win 10 Edge 123
