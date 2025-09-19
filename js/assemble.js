@@ -19,7 +19,6 @@
 /*
 this module helps to assemble content according to the passed simplified object notation.
 */
-import SignaturePad from "../libraries/signature_pad.umd.js";
 import QrCreator from "../libraries/qr-creator.js";
 import Icons from "./icons.json" with { type: "json" };
 

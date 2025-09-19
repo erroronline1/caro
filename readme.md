@@ -6095,10 +6095,9 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * Justification: this library enables the use of simple electronic signature (SES) according to eIDAS.
-    * v5.0.4
+    * v5.1.1
     * \> 11k stars
     * \> 2k forks
-    * [https://www.jsdelivr.com/package/npm/signature_pad](https://www.jsdelivr.com/package/npm/signature_pad) slightly modified for easier import, comment out UMD module wrapper and define export default class SignaturePad, delete sourceMappingURL (Safari)
 * [https://github.com/nimiq/qr-creator](https://github.com/nimiq/qr-creator)
     * creates qr codes on the client side
     * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
@@ -6107,7 +6106,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
 * [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode/)
     * creates barcodes on the client side
     * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
-    * v3.11.6
+    * v3.12.1
     * \> 5k stars
     * \> 1k forks
 * [https://github.com/omrips/viewstl](https://github.com/omrips/viewstl)
