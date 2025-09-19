@@ -1112,7 +1112,7 @@ class CONSUMABLES extends API {
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'values' => [
 						':ids' => intval($this->_requestedID)
-						]
+					]
 				]);
 				$product = $product ? $product[0] : null;
 
