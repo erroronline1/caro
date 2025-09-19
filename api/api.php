@@ -30,7 +30,11 @@ ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 require_once('_config.php');
-define ('REQUEST', explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1)));
+define ('REQUEST', array_map(
+	// reconvert frontend replaced +
+	fn($param) => str_replace('%2B', '+', $param),
+	explode("/", substr(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1'])), 1))
+));
 require_once('_utility.php'); // general utilities
 require_once('_sqlinterface.php');
 require_once('_language.php');
@@ -381,8 +385,8 @@ class API {
 					]
 				]
 			];
-			// linux style delay of login form especially on wrong attempts
-			sleep(2);
+			// linux style delay of login form wrong attempts
+			if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.login', [], true))) sleep(2);
 		}
 		$this->response($response, 511);
 	}
