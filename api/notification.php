@@ -258,7 +258,11 @@ class NOTIFICATION extends API {
 							// does only update database null values
 							// also see order.php->approved()
 							if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()){
-								if (!($erpdata = ERPINTERFACE->orderdata(file_exists($logfile) ? date('Y-m-d H:i:s', filemtime($logfile)) : null))) break;
+
+								$oldest = SQLQUERY::EXECUTE($this->_pdo, 'order_get_appoved_oldest_approval');
+								$oldest = $oldest ? $oldest[0]['approved'] : null;
+
+								if (!$oldest || !($erpdata = ERPINTERFACE->orderdata(file_exists($logfile) ? date('Y-m-d H:i:s', filemtime($logfile)) : $oldest))) break;
 
 								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
 									'values' => [

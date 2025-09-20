@@ -35,7 +35,6 @@ Things are still in motion. Images may be outdated.
     * raise exception if loopcount exceeds passed security parameter
 * erp_interface, additional usecases
     * std method for csv uploads to distinct folder, then show up within tools?
-    * check oldest order and submit for erp order data updates initial date on deletion of cron.log
 * audit
     * auditprogramme and plan review wording
     * audit preparation hint considering external topics
