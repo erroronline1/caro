@@ -42,6 +42,7 @@ Things are still in motion. Images may be outdated.
     * measures and their finalization from audit outcomes before or after closing?
     * measures to calendar
 * calendar tour planning
+* https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## Content
 * [Aims](#aims)

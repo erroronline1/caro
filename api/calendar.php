@@ -1712,5 +1712,38 @@ class CALENDAR extends API {
 		}
 		return $events;
 	}
+
+	public function tourplanning(){
+		/*
+		reuse calendar type tourplanning, columns are suitable
+		list identifiers, scan codes, add hint (e.g. address, room, etc)
+		draggeable?
+		mark as closed, autodelete, assign person
+
+						"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`type` tinytext COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`span_start` datetime NOT NULL," .
+				"	`span_end` datetime NOT NULL," .
+				"	`author_id` int NOT NULL," .
+				"	`affected_user_id` int NULL DEFAULT NULL," .
+				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`subject` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`misc` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`closed` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`alert` tinyint NULL," .
+				"	`autodelete` tinyint NULL," .
+
+		api endpoint description
+		*/
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				break;
+			case 'PUT':
+				break;
+			case 'GET':
+				break;
+			case 'DELETE':
+		}
+	}
 }
 ?>
