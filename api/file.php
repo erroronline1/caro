@@ -686,7 +686,7 @@ class FILE extends API {
 						// add remaining files
 						else {
 							$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
-							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['sharepoint']*3600 - time()) / 3600, 1)]);
+							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['files']['sharepoint']*3600 - time()) / 3600, 1)]);
 
 							$display[$name] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
 						}
@@ -722,7 +722,7 @@ class FILE extends API {
 							'multiple' => true,
 							'required' => true
 						],
-						'hint' => $this->_lang->GET('file.sharepoint_lifespan_hint', [':hours' => CONFIG['lifespan']['sharepoint']])
+						'hint' => $this->_lang->GET('file.sharepoint_lifespan_hint', [':hours' => CONFIG['lifespan']['files']['sharepoint']])
 					]
 				];
 				$this->response($response);
