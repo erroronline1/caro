@@ -118,12 +118,6 @@ class SQLQUERY {
 	 */
 	private static function SEARCH($_pdo, $query, $value, $wildcards){
 		
-		function wildcard($value, $type){
-			if ($type === true) $value = preg_replace(['/\?/', '/\*/'], ['_', '%'], $value);
-			elseif ($type === 'all') $value = preg_replace(['/\?/', '/\*/', '/[^\w\d%]/u'], ['_', '%', '_'], $value);
-			return '%' . $value . '%';
-		}
-
 		preg_match_all('/( +(AND|OR) +)*\((([\w\d\.]+?) LIKE :SEARCH)\)/i', $query, $columns, PREG_SET_ORDER);
 		preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $value, $expressions, PREG_SET_ORDER);
 
@@ -135,14 +129,14 @@ class SQLQUERY {
 
 				switch(CONFIG['sql'][CONFIG['sql']['use']]['driver']){
 					case 'mysql':
-						if ($operator === '+') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
-						elseif ($operator === '-') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
-						else $concatenations[] = 'OR IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						if ($operator === '+') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
+						elseif ($operator === '-') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
+						else $concatenations[] = 'OR IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
 						break;
 					case 'sqlsrv':
-						if ($operator === '+') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
-						elseif ($operator === '-') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
-						else $concatenations[] = 'OR ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(wildcard($search, $wildcards)) . ')';
+						if ($operator === '+') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
+						elseif ($operator === '-') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
+						else $concatenations[] = 'OR ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
 						break;
 				}
 			}
@@ -155,6 +149,18 @@ class SQLQUERY {
 			$query = str_replace($column[3], $concatenation, $query);
 		}
 		return $query;
+	}
+	/**
+	 * replaces characters to SQL qildcards
+	 * @param string $value
+	 * @param bool|string $type
+	 * 
+	 * @return string
+	 */
+	private static function WILDCARD($value, $type){
+		if ($type === true) $value = preg_replace(['/\?/', '/\*/'], ['_', '%'], $value);
+		elseif ($type === 'all') $value = preg_replace(['/\?/', '/\*/', '/[^\w\d%]/u'], ['_', '%', '_'], $value);
+		return '%' . $value . '%';
 	}
 
 	/**
