@@ -139,14 +139,21 @@ export const api = {
 			//_client.application.debug(payload, sanitizedpayload, b.size);
 			payload.append("_user_post_validation", await _.sha256(api._settings.user.fingerprint + b.size.toString()));
 		}
-		await _.api(method, "api/api.php/" + request.join("/"), payload)
+		await _.api(method, "api/api.php/" + request.join("/"), payload, [200, 203, 207, 511])
 			.then(async (data) => {
+
+				if (data.body && (data.body.user || data.body.config || data.body.language)) {
+					if (data.body.user) api._settings.user = data.body.user;
+					if (data.body.config) api._settings.config = data.body.config;
+					if (data.body.language) api._lang._USER = data.body.language;
+				}
+
 				if (data.error) {
 					const date = new Date();
 					let error;
 					_client.application.debug(request, date.toUTCString(), data.error);
 					const errorcode = data.error.message.match(/\d+/g);
-					if (api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
+					if (api._lang._USER["application"] && api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
 
 					if (errorFn != null) errorFn(data.error);
 					new Toast(error, "error");
@@ -163,6 +170,8 @@ export const api = {
 				if (data.status === 511) {
 					// session timeout
 					api.loadindicator(false);
+					clearInterval(_serviceWorker.notif.interval);
+					_serviceWorker.notif.interval = null;
 					if (JSON.stringify(request) !== JSON.stringify(["application", "authentify"])) api._unauthorizedRequest = { method: method, request: request };
 					const options = {};
 					options[api._lang.GET("general.ok_button")] = true;
@@ -197,7 +206,9 @@ export const api = {
 				//if (api._lang._USER["application"]["error_response"][errorcode]) error = api._lang._USER["application"]["error_response"][errorcode];
 
 				if (errorFn != null) errorFn(error);
-				new Toast(error, "error");
+				//new Toast(error, "error");
+				// safari debugging
+				new Dialog({type:"confirm", render : error + JSON.stringify([method, request])});
 			});
 		api.loadindicator(false);
 	},
@@ -444,7 +455,6 @@ export const api = {
 	 *  |__,|  _|  _|_|_|___|__,|_| |_|___|_|_|
 	 *      |_| |_|
 	 *
-	 * imports serverside defined languagefile
 	 * handles user login/logout
 	 * loads application menu
 	 * loads application landing page
@@ -456,7 +466,7 @@ export const api = {
 	 */
 	application: async (method, ...request) => {
 		request = [...request];
-		if (method === "get" && !["language", "menu", "authentify"].includes(request[0])) api.history.write(["application", ...request]);
+		if (method === "get" && !["menu", "authentify"].includes(request[0])) api.history.write(["application", ...request]);
 
 		request.splice(0, 0, "application");
 		let successFn, payload;
@@ -469,7 +479,6 @@ export const api = {
 							api._settings.config = data.config || {};
 							document.querySelector("body>header>h1").innerHTML = document.getElementById("main").innerHTML = document.querySelector("body>nav").innerHTML = "";
 							api.history.reset();
-							await api.application("get", "language");
 							api.application("get", "start");
 						};
 						break;
@@ -505,11 +514,6 @@ export const api = {
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
-				};
-				break;
-			case "language":
-				successFn = async function (data) {
-					api._lang._USER = data.data;
 				};
 				break;
 			case "menu":
@@ -650,11 +654,6 @@ export const api = {
 			case "start":
 				successFn = async function (data) {
 					// set application and user settings
-					if (data.user) api._settings.user = data.user;
-					if (data.config) api._settings.config = data.config;
-
-					// import server side settings
-					await api.application("get", "language");
 
 					if (api._settings.user) await _serviceWorker.register();
 					else {

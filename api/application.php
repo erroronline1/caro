@@ -174,18 +174,6 @@ class APPLICATION extends API {
 	}
 
 	/**
-	 *   _
-	 *  | |___ ___ ___ _ _ ___ ___ ___
-	 *  | | .'|   | . | | | .'| . | -_|
-	 *  |_|__,|_|_|_  |___|__,|_  |___|
-	 *            |___|       |___|
-	 * respond with $this->_lang->_USER as transfer to js frontend
-	 */
-    public function language(){
-		$this->response(['data' => $this->_lang->GETALL()]);
-	}
-
-	/**
 	 *                         _
 	 *   _____ ___ ___ _ _ ___| |
 	 *  |     | .'|   | | | .'| |
