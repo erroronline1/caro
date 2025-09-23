@@ -94,17 +94,25 @@ const _ = {
 		}
 		return replaceString;
 	},
-	api: async function (method, destination, payload) {
+
+	/**
+	 * 
+	 * @param {String} method get, put, post, delete, etc
+	 * @param {String} destination url
+	 * @param {Array|FormData} payload 
+	 * @param {Array} errorless_status get response instead of error message
+	 * @returns 
+	 */
+	api: async function (method, destination, payload, errorless_status = [200]) {
 		method = method.toUpperCase();
 		let query = "";
 		if (["GET", "DELETE"].includes(method) && payload) {
-			if (payload instanceof FormData){
+			if (payload instanceof FormData) {
 				payload.forEach((value, key) => {
 					query += "&" + encodeURI(key) + "=" + encodeURI(value);
 				});
-			}
-			else {
-				for (const [key, value] of Object.entries(payload)){
+			} else {
+				for (const [key, value] of Object.entries(payload)) {
 					query += "&" + encodeURI(key) + "=" + encodeURI(value);
 				}
 			}
@@ -114,17 +122,21 @@ const _ = {
 			cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
 			body: ["GET", "DELETE"].includes(method) ? null : payload, // body data type must match "Content-Type" header
 			timeout: false,
-			headers:{
-				"Content-Type": payload instanceof FormData ? "application/octet-stream" : "application/json"
-			}
+			headers: {
+				"Content-Type": payload instanceof FormData ? "application/octet-stream" : "application/json",
+			},
 		})
 			.then(async (response) => {
-				if (response.statusText === "OK" || response.status === 511)
+				if (!Object.keys(response)) throw new Error("empty or null response");
+				if (errorless_status.includes(response.status)) {
+					let body = await response.json();
 					return {
 						status: response.status,
-						body: await response.json(),
+						body: body,
 					};
-				else throw new Error("server responded " + response.status + ": " + httpResponse[response.status]);
+				} else {
+					throw new Error("server responded " + response.status + ": " + (httpResponse[response.status] ? httpResponse[response.status] : JSON.stringify(response)));
+				}
 			})
 			.catch((e) => {
 				return { error: e };
@@ -189,7 +201,7 @@ const _ = {
 	getInputs: function (target, form_data = false) {
 		// target can either be a querySelector or a passed node object
 		let fields;
-		let form = typeof target === 'string' ? document.querySelector(target) : target;
+		let form = typeof target === "string" ? document.querySelector(target) : target;
 		if (form_data && form) {
 			fields = new FormData(form);
 
