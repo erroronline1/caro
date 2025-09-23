@@ -106,8 +106,7 @@ class API {
 		$this->_lang = new LANG();
 
 		// (re)authentify session user
-		if (REQUEST[0] === 'cron' ||
-			(REQUEST[0] === 'application' && (
+		if ((REQUEST[0] === 'application' && (
 			in_array(REQUEST[1], ['language', 'info', 'menu'])
 			|| (REQUEST[1] === 'authentify' && $_SERVER['REQUEST_METHOD'] === 'DELETE')
 		))){ // these requests do not need authentification or handle it on their own
@@ -334,7 +333,8 @@ class API {
 						'label' => CONFIG['label'],
 						'forbidden' => CONFIG['forbidden'],
 						'system' => ERPINTERFACE && ERPINTERFACE->_instatiated ? ['erp' => CONFIG['system']['erp']] : []
-					]
+					],
+					'language' => $this->_lang->GETALL()
 				];
 			}
 		}
@@ -353,6 +353,7 @@ class API {
 					]
 				]
 			],
+			'language' => $this->_lang->GETALL()
 		];
 
 		if (!$reAuthUser){
