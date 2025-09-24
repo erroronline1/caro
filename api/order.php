@@ -392,43 +392,46 @@ class ORDER extends API {
 				foreach ($vendors as &$vendor){
 					$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true); 
 				}
-				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
-					'replacements' => [
-						':ids' => implode(",", array_column($vendors, 'id'))
-					]
-				]);
+				$preProducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
+				$products = [];
 				// get all checkable products
-				$checkable = [];
-				foreach ($products as $product){
+				$sampleCheck = [];
+				foreach ($preProducts as $product){
+					// assign id as key, unique anyway, fasten things up later
+					// reduce properties to necessities regarding memory load
+					$products[$product['id']]= [
+						'id' => $product['id'],
+						'stock_item' =>$product['stock_item'],
+						'erp_id' =>$product['erp_id'],
+						'last_order' =>$product['last_order'],
+						'special_attention' =>$product['special_attention'],
+						'incorporated' => json_decode($product['incorporated'] ? : '', true)
+					];
+
 					if (!$product['trading_good']) continue;
-					if (!isset($checkable[$product['vendor_id']])) $checkable[$product['vendor_id']] = [];
 					if (!$product['checked']){
-						$checkable[$product['vendor_id']][] = $product['id'];
+						$sampleCheck[$product['id']] = true;
 						continue;
 					}
 					$vendor = $vendors[array_search($product['vendor_id'], array_column($vendors, 'id'))];
 					$check = new \DateTime($product['checked']);
-					if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
-						$checkable[$product['vendor_id']][] = $product['id'];
+					if (
+						(
+							// check longer ago than reusable interval
+							!isset($vendor['pricelist']['samplecheck_reusable'])
+							|| (
+								isset($vendor['pricelist']['samplecheck_reusable'])
+								&& intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']
+							)
+						) && (
+							// check longer ago than vendor interval
+							isset($vendor['pricelist']['samplecheck_interval'])
+							&& intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_interval']
+						)
+					){
+						$sampleCheck[$product['id']] = true;
 					}
 				}
-				// drop vendors that have been checked within their sample check interval
-				foreach ($products as $product){
-					if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_id']])) continue;
-					$check = new \DateTime($product['checked']);
-					if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['servertime'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
-						unset($checkable[$product['vendor_id']]);
-					}
-				}
-				// merge all remaining ids
-				$sampleCheck = [];
-				foreach ($checkable as $ids){
-					$sampleCheck = array_merge($sampleCheck, $ids);
-				}
-
-				// reassign variable to contain all products
-				$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
-
 				// gather applicable order states
 				// update on delayed shipment, availability, etc.
 				$statechange = ['...' => ['value' => '']];
@@ -454,22 +457,28 @@ class ORDER extends API {
 					'orderaddinfo' => PERMISSION::permissionFor('orderaddinfo'),
 					'ordercancel' => PERMISSION::permissionFor('ordercancel') && !in_array('group', $_SESSION['user']['permissions']),
 					'orderprocessing' => PERMISSION::permissionFor('orderprocessing'),
-					'purchasemembers' => []
+					'purchasemembers' => [],
+					'regularuser' => !in_array('group', $_SESSION['user']['permissions']),
+					'products' => PERMISSION::permissionFor('products'),
+					'admin' =>  array_intersect(['admin'], $_SESSION['user']['permissions'])
 				];
 				$response['data']['export'] = $permission['orderprocessing'];
 
 				// userlist to decode orderer
-				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-
-				// import to determine if interface is present
-				include_once("./_erpinterface.php");
+				$preUsers = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+				$users = [];
 
 				// get purchase member names passed to data['editproductrequest'] as array type for message initialization
 				// while possible to intersect with products-permission, ceo, prrc and qmo by default may not have time to handle this
-				foreach ($users as $user){
+				foreach ($preUsers as $user){
 					$user['permissions'] = explode(',', $user['permissions'] ? : '');
 					if (array_intersect(['purchase', 'admin'], $user['permissions'])) $permission['purchasemembers'][] = $user['name'];
+					$users[$user['id']] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
+
+				// import to determine if interface is present
+				include_once("./_erpinterface.php");
+				$erp_interface_available = (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata());
 
 				// create array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
 				foreach ($order as $row){
@@ -490,14 +499,15 @@ class ORDER extends API {
 					$decoded_order_data = json_decode($row['order_data'], true);
 
 					$product = null;
-					if (isset($decoded_order_data['productid']) && ($dbrow = array_search($decoded_order_data['productid'], array_column($products, 'id'))) !== false){
-						$product = $products[$dbrow];
+					if (isset($decoded_order_data['productid']) && isset($products[$decoded_order_data['productid']])){
+						$product = $products[$decoded_order_data['productid']];
 					}
 
 					// data chunks to be assembled by js _client.order.approved()
 					$orderer = UTILITY::propertySet($decoded_order_data, 'orderer') ? : null;
-					if ($orderer = array_search($orderer, array_column($users, 'id'))) $orderer = ['name' => $users[$orderer]['name'], 'image' => './api/api.php/file/stream/' . $users[$orderer]['image']];
+					if (isset($users[$orderer])) $orderer = $users[$orderer];
 					else $orderer = ['name' => $this->_lang->GET('general.deleted_user'), 'image' => null];
+					$unit_intersection = array_intersect([$row['organizational_unit']], $units);
 					$data = [
 						'id' => $row['id'],
 						'ordertype' => $row['ordertype'],
@@ -515,17 +525,17 @@ class ORDER extends API {
 						'commission' => UTILITY::propertySet($decoded_order_data, 'commission') ? : null,
 						'approval' => null,
 						'information' => null,
-						'addinformation' => $permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units),
+						'addinformation' => $permission['orderaddinfo'] || $unit_intersection,
 						'lastorder' => $product && $product['last_order'] ? $this->_lang->GET('order.order_last_ordered', [':date' => $this->convertFromServerTime(substr($product['last_order'], 0, -9))]) : null,
 						'orderer' => $orderer,
 						'organizationalunit' => $row['organizational_unit'],
-						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || array_intersect([$row['organizational_unit']], $units))) ? $statechange : [],
+						'orderstatechange' => ($row['ordered'] && !$row['received'] && !$row['delivered'] && ($permission['orderaddinfo'] || $unit_intersection)) ? $statechange : [],
 						'state' => [],
 						'disapprove' => (!($row['ordered'] || $row['received'] || $row['delivered']) && in_array($row['ordertype'], ['order', 'service'])),
-						'cancel' => !in_array('group', $_SESSION['user']['permissions']) && ($row['ordered'] && !($row['received'] || $row['delivered']) && ($permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))),
-						'return' => (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && ($permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))),
+						'cancel' => $permission['regularuser'] && ($row['ordered'] && !($row['received'] || $row['delivered']) && ($permission['ordercancel'] || $unit_intersection)),
+						'return' => (($row['received'] || $row['delivered']) && $row['ordertype'] === 'order' && ($permission['ordercancel'] || $unit_intersection)),
 						'attachments' => [],
-						'delete' => !in_array('group', $_SESSION['user']['permissions']) && ($permission['ordercancel'] || array_intersect([$row['organizational_unit']], $_SESSION['user']['units'])),
+						'delete' => $permission['regularuser'] && ($permission['ordercancel'] || $unit_intersection),
 						'autodelete' => null,
 						'incorporation' => [],
 						'samplecheck' => [],
@@ -534,7 +544,7 @@ class ORDER extends API {
 						'addproduct' => null,
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
-						'identifier' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? UTILITY::identifier(' ', $row['approved']) : null
+						'identifier' => $erp_interface_available ? UTILITY::identifier(' ', $row['approved']) : null
 					];
 
 					// add identified group user
@@ -592,14 +602,14 @@ class ORDER extends API {
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'partially_delivered':
-								if ($row['delivered'] || !(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
+								if ($row['delivered'] || !($permission['admin'] || $unit_intersection)){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'delivered':
 							case 'archived':
-								if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || array_intersect([$row['organizational_unit']], $_SESSION['user']['units']))){
+								if (!($permission['admin'] || $unit_intersection)){
 									$data['state'][$s]['disabled'] = true;
 								}
 								else $response['data']['allowedstateupdates'][] = $s;
@@ -616,10 +626,8 @@ class ORDER extends API {
 
 					// incorporation state
 					if ($product){
-						$product['incorporated'] = json_decode($product['incorporated'] ? : '', true);
-
 						if (!$product['incorporated']){
-							if (!in_array('group', $_SESSION['user']['permissions'])){
+							if ($permission['regularuser']){
 								$data['incorporation']['item'] = $product['id'];
 							} else {
 								// simple groups are not allowed to make records
@@ -635,8 +643,8 @@ class ORDER extends API {
 					}
 					
 					// request MDR §14 sample check
-					if ($product && in_array($product['id'], $sampleCheck)){
-						if (!in_array('group', $_SESSION['user']['permissions'])){
+					if ($product && isset($sampleCheck[$product['id']])){
+						if ($permission['regularuser']){
 							$data['samplecheck']['item'] = $product['id'];
 						} else {
 							// simple groups are not allowed to make records
@@ -645,7 +653,7 @@ class ORDER extends API {
 					}
 
 					// request adding unknown product or editing of product
-					if (PERMISSION::permissionFor('products')){
+					if ($permission['products']){
 						if (!$product) $data['addproduct'] = true;
 					}
 					else {
@@ -653,8 +661,8 @@ class ORDER extends API {
 					}
 
 					array_push($response['data']['order'], array_filter($data, fn($property) => $property || $property === 0));
-					$response['data']['allowedstateupdates'] = array_unique($response['data']['allowedstateupdates']);
 				}
+				$response['data']['allowedstateupdates'] = array_unique($response['data']['allowedstateupdates']);
 				break;
 			case 'DELETE':
 				$order = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
