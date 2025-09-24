@@ -536,7 +536,7 @@
 				"close": "completed",
 				"close_confirm": "After closing editing is not longer possible. The audited unit will be sent a message with the summary. Proceed?",
 				"consider": "Consider",
-				"consider_content": "Slips are not necessarily a deviation, only multiple faulty samples point to systematic deficiencies.",
+				"consider_content": "Slips are not necessarily a deviation, only multiple faulty samples point to systematic deficiencies. Ask inclusive, how do \"we\" do things. Try to stay factual. Previous audit answers are imported by default if available.",
 				"conversation_partner": "Conversation partner",
 				"delete_confirm_header": "Delete Audit for :unit permanently?",
 				"delete_confirm_ok": "Yes, delete",
@@ -557,9 +557,13 @@
 					"irrelevant": "not relevant"
 				},
 				"regulatory": "Regulatory issue",
+				"schedule_measures": "Add measure/follow up to calendar",
+				"schedule_measures_hint": "If necessary; also consider a monitoring event.",
+				"schedule_measures_text": "Folgemaßnahme aus Audit: ",
 				"saved": "Audit saved",
 				"statement": "Statement",
-				"summary": "Summary"
+				"summary": "Summary",
+				"summary_hint": "Measures and their monitoring date should be documented within the summary independently of any calendar entries."
 			},
 			"hint": "Hint",
 			"method": "Audit method",
@@ -570,7 +574,7 @@
 				"interview": "Interview responsible employees",
 				"observe": "Observation of activities"
 			},
-			"objectives": "Audit programme objectives",
+			"objectives": "Audit objectives",
 			"reminder_message": "It has been :days days since the last record edit of the audit of :unit. The last edit happened on :date.\nPlease finalize the audit.",
 			"template": {
 				"delete_confirm_header": "Delete template for :unit permanently?",

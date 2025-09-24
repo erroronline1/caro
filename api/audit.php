@@ -508,14 +508,27 @@ class AUDIT extends API {
 						];	
 					}
 
-					// append final note, deletion and closing options
+					// append final note, measure entries into calendar, deletion and closing options
+					$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 					$response['render']['content'][] = [
 						[
 							'type' => 'textarea',
 							'attributes' => [
 								'name' => $this->_lang->GET('audit.audit.execute.summary'),
 								'value' => isset($audit['content']['summary']) ? $audit['content']['summary'] : ''
-							]
+							],
+							'hint' => $this->_lang->GET('audit.audit.execute.summary_hint')
+						], [
+							'type' => 'calendarbutton',
+							'attributes' => [
+								'value' => $this->_lang->GET('audit.audit.execute.schedule_measures'),
+								'onclick' => $calendar->dialog([
+									':type' => 'schedule',
+									':organizational_unit' => $template['unit'],
+									':subject' => $this->_lang->GET('audit.audit.execute.schedule_measures_text')
+								])
+							],
+							'hint' => $this->_lang->GET('audit.audit.execute.schedule_measures_hint')
 						], [
 							'type' => 'checkbox',
 							'content' => [

@@ -536,7 +536,7 @@
 				"close": "abgeschlossen",
 				"close_confirm": "Nach dem Abschluss ist eine weitere Bearbeitung nicht mehr möglich. Der auditierte Bereich erhält eine Nachricht mit der Zusammenfassung. Fortfahren?",
 				"consider": "Beachte",
-				"consider_content": "Ausrutscher stellen keine Abweichung dar, erst bei mehreren fehlerhaften Stichproben ist ein systematisches Defizit wahrscheinlich.",
+				"consider_content": "Ausrutscher stellen keine Abweichung dar, erst bei mehreren fehlerhaften Stichproben ist ein systematisches Defizit wahrscheinlich. Formuliere inklusiv, frage, wie \"wir\" das machen. Versuche sachlich zu bleiben. Falls verfübar werden die Antworten des vorausgehenden Audits importiert.",
 				"conversation_partner": "Gesprächspartner",
 				"delete_confirm_header": "Audit für :unit dauerhaft löschen?",
 				"delete_confirm_ok": "Ja, Audit löschen",
@@ -557,9 +557,13 @@
 					"irrelevant": "nicht relevant"
 				},
 				"regulatory": "Regulatorischer Zusammenhang",
+				"schedule_measures": "Maßnahme/Folgemaßnahme in Kalender eintragen",
+				"schedule_measures_hint": "Sofern erforderlich; ggf. auch einen Termin für die Überwachung erstellen.",
+				"schedule_measures_text": "Folgemaßnahme aus Audit: ",
 				"saved": "Audit gespeichert",
 				"statement": "Anmerkung",
-				"summary": "Zusammenfassung"
+				"summary": "Zusammenfassung",
+				"summary_hint": "Folgemaßnahmen und deren Überwachungszeitraum sollten in der Zusammenfassung dokumentiert werden, unabhängig vom Kalendereintrag."
 			},
 			"hint": "Hinweis",
 			"method": "Auditmethode",
@@ -570,7 +574,7 @@
 				"interview": "Befragung verantwortlicher Mitarbeiter",
 				"observe": "Beobachtung von Tätigkeiten"
 			},
-			"objectives": "Auditprogrammziele",
+			"objectives": "Auditziele",
 			"reminder_message": "Es sind :days Tage vergangen seit der letzten Bearbeitung des Audits für :unit. Die letzte Bearbeitung fand am :date statt.\nBitte schließe das Audit ab.",
 			"template": {
 				"delete_confirm_header": "Vorlage für :unit dauerhaft löschen?",
