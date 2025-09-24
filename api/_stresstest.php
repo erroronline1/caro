@@ -140,7 +140,8 @@ class STRESSTEST extends INSTALL{
 		$entries = SQLQUERY::EXECUTE($this->_pdo, 'calendar_search', [
 			'values' => [
 				':SEARCH' => $this->_prefix
-			]
+			],
+			'wildcards' => 'contained'
 		]);
 		foreach ($entries as $entry){
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_delete', [
@@ -250,7 +251,8 @@ class STRESSTEST extends INSTALL{
 						'barcode_label' => $product['article_ean'],
 						'vendor_label' => $product['vendor_name'],
 						'commission' => 'wolfgang' . $this->_prefix . random_int(1, $this->_orderentries),
-						'orderer' => $this->_defaultUser
+						'orderer' => $this->_defaultUser,
+						'product_id' => $product['id']
 					]
 				),
 				':organizational_unit' => 'prosthetics2',
