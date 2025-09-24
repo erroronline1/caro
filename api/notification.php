@@ -197,9 +197,9 @@ class NOTIFICATION extends API {
 								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
 								// split multiple erp case numbers within records
 								$casenumbers = [];
-								foreach ($data as $case){
-									if (!$case['erp_case_number']) continue;
-									array_push($casenumbers, ...preg_split('/[\s;,]+/', $case['erp_case_number']));
+								foreach ($data as &$case){
+									$case['_erp_case_numbers'] = preg_split('/[\s;,]+/', $case['erp_case_number'] ? : '');
+									array_push($casenumbers, ...$case['_erp_case_numbers']);
 								}
 
 								if (!($erpdata = ERPINTERFACE->casestate($casenumbers))) break;
@@ -207,12 +207,12 @@ class NOTIFICATION extends API {
 								// case states will be merged from all case numbers if having content.
 								$updates = [];
 								foreach ($data as $case){
-									if (!$case['erp_case_number']) continue;
-									if (!array_key_exists($case['context'], $this->_lang->_DEFAULT['casestate'])) continue;
+									if (!$case['_erp_case_numbers']) continue;
+									if (!isset($case['context'], $this->_lang->_DEFAULT['casestate'])) continue;
 									$current_records = [];
 									$case['case_state'] = json_decode($case['case_state'] ? : '', true);
-									foreach(preg_split('/[\s;,]+/', $case['erp_case_number']) as $casenumber){
-										if (!array_key_exists($casenumber, $erpdata)) continue;
+									foreach($case['_erp_case_numbers'] as $casenumber){
+										if (!isset($erpdata[$casenumber])) continue;
 										foreach($erpdata[$casenumber] as $_ERPcaseState => $value){
 											if (!isset($case['case_state'][$_ERPcaseState]) && $value) {
 												$case['case_state'][$_ERPcaseState] = true;
@@ -264,9 +264,9 @@ class NOTIFICATION extends API {
 
 								if (!$oldest || !($erpdata = ERPINTERFACE->orderdata(file_exists($logfile) ? date('Y-m-d H:i:s', filemtime($logfile)) : $oldest))) break;
 
-								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+								$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
 									'values' => [
-										':orderfilter' => ''
+										':SEARCH' => '%'
 									],
 									'replacements' => [
 										':organizational_unit' => implode(",", array_keys($this->_lang->_USER['units']))
@@ -408,12 +408,15 @@ class NOTIFICATION extends API {
 												':id' => intval($row['id'])
 											]) . '; ');
 
-										// delete orders containing identifier e.g. archived case related orders havong idenfier as commission
+										// delete orders containing identifier e.g. archived case related orders having identifier as commission
 										if (in_array($row['record_type'], array_keys($this->_lang->_DEFAULT['record']['type']))) {
-											$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_filtered', [
+											$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_search', [
+												'values'=> [
+													':SEARCH' => $row['identifier']
+												],
+												'wildcards' => 'contained',
 												'replacements' => [
-													':organizational_unit' => implode(',', array_keys($this->_lang->_DEFAULT['units'])), // all units
-													':orderfilter' => $row['identifier']
+													':organizational_unit' => implode(',', array_keys($this->_lang->_DEFAULT['units'])) // all units
 												]
 											]);
 											foreach($orders as $relatedorder){
