@@ -454,9 +454,9 @@ class API {
 			'locations' => CONFIG['locations'][array_key_first(CONFIG['locations'])],
 		];
 		// override with user-selected config options
-		if (isset($_SESSION['user']['app_settings']['timezone']) && array_key_exists($_SESSION['user']['app_settings']['timezone'], CONFIG['calendar']['timezones'])) $return['timezone'] = CONFIG['calendar']['timezones'][$_SESSION['user']['app_settings']['timezone']];
-		if (isset($_SESSION['user']['app_settings']['dateformat']) && array_key_exists($_SESSION['user']['app_settings']['dateformat'], CONFIG['calendar']['dateformats'])) $return['dateformat'] = CONFIG['calendar']['dateformats'][$_SESSION['user']['app_settings']['dateformat']];
-		if (isset($_SESSION['user']['app_settings']['location']) && array_key_exists($_SESSION['user']['app_settings']['location'], CONFIG['locations'])) $return['locations'] = CONFIG['locations'][$_SESSION['user']['app_settings']['location']];
+		if (isset($_SESSION['user']['app_settings']['timezone']) && isset(CONFIG['calendar']['timezones'][$_SESSION['user']['app_settings']['timezone']])) $return['timezone'] = CONFIG['calendar']['timezones'][$_SESSION['user']['app_settings']['timezone']];
+		if (isset($_SESSION['user']['app_settings']['dateformat']) && isset(CONFIG['calendar']['dateformats'][$_SESSION['user']['app_settings']['dateformat']])) $return['dateformat'] = CONFIG['calendar']['dateformats'][$_SESSION['user']['app_settings']['dateformat']];
+		if (isset($_SESSION['user']['app_settings']['location']) && isset(CONFIG['locations'][$_SESSION['user']['app_settings']['location']] )) $return['locations'] = CONFIG['locations'][$_SESSION['user']['app_settings']['location']];
 
 		$return['servertime'] = new \DateTime('now');
 		$return['usertime'] = new \DateTime('now', new \DateTimeZone($return['timezone']));

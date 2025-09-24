@@ -184,7 +184,7 @@ class PDF{
 						if ($nameLines>$textsectionLines) $this->_pdf->Ln($height['default'] + max([1, $nameLines]) * 5);
 						break;
 					case 'image':
-						if (array_key_exists($document, $content['images']) && in_array($value['value'], $content['images'][$document])) {
+						if (isset($content['images'][$document]) && in_array($value['value'], $content['images'][$document])) {
 							$value['value'] = str_ireplace('./api/api.php/file/stream/' , '', $value['value']);
 							$imagedata = pathinfo($value['value']);
 							list($img_width, $img_height, $img_type, $img_attr) = getimagesize('.' . $value['value']);
@@ -391,9 +391,9 @@ class PDF{
 			//$this->_pdf->startPageGroup();
 			if ($page++)$this->_pdf->AddPage();
 			foreach ($user as $row){
-				$key = array_key_exists(0, $row) ? $row[0][0] : '';
-				$value = array_key_exists(1, $row) ? $row[1] : '';
-				if (array_key_exists(0, $row) && $row[0][1]) $this->_pdf->SetTextColor(192, 192, 192);
+				$key = isset($row[0]) ? $row[0][0] : '';
+				$value = isset($row[1]) ? $row[1] : '';
+				if (isset($row[0]) && $row[0][1]) $this->_pdf->SetTextColor(192, 192, 192);
 				$this->_pdf->MultiCell(50, 2, $key, 0, '', 0, 0, 15, null, true, 0, false, true, 0, 'T', false);
 				$this->_pdf->SetTextColor(0, 0, 0);
 				$this->_pdf->MultiCell(145, 2, $value, 0, '', 0, 1, 60, null, true, 0, false, true, 0, 'T', false);
