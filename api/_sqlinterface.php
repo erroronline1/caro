@@ -114,7 +114,7 @@ class SQLQUERY {
 	 * @param object $_pdo database connection, passed from main application
 	 * @param string $query either defined within queries below or prepared raw queries
 	 * @param string $value search string '"lorem ipsum" +dolor -sit amet
-	 * @param bool|string $wildcards true for ? and *, all for replacement of [^\w\d]
+	 * @param bool|string $wildcards true for ? and *, all for replacement of [^\w\d], contain for only %...%
 	 */
 	private static function SEARCH($_pdo, $query, $value, $wildcards){
 		
@@ -151,16 +151,17 @@ class SQLQUERY {
 		return $query;
 	}
 	/**
-	 * replaces characters to SQL qildcards
+	 * replaces characters to SQL wildcards
 	 * @param string $value
 	 * @param bool|string $type
 	 * 
 	 * @return string
 	 */
 	private static function WILDCARD($value, $type){
-		if ($type === true) $value = preg_replace(['/\?/', '/\*/'], ['_', '%'], $value);
-		elseif ($type === 'all') $value = preg_replace(['/\?/', '/\*/', '/[^\w\d%]/u'], ['_', '%', '_'], $value);
-		return '%' . $value . '%';
+		if ($type === true) $value = '%' . preg_replace(['/\?/', '/\*/'], ['_', '%'], $value) . '%';
+		elseif ($type === 'all') $value = '%' . preg_replace(['/\?/', '/\*/', '/[^\w\d%]/u'], ['_', '%', '_'], $value) . '%';
+		elseif ($type === 'contained') $value = '%' . $value . '%';
+		return $value;
 	}
 
 	/**
