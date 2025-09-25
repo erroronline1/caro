@@ -49,10 +49,14 @@ window.addEventListener("scroll", function () {
 // menu clearing event listener
 window.addEventListener("pointerup", _client.application.clearMenu);
 
+// hide fullscreen toggle if loaded as pwa
+if (navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) {
+	document.querySelector("body > header > div:nth-of-type(1)").style.display = 'none';
+}
+
 // add useragent to html tag to apply specific css attributes
 if (navigator.userAgent.toLowerCase().includes("safari")) document.documentElement.setAttribute("data-useragent", "safari");
 if (navigator.userAgent.toLowerCase().includes("chrome")) document.documentElement.removeAttribute("data-useragent");
 
 // initial api requests
-await api.application("get", "language");
 api.application("get", "start");
