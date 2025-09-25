@@ -305,75 +305,90 @@ class SEARCHHANDLER {
 		$hidden = $matches = [];
 		$recentdocument = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+		preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
 
 		/**
-		 * looks for names, descriptions, hints and contents similar to search string
-		 * @param array $element component
-		 * @param string $search keyword
+		 * iterates over terms and checks if mandatory, excluded or any search strings are found
+		 * @param array $terms
+		 * @param array $expressions
+		 * 
+		 * @return bool
 		 */
-		function findInComponent($element, $search){
-			$found = false;
+		function searchExpressions($terms, $expressions){
+			$any = $mandatory = false;
+			foreach ($expressions as $expression){
+				list(, $operator, $search) = $expression;
+				$search = isset($expression[3]) ? $expression[3] : $search; // quoted literal
+
+				foreach($terms as $term){
+					$found = @fnmatch('*' . $search . '*', $term, FNM_CASEFOLD);
+					if ($operator === '-' && $found) return false; // this term should not have been included
+					elseif ($operator === '+' && $found) $mandatory = true; // this term must have been included
+					elseif ($found) $any = true;
+				}
+				if ($any && $mandatory) return true;
+			}
+			// mandatory has not been requested
+			if (!array_filter($expressions, fn($o) => $o[2] === '+')) $mandatory = true;
+			if ($any && $mandatory) return true;
+			return false;
+		}
+
+		/**
+		 * extracts names, descriptions, hints and contents
+		 * @param array $element component
+		 * 
+		 * @return array
+		 */
+		function componentSearcheables($element){
+			$searcheables = [];
 			foreach ($element as $subs){
 				if (!isset($subs['type'])){
-					if ($found = findInComponent($subs, $search)) return true;
+					array_push($searcheables, ... componentSearcheables($subs));
 				}
 				else {
-					$comparisons = [];
 					foreach (['description', 'content', 'hint'] as $property){
 						if (isset($subs[$property])){
 							if (is_array($subs[$property])){ // links, checkboxes, etc
-								foreach (array_keys($subs[$property]) as $key) $comparisons[] = $key;
+								foreach (array_keys($subs[$property]) as $key) $searcheables[] = $key;
 							}
-							else $comparisons[] = $subs[$property];
+							else $searcheables[] = $subs[$property];
 						}
 					}
 					if (isset($subs['attributes'])){
 						foreach (['name', 'value'] as $property){
-							if (isset($subs['attributes'][$property])) $comparisons[] = $subs['attributes'][$property];
+							if (isset($subs['attributes'][$property])) $searcheables[] = $subs['attributes'][$property];
 						}
-					}
-					foreach ($comparisons as $term) {
-						// suppress errors on long terms for fnmatch limit
-						if (stristr($term, $search) || @fnmatch($search, $term, FNM_CASEFOLD)) return true;
 					}
 				}
 			}
-			return $found;
-		};
+			return $searcheables;
+		}
 
 		foreach ($fd as $row) {
 			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access']) || !PERMISSION::fullyapproved('documentapproval', $row['approval'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
+
+				if (!$parameter['search']){
+					$matches[] = $row;
+					continue;
+				}
+
 				// set up search terms with name and alias
 				$terms = [$row['name']];
+				// add alias to terms
 				foreach (preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
-				// match similarity
-				foreach ($terms as $term){
-					// limit search to similarity
-					if ($parameter['search']){
-						if (!fnmatch($parameter['search'], $term, FNM_CASEFOLD)) continue;
-					}
-					$matches[] = $row;
-				}
-
-				// if not found within name, search regulatory contexts
-				if (in_array($row, $matches)) continue;
-				foreach (explode(',', $row['regulatory_context']) as $context) {
-					if (stristr($this->_lang->GET('regulatory.' . $context), $parameter['search']) !== false) {
-						$matches[] = $row;
-						break;	
-					}
-				}
-
-				// if not found already, search within components
-				if (in_array($row, $matches)) continue;
+				// add regulatory contexts to terms
+				foreach (array_map(fn($c) => $this->_lang->GET('regulatory.' . $c), explode(',', $row['regulatory_context'])) as $context) array_push($terms, $context);
+				// add component contents to terms
 				$document = $recentdocument->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $row['name']
 					]]);
-				if ($parameter['search'] && findInComponent($document['content'], $parameter['search'])) {
-					$matches[] = $row;
-				}
+				array_push($terms, ...componentSearcheables($document['content']));
+
+				// compare search
+				if (searchExpressions($terms, $expressions)) $matches[] = $row;
 			}
 		}
 		return $matches;
