@@ -26,6 +26,50 @@ export function getNextElementID() {
 	return "elementID" + ++api._settings.session.elementId;
 }
 
+export const Polyfill = {
+	/**
+	 * download handler to match safaris special needs
+	 * kudos: https://www.linkedin.com/pulse/how-i-ate-apple-downloading-pdf-mobile-safari-pwa-version-novikov-98cte
+	 */
+	a: function (a) {
+		if (!a.download) {
+			if (!a.href.includes("javascript:") && !a.target) a.target = "_blank";
+			return a;
+		}
+
+		if (!a.dataset.type) a.dataset.type = "downloadlink";
+		a.removeAttribute("target");
+
+		if (!a.href.includes("javascript:") && (this.isIOS || this.isStandalone || !("download" in document.createElement("a")))) {
+			let href = a.href;
+			a.onclick = function () {
+				fetch(href)
+					.then((response) => response.blob())
+					.then((blob) => {
+						const fileURL = URL.createObjectURL(blob),
+							pseudoa = document.createElement("a");
+						pseudoa.href = fileURL;
+						pseudoa.download = a.download;
+						pseudoa.target = "_blank";
+						document.body.appendChild(pseudoa);
+						pseudoa.click();
+						document.body.removeChild(pseudoa);
+						URL.revokeObjectURL(fileURL);
+					})
+					.catch((error) => new Toast(error + " " + href));
+			};
+			a.href = "javascript: void(0)";
+		}
+		return a;
+	},
+	isIOS: () => {
+		return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+	},
+	isStandalone: () => {
+		return window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
+	},
+};
+
 const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown", "onfocus"];
 const VOIDVALUES = ["", "..."];
 
@@ -830,6 +874,7 @@ export class Dialog {
 	 * create canvases for preview and download link if applicable
 	 */
 	preview() {
+		let a = document.createElement("a");
 		if (this.render.type === "stl") {
 			const div = document.createElement("div");
 			div.id = "stlviewer_canvas";
@@ -840,11 +885,9 @@ export class Dialog {
 			if (this.render.transfer) {
 				return [div, ...this.confirm()];
 			} else {
-				const a = document.createElement("a");
 				a.href = this.render.url;
-				a.target = "_blank";
 				a.download = this.render.name || this.render.url;
-				a.dataset.type = "downloadlink";
+				a = Polyfill.a(a);
 				a.append(document.createTextNode(this.render.name || this.render.url));
 				return [div, a];
 			}
@@ -855,21 +898,21 @@ export class Dialog {
 		canvas.classList.add("preview");
 		canvas.title = api._lang.GET("assemble.render.aria.image", { ":image": this.render.name });
 
-		const a = document.createElement("a");
-		a.target = "_blank";
+		a.href = this.render.content;
 		a.download = this.render.name || this.render.content;
 		a.dataset.type = "downloadlink";
 		a.append(document.createTextNode(this.render.name || this.render.content));
+
 		if (["qrcode", "barcode"].includes(this.render.type)) {
 			result.push(canvas);
 			this.previewElements.canvas = canvas;
-			a.href = "javascript:void(0)";
 			// invisible pseudo anchor for downloading rendered canvas content from libraries to file
+			a.href = "javascript: void(0)";
 			a.onclick = () => {
 				canvas.toBlob(
 					function (blob) {
-						const blobUrl = URL.createObjectURL(blob),
-							link = document.createElement("a");
+						const blobUrl = URL.createObjectURL(blob);
+						let link = document.createElement("a");
 						link.href = blobUrl;
 						link.download = a.download + ".png";
 						link.click();
@@ -889,14 +932,14 @@ export class Dialog {
 				if (this.render.transfer) {
 					return [canvas, ...this.confirm()];
 				} else {
-					a.href = this.render.content;
+					a = Polyfill.a(a);
 					return [canvas, a];
 				}
 			} else {
 				// not supported; currently no need for fallback as preview is prepared by backend with filtered file types as well
 			}
 			// direct download, lossless and original format
-			a.href = this.render.content;
+			a = Polyfill.a(a);
 		}
 		result.push(a);
 
@@ -2423,13 +2466,14 @@ export class Assemble {
 	 * 	}
 	 */
 	links() {
-		let result = [...this.header()];
+		let result = [...this.header()],
+			a;
 		if (this.currentElement.attributes !== undefined) result.push(...this.hidden()); // applying data-filtered for css rules
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
-			let a = document.createElement("a");
+			a = document.createElement("a");
 			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
-			if (!a.href.includes("javascript:") && !a.target) a.target = "_blank";
+			a = Polyfill.a(a);
 			a.appendChild(document.createTextNode(link));
 			result.push(a);
 		}

@@ -307,7 +307,7 @@ class USER extends API {
 					if ($row['file_path']) $usertrainings[] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path']])
+							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path'], 'download' => pathinfo($row['file_path'])['basename']])
 						]
 					];
 				}
@@ -1015,7 +1015,7 @@ class USER extends API {
 					if ($row['file_path']) $skillmatrix[0][] = [
 						'type' => 'links',
 						'content' => [
-							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path']])
+							$row['file_path'] => UTILITY::link(['href' => './api/api.php/file/stream/' . $row['file_path'], 'download' => pathinfo($row['file_path'])['basename']])
 						]
 					];
 					$skillmatrix[0][] = [

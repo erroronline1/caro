@@ -566,7 +566,7 @@ class FILE extends API {
 					if (preg_match('/^\.\.\//', $file))	$file = ['name' => $fileinfo['basename'], 'path' => './api/api.php/file/stream/' . substr($file, 1)];
 					else $file = ['name' => $file, 'path' => $file];
 
-					$matches[$file['name']] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
+					$matches[$file['name']] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 				}
 
 				// reassign displayed folder name
@@ -688,7 +688,7 @@ class FILE extends API {
 							$file['path'] = './api/api.php/file/stream/' . substr($file['path'], 1);
 							$name = $file['name'] . ' ' . $this->_lang->GET('file.sharepoint_file_lifespan', [':hours' => round(($filetime + CONFIG['lifespan']['files']['sharepoint']*3600 - time()) / 3600, 1)]);
 
-							$display[$name] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path']]);
+							$display[$name] = UTILITY::link(['href' => $file['path'], 'data-filtered' => $file['path'], 'download' => $name]);
 						}
 					}
 				}
@@ -748,7 +748,15 @@ class FILE extends API {
 				echo $this->_lang->GET('file.external_file.retired_success');
 				die();
 			}
-			header('Content-Type: '.mime_content_type($file));
+			switch (pathinfo($file)['extension']){
+				case 'stl':
+					$mime_type = 'model/stl';
+					break;
+				default:
+					$mime_type = mime_content_type($file);
+			}
+
+			header('Content-Type: '. $mime_type);
 			header('Content-Disposition: inline; filename=' . pathinfo($file)['basename']);
 			header('Expires: 0');
 			header('Cache-Control: must-revalidate');

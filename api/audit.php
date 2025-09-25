@@ -430,9 +430,7 @@ class AUDIT extends API {
 									'name' => $fileinfo['basename'],
 									'link' => './api/api.php/file/stream/' . substr($file, 1)
 								];
-								if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
-								elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
-								else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+								$link[$file['name']] = UTILITY::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 							}
 							if ($link) {
 								$proof[] = [
@@ -627,8 +625,10 @@ class AUDIT extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('audit.checks_type.audits')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -715,9 +715,8 @@ class AUDIT extends API {
 							'name' => $fileinfo['basename'],
 							'link' => './api/api.php/file/stream/' . substr($file, 1)
 						];
-						if (in_array($fileinfo['extension'], ['stl'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'stl', name: '" . $file['name'] . "', url: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'stl'];
-						elseif (in_array($fileinfo['extension'], ['png','jpg', 'jpeg', 'gif'])) $link[$file['name']] = ['href' => "javascript:new _client.Dialog({type: 'preview', header: '" . $file['name'] . "', render:{type: 'image', name: '" . $file['name'] . "', content: '" . $file['link'] . "'}})", 'data-filtered' => $file['path'], 'data-type' => 'imagelink'];
-						else $link[$file['name']]= ['href' => $file['link'], 'target' => '_blank', 'data-filtered' => 'breakline'];
+
+						$link[$file['name']] = UTILITY::link(['href' => $file['link'], 'data-filtered' => $file['path'], 'download' => $file['name']]);
 					}
 					if ($link) {
 						$current[] = [
@@ -1499,8 +1498,11 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
+
 		];
 
 		$body = [];
@@ -1778,8 +1780,10 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -2048,8 +2052,10 @@ class AUDIT extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('audit.navigation.management_review')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -2296,8 +2302,10 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -2440,6 +2448,7 @@ class AUDIT extends API {
 		$writer->writeToFile($tempFile);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
 			'href' => './api/api.php/file/stream/' . substr($tempFile, 1),
+			'download' => pathinfo($tempFile)['basename']
 		];
 
 		$body = [];
@@ -2739,8 +2748,10 @@ class AUDIT extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -2909,8 +2920,10 @@ class AUDIT extends API {
 		}
 		if (count($summary['content']) > 1){
 			$PDF = new PDF(CONFIG['pdf']['record']);
+			$file = $PDF->auditPDF($summary);
 			$downloadfiles[$this->_lang->GET('audit.risk_issues_none')] = [
-				'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+				'href' => './api/api.php/file/stream/' . $file,
+				'download' => pathinfo($file)['basename']
 			];
 		}
 
@@ -2991,7 +3004,8 @@ class AUDIT extends API {
 
 			// provide downloadfile			
 			$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => pathinfo($tempFile)['basename']])] = [
-				'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename']
+				'href' => './api/api.php/file/stream/' . substr(UTILITY::directory('tmp'), 1) . '/' . pathinfo($tempFile)['basename'],
+				'download' => pathinfo($tempFile)['basename']
 			];
 		}
 
@@ -3283,8 +3297,10 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -3577,8 +3593,10 @@ class AUDIT extends API {
 		}
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -3724,8 +3742,10 @@ class AUDIT extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 		$body = [];
 		array_push($body, 

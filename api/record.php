@@ -556,8 +556,10 @@ class RECORD extends API {
 		if (!$content) $this->response([], 404);
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->recordsPDF($content);
 		$downloadfiles[$this->_lang->GET('record.navigation.summaries')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->recordsPDF($content)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];
@@ -607,8 +609,10 @@ class RECORD extends API {
 						'content' => [$content, $content],
 						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $content)
 					];
+					$file = $PDF->qrcodePDF($content);
 					$downloadfiles[$this->_lang->GET('record.create_identifier')] = [
-						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
+						'href' => './api/api.php/file/stream/' . $file,
+						'download' => pathinfo($file)['basename']
 					];
 					$body = [
 						[

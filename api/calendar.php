@@ -108,8 +108,10 @@ class CALENDAR extends API {
 						],
 						'filename' => preg_replace(['/' . CONFIG['forbidden']['names']['characters'] . '/', '/' . CONFIG['forbidden']['filename']['characters'] . '/'], '', $this->_lang->GET('calendar.appointment.pdf', [], true) . ' ' . $appointment['occasion'] . ' ' . $this->convertFromServerTime($appointment['date'] . ' ' . $appointment['time'], true, false))
 					];
+					$file = $PDF->qrcodePDF($content);
 					$downloadfiles[$this->_lang->GET('calendar.appointment.pdf')] = [
-						'href' => './api/api.php/file/stream/' . $PDF->qrcodePDF($content)
+						'href' => './api/api.php/file/stream/' . $file,
+						'download' => pathinfo($file)['basename']
 					];
 
 					// add ics file to send by mail
@@ -721,8 +723,10 @@ class CALENDAR extends API {
 
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->timesheetPDF($summary);
 		$downloadfiles[$this->_lang->GET('calendar.navigation.timesheet', [], true)] = [
-			'href' => './api/api.php/file/stream/' . $PDF->timesheetPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 		$body = [];
 		array_push($body, 
