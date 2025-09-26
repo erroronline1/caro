@@ -174,6 +174,9 @@
 		"prevent_dataloss": "You have unprocessed changes. Sure to continue?",
 		"prevent_dataloss_cancel": "I want to stay",
 		"prevent_dataloss_ok": "Yes, nevermind",
+		"safari":{
+			"downloads": "Downloads are not supported in Safari using browser-mode, without the application restarting itself. Consider adding CARO as app to the homescreen."
+		},
 		"save": "Save :title?",
 		"scan_successful": "Scan has been successful",
 		"service_worker_get_cache_fallback": "Serving last available version due to current connectivity loss!",

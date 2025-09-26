@@ -32,15 +32,10 @@ export const Polyfill = {
 	 * kudos: https://www.linkedin.com/pulse/how-i-ate-apple-downloading-pdf-mobile-safari-pwa-version-novikov-98cte
 	 */
 	a: function (a) {
-		if (!a.download) {
-			if (!a.href.includes("javascript:") && !a.target) a.target = "_blank";
-			return a;
-		}
-
 		if (!a.dataset.type) a.dataset.type = "downloadlink";
 		a.removeAttribute("target");
 
-		if (!a.href.includes("javascript:") && (this.isIOS || this.isStandalone || !("download" in document.createElement("a")))) {
+		if (!a.href.includes("javascript:") && (this.isIOS() || this.isStandalone() || !("download" in document.createElement("a")))) {
 			let href = a.href;
 			a.onclick = function () {
 				fetch(href)
@@ -68,6 +63,14 @@ export const Polyfill = {
 	isStandalone: () => {
 		return window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
 	},
+
+	downloadWarning: function (){
+		if (!this.isIOS() || this.isStandalone()) return null;
+		const span = document.createElement("span");
+		span.append(document.createTextNode(api._lang.GET("general.safari.downloads")));
+		span.classList.add('orange');
+		return span;
+	}
 };
 
 const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown", "onfocus"];
@@ -874,7 +877,7 @@ export class Dialog {
 	 * create canvases for preview and download link if applicable
 	 */
 	preview() {
-		let a = document.createElement("a");
+		let a = document.createElement("a"), warning = Polyfill.downloadWarning();
 		if (this.render.type === "stl") {
 			const div = document.createElement("div");
 			div.id = "stlviewer_canvas";
@@ -889,6 +892,7 @@ export class Dialog {
 				a.download = this.render.name || this.render.url;
 				a = Polyfill.a(a);
 				a.append(document.createTextNode(this.render.name || this.render.url));
+				if (warning) return [div, warning, a];
 				return [div, a];
 			}
 		}
@@ -933,12 +937,14 @@ export class Dialog {
 					return [canvas, ...this.confirm()];
 				} else {
 					a = Polyfill.a(a);
+					if (warning) return [canvas, warning, a];
 					return [canvas, a];
 				}
 			} else {
 				// not supported; currently no need for fallback as preview is prepared by backend with filtered file types as well
 			}
 			// direct download, lossless and original format
+			if (warning = Polyfill.downloadWarning()) result.push(warning);
 			a = Polyfill.a(a);
 		}
 		result.push(a);
@@ -2469,14 +2475,21 @@ export class Assemble {
 		let result = [...this.header()],
 			a;
 		if (this.currentElement.attributes !== undefined) result.push(...this.hidden()); // applying data-filtered for css rules
+		let warning = Polyfill.downloadWarning(), includesDownloads=false;
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			a = document.createElement("a");
 			a = this.apply_attributes(attributes, a);
 			if (!a.href) a.href = link;
-			a = Polyfill.a(a);
+			if (!a.download) {
+				if (!a.href.includes("javascript:") && !a.target) a.target = "_blank";
+			} else {
+				includesDownloads = true;
+				a = Polyfill.a(a);
+			}
 			a.appendChild(document.createTextNode(link));
 			result.push(a);
 		}
+		if (warning && includesDownloads) result.push(warning);
 		return [...result, ...this.hint()];
 	}
 
