@@ -880,6 +880,10 @@ export const _client = {
 							class: "imagealigned",
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 							onclick: function () {
+								if (!labels.length) {
+									_client.application.toClipboard(this);
+									return;
+								}
 								new _client.Dialog({
 									type: "input",
 									header: api._lang.GET("order.ordernumber_label"),
@@ -950,31 +954,8 @@ export const _client = {
 							value: element.identifier,
 							name: api._lang.GET("order.identifier"),
 							readonly: true,
+							onclick: "_client.application.toClipboard(this)",
 							class: "imagealigned",
-							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
-							onclick: function () {
-								new _client.Dialog({
-									type: "input",
-									header: api._lang.GET("order.identifier"),
-									render: [
-										[
-											{
-												type: "text",
-												attributes: {
-													value: "element.identifier",
-													name: api._lang.GET("order.identifier"),
-													readonly: true,
-													onclick: "_client.application.toClipboard(this)",
-												},
-												hint: api._lang.GET("order.identifier_hint") + " " + api._lang.GET("order.copy_value"),
-											},
-										],
-									],
-									options: buttons,
-								});
-							}
-								.toString()
-								._replaceArray(["element.identifier", "buttons"], [element.identifier.replaceAll('"', '\\"'), JSON.stringify(buttons)]),
 						},
 						hint: api._lang.GET("order.identifier_hint") + " " + api._lang.GET("order.copy_value"),
 					});
@@ -993,16 +974,21 @@ export const _client = {
 
 				// append information
 				if (element.information) {
-					collapsible.push({
-						type: "textarea_copy",
-						attributes: {
-							value: element.information,
-							name: api._lang.GET("order.additional_info"),
-							readonly: true,
+					collapsible.push(
+						{
+							type: "br",
 						},
-						numeration: "none",
-						hint: api._lang.GET("order.copy_value"),
-					});
+						{
+							type: "textarea_copy",
+							attributes: {
+								value: element.information,
+								name: api._lang.GET("order.additional_info"),
+								readonly: true,
+							},
+							numeration: "none",
+							hint: api._lang.GET("order.copy_value"),
+						}
+					);
 				}
 
 				// append add info button
