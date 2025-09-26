@@ -869,9 +869,9 @@ class CONSUMABLES extends API {
 					]
 				])) {
 					// save documents
+					$filenamewarning = [];
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
 						// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
-						$filenamewarning = [];
 						foreach($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['name'] as $index => $file){
 							preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file, $fileNameComponents);
 							if ($fileNameComponents){
@@ -905,7 +905,7 @@ class CONSUMABLES extends API {
 				break;
 
 			case 'PUT':
-				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')) $this->response([], 401);
+				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !PERMISSION::permissionFor('incorporation')) $this->response([], 401);
 				// prepare product-array to update, return error if not found
 				$product = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
 					'values' => [
@@ -918,7 +918,7 @@ class CONSUMABLES extends API {
 				// hand over payload to product properties
 				$product['article_alias'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null;
 				$product['article_info'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null;
-				if (!PERMISSION::permissionFor('productslimited')){
+				if (PERMISSION::permissionFor('products')){
 					$product['vendor_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) && UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) !== $this->_lang->GET('consumables.product.vendor_select_default') ? UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor'));
 					$product['article_no'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : null;
 					$product['article_name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null;
@@ -967,9 +967,9 @@ class CONSUMABLES extends API {
 				$product['vendor_id'] = $vendor['id'];
 				
 				// save documents
-				if (PERMISSION::permissionFor('products') && isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
+				$filenamewarning = [];
+				if ((PERMISSION::permissionFor('products') || PERMISSION::permissionFor('incorporation')) && isset($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['tmp_name'][0]) {
 					// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
-					$filenamewarning = [];
 					foreach($_FILES[$this->_lang->PROPERTY('consumables.product.documents_update')]['name'] as $index => $file){
 						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file, $fileNameComponents);
 						if ($fileNameComponents){
@@ -1221,7 +1221,7 @@ class CONSUMABLES extends API {
 				$response = ['render' => ['content' => $search->productsearch($this->_usecase ? : 'product')]];
 		
 				// switch between display- and edit mode 
-				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited')) {
+				if (!PERMISSION::permissionFor('products') && !PERMISSION::permissionFor('productslimited') && !PERMISSION::permissionFor('incorporation')) {
 					// standard user view
 					if ($product['id']){
 						// deactivate inputs for regular users
@@ -1408,7 +1408,7 @@ class CONSUMABLES extends API {
 							]
 					];
 					// append form for authorized users
-					if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited')){
+					if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited') || PERMISSION::permissionFor('incorporation')){
 						$response['render']['form'] = [
 						'data-usecase' => 'purchase',
 						'action' => $product['id'] ? "javascript:api.purchase('put', 'product', '" . $product['id'] . "')" : "javascript:api.purchase('post', 'product')",
@@ -1418,7 +1418,7 @@ class CONSUMABLES extends API {
 
 					// deactivate inputs for restricted users
 					if (!PERMISSION::permissionFor('products')){
-						$response['render']['content'][0][2]['attributes']['disabled'] = // add new product
+						$response['render']['content'][0][1]['attributes']['disabled'] = // add new product
 						$productedit[0]['attributes']['disabled'] = // select vendor
 						$productedit[1]['attributes']['readonly'] = // type vendor
 						$productedit[2]['attributes']['readonly'] = // article number
@@ -1430,7 +1430,7 @@ class CONSUMABLES extends API {
 						$productedit[8]['attributes']['readonly'] = // article info
 						true; 
 					}
-					if (PERMISSION::permissionFor('productslimited')){
+					if (PERMISSION::permissionFor('productslimited') || PERMISSION::permissionFor('incorporation')){
 						unset($productedit[4]['attributes']['readonly']); // article alias
 						unset($productedit[8]['attributes']['readonly']); // article info
 					}
@@ -1531,6 +1531,27 @@ class CONSUMABLES extends API {
 					if ($checkslides) $response['render']['content'][] = [$productedit, ...$checkslides];
 					else $response['render']['content'][] = $productedit;
 
+					// add file upload
+					if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('incorporation')){
+						$response['render']['content'][] = [
+							[
+								'type' => 'file',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.documents_update'),
+									'multiple' => true,
+								],
+								'hint' => $this->_lang->GET('consumables.product.documents_update_hint')
+							],
+							[
+								'type' => 'date',
+								'attributes' => [
+									'name' => $this->_lang->GET('consumables.product.documents_validity'),
+								],
+								'hint' => $this->_lang->GET('consumables.product.documents_validity_hint')
+							]
+						];
+					}
+
 					// append toggles
 					if (PERMISSION::permissionFor('products')){
 						$response['render']['content'][] = [
@@ -1560,25 +1581,6 @@ class CONSUMABLES extends API {
 								]
 							],
 							...$response['render']['content'][count($response['render']['content']) - 1]
-						];
-
-						// add file upload
-						$response['render']['content'][] = [
-							[
-								'type' => 'file',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.documents_update'),
-									'multiple' => true,
-								],
-								'hint' => $this->_lang->GET('consumables.product.documents_update_hint')
-							],
-							[
-								'type' => 'date',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.documents_validity'),
-								],
-								'hint' => $this->_lang->GET('consumables.product.documents_validity_hint')
-							]
 						];
 
 						// add availability toggle

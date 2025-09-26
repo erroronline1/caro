@@ -483,7 +483,7 @@ class APPLICATION extends API {
 		$menu[$this->_lang->GET('application.navigation.header')][$this->_lang->GET('application.navigation.about')] = ['onclick' => "api.application('get', 'about')"];
 
 		// purchase
-		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('consumables.navigation.header')][$this->_lang->GET('consumables.navigation.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
+		if (PERMISSION::permissionFor('incorporation')) $menu[$this->_lang->GET('consumables.navigation.header')][$this->_lang->GET('consumables.navigation.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
 		// tools
 		include_once('./_erpinterface.php');
