@@ -96,5 +96,10 @@
 		"title": "Improvement suggestions",
 		"content": "You can contribute improvement suggestions for all topics. Suggestions are public and can be voted on. If you fell uncomfortable you are allowed to contribute anonymously.\nEveryone gets informed on new suggestions, only you as soon as yours are being processed.\nAuthorized users can define measures and close the contribution if this appears reasonable.",
 		"permissions": "user,group"
+	},
+	{
+		"title": "Search functions",
+		"content": "Most search inputs allow placeholders and modificators.\nA ? is for any character at this position. \"99?25\" matches \"99B25\" as well as \"99C25\".\n A * is for any characters of any length. \"Measurments *tics\" matches \"Measurments prosthetics\" as well as \"Measurments orthotics\".\nMandatory terms can be preceded by an immediate +, excluded terms by a -. \"Orthosis +Knee -cruciate\" matches knee orthoses that do not contain \"cruciate\".\nMultiple terms match results in random order. \"Knee orthosis\" matches \"knee orthosis\" as well as \"orthosis for knee\", while terms whose order do matter and are quoted and \" \"knee orthosis\" \" only matches the first results of the example. +, -, ? and * are possible as well.",
+		"permissions": "user,group"
 	}
 ]

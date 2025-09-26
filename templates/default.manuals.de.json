@@ -96,5 +96,10 @@
 		"title": "Verbesserungsvorschläge",
 		"content": "Es können Verbesserungsvorschläge eingereicht werden, die sich auf alle Themen beziehen. Die Verbesserungsvorschläge sind für alle einsehbar und können bewertet werden. Wenn Du Dich unwohl fühlst, darfst du das auch anonym tun.\nAlle werden über neue Vorschläge benachrichtigt, Du selbst, sobald deine bearbeitet werden.\nBerechtigte Nutzer können für die Vorschläge Maßnahmen festlegen und den Beitrag abschließen sobald dies angemessen erscheint.",
 		"permissions": "user,group"
+	},
+	{
+		"title": "Suchfunktion",
+		"content": "Bei den meisten Suchfeldern ist es möglich Platzhalter und Modifikatoren zu verwenden.\nEin ? steht für ein Beliebiges Zeichen an dieser Stelle. \"99?25\" findet sowohl \"99B25\" als auch \"99C25\".\nEin * in einem Suchbegriff steht für eine beliebige Anzahl beliebiger Zeichen. \"Maßblatt *thetik\" findet sowohl \"Maßblatt Prothetik\" als auch \"Maßblatt Orthetik\".\nBegriffe, die unbedingt auch vorkommen sollen, kann ein + unmittelbar vorangestellt werden, ausgeschlossenen Begriffen ein -. \"Orthese +Knie -Kreuzband\" findet dann nur Knieorthesen, die \"Kreuzband\" nicht enthalten.\nMehrere Begriffe erzielen Ergebnisse in beliebiger Reihenfolge. \"Knie Orthese\" findet sowohl \"Knie Orthese\" als auch \"Orthese für das Knie, während Begriffe deren Reihenfolge wichtig ist in Anführungsstriche gesetzt werden und \" \"Knie Orthese\" \" nur die ersten Ergebnisse beinhalten. Auch hier sind +, -, ? und * verwendbar.",
+		"permissions": "user,group"
 	}
 ]
