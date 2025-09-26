@@ -388,9 +388,40 @@ class SEARCHHANDLER {
 				array_push($terms, ...componentSearcheables($document['content']));
 
 				// compare search
-				if (searchExpressions($terms, $expressions)) $matches[] = $row;
+				if (searchExpressions($terms, $expressions)){
+					$row['_searchableTerms'] = $terms;
+					$matches[] = $row;
+				}
 			}
 		}
+		if ($parameter['search']) {
+			// reduce expressions by leading operators
+			foreach($expressions as $index => &$expression){
+				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
+				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
+				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+			}
+			usort($matches, function ($a, $b) use ($expressions){
+				$a_matches = $b_matches = 0;
+				foreach($expressions as $expression){
+					foreach($a['_searchableTerms'] as $term) {
+						if (preg_match('/' . $expression[2] . '/i', $term ? : '', $matches)) {
+							$a_matches++;
+							break;
+						}
+					}
+					foreach($b['_searchableTerms'] as $term) {
+						if (preg_match('/' . $expression[2] . '/i', $term ? : '', $matches)) {
+							$b_matches++;
+							break;
+						}
+					}
+				}
+				return $a_matches <=> $b_matches;
+			});
+			$matches = array_reverse($matches);
+		}
+
 		return $matches;
 	}
 
@@ -415,6 +446,38 @@ class SEARCHHANDLER {
 			],
 			'wildcards' => 'all',
 		]);
+
+		if ($parameter['search']) {
+			// order matches by relevance; shift to top if all of optional terms have been found
+			preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+			// reduce expressions by leading operators
+			foreach($expressions as $index => &$expression){
+				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
+				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
+				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+			}
+			usort($data, function ($a, $b) use ($expressions){
+				$a_matches = $b_matches = 0;
+				foreach($expressions as $expression){
+					foreach($expressions as $expression){
+						foreach(['identifier', 'content'] as $column) {
+							if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
+								$a_matches++;
+								break;
+							}
+						}
+						foreach(['identifier', 'content'] as $column) {
+							if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
+								$b_matches++;
+								break;
+							}
+						}
+					}
+				}
+				return $a_matches <=> $b_matches;
+			});
+			$data = array_reverse($data);
+		}
 
 		$contexts = [];
 		foreach ($data as $row){
@@ -463,10 +526,41 @@ class SEARCHHANDLER {
 
 		$risk_datalist = $parameter['search'] ? SQLQUERY::EXECUTE($this->_pdo, 'risk_search', [
 			'values' => [
-				':SEARCH' => $parameter['search']
+				':SEARCH' => $parameter['search'] ? : '%'
 			],
 			'wildcards' => true,
 		]) : [];
+
+		if ($parameter['search']) {
+			// order matches by relevance; shift to top if all of optional terms have been found
+			preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+			// reduce expressions by leading operators
+			foreach($expressions as $index => &$expression){
+				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
+				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
+				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+			}
+			usort($risk_datalist, function ($a, $b) use ($expressions){
+				$a_matches = $b_matches = 0;
+				foreach($expressions as $expression){
+					foreach(['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder'] as $column) {
+						if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
+							$a_matches++;
+							break;
+						}
+					}
+					foreach(['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder'] as $column) {
+						if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
+							$b_matches++;
+							break;
+						}
+					}
+				}
+				return $a_matches <=> $b_matches;
+			});
+			$risk_datalist = array_reverse($risk_datalist);
+		}
+
 		$productsPerSlide = 0;
 
 		$slides = [
@@ -558,6 +652,7 @@ class SEARCHHANDLER {
 				$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
 				if ($parameter['search']) {
+					// get matches
 					$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
 						'values' => [
 							':SEARCH' => $parameter['search'],
@@ -568,7 +663,37 @@ class SEARCHHANDLER {
 							':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
 						]
 					]);
+					// order matches by relevance; shift to top if all of optional terms have been found
+					preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+					// reduce expressions by leading operators
+					foreach($expressions as $index => &$expression){
+						if ($expression[1] === '-') unset($expressions[$index]); // has - operator
+						$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
+						$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+					}
+					usort($search, function ($a, $b) use ($expressions){
+						$a_matches = $b_matches = 0;
+						foreach($expressions as $expression){
+							foreach($expressions as $expression){
+								foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
+									if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
+										$a_matches++;
+										break;
+									}
+								}
+								foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
+									if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
+										$b_matches++;
+										break;
+									}
+								}
+							}
+						}
+						return $a_matches <=> $b_matches;
+					});
+					$search = array_reverse($search);
 				}
+
 				$productsPerSlide = 0;
 
 				// insert request specific search to first slide
