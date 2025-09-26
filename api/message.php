@@ -201,7 +201,7 @@ class MESSAGE extends API {
 								[
 									...$this->announcementform([
 										'subject' => $announcement['subject'] ? : '',
-										'text' => $announcement['text'] ? preg_replace(['/\r/','/\n/', '/"/'],['', "\\n", '\"'], $announcement['text']): '',
+										'text' => $announcement['text'] ? preg_replace(['/\r/','/\n/'],['', "\\n"], $announcement['text']): '',
 										'span_start' => $announcement['span_start'] ? $this->convertFromServerTime(substr($announcement['span_start'], 0, 10), true) : '',
 										'span_end' => $announcement['span_end'] ? $this->convertFromServerTime(substr($announcement['span_end'], 0, 10), true) : '',
 										'units' => $announcementunits
