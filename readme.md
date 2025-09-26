@@ -30,17 +30,11 @@ Things are still in motion. Images may be outdated.
 ## to do
 * unittests
 * templates
-* csvprocessor
-    * max loops for avoiding runaway on improper configured replacement patterns?
-    * raise exception if loopcount exceeds passed security parameter
 * erp_interface, additional usecases
     * std method for csv uploads to distinct folder, then show up within tools?
-* audit
-    * auditprogramme and plan review wording
-    * audit preparation hint considering external topics
-    * conformity stages
-    * measures and their finalization from audit outcomes before or after closing?
-    * measures to calendar
+* manual order
+    * intersection of product name (split and plussed) and order number results for products may contain request
+    * select from results or proceed with manual adding
 * calendar tour planning
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
@@ -280,6 +274,8 @@ Users can have multiple assigned organizational units and permissions.
 On registering a new user a default profile picture is generated. Custom set pictures can be restored to default. A generated order authorization pin can be used to approve orders. Adding trainings is granted to defined authorized users only, to make sure certificates are acknowledged. Skill levels (according to the [intended list](#customisation)) can be modified. The generated access token can be exported and, for example, used as a laminated card.
 
 ![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
+
+The token lacks any further identification, like the application name or logo, by intent to obfuscate its use.
 
 Usernames can be edited for societal reasons. This does not affect stored names within records as these are not linked but stored as plain text to avoid information loss on deleting any user. The profile picture will always be overwritten with the default image following a name change.
 
@@ -1176,9 +1172,9 @@ Trainings are matched by their name.
 ## Search
 Search functionality across the application may differ slightly depending of context.
 
-* Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext.
-* File- and document search allow wildcards as `*` for any amount of any characters or `?` as any character on the given position.
-* All others allow wildcards as well as +mandatory, -excluded and "literal search".
+* Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext. Available options are sorted alphabetically.
+* File search allows wildcards as `*` for any amount of any characters or `?` as any character on the given position.
+* All others allow wildcards as well as +mandatory, -excluded and "search in this specific order". Results are sorted by amount of matched terms.
 
 [Content](#content)
 
@@ -1308,6 +1304,7 @@ Description of options:
 		"dialect": Settings according to php fgetcsv
 		"columns": list/array of column names to process and export to destination
 		"encoding": Comma separated string of possible character encoding of sourcefile
+		"replacementOverflow": integer to raise an exception on an suspicious amount of replacements (1000 by default)
 
 	"filter": List/array of objects/dicts
 		"apply": "filter_by_expression"
@@ -1798,7 +1795,8 @@ It is strongly recommended to create an additional development environment to te
     * php_pdo_sqlsrv_82_nts_x64.dll (sqlsrv if applicable)
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * Manually set mime type for site-webmanifest as application/manifest+json for IIS servers.
-* web.config for IIS allow double escaping
+* Allow double escaping in web.config for IIS 
+* ignore client certificates in IIS SSL settings for the site
 
 ### Application setup
 The default provides [template files](#https://github.com/erroronline1/caro/tree/master/templates) in the respective template folder for a swift availability of contents upon launch. Filenames follow a pattern of `{choosable name part}.{type}.{default language}.{extension}` where
@@ -1977,7 +1975,7 @@ files = "office, ceo, qmo" ; upload and delete files
 documentapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve documents and components
 documentcomposer = "ceo, qmo" ; compose documents
 documentexport = "ceo, qmo, supervisor" ; export documents as printable pdf
-incorporation = "ceo, qmo, prrc" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
+incorporation = "ceo, qmo, prrc, hazardous_materials" ; SEE WARNING ABOVE - incorporate products, user by default for gathering information, set up permissions have to approve and are authorized to revoke
 longtermplanning = "ceo, qmo, supervisor" ; set up transfer schedules or other long term planning
 maintenance = "ceo, qmo" ; application maintenance tools
 measureedit = "ceo, qmo, prrc" ; edit, close and delete measures
@@ -2120,7 +2118,8 @@ Tests:
 
 Notes:
 * iOS PWAs seem to not being updated regarding front end code and may have to be reinstalled on changes.
-* Styling is slightly different because of inconsistent following of web standards
+* Styling is slightly different because of inconsistent following of web standards.
+* Downloading files does not work properly in browser-mode because of inconsistent following of web standards. The application starts anew with risk of losing unsaved inputs. Works as PWA with the implemented polyfill as intended though.
 
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
 
@@ -2747,8 +2746,8 @@ Some stress tests can be performed with ./api/_stresstest.php. 20000 calendar-ev
 During development following outcomes could be noted:
 * 100k distributed records perform well, landing page loads in about 3s.
 * 100k calendar events perform well, landing page still loads in about 3s.
-* 1k approved orders process in about 1s on the server side and 3s on the client side on 155k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
-* The products database and depending functions (orders, product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
+* 1k approved orders process in about 2.7s on the server side and 3s on the client side (in full data tile view on desktop) on 282k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
+* The products database and depending functions (product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
 Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script must be removed from the production server once being tested, before going public.**
 
@@ -2905,15 +2904,6 @@ Sample response
 ```
 {"render":{"content":[{"type":"textsection","attributes":{"name":"CARO - Cloud Assisted Records and Operations"},"content":"Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and\/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful,....
 ```
-
-> GET ./api/api.php/application/language
-
-Retrieves an object with language chunks, similar to language.XX.json, slightly reduced by properties definetively not used by frontend, processed by ./js/language.js
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none | | | |
 
 > GET ./api/api.php/application/menu
 

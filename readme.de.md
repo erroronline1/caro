@@ -182,6 +182,8 @@ Bei der Registrierung eines neuen Nutzers wird ein Standard-Profilbild erstellt.
 
 ![token example](http://toh.erroronline.one/caro/error%20on%20line%201_token.png)
 
+Der Token verzichtet bewusst auf weitere Identifikationsmerkmale, wie Anwendungsname- oder Logo, um seinen Anwendungszweck zu verschleiern.
+
 Nutzernamen können aus gesellschaftlichen Gründen geändert werden. Dies betrifft jedoch nicht in Aufzeichnungen gespeicherte Namen, da diese nicht veknüpft, sondern als Text gespeichert werden um einen Informationsverlust zu vermeiden, sobald ein Nutzer gelöscht wird. Das Profilbild wird im Falle einer Namensänderung stets mit dem Standard-Profilbild überschrieben.
 
 > In seltenen Fällen kann der QR-Code nicht vom eingebauten Scanner gelesen werden. Es wird empfohlen die Kompatibilität mit dem eingebauten Scanner der [Werkzeuge](#werkzeuge) zu prüfen, bevor der Code weitergegeben wird und bei Bedarf einen neuen Zugangstoken generieren zu lassen.
@@ -1075,9 +1077,9 @@ Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
 ## Suche
 Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zusammenhang unterscheiden.
 
-* Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden.
-* Dateien- und Dokumentensuche erlauben Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position.
-* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "buchstäbliche Suchbegriffe".
+* Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden. Verfügbare Optionen sind alphabetisch sortiert.
+* Die Dateiensuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position.
+* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert.
 
 [Übersicht](#übersicht)
 
@@ -1206,6 +1208,7 @@ Beschreibung der Optionen:
 		"dialect": Einstellungen gemäß php fgetcsv
 		"columns": Liste von Spaltennamen, die verwertet und exportiert werden sollen
 		"encoding": kommagetrennte Zeichenkette möglicher Zeichenkodierungen der Quelldatei
+		"replacementOverflow": Ganzzahl um eine Fehlermeldung zu erzeugen, im Falle verdächtig vieler Ersetzungen (1000 ohne Angabe)
 
 	"filter": Liste von Objekten
 		"apply": "filter_by_expression"
@@ -1697,6 +1700,7 @@ Es wird dringed empfohlen eine zusätzliche Entwicklungsumgebung zu schaffen um 
 * my.ini (MySQL) / mysql.conf.d/mysql.cnf (MariaDB) max_allowed_packet = 100M / [SQL SERVER](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-network-packet-size-server-configuration-option?view=sql-server-ver16) 32767
 * manuelle Konfiguration den MIME-Typs für das site-webmanifest als application/manifest+json für IIS Server.
 * doppelte Escapezeichen zulassen (web.config für IIS Server)
+* IIS: Client-Zertifikate in den SSL-Einstellungen der Website ignorieren
 
 ### Anwendungseinrichtung
 Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronline1/caro/tree/master/templates) im entsprechenden *template*-Ordner bereit um eine schnelle Verfügbarkeit von Inhalten bei der Inbetriebnahme der Anwendung zu unterstützen. Dateinamen folgen dem Muster `{frei wählbar}.{Typ}.{Standardsprache}.{Dateinamenerweiterung} wobei
@@ -1876,7 +1880,7 @@ files = "office, ceo, qmo" ; Dateien bereitstellen und Verwalten
 formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Dokumenten und ihrer Komponenten
 documentcomposer = "ceo, qmo" ; Dokumente und Komponenten erstellen
 documentexport = "ceo, qmo, supervisor" ; Dokumente als PDF exportieren
-incorporation = "ceo, qmo, prrc" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
+incorporation = "ceo, qmo, prrc, hazardous_materials" ; obige Warnung beachten - Produkteinführung freigeben oder entziehen
 longtermplanning = "ceo, qmo, supervisor" ; Anlegen, Ändern und Löschen von Langzeitplanungen
 maintenance = "ceo, qmo" ; Werkzeuge zur Anwendungspflege
 measureedit = "ceo, qmo, prrc" ; Verbesserungsvorschläge bearbeiten, schließen und löschen
@@ -2021,6 +2025,7 @@ Tests:
 Anmerkungen:
 * iOS PWAs scheinen Frontend-Code nicht zu aktualisieren uns müssen ggf. bei Änderungen neu installiert werden.
 * Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
+* Der Download von Dateien ist aufgrund von inkonsequenten Verhalten gegenüber Webstandards in der Browser-Ansicht nicht möglich. Die Anwendung startet neu und es besteht das Risiko von Verlusten ungespeicherter Eingaben. Als PWA funktioniert es mit dem implementierten Polyfill wie vorgesehen.
 
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
 
