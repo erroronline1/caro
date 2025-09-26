@@ -200,7 +200,7 @@ class ORDER extends API {
 								// schedule review of disapproved order for unit (in case of vacation, sick leave etc.)
 								$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 								$calendar->post([
-									':type' => 'schedule',
+									':type' => 'tasks',
 									':span_start' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 									':span_end' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 									':author_id' => $_SESSION['user']['id'],

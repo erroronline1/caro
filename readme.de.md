@@ -29,7 +29,8 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
         * [Managementbericht](#managementbericht)
     * [Kalender](#kalender)
         * [Terminvereinbarung](#terminvereinbarung)
-        * [Kalender](#kalender-1)
+        * [Aufgaben](#aufgaben)
+        * [Vorgangsplanung](#vorgangsplanung)
         * [Langzeitplanung](#langzeitplanung)
         * [Zeiterfassung](#zeiterfassung)
     * [Dateien](#dateien)
@@ -614,16 +615,16 @@ Es kann eine Terminerinnerung für Kunden erstellt werden. Nach der Eingabe der 
 
 [Übersicht](#übersicht)
 
-### Kalender
-Es können Einträge zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Termine der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst, sofern in der [Zeiterfassung](#zeiterfassung) eingetragen. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
+### Aufgaben
+Es können Aufgaben zum Kalender hinzugefügt werden. Die Startseite gibt eine kurze Zusammenfassung der geplanten Aufgaben der aktuellen Kalenderwoche sowie eine Übersicht über Mitarbeiter außer Dienst, sofern in der [Zeiterfassung](#zeiterfassung) eingetragen. Termine können von jedem Nutzer angelegt und abgeschlossen werden, eine Änderung und Löschung ist jedoch nur für berechtigte Nutzer möglich.
 
-Ereignisse können eine [Benachrichtigung](#unterhaltungen) an Nutzergruppen auslösen, wenn diese Einstellung vorgenommen wurde.
+Aufgaben können eine [Benachrichtigung](#unterhaltungen) an Nutzergruppen auslösen, wenn diese Einstellung vorgenommen wurde.
 
 Da die Terminplanung primär die Arbeitsplanung (beispielweise die Festlegung von täglichen Aufgaben für einen Bereich) oder Erinnerungen in Zusammenhang mit Aufzeichnungen unterstützen soll, kann nur ein Datum und keine Zeit ausgewählt werden. Dies vereinfacht zudem die Eingabemaske.
 
 Angezeigte Kalender stellen auch Wochenenden und sonstige arbeitsfreie Tage dar, um sicherzustellen, dass versehentlich an einem solchen Tag geplante Ereignisse nicht übersehen werden.
 
-Die Planung von Terminen ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht. Ereignisse werden nach einer [einstellbaren Zeit](#laufzeitvariablen) nach Erledigung gelöscht sofern nicht anders angegeben.
+Die Planung von Aufgaben ist nicht Bestandteil der Aufzeichnungen, da jede Maßnahme ihre eigene [Aufzeichnung mit Zeitstempel](#aufzeichnungen) vorsieht. Ereignisse werden nach einer [einstellbaren Zeit](#laufzeitvariablen) nach Erledigung gelöscht sofern nicht anders angegeben.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar%20de.png)
 
@@ -691,6 +692,11 @@ graph TD;
     database2-.->summary;
     summary-......->select_day
 ```
+
+[Übersicht](#übersicht)
+
+### Vorgangsplanung
+Während Aufgaben einzelne Fälle oder spezifische Angelegenheiten adressieren, sammelt die Vorgangsplanung Versorgungen anhand ihrer Kennzeichen für Stationsgänge, andere Touren oder wöchentliche Arbeitsausfträge wie anstehende Gießarbeiten. Wärend der abarbeitung ist jeder Vorgang schnell erreichbar. Wie die Aufgaben können die Vorgangsplanungen von jedem Nutzer als erledigt markiert werden, die Bearbeitung und Löschung ist jedoch nur berechtigten Nutzern möglich.
 
 [Übersicht](#übersicht)
 

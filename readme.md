@@ -32,7 +32,7 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases
     * std method for csv uploads to distinct folder, then show up within tools?
-* calendar tour planning
+* records quickinfo (non record type)?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## Content
@@ -62,7 +62,8 @@ Things are still in motion. Images may be outdated.
         * [Management review](#management-review)
     * [Calendar](#calendar)
         * [Appointment notice](#appointment-notice)
-        * [Scheduling](#scheduling)
+        * [Tasks](#tasks)
+        * [Case planning](#case-planning)
         * [Long term planning](#long-term-planning)
         * [Timesheet](#timesheet)
     * [Files](#files)
@@ -714,8 +715,8 @@ Create an appointment notice for customers. Setting relevant data you can decide
 
 [Content](#content)
 
-### Scheduling
-Add events to the calendar. The landing page gives a brief overview of the scheduled events and the current week as well as off duty workmates at a quick glance if provided within the [timesheets](#timesheet). Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
+### Tasks
+Add tasks to the calendar. The landing page gives a brief overview of the scheduled tasks and the current week as well as off duty workmates at a quick glance if provided within the [timesheets](#timesheet). Events can be added and completed by every user, editing and deleting is permitted to defined authorized users only.
 
 Events may trigger a [message](#conversations) to a defined user group if set.
 
@@ -723,7 +724,7 @@ As scheduling is supposed to help you with operational planning (e.g. daily assi
 
 Displayed calendars do include weekends and any non working day intentionally in case some event occurs non-standard or recurring events happen to be dated then, to not being overlooked.
 
-Scheduling and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records). Events are deleted after a [configurable timespan](#runtime-variables) after the event has been as closed if not specified otherwise.
+Scheduling tasks and its events are not part of the records per se as any treatment measure is supposed to have its own timed [record](#records). Events are deleted after a [configurable timespan](#runtime-variables) after the event has been as closed if not specified otherwise.
 
 ![calendar screenshot](http://toh.erroronline.one/caro/calendar%20en.png)
 
@@ -790,6 +791,11 @@ graph TD;
     database2-.->summary;
     summary-......->select_day
 ```
+
+[Content](#content)
+
+### Case planning
+While scheduled tasks address single cases or specified duties, case planning is supposed to gather treatment cases by identifier for hospital ward or other tours or weekly case executions like bundled resin work schedules. During execution every case is accessible by a tap. Similar to other scheduled events, case planning can be marked as completed by anyone, but edited and deleted by authorized users only.
 
 [Content](#content)
 
@@ -3239,12 +3245,12 @@ Parameters
 | ---- | --------- | -------- | ----------- |
 | {id} | path parameter | required | database id |
 | {bool} | path parameter| required | true or false completed state |
-| {type} | path parameter | required | schedule or timesheet |
+| {type} | path parameter | required | tasks, timesheet or planning |
 | payload | form data | required | form data including user validation |
 
 Sample response
 ```
-{"response":{"msg":"Event has been marked as completed.","type":"success"},"data":{"calendar_uncompletedevents":1}}
+{"response":{"msg":"Event has been marked as completed.","type":"success"},"data":{"calendar_uncompletedtasks":1}}
 ```
 
 > POST ./api/api.php/calendar/longtermplanning
@@ -3303,9 +3309,9 @@ Sample response
 {"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
 ```
 
-> DELETE ./api/api.php/calendar/schedule/{id}
+> DELETE ./api/api.php/calendar/tasks/{id}
 
-Deletes scheduled events.
+Deletes scheduled tasks.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3317,7 +3323,7 @@ Sample response
 {"response":{"msg":"Event has been deleted.","type":"success"},"data":{"calendar_uncompletedevents":1}}
 ```
 
-> GET ./api/api.php/calendar/schedule/{date Y-m-d}/{date Y-m-d}
+> GET ./api/api.php/calendar/tasks/{date Y-m-d}/{date Y-m-d}
 
 Returns a calendar.
 
@@ -3332,9 +3338,9 @@ Sample response
 {"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"calendar","description":"June 2024","content":[null,null,null,null,null,{"date":"2024-06-01","display":"Sat 1","today":false,"selected":false,"holiday":true},{"date":"2024-06-02","display":"Sun 2","today":false,"selected":false,"holiday":true},{"date":"2024-06-03","display":"Mon 3","today":false,"selected":false,"holiday":false},....
 ```
 
-> POST ./api/api.php/calendar/schedule
+> POST ./api/api.php/calendar/tasks
 
-Contributes scheduled events to the calendar.
+Contributes scheduled tasks to the calendar.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3346,9 +3352,9 @@ Sample response
 {"response":{"id":"8","msg":"Event has been saved.","type":"success"},"data":{"calendar_uncompletedevents":2}}
 ```
 
-> PUT ./api/api.php/calendar/schedule/{id}
+> PUT ./api/api.php/calendar/tasks/{id}
 
-Updates scheduled events.
+Updates scheduled tasks.
 
 Parameters
 | Name | Data Type | Required | Description |
@@ -3362,47 +3368,78 @@ Sample response
 
 > GET ./api/api.php/calendar/search/{search}
 
-Returns scheduled events according to search phrase.
+Returns scheduled tasks according to search phrase.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | displays scheduled events according to search, calendar overview if omitted |
+| {search} | path parameter | optional | displays scheduled tasks according to search, calendar overview if omitted |
 
 Sample response
 ```
-{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textsection","attributes":{"data-type":"textsection","name":"test event"},"content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'schedule')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
+{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textsection","attributes":{"data-type":"textsection","name":"test event"},"content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'tasks')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
 ```
+
+> DELETE ./api/api.php/calendar/planning/{id}
+
+Deletes planning entries.
+
+Similar to tasks.
+
+> GET ./api/api.php/calendar/planning/{date Y-m-d}/{date Y-m-d}
+
+Returns a calendar.
+
+Similar to tasks with slightly adapted inputs for case planning.
+
+> POST ./api/api.php/calendar/planning
+
+Contributes planning entries to the calendar
+
+Similar to tasks.
+
+> PUT ./api/api.php/calendar/planning/{id}
+
+Updates planning entries
+
+Similar to tasks.
+
+> PUT ./api/api.php/calendar/planning/{id}/{bool}/{type}
+
+Markes planning entries as complete or revokes state
+
+Similar to tasks.
+
 
 > DELETE ./api/api.php/calendar/timesheet/{id}
 
 Deletes timesheet entries.
 
-Similar to schedules.
+Similar to tasks.
 
 > GET ./api/api.php/calendar/timesheet/{date Y-m-d}/{date Y-m-d}
 
 Returns a calendar.
 
-Similar to schedules with slightly adapted inputs for time tracking.
+Similar to tasks with slightly adapted inputs for time tracking.
 
 > POST ./api/api.php/calendar/timesheet
 
 Contributes timesheet entries to the calendar
 
-Similar to schedules.
+Similar to tasks.
 
 > PUT ./api/api.php/calendar/timesheet/{id}
 
 Updates timesheet entries
 
-Similar to schedules.
+Similar to tasks.
 
 > PUT ./api/api.php/calendar/timesheet/{id}/{bool}/{type}
 
 Markes timesheet entries as complete or revokes state
 
-Similar to schedules.
+Similar to tasks.
 
 [Content](#content)
 

@@ -297,8 +297,8 @@ class RECORD extends API {
 						$subs['attributes']['value'] = $identify;
 					}
 					if ($subs['type'] === 'calendarbutton'){
-						$subs['attributes']['value'] = $_lang->GET('calendar.schedule.new');
-						$subs['attributes']['onclick'] = $calendar->dialog([':type' => 'schedule']);
+						$subs['attributes']['value'] = $_lang->GET('calendar.tasks.new');
+						$subs['attributes']['onclick'] = $calendar->dialog([':type' => 'tasks']);
 					}
 					if (isset($subs['autocomplete'])){
 						if (($index = array_search($subs['attributes']['name'], array_column($datalists, 'issue'))) !== false){

@@ -141,7 +141,6 @@ export const api = {
 		}
 		await _.api(method, "api/api.php/" + request.join("/"), payload, [200, 203, 207, 511])
 			.then(async (data) => {
-
 				if (data.body && (data.body.user || data.body.config || data.body.language)) {
 					if (data.body.user) api._settings.user = data.body.user;
 					if (data.body.config) api._settings.config = data.body.config;
@@ -208,7 +207,7 @@ export const api = {
 				if (errorFn != null) errorFn(error);
 				//new Toast(error, "error");
 				// safari debugging
-				new Dialog({type:"confirm", render : error + JSON.stringify([method, request])});
+				new Dialog({ type: "confirm", render: error + JSON.stringify([method, request]) });
 			});
 		api.loadindicator(false);
 	},
@@ -942,13 +941,14 @@ export const api = {
 					if (id && id[0]) id[0].value = data.response.id;
 				}
 				if (data.data) _serviceWorker.notif.calendar(data.data);
-				if (["post", "put", "delete"].includes(method) && ["schedule", "timesheet"].includes(request[1])) api.history.go("forth"); // updates the view after any change
+				if (["post", "put", "delete"].includes(method) && ["tasks", "timesheet", "planning"].includes(request[1])) api.history.go("forth"); // updates the view after any change
 			},
 			title = {
 				appointment: api._lang.GET("calendar.navigation.appointment"),
-				schedule: api._lang.GET("calendar.navigation.scheduling"),
+				tasks: api._lang.GET("calendar.navigation.tasks"),
 				timesheet: api._lang.GET("calendar.navigation.timesheet"),
 				longtermplanning: api._lang.GET("calendar.navigation.longtermplanning"),
+				planning: api._lang.GET("calendar.navigation.planning"),
 			};
 		switch (method) {
 			case "get":
@@ -995,7 +995,7 @@ export const api = {
 						for (const [key, value] of payload.entries()) {
 							if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
 						}
-						if (units.length) payload.set(api._lang.GET("calendar.schedule.organizational_unit"), units.join(","));
+						if (units.length) payload.set(api._lang.GET("calendar.tasks.organizational_unit"), units.join(","));
 				}
 				break;
 			case "put":
@@ -1010,7 +1010,7 @@ export const api = {
 						for (const [key, value] of payload.entries()) {
 							if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
 						}
-						if (units.length) payload.set(api._lang.GET("calendar.schedule.organizational_unit"), units.join(","));
+						if (units.length) payload.set(api._lang.GET("calendar.tasks.organizational_unit"), units.join(","));
 				}
 				break;
 			case "delete":
@@ -1685,12 +1685,12 @@ export const api = {
 				switch (request[1]) {
 					case "productsearch":
 						payload = request[3]; // form data object passed by utility.js
-						request[3] = 'null';
+						request[3] = "null";
 						successFn = function (data) {
 							new Dialog({
-								type :'input',
-								header:api._lang.GET("order.manual_match"),
-								render:data.render.content
+								type: "input",
+								header: api._lang.GET("order.manual_match"),
+								render: data.render.content,
 							});
 						};
 						break;

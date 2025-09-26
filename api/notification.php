@@ -55,7 +55,8 @@ class NOTIFICATION extends API {
 			'measure_unclosed' => $this->measures(),
 			'responsibilities' => $this->responsibilities(),
 			// make the following calls last no matter what to include all possible previous calendar entries and messages
-			'calendar_uncompletedevents' => $this->calendar(),
+			'calendar_uncompletedtasks' => $this->tasks(),
+			'calendar_uncompletedplans' => $this->planning(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen(),
 		];
@@ -78,36 +79,6 @@ class NOTIFICATION extends API {
 			if (!$row['closed']) $number++;
 		} 
 		return $number;
-	}
-
-	/**
-	 *           _           _
-	 *   ___ ___| |___ ___ _| |___ ___
-	 *  |  _| .'| | -_|   | . | .'|  _|
-	 *  |___|__,|_|___|_|_|___|__,|_|
-	 *
-	 * checks system processable expiry dates, adds calendar reminders if applicable
-	 * alerts a user group if selected
-	 */
-	public function calendar(){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$today = new \DateTime('now');
-		$today->setTime(0, 0);
-
-		// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day
-		$alerts = $calendar->alert($today->format('Y-m-d'));
-		foreach ($alerts as $event){
-			// alert current events including workmates pto if alert is set
-			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '')], $this->_lang->GET('calendar.schedule.alert_message', [':content' => (isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
-		}
-
-		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
-		$uncompleted = 0;
-		foreach ($events as $row){
-			if (!$row['organizational_unit']) continue; 
-			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] !== 'timesheet' && !$row['closed']) $uncompleted++;
-		}
-		return $uncompleted;
 	}
 
 	/**
@@ -586,7 +557,7 @@ class NOTIFICATION extends API {
 									}
 									if (!$open){
 										$calendar->post([
-											':type' => 'schedule',
+											':type' => 'tasks',
 											':span_start' => $today->format('Y-m-d H:i:s'),
 											':span_end' => $today->format('Y-m-d H:i:s'),
 											':author_id' => 1,
@@ -628,20 +599,20 @@ class NOTIFICATION extends API {
 									}
 									if ($documents){
 										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-										$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_vendor_document_expired', [':vendor' => $vendor['name']], true));
+										$reminders = $calendar->search($this->_lang->GET('calendar.tasks.alert_vendor_document_expired', [':vendor' => $vendor['name']], true));
 										$open = false;
 										foreach ($reminders as $reminder){
 											if (!$reminder['closed']) $open = true;
 										}
 										if (!$open){
 											$calendar->post([
-												':type' => 'schedule',
+												':type' => 'tasks',
 												':span_start' => $today->format('Y-m-d H:i:s'),
 												':span_end' => $today->format('Y-m-d H:i:s'),
 												':author_id' => 1,
 												':affected_user_id' => null,
 												':organizational_unit' => 'admin,office',
-												':subject' => $this->_lang->GET('calendar.schedule.alert_vendor_document_expired', [':vendor' => $vendor['name']], true) . " - " . implode(" | ", $documents),
+												':subject' => $this->_lang->GET('calendar.tasks.alert_vendor_document_expired', [':vendor' => $vendor['name']], true) . " - " . implode(" | ", $documents),
 												':misc' => null,
 												':closed' => null,
 												':alert' => 1,
@@ -669,20 +640,20 @@ class NOTIFICATION extends API {
 									}
 									if ($documents){
 										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-										$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_product_document_expired', [':vendor' => $vendor['name']], true));
+										$reminders = $calendar->search($this->_lang->GET('calendar.tasks.alert_product_document_expired', [':vendor' => $vendor['name']], true));
 										$open = false;
 										foreach ($reminders as $reminder){
 											if (!$reminder['closed']) $open = true;
 										}
 										if (!$open){
 											$calendar->post([
-												':type' => 'schedule',
+												':type' => 'tasks',
 												':span_start' => $today->format('Y-m-d H:i:s'),
 												':span_end' => $today->format('Y-m-d H:i:s'),
 												':author_id' => 1,
 												':affected_user_id' => null,
 												':organizational_unit' => 'office',
-												':subject' => $this->_lang->GET('calendar.schedule.alert_product_document_expired', [':vendor' => $vendor['name']], true) . " - " . implode(" | ", $documents),
+												':subject' => $this->_lang->GET('calendar.tasks.alert_product_document_expired', [':vendor' => $vendor['name']], true) . " - " . implode(" | ", $documents),
 												':misc' => null,
 												':closed' => null,
 												':alert' => 1,
@@ -700,20 +671,20 @@ class NOTIFICATION extends API {
 							foreach ($responsibilities as $row){
 								if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 									// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-									$reminders = $calendar->search($this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true));
+									$reminders = $calendar->search($this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true));
 									$open = false;
 									foreach ($reminders as $reminder){
 										if (!$reminder['closed']) $open = true;
 									}
 									if (!$open){
 										$calendar->post([
-											':type' => 'schedule',
+											':type' => 'tasks',
 											':span_start' => $today->format('Y-m-d H:i:s'),
 											':span_end' => $today->format('Y-m-d H:i:s'),
 											':author_id' => 1,
 											':affected_user_id' => null,
 											':organizational_unit' => 'admin',
-											':subject' => $this->_lang->GET('calendar.schedule.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true),
+											':subject' => $this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true),
 											':misc' => null,
 											':closed' => null,
 											':alert' => 1,
@@ -751,7 +722,7 @@ class NOTIFICATION extends API {
 										}
 										if (!$open){
 												$calendar->post([
-												':type' => 'schedule',
+												':type' => 'tasks',
 												':span_start' => $today->format('Y-m-d H:i:s'),
 												':span_end' => $today->format('Y-m-d H:i:s'),
 												':author_id' => 1,
@@ -967,6 +938,29 @@ class NOTIFICATION extends API {
 		return $unprocessed;
 	}
 
+
+	/**
+	 *       _             _         
+	 *   ___| |___ ___ ___|_|___ ___ 
+	 *  | . | | .'|   |   | |   | . |
+	 *  |  _|_|__,|_|_|_|_|_|_|_|_  |
+	 *  |_|                     |___|
+	 * 
+	 */
+	public function planning(){
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new \DateTime('now');
+		$today->setTime(0, 0);
+
+		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+		$uncompleted = 0;
+		foreach ($events as $row){
+			if (!$row['organizational_unit']) continue; 
+			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'planning' && !$row['closed']) $uncompleted++;
+		}
+		return $uncompleted;
+	}
+
 	/**
 	 *                                 _           _
 	 *   ___ ___ ___ ___ ___ ___ ___ _| |___ ___ _| |___ ___ ___
@@ -1082,6 +1076,35 @@ class NOTIFICATION extends API {
 			}
 		}
 		return $number;
+	}
+
+	/**
+	 *   _           _       
+	 *  | |_ ___ ___| |_ ___ 
+	 *  |  _| .'|_ -| '_|_ -|
+	 *  |_| |__,|___|_,_|___|
+	 *                       
+	 * alerts a user group if selected
+	 */
+	public function tasks(){
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new \DateTime('now');
+		$today->setTime(0, 0);
+
+		// alert if applicable despite cron for e.g. entries of sick colleagues after cron and still being notified during the day
+		$alerts = $calendar->alert($today->format('Y-m-d'));
+		foreach ($alerts as $event){
+			// alert current events including workmates pto if alert is set
+			$this->alertUserGroup(['unit' => $event['organizational_unit'] ? explode(',', $event['organizational_unit']) : explode(',', $event['affected_user_units'] ? : '')], $this->_lang->GET('calendar.tasks.alert_message', [':content' => (isset($this->_lang->_USER['calendar']['timesheet']['pto'][$event['subject']]) ? $this->_lang->GET('calendar.timesheet.pto.' . $event['subject'], [], true) : $event['subject']), ':date' => substr($event['span_start'], 0, 10), ':author' => $event['author'], ':due' => substr($event['span_end'], 0, 10)], true) . ($event['affected_user'] ? ' (' . $event['affected_user'] . ')': ''));
+		}
+
+		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+		$uncompleted = 0;
+		foreach ($events as $row){
+			if (!$row['organizational_unit']) continue; 
+			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'tasks' && !$row['closed']) $uncompleted++;
+		}
+		return $uncompleted;
 	}
 }
 ?>

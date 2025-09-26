@@ -116,7 +116,7 @@ class STRESSTEST extends INSTALL{
 			if (!($i % intval($this->_calendarentries/12/30))) $this->_currentdate->modify('+1 day');
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 				'values' => [
-					':type' => 'schedule',
+					':type' => 'tasks',
 					':span_start' => $this->_currentdate->format('Y-m-d H:i:s'),
 					':span_end' => $this->_currentdate->format('Y-m-d H:i:s'),
 					':author_id' => 2,
@@ -130,7 +130,7 @@ class STRESSTEST extends INSTALL{
 				]
 			]);
 		}
-		echo '[*] ' . $i. ' schedule entries done, please check the application for performance';
+		echo '[*] ' . $i. ' task entries done, please check the application for performance';
 	}
 
 	/**

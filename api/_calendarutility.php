@@ -233,7 +233,7 @@ class CALENDARUTILITY {
 	 * @param array $columns, like put-method, but :type must be provided
 	 * 	[
 	 * 	':id' => int
-	 * 	':type' => string schedule|timesheet
+	 * 	':type' => string tasks|timesheet|planning
 	 * 	':span_start' => string Y-m-d H:i:s,
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
@@ -279,13 +279,13 @@ class CALENDARUTILITY {
 
 		// set up defaults
 		$alert = $autodelete = $span_start = $span_end = null; 
-		$alert = [$this->_lang->GET('calendar.schedule.alert') => $columns[':alert'] ? ['checked' => true] : []];		
-		$autodelete = [$this->_lang->GET('calendar.schedule.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']]) => $columns[':id'] === 0 || $columns[':autodelete'] ? ['checked' => true] : []];		
+		$alert = [$this->_lang->GET('calendar.tasks.alert') => $columns[':alert'] ? ['checked' => true] : []];		
+		$autodelete = [$this->_lang->GET('calendar.tasks.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']]) => $columns[':id'] === 0 || $columns[':autodelete'] ? ['checked' => true] : []];		
 		$span_start = new \DateTime($columns[':span_start'] ? : 'now');
 
 		// assemble by type
 		switch ($columns[':type']){
-			case 'schedule':
+			case 'tasks':
 				// set end date to preset of CONFIG default
 				if ($columns[':span_end']) $span_end = new \DateTime($columns[':span_end']);
 				else {
@@ -297,47 +297,47 @@ class CALENDARUTILITY {
 					[
 						'type' => 'scanner',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.content'),
+							'name' => $this->_lang->GET('calendar.tasks.content'),
 							'value' => $columns[':subject'],
 							'required' => true
 						]
 					], [
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.date'),
+							'name' => $this->_lang->GET('calendar.tasks.date'),
 							'value' => $span_start->format('Y-m-d'),
 							'required' => true
 						]
 					], [
 						'type' => 'date',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.due'),
+							'name' => $this->_lang->GET('calendar.tasks.due'),
 							'value' => $span_end->format('Y-m-d'),
 							'required' => true
 						]
 					], [
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.organizational_unit')
+							'name' => $this->_lang->GET('calendar.tasks.organizational_unit')
 						],
 						'content' => $units,
-						'hint' => $this->_lang->GET('calendar.schedule.organizational_unit_hint')
+						'hint' => $this->_lang->GET('calendar.tasks.organizational_unit_hint')
 					], [
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.affected_user')
+							'name' => $this->_lang->GET('calendar.tasks.affected_user')
 						]
 					], [
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.options')
+							'name' => $this->_lang->GET('calendar.tasks.options')
 						],
 						'content' => array_merge($alert, $autodelete)
 					], [
 						'type' => 'hidden',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.type'),
+							'name' => $this->_lang->GET('calendar.tasks.type'),
 							'value' => $columns[':type']
 						]
 					], [
@@ -375,7 +375,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'content' => $affected_users,
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.affected_user'),
+							'name' => $this->_lang->GET('calendar.tasks.affected_user'),
 							'required' => true
 						]
 					];
@@ -384,7 +384,7 @@ class CALENDARUTILITY {
 						'type' => 'select',
 						'content' => $affected_unit_users,
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.affected_user'),
+							'name' => $this->_lang->GET('calendar.tasks.affected_user'),
 							'required' => true
 						]
 					];
@@ -392,7 +392,7 @@ class CALENDARUTILITY {
 					$inputs[] = [
 						'type' => 'hidden',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.affected_user'),
+							'name' => $this->_lang->GET('calendar.tasks.affected_user'),
 							'value' => $columns[':affected_user_id']
 						]
 					];
@@ -404,7 +404,7 @@ class CALENDARUTILITY {
 					$this->_lang->GET('calendar.timesheet.break_time') => ['required' => true, 'display' => true],
 					$this->_lang->GET('calendar.timesheet.homeoffice') => ['required' => true, 'display' => true],
 					$this->_lang->GET('calendar.timesheet.workinghourscorrection') => ['required' => false, 'display' => true],
-					$this->_lang->GET('calendar.schedule.alert') => ['required' => false, 'display' => false],
+					$this->_lang->GET('calendar.tasks.alert') => ['required' => false, 'display' => false],
 				];
 
 				// break recommendation according to config
@@ -486,7 +486,7 @@ class CALENDARUTILITY {
 					], [
 						'type' => 'checkbox',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.schedule.options')
+							'name' => $this->_lang->GET('calendar.tasks.options')
 						],
 						'content' => $alert
 					], [
@@ -510,9 +510,93 @@ class CALENDARUTILITY {
 						]
 					]);
 				break;
+			case 'planning':
+				// set end date to preset of CONFIG default
+				if ($columns[':span_end']) $span_end = new \DateTime($columns[':span_end']);
+				else {
+					$span_end = clone $span_start;
+					$span_end->modify('+' . CONFIG['calendar']['default_due'] . ' days');
+				}
+				// add inputs
+				$inputs = [
+					[
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.planning.name'),
+							'value' => $columns[':subject'],
+							'required' => true
+						]
+					], [
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.tasks.date'),
+							'value' => $span_start->format('Y-m-d'),
+							'required' => true
+						]
+					], [
+						'type' => 'date',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.tasks.due'),
+							'value' => $span_end->format('Y-m-d'),
+							'required' => true
+						]
+					], [
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.tasks.organizational_unit')
+						],
+						'content' => $units,
+						'hint' => $this->_lang->GET('calendar.tasks.organizational_unit_hint')
+					], [
+						'type' => 'select',
+						'content' => $affected_users,
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.tasks.affected_user')
+						]
+					], [
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.tasks.options')
+						],
+						'content' => $autodelete
+					], [
+						'type' => 'hidden',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.tasks.type'),
+							'value' => $columns[':type']
+						]
+					], [
+						'type' => 'hidden',
+						'attributes' => [
+							'name' => 'calendarEventId',
+							'value' => $columns[':id'],		
+						]
+					], [
+						'type' => 'hr'
+					]
+				];
+				$misc = json_decode($columns[':misc'] ? : '', true) ? : [];
+
+				foreach ($misc as $station){
+					$inputs[] = [
+						'type' => 'scanner',
+						'attributes' => [
+							'name' => $this->_lang->GET('calendar.planning.station'),
+							'value' => $station['station']
+						],
+					];
+				}
+				$inputs[] = [
+					'type' => 'scanner',
+					'attributes' => [
+						'name' => $this->_lang->GET('calendar.planning.station'),
+						'multiple' => true
+					],
+				];
+				break;
 		}
 
-		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.schedule.cancel') . "': false, '" . $this->_lang->GET('calendar.schedule.submit') . "': {'value': true, class: 'reducedCTA'}}}, 'FormData')" .
+		return "new _client.Dialog({type:'input', header: '', render: " . UTILITY::json_encode($inputs) . ", options:{'" . $this->_lang->GET('calendar.tasks.cancel') . "': false, '" . $this->_lang->GET('calendar.tasks.submit') . "': {'value': true, class: 'reducedCTA'}}}, 'FormData')" .
 			".then(response => {if (response) {api.calendar('" . ($columns[':id'] ? 'put': 'post') . "', '" . $columns[':type'] . "', response);}})";
 	}
 	
@@ -678,7 +762,7 @@ class CALENDARUTILITY {
 	 * calculates holidays for every date for possible year overlaps in selected view-format
 	 * 
 	 * @param string $format month|week
-	 * @param string $type schedule|timesheet
+	 * @param string $type tasks|timesheet|planning
 	 * @param string $date yyyy-mm-dd
 	 * 
 	 * @return array assemble.js calendar type
@@ -697,7 +781,8 @@ class CALENDARUTILITY {
 					if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 					$row['affected_user_units'] = $row['affected_user_units'] ? : $row['organizational_unit'];
 					switch ($type){
-						case 'schedule':
+						case 'tasks':
+						case 'planning':
 							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]))
 								if (!$row['closed'])
 								$numbers++;
@@ -705,6 +790,7 @@ class CALENDARUTILITY {
 						case 'timesheet':
 							if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']]))
 							$numbers++;
+							break;
 					}	
 				}
 

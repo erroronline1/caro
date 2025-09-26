@@ -521,7 +521,7 @@ class AUDIT extends API {
 							'attributes' => [
 								'value' => $this->_lang->GET('audit.audit.execute.schedule_measures'),
 								'onclick' => $calendar->dialog([
-									':type' => 'schedule',
+									':type' => 'tasks',
 									':organizational_unit' => $template['unit'],
 									':subject' => $this->_lang->GET('audit.audit.execute.schedule_measures_text')
 								])
@@ -997,7 +997,7 @@ class AUDIT extends API {
 						'type' => 'calendarbutton',
 						'attributes' => [
 							'value' => $this->_lang->GET('audit.audit.template.schedule'),
-							'onclick' => $calendar->dialog([':type' => 'schedule'])
+							'onclick' => $calendar->dialog([':type' => 'tasks'])
 						]
 					]
 

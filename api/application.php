@@ -431,7 +431,8 @@ class APPLICATION extends API {
 			],
 			$this->_lang->GET('calendar.navigation.header') => [
 				$this->_lang->GET('calendar.navigation.appointment') => ['onclick' => "api.calendar('get', 'appointment')"],
-				$this->_lang->GET('calendar.navigation.scheduling') => ['onclick' => "api.calendar('get', 'schedule')"],
+				$this->_lang->GET('calendar.navigation.tasks') => ['onclick' => "api.calendar('get', 'tasks')"],
+				$this->_lang->GET('calendar.navigation.planning') => ['onclick' => "api.calendar('get', 'planning')"],
 				$this->_lang->GET('calendar.navigation.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
 			],
 			$this->_lang->GET('application.navigation.header') => [
@@ -916,14 +917,14 @@ class APPLICATION extends API {
 			// calendar scheduled events
 			$overview = [];
 			$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-			$week = $calendar->render('week', 'schedule');
+			$week = $calendar->render('week', 'tasks');
 
 			// add overview to calendar view
 			$overview[] = [
 				'type' => 'calendar',
 				'description' => $week['header'],
 				'content' => $week['content'],
-				'api' => 'schedule'
+				'api' => 'tasks'
 			];
 
 			$displayevents = $displayabsentmates = '';
@@ -932,7 +933,7 @@ class APPLICATION extends API {
 			// sort events
 			foreach ($thisDaysEvents as $row){
 				if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
-				if ($row['type'] === 'schedule' && (array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || 
+				if ($row['type'] === 'tasks' && (array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || 
 					array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('general.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
 				if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . " - ". $this->convertFromServerTime(substr($row['span_end'], 0, 10)) . "\n";
 			}
@@ -940,7 +941,7 @@ class APPLICATION extends API {
 			if ($displayevents) $overview[] = [
 				'type' => 'textsection',
 				'attributes' => [
-						'name' => $this->_lang->GET('calendar.schedule.events_assigned_units')
+						'name' => $this->_lang->GET('calendar.tasks.events_assigned_units')
 				],
 				'content' => $displayevents
 			];
@@ -958,11 +959,11 @@ class APPLICATION extends API {
 			$pastEvents = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
 			$uncompleted = [];
 			foreach ($pastEvents as $row){
-				if (!in_array($row, $thisDaysEvents) && $row['type'] === 'schedule' && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . ")"] = ['href' => "javascript:api.calendar('get', 'schedule', '" . substr($row['span_start'], 0, 10) . "', '" . substr($row['span_start'], 0, 10) . "')"];
+				if (!in_array($row, $thisDaysEvents) && $row['type'] === 'tasks' && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !$row['closed']) $uncompleted[$row['subject'] . " (" . $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . ")"] = ['href' => "javascript:api.calendar('get', 'tasks', '" . substr($row['span_start'], 0, 10) . "', '" . substr($row['span_start'], 0, 10) . "')"];
 			}
 			if ($uncompleted) $overview[] = [
 				'type' => 'links',
-				'description' => $this->_lang->GET('calendar.schedule.events_assigned_units_uncompleted'),
+				'description' => $this->_lang->GET('calendar.tasks.events_assigned_units_uncompleted'),
 				'content' => $uncompleted
 			];
 

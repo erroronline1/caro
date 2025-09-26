@@ -29,13 +29,21 @@ export const _serviceWorker = {
 		 * @event sets querySelector attribute data-notification
 		 */
 		calendar: function (data) {
-			let notif;
-			if ("calendar_uncompletedevents" in data) {
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("calendar.navigation.header").replace(" ", "_") + "]"); // main menu label
-				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("calendar.navigation.scheduling").replace(" ", "_") + "]"); // button
-				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedevents);
+			let notif,
+				tasks = 0,
+				planning = 0;
+			if ("calendar_uncompletedtasks" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("calendar.navigation.tasks").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedtasks);
+				tasks = parseInt(data.calendar_uncompletedtasks, 10);
 			}
+			if ("calendar_uncompletedplans" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("calendar.navigation.planning").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedplans);
+				planning = parseInt(data.calendar_uncompletedplans, 10);
+			}
+			notif = document.querySelector("[for=userMenu" + api._lang.GET("calendar.navigation.header").replace(" ", "_") + "]"); // main menu label
+			if (notif) notif.setAttribute("data-notification", tasks + planning);
 		},
 
 		/**
@@ -46,28 +54,26 @@ export const _serviceWorker = {
 		 */
 		records: function (data) {
 			let notif;
-			if ("document_approval" in data || "audit_closing" in data || "managementreview" in data) {
-				let document_approval = 0,
-					audit_closing = 0,
-					managementreview = 0;
-				if ("document_approval" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("assemble.navigation.manage_approval").replace(" ", "_") + "]"); // button
-					if (notif) notif.setAttribute("data-notification", data.document_approval);
-					document_approval = data.document_approval;
-				}
-				if ("audit_closing" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("audit.navigation.audit").replace(" ", "_") + "]"); // button
-					if (notif) notif.setAttribute("data-notification", data.audit_closing);
-					audit_closing = data.audit_closing;
-				}
-				if ("managementreview" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("audit.navigation.management_review").replace(" ", "_") + "]"); // button
-					if (notif) notif.setAttribute("data-notification", data.managementreview);
-					managementreview = data.managementreview;
-				}
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("record.navigation.header").replace(" ", "_") + "]"); // main menu label
-				if (notif) notif.setAttribute("data-notification", parseInt(document_approval, 10) + parseInt(audit_closing, 10) + parseInt(managementreview, 10));
+			let document_approval = 0,
+				audit_closing = 0,
+				managementreview = 0;
+			if ("document_approval" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("assemble.navigation.manage_approval").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.document_approval);
+				document_approval = parseInt(data.document_approval, 10);
 			}
+			if ("audit_closing" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("audit.navigation.audit").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.audit_closing);
+				audit_closing = parseInt(data.audit_closing, 10);
+			}
+			if ("managementreview" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("audit.navigation.management_review").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.managementreview);
+				managementreview = parseInt(data.managementreview, 10);
+			}
+			notif = document.querySelector("[for=userMenu" + api._lang.GET("record.navigation.header").replace(" ", "_") + "]"); // main menu label
+			if (notif) notif.setAttribute("data-notification", document_approval + audit_closing + managementreview);
 		},
 
 		interval: null,
@@ -81,22 +87,22 @@ export const _serviceWorker = {
 		 * @event sets querySelector attribute data-notification
 		 */
 		communication: function (data) {
-			let notif;
+			let notif,
+				message_unseen = 0,
+				responsibilities = 0;
 			if ("message_unseen" in data || "responsibilities" in data) {
-				let message_unseen = 0,
-					responsibilities = 0;
 				if ("message_unseen" in data) {
 					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("message.navigation.conversations").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.message_unseen);
-					message_unseen = data.message_unseen;
+					message_unseen = parseInt(data.message_unseen, 10);
 				}
 				if ("responsibilities" in data) {
 					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("responsibility.navigation.responsibility").replace(" ", "_") + "]"); // button
 					if (notif) notif.setAttribute("data-notification", data.responsibilities);
-					responsibilities = data.responsibilities;
+					responsibilities = parseInt(data.responsibilities, 10);
 				}
 				notif = document.querySelector("[for=userMenu" + api._lang.GET("message.navigation.header").replace(" ", "_") + "]"); // main menu label
-				if (notif) notif.setAttribute("data-notification", parseInt(message_unseen, 10) + parseInt(responsibilities, 10));
+				if (notif) notif.setAttribute("data-notification", message_unseen + responsibilities);
 			}
 			if ("measure_unclosed" in data) {
 				// no appending number to userMenu to avoid distracting from unread messages
@@ -112,29 +118,27 @@ export const _serviceWorker = {
 		 * @event sets querySelector attribute data-notification
 		 */
 		consumables: function (data) {
-			let notif;
-			if ("order_prepared" in data || "order_unprocessed" in data || "consumables_pendingincorporation" in data) {
-				let order_prepared = 0,
-					order_unprocessed = 0,
-					consumables_pendingincorporation = 0;
-				if ("order_prepared" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("order.navigation.prepared_orders").replace(" ", "_") + "]"); // button
-					if (notif) notif.setAttribute("data-notification", data.order_prepared);
-					order_prepared = data.order_prepared;
-				}
-				if ("order_unprocessed" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("order.navigation.approved_orders").replace(" ", "_") + "]"); // button
-					if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
-					order_unprocessed = data.order_unprocessed;
-				}
-				if ("consumables_pendingincorporation" in data) {
-					notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("consumables.navigation.incorporated_pending").replace(" ", "_") + "]"); // button
-					if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
-					consumables_pendingincorporation = data.consumables_pendingincorporation;
-				}
-				notif = document.querySelector("[for=userMenu" + api._lang.GET("consumables.navigation.header").replace(" ", "_") + "]");
-				if (notif) notif.setAttribute("data-notification", parseInt(order_prepared, 10) + parseInt(order_unprocessed, 10) + parseInt(consumables_pendingincorporation, 10)); // main menu label
+			let notif,
+				order_prepared = 0,
+				order_unprocessed = 0,
+				consumables_pendingincorporation = 0;
+			if ("order_prepared" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("order.navigation.prepared_orders").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.order_prepared);
+				order_prepared = parseInt(data.order_prepared, 10);
 			}
+			if ("order_unprocessed" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("order.navigation.approved_orders").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.order_unprocessed);
+				order_unprocessed = parseInt(data.order_unprocessed, 10);
+			}
+			if ("consumables_pendingincorporation" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("consumables.navigation.incorporated_pending").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.consumables_pendingincorporation);
+				consumables_pendingincorporation = parseInt(data.consumables_pendingincorporation, 10);
+			}
+			notif = document.querySelector("[for=userMenu" + api._lang.GET("consumables.navigation.header").replace(" ", "_") + "]");
+			if (notif) notif.setAttribute("data-notification", order_prepared + order_unprocessed + consumables_pendingincorporation); // main menu label
 		},
 	},
 

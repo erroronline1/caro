@@ -44,7 +44,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_08_15'] as $update){
+		foreach (['_2025_09_27'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -206,6 +206,17 @@ class UPDATE{
 				"    ALTER TABLE caro_records" .
 				"    ADD erp_case_number varchar(255) NULL DEFAULT NULL" .
 				" END; "
+			]
+		];
+	}
+
+	private function _2025_09_27(){
+		return [
+			'mysql' => [
+				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; "
+			],
+			'sqlsrv' => [
+				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; "
 			]
 		];
 	}
