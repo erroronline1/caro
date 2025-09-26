@@ -1106,18 +1106,28 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["article_no", "Bezeichnung", "Einheit"],
-					"headerrow": 24
+					"columns": ["Artikelnummer", "Bezeichnung", "Einheit"],
+					"headerrow": 15
 				},
 				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "filter articles",
+						"keep": true,
+						"match": {
+							"any": {
+								"Artikelnummer": ".*"
+							}
+						}
+					},
 					{
 						"apply": "filter_by_duplicates",
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["article_no"],
+							"orderby": ["Artikelnummer"],
 							"descending": false,
-							"column": "article_no",
+							"column": "Artikelnummer",
 							"amount": 1
 						}
 					},
@@ -1157,7 +1167,7 @@
 						],
 						"match": {
 							"all": {
-								"article_no": "BESTELL_NUMMER"
+								"Artikelnummer": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -1184,7 +1194,7 @@
 					],
 					"rewrite": [
 						{
-							"article_no": ["article_no"],
+							"article_no": ["Artikelnummer"],
 							"article_name": ["Bezeichnung"],
 							"article_unit": ["Einheit"],
 							"article_ean": [""]
@@ -2435,8 +2445,8 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrow": 3,
-					"columns": ["Artikelnummer ", "Artikelbezeichnung", "Einheit"]
+					"headerrow": 1,
+					"columns": ["ArtNr", "Bez", "Einheit", "EANNR"]
 				},
 				"filter": [
 					{
@@ -2454,9 +2464,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikelnummer"],
+							"orderby": ["ArtNr"],
 							"descending": false,
-							"column": "Artikelnummer",
+							"column": "ArtNr",
 							"amount": 1
 						}
 					},
@@ -2476,7 +2486,7 @@
 								"match": {
 									"all": {
 										"STATUS": "false",
-										"LIEFERANTENNAME": "russka",
+										"LIEFERANTENNAME": "russka|ludwig bertram",
 										"BESTELLSTOP": "false",
 										"WE_DAT_ARTIKELSTAMM": ".+"
 									}
@@ -2496,7 +2506,7 @@
 						],
 						"match": {
 							"all": {
-								"Artikelnummer ": "BESTELL_NUMMER"
+								"ArtNr": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -2509,13 +2519,13 @@
 					"add": {
 						"trading_good": "0"
 					},
-					"conditional_or": [["trading_good", "1", ["Artikelbezeichnung", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|st(?:ü|Ü)tzschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]],
+					"conditional_or": [["trading_good", "1", ["Bez", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|st(?:ü|Ü)tzschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]],
 					"rewrite": [
 						{
-							"article_no": ["Artikelnummer "],
-							"article_name": ["Artikelbezeichnung"],
+							"article_no": ["ArtNr"],
+							"article_name": ["Bez"],
 							"article_unit": ["Einheit"],
-							"article_ean": [""]
+							"article_ean": ["EANNR"]
 						}
 					]
 				}
