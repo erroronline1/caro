@@ -436,6 +436,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE id = :id OR name = :id",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE CONVERT(VARCHAR, id) = :id OR name = :id"
 		],
+		'consumables_get_vendor_search' => [
+			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)",
+			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)"
+		],
 
 		'consumables_post_product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)",

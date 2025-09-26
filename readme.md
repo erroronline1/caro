@@ -32,9 +32,6 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases
     * std method for csv uploads to distinct folder, then show up within tools?
-* manual order
-    * intersection of product name (split and plussed) and order number results for products may contain request
-    * select from results or proceed with manual adding
 * calendar tour planning
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
@@ -3539,6 +3536,22 @@ Sample response
 {"response":{"id":"1752","msg":"Product Schlauch-Strumpf has been saved","type":"success"},"data":{"order_unprocessed":3,"consumables_pendingincorporation":2}}
 ```
 
+> POST ./api/api.php/consumables/productsearch/{vendor_id}/{search}/{usecase}
+
+Returns a product search result based on usecase and payload. Current implementation is used for matching manual orders with the products database.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {vendor_id} | path parameter | required | null |
+| {search} | path parameter | required | null |
+| {usecase} | path parameter | optional | manualorder |
+| payload | form data | required | containing the manual order details |
+
+Sample response
+```
+{"render":{"content":[{"type":"textsection","attributes":{"name":"Please consider","class":"orange"},"content":"Manually added products may not be considered regarding incorporation and sample check, as well as automated matching with order state."},[[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","onkeydown":"if (event.key==='Enter') _client.order.addProduct('', '', 'deusith 3,5', '', 'Fritz Minke GmbH'); return false;","role":"link","tabindex":"0","title":"add deusith 3,5 by Fritz Minke GmbH to order"},"content":[{"type":"textsection","attributes":{"name":"","data-type":"cart"},"content":"Fritz Minke GmbH  deusith 3,5 "}]},{"type":"textsection","attributes":{"name":"Add article from 3 matches"}},[{"type":"tile","attributes":{"onclick":"_client.order.addProduct('Platte', '3166.35 - 000', 'DEUSITH - Zuschnitte 60 x 45 cm, 70° Shore 3,5 mm, weiß, haut ', 'ab 5 Platten', 'Fritz Minke GmbH'); return false;","onkeydown":....
+```
 > GET ./api/api.php/consumables/productsearch/{vendor_id}/{search}/{usecase}
 
 Returns a search form based on usecase and products matching {search}. If {_usecase} is set to *product* the returned elements events lead to consumables editing or product information depending on permissions. *productselection* returns only results for the respective widget. *order* results lead to adding the selected product to a new order.

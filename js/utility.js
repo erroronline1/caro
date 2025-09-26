@@ -486,7 +486,7 @@ export const _client = {
 	order: {
 		/**
 		 * insert nodes with product data
-		 * order to be taken into account in order.php "productsearch" method as well!
+		 * order to be taken into account in _shared.php "productsearch" method as well!
 		 * cart-content has a twin within order.php "order"-get method
 		 * @requires api, Assemble
 		 * @param  {...any} data

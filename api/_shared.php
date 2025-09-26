@@ -639,294 +639,285 @@ class SEARCHHANDLER {
 	public function productsearch($usecase = '', $parameter = []){
 		$slides = [];
 		// order of output to be taken into account in utility.js _client.order.addProduct() method and order.php->order() method as well!
-		switch ($_SERVER['REQUEST_METHOD']){
-			case 'GET':
-				$vendors = SQLQUERY::EXECUTE($this->_pdo, SQLQUERY::PREPARE('consumables_get_vendor_datalist'));
+		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 
-				if (!isset($parameter['vendors']) || $parameter['vendors'] === 'null'){
-					$parameter['vendors'] = implode('_', array_values(array_column($vendors, 'id')));
-				}
+		if (!isset($parameter['vendors']) || $parameter['vendors'] === 'null'){
+			$parameter['vendors'] = implode('_', array_values(array_column($vendors, 'id')));
+		}
 
-				$search = [];
+		$search = [];
 
-				$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
+		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
 
-				if ($parameter['search']) {
-					// get matches
-					$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? SQLQUERY::PREPARE('consumables_get_product_search') : SQLQUERY::PREPARE('order_get_product_search'), [
-						'values' => [
-							':SEARCH' => $parameter['search'],
-							':search' => $parameter['search'],
-						],
-						'wildcards' => 'all',
-						'replacements' => [
-							':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
-						]
-					]);
-					// order matches by relevance; shift to top if all of optional terms have been found
-					preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
-					// reduce expressions by leading operators
-					foreach($expressions as $index => &$expression){
-						if ($expression[1] === '-') unset($expressions[$index]); // has - operator
-						$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
-						$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
-					}
-					usort($search, function ($a, $b) use ($expressions){
-						$a_matches = $b_matches = 0;
-						foreach($expressions as $expression){
-							foreach($expressions as $expression){
-								foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
-									if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
-										$a_matches++;
-										break;
-									}
-								}
-								foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
-									if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
-										$b_matches++;
-										break;
-									}
-								}
+		if ($parameter['search']) {
+			// get matches
+			$search = SQLQUERY::EXECUTE($this->_pdo, in_array($usecase, ['product']) ? 'consumables_get_product_search' : 'order_get_product_search', [
+				'values' => [
+					':SEARCH' => $parameter['search'],
+					':search' => $parameter['search'],
+				],
+				'wildcards' => 'all',
+				'replacements' => [
+					':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
+				]
+			]);
+			// order matches by relevance; shift to top if all of optional terms have been found
+			preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+			// reduce expressions by leading operators
+			foreach($expressions as $index => &$expression){
+				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
+				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
+				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+			}
+			usort($search, function ($a, $b) use ($expressions){
+				$a_matches = $b_matches = 0;
+				foreach($expressions as $expression){
+					foreach($expressions as $expression){
+						foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
+							if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
+								$a_matches++;
+								break;
 							}
 						}
-						return $a_matches <=> $b_matches;
-					});
-					$search = array_reverse($search);
-				}
-
-				$productsPerSlide = 0;
-
-				// insert request specific search to first slide
-				switch($usecase){
-					case 'productselection': // document.php, record.php, assemble.js don't need prefacing inputs for productselection widget
-						break;
-					case 'product': // consumables.php can make good use of this method!
-						// prepare existing vendor lists
-						$vendorselection = [];
-
-						$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
-
-						foreach ($vendors as $key => $row) {
-							$datalist[] = $row['name'];
-							$display = $row['name'];
-							if ($row['hidden']) $display = UTILITY::hiddenOption($display);
-							$vendorselection[$display] = ['value' => $row['id']];
-							if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$display]['selected'] = true;
+						foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
+							if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
+								$b_matches++;
+								break;
+							}
 						}
-						ksort($vendorselection);
-						$slides[] = [
-							[
-								'type' => 'scanner',
-								'destination' => 'productsearch'
-							], [
-								'type' => 'select',
-								'content' => $vendorselection,
-								'attributes' => [
-									'id' => 'productsearchvendor',
-									'name' => $this->_lang->GET('consumables.product.filter_vendors')
-									]
-							], [
-								'type' => 'search',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.search'),
-									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), '" . $usecase . "'); return false;}",
-									'id' => 'productsearch',
-									'value' => $parameter['search'] ? : ''
-								]
-							]
-						];
-						if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited')){
-							array_splice($slides[0], 0, 0, [
-								[
-								'type' => 'button',
-								'attributes' => [
-									'value' => $this->_lang->GET('consumables.product.add_new'),
-									'onclick' => "api.purchase('get', 'product')",
-								]
-							]
-							]);
-						}
-						break;
-					default: // order.php can make good use of this method!
-						$datalist = [];
-						$datalist_unit = [];
-		
-						// import to determine if interface is present
-						include_once("./_erpinterface.php");
-
-						// prepare existing vendor lists
-						$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
-						foreach ($vendors as $key => $row) {
-							if ($row['hidden']) continue;
-							$datalist[] = $row['name'];
-							$vendorselection[$row['name']] = ['value' => $row['id']];
-							if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$row['name']]['selected'] = true;
-						}
-						ksort($vendorselection);
-		
-						// prepare existing sales unit lists
-						$product_units = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
-						foreach ($product_units as $key => $row) {
-							$datalist_unit[] = $row['article_unit'];
-						}
-
-						$slides[] = [
-							[
-								'type' => 'scanner',
-								'destination' => 'productsearch'
-							], [
-								'type' => 'select',
-								'content' => $vendorselection,
-								'attributes' => [
-									'id' => 'productsearchvendor',
-									'name' => $this->_lang->GET('consumables.product.vendor_select')
-								]
-							], [
-								'type' => 'search',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.product.search'),
-									'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), 'order'); return false;}",
-									'id' => 'productsearch',
-									'value' => $parameter['search'] ? : ''
-								]
-							], [
-								'type' => 'button',
-								'attributes' => [
-									'value' => $this->_lang->GET('order.add_manually'),
-									'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
-									UTILITY::json_encode([
-										[
-											[
-												'type' => 'number',
-												'attributes' => [
-													'name' => $this->_lang->GET('order.quantity_label'),
-												]
-											], [
-												'type' => 'text',
-												'attributes' => [
-													'name' => $this->_lang->GET('order.unit_label'),
-												],
-												'datalist' => array_values(array_unique($datalist_unit))
-											], [
-												'type' => 'text',
-												'attributes' => [
-													'name' => $this->_lang->GET('order.ordernumber_label')
-												]
-											], [
-												'type' => 'text',
-												'attributes' => [
-													'name' => $this->_lang->GET('order.productname_label')
-												]
-											], [
-												'type' => 'text',
-												'attributes' => [
-													'name' => $this->_lang->GET('order.vendor_label'),
-												],
-												'datalist' => array_values(array_unique($datalist))
-											], [
-												'type' => 'textsection',
-												'attributes' => [
-													'name' => $this->_lang->GET('order.add_manually_warning_header'),
-													'class' => 'orange'
-												],
-												'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
-											]
-										]
-									])
-									."'), options:{".
-										"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false},".
-										"'".$this->_lang->GET('order.add_manually_confirm')."': {value: true, class: 'reducedCTA'},".
-									"}}).then(response => {if (Object.keys(response).length) {".
-										"_client.order.addProduct(response[api._lang.GET('order.quantity_label')] || '', response[api._lang.GET('order.unit_label')] || '', response[api._lang.GET('order.ordernumber_label')] || '', response[api._lang.GET('order.productname_label')] || '', response[api._lang.GET('order.barcode_label')] || '', response[api._lang.GET('order.vendor_label')] || '');".
-										"api.preventDataloss.monitor = true;}".
-										"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
-								]
-							]
-						];
-				}
-
-				foreach ($search as $key => $row) {
-					foreach ($row as $key => $value){
-						$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
 					}
-					if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
-						$slides[] = [
+				}
+				return $a_matches <=> $b_matches;
+			});
+			$search = array_reverse($search);
+		}
+		$productsPerSlide = 0;
+
+		// insert request specific search to first slide
+		switch($usecase){
+			case 'productselection': // document.php, record.php, assemble.js don't need prefacing inputs for productselection widget
+			case 'manualorder': // manual orders try to find a database match in advance
+				break;
+			case 'product': // consumables.php can make good use of this method!
+				// prepare existing vendor lists
+				$vendorselection = [];
+
+				$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
+
+				foreach ($vendors as $key => $row) {
+					$datalist[] = $row['name'];
+					$display = $row['name'];
+					if ($row['hidden']) $display = UTILITY::hiddenOption($display);
+					$vendorselection[$display] = ['value' => $row['id']];
+					if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$display]['selected'] = true;
+				}
+				ksort($vendorselection);
+				$slides[] = [
+					[
+						'type' => 'scanner',
+						'destination' => 'productsearch'
+					], [
+						'type' => 'select',
+						'content' => $vendorselection,
+						'attributes' => [
+							'id' => 'productsearchvendor',
+							'name' => $this->_lang->GET('consumables.product.filter_vendors')
+							]
+					], [
+						'type' => 'search',
+						'attributes' => [
+							'name' => $this->_lang->GET('consumables.product.search'),
+							'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), '" . $usecase . "'); return false;}",
+							'id' => 'productsearch',
+							'value' => $parameter['search'] ? : ''
+						]
+					]
+				];
+				if (PERMISSION::permissionFor('products') || PERMISSION::permissionFor('productslimited')){
+					array_splice($slides[0], 0, 0, [
+						[
+						'type' => 'button',
+						'attributes' => [
+							'value' => $this->_lang->GET('consumables.product.add_new'),
+							'onclick' => "api.purchase('get', 'product')",
+						]
+					]
+					]);
+				}
+				break;
+			default: // order.php can make good use of this method!
+				$datalist = [];
+				$datalist_unit = [];
+
+				// import to determine if interface is present
+				include_once("./_erpinterface.php");
+
+				// prepare existing vendor lists
+				$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
+				foreach ($vendors as $key => $row) {
+					if ($row['hidden']) continue;
+					$datalist[] = $row['name'];
+					$vendorselection[$row['name']] = ['value' => $row['id']];
+					if ($parameter['vendors'] === strval($row['id'])) $vendorselection[$row['name']]['selected'] = true;
+				}
+				ksort($vendorselection);
+
+				// prepare existing sales unit lists
+				$product_units = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product_units');
+				foreach ($product_units as $key => $row) {
+					$datalist_unit[] = $row['article_unit'];
+				}
+
+				$slides[] = [
+					[
+						'type' => 'scanner',
+						'destination' => 'productsearch'
+					], [
+						'type' => 'select',
+						'content' => $vendorselection,
+						'attributes' => [
+							'id' => 'productsearchvendor',
+							'name' => $this->_lang->GET('consumables.product.vendor_select')
+						]
+					], [
+						'type' => 'search',
+						'attributes' => [
+							'name' => $this->_lang->GET('consumables.product.search'),
+							'onkeydown' => "if (event.key === 'Enter') {api.purchase('get', 'productsearch', document.getElementById('productsearchvendor').value, encodeURIComponent(this.value), 'order'); return false;}",
+							'id' => 'productsearch',
+							'value' => $parameter['search'] ? : ''
+						]
+					], [
+						'type' => 'button',
+						'attributes' => [
+							'value' => $this->_lang->GET('order.add_manually'),
+							'onclick' => "new _client.Dialog({type: 'input', header: '". $this->_lang->GET('order.add_manually') ."', render: JSON.parse('".
+							UTILITY::json_encode([
+								[
+									[
+										'type' => 'text',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.unit_label'),
+										],
+										'datalist' => array_values(array_unique($datalist_unit))
+									], [
+										'type' => 'text',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.ordernumber_label')
+										]
+									], [
+										'type' => 'text',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.productname_label')
+										]
+									], [
+										'type' => 'text',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.vendor_label'),
+										],
+										'datalist' => array_values(array_unique($datalist))
+									], [
+										'type' => 'textsection',
+										'attributes' => [
+											'name' => $this->_lang->GET('order.add_manually_warning_header'),
+											'class' => 'orange'
+										],
+										'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
+									]
+								]
+							])
+							."'), options:{".
+								"'".$this->_lang->GET('order.add_manually_cancel')."': {value: false},".
+								"'".$this->_lang->GET('order.add_manually_confirm')."': {value: true, class: 'reducedCTA'},".
+							"}}, 'FormData').then(response => {if (response) {".
+								"api.purchase('post', 'productsearch', 'null', response, 'manualorder');".
+								"api.preventDataloss.monitor = true;}".
+								"document.getElementById('modal').replaceChildren()})", // clear modal to avoid messing up input names
+						]
+					]
+				];
+		}
+
+		foreach ($search as $key => $row) {
+			foreach ($row as $key => $value){
+				$row[$key] = $row[$key] ? str_replace("\n", ' ', $row[$key]) : '';
+			}
+			if (empty($productsPerSlide++ % CONFIG['limits']['products_per_slide'])){
+				$slides[] = [
+					[
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
+						],
+					]
+				];
+			}
+			$slide = count($slides) - 1;
+			$tiles = max(1, count($slides[$slide]) - 1);
+			switch ($usecase){
+				case 'product': // consumables.php can make good use of this method!
+						$slides[$slide][$tiles][] = [
+						'type' => 'tile',
+						'attributes' => [
+							'onclick' => "api.purchase('get', 'product', " . $row['id'] . ")",
+							'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'product', " . $row['id'] . ")",
+							'role' => 'link',
+							'tabindex' => '0',
+							'title' => $this->_lang->GET('consumables.product.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
+						],
+						'content' => [
+							[
+								'type' => 'textsection',
+								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
+									. ($row['erp_id'] ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
+							]
+						]
+					];
+					break;
+				case 'productselection': // document.php, record.php, assemble.js can make good use of this method!
+					if (!isset($slides[$slide][$tiles][1])) $slides[$slide][$tiles][] = [
+						'type' => 'radio',
+						'attributes' => [
+							'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
+						],
+						'content' => []
+					];
+					$slides[$slide][$tiles][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
+							'onchange' => "if (this.checked) document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
+						];
+					break;
+				default: // order.php can make good use of this method!, also see consumables.php->productsearch()
+					$incorporationState = '';
+					if (!$row['incorporated']) $incorporationState = $this->_lang->GET('order.incorporation.neccessary');
+					else {
+						$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
+						if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
+						elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
+					}
+					$slides[$slide][$tiles][] = [
+						'type' => 'tile',
+						'attributes' => [
+							'onclick' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+							'onkeydown' => "if (event.key==='Enter') _client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
+							'role' => 'link',
+							'tabindex' => '0',
+							'title' => $this->_lang->GET('order.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
+						],
+						'content' => [
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
+									'name' => ($row['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') : '') . ($incorporationState && $row['stock_item'] ? ' - ' : '') . $incorporationState,
+									'data-type' => 'cart'
 								],
+								'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
+									. ($row['erp_id'] ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
 							]
-						];
-					}
-					$slide = count($slides) - 1;
-					$tiles = max(1, count($slides[$slide]) - 1);
-					switch ($usecase){
-						case 'product': // consumables.php can make good use of this method!
-								$slides[$slide][$tiles][] = [
-								'type' => 'tile',
-								'attributes' => [
-									'onclick' => "api.purchase('get', 'product', " . $row['id'] . ")",
-									'onkeydown' => "if (event.key==='Enter') api.purchase('get', 'product', " . $row['id'] . ")",
-									'role' => 'link',
-									'tabindex' => '0',
-									'title' => $this->_lang->GET('consumables.product.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
-								],
-								'content' => [
-									[
-										'type' => 'textsection',
-										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']
-											. ($row['erp_id'] ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
-									]
-								]
-							];
-							break;
-						case 'productselection': // document.php, record.php, assemble.js can make good use of this method!
-							if (!isset($slides[$slide][$tiles][1])) $slides[$slide][$tiles][] = [
-								'type' => 'radio',
-								'attributes' => [
-									'name' => $this->_lang->GET('order.add_product_search_matches', [':number' => count($search)])
-								],
-								'content' => []
-							];
-							$slides[$slide][$tiles][0]['content'][$row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit']] = [
-									'onchange' => "if (this.checked) document.getElementById('_selectedproduct').value = '" . $row['vendor_name'] . " " . $row['article_no'] . " " . $row['article_name'] . " " . $row['article_unit'] ."';",
-								];
-							break;
-						default: // order.php can make good use of this method!
-							$incorporationState = '';
-							if (!$row['incorporated']) $incorporationState = $this->_lang->GET('order.incorporation.neccessary');
-							else {
-								$row['incorporated'] = json_decode($row['incorporated'] ? : '', true);
-								if (isset($row['incorporated']['_denied'])) $incorporationState = $this->_lang->GET('order.incorporation.denied');
-								elseif (!PERMISSION::fullyapproved('incorporation', $row['incorporated'])) $incorporationState = $this->_lang->GET('order.incorporation.pending');
-							}
-							$slides[$slide][$tiles][] = [
-								'type' => 'tile',
-								'attributes' => [
-									'onclick' => "_client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
-									'onkeydown' => "if (event.key==='Enter') _client.order.addProduct('" . $row['article_unit'] . "', '" . preg_replace('/\'/', "\'", $row['article_no']) . "', '" . preg_replace('/\'/', "\'", $row['article_name']) . "', '" . $row['article_ean'] . "', '" . $row['vendor_name'] . "'); return false;",
-									'role' => 'link',
-									'tabindex' => '0',
-									'title' => $this->_lang->GET('order.tile_title', [':product' => $row['article_name'], ':vendor' => $row['vendor_name']])
-								],
-								'content' => [
-									[
-										'type' => 'textsection',
-										'attributes' => [
-											'name' => ($row['stock_item'] ? $this->_lang->GET('consumables.product.stock_item') : '') . ($incorporationState && $row['stock_item'] ? ' - ' : '') . $incorporationState,
-											'data-type' => 'cart'
-										],
-										'content' => $row['vendor_name'] . ' ' . $row['article_no'] . ' ' . $row['article_name'] . ' ' . $row['article_unit'] . ' ' . $row['article_ean']
-											. ($row['erp_id'] ? "\n" . $this->_lang->GET('consumables.product.erp_id') . ": " . $row['erp_id'] : '')
-									]
-								]
-							];
-					}
-				}
-				if ($parameter['search'] && !isset($slides[$usecase === 'productselection' ? 0 : 1])) return false;
-				break;
+						]
+					];
 			}
+		}
+		if ($parameter['search'] && !isset($slides[in_array($usecase, ['productselection', 'manualorder']) ? 0 : 1])) return false;
 		return [array_values($slides)]; // return a proper nested article
 	}
 }

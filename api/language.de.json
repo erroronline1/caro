@@ -1294,6 +1294,7 @@
 			"submit": "Einführung übermitteln",
 			"success": "Die Angaben zur Einführung wurde gespeichert"
 		},
+		"manual_match" :"Ist der Artikel vielleicht doch in der Datenbank?",
 		"message": ":quantity :unit :number :name von :vendor :aut_idem für :commission\\n:info",
 		"message_orderer": "Mitteilung an :orderer",
 		"message_to_orderer": "Mitteilung senden",

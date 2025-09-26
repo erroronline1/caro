@@ -1294,6 +1294,7 @@
 			"submit": "Submit incorporation",
 			"success": "Incorporation has been saved"
 		},
+		"manual_match" :"Are you sure the requested product is not in the database?",
 		"message": ":quantity :unit :number :name by :vendor :aut_idem for :commission\\n:info",
 		"message_orderer": "Message to :orderer",
 		"message_to_orderer": "Send message",

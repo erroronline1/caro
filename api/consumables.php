@@ -1618,10 +1618,10 @@ class CONSUMABLES extends API {
 
 					// append documents if applicable
 					if ($documents) {
-						if (isset($response['render']['content'][3])){
+						if (isset($response['render']['content'][2])){
 							if ($documents['valid'])
-								$response['render']['content'][3] = [
-									...$response['render']['content'][3],
+								$response['render']['content'][2] = [
+									...$response['render']['content'][2],
 									[
 										'type' => 'links',
 										'description' => $this->_lang->GET('consumables.product.documents_valid'),
@@ -1629,8 +1629,8 @@ class CONSUMABLES extends API {
 									]
 								];
 							if ($documents['expired'])
-								$response['render']['content'][3] = [
-									$response['render']['content'][3],
+								$response['render']['content'][2] = [
+									$response['render']['content'][2],
 									[
 										'type' => 'links',
 										'description' => $this->_lang->GET('consumables.product.documents_expired'),
@@ -1698,9 +1698,72 @@ class CONSUMABLES extends API {
 	public function productsearch(){
 		require_once('_shared.php');
 		$search = new SEARCHHANDLER($this->_pdo, $this->_date);
-		if ($result = $search->productsearch($this->_usecase ? : 'product', ['search' => $this->_search, 'vendors' => $this->_requestedID])){
-			$this->response(['render' => ['content' => $result]]);
-		}	
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				// try if any product is known to switch from manual order to a decent tracked product
+				$manual = [
+					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.unit_label')) ? : '',
+					'article_no' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.ordernumber_label')) ? : '',
+					'article_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.productname_label')) ? : '',
+					'vendor_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.vendor_label')) ? : '',
+					'article_ean' => ''
+				];
+
+				// determine vendor
+				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_search', [
+						'values' => [
+							':SEARCH' => $manual['vendor_name'] ? '"' . $manual['vendor_name'] .'"' : '%'
+						],
+						'wildcards' => 'contained'
+					]);
+				$this->_requestedID = implode('_', array_values(array_column($vendors, 'id')));
+				$this->_search = $manual['article_no'] . ($manual['article_name'] ? ' +' . implode(' +', explode(' ', $manual['article_name'])) : '');
+
+				$result = $search->productsearch($this->_usecase ? : 'product', ['search' => $this->_search, 'vendors' => $this->_requestedID]);
+				
+				// also see _shared.php->productsearch
+				$tile = [
+						'type' => 'tile',
+						'attributes' => [
+							'onclick' => "_client.order.addProduct('" . $manual['article_unit'] . "', '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', '" . $manual['article_ean'] . "', '" . $manual['vendor_name'] . "'); return false;",
+							'onkeydown' => "if (event.key==='Enter') _client.order.addProduct('" . $manual['article_unit'] . "', '" . preg_replace('/\'/', "\'", $manual['article_no']) . "', '" . preg_replace('/\'/', "\'", $manual['article_name']) . "', '" . $manual['article_ean'] . "', '" . $manual['vendor_name'] . "'); return false;",
+							'role' => 'link',
+							'tabindex' => '0',
+							'title' => $this->_lang->GET('order.tile_title', [':product' => $manual['article_name'], ':vendor' => $manual['vendor_name']])
+						],
+						'content' => [
+							[
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => '',
+									'data-type' => 'cart'
+								],
+								'content' => $manual['vendor_name'] . ' ' . $manual['article_no'] . ' ' . $manual['article_name'] . ' ' . $manual['article_unit']
+							]
+						]
+					];
+				if ($result){
+					array_unshift($result[0][0], $tile);
+					array_unshift($result, [
+						'type' => 'textsection',
+						'attributes' => [
+							'name' => $this->_lang->GET('order.add_manually_warning_header'),
+							'class' => 'orange'
+						],
+						'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
+					]);
+				}
+				else
+					$result = [[[$tile]]];
+				
+				$this->response(['render' => ['content' => $result]]);
+
+				break;
+			default:
+				if ($result = $search->productsearch($this->_usecase ? : 'product', ['search' => $this->_search, 'vendors' => $this->_requestedID])){
+					$this->response(['render' => ['content' => $result]]);
+				}
+		}
 		$this->response([
 			'response' => [
 			'msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_search]),

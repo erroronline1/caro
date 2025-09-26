@@ -1683,6 +1683,17 @@ export const api = {
 				break;
 			case "post":
 				switch (request[1]) {
+					case "productsearch":
+						payload = request[3]; // form data object passed by utility.js
+						request[3] = 'null';
+						successFn = function (data) {
+							new Dialog({
+								type :'input',
+								header:api._lang.GET("order.manual_match"),
+								render:data.render.content
+							});
+						};
+						break;
 					case "incorporation":
 					case "mdrsamplecheck":
 						payload = request[3]; // form data object passed by utility.js
