@@ -64,13 +64,13 @@ export const Polyfill = {
 		return window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
 	},
 
-	downloadWarning: function (){
+	downloadWarning: function () {
 		if (!this.isIOS() || this.isStandalone()) return null;
 		const span = document.createElement("span");
 		span.append(document.createTextNode(api._lang.GET("general.safari.downloads")));
-		span.classList.add('orange');
+		span.classList.add("orange");
 		return span;
-	}
+	},
 };
 
 const EVENTS = ["onclick", "onmouseover", "onmouseout", "onchange", "onpointerdown", "onpointerup", "onkeyup", "onkeydown", "onfocus"];
@@ -519,6 +519,7 @@ export class Dialog {
 						header.append(document.createTextNode(line));
 						header.append(document.createElement("br"));
 					}
+					header.children[header.children.length - 1].remove(); //remove trailing linebreak
 				}
 				this.form.append(header);
 			}
@@ -726,12 +727,13 @@ export class Dialog {
 	 * @returns {domNodes}
 	 */
 	linebreak(string) {
-		let content = string.matchAll(/(.*?)(?:\\r\\n|\r\n|\\n|\n|<br.\/>|<br>|$)/gm),
+		let content = string.matchAll(/(.+?|^)(?:\\r\\n|\r\n|\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
 		for (const match of content) {
 			result.push(document.createTextNode(match[1] || ""));
 			result.push(document.createElement("br"));
 		}
+		result.pop(); //remove trailing linebreak
 		return result;
 	}
 
@@ -877,7 +879,8 @@ export class Dialog {
 	 * create canvases for preview and download link if applicable
 	 */
 	preview() {
-		let a = document.createElement("a"), warning = Polyfill.downloadWarning();
+		let a = document.createElement("a"),
+			warning = Polyfill.downloadWarning();
 		if (this.render.type === "stl") {
 			const div = document.createElement("div");
 			div.id = "stlviewer_canvas";
@@ -944,7 +947,7 @@ export class Dialog {
 				// not supported; currently no need for fallback as preview is prepared by backend with filtered file types as well
 			}
 			// direct download, lossless and original format
-			if (warning = Polyfill.downloadWarning()) result.push(warning);
+			if ((warning = Polyfill.downloadWarning())) result.push(warning);
 			a = Polyfill.a(a);
 		}
 		result.push(a);
@@ -1486,6 +1489,7 @@ export class Assemble {
 			header.append(document.createTextNode(line));
 			header.append(document.createElement("br"));
 		}
+		header.children[header.children.length - 1].remove(); //remove trailing linebreak
 
 		header.dataset.type = this.currentElement.attributes && this.currentElement.attributes["data-type"] ? this.currentElement.attributes["data-type"] : this.currentElement.type;
 		if (this.currentElement["data-filtered"]) header.dataset.filtered = this.currentElement["data-filtered"];
@@ -1515,9 +1519,10 @@ export class Assemble {
 		const content = this.currentElement.hint.matchAll(/(.*?)(?:\\n|\n|<br.\/>|<br>|$)/gm);
 		for (const part of content) {
 			if (!part[1].length) continue;
-			div.appendChild(document.createTextNode(part[1]));
-			div.appendChild(document.createElement("br"));
+			div.append(document.createTextNode(part[1]));
+			div.append(document.createElement("br"));
 		}
+		div.children[div.children.length - 1].remove(); //remove trailing linebreak
 		if (["range", "links"].includes(this.currentElement.type)) div.classList.add(this.currentElement.type + "-hint");
 		return [div];
 	}
@@ -1557,13 +1562,13 @@ export class Assemble {
 	 * @returns {domNodes}
 	 */
 	linebreak(string) {
-		let content = string.matchAll(/(.*?)(?:\\r\\n|\r\n|\\n|\n|<br.\/>|<br>|$)/gm),
+		let content = string.matchAll(/(.+?|^)(?:\\r\\n|\r\n|\\n|\n|<br.\/>|<br>|$)/gm),
 			result = [];
 		for (const match of content) {
 			result.push(document.createTextNode(match[1] || ""));
 			result.push(document.createElement("br"));
 		}
-		result.pop(); // drop last br
+		result.pop(); //remove trailing linebreak
 		return result;
 	}
 
@@ -1699,6 +1704,8 @@ export class Assemble {
 					daytile.append(document.createTextNode(line));
 					daytile.append(document.createElement("br"));
 				}
+				daytile.children[daytile.children.length - 1].remove(); //remove trailing linebreak
+
 				daytile.onclick = function () {
 					api.calendar("get", apicall, day.date, day.date);
 				};
@@ -2475,7 +2482,8 @@ export class Assemble {
 		let result = [...this.header()],
 			a;
 		if (this.currentElement.attributes !== undefined) result.push(...this.hidden()); // applying data-filtered for css rules
-		let warning = Polyfill.downloadWarning(), includesDownloads=false;
+		let warning = Polyfill.downloadWarning(),
+			includesDownloads = false;
 		for (const [link, attributes] of Object.entries(this.currentElement.content)) {
 			a = document.createElement("a");
 			a = this.apply_attributes(attributes, a);
