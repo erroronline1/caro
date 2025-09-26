@@ -126,6 +126,7 @@ class SQLQUERY {
 			foreach ($expressions as $expression){
 				list(, $operator, $search) = $expression;
 				$search = isset($expression[3]) ? $expression[3] : $search; // quoted literal
+				if (in_array($search, ['+', '-'])) continue; // drop accidental mistypes
 
 				switch(CONFIG['sql'][CONFIG['sql']['use']]['driver']){
 					case 'mysql':
@@ -744,8 +745,8 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
 		'order_get_approved_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
-			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND (order_data LIKE :SEARCH)",
-			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE organizational_unit IN (:organizational_unit) AND (order_data LIKE :SEARCH)"
+			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE 'orderer\":\":user') AND (order_data LIKE :SEARCH)",
+			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE 'orderer\":\":user') AND (order_data LIKE :SEARCH)"
 		],
 		'order_get_approved_unprocessed' => [ // for notifications
 			'mysql' => "SELECT count(id) as num FROM caro_consumables_approved_orders WHERE ordered IS NULL",

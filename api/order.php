@@ -448,7 +448,8 @@ class ORDER extends API {
 					],
 					'wildcards' => true,
 					'replacements' => [
-						':organizational_unit' => implode(",", $units)
+						':organizational_unit' => implode(",", $units),
+						':user' =>  $_SESSION['user']['id']
 					]
 				]);
 
@@ -748,7 +749,8 @@ class ORDER extends API {
 			],
 			'wildcards' => true,
 			'replacements' => [
-				':organizational_unit' => implode(",", $units)
+				':organizational_unit' => implode(",", $units),
+				':user' =>  $_SESSION['user']['id']
 			]
 		]);
 
@@ -758,7 +760,7 @@ class ORDER extends API {
 		// gather product information on stock item flag
 		$stock_items = $erp_ids = [];
 		foreach (SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products') as $product) {
-			if ($product['stock_item']) $stock_items[] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
+			if ($product['stock_item']) $stock_items[$product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name']] = true;
 			if ($product['erp_id']) $erp_ids[$product['erp_id']] = $product['vendor_name'] . '_' . $product['article_no'] . '_' . $product['article_name'];
 		}
 
@@ -771,7 +773,7 @@ class ORDER extends API {
 			$decoded_order_data = json_decode($row['order_data'], true);
 
 			if (isset($decoded_order_data['vendor_label']) && isset($decoded_order_data['ordernumber_label']) && isset($decoded_order_data['productname_label'])
-				&& !in_array($decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label'], $stock_items)
+				&& !isset($stock_items[$decoded_order_data['vendor_label'] . '_' . $decoded_order_data['ordernumber_label']. '_' . $decoded_order_data['productname_label']])
 			){
 				continue;
 			}
@@ -813,8 +815,10 @@ class ORDER extends API {
 		];
 		$downloadfiles = [];
 		$PDF = new PDF(CONFIG['pdf']['record']);
+		$file = $PDF->auditPDF($summary);
 		$downloadfiles[$this->_lang->GET('order.export')] = [
-			'href' => './api/api.php/file/stream/' . $PDF->auditPDF($summary)
+			'href' => './api/api.php/file/stream/' . $file,
+			'download' => pathinfo($file)['basename']
 		];
 
 		$body = [];

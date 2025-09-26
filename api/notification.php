@@ -269,7 +269,8 @@ class NOTIFICATION extends API {
 										':SEARCH' => '%'
 									],
 									'replacements' => [
-										':organizational_unit' => implode(",", array_keys($this->_lang->_USER['units']))
+										':organizational_unit' => implode(",", array_keys($this->_lang->_USER['units'])),
+										':user' => ''
 									]
 								]);
 								
@@ -416,7 +417,8 @@ class NOTIFICATION extends API {
 												],
 												'wildcards' => 'contained',
 												'replacements' => [
-													':organizational_unit' => implode(',', array_keys($this->_lang->_DEFAULT['units'])) // all units
+													':organizational_unit' => implode(',', array_keys($this->_lang->_DEFAULT['units'])), // all units
+													':user' => ''
 												]
 											]);
 											foreach($orders as $relatedorder){
