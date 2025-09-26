@@ -1173,8 +1173,8 @@ Trainings are matched by their name.
 Search functionality across the application may differ slightly depending of context.
 
 * Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext. Available options are sorted alphabetically.
-* File search allows wildcards as `*` for any amount of any characters or `?` as any character on the given position.
-* All others allow wildcards as well as +mandatory, -excluded and "search in this specific order". Results are sorted by amount of matched terms.
+* File search allows wildcards as `*` for any amount of any characters or `?` as any character on the given position, as you know from any file search in other places.
+* All others allow wildcards as well as +mandatory, -excluded and "search in this specific order". Results are sorted by amount of matched terms. Please note, that results may contain any amount of optional matches. Looking for "Velcro blue 20mm" lists all products that contain either "velcro", "blue" or "20mm" as single or combined match. The same search with quotes does not match "blue 20mm velcro" though.
 
 [Content](#content)
 

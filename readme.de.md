@@ -1078,8 +1078,8 @@ Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
 Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zusammenhang unterscheiden.
 
 * Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden. Verfügbare Optionen sind alphabetisch sortiert.
-* Die Dateiensuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position.
-* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert.
+* Die Dateiensuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position, wie es von jeder anderen Dateisuche in anderen Systeme bekannt ist.
+* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert. Dabei ist zu beachten, dass die Ergebnisse eine beliebige Menge an Übereinstimmungen beinhalten. "Klettband blau 20mm" listet alle Artikel auf, die entweder "Klettband", "blau" oder "20mm" als einzelne oder kombinierte Übereinstimmung beinhalten. Die gleiche Suchanfrage mit Anführungszeichen findet jedoch nicht "blaues Klettband in 20mm".
 
 [Übersicht](#übersicht)
 
