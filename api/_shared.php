@@ -701,7 +701,8 @@ class SEARCHHANDLER {
 											], [
 												'type' => 'textsection',
 												'attributes' => [
-													'name' => $this->_lang->GET('order.add_manually_warning_header')
+													'name' => $this->_lang->GET('order.add_manually_warning_header'),
+													'class' => 'orange'
 												],
 												'content' => $this->_lang->GET('order.add_manually_warning', [':erp_interface' => (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata()) ? $this->_lang->GET('order.add_manually_warning_erpinterface') : ''])
 											]
