@@ -35,6 +35,7 @@ filters and returns a named array according to setup.
 		"dialect": settings according to php fgetcsv
 		"columns": list/array of column names to process and export to destination
 		"encoding": comma separated string of possible character encoding of sourcefile
+		"replacementOverflow": integer to raise an exception on an suspicious amount of replacements (10k by default)
 
 	"filter": list/array of objects/dicts
 		"apply": "filter_by_expression"
@@ -175,10 +176,19 @@ class Listprocessor {
 	 */
 	private $_delimiter = '#';
 
+	/**
+	 * define default regex pattern delimiter
+	 * eventually overrun by setup
+	 * 
+	 * @var int
+	 */
+	private $_replacementOverflow = 1000;
+
 	public function __construct($setup, $argument = []){
 		$this->_setting = gettype($setup) === 'array' ? $setup : json_decode($setup, true);
 		$this->_argument = $argument;
 		if (isset($this->_setting['filesetting']['dialect']['preg_delimiter'])) $this->_delimiter = $this->_setting['filesetting']['dialect']['preg_delimiter'];
+		if (isset($this->_setting['filesetting']['replacementOverflow'])) $this->_replacementOverflow = $this->_setting['filesetting']['replacementOverflow'];
 
 		$this->_setting['filesetting']['columns'] = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'], true)), $this->_setting['filesetting']['columns']);
 
@@ -814,6 +824,7 @@ class Listprocessor {
 
 							foreach ($row as $column => $value) {
 								for ($replacement = 2; $replacement < count($rule); $replacement++){
+									$replacementLimit = 0;
 									if ((!$rule[0] || $rule[0] == $column) && preg_match($this->_delimiter . $rule[1]. $this->_delimiter . 'm', $value)){
 										$replaced_value = preg_replace_callback(
 											$this->_delimiter . $rule[1]. $this->_delimiter . 'm',
@@ -832,6 +843,10 @@ class Listprocessor {
 										} else {
 											$this->_list->setSize(count($this->_list) + 1);
 											$this->_list[count($this->_list) - 1] = $row;
+											if (++$replacementLimit > $this->_replacementOverflow) {
+												$this->_log[] = '[~] Suspicious overflow @' . $replacementLimit . ' replacements for ' . json_encode($rule). '. Check your regex or adjust filesettings.replacementOverflow.';
+												return;
+											}
 										}
 									}
 								}
