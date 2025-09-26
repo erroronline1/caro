@@ -473,13 +473,6 @@ nav {
 	}
 }
 
-html[data-useragent*="safari"] body {
-	/* backdrop filter bug in 12/24 https://discussions.apple.com/thread/255764118?sortBy=rank */
-	& > header,
-	nav {
-		background-color: var(--menu);
-	}
-}
 
 /*************************** main with breakpoints for bigger screen masonry ******************************/
 /* hope default value is ridiculously high enough in the medium future.
@@ -1174,7 +1167,7 @@ html[data-useragent*="safari"] body {
 	}
 	input[type="date"],
 	input[type="time"] {
-		-webkit-min-logical-width: calc(100% - 3.125rem);
+		width: calc(100% - 3.125rem);
 		-webkit-logical-height: 3em;
 	}
 }
