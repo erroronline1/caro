@@ -255,6 +255,31 @@ class _ERPINTERFACE {
 		 */
 		return null;
 	}
+
+	/**
+	 * retrieve expected file options for structured uploads of erp-data-files  
+	 * possibly used by other methods as custom source if database connections are not available  
+	 * returns an array of usecase descriptions and filenames to rename to
+	 * @return null|array
+	 * 
+	 * files are stored within UTILITY::directory('erp_documents'),  
+	 * access them from the other methods using UTILITY::directory('erp_documents') . '/intended_name.csv' as path
+	 * 
+	 * not necessarily csv files but whatever you can process in your custom methods
+	 */
+	public function upload(){
+		return null;
+
+		/**
+		 * return [
+		 * 		[
+		 * 			'option' => 'file named like possible_dump_name.csv as data source for ...' // keep it short as it is part of the option string within select element
+		 * 			'rename' => 'intended_name', // without extension!
+		 * 		],
+		 * 		...
+		 * ]
+		 */
+	}
 }
 
 class TEST extends _ERPINTERFACE {
@@ -334,13 +359,13 @@ class TEST extends _ERPINTERFACE {
 	*/
 	public function customcsvdump($key = null){
 		$queries = [
-			'random query' => 'this is no a real file path',
-			'random query 2' => 'this is another unreal file path',
+			'random query' => 'fictional_file.csv',
+			'random query 2' => 'another_fictional_file.csv',
 		];
 
 		if (!$key) return array_keys($queries);
 		if (!isset($queries[$key])) return null;
-		return $queries[$key];
+		return substr(UTILITY::directory('tmp'), 1) . '/' . $queries[$key];
 		return [];
 	}
 
@@ -381,6 +406,35 @@ class TEST extends _ERPINTERFACE {
 				'partially_received' => null,
 				'received' => '2025-09-01 21:00:00',
 				'order_reference' => '12345'
+			],
+		];
+	}
+
+
+	/**
+	 * retrieve expected file options for structured uploads of erp-data-files
+	 * possibly used by other methods as custom source if database connections are not available  
+	 * returns an array of usecase descriptions and filenames to rename to
+	 * @return null|array
+	 * 
+	 * files are stored within UTILITY::directory('erp_documents'),  
+	 * access them from the other methods using UTILITY::directory('erp_documents') . '/intended_name.csv' as path
+	 * 
+	 * not necessarily csv files but whatever you can process in your custom methods
+	 */
+	public function upload(){
+		return [
+			[
+				'option' => 'ARTIKELMANAGER.csv as product database data source from erp export',
+				'rename' => 'ARTIKELMANAGER'
+			],
+			[
+				'option' => 'File named like EXPORT123.456.789.csv as case database data source from erp export',
+				'rename' => 'VORGANGSEXPORT'
+			],
+			[
+				'option' => 'AUSSCHLUSS.csv as case exceptions for comparison of erp export',
+				'rename' => 'AUSSCHLUSS'
 			],
 		];
 	}

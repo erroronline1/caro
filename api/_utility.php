@@ -694,7 +694,7 @@ class UTILITY {
 	 * @param array $name mandatory array of input names
 	 * @param string $folder where to store
 	 * @param array $prefix to add to filename, length according to $files
-	 * @param array $rename to rename file, length according to $files
+	 * @param array $rename to rename file, length according to $files. does not change the extension!
 	 * @param bool $replace to replace files, false adds an enumerator
 	 * 
 	 * @return array paths of stored files

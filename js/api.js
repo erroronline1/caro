@@ -1057,6 +1057,7 @@ export const api = {
 				rule: api._lang.GET("csvfilter.navigation.filter_manager"),
 				filter: api._lang.GET("csvfilter.navigation.filter"),
 				erpquery: api._lang.GET("csvfilter.navigation.erpquery"),
+				erpupload: api._lang.GET("csvfilter.navigation.erpupload"),
 			};
 		switch (method) {
 			case "get":
@@ -1072,6 +1073,13 @@ export const api = {
 				};
 				break;
 			case "post":
+				switch (request[1]) {
+					case "erpupload":
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
+				}
 				payload = _.getInputs("[data-usecase=csvfilter]", true);
 				break;
 			default:
@@ -1951,7 +1959,7 @@ export const api = {
 				} else payload = _.getInputs("[data-usecase=record]", true);
 				break;
 			case "put":
-				if (request[4] instanceof FormData){
+				if (request[4] instanceof FormData) {
 					payload = request[4];
 					delete request[4];
 				}

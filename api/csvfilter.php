@@ -20,6 +20,7 @@
 namespace CARO\API;
 
 // add filters and filter csv-files
+// handle erp-interface methods typically involving csv files
 require_once('./_csvprocessor.php');
 require_once("../libraries/xlsxwriter.class.php");
 
@@ -46,7 +47,7 @@ class CSVFILTER extends API {
 	 * post responds with a download link to the result file after processing
 	 */
 	public function erpquery(){
-		if (!PERMISSION::permissionFor('csvfilter')) $this->response([], 401);
+		if (!PERMISSION::permissionFor('erpimport')) $this->response([], 401);
 		include_once('./_erpinterface.php');
 		if(!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customcsvdump') && ERPINTERFACE->customcsvdump())) $this->response([], 404);
 		$response = [];
@@ -105,6 +106,76 @@ class CSVFILTER extends API {
 	}
 
 	/**
+	 *                                   
+	 *   ___ ___ ___ ___ _ _ ___ ___ _ _ 
+	 *  | -_|  _| . | . | | | -_|  _| | |
+	 *  |___|_| |  _|_  |___|___|_| |_  |
+	 *          |_|   |_|           |___|
+	 * retrieve data dumps from the erp-interface as file
+	 * get respondes with available options to select from
+	 * post responds with a download link to the result file after processing
+	 */
+	public function erpupload(){
+		if (!PERMISSION::permissionFor('csvfilter')) $this->response([], 401);
+		include_once('./_erpinterface.php');
+		if(!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'upload') && ERPINTERFACE->upload())) $this->response([], 404);
+		$response = [];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$upload = null;
+				$rename = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('csvfilter.erpupload.select'));
+
+				if ($rename) $upload = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('csvfilter.erpupload.file')], UTILITY::directory('erp_documents'), [], [$rename]);
+				if ($upload) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('csvfilter.erpupload.success'),
+						'type' => 'success'
+					]]);
+
+				$this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('csvfilter.erpupload.failure'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				$options = ['...' . $this->_lang->GET('csvfilter.erpupload.select') => ['value' => '0']];
+				foreach(ERPINTERFACE->upload() as $set){
+					$options[$set['option']] = ['value' => $set['rename']];
+				}
+
+				// append filter selection
+				$response['render'] = [
+					'content' => [
+						[
+							[
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('csvfilter.erpupload.select'),
+									'required' => true
+								],
+								'content' => $options,
+							],
+							[
+								'type' => 'file',
+								'attributes' => [
+									'name' => $this->_lang->GET('csvfilter.erpupload.file'),
+									'required' => true
+								]
+							]
+						]
+					]
+				];
+				$response['render']['form'] = [
+					'data-usecase' => 'csvfilter',
+					'action' => "javascript:api.csvfilter('post', 'erpupload')"
+				];
+		}
+		$this->response($response);
+	}
+
+	/**
 	 *   ___ _ _ _
 	 *  |  _|_| | |_ ___ ___
 	 *  |  _| | |  _| -_|  _|
@@ -133,7 +204,7 @@ class CSVFILTER extends API {
 					]]);
 				$content = json_decode($filter['content'], true);
 
-				// check if input file ist provided
+				// check if input file is provided
 				$inputfile = isset($_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]) ? $_FILES[$this->_lang->PROPERTY('csvfilter.use.filter_input_file')]['tmp_name'][0] : null;
 				if (!$inputfile) $this->response([
 					'response' => [

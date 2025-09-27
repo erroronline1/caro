@@ -1042,7 +1042,14 @@
 			"select": "Select query to export as CSV",
 			"select_hint": "No fitting query found? Contact a programmer to set one up."
 		},
+		"erpupload": {
+			"failure": "An error occured, file could not be saved. Please try again.",
+			"file":"Source file",
+			"select": "Usecase",
+			"success": "File successfully saved."
+		},
 		"navigation": {
+			"erpupload":"Submit ERP data files",
 			"erpquery": "ERP database query",
 			"filter": "CSV filter",
 			"filter_manager": "Manage CSV filter"

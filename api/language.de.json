@@ -1042,7 +1042,14 @@
 			"select": "Wähle eine Abfrage für den CSV-Export",
 			"select_hint": "Keine passende Abfrage gefunden? Frage einen Programmierer nach einer Einrichtung."
 		},
+		"erpupload": {
+			"failure": "Es trat ein Fehler auf, bitte versuche es erneut.",
+			"file":"Quelldatei",
+			"select": "Verwendungszweck",
+			"success": "Datei wurde bereitgestellt."
+		},
 		"navigation": {
+			"erpupload":"Bereitstellen von ERP-Daten",
 			"erpquery": "EVA Datenbanken-Abfrage",
 			"filter": "CSV-Filter",
 			"filter_manager": "CSV-Filter verwalten"

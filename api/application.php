@@ -490,6 +490,8 @@ class APPLICATION extends API {
 		include_once('./_erpinterface.php');
 		if (PERMISSION::permissionFor('csvfilter') && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customcsvdump') && ERPINTERFACE->customcsvdump())
 			$menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.erpquery')] =['onclick' => "api.csvfilter('get', 'erpquery')"];
+		if (PERMISSION::permissionFor('csvfilter') && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'upload') && ERPINTERFACE->upload())
+			$menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.erpupload')] =['onclick' => "api.csvfilter('get', 'erpupload')"];
 
 		if (PERMISSION::permissionFor('csvfilter')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.filter')] =['onclick' => "api.csvfilter('get', 'filter')"];
 		if (PERMISSION::permissionFor('regulatory')) $menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('audit.navigation.regulatory')] =['onclick' => "api.audit('get', 'checks')"];

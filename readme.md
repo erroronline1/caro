@@ -30,8 +30,7 @@ Things are still in motion. Images may be outdated.
 ## to do
 * unittests
 * templates
-* erp_interface, additional usecases
-    * std method for csv uploads to distinct folder, then show up within tools?
+* erp_interface, additional usecases?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## Content
@@ -1612,6 +1611,9 @@ Data will be presented as constructed within the custom interface-class-method. 
 ### Custom database dumps
 Your custom erp interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
 
+### Data source provision
+In case you have to rely on data dumps instead of direct database access, the interface parent class provides an example to define files, usecases and the intended name for processing within your custom methods. If this is provided a menu item will show up within the [Tools](#tools). Files are overwritten.
+
 ### Customization recommendations
 * it is recommended to write a respective class extending _ERPINTERFACE and setting it up within config.ini[system][erp]. Data for the responses must match the expected structure described within the parent class
 * signal unavailable methods by returning `null`
@@ -1620,6 +1622,10 @@ Your custom erp interface class can contain a method to provide a CSV-file with 
 * if you process regularly provided CSV-dumps you can probably use the [CSV Processor](#csv-processor))
 * if you get access to the database e.g. via SQL you can set up a respective settings set within config.ini or config.env to establish a connection, e.g. named after your class
 * use the `UTILITY::identifier()`-method with `verify`-parameter to obtain the identifier for matching order-data
+* provided data dumps are accessible via `UTILITY::directory('erp_documents') . '/intended_name.csv'`
+* custom csv dumps are recommended to be stored within `UTILITY::directory('tmp')` for regular cleanup
+
+`UTILITY`-methods can be found in api/_utility.php.
 
 [Content](#content)
 
@@ -1972,6 +1978,7 @@ calendarfulltimesheetexport = "ceo, human_ressources" ; exporting of all users t
 complaintclosing = "supervisor, qmo, prrc" ; SEE WARNING ABOVE - close case documentation containing a complaint
 csvfilter = "ceo, qmo, purchase, office" ; access and execute csv filter
 csvrules = "qmo" ; add csv filter
+erpimport = "purchse, office" ; provide erp data sources, more details within _erpinterface regarding usecase if applicable
 externaldocuments = "office, ceo, qmo" ; upload and manage external documents
 files = "office, ceo, qmo" ; upload and delete files
 documentapproval = "ceo, qmo, supervisor" ; SEE WARNING ABOVE - approve documents and components
@@ -3680,7 +3687,35 @@ Parameters
 
 Sample response
 ```
-{"log":[],"links":{"Download Some query 2025-09-11 22-48-00.csv":{"href":"./api/api.php/file/stream/Some query 2025-09-11 22-48-00.csv","download":"Some query 2025-09-11 22-48-00.csv"}}}
+{"log":[],"links":{"Download Some query 2025-09-11 22-48-00.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/Some query 2025-09-11 22-48-00.csv","download":"Some query 2025-09-11 22-48-00.csv"}}}
+```
+
+> GET ./api/api.php/csvfilter/erpupload/
+
+Returns the input form for uploading erp data sources.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","attributes":{"name":"Usecase","required":true},"content":{"...Usecase":{"value":"0"},"ARTIKELMANAGER.csv as product database data source from erp export":{"value":"ARTIKELMANAGER"},"File named like EXPORT123.456.789.csv as case database data source from erp export":{"value":"VORGANGSEXPORT"},"AUSSCHLUSS.csv as case exceptions for comparison of erp export":{"value":"AUSSCHLUSS"}}},{"type":"file","attributes":{"name":"Source file","required":true}}]],"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'erpupload')"}}}
+```
+
+> POST ./api/api.php/csvfilter/erpupload/
+
+success or failure response on uploading erp data sources.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | file and intended name |
+
+Sample response
+```
+{"response":{"msg":"File successfully saved.","type":"success"}}
 ```
 
 > GET ./api/api.php/csvfilter/filter/{id}

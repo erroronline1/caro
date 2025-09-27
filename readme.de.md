@@ -1466,7 +1466,7 @@ RegEx-Muster werden unabhängig von der Groß-/Kleinschreibung verarbeitet, es i
 [Übersicht](#übersicht)
 
 ## ERP Anbindung
-Die CARO App ist auf dem Empfang und die Einbindung von Updates aus dem ERP-System vorbereitet. Da es viele entsprechende Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung, bestenfalls die Lösung aus dem Alltag des [Teams](#das-team). Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Datenstruktur die von CARO verarbeitet werden kann, es ist nicht zwingend erforderlich sich mit der gesamten Programmstruktur auseinanderzusetzen.
+Die CARO App ist auf dem Empfang und die Einbindung von Updates aus dem ERP-System vorbereitet. Da es viele entsprechende Anwendungen gibt, gibt es hier keine gebrauchsfertige Lösung, bestenfalls die Lösung aus dem Alltag des [Teams](#das-team). Es ist aber möglich vorranging die Datei _erpinterface.php an die Erfordernisse anzupassen. Die _ERPINTERFACE-Klasse dient als Gerüst und beschreibt die erwartete Datenstruktur die von CARO verarbeitet werden kann, es ist nicht zwingend erforderlich sich mit der gesamten Programmstruktur auseinanderzusetzen. Es gibt jedoch ein paar [Empfehlungen für die Anpassung](#empfehlungen-für-die-anpassung).
 
 Die grundlegend unterstützten Integrationen beinhalten
 
@@ -1518,16 +1518,23 @@ Vorgangspositionen werden je Anfrage verarbeitet. Sofern verfügbar werden Tabel
 Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden. Die Schlüssel müssen zu den Sprachblöcken der `record.erpinterface.casepositions` passen.
 
 ### Angepasste Datenbankauszüge
-Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar tauch dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
+Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
+
+### Bereitstellung von Datenquellen
+Sofern anstelle direkter Datenbankzugriffe auf Datenexporte zurückgegriffen werden muss, stellt die Elternklasse der ERP-Anbindung ein Beispiel bereit um Dateien, Anwendungsfälle und vorgesehende Dateinamen zu definieren, welche anschließend in den angepassten Methoden verwendet werden können. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf. Dateien werden jeweils überschrieben.
 
 ### Empfehlungen für die Anpassung
-* es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Daten für die Rückgabewerte müssen der erwarteten Struktur entsprechen, die in der Elternklasse beschrieben sind.
+* es wird empfohlen eine eigene Klasse zu schreiben, welche _ERPINTERFACE erweitert, und diese in der config.ini[system][erp] zu aktivieren. Daten für die Rückgabewerte müssen der erwarteten Struktur entsprechen, die in der Elternklasse beschrieben sind
 * nicht verfügbare Methoden können durch den Rückgabewert `null` signalisiert werden
 * verfügbare Methoden ohne aktuellen Inhalt können durch den Rückgabewert `[[]]` signalisiert werden
 * für die Verarbeitung von Web-APIs kann `UTILITY::webrequest()` hilfreich sein
 * für die Verarbeitung von regelmäßig breitgestellten CSV-Exporte kann der [CSV Prozessor](#csv-prozessor)) hilfreich sein
-* falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden.
-* für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten.
+* falls ein Direktzugriff auf die Datenbank z.B. viq SQL erfolgen kann, können die entsprechenden Vebindungsparameter innerhalb der config.ini oder vonfig.env hinterlegt und z.B. nach der Klasse benannt werden
+* für den Abgleich von Bestelldaten sollte die `UTILITY::identifier()`-Methode mit `verify`-Parameter genutzt werden um das Kennzeichen für den Datenabgleich zu erhalten
+* bereitgestellte Datendateien finden sich unter `UTILITY::directory('erp_documents') . '/Vorgesehener_Dateiname.csv'`
+* angepasste Datenbankauszüge sollten bevorzugt in `UTILITY::directory('tmp')` im Sinne einer regelmäßigen Bereinigung gespeichert werden
+
+`UTILITY`-Methoden finden sich in api/_utility.php.
 
 [Übersicht](#übersicht)
 
@@ -1881,6 +1888,7 @@ calendarfulltimesheetexport = "ceo, human_ressources" ; Arbeitszeitexporte aller
 complaintclosing = "supervisor, qmo, prrc" ; obige Warnung beachten - Dokumentationen mit Reklamationen als abgeschlossen kennzeichnen
 csvfilter = "ceo, qmo, purchase, office" ; Zugriff und Anwendung von CSV-Filtern
 csvrules = "qmo" ; neue CSV-Filter anlegen
+erpimport = "purchse, office" ; Bereitstellung von ERP Datenquellen, mehr dazu unter _erpinterface.php sofern anwendbar
 externaldocuments = "office, ceo, qmo" ; Bereitstellung und Verwaltung externer Dokumente
 files = "office, ceo, qmo" ; Dateien bereitstellen und Verwalten
 formapproval = "ceo, qmo, supervisor" ; obige Warnung beachten - Freigabe von Dokumenten und ihrer Komponenten
