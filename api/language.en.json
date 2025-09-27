@@ -799,6 +799,7 @@
 			"timesheet": "Timesheet"
 		},
 		"worklists":{
+			"events_assigned_units": "Current work lists for your assigned units or created by you",
 			"name":"Tourname",
 			"new":"schedule new tour",
 			"station": "Case identifier",

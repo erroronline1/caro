@@ -927,23 +927,34 @@ class APPLICATION extends API {
 				'api' => 'tasks'
 			];
 
-			$displayevents = $displayabsentmates = '';
+			$displaytasks = $displayworklists = $displayabsentmates = '';
 			$today = new \DateTime('now');
 			$thisDaysEvents = $calendar->getDay($today->format('Y-m-d'));
 			// sort events
 			foreach ($thisDaysEvents as $row){
 				if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
-				if ($row['type'] === 'tasks' && (array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) || 
-					array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']) $displayevents .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('general.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
+				if ((array_intersect(explode(',', $row['organizational_unit'] ? : ''), ['common', ...$_SESSION['user']['units']]) || 
+					array_intersect(explode(',', $row['affected_user_units'] ? : ''), $_SESSION['user']['units'])) && !$row['closed']){
+						if ($row['type'] === 'tasks') $displaytasks .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('general.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
+						if ($row['type'] === 'worklists') $displayworklists .= "* " . $row['subject'] . ($row['affected_user'] !== $this->_lang->GET('general.deleted_user') ? ' (' . $row['affected_user'] . ')': '') . "\n";
+					}
 				if ($row['type'] === 'timesheet' && !in_array($row['subject'], CONFIG['calendar']['hide_offduty_reasons']) && array_intersect(explode(',', $row['affected_user_units']), $_SESSION['user']['units'])) $displayabsentmates .= "* " . $row['affected_user'] . " ". $this->_lang->_USER['calendar']['timesheet']['pto'][$row['subject']] . " ". $this->convertFromServerTime(substr($row['span_start'], 0, 10)) . " - ". $this->convertFromServerTime(substr($row['span_end'], 0, 10)) . "\n";
 			}
-			// display todays events
-			if ($displayevents) $overview[] = [
+			// display todays tasks
+			if ($displaytasks) $overview[] = [
 				'type' => 'textsection',
 				'attributes' => [
-						'name' => $this->_lang->GET('calendar.tasks.events_assigned_units')
+					'name' => $this->_lang->GET('calendar.tasks.events_assigned_units')
 				],
-				'content' => $displayevents
+				'htmlcontent' => $markdown->md2html($displaytasks), 
+			];
+			// display todays worklists
+			if ($displayworklists) $overview[] = [
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => $this->_lang->GET('calendar.worklists.events_assigned_units')
+				],
+				'htmlcontent' => $markdown->md2html($displayworklists), 
 			];
 			// display todays absent workmates (sick, vacation, etc.)
 			if ($displayabsentmates) $overview[] = [
@@ -951,7 +962,7 @@ class APPLICATION extends API {
 				'attributes' => [
 						'name' => $this->_lang->GET('calendar.timesheet.irregular')
 				],
-				'content' => $displayabsentmates
+				'htmlcontent' => $markdown->md2html($displayabsentmates), 
 			];
 
 			// add past unclosed events

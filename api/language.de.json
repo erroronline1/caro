@@ -799,6 +799,7 @@
 			"timesheet": "Zeiterfassung"
 		},
 		"worklists":{
+			"events_assigned_units": "Aktuelle Arbeitslisten für deine zugewiesenen Bereiche oder von dir erstellt",
 			"name":"Bezeichnung",
 			"new":"neuen Plan erstellen",
 			"station": "Vorgangskennzeichen",
