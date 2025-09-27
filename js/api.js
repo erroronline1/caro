@@ -941,14 +941,14 @@ export const api = {
 					if (id && id[0]) id[0].value = data.response.id;
 				}
 				if (data.data) _serviceWorker.notif.calendar(data.data);
-				if (["post", "put", "delete"].includes(method) && ["tasks", "timesheet", "planning"].includes(request[1])) api.history.go("forth"); // updates the view after any change
+				if (["post", "put", "delete"].includes(method) && ["tasks", "timesheet", "worklists"].includes(request[1])) api.history.go("forth"); // updates the view after any change
 			},
 			title = {
 				appointment: api._lang.GET("calendar.navigation.appointment"),
 				tasks: api._lang.GET("calendar.navigation.tasks"),
 				timesheet: api._lang.GET("calendar.navigation.timesheet"),
 				longtermplanning: api._lang.GET("calendar.navigation.longtermplanning"),
-				planning: api._lang.GET("calendar.navigation.planning"),
+				worklists: api._lang.GET("calendar.navigation.worklists"),
 			};
 		switch (method) {
 			case "get":

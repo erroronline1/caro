@@ -233,7 +233,7 @@ class CALENDARUTILITY {
 	 * @param array $columns, like put-method, but :type must be provided
 	 * 	[
 	 * 	':id' => int
-	 * 	':type' => string tasks|timesheet|planning
+	 * 	':type' => string tasks|timesheet|worklists
 	 * 	':span_start' => string Y-m-d H:i:s,
 	 * 	':span_end' => string Y-m-h H:i:s,
 	 * 	':author_id' => int,
@@ -510,7 +510,7 @@ class CALENDARUTILITY {
 						]
 					]);
 				break;
-			case 'planning':
+			case 'worklists':
 				// set end date to preset of CONFIG default
 				if ($columns[':span_end']) $span_end = new \DateTime($columns[':span_end']);
 				else {
@@ -522,7 +522,7 @@ class CALENDARUTILITY {
 					[
 						'type' => 'text',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.planning.name'),
+							'name' => $this->_lang->GET('calendar.worklists.name'),
 							'value' => $columns[':subject'],
 							'required' => true
 						]
@@ -581,7 +581,7 @@ class CALENDARUTILITY {
 					$inputs[] = [
 						'type' => 'scanner',
 						'attributes' => [
-							'name' => $this->_lang->GET('calendar.planning.station'),
+							'name' => $this->_lang->GET('calendar.worklists.station'),
 							'value' => $station['station']
 						],
 					];
@@ -589,7 +589,7 @@ class CALENDARUTILITY {
 				$inputs[] = [
 					'type' => 'scanner',
 					'attributes' => [
-						'name' => $this->_lang->GET('calendar.planning.station'),
+						'name' => $this->_lang->GET('calendar.worklists.station'),
 						'multiple' => true
 					],
 				];
@@ -762,7 +762,7 @@ class CALENDARUTILITY {
 	 * calculates holidays for every date for possible year overlaps in selected view-format
 	 * 
 	 * @param string $format month|week
-	 * @param string $type tasks|timesheet|planning
+	 * @param string $type tasks|timesheet|worklists
 	 * @param string $date yyyy-mm-dd
 	 * 
 	 * @return array assemble.js calendar type
@@ -782,7 +782,7 @@ class CALENDARUTILITY {
 					$row['affected_user_units'] = $row['affected_user_units'] ? : $row['organizational_unit'];
 					switch ($type){
 						case 'tasks':
-						case 'planning':
+						case 'worklists':
 							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]))
 								if (!$row['closed'])
 								$numbers++;

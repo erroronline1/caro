@@ -31,19 +31,19 @@ export const _serviceWorker = {
 		calendar: function (data) {
 			let notif,
 				tasks = 0,
-				planning = 0;
+				worklists = 0;
 			if ("calendar_uncompletedtasks" in data) {
 				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("calendar.navigation.tasks").replace(" ", "_") + "]"); // button
 				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedtasks);
 				tasks = parseInt(data.calendar_uncompletedtasks, 10);
 			}
-			if ("calendar_uncompletedplans" in data) {
-				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("calendar.navigation.planning").replace(" ", "_") + "]"); // button
-				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedplans);
-				planning = parseInt(data.calendar_uncompletedplans, 10);
+			if ("calendar_uncompletedworklists" in data) {
+				notif = document.querySelector("[data-for=userMenuItem" + api._lang.GET("calendar.navigation.worklists").replace(" ", "_") + "]"); // button
+				if (notif) notif.setAttribute("data-notification", data.calendar_uncompletedworklists);
+				worklists = parseInt(data.calendar_uncompletedworklists, 10);
 			}
 			notif = document.querySelector("[for=userMenu" + api._lang.GET("calendar.navigation.header").replace(" ", "_") + "]"); // main menu label
-			if (notif) notif.setAttribute("data-notification", tasks + planning);
+			if (notif) notif.setAttribute("data-notification", tasks + worklists);
 		},
 
 		/**

@@ -794,11 +794,11 @@
 			"appointment": "Terminvereinbarung",
 			"header": "Kalender",
 			"longtermplanning": "Langzeitplanung",
-			"planning": "Vorgangsplanung",
+			"worklists": "Arbeitslisten",
 			"tasks": "Aufgaben",
 			"timesheet": "Zeiterfassung"
 		},
-		"planning":{
+		"worklists":{
 			"name":"Bezeichnung",
 			"new":"neuen Plan erstellen",
 			"station": "Vorgangskennzeichen",

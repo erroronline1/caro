@@ -222,7 +222,7 @@ class CALENDAR extends API {
 				0 => $this->_lang->GET('calendar.tasks.incompleted'),
 				1 => $this->_lang->GET('calendar.tasks.completed')
 			],
-			'planning' => [
+			'worklists' => [
 				0 => $this->_lang->GET('calendar.tasks.incompleted'),
 				1 => $this->_lang->GET('calendar.tasks.completed')
 			],
@@ -244,7 +244,7 @@ class CALENDAR extends API {
 			],
 			'data' => [
 				'calendar_uncompletedtasks' => $notifications->tasks(),
-				'calendar_uncompletedplans' => $notifications->planning()
+				'calendar_uncompletedworklists' => $notifications->worklists()
 				]
 			]);
 		else $this->response([
@@ -757,14 +757,14 @@ class CALENDAR extends API {
 	 *  |  _|_|__,|_|_|_|_|_|_|_|_  |
 	 *  |_|                     |___|
 	 * handle scheduled cases
-	 * post adds plans to calendar
-	 * put updates plan data
-	 * get displays plans
-	 * delete removes scheduled plans
+	 * post adds worklist to calendar
+	 * put updates worklist data
+	 * get displays worklists
+	 * delete removes scheduled worklist
 	 * 
 	 * responds with render data for assemble.js
 	 */ 
-	public function planning(){
+	public function worklists(){
 		/*
 		list identifiers, scan codes, add hint (e.g. address, room, etc)
 		api endpoint description
@@ -780,13 +780,13 @@ class CALENDAR extends API {
 
 				// set up event properties
 				$event = [
-					':type' => 'planning',
+					':type' => 'worklists',
 					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.date'))),
 					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.due'))),
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.organizational_unit')),
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.planning.name')),
+					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.worklists.name')),
 					':misc' => null,
 					':closed' => null,
 					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
@@ -794,7 +794,7 @@ class CALENDAR extends API {
 				];
 				$misc = [];
 				foreach($this->_payload as $key => $value){
-					preg_match('/^' . preg_quote($this->_lang->PROPERTY('calendar.planning.station'), '/') . '(?:\(\d+\))*$/', $key, $station);
+					preg_match('/^' . preg_quote($this->_lang->PROPERTY('calendar.worklists.station'), '/') . '(?:\(\d+\))*$/', $key, $station);
 					if (!$station || !$value) continue;
 					$misc[] = [
 						'station' => $value
@@ -819,7 +819,7 @@ class CALENDAR extends API {
 						'msg' => $this->_lang->GET('calendar.tasks.success'),
 						'type' => 'success'
 					],
-					'data' => ['calendar_uncompletedplans' => $notifications->planning()]]);
+					'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
 				else $this->response([
 					'response' => [
 						'id' => false,
@@ -840,7 +840,7 @@ class CALENDAR extends API {
 					':author_id' => $_SESSION['user']['id'],
 					':affected_user_id' => $affected_user_id,
 					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.organizational_unit')),
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.planning.name')),
+					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.worklists.name')),
 					':misc' => null,
 					':closed' => null,
 					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
@@ -848,7 +848,7 @@ class CALENDAR extends API {
 				];
 				$misc = [];
 				foreach($this->_payload as $key => $value){
-					preg_match('/^' . preg_quote($this->_lang->PROPERTY('calendar.planning.station'), '/') . '(?:\(\d+\))*$/', $key, $station);
+					preg_match('/^' . preg_quote($this->_lang->PROPERTY('calendar.worklists.station'), '/') . '(?:\(\d+\))*$/', $key, $station);
 					if (!$station || !$value) continue;
 					$misc[] = [
 						'station' => $value
@@ -873,20 +873,20 @@ class CALENDAR extends API {
 						'msg' => $this->_lang->GET('calendar.tasks.success'),
 						'type' => 'success'
 					],
-					'data' => ['calendar_uncompletedplans' => $notifications->planning()]]);
+					'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
 				else {
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
 					$calendar->delete($event[':id']);
 					unset($event[':id']);
-					$event[':type'] = 'planning';
+					$event[':type'] = 'worklists';
 					if ($newid = $calendar->post($event)) $this->response([
 						'response' => [
 							'id' => $newid,
 							'msg' => $this->_lang->GET('calendar.tasks.success'),
 							'type' => 'success'
 						],
-						'data' => ['calendar_uncompletedplans' => $notifications->planning()]]);
+						'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
 					else $this->response([
 						'response' => [
 							'id' => false,
@@ -899,7 +899,7 @@ class CALENDAR extends API {
 				$response = ['render' => ['content' => []]];
 
 				// set up calendar
-				$week = $calendar->render('week', 'planning', $this->_requestedTimespan);
+				$week = $calendar->render('week', 'worklists', $this->_requestedTimespan);
 				$previousweek = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousweek->modify('-1 week')->modify('monday this week');
 				$nextweek = clone $calendar->_days[6];
@@ -911,21 +911,21 @@ class CALENDAR extends API {
 						'type' => 'calendar',
 						'description' => $week['header'],
 						'content' => $week['content'],
-						'api' => 'planning'
+						'api' => 'worklists'
 					],
 					[
 						'type' => 'button',
 						'attributes' => [
-							'value' => $this->_lang->GET('calendar.planning.week_previous'),
-							'onclick' => "api.calendar('get', 'planning', '" . $previousweek->format('Y-m-d') . "', '" . $previousweek->format('Y-m-d') . "')",
+							'value' => $this->_lang->GET('calendar.worklists.week_previous'),
+							'onclick' => "api.calendar('get', 'worklists', '" . $previousweek->format('Y-m-d') . "', '" . $previousweek->format('Y-m-d') . "')",
 							'data-type' => 'toleft'
 						]
 					],
 					[
 						'type' => 'button',
 						'attributes' => [
-							'value' => $this->_lang->GET('calendar.planning.week_next') . ' ',
-							'onclick' => "api.calendar('get', 'planning', '" . $nextweek->format('Y-m-d') . "', '" . $nextweek->format('Y-m-d') . "')",
+							'value' => $this->_lang->GET('calendar.worklists.week_next') . ' ',
+							'onclick' => "api.calendar('get', 'worklists', '" . $nextweek->format('Y-m-d') . "', '" . $nextweek->format('Y-m-d') . "')",
 							'data-type' => 'toright'
 						]
 					],
@@ -940,7 +940,7 @@ class CALENDAR extends API {
 
 				// set up default calendar dialog properties
 				$columns = [
-					':type' => 'planning',
+					':type' => 'worklists',
 					':span_start' => $this->_requestedDate, 
 				];
 
@@ -965,7 +965,7 @@ class CALENDAR extends API {
 				$events[] = [
 					'type' => 'calendarbutton',
 					'attributes' => [
-						'value' => $this->_lang->GET('calendar.planning.new'),
+						'value' => $this->_lang->GET('calendar.worklists.new'),
 						'onclick' => $calendar->dialog($columns)
 					]
 				];
@@ -973,7 +973,7 @@ class CALENDAR extends API {
 				$response['render']['content'][] = $events;
 
 				// add events
-				if ($thisDaysEvents) array_push($response['render']['content'], ...$this->planningEvents($thisDaysEvents, $calendar));
+				if ($thisDaysEvents) array_push($response['render']['content'], ...$this->worklistsEvents($thisDaysEvents, $calendar));
 
 				$this->response($response);
 				break;
@@ -984,7 +984,7 @@ class CALENDAR extends API {
 						'msg' => $this->_lang->GET('calendar.tasks.deleted'),
 						'type' => 'deleted'
 					],
-					'data' => ['calendar_uncompletedplans' => $notifications->planning()]]);
+					'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
 				else $this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('calendar.tasks.not_found'),
@@ -1000,20 +1000,20 @@ class CALENDAR extends API {
 	 *  | . | | .'|   |   | |   | . | -_| | | -_|   |  _|_ -|
 	 *  |  _|_|__,|_|_|_|_|_|_|_|_  |___|\_/|___|_|_|_| |___|
 	 *  |_|                     |___|
-	 * renders scheduled plans as articles
+	 * renders scheduled worklists as articles
 	 * @param array $dbevents db query results
 	 * @param object $calendar inherited CALENDARUTILITY-object
 	 * 
 	 * @return array render options for assemble.js 
  	*/
-	private function planningEvents($dbevents, $calendar){
+	private function worklistsEvents($dbevents, $calendar){
 		$events = [];
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'); // to eventually match affected_user_id
 		foreach ($dbevents as $row){
 			$date = new \DateTime($row['span_start']);
 			$due = new \DateTime($row['span_end']);
 			if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
-			if ((!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !in_array($_SESSION['user']['id'], [$row['author_id'], $row['affected_user_id']])) || $row['type'] !== 'planning' ) continue; // skip not planning and not user unit affecting
+			if ((!array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]) && !in_array($_SESSION['user']['id'], [$row['author_id'], $row['affected_user_id']])) || $row['type'] !== 'worklists' ) continue; // skip not worklists and not user unit affecting
 
 			// construct event information
 			$display = $this->_lang->GET('calendar.tasks.date') . ': ' . $this->convertFromServerTime($date->format('Y-m-d')) . "\n" .
@@ -1028,7 +1028,7 @@ class CALENDAR extends API {
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 			// construct complete information
-			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'planning')"];
+			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'worklists')"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.tasks.complete')]['checked'] = true;
@@ -1066,7 +1066,7 @@ class CALENDAR extends API {
 				// prepare information to import to dialog
 				$columns = [
 					':id' => $row['id'],
-					':type' => 'planning',
+					':type' => 'worklists',
 					':span_start' => $date->format('Y-m-d'),
 					':span_end' => $due->format('Y-m-d'),
 					':author_id' => $row['author_id'],
@@ -1095,7 +1095,7 @@ class CALENDAR extends API {
 					'attributes' => [
 						'value' => $this->_lang->GET('calendar.tasks.delete'),
 						'onclick' => "new _client.Dialog({type:'confirm', header:'" . $this->_lang->GET('calendar.tasks.delete') . " " . $row['subject'] . "', options:{'" . $this->_lang->GET('general.cancel_button') . "': false, '" . $this->_lang->GET('calendar.tasks.delete') . "': {'value': true, class: 'reducedCTA'}}})" .
-							".then(confirmation => {if (confirmation) api.calendar('delete', 'planning', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
+							".then(confirmation => {if (confirmation) api.calendar('delete', 'worklists', " . $row['id'] . "); this.disabled = Boolean(confirmation);});"
 					]
 				];
 			}

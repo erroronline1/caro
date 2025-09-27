@@ -30,7 +30,7 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
     * [Kalender](#kalender)
         * [Terminvereinbarung](#terminvereinbarung)
         * [Aufgaben](#aufgaben)
-        * [Vorgangsplanung](#vorgangsplanung)
+        * [Arbeitslisten](#arbeitslisten)
         * [Langzeitplanung](#langzeitplanung)
         * [Zeiterfassung](#zeiterfassung)
     * [Dateien](#dateien)
@@ -695,8 +695,8 @@ graph TD;
 
 [Übersicht](#übersicht)
 
-### Vorgangsplanung
-Während Aufgaben einzelne Fälle oder spezifische Angelegenheiten adressieren, sammelt die Vorgangsplanung Versorgungen anhand ihrer Kennzeichen für Stationsgänge, andere Touren oder wöchentliche Arbeitsausfträge wie anstehende Gießarbeiten. Wärend der abarbeitung ist jeder Vorgang schnell erreichbar. Wie die Aufgaben können die Vorgangsplanungen von jedem Nutzer als erledigt markiert werden, die Bearbeitung und Löschung ist jedoch nur berechtigten Nutzern möglich.
+### Arbeitslisten
+Während Aufgaben einzelne Fälle oder spezifische Angelegenheiten adressieren, sammeln Arbeitslisten Versorgungen anhand ihrer Kennzeichen für Stationsgänge, andere Touren oder wöchentliche Arbeitsausfträge wie anstehende Gießarbeiten. Während der Abarbeitung ist jeder Vorgang schnell erreichbar. Wie die Aufgaben können die Arbeitslisten von jedem Nutzer als erledigt markiert werden, die Bearbeitung und Löschung ist jedoch nur berechtigten Nutzern möglich.
 
 [Übersicht](#übersicht)
 

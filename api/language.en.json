@@ -794,11 +794,11 @@
 			"appointment": "Appointment notice",
 			"header": "Calendar",
 			"longtermplanning": "Long term planning",
-			"planning": "Case planning",
+			"worklists": "Work lists",
 			"tasks": "Tasks",
 			"timesheet": "Timesheet"
 		},
-		"planning":{
+		"worklists":{
 			"name":"Tourname",
 			"new":"schedule new tour",
 			"station": "Case identifier",

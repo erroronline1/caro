@@ -62,7 +62,7 @@ Things are still in motion. Images may be outdated.
     * [Calendar](#calendar)
         * [Appointment notice](#appointment-notice)
         * [Tasks](#tasks)
-        * [Case planning](#case-planning)
+        * [Work lists](#work-lists)
         * [Long term planning](#long-term-planning)
         * [Timesheet](#timesheet)
     * [Files](#files)
@@ -793,8 +793,8 @@ graph TD;
 
 [Content](#content)
 
-### Case planning
-While scheduled tasks address single cases or specified duties, case planning is supposed to gather treatment cases by identifier for hospital ward or other tours or weekly case executions like bundled resin work schedules. During execution every case is accessible by a tap. Similar to other scheduled events, case planning can be marked as completed by anyone, but edited and deleted by authorized users only.
+### Work lists
+While scheduled tasks address single cases or specified duties, work lists are supposed to gather treatment cases by identifier for hospital ward or other tours or weekly case executions like bundled resin work schedules. During execution every case is accessible by a tap. Similar to other scheduled events, work lists can be marked as completed by anyone, but edited and deleted by authorized users only.
 
 [Content](#content)
 
@@ -3379,33 +3379,33 @@ Sample response
 {"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textsection","attributes":{"data-type":"textsection","name":"test event"},"content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'tasks')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
 ```
 
-> DELETE ./api/api.php/calendar/planning/{id}
+> DELETE ./api/api.php/calendar/worklists/{id}
 
-Deletes planning entries.
+Deletes worklist entries.
 
 Similar to tasks.
 
-> GET ./api/api.php/calendar/planning/{date Y-m-d}/{date Y-m-d}
+> GET ./api/api.php/calendar/worklists/{date Y-m-d}/{date Y-m-d}
 
 Returns a calendar.
 
-Similar to tasks with slightly adapted inputs for case planning.
+Similar to tasks with slightly adapted inputs for worklists.
 
-> POST ./api/api.php/calendar/planning
+> POST ./api/api.php/calendar/worklists
 
-Contributes planning entries to the calendar
-
-Similar to tasks.
-
-> PUT ./api/api.php/calendar/planning/{id}
-
-Updates planning entries
+Contributes worklist entries to the calendar
 
 Similar to tasks.
 
-> PUT ./api/api.php/calendar/planning/{id}/{bool}/{type}
+> PUT ./api/api.php/calendar/worklists/{id}
 
-Markes planning entries as complete or revokes state
+Updates worklist entries
+
+Similar to tasks.
+
+> PUT ./api/api.php/calendar/worklists/{id}/{bool}/{type}
+
+Markes worklist entries as complete or revokes state
 
 Similar to tasks.
 

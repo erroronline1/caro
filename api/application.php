@@ -432,7 +432,7 @@ class APPLICATION extends API {
 			$this->_lang->GET('calendar.navigation.header') => [
 				$this->_lang->GET('calendar.navigation.appointment') => ['onclick' => "api.calendar('get', 'appointment')"],
 				$this->_lang->GET('calendar.navigation.tasks') => ['onclick' => "api.calendar('get', 'tasks')"],
-				$this->_lang->GET('calendar.navigation.planning') => ['onclick' => "api.calendar('get', 'planning')"],
+				$this->_lang->GET('calendar.navigation.worklists') => ['onclick' => "api.calendar('get', 'worklists')"],
 				$this->_lang->GET('calendar.navigation.longtermplanning') => ['onclick' => "api.calendar('get', 'longtermplanning')"]
 			],
 			$this->_lang->GET('application.navigation.header') => [

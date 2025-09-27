@@ -56,7 +56,7 @@ class NOTIFICATION extends API {
 			'responsibilities' => $this->responsibilities(),
 			// make the following calls last no matter what to include all possible previous calendar entries and messages
 			'calendar_uncompletedtasks' => $this->tasks(),
-			'calendar_uncompletedplans' => $this->planning(),
+			'calendar_uncompletedworklists' => $this->worklists(),
 			'message_unnotified' => $this->messageunnotified(),
 			'message_unseen' => $this->messageunseen(),
 		];
@@ -947,7 +947,7 @@ class NOTIFICATION extends API {
 	 *  |_|                     |___|
 	 * 
 	 */
-	public function planning(){
+	public function worklists(){
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
@@ -956,7 +956,7 @@ class NOTIFICATION extends API {
 		$uncompleted = 0;
 		foreach ($events as $row){
 			if (!$row['organizational_unit']) continue; 
-			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'planning' && !$row['closed']) $uncompleted++;
+			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'worklists' && !$row['closed']) $uncompleted++;
 		}
 		return $uncompleted;
 	}
