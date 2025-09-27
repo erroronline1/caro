@@ -791,12 +791,12 @@ class SQLQUERY {
 
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number) VALUES (NULL, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_records (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL)"
+			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) VALUES (NULL, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL)",
+			'sqlsrv' => "INSERT INTO caro_records (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL)"
 		],
 		'records_put' => [
-			'mysql' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, lifespan = :lifespan, closed = NULL, erp_case_number = :erp_case_number WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, lifespan = :lifespan, closed = NULL, erp_case_number = :erp_case_number WHERE id = :id"
+			'mysql' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, lifespan = :lifespan, closed = NULL, erp_case_number = :erp_case_number, note = :note WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, lifespan = :lifespan, closed = NULL, erp_case_number = :erp_case_number, note = :note WHERE id = :id"
 		],
 		'records_get_all' => [
 			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id",
@@ -823,8 +823,8 @@ class SQLQUERY {
 			'sqlsrv' => "DELETE FROM caro_records WHERE id = :id"
 		],
 		'records_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
-			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search",
-			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search"
+			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search",
+			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search"
 		],
 
 

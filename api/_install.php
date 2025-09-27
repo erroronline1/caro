@@ -242,6 +242,7 @@ define('DEFAULTSQL', [
 				"	`notified` int NULL DEFAULT NULL," .
 				"	`lifespan` int NULL DEFAULT NULL," .
 				"	`erp_case_number` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`note` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -537,7 +538,8 @@ define('DEFAULTSQL', [
 				"	closed varchar(MAX) NULL DEFAULT NULL," .
 				"	notified int NULL DEFAULT NULL," .
 				"	lifespan int NULL DEFAULT NULL," .
-				"	erp_case_number varchar(255) NULL DEFAULT NULL" .
+				"	erp_case_number varchar(255) NULL DEFAULT NULL," .
+				"	note varchar(MAX) NOT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_records_datalist', N'U') IS NULL " .

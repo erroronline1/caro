@@ -213,10 +213,16 @@ class UPDATE{
 	private function _2025_09_27(){
 		return [
 			'mysql' => [
-				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; "
+				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",
+				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS note text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
 			],
 			'sqlsrv' => [
-				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; "
+				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",
+				"IF COL_LENGTH('caro_records', 'note') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_records" .
+				"    ADD note varchar(MAX) NULL DEFAULT NULL" .
+				" END; "
 			]
 		];
 	}

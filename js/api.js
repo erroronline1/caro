@@ -1951,6 +1951,10 @@ export const api = {
 				} else payload = _.getInputs("[data-usecase=record]", true);
 				break;
 			case "put":
+				if (request[4] instanceof FormData){
+					payload = request[4];
+					delete request[4];
+				}
 				break;
 			default:
 				return;

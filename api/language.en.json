@@ -1469,6 +1469,10 @@
 			"summaries": "Record summaries"
 		},
 		"no_records": "records",
+		"note": "Brief note",
+		"note_edit": "by :name on :date",
+		"note_hint": "For hospital ward/room or other volatile reminders; not part of records.",
+		"note_save": "save note",
 		"pseudodocument_casedocumentation": "Case state",
 		"recommended_continue": "Would you like to proceed with one of the following documents?",
 		"reidentify": "Set a new identifier or merge with another record",

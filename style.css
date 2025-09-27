@@ -760,10 +760,13 @@ article:has(> article) {
 	max-height: 8em;
 }
 .em12 {
-	max-height: 16em;
+	max-height: 12em;
 }
 .em16 {
 	max-height: 16em;
+}
+.em24 {
+	max-height: 24em;
 }
 
 .collapsible.extended {

@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases
     * std method for csv uploads to distinct folder, then show up within tools?
-* records quickinfo (non record type)?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## Content
