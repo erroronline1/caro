@@ -799,7 +799,7 @@
 			"timesheet": "Zeiterfassung"
 		},
 		"worklists":{
-			"events_assigned_units": "Aktuelle Arbeitslisten für deine zugewiesenen Bereiche oder von dir erstellt",
+			"events_assigned_units": "Aktuelle Arbeitslisten für deine Bereiche",
 			"name":"Bezeichnung",
 			"new":"neuen Plan erstellen",
 			"station": "Vorgangskennzeichen",
@@ -827,7 +827,7 @@
 			"edit": "bearbeiten",
 			"error": "Es trat eine Fehler beim Speichern der Aufgabe auf! Bitte versuche es erneut.",
 			"error_missing": "Aufgaben können nur mit einem Datum, einer Beschreibung und ausgewählten Bereichen erstellt werden! Bitte versuche es erneut.",
-			"events_assigned_units": "Heutige Aufgaben für deine zugewiesenen Bereiche oder von dir erstellt",
+			"events_assigned_units": "Heutige Aufgaben für deine Bereiche",
 			"events_assigned_units_previous_uncompleted": "Frühere unerledigte Aufgaben",
 			"events_assigned_units_uncompleted": "Unerledigte Aufgaben",
 			"events_none": "Keine Aufgaben gefunden",

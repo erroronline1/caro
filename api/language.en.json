@@ -799,7 +799,7 @@
 			"timesheet": "Timesheet"
 		},
 		"worklists":{
-			"events_assigned_units": "Current work lists for your assigned units or created by you",
+			"events_assigned_units": "Current work lists for your units",
 			"name":"Tourname",
 			"new":"schedule new tour",
 			"station": "Case identifier",
@@ -827,7 +827,7 @@
 			"edit": "Edit",
 			"error": "Error saving task! Please try again.",
 			"error_missing": "Tasks only can be created with a date, description and selected units! Please try again.",
-			"events_assigned_units": "This days tasks for your assigned units or created by you",
+			"events_assigned_units": "This days tasks for your units",
 			"events_assigned_units_previous_uncompleted": "Previous yet uncompleted tasks",
 			"events_assigned_units_uncompleted": "Yet uncompleted tasks",
 			"events_none": "No tasks found.",
