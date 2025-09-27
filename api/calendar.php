@@ -899,7 +899,7 @@ class CALENDAR extends API {
 				$response = ['render' => ['content' => []]];
 
 				// set up calendar
-				$week = $calendar->render('week', 'worklists', $this->_requestedTimespan);
+				$week = $calendar->render('week', ['worklists'], $this->_requestedTimespan);
 				$previousweek = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousweek->modify('-1 week')->modify('monday this week');
 				$nextweek = clone $calendar->_days[6];
@@ -1386,7 +1386,7 @@ class CALENDAR extends API {
 				$response = ['render' => ['content' => []]];
 
 				// set up calendar
-				$month = $calendar->render('month', 'tasks', $this->_requestedTimespan);
+				$month = $calendar->render('month', ['tasks'], $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousmonth->modify('-1 month')->modify('last day of this month');
 				$nextmonth = clone $calendar->_days[6];
@@ -1782,7 +1782,7 @@ class CALENDAR extends API {
 			case 'GET':
 				$response = ['render' => ['content' => []]];
 				// set up calendar
-				$month = $calendar->render('month', 'timesheet', $this->_requestedTimespan);
+				$month = $calendar->render('month', ['timesheet'], $this->_requestedTimespan);
 				$previousmonth = clone $calendar->_days[6]; // definetly a date and not a null filler
 				$previousmonth->modify('-1 month')->modify('last day of this month');
 				$nextmonth = clone $calendar->_days[6];

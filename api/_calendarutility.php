@@ -762,12 +762,12 @@ class CALENDARUTILITY {
 	 * calculates holidays for every date for possible year overlaps in selected view-format
 	 * 
 	 * @param string $format month|week
-	 * @param string $type tasks|timesheet|worklists
+	 * @param array $type tasks|timesheet|worklists
 	 * @param string $date yyyy-mm-dd
 	 * 
 	 * @return array assemble.js calendar type
 	 */
-	public function render($format = '', $type = '', $date = '', ){
+	public function render($format = '', $types = [], $date = ''){
 		$result = ['header' => null, 'content' => []];
 		if (!$this->_days || $date) $this->days($format, $date);
 
@@ -780,18 +780,20 @@ class CALENDARUTILITY {
 				foreach ($events as $row){
 					if (!$row['organizational_unit']) $row['organizational_unit'] = ''; 
 					$row['affected_user_units'] = $row['affected_user_units'] ? : $row['organizational_unit'];
-					switch ($type){
-						case 'tasks':
-						case 'worklists':
-							if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]))
-								if (!$row['closed'])
+					foreach($types as $type){
+						switch ($type){
+							case 'tasks':
+							case 'worklists':
+								if ($row['type'] === $type && array_intersect(explode(',', $row['organizational_unit']), ['common', ...$_SESSION['user']['units']]))
+									if (!$row['closed'])
+									$numbers++;
+								break;
+							case 'timesheet':
+								if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']]))
 								$numbers++;
-							break;
-						case 'timesheet':
-							if ($row['type'] === $type && array_intersect(explode(',', $row['affected_user_units']), ['common', ...$_SESSION['user']['units']]))
-							$numbers++;
-							break;
-					}	
+								break;
+						}
+					}
 				}
 
 				// construct information for day

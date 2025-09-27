@@ -917,7 +917,7 @@ class APPLICATION extends API {
 			// calendar scheduled events
 			$overview = [];
 			$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-			$week = $calendar->render('week', 'tasks');
+			$week = $calendar->render('week', ['tasks', 'worklists']);
 
 			// add overview to calendar view
 			$overview[] = [
