@@ -940,28 +940,6 @@ class NOTIFICATION extends API {
 
 
 	/**
-	 *       _             _         
-	 *   ___| |___ ___ ___|_|___ ___ 
-	 *  | . | | .'|   |   | |   | . |
-	 *  |  _|_|__,|_|_|_|_|_|_|_|_  |
-	 *  |_|                     |___|
-	 * 
-	 */
-	public function worklists(){
-		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
-		$today = new \DateTime('now');
-		$today->setTime(0, 0);
-
-		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
-		$uncompleted = 0;
-		foreach ($events as $row){
-			if (!$row['organizational_unit']) continue; 
-			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'worklists' && !$row['closed']) $uncompleted++;
-		}
-		return $uncompleted;
-	}
-
-	/**
 	 *                                 _           _
 	 *   ___ ___ ___ ___ ___ ___ ___ _| |___ ___ _| |___ ___ ___
 	 *  | . |  _| -_| . | .'|  _| -_| . | . |  _| . | -_|  _|_ -|
@@ -1103,6 +1081,27 @@ class NOTIFICATION extends API {
 		foreach ($events as $row){
 			if (!$row['organizational_unit']) continue; 
 			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'tasks' && !$row['closed']) $uncompleted++;
+		}
+		return $uncompleted;
+	}
+
+	/**
+	 *                 _   _ _     _       
+	 *   _ _ _ ___ ___| |_| |_|___| |_ ___ 
+	 *  | | | | . |  _| '_| | |_ -|  _|_ -|
+	 *  |_____|___|_| |_,_|_|_|___|_| |___|
+	 *
+	 */
+	public function worklists(){
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
+		$today = new \DateTime('now');
+		$today->setTime(0, 0);
+
+		$events = $calendar->getWithinDateRange(null, $today->format('Y-m-d'));
+		$uncompleted = 0;
+		foreach ($events as $row){
+			if (!$row['organizational_unit']) continue; 
+			if (array_intersect(explode(',', $row['organizational_unit'] ? : ''), $_SESSION['user']['units']) && $row['type'] === 'worklists' && !$row['closed']) $uncompleted++;
 		}
 		return $uncompleted;
 	}
