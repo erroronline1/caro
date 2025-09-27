@@ -1053,7 +1053,7 @@ export class Assemble {
 	 *
 	 * elements are assembled by default but can be assigned common html attributes
 	 * names are mandatory for input elements
-	 * @requires api, _client, JsBarcode, QrCreator, SignaturePad
+	 * @requires api, _client, JsBarcode, QrCreator, SignaturePad, TLN
 	 * @param {object} setup render object
 	 */
 	constructor(setup) {
@@ -1063,6 +1063,7 @@ export class Assemble {
 		this.imageQrCode = [];
 		this.imageBarCode = [];
 		this.imageUrl = [];
+this.codeEditor=[];
 		this.names = setup.names || {};
 		this.composer = setup.composer;
 	}
@@ -1149,6 +1150,11 @@ export class Assemble {
 			images: this.imageUrl,
 		});
 
+		if (this.codeEditor.length){
+			for (const id of this.codeEditor){
+				TLN.append_line_numbers(id);
+			}
+		}
 		if (this.imageQrCode.length || this.imageBarCode.length || this.imageUrl.length) {
 			lazyload.lazyload();
 			eventListenerTarget.addEventListener(
@@ -3453,17 +3459,10 @@ export class Assemble {
 			delete this.currentElement.hint;
 		}
 		if (this.currentElement.editor) {
-			let div = document.createElement("div"),
-				linenumber = document.createElement("div");
-			linenumber.id = getNextElementID();
+			let div = document.createElement("div");
 			div.classList.add("editor");
-			linenumber.classList.add("line-numbers");
-			linenumber.append(document.createElement("span"));
-			div.append(linenumber, textarea);
-			textarea.addEventListener("keyup", (event) => {
-				const numberOfLines = event.target.value.split("\n").length;
-				document.getElementById(linenumber.id).innerHTML = Array(numberOfLines).fill("<span></span>").join("");
-			});
+			div.append(textarea);
+			this.codeEditor.push(textarea.id);
 			div.append(document.createElement("br"));
 			textarea = div;
 		}

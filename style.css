@@ -1183,37 +1183,6 @@ html[data-useragent*="safari"] body {
 	height: 15em;
 	overflow: auto;
 	padding: 0.75em;
-
-	& > textarea {
-		font-family: inherit;
-		line-height: inherit;
-		overflow-y: hidden;
-		white-space: pre;
-		padding: 0;
-		border: 0;
-		margin: 0;
-		min-width: 500em;
-		outline: none;
-		resize: none;
-		height: calc(1.5em * 1000); /* about 1000 lines of 1.5 line-height should suffice*/
-	}
-
-	.line-numbers {
-		width: 2em;
-		text-align: right;
-		height: calc(1.5em * 1000);
-		line-height: inherit;
-	}
-
-	.line-numbers span {
-		counter-increment: linenumber;
-		display: block;
-	}
-
-	.line-numbers span::before {
-		content: counter(linenumber);
-		color: var(--disabled);
-	}
 }
 
 /*

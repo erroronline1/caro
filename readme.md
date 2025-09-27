@@ -6184,6 +6184,12 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * v1.13
     * \> 200 stars
     * \> 50 forks
+* [https://github.com/MatheusAvellar/textarea-line-numbers](https://github.com/MatheusAvellar/textarea-line-numbers)
+    * applies line numbers to textareas for code editor widgets
+    * Justification: this nifty library does it tidy with little load. Don't have to reinvent the wheel.
+    * \> 50 stars
+    * \> 10 forks
+    * slightly modified to drop font names, font sizes and colours, .tln-wrapper top padding adjustments within css
 * [Font Awesome 5](https://fontawesome.com/)
     * SVG ui-icon files, not executable
     * Justification: "Der Mensch ist doch ein Augentier, schöne Dinge wünsch ich mir!"
