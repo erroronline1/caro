@@ -1,4 +1,4 @@
-![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
+![CARO logo](media/favicon/icon72.png)
 # CARO - Cloud Assisted Records and Operations
 Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lokale Apache- oder IIS-Server-Umgebungen.
 
@@ -1163,7 +1163,7 @@ eingefasst sein
 ein `code mit <Klammern>`  
 Betonung*im*Wort und __Betonung mit Unterstrich__  
 eine@email.addresse und maskierte\@email.addresse  
-![ein externes Bild](./media/favicon/android/android-launchericon-48-48.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
+![ein externes Bild](./media/favicon/icon72.png) kann, wird aber im CARO Kontext wegen des Service-Workers üblicherweise nicht dargestellt  
 123\. maskierter Punkt um eine Liste zu vermeiden  
 
 ### Verschachtelte Elemente in Listen
@@ -1783,7 +1783,7 @@ issue_mail = "issues@companymail.tld" ; Kontaktadresse für Meldungen in Bezug a
 order_auth = "token, signature" ; Optionen: token, signature; pin ist Standard, da dieser die Bestellberechtigung repräsentiert
 order_gtin_barcode = no ; yes: ja, no: nein; stellt einen GTIN/EAN Strichcode da, sofern verfügbar, oder erzwingt statt dessen einen QR-Code mit der Artikelnummer, je nach Zustand des ERP
 require_complaint_selection = yes ; yes: ja, no: nein; die Auswahl ob eine Aufzeichnung einen Bezug zu einer Reklamation hat, ist zwingend erforderlich
-watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
+watermark = "media/favicon/icon192.png" ; .jpg, .jpeg, .png, .gif, wird in Bilder eingefügt sofern ausgewählt, "" um zu verzichten, z.B. Firmenlogo
 
 [calendar]
 timezones[europeberlin] = "Europe/Berlin" ; der erste Eintrag muss der Serverstandort sein; um weitere tz Zeitzonen je nach Standorten ergänzen, in den Profileinstellungen wählbar
@@ -1945,13 +1945,13 @@ label[footer] = no
 ; Seiteneinstellungen für PDF-Aufzeichnungen
 [pdf]
 record[format] = 'A4'
-record[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
+record[header_image] = "media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
 record[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
 record[exportimage_maxheight] = 75 ; Je nach typischen Seitenverhältnissen für Querformat, muss ausgetestet werden
 
 appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape
-appointment[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
+appointment[header_image] = "media/favicon/icon192.png" ; Anzeige oben rechts, automatisch skaliert auf 20mm Höhe, "" um zu verzichten, z.B. Firmenlogo
 appointment[footer_image] = "" ; Anzeige unten rechts, automatisch skaliert auf 10mm Höhe, "" um zu verzichten, z.B. Abteilungslogo
 appointment[codesizelimit] = 50
 appointment[codepadding] = 10

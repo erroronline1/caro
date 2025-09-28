@@ -1,4 +1,4 @@
-![CARO logo](media/favicon/windows11/SmallTile.scale-100.png)
+![CARO logo](media/favicon/icon72.png)
 # CARO - Cloud Assisted Records and Operations
 A quality management software as device agnostic web-app for local Apache- or IIS-server environments.
 
@@ -1253,7 +1253,7 @@ three \` or ~
 some `code with <brackets>`  
 mid*word*emphasis and __underscore emphasis__  
 some@mail.address and escaped\@mail.address  
-![an external image](./media/favicon/android/android-launchericon-48-48.png) could, but may not work in caro context because of the Service-Worker though  
+![an external image](./media/favicon/icon72.png) could, but may not work in caro context because of the Service-Worker though  
 123\. escaped period avoiding a list
 
 ### Nested items in lists
@@ -1874,7 +1874,7 @@ issue_mail = "issues@companymail.tld" ; address for application and security iss
 order_auth = "token, signature" ; available options: token, signature; pin is default, because it represents authorization
 order_gtin_barcode = no ; yes, no; displays a gtin barcode if available or force all orders displaying the article number as a qr-code instead, dependent on the state of your erp
 require_record_type_selection = yes ; yes, no; require selection on records e.g. if this is related to a complaint 
-watermark = "media/favicon/android/android-launchericon-192-192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
+watermark = "media/favicon/icon192.png" ; .jpg, .jpeg, .png, .gif, copied into images on resizing if selected, leave as "" if not desired, e.g. company logo
 
 [calendar]
 timezones[europeberlin] = "Europe/Berlin" ; initial entry has to be server site; append tz time zones to your customs, selecteable within user settings
@@ -2035,13 +2035,13 @@ label[footer] = no
 ; page settings for record pdf
 [pdf]
 record[format] = 'A4'
-record[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
+record[header_image] = "media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
 record[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
 record[exportimage_maxheight] = 75 ; try what fits your typical aspect ratio for landscape
 
 appointment[format] = 'A5'
 appointment[orientation] = 'landscape' ; portrait or landscape
-appointment[header_image] = "media/favicon/android/android-launchericon-192-192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
+appointment[header_image] = "media/favicon/icon192.png" ; displayed top right, auto scaled to 20mm maximum height, leave as "" if not desired, e.g. company logo
 appointment[footer_image] = "" ; displayed bottom right, auto scaled to 10mm maximum height, leave as "" if not desired, e.g. department logo
 appointment[codesizelimit] = 50
 appointment[codepadding] = 10
@@ -4324,7 +4324,7 @@ Parameters
 
 Sample response
 ```
-{"render":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/ios/256.png","user":"CARO App","text":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
+{"render":{"content":[[{"type":"deletebutton","attributes":{"value":"Delete conversation","onpointerup":"new Dialog({type:'confirm', header:'Delete conversation', options:{'No, thank you': false,'Yes, delete conversation':{value: true, class:'reducedCTA'},}}).then(confirmation =>{if (confirmation) api.message('delete','conversation', 1,'inbox')})"}}],[{"type":"message","content":{"img":"media/favicon/icon192.png","user":"CARO App","text":"The certificate / quality agreement with Otto Bock has expired. Look after an updated one! is scheduled for 2024-05-27 by CARO App and due on 2024-05-27.",....
 ```
 
 > POST ./api/api.php/message/message

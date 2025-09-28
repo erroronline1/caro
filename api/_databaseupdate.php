@@ -206,7 +206,8 @@ class UPDATE{
 		return [
 			'mysql' => [
 				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",
-				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS note text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
+				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS note text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
+				"UPDATE caro_user SET image = 'media/favicon/icon192.png' where id = 1; "
 			],
 			'sqlsrv' => [
 				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",
@@ -214,7 +215,8 @@ class UPDATE{
 				" BEGIN" .
 				"    ALTER TABLE caro_records" .
 				"    ADD note varchar(MAX) NULL DEFAULT NULL" .
-				" END; "
+				" END; ",
+				"UPDATE caro_user SET image = 'media/favicon/icon192.png' where id = 1; "
 			]
 		];
 	}

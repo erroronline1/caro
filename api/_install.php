@@ -885,7 +885,7 @@ class INSTALL {
 					':units' => '',
 					':token' => REQUEST[1],
 					':orderauth' => '',
-					':image' => 'media/favicon/ios/256.png',
+					':image' => 'media/favicon/icon192.png',
 					':app_settings' => '',
 					':skills' => ''
 				]
