@@ -6148,6 +6148,7 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * v2.3.8
     * \> 5k stars
     * \> 1k forks
+    * [ASL 2.0 license](https://github.com/mebjas/html5-qrcode?tab=Apache-2.0-1-ov-file)
     * [https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js](https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js) slightly modified for multi-language integration of applications language model
 * [https://github.com/tecnickcom/TCPDF](https://github.com/tecnickcom/TCPDF)
     * creates PDF-files on the server side
@@ -6155,40 +6156,47 @@ O.Cryp_8 For TLS one of the recommended cypher suits in [TR02102-2], chapter 3.3
     * v6.10.0
     * \> 4k stars
     * \> 1k forks
+    * [LGPL license](https://github.com/tecnickcom/TCPDF?tab=License-1-ov-file)
 * [https://github.com/mk-j/PHP_XLSXWriter](https://github.com/mk-j/PHP_XLSXWriter)
     * creates XLSX-files on the server side
     * Justification: this library enables consistent and correct creation of the widely used XLSX-format for data transfers from the application.
     * v0.39
     * \> 1k stars
     * \> 650 forks
+    * [MIT license](https://github.com/mk-j/PHP_XLSXWriter?tab=MIT-1-ov-file)
 * [https://github.com/szimek/signature_pad](https://github.com/szimek/signature_pad)
     * creates a canvas to draw upon on the client side
     * Justification: this library enables the use of simple electronic signature (SES) according to eIDAS.
     * v5.1.1
     * \> 11k stars
     * \> 2k forks
+    * [MIT license](https://github.com/szimek/signature_pad?tab=MIT-1-ov-file)
 * [https://github.com/nimiq/qr-creator](https://github.com/nimiq/qr-creator)
     * creates qr codes on the client side
     * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
     * \> 200 stars
     * \> 20 forks
+    * [MIT license](https://github.com/nimiq/qr-creator?tab=MIT-1-ov-file)
 * [https://github.com/lindell/JsBarcode/](https://github.com/lindell/JsBarcode/)
     * creates barcodes on the client side
     * Justification: creating 2D-codes on the client side reduces data volume and server operations as opposed to rendering and transferring codes with the TCPDF library.
     * v3.12.1
     * \> 5k stars
     * \> 1k forks
+    * [MIT license](https://github.com/lindell/JsBarcode/?tab=MIT-1-ov-file)
 * [https://github.com/omrips/viewstl](https://github.com/omrips/viewstl)
     * renders stl files on the client side
     * Justification: this library reduces the need of additional software for physically distant units communicating on digital models
     * v1.13
     * \> 200 stars
     * \> 50 forks
+    * [MIT license](https://github.com/omrips/viewstl?tab=MIT-1-ov-file)
 * [https://github.com/MatheusAvellar/textarea-line-numbers](https://github.com/MatheusAvellar/textarea-line-numbers)
     * applies line numbers to textareas for code editor widgets
     * Justification: this nifty library does it tidy with little load. Don't have to reinvent the wheel.
     * \> 50 stars
     * \> 10 forks
+    * [ASL 2.0 license](https://github.com/MatheusAvellar/textarea-line-numbers?tab=Apache-2.0-1-ov-file)
     * slightly modified to drop font names, font sizes and colours, .tln-wrapper top padding adjustments within css
 * [Font Awesome 5](https://fontawesome.com/)
     * SVG ui-icon files, not executable
@@ -6214,15 +6222,13 @@ There are **no** dependency install routines for [composer](https://getcomposer.
 [Content](#content)
 
 # License
-[CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
-
+[CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
 Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation,  either version 3 of the License, or any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
+You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
 
 # The team
 | Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |

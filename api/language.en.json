@@ -1,5 +1,5 @@
 {
-	"_LICENSE": "CARO - Cloud Assisted Records and Operations Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one) This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.",
+	"_LICENSE": "CARO - Cloud Assisted Records and Operations\nCopyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\nYou should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.\nThird party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))",
 	"_IMPORTANT": "see _language.md",
 	"company": {
 		"address": "Marvellous Aid Manufacturing, In The Meadows 18, 10E89 Meadow Creek, Coderland",
@@ -197,7 +197,6 @@
 	},
 	"application": {
 		"about": {
-			"license": "Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n \nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.",
 			"license_header": "CARO - Cloud Assisted Records and Operations",
 			"lines": ":code lines of code\n:documentation lines of documentation\n:configuration lines of configuration",
 			"lines_header": "Affectionate crafted",

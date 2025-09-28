@@ -2369,15 +2369,13 @@ Eine Auflistung der verwendeten Bibliotheken liegt in der englischsprachigen Bes
 [Übersicht](#übersicht)
 
 # Lizenz
-[CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
-
+[CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
 Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
 
-Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU Affero General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder jeder späteren Version.
-
-Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU Affero General Public License.
-
-Sie sollten ein Exemplar der GNU Affero General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>.
+Dieses Programm ist freie Software. Sie können es unter den Bedingungen der GNU Affero General Public License, wie von der Free Software Foundation veröffentlicht, weitergeben und/oder modifizieren, entweder gemäß Version 3 der Lizenz oder jeder späteren Version.  
+Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE, sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Details finden Sie in der GNU Affero General Public License.  
+Sie sollten ein Exemplar der GNU Affero General Public License zusammen mit diesem Programm erhalten haben. Falls nicht, siehe <http://www.gnu.org/licenses/>.  
+Verwendete Bibliotheken von Drittanbietern werden zu deren gesonderten Bedingungen veröffentlicht (siehe [readme.md](readme.md#external-libraries))
 
 # Das Team
 | Product Manager | Lead developer | Lead designer | Usability / QA / RA / Testing |
