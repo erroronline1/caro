@@ -26,6 +26,12 @@ Things are still in motion. Images may be outdated.
 * post-market evaluation
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
+* consider search _shared.php
+    * method returning ([+-]{0,1})([\w\.]+:){0,1}((?:["\'])(.+?)(?:["\'])|\S+) on search term  
+      to array of $operator [1], $column[0:-1] if [2], $term [3], $term if quoted [4]
+    * database queries insert and replace AND (:COLUMNSEARCH), plus effectively unnecessary,
+    * document replace fnsearch with preg_match, searchable terms keyed for -*column_name:[\S]+
+* readme roles update
 
 ## to do
 * unittests
