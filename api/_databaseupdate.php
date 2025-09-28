@@ -41,7 +41,7 @@ class UPDATE{
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
 					$sql = SQLQUERY::EXECUTE($this->_pdo, $query);
-					if (!$sql[1])
+					if (!$sql || !$sql[1])
 						echo '<br />[*] This update has no errorInfo and was successful or without side effects:<br /><code>' . $query . '</code><br />';
 					else
 						echo '<br />[X] This update likely has failed with errorInfo ' . json_encode($sql) . ':<br /><code>' . $query . '</code><br />';
