@@ -31,7 +31,6 @@ Things are still in motion. Images may be outdated.
       to array of $operator [1], $column[0:-1] if [2], $term [3], $term if quoted [4]
     * database queries insert and replace AND (:COLUMNSEARCH), plus effectively unnecessary,
     * document replace fnsearch with preg_match, searchable terms keyed for -*column_name:[\S]+
-* readme roles update
 
 ## to do
 * unittests
@@ -1856,6 +1855,7 @@ Using the config.env-file you can also append labels, forbidden names, hide_offd
 By default following permissions/roles are defined within the language.XX.json-file:
 ```
 {
+    "patient": "Patient",
     "user": "User",
     "group": "Group",
     "medicaldeviceconsultant": "Medical device consultant",
@@ -1864,6 +1864,7 @@ By default following permissions/roles are defined within the language.XX.json-f
     "human_ressources": "Human ressources",
     "purchase": "Purchase",
     "purchase_assistant": "Purchase assistant",
+    "hazardous_materials": "Hazardous materials safety officer",
     "qmo": "Quality management officer",
     "prrc": "Person responsible for regulatory compliance",
     "ceo": "CEO",

@@ -1759,6 +1759,7 @@ In den Umgebungseinstellungen können auch Label, unerlaubte Namen, hide_offduty
 Standardmäßig sind folgende Berechtigungen/Rollen in der language.XX.json-Datei definiert:
 ```
 {
+    "patient": "Patient",
     "user": "Mitarbeiter",
     "group": "Gruppe",
     "medicaldeviceconsultant": "Medizinprodukteberater",
@@ -1767,6 +1768,7 @@ Standardmäßig sind folgende Berechtigungen/Rollen in der language.XX.json-Date
     "human_ressources": "Personalverwaltung",
     "purchase": "Einkauf",
     "purchase_assistant": "Einkaufsassistent",
+    "hazardous_materials": "Sicherheitsbeauftragter für Gefahrstoffe",
     "qmo": "Qualitätsmanagementbeauftragter",
     "prrc": "Verantwortliche Person nach MDR",
     "ceo": "Leiter",
