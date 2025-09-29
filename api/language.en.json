@@ -799,8 +799,8 @@
 		},
 		"worklists":{
 			"events_assigned_units": "Current work lists for your units",
-			"name":"Tourname",
-			"new":"schedule new tour",
+			"name":"Name",
+			"new":"schedule new work list",
 			"station": "Case identifier",
 			"week_next":"next week",
 			"week_previous":"previous week"			
