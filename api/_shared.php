@@ -297,7 +297,7 @@ class SEARCHHANDLER {
 		$hidden = $matches = [];
 		$recentdocument = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
-		preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+		$expressions = UTILITY::searchExpressions($parameter['search']);
 
 		/**
 		 * iterates over terms and checks if mandatory, excluded or any search strings are found
@@ -309,19 +309,16 @@ class SEARCHHANDLER {
 		function searchExpressions($terms, $expressions){
 			$any = $mandatory = false;
 			foreach ($expressions as $expression){
-				list(, $operator, $search) = $expression;
-				$search = isset($expression[3]) ? $expression[3] : $search; // quoted literal
-
 				foreach($terms as $term){
-					$found = @fnmatch('*' . $search . '*', $term, FNM_CASEFOLD);
-					if ($operator === '-' && $found) return false; // this term should not have been included
-					elseif ($operator === '+' && $found) $mandatory = true; // this term must have been included
-					elseif ($found) $any = true;
+					preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches);
+					if ($expression['operator'] === '-' && $matches) return false; // this term should not have been included
+					elseif ($expression['operator'] === '+' && $matches) $mandatory = true; // this term must have been included
+					elseif ($matches) $any = true;
 				}
 				if ($any && $mandatory) return true;
 			}
 			// mandatory has not been requested
-			if (!array_filter($expressions, fn($o) => $o[2] === '+')) $mandatory = true;
+			if (!array_filter($expressions, fn($o) => $o['operator'] === '+')) $mandatory = true;
 			if ($any && $mandatory) return true;
 			return false;
 		}
@@ -389,21 +386,19 @@ class SEARCHHANDLER {
 		if ($parameter['search']) {
 			// reduce expressions by leading operators
 			foreach($expressions as $index => &$expression){
-				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
-				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
-				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
 			}
 			usort($matches, function ($a, $b) use ($expressions){
 				$a_matches = $b_matches = 0;
 				foreach($expressions as $expression){
 					foreach($a['_searchableTerms'] as $term) {
-						if (preg_match('/' . $expression[2] . '/i', $term ? : '', $matches)) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches)) {
 							$a_matches++;
 							break;
 						}
 					}
 					foreach($b['_searchableTerms'] as $term) {
-						if (preg_match('/' . $expression[2] . '/i', $term ? : '', $matches)) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches)) {
 							$b_matches++;
 							break;
 						}
@@ -441,28 +436,24 @@ class SEARCHHANDLER {
 
 		if ($parameter['search']) {
 			// order matches by relevance; shift to top if all of optional terms have been found
-			preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+			$expressions = UTILITY::searchExpressions($parameter['search']);
 			// reduce expressions by leading operators
 			foreach($expressions as $index => &$expression){
-				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
-				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
-				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
 			}
 			usort($data, function ($a, $b) use ($expressions){
 				$a_matches = $b_matches = 0;
 				foreach($expressions as $expression){
-					foreach($expressions as $expression){
-						foreach(['identifier', 'content'] as $column) {
-							if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
-								$a_matches++;
-								break;
-							}
+					foreach(['identifier', 'content'] as $column) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $a[$column] ? : '', $matches)) {
+							$a_matches++;
+							break;
 						}
-						foreach(['identifier', 'content'] as $column) {
-							if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
-								$b_matches++;
-								break;
-							}
+					}
+					foreach(['identifier', 'content'] as $column) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $b[$column] ? : '', $matches)) {
+							$b_matches++;
+							break;
 						}
 					}
 				}
@@ -525,24 +516,22 @@ class SEARCHHANDLER {
 
 		if ($parameter['search']) {
 			// order matches by relevance; shift to top if all of optional terms have been found
-			preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+			$expressions = UTILITY::searchExpressions($parameter['search']);
 			// reduce expressions by leading operators
 			foreach($expressions as $index => &$expression){
-				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
-				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
-				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
 			}
 			usort($risk_datalist, function ($a, $b) use ($expressions){
 				$a_matches = $b_matches = 0;
 				foreach($expressions as $expression){
 					foreach(['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder'] as $column) {
-						if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $a[$column] ? : '', $matches)) {
 							$a_matches++;
 							break;
 						}
 					}
 					foreach(['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder'] as $column) {
-						if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $b[$column] ? : '', $matches)) {
 							$b_matches++;
 							break;
 						}
@@ -654,28 +643,24 @@ class SEARCHHANDLER {
 				]
 			]);
 			// order matches by relevance; shift to top if all of optional terms have been found
-			preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $parameter['search']? : '', $expressions, PREG_SET_ORDER);
+			$expressions = UTILITY::searchExpressions($parameter['search']);
 			// reduce expressions by leading operators
 			foreach($expressions as $index => &$expression){
-				if ($expression[1] === '-') unset($expressions[$index]); // has - operator
-				$expression[2] = isset($expression[3]) ? $expression[3] : $expression[2]; // quoted literal; reassign for reducing of operations later
-				$expression[2] = preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $expression[2]);
+				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
 			}
 			usort($search, function ($a, $b) use ($expressions){
 				$a_matches = $b_matches = 0;
 				foreach($expressions as $expression){
-					foreach($expressions as $expression){
-						foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
-							if (preg_match('/' . $expression[2] . '/i', $a[$column] ? : '', $matches)) {
-								$a_matches++;
-								break;
-							}
+					foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $a[$column] ? : '', $matches)) {
+							$a_matches++;
+							break;
 						}
-						foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
-							if (preg_match('/' . $expression[2] . '/i', $b[$column] ? : '', $matches)) {
-								$b_matches++;
-								break;
-							}
+					}
+					foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
+						if (preg_match('/' . $expression['pregterm'] . '/i', $b[$column] ? : '', $matches)) {
+							$b_matches++;
+							break;
 						}
 					}
 				}

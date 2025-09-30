@@ -109,34 +109,29 @@ class SQLQUERY {
 	 * @param bool|string $wildcards true for ? and *, all for replacement of [^\w\d], contain for only %...%
 	 */
 	private static function SEARCH($_pdo, $query, $value, $wildcards){
-		
 		preg_match_all('/( +(AND|OR) +)*\((([\w\d\.]+?) LIKE :SEARCH)\)/i', $query, $columns, PREG_SET_ORDER);
-		preg_match_all('/([+-]{0,})(["\'](.+?)["\']|\S+)/', $value, $expressions, PREG_SET_ORDER);
+		$expressions = UTILITY::searchExpressions($value);
 
 		foreach ($columns as $column){
 			$concatenations = [];
 			foreach ($expressions as $expression){
-				list(, $operator, $search) = $expression;
-				$search = isset($expression[3]) ? $expression[3] : $search; // quoted literal
-				if (in_array($search, ['+', '-'])) continue; // drop accidental mistypes
-
 				switch(CONFIG['sql'][CONFIG['sql']['use']]['driver']){
 					case 'mysql':
-						if ($operator === '+') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
-						elseif ($operator === '-') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
-						else $concatenations[] = 'OR IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
+						if ($expression['operator'] === '+') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						elseif ($expression['operator'] === '-') $concatenations[] = 'AND IFNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						else $concatenations[] = 'OR IFNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						break;
 					case 'sqlsrv':
-						if ($operator === '+') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
-						elseif ($operator === '-') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
-						else $concatenations[] = 'OR ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($search, $wildcards)) . ')';
+						if ($expression['operator'] === '+') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						elseif ($expression['operator'] === '-') $concatenations[] = 'AND ISNULL(LOWER(' . $column[4] . "), '') NOT LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
+						else $concatenations[] = 'OR ISNULL(LOWER(' . $column[4] . "), '') LIKE LOWER(" . $_pdo->quote(self::WILDCARD($expression['term'], $wildcards)) . ')';
 						break;
 				}
 			}
 			$concatenation = implode(' ', $concatenations);
 			$concatenation = substr($concatenation, strpos($concatenation, ' ')); // drop initial and/or
 
-			if ($operator === '-' && count($expressions) < 2 && $column[2] === 'OR')
+			if ($expression['operator'] === '-' && count($expressions) < 2 && $column[2] === 'OR')
 				$query = str_replace($column[0], str_replace(' OR ', ' AND ', $column[0]), $query);
 
 			$query = str_replace($column[3], $concatenation, $query);

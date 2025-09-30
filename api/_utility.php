@@ -650,6 +650,38 @@ class UTILITY {
 		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
 	}
 
+
+	/**
+	 *                       _                               _
+	 *   ___ ___ ___ ___ ___| |_ ___ _ _ ___ ___ ___ ___ ___|_|___ ___ ___
+	 *  |_ -| -_| .'|  _|  _|   | -_|_'_| . |  _| -_|_ -|_ -| | . |   |_ -|
+	 *  |___|___|__,|_| |___|_|_|___|_,_|  _|_| |___|___|___|_|___|_|_|___|
+	 *                                  |_|
+	 * splits a search into terms with conditions
+	 * @param string $search requested search string
+	 * @return array array of named arrays containing operator, column, term and pregterm with wildcard replacement
+	 */
+	public static function searchExpressions($search){
+		preg_match_all('/([+-]{0,1})([\w\.]+:){0,1}((?:["\'])(.+?)(?:["\'])|\S+)/', $search ? : '', $expressions, PREG_SET_ORDER);
+		$result = [];
+		foreach($expressions as $expression){
+			$term = isset($expression[4]) ? $expression[4] : $expression[3];
+			$column = isset($expression[2]) ? substr($expression[2], 0, -1) : null;
+			
+			// filter terms resulting in unnecessary huge result lists
+			if (in_array($term, ['+', '-'])) continue; // most probably a typo 
+			if (strlen($term) < 2 && !$column) continue; // still allows explicit int(bool)
+
+			$result[] = [
+				'operator' => $expression[1] ? : null,
+				'column' => $column,
+				'term' => $term,
+				'pregterm' => preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $term)
+			];
+		}
+		return $result;		
+	}
+
 	/**
 	 *                             _ _             _
 	 *   ___ ___ ___ _ _ ___ ___ _| |_|___ ___ ___| |_ ___ ___ _ _
