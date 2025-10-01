@@ -506,7 +506,7 @@ class UTILITY {
 				parse_str($inputstream, $post);
 				$data = array();
 				foreach ($post as $key => $val) {
-					$data[hex2bin($key)] = $val;
+					$data[hex2bin($key)] = urldecode($val);
 				}
 				break;
 			case "POST":
