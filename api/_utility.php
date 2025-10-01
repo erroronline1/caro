@@ -670,7 +670,7 @@ class UTILITY {
 			
 			// filter terms resulting in unnecessary huge result lists
 			if (in_array($term, ['+', '-'])) continue; // most probably a typo 
-			if (strlen($term) < 2 && !$column) continue; // still allows explicit int(bool)
+			if (strlen($term) < 2 && $term !== '%' && !$column) continue; // still allows explicit int(bool) and general system searches
 
 			$result[] = [
 				'operator' => $expression[1] ? : null,
