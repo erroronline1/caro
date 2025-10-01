@@ -636,8 +636,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		END;
 		
 		if (!trim($name) && !trim($dob)) return [];
-
-		$name = preg_split('/\s+/', $name);
+		$name = preg_split('/[\s,;]+/', $name);
 		$namesearch = [];
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
