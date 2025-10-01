@@ -204,7 +204,8 @@ class NOTIFICATION extends API {
 												':content' => $this->_pdo->quote(UTILITY::json_encode($records)),
 												':id' => $case['id'],
 												':lifespan' => $case['lifespan'] ? intval($case['lifespan']) : 'NULL',
-												':erp_case_number' => $this->_pdo->quote($case['erp_case_number'])
+												':erp_case_number' => $this->_pdo->quote($case['erp_case_number']),
+												':note' => $this->_pdo->quote($case['note'] ? : '')
 											]) . '; ');
 									}
 								}
@@ -233,7 +234,7 @@ class NOTIFICATION extends API {
 									],
 									'replacements' => [
 										':organizational_unit' => implode(",", array_keys($this->_lang->_USER['units'])),
-										':user' => ''
+										':user' => 0
 									]
 								]);
 								
@@ -542,7 +543,7 @@ class NOTIFICATION extends API {
 									$subject = $this->_lang->GET('order.alert_archived_limit', [
 										':max' => CONFIG['limits']['order_approved_archived']
 									], true);
-									$reminders = $calendar->search($subject);
+									$reminders = $calendar->search('"' . $subject . '"'); // literal
 									$open = false;
 									foreach ($reminders as $reminder){
 										if (!$reminder['closed']) $open = true;
@@ -591,7 +592,7 @@ class NOTIFICATION extends API {
 									}
 									if ($documents){
 										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-										$reminders = $calendar->search($this->_lang->GET('calendar.tasks.alert_vendor_document_expired', [':vendor' => $vendor['name']], true));
+										$reminders = $calendar->search('"' . $this->_lang->GET('calendar.tasks.alert_vendor_document_expired', [':vendor' => $vendor['name']], true) . '"'); // literal
 										$open = false;
 										foreach ($reminders as $reminder){
 											if (!$reminder['closed']) $open = true;
@@ -632,7 +633,7 @@ class NOTIFICATION extends API {
 									}
 									if ($documents){
 										// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-										$reminders = $calendar->search($this->_lang->GET('calendar.tasks.alert_product_document_expired', [':vendor' => $vendor['name']], true));
+										$reminders = $calendar->search('"' . $this->_lang->GET('calendar.tasks.alert_product_document_expired', [':vendor' => $vendor['name']], true) . '"'); // literal
 										$open = false;
 										foreach ($reminders as $reminder){
 											if (!$reminder['closed']) $open = true;
@@ -663,7 +664,7 @@ class NOTIFICATION extends API {
 							foreach ($responsibilities as $row){
 								if (substr($row['span_end'], 0, 10) < $this->_date['servertime']->format('Y-m-d')) {
 									// check for open reminders. if none add a new. dependent on language setting, may set multiple on system language change.
-									$reminders = $calendar->search($this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true));
+									$reminders = $calendar->search('"' . $this->_lang->GET('calendar.tasks.alert_responsibility_expired', [':task' => $row['responsibility'], ':units' => implode(',', array_map(fn($u) => $this->_lang->_DEFAULT['units'][$u], explode(',', $row['units'] ? : '')))], true) . '"'); // literal
 									$open = false;
 									foreach ($reminders as $reminder){
 										if (!$reminder['closed']) $open = true;
@@ -707,7 +708,7 @@ class NOTIFICATION extends API {
 											':module' => $this->_lang->GET('audit.navigation.regulatory', [], true),
 											':date' => $this->convertFromServerTime($training['date'], true)
 										], true);
-										$reminders = $calendar->search($subject);
+										$reminders = $calendar->search('"' . $subject . '"'); // literal
 										$open = false;
 										foreach ($reminders as $reminder){
 											if (!$reminder['closed']) $open = true;
