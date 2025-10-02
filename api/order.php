@@ -445,6 +445,10 @@ class ORDER extends API {
 					]
 				]);
 
+				// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
+				// weighting is reasonable though
+				$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
+
 				// request permissions once, avoiding repetitive comparisons within loop
 				$permission = [
 					'orderaddinfo' => PERMISSION::permissionFor('orderaddinfo'),
@@ -745,6 +749,10 @@ class ORDER extends API {
 				':user' =>  $_SESSION['user']['id']
 			]
 		]);
+
+		// allow for column condition albeit being unlikely usable and orderdata is not yet decoded at this point
+		// weighting is reasonable though
+		$order = SEARCH::refine($this->_requestedID, $order, ['order_data']);
 
 		// userlist to decode orderer
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
