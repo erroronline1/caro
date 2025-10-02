@@ -664,7 +664,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			WHERE im.BEZEICHNUNG = 'Telefonnummer'
 		) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
 
-		WHERE pat.GEBURTSDATUM=:dob OR pat.FIBU_NUMMER=:patientnumber OR :namesearch
+		WHERE :dob :patientnumber :namesearch
 		END;
 		
 		if (!$request) {
@@ -705,16 +705,16 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		}
 
 		if (
-			(!isset($request['Name']) || !trim($request['Name'])) &&
-			(!isset($request['Geburtsdatum']) || !trim($request['Date of birth'])) &&
-			(!isset($request['FiBu-Nummer']) || !trim($request['Patient number'])) &&
+			(!isset($request['Name']) || !trim($request['Name'] ? : '')) &&
+			(!isset($request['Date of birth']) || !trim($request['Date of birth'] ? : '')) &&
+			(!isset($request['Patient number']) || !trim($request['Patient number'] ? : '')) &&
 
-			(!isset($request['Name']) || !trim($request['Name'])) &&
-			(!isset($request['Geburtsdatum']) || !trim($request['Geburtsdatum'])) &&
-			(!isset($request['FiBu-Nummer']) || !trim($request['FiBu-Nummer']))
+			(!isset($request['Name']) || !trim($request['Name'] ? : '')) &&
+			(!isset($request['Geburtsdatum']) || !trim($request['Geburtsdatum'] ? : '')) &&
+			(!isset($request['FiBu-Nummer']) || !trim($request['FiBu-Nummer'] ? : ''))
 		) return [];
 		
-		$name = preg_split('/[\s,;]+/', trim($request['Name']));
+		$name = preg_split('/[\s,;]+/', trim($request['Name'] ? : ''));
 		$namesearch = [];
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
@@ -723,13 +723,18 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			}
 		}
 
-		$dob = trim($request['Date of birth']) ? : trim($request['Geburtsdatum']);
-		$patientnumber = trim($request['Patient number']) ? : trim($request['FiBu-Nummer']);
+		$dob = isset($request['Date of birth']) ? trim($request['Date of birth']) : trim($request['Geburtsdatum'] ? : '');
+		$patientnumber = isset($request['Patient number']) ? trim($request['Patient number']) : trim($request['FiBu-Nummer'] ? : '');
+
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':dob' => $dob ? $this->_pdo->quote($dob . ' 00:00:00.000'): 'NULL',
-				':patientnumber' => $patientnumber ? $this->_pdo->quote($patientnumber): 'NULL',
-				':namesearch' => implode(' OR ', $namesearch)
+				':dob' => $dob ? 'pat.GEBURTSDATUM=CONVERT(DATETIME, ' . $this->_pdo->quote($dob . ' 00:00:00.000') . ', 21)': '',
+				':patientnumber' => $patientnumber
+					? ($dob ? ' AND ' : '') . 'pat.FIBU_NUMMER=' . $this->_pdo->quote($patientnumber)
+					: '',
+				':namesearch' => $namesearch 
+					? ($dob|| $patientnumber ? ' AND ' : '') . implode(' OR ', $namesearch)
+					: ''
 			]));
 			$statement->execute();	
 		}
