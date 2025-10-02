@@ -1,10 +1,10 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
+ * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
  * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
@@ -1335,6 +1335,56 @@ export const api = {
 	},
 
 	/**
+	 *               _     _           ___
+	 *   ___ ___ ___|_|___| |_ ___ ___|  _|___ ___ ___
+	 *  | -_|  _| . | |   |  _| -_|  _|  _| .'|  _| -_|
+	 *  |___|_| |  _|_|_|_|_| |___|_| |_| |__,|___|___|
+	 *          |_|
+	 * available data requests for regular users regarding erp data if applicable
+	 *
+	 * @param {string} method get|post
+	 * @param  {array} request api method
+	 * @returns request
+	 */
+	erpquery: (method, ...request) => {
+		request = [...request];
+		if (method === "get") api.history.write(["erpquery", ...request]);
+
+		request.splice(0, 0, "erpquery");
+		let payload,
+			successFn = async function (data) {
+				if (data.render) {
+					if (request[2]) await window.Masonry.breakpoints(false);
+					api.update_header(title[request[1]]);
+					const render = new Assemble(data.render);
+					document.getElementById("main").replaceChildren(render.initializeSection());
+					render.processAfterInsertion();
+					if (request[2]) window.scrollTo(0, document.body.scrollHeight);
+				}
+				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+			},
+			title = {
+				erpquery: api._lang.GET("erpquery.navigation.erpquery"),
+			};
+
+		switch (method) {
+			case "get":
+				switch (request[1]) {
+					default:
+				}
+				break;
+			case "post":
+				payload = _.getInputs("[data-usecase=erpquery]", true);
+				break;
+			case "put":
+			case "delete":
+			default:
+				return;
+		}
+		api.send(method, request, successFn, null, payload);
+	},
+
+	/**
 	 *             _     _
 	 *   _____ ___|_|___| |_ ___ ___ ___ ___ ___ ___
 	 *  |     | .'| |   |  _| -_|   | .'|   |  _| -_|
@@ -1938,7 +1988,7 @@ export const api = {
 							}
 						};
 						break;
-					}
+				}
 				if (request[3]) {
 					payload = request[3]; // form data object passed by utility.js
 					delete request[3];

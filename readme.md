@@ -120,6 +120,7 @@ Things are still in motion. Images may be outdated.
     * [Consumables endpoints](#consumables-endpoints)
     * [CSV filter endpoints](#csv-filter-endpoints)
     * [Document endpoints](#document-endpoints)
+    * [ERP Query endpoints](#erp-query-endpoints)
     * [File endpoints](#file-endpoints)
     * [Maintenance endpoints](#maintenance-endpoints)
     * [Measure endpoints](#measure-endpoints)
@@ -1637,6 +1638,9 @@ In case you have to rely on data dumps instead of direct database access, the in
 
 `UTILITY`-methods can be found in api/_utility.php.
 
+### ERP queries module
+The default module contains available options for data retrieval from the [teams](#the-team) ERP-software, many workmates have been asking for. This may have to be adjusted to your available solutions as well, but here it may get necessary to get accomodated to this applications code syntax and data structures such as language models and backend widget construction. Sorry for that in advance.
+
 [Content](#content)
 
 # Intended regulatory goals
@@ -3084,7 +3088,7 @@ Deletes records. Currently implemented for order statistics only.
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {type} | path parameter | optional | adds contents based on given type to response |
+| {type} | path parameter | required | "orderstatistics" |
 
 Sample response
 ```
@@ -3974,6 +3978,37 @@ Sample response
 ```
 
 [Content](#content)
+
+### ERP Query endpoints
+
+> GET ./api/api.php/erpquery/erpquery/{type}
+
+Returns selection of available data queries, given type the result of the selected type.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | adds contents based on given type to response |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"}}]]}}
+```
+
+> POST ./api/api.php/erpquery/erpquery/{type}
+
+Appends the query result to the types regular content using GET
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {type} | path parameter | optional | adds contents based on given type to response |
+| payload | form data | optional | |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup","selected":true}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"}}],[{"type":"text","attributes":{"name":"Name","value":"Jane Doe"}},{"type":"date","attributes":{"name":"Date of birth","value":""}},{"type":"text","attributes":{"name":"ERP ID","value":""}}],[{"type":"textsection","content":"Name: Jane Doe<br>Geburtsdatum: 2003-02-01<br>Adresse: Somewhere over the Rainbow 5<br>Telefonnummer: 01234 56789"}]],"form":{"data-usecase":"erpquery","action":"javascript:api.erpquery('post', 'erpquery', 'patientlookup')"}}}
+```
 
 ### File endpoints
 

@@ -455,9 +455,14 @@ class APPLICATION extends API {
 		//////////////////////////////////
 		// permission based functions
 		//////////////////////////////////
+		include_once('./_erpinterface.php');
 
 		// records
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('assemble.navigation.bundles')] = ['onclick' => "api.document('get', 'bundles')"];
+		// add erpinterface if applicable
+		if (ERPINTERFACE && ERPINTERFACE->_instatiated) {
+			$menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('erpquery.navigation.erpquery')] = ['onclick' => "api.erpquery('get', 'erpquery')"];
+		}
 		// make sure risk management comes after documents so this is an order exception without special permission
 		$menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('risk.navigation.risk_management')] = ['onclick' => "api.risk('get', 'risk')"];
 		if (PERMISSION::permissionFor('audit')){
@@ -479,7 +484,6 @@ class APPLICATION extends API {
 		if (PERMISSION::permissionFor('incorporation')) $menu[$this->_lang->GET('consumables.navigation.header')][$this->_lang->GET('consumables.navigation.incorporated_pending')] =['onclick' => "api.purchase('get', 'pendingincorporations')"];
 
 		// tools
-		include_once('./_erpinterface.php');
 		if (PERMISSION::permissionFor('csvfilter') && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customcsvdump') && ERPINTERFACE->customcsvdump())
 			$menu[$this->_lang->GET('tool.navigation.header')][$this->_lang->GET('csvfilter.navigation.erpquery')] =['onclick' => "api.csvfilter('get', 'erpquery')"];
 		if (PERMISSION::permissionFor('csvfilter') && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'upload') && ERPINTERFACE->upload())

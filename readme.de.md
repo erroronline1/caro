@@ -1541,6 +1541,9 @@ Sofern anstelle direkter Datenbankzugriffe auf Datenexporte zurückgegriffen wer
 
 `UTILITY`-Methoden finden sich in api/_utility.php.
 
+### ERP-Abfragemodul
+Das Standardmodul beinhaltet verfügbare Optionen zur Dateneinsicht in die ERP-Software des [Teams](#das-team), wonach viele Kollegen gefragt haben. Das Modul muss gegebenenfalls an die jeweilig verfügbare Lösung angepasst werden, aber an dieser Stelle wird es erforderlich sich mit der Syntax und den Datenstrukturen des Quelltextes vertraut zu machen, wie Sprachmodell und die Konstruktion der Widgets durch das Backend. Entschuldigung vorab dafür.
+
 [Übersicht](#übersicht)
 
 # Vorgesehene regulatorische Zielsetzungen

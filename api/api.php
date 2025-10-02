@@ -624,6 +624,7 @@ if (in_array(REQUEST[0], [
 	'calendar',
 	'consumables',
 	'csvfilter',
+	'erpquery',
 	'file',
 	'document',
 	'maintenance',

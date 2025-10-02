@@ -313,7 +313,7 @@ class RECORD extends API {
 					if ($subs['type'] === 'identify'){
 						$subs['attributes']['value'] = $identify;
 						// add erp fields for data import on identifier widgets if applicable
-						if (ERPINTERFACE && ERPINTERFACE->_instatiated && $fields = ERPINTERFACE->customerdata()) {
+						if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customerdata') && $fields = ERPINTERFACE->customerdata()) {
 							$subs['identify_erp_import_fields'] = $fields;
 						}
 					}
@@ -750,7 +750,7 @@ class RECORD extends API {
 
 		if (array_values((array)$this->_payload)){
 			require_once('./_erpinterface.php');
-			if (ERPINTERFACE && ERPINTERFACE->_instatiated && $result = ERPINTERFACE->customerdata((array)$this->_payload)) {
+			if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customerdata') && $result = ERPINTERFACE->customerdata((array)$this->_payload)) {
 				$options = [];
 				foreach($result as $option){
 					// construct key: value radio input content

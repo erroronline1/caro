@@ -1067,6 +1067,16 @@
 			"filter_year": "Jahr"
 		}
 	},
+	"erpquery": {
+		"casepositions": {
+			"case_id": "Vorgangsnummer"
+		},
+		"navigation": {
+			"casepositions": "Vorgangsnummern",
+			"erpquery": "EVA Vorgangs- und Patientendaten",
+			"patientlookup": "Patientensuche"
+		}
+	},
 	"file": {
 		"external_file": {
 			"available": "verfügbar",
