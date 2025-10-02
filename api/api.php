@@ -22,11 +22,12 @@ ini_set('display_errors', 1); error_reporting(E_ALL);
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: text/html; charset=UTF-8');
 require_once('_config.php');
-define ('REQUEST', array_map(
-	// reconvert frontend replaced +
-	fn($param) => str_replace('%2B', '+', $param),
-	explode("/", substr(urldecode(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1']))), 1))
-));
+define ('REQUEST',
+	array_map(
+		fn($param) => $param,//str_replace('%2B', '+', $param),
+		explode("/", substr(rawurldecode(mb_convert_encoding($_SERVER['PATH_INFO'], 'UTF-8', mb_detect_encoding($_SERVER['PATH_INFO'], ['ASCII', 'UTF-8', 'ISO-8859-1']))), 1))
+	)
+);
 require_once('_utility.php'); // general utilities
 require_once('_sqlinterface.php');
 require_once('_language.php');
