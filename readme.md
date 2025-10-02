@@ -26,17 +26,20 @@ Things are still in motion. Images may be outdated.
 * post-market evaluation
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
-* consider search _shared.php
-    * method returning ([+-]{0,1})([\w\.]+:){0,1}((?:["\'])(.+?)(?:["\'])|\S+) on search term  
-      to array of $operator [1], $column[0:-1] if [2], $term [3], $term if quoted [4]
-    * database queries insert and replace AND (:COLUMNSEARCH), plus effectively unnecessary,
-    * document replace fnsearch with preg_match, searchable terms keyed for -*column_name:[\S]+
 
 ## to do
 * unittests
 * templates
 * erp_interface, additional usecases?
+    * erp case access by name, dob, erp-reference (data, multimedia)?
+    * customerdata defines searcheable fields, not caro. return optional multilanguage input names and type (text/date)
+    * improve matched conditions and sort, like sqlinterface, include search options?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
+* consider search _shared.php
+    * documentsearch: searchable terms keyed for column_name:; apply SEARCH::refine
+    * process ordersearch likewise? apply SEARCH::refine
+    * describe options *somewhere*?
+* close recent dialog (e.g. on adding new products from dialog view)
 
 ## Content
 * [Aims](#aims)
@@ -1180,7 +1183,11 @@ Search functionality across the application may differ slightly depending of con
 
 * Editors (e.g. documents, CSV-filters) provide a search input that displays recommendations based on the input so far. To get the desired result one of the recommendations has to be selected fulltext. Available options are sorted alphabetically.
 * File search allows wildcards as `*` for any amount of any characters or `?` as any character on the given position, as you know from any file search in other places.
-* All others allow wildcards as well as +mandatory, -excluded and "search in this specific order". Results are sorted by amount of matched terms. Please note, that results may contain any amount of optional matches. Looking for "Velcro blue 20mm" lists all products that contain either "velcro", "blue" or "20mm" as single or combined match. The same search with quotes does not match "blue 20mm velcro" though.
+* All others allow wildcards as well as +mandatory, -excluded and "search in this specific order". Results are sorted by amount of matched terms. Please note, that results may contain any amount of optional matches. Looking for "Velcro blue 20mm" lists all products that contain either "velcro", "blue" or "20mm" as single or combined match. The same search with quotes does not match "blue 20mm velcro" though.  
+The search can further be refined by database column names followed by : prior to the search term. -, ?, * and "" can be used for the term as well. results without the column name will be filtered out. Possible column names are:
+    * for product search e.g.: vendor_name, article_name, article_no, article_alias
+    * for risk search e.g.: cause, effect, measure, risk_benefit, measure_remainder
+    * for record search e.g.: identifier, content, last_user
 
 [Content](#content)
 
@@ -1769,7 +1776,7 @@ Tested operating systems, browsers and devices:
 * Linux Mint 21.3 Firefox 133 (from 2024-05-30)
 * Android 12 Firefox 133
 * macOS 13 Ventura [Safari 18](#safaris-special-needs), Edge 131, Firefox 133
-* iOS 18.4.1 [Safari](#safaris-special-needs)
+* iOS 18.7.1 [Safari](#safaris-special-needs)
 * Opticon USB Barcode Reader L-46X (works on screen and paper, CODE128 and QR as per specifications, but apparently limited to [ASCII](https://www.asciitable.com/) with a defective recognition of special characters on default installation on Win10)
 
 External scanners must be able to scan 2D-Codes and read UTF-8 character encoding.
@@ -2135,7 +2142,7 @@ Tests:
 Notes:
 * iOS PWAs seem to not being updated regarding front end code and may have to be reinstalled on changes.
 * Styling is slightly different because of inconsistent following of web standards.
-* Downloading files does not work properly in browser-mode because of inconsistent following of web standards. The application starts anew with risk of losing unsaved inputs. Works as PWA with the implemented polyfill as intended though.
+* Downloading files does not work intuitevly in browser-mode because of inconsistent following of web standards. If the file is not explicitly *loaded* the application starts anew with risk of losing unsaved inputs. Works as PWA with the implemented polyfill as intended though.
 
 Albeit Safari being capable of displaying most of the content and contributing reliable to records it is highly recommended to use a webbrowser that adheres to current standards. Firefox and Edge show no issues on the test environment.
 
@@ -2566,6 +2573,8 @@ Stakeholder identification:
 | Reconsider incorporation approach on qm-system transfer | Supervisor | 2025-06-23 | On importing pricelists the last ERP-order-date initiates an default incorporation; 2025-06-25 |
 | Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information, compact tiles and table layout; 2025-07-04 |
 | Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 | Critical return reasons alert incorporation authorized users and append an incorporation review; 2025-07-11 |
+| Hospital ward tour planning | User | 2025-09-22 | Implemented as work lists with identifier items, volatile note within records; 2025-09-27 |
+| ERP-data access for cases not available within caro | User | 2025-09-29 | |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
