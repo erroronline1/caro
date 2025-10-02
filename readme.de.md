@@ -1084,8 +1084,12 @@ Der Abgleich der Schulungen erfolgt über den Namen der Schulung.
 Die Funktionalität der Suche kann sich innerhalb der Anwendung abhängig vom Zusammenhang unterscheiden.
 
 * Bearbeitungsmasken (z.B. Dokumente, CSV-Filter) stellen eine Sucheingabe bereit, welche Vorschläge aus der bisherigen Eingabe präsentiert. Für das gewünschte Ergebnis muss der Volltext aus den Vorschlägen ausgewählt werden. Verfügbare Optionen sind alphabetisch sortiert.
-* Die Dateiensuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position, wie es von jeder anderen Dateisuche in anderen Systeme bekannt ist.
-* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert. Dabei ist zu beachten, dass die Ergebnisse eine beliebige Menge an Übereinstimmungen beinhalten. "Klettband blau 20mm" listet alle Artikel auf, die entweder "Klettband", "blau" oder "20mm" als einzelne oder kombinierte Übereinstimmung beinhalten. Die gleiche Suchanfrage mit Anführungszeichen findet jedoch nicht "blaues Klettband in 20mm".
+* Die Dateiensuche erlaubt Platzhalter wie `*` für eine beliebige Anzahl beliebiger Zeichen oder `?` als beliebiges Zeichen an der angegebenen Position, wie es von jeder anderen Dateisuche in anderen Systemen bekannt ist.
+* Alle anderen Suchen erlauben Platzhalter, sowie +verpflichtende, -ausgeschlossene und "Suchbegriffe in dieser Reihenfolge". Die Ergebnisse sind nach der Anzahl von Übereinstimmungen der Suchbegriffe sortiert. Dabei ist zu beachten, dass die Ergebnisse eine beliebige Menge an Übereinstimmungen beinhalten. "Klettband blau 20mm" listet alle Artikel auf, die entweder "Klettband", "blau" oder "20mm" als einzelne oder kombinierte Übereinstimmung beinhalten. Die gleiche Suchanfrage mit Anführungszeichen findet jedoch nicht "blaues Klettband in 20mm".  
+Die Suche kann weiterhin nach Datenbankenspalten eingegrenzt werden indem einem Suchbegriff der Spaltenname mit : vorangestellt wird. -, ?, * und "" sind auch hier für den Suchbegriff nutzbar. Ergebnisse ohne den Spaltennamen werden herausgefiltert. Mögliche Spaltennamen sind:
+    * für die Artikelsuche z.B.: vendor_name, article_name, article_no, article_alias
+    * für die Risikosuche z.B.: cause, effect, measure, risk_benefit, measure_remainder
+    * für die Aufzeichnungssuche z.B.: identifier, content, last_user
 
 [Übersicht](#übersicht)
 
@@ -1673,7 +1677,7 @@ Getestete Betriebssysteme, Browser und Geräte:
 * Linux Mint 21.3 Firefox 133 (seit 2024-05-30)
 * Android 12 Firefox 133
 * macOS 13 Ventura [Safari 18](#safaris-besondere-bedürfnisse), Edge 131, Firefox 133
-* iOS 18.4.1 [Safari](#safaris-special-needs)
+* iOS 18.7.1 [Safari](#safaris-special-needs)
 * Opticon USB Barcode Reader L-46X (funktioniert am Bildschirm und auf Papier, CODE128 und QR gemäß Spezifikationen, aber scheinbar limitiert auf [ASCII](https://www.asciitable.com/) mit fehlerhafter Auflösung von Sonderzeichen (z.B. Umlaute) bei Standardinstallation an Win10)
 
 Externe Scanner müssen 2D-Codes scannen und UTF-8 Zeichencodierung auswerten können.
@@ -2041,7 +2045,7 @@ Tests:
 Anmerkungen:
 * iOS PWAs scheinen Frontend-Code nicht zu aktualisieren uns müssen ggf. bei Änderungen neu installiert werden.
 * Die Darstellung weicht aufgrund von inkonsequenten Verhalten gegenüber Webstandards leicht ab.
-* Der Download von Dateien ist aufgrund von inkonsequenten Verhalten gegenüber Webstandards in der Browser-Ansicht nicht möglich. Die Anwendung startet neu und es besteht das Risiko von Verlusten ungespeicherter Eingaben. Als PWA funktioniert es mit dem implementierten Polyfill wie vorgesehen.
+* Der Download von Dateien ist aufgrund von inkonsequenten Verhalten gegenüber Webstandards in der Browser-Ansicht nicht intitiv. Wenn die Datei nicht ausdrücklich *geladen* wird, startet die Anwendung unter Umständen neu und es besteht das Risiko von Verlusten ungespeicherter Eingaben. Als PWA funktioniert es mit dem implementierten Polyfill wie vorgesehen.
 
 Obwohl Safari in der Lage ist den größte Teil der Inhalte anzuzeigen und zu Aufzeichnungen zuverlässig beizutragen, wird dringend empfohlen einen Webbrowser zu verwenden, der sich an aktuelle Standards hält. Firefox und Edge zeigen keine Schwierigkeiten in der Testumgebung.
 
