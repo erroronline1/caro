@@ -84,11 +84,13 @@ class _ERPINTERFACE {
 	}
 
 	/**
-	 * retrieve most recent customer data details based on matching name / dob
+	 * retrieve most recent customer data details based on matching requests
 	 * returns results to select from on application level
-	 * @param string|null $name
-	 * @param string|null $dob date of birth
+	 * @param array|null $request as named array with columns to match
 	 * @return null|array
+	 * 
+	 * best practice would be to return available columns as input field names with type on empty request to determine options from the interface
+	 * types as simple html input type of text, date, number etc.
 	 * 
 	 * customer data is supposed to be imported on filling out documents for records.
 	 * as the interface must be adjusted to your specific usecase it is probably the easiest
@@ -97,8 +99,17 @@ class _ERPINTERFACE {
 	 * 
 	 * sanitize parameters according to the usecase e.g. dbo driver
 	*/
-	public function customerdata($name = null, $dob = null){
+	public function customerdata($request = null){
 		/**
+		 * on !$request
+		 * return [
+		 * 		[
+		 * 			'name' => string,
+		 * 			'type' => string, // text, date, number
+		 * 		],
+		 * 		...
+		 * ]
+		 * 
 		 * array keys according to record document field names, drop or append reasonable options, e.g. multilanguage if applicable
 		 * return [
 		 * 		[
@@ -313,11 +324,13 @@ class TEST extends _ERPINTERFACE {
 	}
 
 	/**
-	 * retrieve most recent customer data details based on matching name / dob
+	 * retrieve most recent customer data details based on matching requests
 	 * returns results to select from on application level
-	 * @param string|null $name
-	 * @param string|null $dob date of birth
+	 * @param array|null $request as named array with columns to match
 	 * @return null|array
+	 * 
+	 * best practice would be to return available columns as input field names with type on empty request to determine options from the interface
+	 * types as simple html input type of text, date, number etc.
 	 * 
 	 * customer data is supposed to be imported on filling out documents for records.
 	 * as the interface must be adjusted to your specific usecase it is probably the easiest
@@ -326,7 +339,24 @@ class TEST extends _ERPINTERFACE {
 	 * 
 	 * sanitize parameters according to the usecase e.g. dbo driver
 	 */
-	public function customerdata($name = null, $dob = null){
+	public function customerdata($request = null){
+		if (!$request){
+			return [
+				[
+					'name' => 'Name',
+					'type' => 'text'
+				],
+				[
+					'name' => 'Date of birth',
+					'type' => 'date'
+				],
+				[
+					'name' => 'ERP ID',
+					'type' => 'text'
+				],
+			];
+		}
+
 		return [
 			[
 				'Name' => 'Jane Doe',
@@ -560,11 +590,13 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 
 	/**
-	 * retrieve most recent customer data details based on matching name / dob
+	 * retrieve most recent customer data details based on matching requests
 	 * returns results to select from on application level
-	 * @param string|null $name
-	 * @param string|null $dob date of birth
+	 * @param array|null $request as named array with columns to match
 	 * @return null|array
+	 * 
+	 * best practice would be to return available columns as input field names with type on empty request to determine options from the interface
+	 * types as simple html input type of text, date, number etc.
 	 * 
 	 * customer data is supposed to be imported on filling out documents for records.
 	 * as the interface must be adjusted to your specific usecase it is probably the easiest
@@ -573,7 +605,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * 
 	 * sanitize parameters according to the usecase e.g. dbo driver
 	 */
-	public function customerdata($name = null, $dob = null){
+	public function customerdata($request = null){
 		/**
 		 * array keys according to record document field names, drop or append reasonable options, e.g. multilanguage if applicable
 		 */
@@ -632,11 +664,57 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			WHERE im.BEZEICHNUNG = 'Telefonnummer'
 		) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
 
-		WHERE pat.GEBURTSDATUM=:dob OR :namesearch
+		WHERE pat.GEBURTSDATUM=:dob OR pat.FIBU_NUMMER=:patientnumber OR :namesearch
 		END;
 		
-		if (!trim($name) && !trim($dob)) return [];
-		$name = preg_split('/[\s,;]+/', $name);
+		if (!$request) {
+			// this may handle available languages as well!
+			$language = isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'];
+			switch($language){
+				case 'en':
+					return [
+						[
+							'name' => 'Name',
+							'type' => 'text'
+						],
+						[
+							'name' => 'Date of birth',
+							'type' => 'date'
+						],
+						[
+							'name' => 'Patient number',
+							'type' => 'number'
+						]
+					];
+				case 'de':
+					return [
+						[
+							'name' => 'Name',
+							'type' => 'text'
+						],
+						[
+							'name' => 'Geburtsdatum',
+							'type' => 'date'
+						],
+						[
+							'name' => 'FiBu-Nummer',
+							'type' => 'number'
+						]
+					];
+			}
+		}
+
+		if (
+			(!isset($request['Name']) || !trim($request['Name'])) &&
+			(!isset($request['Geburtsdatum']) || !trim($request['Date of birth'])) &&
+			(!isset($request['FiBu-Nummer']) || !trim($request['Patient number'])) &&
+
+			(!isset($request['Name']) || !trim($request['Name'])) &&
+			(!isset($request['Geburtsdatum']) || !trim($request['Geburtsdatum'])) &&
+			(!isset($request['FiBu-Nummer']) || !trim($request['FiBu-Nummer']))
+		) return [];
+		
+		$name = preg_split('/[\s,;]+/', trim($request['Name']));
 		$namesearch = [];
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
@@ -645,9 +723,12 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			}
 		}
 
+		$dob = trim($request['Date of birth']) ? : trim($request['Geburtsdatum']);
+		$patientnumber = trim($request['Patient number']) ? : trim($request['FiBu-Nummer']);
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
 				':dob' => $dob ? $this->_pdo->quote($dob . ' 00:00:00.000'): 'NULL',
+				':patientnumber' => $patientnumber ? $this->_pdo->quote($patientnumber): 'NULL',
 				':namesearch' => implode(' OR ', $namesearch)
 			]));
 			$statement->execute();	

@@ -312,6 +312,10 @@ class RECORD extends API {
 				else {
 					if ($subs['type'] === 'identify'){
 						$subs['attributes']['value'] = $identify;
+						// add erp fields for data import on identifier widgets if applicable
+						if (ERPINTERFACE && ERPINTERFACE->_instatiated && $fields = ERPINTERFACE->customerdata()) {
+							$subs['identify_erp_import_fields'] = $fields;
+						}
 					}
 					if ($subs['type'] === 'calendarbutton'){
 						$subs['attributes']['value'] = $_lang->GET('calendar.tasks.new');
@@ -696,12 +700,18 @@ class RECORD extends API {
 	 * on available erpinterface respond found entries according to name and date of birth
 	 */
 	public function import(){
-		$IDENTIFY_BY_ = UTILITY::propertySet($this->_payload, 'IDENTIFY_BY_');
-		if ($IDENTIFY_BY_ === 'null') $IDENTIFY_BY_ = null;
-		$NAMELOOKUP = UTILITY::propertySet($this->_payload, 'NAMELOOKUP');
-		if ($NAMELOOKUP === 'null') $NAMELOOKUP = null;
-		$DOBLOOKUP = UTILITY::propertySet($this->_payload, 'DOBLOOKUP');
-		if ($DOBLOOKUP === 'null') $DOBLOOKUP = null;
+		$IDENTIFY_BY_ = null;
+		foreach($this->_payload as $field => $value){
+			if (str_starts_with($field, 'IDENTIFY_BY_')){
+				if ($value){
+					$IDENTIFY_BY_ = $value;
+				}
+				else {
+					unset($this->_payload->{$field});
+				}
+				break;
+			}
+		}
 
 		if ($IDENTIFY_BY_){
 			$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
@@ -737,9 +747,10 @@ class RECORD extends API {
 				]);
 			}
 		}
-		if ($NAMELOOKUP || $DOBLOOKUP){
+
+		if (array_values((array)$this->_payload)){
 			require_once('./_erpinterface.php');
-			if (ERPINTERFACE && ERPINTERFACE->_instatiated && $result = ERPINTERFACE->customerdata($NAMELOOKUP, $DOBLOOKUP)) {
+			if (ERPINTERFACE && ERPINTERFACE->_instatiated && $result = ERPINTERFACE->customerdata((array)$this->_payload)) {
 				$options = [];
 				foreach($result as $option){
 					// construct key: value radio input content
@@ -752,7 +763,7 @@ class RECORD extends API {
 							[
 								'type' => 'radio',
 								'attributes' => [
-									'name' => $this->_lang->GET('record.import.by_name')
+									'name' => $this->_lang->GET('record.import.by_erp')
 								],
 								'content' => $options
 							]

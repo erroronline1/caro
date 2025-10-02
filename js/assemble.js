@@ -1055,7 +1055,7 @@ export class Assemble {
 		this.imageQrCode = [];
 		this.imageBarCode = [];
 		this.imageUrl = [];
-this.codeEditor=[];
+		this.codeEditor = [];
 		this.names = setup.names || {};
 		this.composer = setup.composer;
 	}
@@ -1142,8 +1142,8 @@ this.codeEditor=[];
 			images: this.imageUrl,
 		});
 
-		if (this.codeEditor.length){
-			for (const id of this.codeEditor){
+		if (this.codeEditor.length) {
+			for (const id of this.codeEditor) {
 				TLN.append_line_numbers(id);
 			}
 		}
@@ -2926,6 +2926,7 @@ this.codeEditor=[];
 	 * 			"multiple": "true|undefined, to clone after successful import"
 	 * 		},
 	 * 		"destination": "elementId force output to other input, e.g. search"
+	 * 		"identify_erp_import_fields": [{name, inputtype},...]
 	 * 	}
 	 * ```
 	 */
@@ -3025,8 +3026,7 @@ this.codeEditor=[];
 		result.push(button);
 
 		if (originaltype === "identify" && !api._settings.user.permissions.patient) {
-			let button = document.createElement("button"),
-				fieldname = this.currentElement.attributes.name.replace(/\[\]|IDENTIFY_BY_/g, "");
+			let button = document.createElement("button");
 
 			button.appendChild(document.createTextNode(this.currentElement.description ? this.currentElement.description : api._lang.GET("assemble.render.merge")));
 			button.type = "button";
@@ -3043,33 +3043,30 @@ this.codeEditor=[];
 					{
 						type: "scanner",
 						attributes: {
-							name: fieldname,
+							name: this.currentElement.attributes.name,
 						},
 					},
 				];
-			if (api._settings.config.system.erp)
+			if (this.currentElement.identify_erp_import_fields){
 				inputs.push(
 					{ type: "hr" },
 					{
 						type: "textsection",
 						attributes: {
-							name: api._lang.GET("record.import.by_name"),
+							name: api._lang.GET("record.import.by_erp"),
 							"data-type": "identify",
-						},
-					},
-					{
-						type: "text",
-						attributes: {
-							name: api._lang.GET("record.import.name"),
-						},
-					},
-					{
-						type: "date",
-						attributes: {
-							name: api._lang.GET("record.import.dob"),
 						},
 					}
 				);
+				for (const field of this.currentElement.identify_erp_import_fields) {
+					inputs.push({
+						type: field.type,
+						attributes: {
+							name: field.name,
+						},
+					});
+				}
+			}
 			inputs = JSON.stringify(inputs); // something alters the objects, didn't figure out what, but this solves the problem
 			options[api._lang.GET("general.cancel_button")] = false;
 			options[api._lang.GET("record.import.import")] = { value: true, class: "reducedCTA" };
@@ -3079,14 +3076,9 @@ this.codeEditor=[];
 					header: api._lang.GET("assemble.render.merge"),
 					options: options,
 					render: JSON.parse(inputs),
-				}).then((response) => {
-					if (Boolean(response)) {
-						if (fieldname in response && response[fieldname]) api.record("get", "import", encodeURIComponent(response[fieldname]));
-						else if (api._lang.GET("record.import.name") in response || api._lang.GET("record.import.dob") in response) {
-							let name = response[api._lang.GET("record.import.name")] || null,
-								dob = response[api._lang.GET("record.import.dob")] || null;
-							api.record("get", "import", null, encodeURIComponent(name), encodeURIComponent(dob));
-						}
+				}, "FormData").then((response) => {
+					if (response) {
+						api.record("post", "import", null, response);
 					}
 				});
 			};

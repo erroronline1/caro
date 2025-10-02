@@ -1440,12 +1440,10 @@
 		"filter_hint": "A maximum of :max records will be displayed, but any record will be available if filter matches.\nRecords containing some kind of complaint are highlighted.",
 		"full_export": "Export full detailed record as PDF",
 		"import": {
-			"by_name": "Data from the ERP-software",
-			"by_identify": "import by identifier",
-			"dob": "and date of birth",
+			"by_erp": "Data from the ERP-software",
+			"by_identify": "Import by identifier",
 			"error": "No data available to import for this identifier.",
 			"import": "Import",
-			"name": "by name",
 			"ok": "OK",
 			"options": "Choose from the results",
 			"success": "Matching data has been imported. Please verify and be aware of your resposibility for accuracy. Only the most recent data for the corresponding field will be inserted.\n\nMake sure to have the correct identifier before submitting! Files and photos are not part of the import."
