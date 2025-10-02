@@ -1780,6 +1780,53 @@ export const api = {
 		switch (method) {
 			case "get":
 				switch (request[1]) {
+					case "displayonly":
+						// for linked documents within documents
+						successFn = function (data) {
+							if (data.render) {
+								const options = {};
+								options[api._lang.GET("general.ok_button")] = false;
+								new Dialog({ type: "input", header: data.title, render: data.render, options: options });
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						request[1] = "document";
+						break;
+					case "fullexport":
+					case "simplifiedexport":
+					case "documentexport": // sorry. exports a document with records, not so paperless after all
+					case "simplifieddocumentexport": // sorry. exports a document with records, not so paperless after all
+					case "matchbundles":
+					case "erpcasepositions":
+						// fall back to default successFn
+						break;
+					case "records":
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]] || data.title);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+								_client.record.casestatefilter(api._settings.user.app_settings.primaryRecordState);
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
+					default:
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]] || data.title);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							api.preventDataloss.start();
+						};
+				}
+				break;
+			case "post":
+				switch (request[1]) {
 					case "import":
 						successFn = function (data) {
 							if (data.data !== undefined) {
@@ -1890,61 +1937,8 @@ export const api = {
 								});
 							}
 						};
-						payload = {
-							IDENTIFY_BY_: request[2],
-							NAMELOOKUP: request[3] || null,
-							DOBLOOKUP: request[4] || null,
-						};
-						delete request[2];
-						delete request[3];
-						delete request[4];
 						break;
-					case "displayonly":
-						// for linked documents within documents
-						successFn = function (data) {
-							if (data.render) {
-								const options = {};
-								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({ type: "input", header: data.title, render: data.render, options: options });
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						request[1] = "document";
-						break;
-					case "fullexport":
-					case "simplifiedexport":
-					case "documentexport": // sorry. exports a document with records, not so paperless after all
-					case "simplifieddocumentexport": // sorry. exports a document with records, not so paperless after all
-					case "matchbundles":
-					case "erpcasepositions":
-						// fall back to default successFn
-						break;
-					case "records":
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] || data.title);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-								_client.record.casestatefilter(api._settings.user.app_settings.primaryRecordState);
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-					default:
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]] || data.title);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							api.preventDataloss.start();
-						};
-				}
-				break;
-			case "post":
+					}
 				if (request[3]) {
 					payload = request[3]; // form data object passed by utility.js
 					delete request[3];

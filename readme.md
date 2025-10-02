@@ -32,7 +32,6 @@ Things are still in motion. Images may be outdated.
 * templates
 * erp_interface, additional usecases?
     * erp case access by name, dob, erp-reference (data, multimedia)?
-    * customerdata defines searcheable fields, not caro. return optional multilanguage input names and type (text/date)
     * improve matched conditions and sort, like sqlinterface, include search options?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 * consider search _shared.php
@@ -4682,14 +4681,14 @@ Sample response
 {"render": [{"type": "links","description": "Open the link, print the identifiers and use them where applicable.","content": {"Identifying data": {"href": "./fileserver/tmp/test202406131600.pdf"}}}]}
 ```
 
-> GET ./api/api.php/record/import/{identifier}
+> POST ./api/api.php/record/import
 
-Returns the most recent data for the given identifier.
+Returns the most recent data for the given identifier or ERP-interface data.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {identifier} | path parameter | required | identifier for records |
+| payload | form data | required | identifier for records or inputs according to erp_interface  |
 
 Sample response
 ```
