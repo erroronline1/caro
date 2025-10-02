@@ -176,7 +176,7 @@
 		"prevent_dataloss_cancel": "I want to stay",
 		"prevent_dataloss_ok": "Yes, nevermind",
 		"safari":{
-			"downloads": "Downloads are not supported in Safari using browser-mode, without the application restarting itself. Consider adding CARO as app to the homescreen."
+			"downloads": "Downloads in Safari using browser-mode is risky, the application may restart itself. Choose \"load\" instead of \"view\". Consider adding CARO as app to the homescreen for an improved user experience."
 		},
 		"save": "Save :title?",
 		"scan_successful": "Scan has been successful",

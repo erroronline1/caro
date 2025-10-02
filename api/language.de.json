@@ -176,7 +176,7 @@
 		"prevent_dataloss_cancel": "Ich möchte weiter bearbeiten",
 		"prevent_dataloss_ok": "Ja, ist in Ordnung",
 		"safari":{
-			"downloads": "Downloads werden in Safari im Browser-Modus nicht unterstützt ohne dass sich die Anwendung danach neu startet. Füge CARO als App zum Startbildschirm hinzu."
+			"downloads": "Downloads in Safari im Browser-Modus sind risikobehaftet, da sich die Anwendung danach eventuell neu startet. Wähle \"laden\" statt \"anzeigen\". Füge CARO als App zum Startbildschirm für ein verbessertes Nutzungserlebnis hinzu."
 		},
 		"save": ":title speichern?",
 		"scan_successful": "Der Scan war erfolgreich",
