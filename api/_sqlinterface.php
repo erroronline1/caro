@@ -122,7 +122,7 @@ class SQLQUERY {
 		$expressions = SEARCH::expressions($value);
 
 		// delete column conditions as these are supposed to be postprocessed via SEARCH::refine() (_utility.php)
-		foreach($expressions as $index => &$expression){
+		foreach($expressions as $index => $expression){
 			if (isset($expression['column']) && $expression['column']) unset($expressions[$index]);
 		}
 
