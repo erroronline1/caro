@@ -725,14 +725,15 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 		$dob = isset($request['Date of birth']) ? trim($request['Date of birth']) : trim($request['Geburtsdatum'] ? : '');
 		$patientnumber = isset($request['Patient number']) ? trim($request['Patient number']) : trim($request['FiBu-Nummer'] ? : '');
+
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':dob' => $dob ? 'pat.GEBURTSDATUM=' . $this->_pdo->quote($dob . ' 00:00:00.000'): '',
+				':dob' => $dob ? 'pat.GEBURTSDATUM=CONVERT(DATETIME, ' . $this->_pdo->quote($dob . ' 00:00:00.000') . ', 21)': '',
 				':patientnumber' => $patientnumber
-					? ($dob ? ' OR ' : '') . 'pat.FIBU_NUMMER=' . $this->_pdo->quote($patientnumber)
+					? ($dob ? ' AND ' : '') . 'pat.FIBU_NUMMER=' . $this->_pdo->quote($patientnumber)
 					: '',
 				':namesearch' => $namesearch 
-					? ($dob|| $patientnumber ? ' OR ' : '') . implode(' OR ', $namesearch)
+					? ($dob|| $patientnumber ? ' AND ' : '') . implode(' OR ', $namesearch)
 					: ''
 			]));
 			$statement->execute();	
