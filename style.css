@@ -465,6 +465,9 @@ nav {
 	}
 }
 
+html[data-useragent*="safari"] nav {
+	height:5rem;
+}
 
 /*************************** main with breakpoints for bigger screen masonry ******************************/
 /* hope default value is ridiculously high enough in the medium future.
