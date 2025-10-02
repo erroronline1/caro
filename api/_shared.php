@@ -297,7 +297,7 @@ class SEARCHHANDLER {
 		$hidden = $matches = [];
 		$recentdocument = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
-		$expressions = UTILITY::searchExpressions($parameter['search']);
+		$expressions = SEARCH::expressions($parameter['search']);
 
 		/**
 		 * iterates over terms and checks if mandatory, excluded or any search strings are found
@@ -436,30 +436,7 @@ class SEARCHHANDLER {
 
 		if ($parameter['search']) {
 			// order matches by relevance; shift to top if all of optional terms have been found
-			$expressions = UTILITY::searchExpressions($parameter['search']);
-			// reduce expressions by leading operators
-			foreach($expressions as $index => &$expression){
-				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
-			}
-			usort($data, function ($a, $b) use ($expressions){
-				$a_matches = $b_matches = 0;
-				foreach($expressions as $expression){
-					foreach(['identifier', 'content'] as $column) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $a[$column] ? : '', $matches)) {
-							$a_matches++;
-							break;
-						}
-					}
-					foreach(['identifier', 'content'] as $column) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $b[$column] ? : '', $matches)) {
-							$b_matches++;
-							break;
-						}
-					}
-				}
-				return $a_matches <=> $b_matches;
-			});
-			$data = array_reverse($data);
+			$data = SEARCH::refine($parameter['search'], $data, ['identifier', 'content']);
 		}
 
 		$contexts = [];
@@ -516,30 +493,7 @@ class SEARCHHANDLER {
 
 		if ($parameter['search']) {
 			// order matches by relevance; shift to top if all of optional terms have been found
-			$expressions = UTILITY::searchExpressions($parameter['search']);
-			// reduce expressions by leading operators
-			foreach($expressions as $index => &$expression){
-				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
-			}
-			usort($risk_datalist, function ($a, $b) use ($expressions){
-				$a_matches = $b_matches = 0;
-				foreach($expressions as $expression){
-					foreach(['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder'] as $column) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $a[$column] ? : '', $matches)) {
-							$a_matches++;
-							break;
-						}
-					}
-					foreach(['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder'] as $column) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $b[$column] ? : '', $matches)) {
-							$b_matches++;
-							break;
-						}
-					}
-				}
-				return $a_matches <=> $b_matches;
-			});
-			$risk_datalist = array_reverse($risk_datalist);
+			$risk_datalist = SEARCH::refine($parameter['search'], $risk_datalist, ['cause', 'effect', 'measure', 'risk_benefit', 'measure_remainder']);
 		}
 
 		$productsPerSlide = 0;
@@ -642,31 +596,9 @@ class SEARCHHANDLER {
 					':vendors' => implode(",", array_map(fn($el) => intval($el), explode('_', $parameter['vendors']))),
 				]
 			]);
-			// order matches by relevance; shift to top if all of optional terms have been found
-			$expressions = UTILITY::searchExpressions($parameter['search']);
-			// reduce expressions by leading operators
-			foreach($expressions as $index => &$expression){
-				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
-			}
-			usort($search, function ($a, $b) use ($expressions){
-				$a_matches = $b_matches = 0;
-				foreach($expressions as $expression){
-					foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $a[$column] ? : '', $matches)) {
-							$a_matches++;
-							break;
-						}
-					}
-					foreach(['article_ean', 'erp_id', 'article_no', 'article_name'] as $column) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $b[$column] ? : '', $matches)) {
-							$b_matches++;
-							break;
-						}
-					}
-				}
-				return $a_matches <=> $b_matches;
-			});
-			$search = array_reverse($search);
+			// order matches by relevance; shift to top if all of optional terms have been found, apply column condition if applicable
+
+			$search = SEARCH::refine($parameter['search'], $search, ['article_ean', 'erp_id', 'article_no', 'article_name']);
 		}
 		$productsPerSlide = 0;
 

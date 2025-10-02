@@ -650,38 +650,6 @@ class UTILITY {
 		return (property_exists($object, $property) && boolval($object->{$property}) && $object->{$property} !== 'undefined') ? $object->{$property} : false;
 	}
 
-
-	/**
-	 *                       _                               _
-	 *   ___ ___ ___ ___ ___| |_ ___ _ _ ___ ___ ___ ___ ___|_|___ ___ ___
-	 *  |_ -| -_| .'|  _|  _|   | -_|_'_| . |  _| -_|_ -|_ -| | . |   |_ -|
-	 *  |___|___|__,|_| |___|_|_|___|_,_|  _|_| |___|___|___|_|___|_|_|___|
-	 *                                  |_|
-	 * splits a search into terms with conditions
-	 * @param string $search requested search string
-	 * @return array array of named arrays containing operator, column, term and pregterm with wildcard replacement
-	 */
-	public static function searchExpressions($search){
-		preg_match_all('/([+-]{0,1})([\w\.]+:){0,1}((?:["\'])(.+?)(?:["\'])|\S+)/', $search ? : '', $expressions, PREG_SET_ORDER);
-		$result = [];
-		foreach($expressions as $expression){
-			$term = isset($expression[4]) ? $expression[4] : $expression[3];
-			$column = isset($expression[2]) ? substr($expression[2], 0, -1) : null;
-			
-			// filter terms resulting in unnecessary huge result lists
-			if (in_array($term, ['+', '-'])) continue; // most probably a typo 
-			if (strlen($term) < 2 && $term !== '%' && !$column) continue; // still allows explicit int(bool) and general system searches
-
-			$result[] = [
-				'operator' => $expression[1] ? : null,
-				'column' => $column,
-				'term' => $term,
-				'pregterm' => preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $term)
-			];
-		}
-		return $result;		
-	}
-
 	/**
 	 *                             _ _             _
 	 *   ___ ___ ___ _ _ ___ ___ _| |_|___ ___ ___| |_ ___ ___ _ _
@@ -1386,6 +1354,101 @@ class MARKDOWN {
 			$content
 		);
 		return $content;
+	}
+}
+
+class SEARCH{
+	/**
+	 *                               _
+	 *   ___ _ _ ___ ___ ___ ___ ___|_|___ ___ ___
+	 *  | -_|_'_| . |  _| -_|_ -|_ -| | . |   |_ -|
+	 *  |___|_,_|  _|_| |___|___|___|_|___|_|_|___|
+	 *          |_|
+	 * splits a search string into terms with conditions
+	 * @param string $search requested search string
+	 * @return array array of named arrays containing operator, column, term and pregterm with wildcard replacement
+	 */
+	public static function expressions($search){
+		preg_match_all('/([+-]{0,1})([\w\.]+:){0,1}((?:["\'])(.+?)(?:["\'])|\S+)/', $search ? : '', $expressions, PREG_SET_ORDER);
+		$result = [];
+		foreach($expressions as $expression){
+			$term = isset($expression[4]) ? $expression[4] : $expression[3];
+			$column = isset($expression[2]) ? substr($expression[2], 0, -1) : null;
+			
+			// filter terms resulting in unnecessary huge result lists
+			if (in_array($term, ['+', '-'])) continue; // most probably a typo 
+			if (strlen($term) < 2 && $term !== '%' && !$column) continue; // still allows explicit int(bool) and general system searches
+
+			$result[] = [
+				'operator' => $expression[1] ? : null,
+				'column' => $column,
+				'term' => $term,
+				'pregterm' => preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $term)
+			];
+		}
+		return $result;		
+	}
+
+	/**
+	 *           ___ _
+	 *   ___ ___|  _|_|___ ___
+	 *  |  _| -_|  _| |   | -_|
+	 *  |_| |___|_| |_|_|_|___|
+	 *
+	 * apply column conditions if applicable, sort by weighted column matching
+	 * @param string $search search string
+	 * @param array $result initial result from sql-queries and whatnot
+	 * @param array $weighted columns to observe for the most terms matched, sorts most matches to top
+
+	 * @return array
+	 */
+	public static function refine($search, $results, $weighted){
+		$expressions = self::expressions($search);
+		$columns = [];
+		// reduce expressions by leading operators
+		// reduce to column conditions for $result should have been filtered out in advance
+		foreach($expressions as $index => &$expression){
+			if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out before calling this method
+			if (!isset($expression['column']) || !$expression['column']) continue;
+			$columns[] = $expression;
+			unset($expressions[$index]); // avoid double term filtering
+		}
+
+		// unset rows not matching the column condition some_result_column:hasvalue or -some_result_column:hasvalue
+		// also if column is not found!
+		foreach($columns as $column){
+			foreach($results as $r_index => $row){
+				if (!isset($row[$column['column']])) {
+					unset($results[$r_index]);
+					continue;
+				}
+				preg_match('/.*' . $column['pregterm']. '.*/im', $row[$column['column']], $match);
+				if (($match && $column['operator'] === '-') || (!$match && $column['operator'] !== '-')) unset($results[$r_index]);
+			}
+		}
+
+		// push to top if more terms match the result row
+		usort($results, function ($a, $b) use ($expressions, $weighted){
+			$a_matches = $b_matches = 0;
+			foreach($expressions as $expression){
+				foreach($weighted as $column) {
+					if (preg_match('/' . $expression['pregterm'] . '/im', $a[$column] ? : '', $matches)) {
+						$a_matches++;
+						break;
+					}
+				}
+				foreach($weighted as $column) {
+					if (preg_match('/' . $expression['pregterm'] . '/im', $b[$column] ? : '', $matches)) {
+						$b_matches++;
+						break;
+					}
+				}
+			}
+			return $a_matches <=> $b_matches;
+		});
+		$results = array_reverse($results);
+
+		return $results;
 	}
 }
 ?>
