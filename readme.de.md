@@ -1090,6 +1090,7 @@ Die Suche kann weiterhin nach Datenbankenspalten eingegrenzt werden indem einem 
     * für die Artikelsuche z.B.: vendor_name, article_name, article_no, article_alias
     * für die Risikosuche z.B.: cause, effect, measure, risk_benefit, measure_remainder
     * für die Aufzeichnungssuche z.B.: identifier, content, last_user
+    * für Dokumentensuche z.B.: name, alias, regulatory_content, contents
 
 [Übersicht](#übersicht)
 

@@ -293,35 +293,10 @@ class SEARCHHANDLER {
 	 * @return array of document names
 	 */
 	public function documentsearch($parameter = []){
-		$fd = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
+		$documents = SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist');
 		$hidden = $matches = [];
 		$recentdocument = new DOCUMENTHANDLER($this->_pdo, $this->_date);
 		$parameter['search'] = isset($parameter['search']) ? trim($parameter['search']) : null;
-		$expressions = SEARCH::expressions($parameter['search']);
-
-		/**
-		 * iterates over terms and checks if mandatory, excluded or any search strings are found
-		 * @param array $terms
-		 * @param array $expressions
-		 * 
-		 * @return bool
-		 */
-		function searchExpressions($terms, $expressions){
-			$any = $mandatory = false;
-			foreach ($expressions as $expression){
-				foreach($terms as $term){
-					preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches);
-					if ($expression['operator'] === '-' && $matches) return false; // this term should not have been included
-					elseif ($expression['operator'] === '+' && $matches) $mandatory = true; // this term must have been included
-					elseif ($matches) $any = true;
-				}
-				if ($any && $mandatory) return true;
-			}
-			// mandatory has not been requested
-			if (!array_filter($expressions, fn($o) => $o['operator'] === '+')) $mandatory = true;
-			if ($any && $mandatory) return true;
-			return false;
-		}
 
 		/**
 		 * extracts names, descriptions, hints and contents
@@ -354,7 +329,7 @@ class SEARCHHANDLER {
 			return $searcheables;
 		}
 
-		foreach ($fd as $row) {
+		foreach ($documents as $row) {
 			if ($row['hidden'] || !PERMISSION::permissionIn($row['restricted_access']) || !PERMISSION::fullyapproved('documentapproval', $row['approval'])) $hidden[] = $row['name']; // since ordered by recent, older items will be skipped
 			if (!in_array($row['name'], $hidden)) {
 
@@ -363,50 +338,23 @@ class SEARCHHANDLER {
 					continue;
 				}
 
-				// set up search terms with name and alias
-				$terms = [$row['name']];
-				// add alias to terms
-				foreach (preg_split('/[^\w\d]/', $row['alias']) as $alias) array_push($terms, $alias);
-				// add regulatory contexts to terms
-				foreach (array_map(fn($c) => $this->_lang->GET('regulatory.' . $c), explode(',', $row['regulatory_context'])) as $context) array_push($terms, $context);
+				// translate and reassign regulatory contexts since document search results do not need the language agnostic key
+				$row['regulatory_context'] = implode(', ', array_map(fn($c) => $this->_lang->GET('regulatory.' . $c), explode(',', $row['regulatory_context'])));
 				// add component contents to terms
 				$document = $recentdocument->recentdocument('document_document_get_by_name', [
 					'values' => [
 						':name' => $row['name']
 					]]);
-				array_push($terms, ...componentSearcheables($document['content']));
-
+				$searchables = componentSearcheables($document['content']);
 				// compare search
-				if (searchExpressions($terms, $expressions)){
-					$row['_searchableTerms'] = $terms;
+				if (SEARCH::filter($parameter['search'], [$row['name'], $row['alias'], $row['regulatory_context'], ...$searchables])){
+					$row['contents'] = implode (' ', $searchables);
 					$matches[] = $row;
 				}
 			}
 		}
 		if ($parameter['search']) {
-			// reduce expressions by leading operators
-			foreach($expressions as $index => &$expression){
-				if ($expression['operator'] === '-') unset($expressions[$index]); // has - operator, already filtered out by sql query
-			}
-			usort($matches, function ($a, $b) use ($expressions){
-				$a_matches = $b_matches = 0;
-				foreach($expressions as $expression){
-					foreach($a['_searchableTerms'] as $term) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches)) {
-							$a_matches++;
-							break;
-						}
-					}
-					foreach($b['_searchableTerms'] as $term) {
-						if (preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches)) {
-							$b_matches++;
-							break;
-						}
-					}
-				}
-				return $a_matches <=> $b_matches;
-			});
-			$matches = array_reverse($matches);
+			$matches = SEARCH::refine($parameter['search'], $matches, ['name', 'alias', 'regulatory_context', 'contents']);
 		}
 
 		return $matches;

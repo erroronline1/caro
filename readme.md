@@ -36,9 +36,7 @@ Things are still in motion. Images may be outdated.
     * improve matched conditions and sort, like sqlinterface, include search options?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 * consider search _shared.php
-    * documentsearch: searchable terms keyed for column_name:; apply SEARCH::refine
-    * process ordersearch likewise? apply SEARCH::refine
-    * describe options *somewhere*?
+    * describe advanced options *somewhere* within the application?
 * close recent dialog (e.g. on adding new products from dialog view)
 
 ## Content
@@ -1188,6 +1186,7 @@ The search can further be refined by database column names followed by : prior t
     * for product search e.g.: vendor_name, article_name, article_no, article_alias
     * for risk search e.g.: cause, effect, measure, risk_benefit, measure_remainder
     * for record search e.g.: identifier, content, last_user
+    * for document search e.g.: name, alias, regulatory_content, contents
 
 [Content](#content)
 
