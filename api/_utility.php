@@ -1390,6 +1390,37 @@ class SEARCH{
 	}
 
 	/**
+	 *   ___ _ _ _           
+	 *  |  _|_| | |_ ___ ___ 
+	 *  |  _| | |  _| -_|  _|
+	 *  |_| |_|_|_| |___|_|  
+	 *
+	 * iterates over terms and checks if mandatory, excluded or any search strings are found
+	 * usable for data not prefiltered via sql query
+	 * @param array $terms
+	 * @param array $expressions
+	 * 
+	 * @return bool
+	 */
+	public static function filter($search, $terms){
+		$expressions = self::expressions($search);
+		$any = $mandatory = false;
+		foreach ($expressions as $expression){
+			foreach($terms as $term){
+				preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches);
+				if ($expression['operator'] === '-' && $matches) return false; // this term should not have been included
+				elseif ($expression['operator'] === '+' && $matches) $mandatory = true; // this term must have been included
+				elseif ($matches) $any = true;
+			}
+			if ($any && $mandatory) return true;
+		}
+		// mandatory has not been requested
+		if (!array_filter($expressions, fn($o) => $o['operator'] === '+')) $mandatory = true;
+		if ($any && $mandatory) return true;
+		return false;
+	}
+
+	/**
 	 *           ___ _
 	 *   ___ ___|  _|_|___ ___
 	 *  |  _| -_|  _| |   | -_|
@@ -1432,12 +1463,14 @@ class SEARCH{
 			$a_matches = $b_matches = 0;
 			foreach($expressions as $expression){
 				foreach($weighted as $column) {
+					if (!isset($a[$column])) continue;
 					if (preg_match('/' . $expression['pregterm'] . '/im', $a[$column] ? : '', $matches)) {
 						$a_matches++;
 						break;
 					}
 				}
 				foreach($weighted as $column) {
+					if (!isset($b[$column])) continue;
 					if (preg_match('/' . $expression['pregterm'] . '/im', $b[$column] ? : '', $matches)) {
 						$b_matches++;
 						break;
