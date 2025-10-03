@@ -1847,7 +1847,6 @@ export const api = {
 					case "documentexport": // sorry. exports a document with records, not so paperless after all
 					case "simplifieddocumentexport": // sorry. exports a document with records, not so paperless after all
 					case "matchbundles":
-					case "erpcasepositions":
 						// fall back to default successFn
 						break;
 					case "records":

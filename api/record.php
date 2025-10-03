@@ -536,8 +536,6 @@ class RECORD extends API {
 
 		require_once('./erpquery.php');
 		$ERPQUERY = new ERPQUERY();
-		// convert request param to payload
-		$this->_payload->{$this->_lang->PROPERTY('erpquery.casedata.case_id')} = $this->_requestedID;
 
 		$this->response([
 			'render' => $ERPQUERY->casedata()
@@ -1245,7 +1243,8 @@ class RECORD extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('record.erpinterface.casepositions_button'),
-								'onclick' => "let v = document.getElementById('_erpcasenumbers').value; if (v) api.record('post', 'erpcasepositions', v);"
+								'onclick' => "let v = document.getElementById('_erpcasenumbers').value, formdata; " .
+								"if (v) { formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', v); api.record('post', 'erpcasepositions', null, formdata);}"
 							]
 						];
 					}
