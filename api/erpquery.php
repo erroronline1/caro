@@ -44,6 +44,7 @@ class ERPQUERY extends API {
 		$categories = [];
 		if (method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata()) $categories[] = 'patientlookup';
 		if (method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()) $categories[] = 'casedata';
+		if (method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata() && method_exists(ERPINTERFACE, 'customercases') && ERPINTERFACE->customercases()) $categories[] = 'caselist';
 
 		foreach ($categories as $category){
 				$selecttypes[$this->_lang->GET('erpquery.navigation.' . $category)] = ['value' => $category];
@@ -107,7 +108,10 @@ class ERPQUERY extends API {
 						if (isset($states[$case][$state])) $options[$translation]['checked'] = true;
 					}
 					$casecontent[] = [
-						'type' => 'radio',
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET('record.pseudodocument_casedocumentation')
+						],
 						'content' => $options
 					];
 				}
@@ -141,6 +145,44 @@ class ERPQUERY extends API {
 		}
 		return $content;
 	}
+
+	public function caselist(){
+		$content = $fields = [];
+		foreach(ERPINTERFACE->customerdata() as $field){
+			$fields[] = [
+				'type' => $field['type'],
+				'attributes' => [
+					'name' => $field['name'],
+					'value' => UTILITY::propertySet($this->_payload, $field['name']) ? : ''
+				]
+			];
+		}
+		$content[] = $fields;
+
+		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+			$fields = [];
+			if ($result = ERPINTERFACE->customercases((array)$this->_payload)) {
+
+				foreach($result as $patient => $cases){
+					$links = [];
+					foreach($cases as $case){
+						$description = $case['caseid'] . ' - ' . $case['text'];
+						if ($case['reimbursement']) $description .= ' - ' . $this->_lang->GET('casestate.casedocumentation.reimbursement') . ' ' . $case['reimbursement'];
+						if ($case['settled']) $description .= ' - ' . $this->_lang->GET('casestate.casedocumentation.settled') . ' ' . $case['settled'];
+						$links[$description] = ['href' => 'javascript:void(0)', 'onclick' => "const formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', " . $case['caseid'] . "); api.record('post', 'erpcasepositions', null, formdata);"];
+					}
+					$content[] = [
+						'type' => 'links',
+						'description' => $patient,
+						'content' => $links
+					];
+				}
+			}
+		}
+
+		return $content;
+	}
+
 
 	/**
 	 *           _   _         _   _         _           
@@ -198,6 +240,9 @@ class ERPQUERY extends API {
 		return $content;
 	}
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// direct accessible methods
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
 	 *                 _               

@@ -1518,12 +1518,16 @@ Unnötig auszuführen, dass Lieferantennamen und einzigartige Artikelnummern üb
 
 In der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung) steht eine Stellungnahme, warum dies generell nicht die CARO-App-Artikeldatenbank ersetzt.
 
+### Vorgangslisten
+Vorgangslisten werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Vorgängen angezeigt, welche einen Dialog mit Vorgangsdaten anzeigen, für alle Patienten gemäß Suche. Diese Methode ist abhängig von der Methode zum Datenimport von Kundendaten.  
+Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden.
+
 ### Vorgangspositionen
 Vorgangspositionen werden je Anfrage verarbeitet. Sofern verfügbar werden Tabellen der Vorgangspositionen aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) angezeigt.  
 Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden. Die Schlüssel müssen zu den Sprachblöcken der `erpquery.casedata.casepositions` passen.
 
 ### Vorgangsmedien
-Vorgangsmedian werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Daten-URLs angezeigt, welche die Datein aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) beinhalten.  
+Vorgangsmedien werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Daten-URLs angezeigt, welche die Datein aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) beinhalten.  
 Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden.
 
 ### Angepasste Datenbankauszüge

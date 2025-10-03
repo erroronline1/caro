@@ -31,8 +31,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-    * case lists by patient, linked to casedata
-    * casedata enriching with casestate too
     * improve matched conditions and sort, like sqlinterface, include search options?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 * consider search _shared.php
@@ -1616,6 +1614,10 @@ is updated if not already set within the system.
 Needless to elaborate vendor names and unique article numbers must match.
 
 [Vendor and product management](#vendor-and-product-management) states, why this will not replace the CARO App product database in general.
+
+### Case lists
+Case lists are fetched by request. If available, links with cases will be displayed leading to dialogs with the case data for all matched patients for the requested search. This method is dependent on the customer data method. 
+Data will be presented as constructed within the custom interface-class-method.
 
 ### Case positions
 Case positions are fetched by request. If available, tables of the calculatory items will be displayed from within the records according to the provided ERP case number(s).  

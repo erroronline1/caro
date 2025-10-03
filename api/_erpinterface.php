@@ -85,6 +85,32 @@ class _ERPINTERFACE {
 	}
 
 	/**
+	 * retrieve cases from the erp system by customer  
+	 * customer selection is based on customerdata()-response and matches with whatever key is set to clearly identify a customer  
+	 * all cases for matched customers are returned
+	 * 
+	 * returns results to select from on application level
+	 * @param array|null $request as named array with columns to match, similar to customerdata()
+	 * @return null|array
+	 * 
+	 * sanitize parameters according to the usecase e.g. dbo driver
+	 */
+	public function customercases($request = null){
+		/**
+		 * return [
+		 * 		'{patient}' => [ // e.g. a concatenation of patient name and date of birth
+		 * 			'caseid' => string,
+		 * 			'text' => string,
+		 * 			'reimbursement' => string Y-m-d,
+		 * 			'settled' => string Y-m-d
+		 * 		],
+		 * 		...
+		 * ]
+		 */
+		return null;
+	}
+
+	/**
 	 * retrieve most recent customer data details based on matching requests
 	 * returns results to select from on application level
 	 * @param array|null $request as named array with columns to match
@@ -526,11 +552,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$query = <<<'END'
 		SELECT
 			REFERENZ,
-			convert(varchar(255), KV_DATUM, 104) AS KV_DATUM,
-			convert(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
+			CONVERT(varchar(255), KV_DATUM, 104) AS KV_DATUM,
+			CONVERT(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 			AUFTRAGSWERT_BRUTTO,
 			GENEHMIGT_TEILSUMME,
-			convert(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM
+			CONVERT(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM
 		FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 
 		WHERE REFERENZ IN (:ref)
@@ -590,11 +616,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			SELECT
 				REFERENZ,
 				ADRESSEN_REFERENZ,
-				convert(varchar(255), KV_DATUM, 104) AS KV_DATUM,
-				convert(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
+				CONVERT(varchar(255), KV_DATUM, 104) AS KV_DATUM,
+				CONVERT(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 				AUFTRAGSWERT_BRUTTO,
 				GENEHMIGT_TEILSUMME,
-				convert(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
+				CONVERT(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
 				LEISTUNG
 			FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 		) AS vorgang ON pos.VORGAENGE_REFERENZ = vorgang.REFERENZ
@@ -603,7 +629,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				a.NAME_2,
 				a.NAME_3,
 				a.NAME_4,
-				convert(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
+				CONVERT(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
 				a.REFERENZ,
 				more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
 			FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
@@ -651,6 +677,72 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		return $response;
 	}
 
+	/**
+	 * retrieve cases from the erp system by customer  
+	 * customer selection is based on customerdata()-response and matches with whatever key is set to clearly identify a customer  
+	 * all cases for matched customers are returned
+	 * 
+	 * returns results to select from on application level
+	 * @param array|null $request as named array with columns to match, similar to customerdata()
+	 * @return null|array
+	 * 
+	 * sanitize parameters according to the usecase e.g. dbo driver
+	 */
+	public function customercases($request = null){
+		$query = <<<'END'
+		SELECT
+			vorgang.REFERENZ,
+			vorgang.LEISTUNG,
+			CONVERT(varchar(255), vorgang.KV_DATUM, 104) AS KV_DATUM,
+			CONVERT(varchar(255), vorgang.FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
+			CONCAT(pat.NAME_2, ' ', pat.NAME_3, ' ', pat.NAME_4, ' ', pat.NACHNAME, ' *' , pat.GEBURTSDATUM) as PATIENT
+		FROM [eva3_02_viva_souh].[dbo].[vorgaenge] as vorgang
+		INNER JOIN (
+			SELECT
+				a.NAME_1 as NACHNAME,
+				a.NAME_2,
+				a.NAME_3,
+				a.NAME_4,
+				CONVERT(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
+				a.REFERENZ,
+				more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+			LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+			WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+		) AS pat ON pat.REFERENZ = vorgang.ADRESSEN_REFERENZ
+
+		WHERE pat.REFERENZ IN (:ref)
+		AND vorgang.LEISTUNG IS NOT NULL
+
+		ORDER BY vorgang.ID DESC
+		END;
+
+		if (!$request) return [[]];
+		if (!($customers = $this->customerdata($request))) return [[]];
+		try{
+			$statement = $this->_pdo->prepare(strtr($query, [
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref['ERPNR']), $customers))
+			]));
+			$statement->execute();	
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+		$response = [];
+
+		foreach ($result as $row){
+			$response[$row['PATIENT']][] = [
+				'caseid' => $row['REFERENZ'],
+				'text' => $row['LEISTUNG'],
+				'reimbursement' => $row['KV_DATUM'],
+				'settled' => $row['FAKTURIERT_DATUM']
+			];
+		}
+
+		return $response;
+	}
 
 	/**
 	 * retrieve most recent customer data details based on matching requests
@@ -687,7 +779,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				a.NAME_3,
 				a.NAME_4,
 				a.GEBURTSNAME,
-				convert(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
+				CONVERT(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
 				a.STRASSE_1,
 				a.PLZ_1,
 				a.ORT_1,
@@ -829,6 +921,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'eMailadresse' => $row['EMAIL'],
 				'Kostenträger' => $row['KOSTENTRAEGER_NAME'],
 				'FIBU Nummer' => $row['FIBU_NUMMER'],
+				'ERPNR' => $row['REFERENZ'] // customercases relies on this key
 			];
 			$response[] = $patient;
 		}
@@ -847,7 +940,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			'Vorgangsexport' => <<<'END'
 				SELECT
 					vorgaenge.REFERENZ AS VORGANG,
-					convert(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+					CONVERT(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
 					pat.ANREDE,
 					pat.[PERSOENLICHE ANREDE],
 					pat.REFERENZ AS KUNDENNUMMER,
@@ -857,13 +950,13 @@ class ODEVAVIVA extends _ERPINTERFACE {
 					pat.LKZ,
 					pat.PLZ,
 					pat.ORT,
-					convert(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
+					CONVERT(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
 					EMAIL.EMAIL,
 					pat.STERBEDATUM,
 					vorgaenge.LEISTUNG,
 					vorgaenge.AUFTRAGSWERT_BRUTTO,
 					'geliefert' AS GELIEFERT,
-					convert(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
+					CONVERT(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
 					[sys].GENEHMIGT,
 					'nein' AS OHNE_SERIENBRIEF	
 				FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
@@ -975,7 +1068,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				specialattention*/
 			article2.MINDEST_BESTAND,
 			article.ARTIKEL_REFERENZ,
-			convert(varchar(255), article.WARENEINGANGSDATUM, 23) AS WARENEINGANGSDATUM
+			CONVERT(varchar(255), article.WARENEINGANGSDATUM, 23) AS WARENEINGANGSDATUM
 		FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten] AS article
 		LEFT JOIN (
 			SELECT
@@ -1051,7 +1144,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$query = <<<'END'
 		SELECT
 			multimedia.[BESCHREIBUNG],
-			convert(varchar(255), multimedia.[ANGELEGT_AM], 104) AS ANGELEGT_AM,
+			CONVERT(varchar(255), multimedia.[ANGELEGT_AM], 104) AS ANGELEGT_AM,
 			multimedia.[FILTER_2] as vorgang,
 			multimedia.[DATEINAME],
 			files.MEDIA
@@ -1125,9 +1218,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			orders.BESTELLNUMMER,
 			orders.BEZEICHNUNG AS BESTELLTEXT,
 			article.ARTIKELBEZEICHNUNG,
-			convert(varchar(255), orders.ORDER_DATUM, 120) AS ORDER_DATUM,
+			CONVERT(varchar(255), orders.ORDER_DATUM, 120) AS ORDER_DATUM,
 			orders.MENGE,
-			convert(varchar(255), orders2.WE_DATUM, 120) AS WE_DATUM,
+			CONVERT(varchar(255), orders2.WE_DATUM, 120) AS WE_DATUM,
 			orders2.WE_MENGE,
 			orders2.BESTELL_BELEGNUMMER,
 			vendor.NAME_1 as LIEFERANTEN_NAME

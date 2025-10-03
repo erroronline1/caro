@@ -1075,6 +1075,7 @@
 		},
 		"navigation": {
 			"casedata": "Vorgangsdaten",
+			"caselist": "Vorgänge",
 			"csvdump": "EVA Datenbanken-Abfrage",
 			"erpquery": "EVA Vorgangs- und Patientendaten",
 			"patientlookup": "Patientensuche",

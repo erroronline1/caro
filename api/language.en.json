@@ -1075,6 +1075,7 @@
 		},
 		"navigation": {
 			"casedata": "Case data",
+			"caselist": "Cases",
 			"csvdump": "ERP database query",
 			"erpquery": "ERP customer and case data requests",
 			"patientlookup": "Patient lookup",
