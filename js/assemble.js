@@ -3053,7 +3053,7 @@ export class Assemble {
 					{
 						type: "textsection",
 						attributes: {
-							name: api._lang.GET("record.import.by_erp"),
+							name: api._lang.GET("erpquery.integrations.data_import"),
 							"data-type": "identify",
 						},
 					}

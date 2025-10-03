@@ -2073,8 +2073,8 @@ class CONSUMABLES extends API {
 					'consumables.vendor.samplecheck_interval',
 					'consumables.vendor.samplecheck_interval_reusable',
 					'consumables.vendor.message_vendor_select_special_attention_products',
-					'consumables.vendor.pricelist_erp_match',
-					'consumables.vendor.pricelist_erp_match_selected',
+					'erpquery.integrations.pricelist_erp_match',
+					'erpquery.integrations.pricelist_erp_match_selected',
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
 				}
@@ -2217,7 +2217,7 @@ class CONSUMABLES extends API {
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name']){
 						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name'][0];
 					}
-					$pricelistImportResult = $this->update_pricelist($files, $vendor['pricelist']['filter'], $vendor['id'], $this->_lang->PROPERTY('consumables.vendor.pricelist_erp_match_selected'));
+					$pricelistImportResult = $this->update_pricelist($files, $vendor['pricelist']['filter'], $vendor['id'], $this->_lang->PROPERTY('erpquery.integrations.pricelist_erp_match_selected'));
 					$vendor['pricelist']['validity'] = $pricelistImportResult[0];
 					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
 					// unset pricelist files for later file processing after successful update
@@ -2249,8 +2249,8 @@ class CONSUMABLES extends API {
 					'consumables.vendor.samplecheck_interval',
 					'consumables.vendor.samplecheck_interval_reusable',
 					'consumables.vendor.message_vendor_select_special_attention_products',
-					'consumables.vendor.pricelist_erp_match',
-					'consumables.vendor.pricelist_erp_match_selected',
+					'erpquery.integrations.pricelist_erp_match',
+					'erpquery.integrations.pricelist_erp_match_selected',
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
 				}
@@ -2710,10 +2710,10 @@ class CONSUMABLES extends API {
 							$pricelistupdateoptions[] = [
 								'type' => 'checkbox',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.pricelist_erp_match')
+									'name' => $this->_lang->GET('erpquery.integrations.pricelist_erp_match')
 								],
 								'content' => [
-									$this->_lang->GET('consumables.vendor.pricelist_erp_match_selected') => []
+									$this->_lang->GET('erpquery.integrations.pricelist_erp_match_selected') => []
 								]
 							];
 						}

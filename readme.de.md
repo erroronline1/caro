@@ -1520,7 +1520,7 @@ In der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung)
 
 ### Vorgangspositionen
 Vorgangspositionen werden je Anfrage verarbeitet. Sofern verfügbar werden Tabellen der Vorgangspositionen aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) angezeigt.  
-Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden. Die Schlüssel müssen zu den Sprachblöcken der `record.erpinterface.casepositions` passen.
+Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden. Die Schlüssel müssen zu den Sprachblöcken der `erpquery.casedata.casepositions` passen.
 
 ### Vorgangsmedien
 Vorgangsmedian werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Daten-URLs angezeigt, welche die Datein aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) beinhalten.  

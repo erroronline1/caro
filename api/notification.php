@@ -179,7 +179,7 @@ class NOTIFICATION extends API {
 											if (!isset($case['case_state'][$_ERPcaseState]) && $value) {
 												$case['case_state'][$_ERPcaseState] = true;
 												$current_records[] = [
-													'author' => $this->_lang->GET('general.via_erp_interface', [':systemuser' => CONFIG['system']['caroapp']], true),
+													'author' => $this->_lang->GET('erpquery.integrations.update_via_erp_interface', [':systemuser' => CONFIG['system']['caroapp']], true),
 													'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 													'document' => 0,
 													'content' => UTILITY::json_encode([

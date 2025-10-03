@@ -97,7 +97,7 @@ class ERPQUERY extends API {
 				$files = ERPINTERFACE->media(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casedata.case_id')) ? : ''));
 				foreach($result as $case => $positions){
 					$tablerows = [];
-					$tablerows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
+					$tablerows[] = array_map(fn($v) => ['c' => $this->_lang->GET('erpquery.casedata.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
 					foreach($positions as $position){
 						unset($position['header_data']);
 						$tablerows[] = array_map(fn($v) => ['c' => $v], array_values($position));
@@ -176,7 +176,7 @@ class ERPQUERY extends API {
 							[
 								'type' => 'radio',
 								'attributes' => [
-									'name' => $this->_lang->GET('record.import.by_erp')
+									'name' => $this->_lang->GET('erpquery.integrations.data_import')
 								],
 								'content' => $options
 							]

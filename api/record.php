@@ -1242,7 +1242,7 @@ class RECORD extends API {
 						$general[] = [
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('record.erpinterface.casepositions_button'),
+								'value' => $this->_lang->GET('erpquery.casedata.casepositions_button'),
 								'onclick' => "let v = document.getElementById('_erpcasenumbers').value, formdata; " .
 								"if (v) { formdata = new FormData(); formdata.append('" . $this->_lang->PROPERTY('erpquery.casedata.case_id') . "', v); api.record('post', 'erpcasepositions', null, formdata);}"
 							]

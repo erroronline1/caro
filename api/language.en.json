@@ -183,7 +183,6 @@
 		"service_worker_get_cache_fallback": "Serving last available version due to current connectivity loss!",
 		"service_worker_post_cache_fallback": "Request will be synced on next network access!",
 		"submit_button": "Submit",
-		"via_erp_interface": ":systemuser via ERP interface",
 		"weekday": {
 			"1": "Mon",
 			"2": "Tue",
@@ -998,8 +997,6 @@
 			"not_saved": "Vendor could not be saved",
 			"phone": "Phone",
 			"pricelist_empty": "There are no products to export",
-			"pricelist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
-			"pricelist_erp_match_selected": "Match with ERP database",
 			"pricelist_export": "Export article list",
 			"pricelist_export_hint": "This is recommended for small article lists that do not trace back to an import. The filter operates for exported lists only. Proper pricelists and well formulated filters are preferred.",
 			"pricelist_filter": "Pricelist import filter",
@@ -1055,13 +1052,26 @@
 	},
 	"erpquery": {
 		"casedata": {
-			"case_id": "Case ID(s)"
+			"case_id": "Case ID(s)",
+			"casepositions_button": "Case data",
+			"casepositions": {
+				"amount": "Amount",
+				"contract_position": "Position",
+				"text": "Position text"
+			},
+			"null": "For the provided case number(s) are no results available."
 		},
 		"csvdump": {
 			"none": "There were no results for this query",
 			"null": "This query does not exists",
 			"select": "Select query to export as CSV",
 			"select_hint": "No fitting query found? Contact a programmer to set one up."
+		},
+		"integrations":{
+			"data_import": "Data from the ERP-software",
+			"pricelist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
+			"pricelist_erp_match_selected": "Match with ERP database",
+			"update_via_erp_interface": ":systemuser via ERP interface"
 		},
 		"navigation": {
 			"casedata": "Case data",
@@ -1430,15 +1440,6 @@
 		"date": "Date of record",
 		"erp_case_number": "ERP case number",
 		"erp_case_number_hint": "multiple case numbers can be added, e.g. z.B. 12345; 12346",
-		"erpinterface": {
-			"casepositions_button": "Case positions",
-			"casepositions": {
-				"amount": "Amount",
-				"contract_position": "Position",
-				"text": "Position text"
-			},
-			"null": "For the provided case number(s) are no results available."
-		},
 		"error": "Record could not be saved. Please try again.",
 		"export": "Export record",
 		"export_author": ":author on :date",
@@ -1450,7 +1451,6 @@
 		"filter_hint": "A maximum of :max records will be displayed, but any record will be available if filter matches.\nRecords containing some kind of complaint are highlighted.",
 		"full_export": "Export full detailed record as PDF",
 		"import": {
-			"by_erp": "Data from the ERP-software",
 			"by_identify": "Import by identifier",
 			"error": "No data available to import for this identifier.",
 			"import": "Import",

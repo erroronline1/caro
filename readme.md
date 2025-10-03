@@ -30,7 +30,6 @@ Things are still in motion. Images may be outdated.
 ## to do
 * unittests
 * templates
-* shift erpinterface depended language chunks to respective language object, tidying up
 * erp_interface, additional usecases?
     * case lists by patient, linked to casedata
     * casedata enriching with casestate too
@@ -1620,7 +1619,7 @@ Needless to elaborate vendor names and unique article numbers must match.
 
 ### Case positions
 Case positions are fetched by request. If available, tables of the calculatory items will be displayed from within the records according to the provided ERP case number(s).  
-Data will be presented as constructed within the custom interface-class-method. Keys must match the language chunks `record.erpinterface.casepositions`.
+Data will be presented as constructed within the custom interface-class-method. Keys must match the language chunks `erpquery.casedata.casepositions`.
 
 ### Case media
 Case media are fetched by request. If available, links with data-urls will be displayed containing the files from within the records according to the provided ERP case number(s).  

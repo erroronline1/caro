@@ -183,7 +183,6 @@
 		"service_worker_get_cache_fallback": "Aufgrund eines Verbindungsabbruchs wir die letzte verfügbare Version angezeigt!",
 		"service_worker_post_cache_fallback": "Die Anfrage wird mit der nächsten Netzwerkverbindung verarbeitet!",
 		"submit_button": "Absenden",
-		"via_erp_interface": ":systemuser über die ERP-Anbindung",
 		"weekday": {
 			"1": "Mo",
 			"2": "Di",
@@ -998,8 +997,6 @@
 			"not_saved": "Lieferant konnte nicht gespeichert werden",
 			"phone": "Telefon",
 			"pricelist_empty": "Es gibt keine Artikel zum exportieren",
-			"pricelist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
-			"pricelist_erp_match_selected": "Mit EVA abgleichen",
 			"pricelist_export": "Artikelliste exportieren",
 			"pricelist_export_hint": "Dies wird nur für kleine Artikellisten empfohlen, die nicht auf einen Import zurückgehen. Der Filter funktioniert nur für exportierte Listen. Vernünftige Preislisten und anständig formulierte Filter werden bevorzugt.",
 			"pricelist_filter": "Preislisten Importfilter",
@@ -1055,13 +1052,26 @@
 	},
 	"erpquery": {
 		"casedata": {
-			"case_id": "Vorgangsnummer(n)"
+			"case_id": "Vorgangsnummer(n)",
+			"casepositions_button": "Vorgangsdaten",
+			"casepositions": {
+				"amount": "Anzahl",
+				"contract_position": "Position",
+				"text": "Positionstext"
+			},
+			"null": "Für die angegebenden Vorgangsnummer(n) gibt es keine Ergebnisse."
 		},
 		"csvdump": {
 			"none": "Es gab keine Ergebnisse für diese Abfrage",
 			"null": "Diese Abfrage existiert nicht",
 			"select": "Wähle eine Abfrage für den CSV-Export",
 			"select_hint": "Keine passende Abfrage gefunden? Frage einen Programmierer nach einer Einrichtung."
+		},
+		"integrations":{
+			"data_import": "Daten aus der Verwaltungssoftware",
+			"pricelist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
+			"pricelist_erp_match_selected": "Mit EVA abgleichen",
+			"update_via_erp_interface": ":systemuser über die ERP-Anbindung"
 		},
 		"navigation": {
 			"casedata": "Vorgangsdaten",
@@ -1430,15 +1440,6 @@
 		"date": "Datum des Eintrags",
 		"erp_case_number": "Vorgangsnummer",
 		"erp_case_number_hint": "mehrere Vorgangsnummern können getrennt eingetragen werden, z.B. 12345; 12346",
-		"erpinterface": {
-			"casepositions_button": "Vorgangspositionen",
-			"casepositions": {
-				"amount": "Anzahl",
-				"contract_position": "Position",
-				"text": "Positionstext"
-			},
-			"null": "Für die angegebenden Vorgangsnummer(n) gibt es keine Ergebnisse."
-		},
 		"error": "Die Aufzeichnung konnte nicht gespeichert werden, bitte versuche es erneut.",
 		"export": "Exportiere die Daten als PDF",
 		"export_author": ":author am :date",
@@ -1450,7 +1451,6 @@
 		"filter_hint": "Es werden nicht mehr als :max Aufzeichnungen angezeigt, aber jeder auf den der Filter zutrifft ist erreichbar.\nAufzeichnungen die eine Reklamation beinhalten sind hervorgehoben.",
 		"full_export": "Exportiere die gesamten detaillieren Aufzeichnungen als PDF",
 		"import": {
-			"by_erp": "Daten aus der Verwaltungssoftware",
 			"by_identify": "Von Kennzeichen importieren",
 			"error": "Für dieses Kennzeichen sind keine Daten verfügbar.",
 			"import": "Importieren",
