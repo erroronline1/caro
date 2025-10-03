@@ -145,7 +145,6 @@ class NOTIFICATION extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 		$today = new \DateTime('now');
 		$today->setTime(0, 0);
-		include_once("./_erpinterface.php");
 
 		foreach(CONFIG['system']['cron'] as $task => $minutes){
 			try {

@@ -473,8 +473,6 @@ class ORDER extends API {
 					$users[$user['id']] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
 
-				// import to determine if interface is present
-				include_once("./_erpinterface.php");
 				$erp_interface_available = (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata());
 
 				// create array with reusable images to reduce payload (approval signatures if allowed per CONFIG)

@@ -606,9 +606,6 @@ class SEARCHHANDLER {
 				$datalist = [];
 				$datalist_unit = [];
 
-				// import to determine if interface is present
-				include_once("./_erpinterface.php");
-
 				// prepare existing vendor lists
 				$vendorselection[$this->_lang->GET('consumables.product.search_all_vendors')] = ['value' => 'null'];
 				foreach ($vendors as $key => $row) {

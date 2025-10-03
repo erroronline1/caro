@@ -10,7 +10,6 @@
  */
 
 namespace CARO\API;
-include_once('./_erpinterface.php');
 
 // access patient and case data
 // as separate module for easy access
@@ -83,7 +82,7 @@ class ERPQUERY extends API {
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 			if ($result = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''))) {
-				$files = ERPINTERFACE->erpmedia(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''));
+				$files = ERPINTERFACE->media(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''));
 				foreach($result as $case => $positions){
 					$tablerows = [];
 					$tablerows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
