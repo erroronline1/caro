@@ -32,7 +32,7 @@ require_once('_utility.php'); // general utilities
 require_once('_sqlinterface.php');
 require_once('_language.php');
 // import to determine if interface is present
-include_once("./_erpinterface.php");
+require_once("./_erpinterface.php");
 
 if (!CONFIG['application']['debugging']) {
 	ini_set('display_errors', 0); error_reporting(0);
