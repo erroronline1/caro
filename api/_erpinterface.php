@@ -480,7 +480,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				\PDO::ATTR_EMULATE_PREPARES   => true, // reuse tokens in prepared statements
 				//\PDO::ATTR_PERSISTENT => true // persistent connection for performance reasons, unsupported as of 2/25 on sqlsrv?
 			];
-			$this->_pdo = new \PDO( CONFIG['sql'][CONFIG['system']['erp']]['driver'] . ':' . CONFIG['sql'][CONFIG['system']['erp']]['host'] . ';' . CONFIG['sql'][CONFIG['system']['erp']]['database']. ';' . CONFIG['sql'][CONFIG['system']['erp']]['charset'], CONFIG['sql'][CONFIG['system']['erp']]['user'], CONFIG['sql'][CONFIG['system']['erp']]['password'], $options);
+			$this->_pdo = new \PDO( CONFIG['sql'][CONFIG['system']['erp']]['driver'] . ':' . CONFIG['sql'][CONFIG['system']['erp']]['host'] . ';' . CONFIG['sql'][CONFIG['system']['erp']]['charset'], CONFIG['sql'][CONFIG['system']['erp']]['user'], CONFIG['sql'][CONFIG['system']['erp']]['password'], $options);
 			$this->_instatiated = true;
 		}
 		catch(\Exception $e){
@@ -500,16 +500,16 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 */
 	public function casestate($erp_case_numbers = []){
 		$query = <<<'END'
-			SELECT
+		SELECT
 			REFERENZ,
 			convert(varchar(255), KV_DATUM, 104) AS KV_DATUM,
 			convert(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 			AUFTRAGSWERT_BRUTTO,
 			GENEHMIGT_TEILSUMME,
 			convert(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM
-			FROM vorgaenge
+		FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 
-			WHERE REFERENZ IN (:ref)
+		WHERE REFERENZ IN (:ref)
 		END;
 
 		if (!$erp_case_numbers) return [[]];
@@ -557,11 +557,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			pos.POSITIONSTEXT,
 			vorgang.KV_DATUM,
 			vorgang.GENEHMIGT_DATUM,
+			vorgang.LEISTUNG,
 			CONCAT(pat.NAME_2, ' ' , pat.NAME_3, ' ' , pat.NAME_4, ' ' , pat.NACHNAME) as patientenname,
 			pat.GEBURTSDATUM,
 			KOSTENTRAEGER.NAME_1 as KOSTENTRAEGER
-		
-		FROM vor_positionen as pos
+		FROM [eva3_02_viva_souh].[dbo].[vor_positionen] as pos
 		LEFT JOIN (
 			SELECT
 				REFERENZ,
@@ -570,8 +570,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				convert(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
 				AUFTRAGSWERT_BRUTTO,
 				GENEHMIGT_TEILSUMME,
-				convert(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM
-			FROM vorgaenge
+				convert(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
+				LEISTUNG
+			FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 		) AS vorgang ON pos.VORGAENGE_REFERENZ = vorgang.REFERENZ
 		LEFT JOIN (
 			SELECT a.NAME_1 as NACHNAME,
@@ -581,15 +582,15 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				convert(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
 				a.REFERENZ,
 				more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
-			FROM adressen AS a INNER JOIN inf_adressart AS ia ON a.ADRESSART = ia.REFERENZ
-			LEFT JOIN adr_kunden AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+			LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
 			WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
 		) AS pat ON pat.REFERENZ = vorgang.ADRESSEN_REFERENZ 
 		LEFT JOIN
 		(
 			SELECT ka.NAME_1,
 			ka.REFERENZ
-			FROM adressen AS ka INNER JOIN inf_adressart AS kia ON ka.ADRESSART = kia.REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
 			WHERE kia.BEZEICHNUNG = 'Kostenträger'
 		) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
 		WHERE
@@ -620,7 +621,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'amount' => $row['ANZAHL'] ? : '',
 				'contract_position' => $row['POSITION'] ? : '',
 				'text' => $row['POSITIONSTEXT'] ? : '',
-				'header_data' => ($row['patientenname'] ? : '') . ' ' . ($row['GEBURTSDATUM'] ? : '') . ' ' . ($row['KOSTENTRAEGER'])
+				'header_data' => ($row['LEISTUNG'] ? : '') . ' ' . ($row['patientenname'] ? : '') . ' ' . ($row['GEBURTSDATUM'] ? : '') . ' ' . ($row['KOSTENTRAEGER'])
 			];
 		}
 		return $response;
@@ -649,56 +650,61 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		 */
 		$query = <<<'END'
 		SELECT
-		pat.*,
-		KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER_NAME,
-		EMAIL.EMAIL,
-		PHONE.PHONE,
-		MOBILE.PHONE AS MOBILE
+			pat.*,
+			KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER_NAME,
+			EMAIL.EMAIL,
+			PHONE.PHONE,
+			MOBILE.PHONE AS MOBILE
 		FROM
 		(
-			SELECT a.NAME_1 as NACHNAME,
-			a.NAME_2,
-			a.NAME_3,
-			a.NAME_4,
-			a.GEBURTSNAME,
-			convert(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
-			a.STRASSE_1,
-			a.PLZ_1,
-			a.ORT_1,
-			a.LKZ_1,
-			a.FIBU_NUMMER,
-			a.REFERENZ,
-			more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
-			FROM adressen AS a INNER JOIN inf_adressart AS ia ON a.ADRESSART = ia.REFERENZ
-			LEFT JOIN adr_kunden AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+			SELECT
+				a.NAME_1 as NACHNAME,
+				a.NAME_2,
+				a.NAME_3,
+				a.NAME_4,
+				a.GEBURTSNAME,
+				convert(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
+				a.STRASSE_1,
+				a.PLZ_1,
+				a.ORT_1,
+				a.LKZ_1,
+				a.FIBU_NUMMER,
+				a.REFERENZ,
+				more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adressen] AS a INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+			LEFT JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
 			WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
 		) as pat
 		LEFT JOIN
 		(
-			SELECT ka.NAME_1,
-			ka.REFERENZ
-			FROM adressen AS ka INNER JOIN inf_adressart AS kia ON ka.ADRESSART = kia.REFERENZ
+			SELECT
+				ka.NAME_1,
+				ka.REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adressen] AS ka INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS kia ON ka.ADRESSART = kia.REFERENZ
 			WHERE kia.BEZEICHNUNG = 'Kostenträger'
 		) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
 		LEFT JOIN
 		(
-			SELECT mail.NUMMER AS EMAIL,
-			mail.ADRESSEN_REFERENZ
-			FROM adz_kontakte AS mail INNER JOIN inf_kontaktart as im ON mail.KONTAKTART = im.REFERENZ
+			SELECT
+				mail.NUMMER AS EMAIL,
+				mail.ADRESSEN_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
 			WHERE im.BEZEICHNUNG = 'E-Mail'
 		) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
 		LEFT JOIN
 		(
-			SELECT mail.NUMMER AS PHONE,
-			mail.ADRESSEN_REFERENZ
-			FROM adz_kontakte AS mail INNER JOIN inf_kontaktart as im ON mail.KONTAKTART = im.REFERENZ
+			SELECT
+				mail.NUMMER AS PHONE,
+				mail.ADRESSEN_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
 			WHERE im.BEZEICHNUNG = 'Telefonnummer'
 		) AS PHONE ON pat.REFERENZ = PHONE.ADRESSEN_REFERENZ
 		LEFT JOIN
 		(
-			SELECT mail.NUMMER AS PHONE,
-			mail.ADRESSEN_REFERENZ
-			FROM adz_kontakte AS mail INNER JOIN inf_kontaktart as im ON mail.KONTAKTART = im.REFERENZ
+			SELECT
+				mail.NUMMER AS PHONE,
+				mail.ADRESSEN_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
 			WHERE im.BEZEICHNUNG = 'Telefonnummer'
 		) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
 
@@ -816,69 +822,62 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$queries = [
 			'Vorgangsexport' => <<<'END'
 				SELECT
-				vorgaenge.REFERENZ AS VORGANG,
-				convert(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
-				pat.ANREDE,
-				pat.[PERSOENLICHE ANREDE],
-				pat.REFERENZ AS KUNDENNUMMER,
-				pat.NAME,
-				pat.VORNAME,
-				pat.STRASSE,
-				pat.LKZ,
-				pat.PLZ,
-				pat.ORT,
-				convert(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
-				EMAIL.EMAIL,
-				pat.STERBEDATUM,
-				vorgaenge.LEISTUNG,
-				vorgaenge.AUFTRAGSWERT_BRUTTO,
-				'geliefert' AS GELIEFERT,
-				convert(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
-				[sys].GENEHMIGT,
-				'nein' AS OHNE_SERIENBRIEF
-		
-				FROM vorgaenge
+					vorgaenge.REFERENZ AS VORGANG,
+					convert(varchar(255), vorgaenge.ANLAGEDATUM, 104) AS ANLAGEDATUM,
+					pat.ANREDE,
+					pat.[PERSOENLICHE ANREDE],
+					pat.REFERENZ AS KUNDENNUMMER,
+					pat.NAME,
+					pat.VORNAME,
+					pat.STRASSE,
+					pat.LKZ,
+					pat.PLZ,
+					pat.ORT,
+					convert(varchar(255), pat.GEBURTSDATUM, 104) AS GEBURTSDATUM,
+					EMAIL.EMAIL,
+					pat.STERBEDATUM,
+					vorgaenge.LEISTUNG,
+					vorgaenge.AUFTRAGSWERT_BRUTTO,
+					'geliefert' AS GELIEFERT,
+					convert(varchar(255), vorgaenge.GELIEFERT_DATUM, 104) AS GELIEFERT_DATUM,
+					[sys].GENEHMIGT,
+					'nein' AS OHNE_SERIENBRIEF	
+				FROM [eva3_02_viva_souh].[dbo].[vorgaenge]
 				INNER JOIN (
 					SELECT
-					KENNZEICHEN,
-					BEZEICHNUNG AS GENEHMIGT
-
-					FROM sys_auswahl
-
+						KENNZEICHEN,
+						BEZEICHNUNG AS GENEHMIGT
+					FROM [eva3_02_viva_souh].[dbo].[sys_auswahl]
 					WHERE AUSWAHLART = 'AuftragsGenehmigung'
 				) AS [sys] ON [sys].KENNZEICHEN = vorgaenge.GENEHMIGT
-				INNER JOIN
-					(
+				INNER JOIN (
 					SELECT
-					a.NAME_1 AS NAME,
-					concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
-					a.GEBURTSDATUM,
-					a.STRASSE_1 AS STRASSE,
-					a.PLZ_1 AS PLZ,
-					a.ORT_1 AS ORT,
-					a.LKZ_1 AS LKZ,
-					a.REFERENZ,
-					more.STERBEDATUM,
-					t.ADRESS_ANREDE AS ANREDE,
-					t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE]
-
-					FROM adressen AS a
-					INNER JOIN inf_adressart AS ia ON a.ADRESSART = ia.REFERENZ
-					INNER JOIN adr_kunden AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
-					INNER JOIN inf_anreden AS t ON t.REFERENZ = a.ANREDE 
+						a.NAME_1 AS NAME,
+						concat(a.NAME_2, ' ', a.NAME_3, ' ', a.NAME_4) AS VORNAME,
+						a.GEBURTSDATUM,
+						a.STRASSE_1 AS STRASSE,
+						a.PLZ_1 AS PLZ,
+						a.ORT_1 AS ORT,
+						a.LKZ_1 AS LKZ,
+						a.REFERENZ,
+						more.STERBEDATUM,
+						t.ADRESS_ANREDE AS ANREDE,
+						t.BRIEFKOPF_ANREDE AS [PERSOENLICHE ANREDE]
+					FROM [eva3_02_viva_souh].[dbo].[adressen] AS a
+					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia ON a.ADRESSART = ia.REFERENZ
+					INNER JOIN [eva3_02_viva_souh].[dbo].[adr_kunden] AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_anreden] AS t ON t.REFERENZ = a.ANREDE 
 
 					WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
 					AND more.STERBEDATUM IS NULL
 					AND more.OHNE_SERIENBRIEF = 0
 				) AS pat ON vorgaenge.ADRESSEN_REFERENZ = pat.REFERENZ
-				LEFT JOIN
-				(
+				LEFT JOIN (
 					SELECT
-					mail.NUMMER AS EMAIL,
-					mail.ADRESSEN_REFERENZ
-
-					FROM adz_kontakte AS mail
-					INNER JOIN inf_kontaktart AS im ON mail.KONTAKTART = im.REFERENZ
+						mail.NUMMER AS EMAIL,
+						mail.ADRESSEN_REFERENZ
+					FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail
+					INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] AS im ON mail.KONTAKTART = im.REFERENZ
 
 					WHERE im.BEZEICHNUNG = 'E-Mail'
 				) AS EMAIL ON pat.REFERENZ = EMAIL.ADRESSEN_REFERENZ
@@ -941,41 +940,38 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	public function consumables($vendors = [], $as_passed = true){
 		$query = <<<'END'
 		SELECT
-		vendor.NAME_1 as LIEFERANTEN_NAME,
-		article.BESTELL_NUMMER,
-		article.BESTELL_TEXT,
-		article.EAN,
-		unit.BEZEICHNUNG AS BESTELLEINHEIT,
-		article2.ZUSATZINFORMATION,
-			/*tradinggood
-			expirydate
-			specialattention*/
-		article2.MINDEST_BESTAND,
-		article.ARTIKEL_REFERENZ,
-		convert(varchar(255), article.WARENEINGANGSDATUM, 23) AS WARENEINGANGSDATUM
-
-		FROM wws_artikel_lieferanten AS article
-		left JOIN
-		(
-			SELECT BEZEICHNUNG,
-			REFERENZ
-			FROM inf_einheit
-		) AS unit ON unit.REFERENZ = article.BESTELL_EINHEIT
-		left JOIN
-		(
+			vendor.NAME_1 as LIEFERANTEN_NAME,
+			article.BESTELL_NUMMER,
+			article.BESTELL_TEXT,
+			article.EAN,
+			unit.BEZEICHNUNG AS BESTELLEINHEIT,
+			article2.ZUSATZINFORMATION,
+				/*tradinggood
+				expirydate
+				specialattention*/
+			article2.MINDEST_BESTAND,
+			article.ARTIKEL_REFERENZ,
+			convert(varchar(255), article.WARENEINGANGSDATUM, 23) AS WARENEINGANGSDATUM
+		FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten] AS article
+		LEFT JOIN (
 			SELECT
-			REFERENZ,
-			ZUSATZINFORMATION,
-			MINDEST_BESTAND
-			FROM wws_artikelstamm
+				BEZEICHNUNG,
+				REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[inf_einheit]
+		) AS unit ON unit.REFERENZ = article.BESTELL_EINHEIT
+		LEFT JOIN (
+			SELECT
+				REFERENZ,
+				ZUSATZINFORMATION,
+				MINDEST_BESTAND
+			FROM [eva3_02_viva_souh].[dbo].[wws_artikelstamm]
 		) AS article2 ON article2.REFERENZ = article.ARTIKEL_REFERENZ
-		left JOIN
-		(
+		LEFT JOIN (
 			SELECT 
-			v.NAME_1,
-			v.REFERENZ
-			FROM inf_adressart AS ia
-			INNER JOIN adressen AS v ON v.ADRESSART = ia.REFERENZ
+				v.NAME_1,
+				v.REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
+			INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
 			WHERE ia.BEZEICHNUNG = 'Lieferanten'
 		) AS vendor ON article.LIEFERANTEN_REFERENZ = vendor.REFERENZ
 		
@@ -1018,6 +1014,52 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		return $response;
 	}
 	
+	public function erpmedia($erp_case_numbers = []){
+		$query = <<<'END'
+		SELECT
+			multimedia.[BESCHREIBUNG],
+			convert(varchar(255), multimedia.[ANGELEGT_AM], 104) AS ANGELEGT_AM,
+			multimedia.[FILTER_2] as vorgang,
+			multimedia.[DATEINAME],
+			files.MEDIA
+		FROM [eva3_02_viva_souh].[dbo].[multimedia]
+		INNER JOIN (
+			SELECT 
+				REFERENZ,
+				MEDIA
+			FROM [eva3_mmd_viva_souh].[dbo].[MMD_MEDIA]
+		) AS files ON files.REFERENZ = multimedia.MMD_MEDIA_REFERENZ
+		
+		WHERE multimedia.FILTER_2 IN (:ref)
+		END;
+
+		if (!$erp_case_numbers) return [[]];
+		try{
+			$statement = $this->_pdo->prepare(strtr($query, [
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref), $erp_case_numbers))
+			]));
+			$statement->execute();	
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+		$statement = null;
+		$response = [];
+
+		foreach ($result as $row){
+			$f = finfo_open();
+			$mime_type = finfo_buffer($f, $row['MEDIA'], FILEINFO_MIME_TYPE);
+			$response[$row['vorgang']][] = [
+				'url' => 'data:' . $mime_type . ';base64,' . base64_encode($row['MEDIA']),
+				'description' => $row['BESCHREIBUNG'],
+				'date' => $row['ANGELEGT_AM'],
+				'filename' => $row['vorgang'] . ' ' . $row['ANGELEGT_AM'] . ' ' . $row['BESCHREIBUNG'] . '.' . pathinfo($row['DATEINAME'])['extension']
+			];
+		}
+		return $response;
+	}
+
 	/**
 	 * retrieve recent data on processed orders for given timespan  
 	 * return an array of orders to compare at application level
@@ -1047,40 +1089,36 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 		$query = <<<'END'
 		SELECT
-		orders.BESTELLNUMMER,
-		orders.BEZEICHNUNG AS BESTELLTEXT,
-		article.ARTIKELBEZEICHNUNG,
-		convert(varchar(255), orders.ORDER_DATUM, 120) AS ORDER_DATUM,
-		orders.MENGE,
-		convert(varchar(255), orders2.WE_DATUM, 120) AS WE_DATUM,
-		orders2.WE_MENGE,
-		orders2.BESTELL_BELEGNUMMER,
-		vendor.NAME_1 as LIEFERANTEN_NAME
-		FROM
-		wws_order as orders
-		LEFT JOIN
-		(
+			orders.BESTELLNUMMER,
+			orders.BEZEICHNUNG AS BESTELLTEXT,
+			article.ARTIKELBEZEICHNUNG,
+			convert(varchar(255), orders.ORDER_DATUM, 120) AS ORDER_DATUM,
+			orders.MENGE,
+			convert(varchar(255), orders2.WE_DATUM, 120) AS WE_DATUM,
+			orders2.WE_MENGE,
+			orders2.BESTELL_BELEGNUMMER,
+			vendor.NAME_1 as LIEFERANTEN_NAME
+		FROM [eva3_02_viva_souh].[dbo].[wws_order] as orders
+		LEFT JOIN (
 			SELECT
-			BESTELL_TEXT AS ARTIKELBEZEICHNUNG,
-			ARTIKEL_REFERENZ
-			FROM wws_artikel_lieferanten
+				BESTELL_TEXT AS ARTIKELBEZEICHNUNG,
+				ARTIKEL_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten]
 		) AS article ON orders.ARTIKELNUMMER = article.ARTIKEL_REFERENZ
-		LEFT JOIN
-		(
+		LEFT JOIN (
 			SELECT
-			REFERENZ,
-			WE_DATUM,
-			WE_MENGE,
-			BESTELL_BELEGNUMMER
-			FROM wws_bestellung
+				REFERENZ,
+				WE_DATUM,
+				WE_MENGE,
+				BESTELL_BELEGNUMMER
+			FROM [eva3_02_viva_souh].[dbo].[wws_bestellung]
 		) AS orders2 ON orders.BESTELLUNGS_REFERENZ = orders2.REFERENZ
-		LEFT JOIN
-		(
+		LEFT JOIN (
 			SELECT 
-			v.NAME_1,
-			v.REFERENZ
-			FROM inf_adressart AS ia
-			INNER JOIN adressen AS v ON v.ADRESSART = ia.REFERENZ
+				v.NAME_1,
+				v.REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
+			INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
 			WHERE ia.BEZEICHNUNG = 'Lieferanten'
 		) AS vendor ON orders.LIEFERANTEN_REFERENZ = vendor.REFERENZ
 
