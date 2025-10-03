@@ -1522,6 +1522,10 @@ In der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung)
 Vorgangspositionen werden je Anfrage verarbeitet. Sofern verfügbar werden Tabellen der Vorgangspositionen aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) angezeigt.  
 Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden. Die Schlüssel müssen zu den Sprachblöcken der `record.erpinterface.casepositions` passen.
 
+### Vorgangsmedien
+Vorgangsmedian werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Daten-URLs angezeigt, welche die Datein aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) beinhalten.  
+Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden.
+
 ### Angepasste Datenbankauszüge
 Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
 

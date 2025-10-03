@@ -30,13 +30,16 @@ Things are still in motion. Images may be outdated.
 ## to do
 * unittests
 * templates
+* shift erpinterface depended language chunks to respective language object, tidying up
 * erp_interface, additional usecases?
-    * erp case access by name, dob, erp-reference (data, multimedia)?
+    * case lists by patient, linked to casedata
+    * casedata enriching with casestate too
     * improve matched conditions and sort, like sqlinterface, include search options?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
 * close recent dialog (e.g. on adding new products from dialog view)
+* user default img specialchars
 
 ## Content
 * [Aims](#aims)
@@ -1619,6 +1622,10 @@ Needless to elaborate vendor names and unique article numbers must match.
 Case positions are fetched by request. If available, tables of the calculatory items will be displayed from within the records according to the provided ERP case number(s).  
 Data will be presented as constructed within the custom interface-class-method. Keys must match the language chunks `record.erpinterface.casepositions`.
 
+### Case media
+Case media are fetched by request. If available, links with data-urls will be displayed containing the files from within the records according to the provided ERP case number(s).  
+Data will be presented as constructed within the custom interface-class-method.
+
 ### Custom database dumps
 Your custom erp interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
 
@@ -2576,7 +2583,7 @@ Stakeholder identification:
 | Order overview more compact | CEO, Supervisor | 2025-06-23 | User can select between full information, compact tiles and table layout; 2025-07-04 |
 | Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 | Critical return reasons alert incorporation authorized users and append an incorporation review; 2025-07-11 |
 | Hospital ward tour planning | User | 2025-09-22 | Implemented as work lists with identifier items, volatile note within records; 2025-09-27 |
-| ERP-data access for cases not available within caro | User | 2025-09-29 | |
+| ERP-data access for cases not available within caro | User | 2025-09-29 | Implemented; 2025-10-03 |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
@@ -3680,62 +3687,6 @@ Sample response
 
 ### CSV filter endpoints
 
-> GET ./api/api.php/csvfilter/erpquery/
-
-Returns the input form for requesting a query.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none | | | |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Select query to export as CSV","onchange":"api.csvfilter('post', 'erpquery', this.value)"},"content":{"...Select query to export as CSV":{"value":"0"},"Some query":{"value":"Some query"},"Another query":{"value":"Another query"}},"hint":"No fitting query found? Contact a programmer to set one up."}]]}}
-```
-
-> POST ./api/api.php/csvfilter/erpquery/{id}
-
-Returns a CSV file for successful erp interface requests.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | filter to apply |
-
-Sample response
-```
-{"log":[],"links":{"Download Some query 2025-09-11 22-48-00.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/Some query 2025-09-11 22-48-00.csv","download":"Some query 2025-09-11 22-48-00.csv"}}}
-```
-
-> GET ./api/api.php/csvfilter/erpupload/
-
-Returns the input form for uploading erp data sources.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| none | | | |
-
-Sample response
-```
-{"render":{"content":[[{"type":"select","attributes":{"name":"Usecase","required":true},"content":{"...Usecase":{"value":"0"},"ARTIKELMANAGER.csv as product database data source from erp export":{"value":"ARTIKELMANAGER"},"File named like EXPORT123.456.789.csv as case database data source from erp export":{"value":"VORGANGSEXPORT"},"AUSSCHLUSS.csv as case exceptions for comparison of erp export":{"value":"AUSSCHLUSS"}}},{"type":"file","attributes":{"name":"Source file","required":true}}]],"form":{"data-usecase":"csvfilter","action":"javascript:api.csvfilter('post', 'erpupload')"}}}
-```
-
-> POST ./api/api.php/csvfilter/erpupload/
-
-success or failure response on uploading erp data sources.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | file and intended name |
-
-Sample response
-```
-{"response":{"msg":"File successfully saved.","type":"success"}}
-```
-
 > GET ./api/api.php/csvfilter/filter/{id}
 
 Returns the input form for applying a filter.
@@ -3993,6 +3944,62 @@ Parameters
 Sample response
 ```
 {"render":{"content":[[{"type":"select","content":{"...":[],"Patient lookup":{"value":"patientlookup"}},"attributes":{"name":"Select type of data","onchange":"if (this.value !== '...') api.erpquery('get', 'erpquery', this.value)"}}]]}}
+```
+
+> GET ./api/api.php/erpquery/csvdump/
+
+Returns the input form for requesting a query.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select query to export as CSV","onchange":"api.erpquery('post', 'csvdump', this.value)"},"content":{"...Select query to export as CSV":{"value":"0"},"Some query":{"value":"Some query"},"Another query":{"value":"Another query"}},"hint":"No fitting query found? Contact a programmer to set one up."}]]}}
+```
+
+> POST ./api/api.php/erpquery/csvdump/{id}
+
+Returns a CSV file for successful erp interface requests.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | filter to apply |
+
+Sample response
+```
+{"log":[],"links":{"Download Some query 2025-09-11 22-48-00.csv":{"href":"./api/api.php/file/stream/./fileserver/tmp/Some query 2025-09-11 22-48-00.csv","download":"Some query 2025-09-11 22-48-00.csv"}}}
+```
+
+> GET ./api/api.php/erpquery/upload/
+
+Returns the input form for uploading erp data sources.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","attributes":{"name":"Usecase","required":true},"content":{"...Usecase":{"value":"0"},"ARTIKELMANAGER.csv as product database data source from erp export":{"value":"ARTIKELMANAGER"},"File named like EXPORT123.456.789.csv as case database data source from erp export":{"value":"VORGANGSEXPORT"},"AUSSCHLUSS.csv as case exceptions for comparison of erp export":{"value":"AUSSCHLUSS"}}},{"type":"file","attributes":{"name":"Source file","required":true}}]],"form":{"data-usecase":"erpquery","action":"javascript:api.erpquery('post', 'upload')"}}}
+```
+
+> POST ./api/api.php/erpquery/upload/
+
+success or failure response on uploading erp data sources.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| payload | form data | required | file and intended name |
+
+Sample response
+```
+{"response":{"msg":"File successfully saved.","type":"success"}}
 ```
 
 > POST ./api/api.php/erpquery/erpquery/{type}

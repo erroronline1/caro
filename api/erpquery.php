@@ -28,7 +28,11 @@ class ERPQUERY extends API {
 	}
 
 	/**
-	 * 
+	 *                                   
+	 *   ___ ___ ___ ___ _ _ ___ ___ _ _ 
+	 *  | -_|  _| . | . | | | -_|  _| | |
+	 *  |___|_| |  _|_  |___|___|_| |_  |
+	 *          |_|   |_|           |___|
 	 * main entry point for available requests
 	 * displays a selection of available options
 	 * calls $this->_requestedType method if set
@@ -69,6 +73,14 @@ class ERPQUERY extends API {
 		$this->response($response);
 	}
 
+	/**
+	 *                     _     _       
+	 *   ___ ___ ___ ___ _| |___| |_ ___ 
+	 *  |  _| .'|_ -| -_| . | .'|  _| .'|
+	 *  |___|__,|___|___|___|__,|_| |__,|
+	 *
+	 * 
+	 */
 	public function casedata(){
 		$content = $fields = [];
 		$fields = [
@@ -120,6 +132,13 @@ class ERPQUERY extends API {
 		return $content;
 	}
 
+	/**
+	 *           _   _         _   _         _           
+	 *   ___ ___| |_|_|___ ___| |_| |___ ___| |_ _ _ ___ 
+	 *  | . | .'|  _| | -_|   |  _| | . | . | '_| | | . |
+	 *  |  _|__,|_| |_|___|_|_|_| |_|___|___|_,_|___|  _|
+	 *  |_|                                         |_|
+	 */
 	public function patientlookup($rendertype = 'textsection'){
 		$content = $fields = [];
 		foreach(ERPINTERFACE->customerdata() as $field){
@@ -168,5 +187,144 @@ class ERPQUERY extends API {
 
 		return $content;
 	}
+
+
+	/**
+	 *                 _               
+	 *   ___ ___ _ _ _| |_ _ _____ ___ 
+	 *  |  _|_ -| | | . | | |     | . |
+	 *  |___|___|\_/|___|___|_|_|_|  _|
+	 *                            |_|
+	 * retrieve data dumps from the erp-interface as file
+	 * get respondes with available options to select from
+	 * post responds with a download link to the result file after processing
+	 */
+	public function csvdump(){
+		if (!PERMISSION::permissionFor('erpimport')) $this->response([], 401);
+		if(!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customcsvdump') && ERPINTERFACE->customcsvdump())) $this->response([], 404);
+		$response = [];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$result = ERPINTERFACE->customcsvdump($this->_requestedType);
+				if ($result === null) $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => $this->_lang->GET('erpquery.csvdump.null'),
+						'type' => 'error'
+					]]);
+				if (!$result) $this->response([
+					'response' => [
+						'name' => false,
+						'msg' => $this->_lang->GET('erpquery.csvdump.none'),
+						'type' => 'error'
+					]]);
+				
+				$resultinfo = pathinfo($result);
+				$downloadfiles[$this->_lang->GET('csvfilter.use.filter_download', [':file' => $resultinfo['basename']])] = [
+						'href' => './api/api.php/file/stream/' . substr($result, 1),
+						'download' => $resultinfo['basename']
+					];				
+				$this->response([
+					'log' => [],
+					'links' => $downloadfiles
+				]);
+
+				break;
+			case 'GET':
+				$options = ['...' . $this->_lang->GET('erpquery.csvdump.select') => ['value' => '0']];
+				foreach(ERPINTERFACE->customcsvdump() as $key){
+					$options[$key] = ['value' => $key];
+				}
+
+				// append filter selection
+				$response['render'] = [
+					'content' => [
+						[
+							[
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('erpquery.csvdump.select'),
+									'onchange' => "api.erpquery('post', 'csvdump', this.value)"
+								],
+								'content' => $options,
+								'hint' => $this->_lang->GET('erpquery.csvdump.select_hint')
+							]
+						]
+					]
+				];
+		}
+		$this->response($response);
+	}
+
+	/**
+	 *           _           _ 
+	 *   _ _ ___| |___ ___ _| |
+	 *  | | | . | | . | .'| . |
+	 *  |___|  _|_|___|__,|___|
+	 *      |_|
+	 * retrieve data dumps from the erp-interface as file
+	 * get respondes with available options to select from
+	 * post responds with a download link to the result file after processing
+	 */
+	public function upload(){
+		if (!PERMISSION::permissionFor('csvfilter')) $this->response([], 401);
+		if(!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'upload') && ERPINTERFACE->upload())) $this->response([], 404);
+		$response = [];
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$upload = null;
+				$rename = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.upload.select'));
+
+				if ($rename) $upload = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('erpquery.upload.file')], UTILITY::directory('erp_documents'), [], [$rename]);
+				if ($upload) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('erpquery.upload.success'),
+						'type' => 'success'
+					]]);
+
+				$this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('erpquery.upload.failure'),
+						'type' => 'error'
+					]]);
+				break;
+			case 'GET':
+				$options = ['...' . $this->_lang->GET('erpquery.upload.select') => ['value' => '0']];
+				foreach(ERPINTERFACE->upload() as $set){
+					$options[$set['option']] = ['value' => $set['rename']];
+				}
+
+				// append filter selection
+				$response['render'] = [
+					'content' => [
+						[
+							[
+								'type' => 'select',
+								'attributes' => [
+									'name' => $this->_lang->GET('erpquery.upload.select'),
+									'required' => true
+								],
+								'content' => $options,
+							],
+							[
+								'type' => 'file',
+								'attributes' => [
+									'name' => $this->_lang->GET('erpquery.upload.file'),
+									'required' => true
+								]
+							]
+						]
+					]
+				];
+				$response['render']['form'] = [
+					'data-usecase' => 'erpquery',
+					'action' => "javascript:api.erpquery('post', 'upload')"
+				];
+		}
+		$this->response($response);
+	}
+
 }
 ?>

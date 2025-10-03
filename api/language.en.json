@@ -1035,21 +1035,7 @@
 			"filter_saved": "The filter named :name has been saved.",
 			"filter_select": "Edit latest filter"
 		},
-		"erpquery": {
-			"none": "There were no results for this query",
-			"null": "This query does not exists",
-			"select": "Select query to export as CSV",
-			"select_hint": "No fitting query found? Contact a programmer to set one up."
-		},
-		"erpupload": {
-			"failure": "An error occured, file could not be saved. Please try again.",
-			"file": "Source file",
-			"select": "Usecase",
-			"success": "File successfully saved."
-		},
 		"navigation": {
-			"erpupload": "Submit ERP data files",
-			"erpquery": "ERP database query",
 			"filter": "CSV filter",
 			"filter_manager": "Manage CSV filter"
 		},
@@ -1071,10 +1057,24 @@
 		"casedata": {
 			"case_id": "Case ID(s)"
 		},
+		"csvdump": {
+			"none": "There were no results for this query",
+			"null": "This query does not exists",
+			"select": "Select query to export as CSV",
+			"select_hint": "No fitting query found? Contact a programmer to set one up."
+		},
 		"navigation": {
 			"casedata": "Case data",
+			"csvdump": "ERP database query",
 			"erpquery": "ERP customer and case data requests",
-			"patientlookup": "Patient lookup"
+			"patientlookup": "Patient lookup",
+			"upload": "Submit ERP data files"
+		},
+		"upload": {
+			"failure": "An error occured, file could not be saved. Please try again.",
+			"file": "Source file",
+			"select": "Usecase",
+			"success": "File successfully saved."
 		}
 	},
 	"file": {

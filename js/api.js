@@ -1048,8 +1048,6 @@ export const api = {
 			title = {
 				rule: api._lang.GET("csvfilter.navigation.filter_manager"),
 				filter: api._lang.GET("csvfilter.navigation.filter"),
-				erpquery: api._lang.GET("csvfilter.navigation.erpquery"),
-				erpupload: api._lang.GET("csvfilter.navigation.erpupload"),
 			};
 		switch (method) {
 			case "get":
@@ -1065,13 +1063,6 @@ export const api = {
 				};
 				break;
 			case "post":
-				switch (request[1]) {
-					case "erpupload":
-						successFn = function (data) {
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-						};
-						break;
-				}
 				payload = _.getInputs("[data-usecase=csvfilter]", true);
 				break;
 			default:
@@ -1365,6 +1356,8 @@ export const api = {
 			},
 			title = {
 				erpquery: api._lang.GET("erpquery.navigation.erpquery"),
+				csvdump: api._lang.GET("erpquery.navigation.csvdump"),
+				eupload: api._lang.GET("erpquery.navigation.upload"),
 			};
 
 		switch (method) {
@@ -1374,6 +1367,29 @@ export const api = {
 				}
 				break;
 			case "post":
+				switch (request[1]) {
+					case "csvdump":
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.log !== undefined) {
+								const dialog = {
+									header: api._lang.GET("csvfilter.use.download"),
+									type: "input",
+									render: [
+										{ type: "textsection", content: data.log.join("\n") },
+										{ type: "links", content: data.links },
+									],
+								};
+								new Dialog(dialog);
+							}
+						};
+						break;
+					case "upload":
+						successFn = function (data) {
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+						};
+						break;
+				}
 				payload = _.getInputs("[data-usecase=erpquery]", true);
 				break;
 			case "put":
