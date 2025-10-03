@@ -533,30 +533,14 @@ class RECORD extends API {
 		if (!($this->_requestedID && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions())){
 			$this->response([], 405);
 		}
-		$cases = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', $this->_requestedID));
-		if (!array_keys($cases)) $this->response(['response' => ['msg' => $this->_lang->GET('record.erpinterface.null')]]);
 
-		$body = [];
-		foreach($cases as $case => $positions){
-			$rows = [];
-
-			$rows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
-			foreach($positions as $position){
-				unset($position['header_data']);
-				$rows[] = array_map(fn($v) => ['c' => $v], array_values($position));
-			}
-
-			array_push($body, [
-				'type' => 'table',
-				'attributes' => [
-					'name' => strval($case) . ' ' . $positions[0]['header_data']
-				],
-				'content' => $rows
-			]);
-		}
+		require_once('./erpquery.php');
+		$ERPQUERY = new ERPQUERY();
+		// convert request param to payload
+		$this->_payload->{$this->_lang->PROPERTY('erpquery.casedata.case_id')} = $this->_requestedID;
 
 		$this->response([
-			'render' => $body
+			'render' => $ERPQUERY->casedata()
 		]);	}
 	
 	
@@ -749,24 +733,13 @@ class RECORD extends API {
 		}
 
 		if (array_values((array)$this->_payload)){
-			if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customerdata') && $result = ERPINTERFACE->customerdata((array)$this->_payload)) {
-				$options = [];
-				foreach($result as $option){
-					// construct key: value radio input content
-					$options[implode('<br>', array_map(fn($k, $v) => $k . ': ' . $v, array_keys($option), array_values($option)))] = [];
-				}
-
+			if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customerdata')){
+				require_once('./erpquery.php');
+				$ERPQUERY = new ERPQUERY();
+				if ($options = $ERPQUERY->patientlookup('radio'))
 				$this->response([
 					'response' => [
-						'msg' => [
-							[
-								'type' => 'radio',
-								'attributes' => [
-									'name' => $this->_lang->GET('record.import.by_erp')
-								],
-								'content' => $options
-							]
-						]
+						'msg' => $options
 					]
 				]);
 			}
@@ -1272,7 +1245,7 @@ class RECORD extends API {
 							'type' => 'button',
 							'attributes' => [
 								'value' => $this->_lang->GET('record.erpinterface.casepositions_button'),
-								'onclick' => "let v = document.getElementById('_erpcasenumbers').value; if (v) api.record('get', 'erpcasepositions', v);"
+								'onclick' => "let v = document.getElementById('_erpcasenumbers').value; if (v) api.record('post', 'erpcasepositions', v);"
 							]
 						];
 					}

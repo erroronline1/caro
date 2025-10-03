@@ -12,7 +12,8 @@
 namespace CARO\API;
 
 // access patient and case data
-// as separate module for easy access
+// useable as separate module for easy access with erpquery method as entry point
+// other methods can and should be reusable from within the application where implemented
 class ERPQUERY extends API {
 	// processed parameters for readability
 	public $_requestedMethod = REQUEST[1];
@@ -38,8 +39,7 @@ class ERPQUERY extends API {
 		
 		$categories = [];
 		if (method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata()) $categories[] = 'patientlookup';
-		if (method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()) $categories[] = 'casepositions';
-
+		if (method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()) $categories[] = 'casedata';
 
 		foreach ($categories as $category){
 				$selecttypes[$this->_lang->GET('erpquery.navigation.' . $category)] = ['value' => $category];
@@ -69,20 +69,20 @@ class ERPQUERY extends API {
 		$this->response($response);
 	}
 
-	private function casepositions(){
+	public function casedata(){
 		$content = $fields = [];
 		$fields = [
 			'type' => 'text',
 			'attributes' => [
-				'name' => $this->_lang->GET('erpquery.casepositions.case_id'),
-				'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''
+				'name' => $this->_lang->GET('erpquery.casedata.case_id'),
+				'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casedata.case_id')) ? : ''
 			]
 		];
 		$content[] = $fields;
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-			if ($result = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''))) {
-				$files = ERPINTERFACE->media(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''));
+			if ($result = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casedata.case_id')) ? : ''))) {
+				$files = ERPINTERFACE->media(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casedata.case_id')) ? : ''));
 				foreach($result as $case => $positions){
 					$tablerows = [];
 					$tablerows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
@@ -120,7 +120,7 @@ class ERPQUERY extends API {
 		return $content;
 	}
 
-	private function patientlookup(){
+	public function patientlookup($rendertype = 'textsection'){
 		$content = $fields = [];
 		foreach(ERPINTERFACE->customerdata() as $field){
 			$fields[] = [
@@ -135,13 +135,33 @@ class ERPQUERY extends API {
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 			if ($result = ERPINTERFACE->customerdata((array)$this->_payload)) {
-				foreach($result as $option){
-					$content[] = [
-						[
-							'type' => 'textsection',
-							'content' => implode('<br>', array_map(fn($k, $v) => $k . ': ' . $v, array_keys($option), array_values($option)))
-						]
-					];
+
+				switch ($rendertype){
+					case 'textsection':
+						foreach($result as $option){
+							$content[] = [
+								[
+									'type' => 'textsection',
+									'content' => implode('<br>', array_map(fn($k, $v) => $k . ': ' . $v, array_keys($option), array_values($option)))
+								]
+							];
+						}
+						break;
+					case 'radio': // reused e.g. by record.php
+						$options = [];
+						foreach($result as $option){
+							// construct key: value radio input content
+							$options[implode('<br>', array_map(fn($k, $v) => $k . ': ' . $v, array_keys($option), array_values($option)))] = [];
+						}
+						$content = [
+							[
+								'type' => 'radio',
+								'attributes' => [
+									'name' => $this->_lang->GET('record.import.by_erp')
+								],
+								'content' => $options
+							]
+						];
 				}
 			}
 		}

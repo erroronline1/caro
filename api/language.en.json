@@ -1068,11 +1068,11 @@
 		}
 	},
 	"erpquery": {
-		"casepositions": {
-			"case_id": "Case ID"
+		"casedata": {
+			"case_id": "Case ID(s)"
 		},
 		"navigation": {
-			"casepositions": "Case positions",
+			"casedata": "Case data",
 			"erpquery": "ERP customer and case data requests",
 			"patientlookup": "Patient lookup"
 		}

@@ -1068,11 +1068,11 @@
 		}
 	},
 	"erpquery": {
-		"casepositions": {
-			"case_id": "Vorgangsnummer"
+		"casedata": {
+			"case_id": "Vorgangsnummer(n)"
 		},
 		"navigation": {
-			"casepositions": "Vorgangsnummern",
+			"casedata": "Vorgangsdaten",
 			"erpquery": "EVA Vorgangs- und Patientendaten",
 			"patientlookup": "Patientensuche"
 		}
