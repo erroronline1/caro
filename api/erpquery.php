@@ -75,27 +75,31 @@ class ERPQUERY extends API {
 		$fields = [
 			'type' => 'text',
 			'attributes' => [
-				'name' => $this->_lang->GET('erpquery.casepositions.case_id')
+				'name' => $this->_lang->GET('erpquery.casepositions.case_id'),
+				'value' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''
 			]
 		];
 		$content[] = $fields;
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-			if ($result = ERPINTERFACE->customerdata(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''))) {
+			if ($result = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''))) {
 				foreach($result as $case => $positions){
 					$rows = [];
 
-					$rows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], array_keys($positions[0]));
+					$rows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
 					foreach($positions as $position){
+						unset($position['header_data']);
 						$rows[] = array_map(fn($v) => ['c' => $v], array_values($position));
 					}
 
 					$content[] = [
-						'type' => 'table',
-						'attributes' => [
-							'name' => strval($case)
-						],
-						'content' => $rows
+						[
+							'type' => 'table',
+							'attributes' => [
+								'name' => strval($case) . ' ' . $positions[0]['header_data']
+							],
+							'content' => $rows
+						]
 					];
 				}
 			}

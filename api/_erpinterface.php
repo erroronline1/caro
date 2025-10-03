@@ -75,7 +75,8 @@ class _ERPINTERFACE {
 		 * 		'{erp_case_number}' => [
 		 * 			'amount' => string,
 		 * 			'text' => string,
-		 * 			'contract_position' => string
+		 * 			'contract_position' => string,
+		 * 			'header_data' => string
 		 * 		],
 		 * 		...
 		 * ]
@@ -550,15 +551,51 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	public function casepositions($erp_case_numbers = []){
 		$query = <<<'END'
 		SELECT
-		VORGAENGE_REFERENZ,
-		POSITION,
-		ANZAHL,
-		POSITIONSTEXT
+			pos.VORGAENGE_REFERENZ,
+			pos.POSITION,
+			pos.ANZAHL,
+			pos.POSITIONSTEXT,
+			vorgang.KV_DATUM,
+			vorgang.GENEHMIGT_DATUM,
+			CONCAT(pat.NAME_2, ' ' , pat.NAME_3, ' ' , pat.NAME_4, ' ' , pat.NACHNAME) as patientenname,
+			pat.GEBURTSDATUM,
+			KOSTENTRAEGER.NAME_1 as KOSTENTRAEGER
 		
-		FROM vor_positionen
-		WHERE 
-		POSITIONSTEXT IS NOT NULL AND POSITIONSTEXT != ''
-		AND VORGAENGE_REFERENZ IN (:ref)
+		FROM vor_positionen as pos
+		LEFT JOIN (
+			SELECT
+				REFERENZ,
+				ADRESSEN_REFERENZ,
+				convert(varchar(255), KV_DATUM, 104) AS KV_DATUM,
+				convert(varchar(255), GENEHMIGT_DATUM, 104) AS GENEHMIGT_DATUM,
+				AUFTRAGSWERT_BRUTTO,
+				GENEHMIGT_TEILSUMME,
+				convert(varchar(255), FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM
+			FROM vorgaenge
+		) AS vorgang ON pos.VORGAENGE_REFERENZ = vorgang.REFERENZ
+		LEFT JOIN (
+			SELECT a.NAME_1 as NACHNAME,
+				a.NAME_2,
+				a.NAME_3,
+				a.NAME_4,
+				convert(varchar(255), a.GEBURTSDATUM, 23) as GEBURTSDATUM,
+				a.REFERENZ,
+				more.KOSTENTRAEGER AS KOSTENTRAEGER_REFERENZ
+			FROM adressen AS a INNER JOIN inf_adressart AS ia ON a.ADRESSART = ia.REFERENZ
+			LEFT JOIN adr_kunden AS more ON more.ADRESSEN_REFERENZ = a.REFERENZ
+			WHERE ia.BEZEICHNUNG = 'Kunden / Patienten'
+		) AS pat ON pat.REFERENZ = vorgang.ADRESSEN_REFERENZ 
+		LEFT JOIN
+		(
+			SELECT ka.NAME_1,
+			ka.REFERENZ
+			FROM adressen AS ka INNER JOIN inf_adressart AS kia ON ka.ADRESSART = kia.REFERENZ
+			WHERE kia.BEZEICHNUNG = 'Kostenträger'
+		) AS KOSTENTRAEGER ON pat.KOSTENTRAEGER_REFERENZ = KOSTENTRAEGER.REFERENZ
+		WHERE
+
+		pos.POSITIONSTEXT IS NOT NULL AND pos.POSITIONSTEXT != ''
+		AND pos.VORGAENGE_REFERENZ IN (:ref)
 		
 		ORDER BY ID ASC
 		END;
@@ -583,6 +620,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'amount' => $row['ANZAHL'] ? : '',
 				'contract_position' => $row['POSITION'] ? : '',
 				'text' => $row['POSITIONSTEXT'] ? : '',
+				'header_data' => ($row['patientenname'] ? : '') . ' ' . ($row['GEBURTSDATUM'] ? : '') . ' ' . ($row['KOSTENTRAEGER'])
 			];
 		}
 		return $response;

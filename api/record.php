@@ -541,15 +541,16 @@ class RECORD extends API {
 		foreach($cases as $case => $positions){
 			$rows = [];
 
-			$rows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], array_keys($positions[0]));
+			$rows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
 			foreach($positions as $position){
+				unset($position['header_data']);
 				$rows[] = array_map(fn($v) => ['c' => $v], array_values($position));
 			}
 
 			array_push($body, [
 				'type' => 'table',
 				'attributes' => [
-					'name' => strval($case)
+					'name' => strval($case) . ' ' . $positions[0]['header_data']
 				],
 				'content' => $rows
 			]);
