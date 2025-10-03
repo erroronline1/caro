@@ -93,42 +93,52 @@ class ERPQUERY extends API {
 		$content[] = $fields;
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-			if ($result = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casedata.case_id')) ? : ''))) {
-				$files = ERPINTERFACE->media(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casedata.case_id')) ? : ''));
-				foreach($result as $case => $positions){
+			$casenumbers = preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casedata.case_id')) ? : '');
+			$states = ERPINTERFACE->casestate($casenumbers);
+			$positions = ERPINTERFACE->casepositions($casenumbers);
+			$files = ERPINTERFACE->media($casenumbers);
+			
+			foreach($casenumbers as $case){
+				$casecontent = [];
+				if ($states && isset($states[$case])){
+					$options = [];
+					foreach($this->_lang->_USER['casestate']['casedocumentation'] as $state => $translation){
+						$options[$translation] = ['disabled' => true];
+						if (isset($states[$case][$state])) $options[$translation]['checked'] = true;
+					}
+					$casecontent[] = [
+						'type' => 'radio',
+						'content' => $options
+					];
+				}
+				if ($positions && isset($positions[$case])){
 					$tablerows = [];
 					$tablerows[] = array_map(fn($v) => ['c' => $this->_lang->GET('erpquery.casedata.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
-					foreach($positions as $position){
+					foreach($positions[$case] as $position){
 						unset($position['header_data']);
 						$tablerows[] = array_map(fn($v) => ['c' => $v], array_values($position));
 					}
-					$table = [
+					$casecontent[] = [
 						'type' => 'table',
 						'attributes' => [
-							'name' => strval($case) . ' ' . $positions[0]['header_data']
+							'name' => strval($case) . ' ' . $positions[$case][0]['header_data']
 						],
 						'content' => $tablerows
 					];
-
-					if ($files && isset($files[$case])){
-						$attachments = [];
-						foreach($files[$case] as $attachment){
-							$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
-						}
-						$content[] = [
-							$table,
-							[
-								'type' => 'links',
-								'content' => $attachments
-							]
-						];
-					} else $content[] = [
-							$table
-						];
 				}
+				if ($files && isset($files[$case])){
+					$attachments = [];
+					foreach($files[$case] as $attachment){
+						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
+					}
+					$casecontent[] = [
+						'type' => 'links',
+						'content' => $attachments
+					];
+				}
+				if ($casecontent) $content[] = $casecontent;
 			}
 		}
-
 		return $content;
 	}
 
