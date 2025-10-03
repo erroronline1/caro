@@ -83,24 +83,37 @@ class ERPQUERY extends API {
 
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 			if ($result = ERPINTERFACE->casepositions(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''))) {
+				$files = ERPINTERFACE->erpmedia(preg_split('/[\s;,]+/', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.casepositions.case_id')) ? : ''));
 				foreach($result as $case => $positions){
-					$rows = [];
-
-					$rows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
+					$tablerows = [];
+					$tablerows[] = array_map(fn($v) => ['c' => $this->_lang->GET('record.erpinterface.casepositions.' . $v)], ['amount', 'contract_position', 'text']);
 					foreach($positions as $position){
 						unset($position['header_data']);
-						$rows[] = array_map(fn($v) => ['c' => $v], array_values($position));
+						$tablerows[] = array_map(fn($v) => ['c' => $v], array_values($position));
 					}
-
-					$content[] = [
-						[
-							'type' => 'table',
-							'attributes' => [
-								'name' => strval($case) . ' ' . $positions[0]['header_data']
-							],
-							'content' => $rows
-						]
+					$table = [
+						'type' => 'table',
+						'attributes' => [
+							'name' => strval($case) . ' ' . $positions[0]['header_data']
+						],
+						'content' => $tablerows
 					];
+
+					if ($files && isset($files[$case])){
+						$attachments = [];
+						foreach($files[$case] as $attachment){
+							$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
+						}
+						$content[] = [
+							$table,
+							[
+								'type' => 'links',
+								'content' => $attachments
+							]
+						];
+					} else $content[] = [
+							$table
+						];
 				}
 			}
 		}
