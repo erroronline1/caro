@@ -40,7 +40,6 @@ class CSVFILTER extends API {
 	 */
 	public function erpquery(){
 		if (!PERMISSION::permissionFor('erpimport')) $this->response([], 401);
-		include_once('./_erpinterface.php');
 		if(!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customcsvdump') && ERPINTERFACE->customcsvdump())) $this->response([], 404);
 		$response = [];
 
@@ -109,7 +108,6 @@ class CSVFILTER extends API {
 	 */
 	public function erpupload(){
 		if (!PERMISSION::permissionFor('csvfilter')) $this->response([], 401);
-		include_once('./_erpinterface.php');
 		if(!(ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'upload') && ERPINTERFACE->upload())) $this->response([], 404);
 		$response = [];
 

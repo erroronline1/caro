@@ -530,7 +530,6 @@ class RECORD extends API {
 	 *          |_|                 |_|
 	 */
 	public function erpcasepositions(){
-		include_once('./_erpinterface.php');
 		if (!($this->_requestedID && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions())){
 			$this->response([], 405);
 		}
@@ -750,7 +749,6 @@ class RECORD extends API {
 		}
 
 		if (array_values((array)$this->_payload)){
-			require_once('./_erpinterface.php');
 			if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'customerdata') && $result = ERPINTERFACE->customerdata((array)$this->_payload)) {
 				$options = [];
 				foreach($result as $option){
@@ -1269,7 +1267,6 @@ class RECORD extends API {
 						$erp_case_number
 					);
 
-					include_once('./_erpinterface.php');
 					if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()){
 						$general[] = [
 							'type' => 'button',

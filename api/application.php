@@ -455,7 +455,6 @@ class APPLICATION extends API {
 		//////////////////////////////////
 		// permission based functions
 		//////////////////////////////////
-		include_once('./_erpinterface.php');
 
 		// records
 		if (!array_intersect(['group'], $_SESSION['user']['permissions'])) $menu[$this->_lang->GET('record.navigation.header')][$this->_lang->GET('assemble.navigation.bundles')] = ['onclick' => "api.document('get', 'bundles')"];
