@@ -14,11 +14,11 @@ namespace CARO\API;
 // IF you get a connection to your erp-software via any api or accessible file dumps
 // this feels quite like a hacky attempt to get a data interface.
 // it might be necessary to dynamically adapt this module according to changing requirements
-// especially customerdata
+// especially customerdata regarding document fields
 
 // UTILITY functions may be implemented within the examples, as _utility.php is included by default
-// the base class contains examples of all implemented methods. if you can only serve partially
-// drop the methods or return null from your custom class
+// the base class contains examples of all implemented methods during delevopment.
+// if you can only serve partially drop the methods or return null from your custom class
 
 class _ERPINTERFACE {
 	/**
@@ -41,7 +41,7 @@ class _ERPINTERFACE {
 	 * 
 	 * sanitize parameter according to the usecase e.g. dbo driver
 	 * 
-	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from notification module
 	 */
 	public function casestate($erp_case_numbers = []){
 		/**
@@ -67,7 +67,7 @@ class _ERPINTERFACE {
 	 * 
 	 * sanitize parameter according to the usecase e.g. dbo driver
 	 * 
-	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from application integrations
 	 */
 	public function casepositions($erp_case_numbers = []){
 		/**
@@ -188,7 +188,7 @@ class _ERPINTERFACE {
 	 * @param bool $as_passed false returns the remaining vendors but the passed ones
 	 * @return null|array
 	 * 
-	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from application integrations
 	*/
 	public function consumables($vendors = [], $as_passed = true){
 		/**
@@ -208,6 +208,30 @@ class _ERPINTERFACE {
 		 * 				'last_order' => Y-m-d H:i:s
 		 * 			],
 		 * 			...
+		 * 		],
+		 *		... 		
+		 * ]
+		 */
+		return null;
+	}
+
+	/**
+	 * retrieve media files based on passed case numbers
+	 * @param array $erp_case_numbers
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from application integrations
+	 */
+	public function media($erp_case_numbers = []){
+		/**
+		 * return [
+		 * 		'{erp_case_number}' => [
+		 *			'url' => string, // e.g 'data:' . $mime_type . ';base64,' . base64_encode($row['MEDIA']),
+		 *			'description' => string,
+		 *			'date' => string,
+		 *			'filename' => string, // destination filename for accessing and downloading base64 url
 		 * 		],
 		 *		... 		
 		 * ]
@@ -309,7 +333,7 @@ class TEST extends _ERPINTERFACE {
 	 * 
 	 * sanitize parameter according to the usecase e.g. dbo driver
 	 * 
-	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from notification module
 	 */
 	public function casestate($erp_case_numbers = []){
 		return [
@@ -496,7 +520,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * 
 	 * sanitize parameter according to the usecase e.g. dbo driver
 	 * 
-	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from notification module
 	 */
 	public function casestate($erp_case_numbers = []){
 		$query = <<<'END'
@@ -546,7 +570,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * 
 	 * sanitize parameter according to the usecase e.g. dbo driver
 	 * 
-	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from application integrations
 	 */
 	public function casepositions($erp_case_numbers = []){
 		$query = <<<'END'
@@ -935,7 +959,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 * @param bool $as_passed false returns the remaining vendors but the passed ones
 	 * @return null|array
 	 * 
-	 * availability of the method must be signalled by something, preferably [[]] to enable basic fall from notification module
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from application integrations
 	 */
 	public function consumables($vendors = [], $as_passed = true){
 		$query = <<<'END'
@@ -1014,7 +1038,16 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		return $response;
 	}
 	
-	public function erpmedia($erp_case_numbers = []){
+	/**
+	 * retrieve media files based on passed case numbers
+	 * @param array $erp_case_numbers
+	 * @return null|array
+	 * 
+	 * sanitize parameter according to the usecase e.g. dbo driver
+	 * 
+	 * availability of the method must be signalled by something, preferably [[]] to enable basic call from application integrations
+	 */
+	public function media($erp_case_numbers = []){
 		$query = <<<'END'
 		SELECT
 			multimedia.[BESCHREIBUNG],
