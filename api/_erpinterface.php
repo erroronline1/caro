@@ -879,7 +879,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
 				if (!$namepart) continue;
-				$namesearch[] = 'pat.' . $column . ' LIKE' . $this->_pdo->quote($namepart);
+				$namesearch[] = 'pat.' . $column . ' LIKE ' . $this->_pdo->quote($namepart);
 			}
 		}
 
@@ -888,14 +888,14 @@ class ODEVAVIVA extends _ERPINTERFACE {
 
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':dob' => $dob ? 'pat.GEBURTSDATUM=CONVERT(DATETIME, ' . $this->_pdo->quote($dob . ' 00:00:00.000') . ', 21)': '',
+				':dob' => $dob ? 'pat.GEBURTSDATUM = CONVERT(DATETIME, ' . $this->_pdo->quote($dob . ' 00:00:00.000') . ', 21)': '',
 				':patientnumber' => $patientnumber
-					? ($dob ? ' AND ' : '') . 'pat.FIBU_NUMMER=' . $this->_pdo->quote($patientnumber)
+					? ($dob ? ' AND ' : '') . 'pat.FIBU_NUMMER = ' . $this->_pdo->quote($patientnumber)
 					: '',
 				':namesearch' => $namesearch 
-					? ($dob|| $patientnumber ? ' AND ' : '') . implode(' OR ', $namesearch)
+					? ($dob || $patientnumber ? ' AND ' : '') . '(' . implode(' OR ', $namesearch) . ')'
 					: ''
-			]));
+				]));
 			$statement->execute();	
 		}
 		catch(\EXCEPTION $e){
