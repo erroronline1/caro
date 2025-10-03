@@ -43,8 +43,8 @@ class ERPQUERY extends API {
 		
 		$categories = [];
 		if (method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata()) $categories[] = 'patientlookup';
-		if (method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()) $categories[] = 'casedata';
-		if (method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata() && method_exists(ERPINTERFACE, 'customercases') && ERPINTERFACE->customercases()) $categories[] = 'caselist';
+		if (PERMISSION::permissionFor('erpcasedata') && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()) $categories[] = 'casedata';
+		if (PERMISSION::permissionFor('erpcasedata') && method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata() && method_exists(ERPINTERFACE, 'customercases') && ERPINTERFACE->customercases()) $categories[] = 'caselist';
 
 		foreach ($categories as $category){
 				$selecttypes[$this->_lang->GET('erpquery.navigation.' . $category)] = ['value' => $category];
@@ -80,9 +80,9 @@ class ERPQUERY extends API {
 	 *  |  _| .'|_ -| -_| . | .'|  _| .'|
 	 *  |___|__,|___|___|___|__,|_| |__,|
 	 *
-	 * 
 	 */
 	public function casedata(){
+		if (!PERMISSION::permissionFor('erpcasedata')) $this->response([], 401);
 		$content = $fields = [];
 		$fields = [
 			'type' => 'text',
@@ -146,7 +146,15 @@ class ERPQUERY extends API {
 		return $content;
 	}
 
+	/**
+	 *                   _ _     _
+	 *   ___ ___ ___ ___| |_|___| |_
+	 *  |  _| .'|_ -| -_| | |_ -|  _|
+	 *  |___|__,|___|___|_|_|___|_|
+	 *
+	 */
 	public function caselist(){
+		if (!PERMISSION::permissionFor('erpcasedata')) $this->response([], 401);
 		$content = $fields = [];
 		foreach(ERPINTERFACE->customerdata() as $field){
 			$fields[] = [
@@ -182,7 +190,6 @@ class ERPQUERY extends API {
 
 		return $content;
 	}
-
 
 	/**
 	 *           _   _         _   _         _           

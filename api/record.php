@@ -530,6 +530,8 @@ class RECORD extends API {
 	 *          |_|                 |_|
 	 */
 	public function erpcasepositions(){
+		if (!PERMISSION::permissionFor('erpcasedata')) $this->response([], 401);
+
 		if (!($this->_requestedID && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions())){
 			$this->response([], 405);
 		}
@@ -1238,7 +1240,7 @@ class RECORD extends API {
 						$erp_case_number
 					);
 
-					if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()){
+					if (PERMISSION::permissionFor('erpcasedata') && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()){
 						$general[] = [
 							'type' => 'button',
 							'attributes' => [
