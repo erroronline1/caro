@@ -36,7 +36,6 @@ Things are still in motion. Images may be outdated.
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
 * close recent dialog (e.g. on adding new products from dialog view)
-* user default img specialchars
 
 ## Content
 * [Aims](#aims)

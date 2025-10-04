@@ -43,9 +43,12 @@ class USER extends API {
 	 * @return string image data
 	 */
 	private function defaultPic($name){
+		// avoid umlauts messing up imagettftext
+		$name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
+		// explode and take first and last initial
 		$names = explode(' ', $name);
 		$initials = strtoupper(substr($names[0], 0, 1));
-		if (count($names) >1) $initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
+		if (count($names) > 1) $initials .= strtoupper(substr($names[count($names) - 1], 0, 1));
 
 		$image = imagecreatetruecolor(256, 256);
 		$font_size = round(256 / 2);
@@ -54,7 +57,7 @@ class USER extends API {
 		$background_color = imagecolorallocate($image, 163, 190, 140); // nord green
 		imagefill($image, 0, 0, $background_color);
 		$text_color = imagecolorallocate($image, 46, 52, 64); // nord dark
-		imagefttext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
+		imagettftext($image, $font_size, 0, $x, $y, $text_color, '../media/UbuntuMono-R.ttf', $initials);
 		ob_start();
 		imagepng($image);
 		$image = ob_get_contents();
