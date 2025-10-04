@@ -444,7 +444,7 @@ export class Dialog {
 	 * multiple articles and sections are NOT supported due to simplified query selector
 	 * THIS IS FOR SIMPLE INPUTS ONLY
 	 * @example ```js
-	 * new Dialog({type:'input', header:'fill out assembled form', render: [assemble_content], options:{'abort': false, 'submit': {'value': true, class: 'reducedCTA'}}}).then(response => {
+	 * new Dialog({type:'input', header:'fill out assembled form', render: [assemble_content], options:{'abort': false, 'submit': {'value': true, class: 'reducedCTA'}}, id : 'peculiarDialogID'}).then(response => {
 	 *  	if (Object.keys(response)) console.log('these are the results of the form:', response);
 	 * 	});
 	 * ```
@@ -462,7 +462,7 @@ export class Dialog {
 		this.form = null;
 
 		this.dialog = document.createElement("dialog");
-		this.dialog.id = getNextElementID();
+		this.dialog.id = options.id || getNextElementID();
 		this.dialog.role = "dialog";
 		this.dialog.ariaLabel = api._lang.GET("assemble.render.aria.dialog");
 
@@ -2793,7 +2793,7 @@ export class Assemble {
 			const options = {};
 			options[api._lang.GET("assemble.compose.document.cancel")] = false;
 			options[api._lang.GET("assemble.compose.document.confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({
+			new Dialog({ 
 				type: "input",
 				header: api._lang.GET("consumables.product.search"),
 				render: [
@@ -2820,6 +2820,7 @@ export class Assemble {
 					],
 				],
 				options: options,
+				id: "_productselectionDialog"
 			}).then((response) => {
 				if (Boolean(response)) {
 					const inputfield = document.getElementById(input.id);
