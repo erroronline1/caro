@@ -41,6 +41,7 @@ class MESSAGE extends API {
 			case 'PUT';
 				$announcement = [
 					':id' => $this->_announcement,
+					':date' => time(),
 					':author_id' => $_SESSION['user']['id'],
 					':organizational_unit' => null,
 					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.start'))) ? : null,
