@@ -31,7 +31,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-    * improve matched conditions and sort, like sqlinterface, include search options?
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?

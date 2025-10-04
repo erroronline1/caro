@@ -874,12 +874,13 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			(!isset($request['FiBu-Nummer']) || !trim($request['FiBu-Nummer'] ? : ''))
 		) return [];
 		
-		$name = preg_split('/[\s,;]+/', trim($request['Name'] ? : ''));
+		$request['Name'] = trim(str_replace([',', ';'], '', $request['Name'])); // handle workmates search customs
+
+		$name = SEARCH::expressions($request['Name'] ? : '');
 		$namesearch = [];
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
-				if (!$namepart) continue;
-				$namesearch[] = 'pat.' . $column . ' LIKE ' . $this->_pdo->quote($namepart);
+				$namesearch[] = 'pat.' . $column . ($namepart['operator'] === '-' ? ' NOT LIKE ' : ' LIKE ') . $this->_pdo->quote($namepart['term']);
 			}
 		}
 
@@ -904,11 +905,22 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$result = $statement->fetchAll();
 		$statement = null;
 
-		$result = SEARCH::refine(implode(' ', $name) + $dob, $result, ['NAME_2', 'NAME_3', 'NAME_4', 'NACHNAME', 'GEBURTSDATUM']);
+		$refinequery = ($request['Name'] ? : '') . ($dob ? ' +' . $dob : '') . ($patientnumber ? ' +' . $patientnumber : '');
 
 		$response = [];
 
+		$result = SEARCH::refine($refinequery, $result, ['NAME_2', 'NAME_3', 'NAME_4', 'NACHNAME', 'GEBURTSDATUM', 'FIBU_NUMMER']);
+
 		foreach ($result as $row){
+			if (!SEARCH::filter($refinequery, [
+				$row['NAME_2'],
+				$row['NAME_3'],
+				$row['NAME_4'],
+				$row['NACHNAME'],
+				$row['GEBURTSDATUM'],
+				$row['FIBU_NUMMER'],
+				])) continue;
+
 			$patient = [
 				//'Nachname' =>  $row['NACHNAME'],
 				//'Vorname' => implode(' ', array_filter(array_map(fn($c) => $row[$c] ? : '', ['NAME_2', 'NAME_3', 'NAME_4']), fn($v) => boolval($v))),
@@ -928,6 +940,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			];
 			$response[] = $patient;
 		}
+
 		return $response;
 	}
 
