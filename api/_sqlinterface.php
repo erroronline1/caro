@@ -249,12 +249,14 @@ class SQLQUERY {
 
 
 		'announcement_post' => [
-			'mysql' => "INSERT INTO caro_announcements (id, author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (NULL, :author_id, CURRENT_TIMESTAMP, :organizational_unit, :span_start, :span_end, :subject, :text)",
-			'sqlsrv' => "INSERT INTO caro_announcements (author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :subject, :text)"
-		],
-		'announcement_put' => [
-			'mysql' => "UPDATE caro_announcements SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = :span_start, span_end = :span_end, subject = :subject, text = :text WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_announcements SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), subject = :subject, text = :text WHERE id = :id"
+			'mysql' => "INSERT INTO caro_announcements (id, author_id, date, organizational_unit, span_start, span_end, subject, text) " .
+						"VALUES (:id, :author_id, CURRENT_TIMESTAMP, :organizational_unit, :span_start, :span_end, :subject, :text) " .
+						"ON DUPLICATE KEY UPDATE author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = :span_start, span_end = :span_end, subject = :subject, text = :text",
+			'sqlsrv' => "MERGE INTO caro_announcements WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :author_id AS author_id, :date AS date, :organizational_unit AS organizational_unit, :span_start AS span_start, :span_end AS span_end, :subject AS subject, :text AS text) AS source " .
+						"(id, author_id, date, organizational_unit, span_start, span_end, subject, text) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET author_id = :author_id, date = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), subject = :subject, text = :text " .
+						"WHEN NOT MATCHED THEN INSERT (author_id, date, organizational_unit, span_start, span_end, subject, text) VALUES (:author_id, CURRENT_TIMESTAMP, :organizational_unit, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :subject, :text);"
 		],
 		'announcement_get_all' => [
 			'mysql' => "SELECT caro_announcements.*, caro_user.name as author_name FROM caro_announcements LEFT JOIN caro_user ON caro_announcements.author_id = caro_user.id ORDER BY caro_announcements.span_start DESC",

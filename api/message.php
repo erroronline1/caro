@@ -38,37 +38,7 @@ class MESSAGE extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$announcement = [
-					':author_id' => $_SESSION['user']['id'],
-					':organizational_unit' => null,
-					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.start'))) ? : null,
-					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.end'))) ? : null,
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.subject')) ? : null,
-					':text' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.announcement.text')) ? : null,
-				];
-				// chain checked units
-				$units = [];
-				foreach ($this->_lang->_USER['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, $description)) {
-						$units[] = $unit;
-					}
-				}
-				if ($units) $announcement[':organizational_unit'] = implode(',', $units);
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_post', [
-					'values' => $announcement
-				])) $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('message.announcement.saved_success'),
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('message.announcement.saved_error'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
+			case 'PUT';
 				$announcement = [
 					':id' => $this->_announcement,
 					':author_id' => $_SESSION['user']['id'],
@@ -87,7 +57,7 @@ class MESSAGE extends API {
 				}
 				if ($units) $announcement[':organizational_unit'] = implode(',', $units);
 
-				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_put', [
+				if (SQLQUERY::EXECUTE($this->_pdo, 'announcement_post', [
 					'values' => $announcement
 				])) $this->response([
 					'response' => [
