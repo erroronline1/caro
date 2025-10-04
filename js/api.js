@@ -1326,11 +1326,11 @@ export const api = {
 	},
 
 	/**
-	 *               _     _           ___
-	 *   ___ ___ ___|_|___| |_ ___ ___|  _|___ ___ ___
-	 *  | -_|  _| . | |   |  _| -_|  _|  _| .'|  _| -_|
-	 *  |___|_| |  _|_|_|_|_| |___|_| |_| |__,|___|___|
-	 *          |_|
+	 *                                   
+	 *   ___ ___ ___ ___ _ _ ___ ___ _ _ 
+	 *  | -_|  _| . | . | | | -_|  _| | |
+	 *  |___|_| |  _|_  |___|___|_| |_  |
+	 *          |_|   |_|           |___|
 	 * available data requests for regular users regarding erp data if applicable
 	 *
 	 * @param {string} method get|post
@@ -1346,11 +1346,10 @@ export const api = {
 			successFn = async function (data) {
 				if (data.render) {
 					if (request[2]) await window.Masonry.breakpoints(false);
-					api.update_header(title[request[1]]);
+					api.update_header(title[request[1]] + (request[2] && request[2] !== "null" ? " - " + api._lang.GET("erpquery.navigation." + request[2]) : ""));
 					const render = new Assemble(data.render);
 					document.getElementById("main").replaceChildren(render.initializeSection());
 					render.processAfterInsertion();
-					if (request[2]) window.scrollTo(0, document.body.scrollHeight);
 				}
 				if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 			},
