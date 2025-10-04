@@ -903,6 +903,9 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		}
 		$result = $statement->fetchAll();
 		$statement = null;
+
+		$result = SEARCH::refine(implode(' ', $name) + $dob, $result, ['NAME_2', 'NAME_3', 'NAME_4', 'NACHNAME', 'GEBURTSDATUM']);
+
 		$response = [];
 
 		foreach ($result as $row){
