@@ -252,6 +252,22 @@ export const _client = {
 		},
 
 		/**
+		 * closes a dialog if triggered from within on any child node events as this
+		 * @param {event} event 
+		 */
+		closeParentDialog:(element) => {
+			console.log(element);
+			do {
+				if (element.localName === 'dialog'){
+					element.close();
+					element.remove();
+					return;
+				}
+				element = element.parentNode;
+			} while (element.localname !== 'html'); 
+		},
+
+		/**
 		 * output for debugging purpose if not forbidden
 		 */
 		debug: (...$vars) => {
@@ -1355,7 +1371,7 @@ export const _client = {
 									article_unit: element.unit ? element.unit : "",
 									vendor_name: element.vendor ? element.vendor : "",
 								}) +
-								"');",
+								"'); _client.application.closeParentDialog(this);",
 						},
 					});
 				}

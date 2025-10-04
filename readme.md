@@ -34,7 +34,6 @@ Things are still in motion. Images may be outdated.
 * https://github.com/thiagoalessio/tesseract-ocr-for-php
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
-* close recent dialog (e.g. on adding new products from dialog view)
 
 ## Content
 * [Aims](#aims)
