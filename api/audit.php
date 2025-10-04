@@ -56,9 +56,14 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', ['values' => [':id' => $this->_requestedTemplate]]);
 				$template = $template ? $template[0] : null;
 				if (!$template) $this->response(['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
+
+				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+				$audit = $audit ? $audit[0] : null;
+				if ($this->_requestedID && !$audit) $this->response(['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
 
 				// set up general properties
 				$audit = [
@@ -116,7 +121,7 @@ class AUDIT extends API {
 						$summary .= $audit[':last_user'] . "\n";
 						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit[':content']['objectives'];
 						foreach ($audit[':content']['questions'] as $question){
-							// start with  question and direct response as initial value
+							// start with question and direct response as initial value
 							foreach ($question as $key => $values){
 								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
 								$summary .= "\n \n" .$key . ': ' . implode("\n", $values) . "\n";
@@ -143,110 +148,6 @@ class AUDIT extends API {
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit[':unit']]], $summary);
 					}
 
-					$this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.execute.saved'),
-						'id' => $this->_pdo->lastInsertId(),
-						'type' => 'success'
-					]]);
-				}
-				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.execute.not_saved'),
-						'id' => false,
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
-				$template = SQLQUERY::EXECUTE($this->_pdo, 'audit_get_template', ['values' => [':id' => $this->_requestedTemplate]]);
-				$template = $template ? $template[0] : null;
-				if (!$template) $this->response(['msg' => $this->_lang->GET('audit.audit.template.not_found'), 'type' => 'error'], 404);
-				$audit = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
-				$audit = $audit ? $audit[0] : null;
-				if (!$audit) $this->response(['msg' => $this->_lang->GET('audit.audit.execute.not_found'), 'type' => 'error'], 404);
-
-				// update general properties
-				$audit['last_user'] = $_SESSION['user']['name'];
-				$audit['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null;
-				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
-
-				// reset content to passed values
-				$audit['content'] = [
-					'objectives' => $template['objectives'],
-					'method' => $template['method'],
-					'summary' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.summary')) ? : null,
-					'questions' => []
-				];
-				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.summary')});
-
-				// process content
-				// process files
-				foreach ($_FILES as $fileinput => $files){
-					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('audit_attachments'), [preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])], null, true)){
-						for($i = 0; $i < count($files['name']); $i++){
-							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
-							preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
-							if (isset($audit['content']['questions'][intval($set[1])]['files'])) $audit['content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
-							else $audit['content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
-						}
-					}
-				}
-
-				// iterate over payload, match template question index, input name and possible multiples
-				// values always will be stored within an array to handle multiples by default
-				foreach ($this->_payload as $key => $value){
-					if ($key === 'null') continue;
-					if (!$value) $value = ''; // the audit has to contain all questions as planned
-					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
-					$set[2] = str_replace('_', ' ', $set[2]);
-					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
-						// translateable system fields
-						$audit['content']['questions'][intval($set[1])][$input][isset($set[3]) ? $set[3] - 1 : 0] = $value;
-					else
-						// manual human template question
-						$audit['content']['questions'][intval($set[1])][$set[2]][0] = $value;
-				}
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_put', [
-					'values' => [
-						':id' => $audit['id'],
-						':content' => UTILITY::json_encode($audit['content']),
-						':last_user' => $audit['last_user'],
-						':closed' => $audit['closed']
-					]
-				])) {
-					if ($audit['closed']){
-						$summary = $this->_lang->GET('audit.checks_type.audits', [], true) . ' - ' . $this->_lang->_DEFAULT['units'][$audit['unit']] . "\n \n";
-						$summary .= $audit['last_user'] . "\n";
-						$summary .= $this->_lang->GET('audit.audit.objectives', [], true) . ': '. $audit['content']['objectives'];
-						foreach ($audit['content']['questions'] as $question){
-							// start with  question and direct response as initial value
-							foreach ($question as $key => $values){
-								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))) continue;
-								$summary .= "\n \n" .$key . ': ' . implode("\n", $values) . "\n";
-								break;
-							}
-							// assign question response as value
-							foreach ($question as $key => $values){
-								if (in_array($key, array_keys($this->_lang->_DEFAULT['audit']['audit']['execute']))){
-									$summary .=  "\n" . $this->_lang->_DEFAULT['audit']['audit']['execute'][$key] . ': ';
-									switch ($key){
-										case 'rating':
-											$summary .=  $this->_lang->_DEFAULT['audit']['audit']['execute']['rating_steps'][$values[0]];
-											break;
-										case 'regulatory':
-											$summary .= implode(', ' , array_map(fn($r) => isset($this->_lang->_DEFAULT['regulatory'][$r]) ? $this->_lang->_DEFAULT['regulatory'][$r] : $r, explode(',', $values[0])));
-											break;
-										default:
-										$summary .=  implode("\n", $values);
-									}
-								}
-							}
-						}
-						$summary .= "\n \n" . $this->_lang->GET('audit.audit.execute.summary', [], true) . ': ' . $audit['content']['summary'];
-						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true), 'unit' => [$audit['unit']]], $summary);
-					}
-					
 					$this->response([
 					'response' => [
 						'msg' => $this->_lang->GET('audit.audit.execute.saved'),
@@ -766,7 +667,9 @@ class AUDIT extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				$template = [
+					':id' => $this->_requestedID,
 					':content' => UTILITY::propertySet($this->_payload, 'content'),
 					':objectives' => UTILITY::propertySet($this->_payload, 'objectives'),
 					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
@@ -793,49 +696,6 @@ class AUDIT extends API {
 				$template[':content'] = UTILITY::json_encode($template[':content']);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_post_template', [
-					'values' => $template
-				])) $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.template.saved'),
-						'id' => $this->_pdo->lastInsertId(),
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('audit.audit.template.not_saved'),
-						'id' => false,
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
-				$template = [
-					':content' => UTILITY::propertySet($this->_payload, 'content'),
-					':objectives' => UTILITY::propertySet($this->_payload, 'objectives'),
-					':unit' => array_search(UTILITY::propertySet($this->_payload, 'unit'), $this->_lang->_USER['units']),
-					':author' => $_SESSION['user']['name'],
-					':hint' =>  UTILITY::propertySet($this->_payload, 'hint'),
-					':id' => $this->_requestedID,
-					':method' => null,
-				];
-
-				// sanitize payload content and translate regulatory to keys
-				foreach ($this->_lang->_USER['audit']['audit']['methods'] as $method => $description){
-					if ($description === UTILITY::propertySet($this->_payload, 'method')){
-						$template[':method'] = $method;
-						break;
-					}
-				}
-				if (!$template[':content'] || !$template[':unit'] || !$template[':objectives'] || !$template[':method']) $this->response([], 400);
-				$template[':content'] = json_decode($template[':content'] ? : '', true);
-				$template[':content'] = sanitizeQuestionNesting($template[':content']);
-				foreach ($template[':content'] as &$question){
-					$question['regulatory'] = explode(', ', $question['regulatory']);
-					$question['regulatory'] = implode(',', array_map(fn($r) => array_search($r, $this->_lang->_USER['regulatory']), $question['regulatory']));
-				}
-
-				$template[':content'] = UTILITY::json_encode($template[':content']);
-
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_put_template', [
 					'values' => $template
 				])) $this->response([
 					'response' => [
@@ -1803,12 +1663,21 @@ class AUDIT extends API {
 		if (!PERMISSION::permissionFor('audit')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
+				$managementreview = [];
+				if ($this->_requestedID){
+					$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
+					$managementreview = $managementreview ? $managementreview[0] : null;
+					if (!$managementreview) $this->response(['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
+				}
+
 				$managementreview = [
 					':template' => null,
 					':unit' => null,
-					':content' => [],
+					':content' => isset($managementreview['content']) ? json_decode($managementreview['content'], true) : [],
 					':last_user' => $_SESSION['user']['name'],
-					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null
+					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null,
+					':id' => isset($managementreview['id']) ? $managementreview['id'] : null
 				];
 				// process content according to required fields
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $value){
@@ -1821,47 +1690,6 @@ class AUDIT extends API {
 					if ($managementreview[':closed']){
 						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
 							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\', \'managementreviews\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true). '</a>'],
-							true )
-						);
-					}
-					$this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('audit.managementreview.saved'),
-						'id' => $this->_pdo->lastInsertId(),
-						'type' => 'success'
-					]]);
-				}
-				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('audit.managementreview.not_saved'),
-						'id' => false,
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT';
-				$managementreview = SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_get_by_id', ['values' => [':id' => $this->_requestedID]]);
-				$managementreview = $managementreview ? $managementreview[0] : null;
-				if (!$managementreview) $this->response(['msg' => $this->_lang->GET('audit.managementreview.not_found'), 'type' => 'error'], 404);
-				
-				// update general properties
-				$managementreview['last_user'] = $_SESSION['user']['name'];
-				$managementreview['closed'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null;
-				$managementreview['content'] = json_decode($managementreview['content'], true);
-				// process content according to required fields
-				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $value){
-					$managementreview['content'][$key] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.required.' . $key)) ? : '';
-				}
-				if (SQLQUERY::EXECUTE($this->_pdo, 'audit_and_management_put', [
-					'values' => [
-						':id' => $managementreview['id'],
-						':content' => UTILITY::json_encode($managementreview['content']),
-						':last_user' => $managementreview['last_user'],
-						':closed' => $managementreview['closed']
-					]
-				])) {
-				if ($managementreview['closed']){
-						$this->alertUserGroup(['permission' => PERMISSION::permissionFor('regulatory', true)], $this->_lang->GET('audit.managementreview.alert', [
-							':link' => '<a href="javascript:void(0);" onclick="api.audit(\'get\', \'checks\',  \'managementreviews\')">' . $this->_lang->GET('audit.navigation.regulatory', [], true). '</a>'],
 							true )
 						);
 					}
@@ -3022,7 +2850,7 @@ class AUDIT extends API {
 	 *                          |___|   
 	 */
 	private function trainingevaluation(){
-		if ($_SERVER['REQUEST_METHOD']==='PUT' && PERMISSION::permissionFor('trainingevaluation')){
+		if ($_SERVER['REQUEST_METHOD'] === 'PUT' && PERMISSION::permissionFor('trainingevaluation')){
 			$user = null;
 			$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
 				'values' => [

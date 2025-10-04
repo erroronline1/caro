@@ -180,6 +180,7 @@ class APPLICATION extends API {
 		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':	
 				// prepare entry
 				$permissions = [];
 				$entry = [
@@ -204,7 +205,8 @@ class APPLICATION extends API {
 					'values' => [
 						':title' => $entry['title'],
 						':content' => $entry['content'],
-						':permissions' => $entry['permissions']
+						':permissions' => $entry['permissions'],
+						':id' => $this->_requestedManual
 					]
 				]);
 		
@@ -220,49 +222,6 @@ class APPLICATION extends API {
 						'name' => $this->_lang->GET('application.manual.not_saved'),
 						'type' => 'error'
 					]]);
-				break;
-			case 'PUT':
-				// prepare entry
-				$permissions = [];
-				$entry = [
-					'title' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.title')),
-					'content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('application.manual.content')),
-					'permissions' => '',
-				];
-		
-				// check forbidden names
-				if (UTILITY::forbiddenName($entry['title'])) $this->response(['response' => ['msg' => $this->_lang->GET('application.manual.forbidden_name', [':name' => $entry['title']]), 'type' => 'error']]);
-		
-				// chain checked permission levels
-				foreach ($this->_lang->_USER['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, str_replace(' ', '_', $description))) {
-						$permissions[] = $level;
-					}
-				}
-				$entry['permissions'] = implode(',', $permissions);
-
-				// update manual entry
-				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_put_manual', [
-					'values' => [
-						':title' => $entry['title'],
-						':content' => $entry['content'],
-						':permissions' => $entry['permissions'],
-						':id' => $this->_requestedManual
-					]
-				]);
-				if ($query) $this->response([
-					'response' => [
-						'id' => $this->_requestedManual,
-						'msg' => $this->_lang->GET('application.manual.saved', [':name' => $entry['title']]),
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'response' => [
-						'id' => false,
-						'name' => $this->_lang->GET('application.manual.not_saved'),
-						'type' => 'error'
-					]]);
-
 				break;
 			case 'GET':
 				$query = SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual_by_id', [
