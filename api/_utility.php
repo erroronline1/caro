@@ -765,6 +765,24 @@ class UTILITY {
 	}
 
 	/**
+	 *       _   ___ ___ ___             _ _ 
+	 *   _ _| |_|  _| . |_  |___ ___ ___|_|_|
+	 *  | | |  _|  _| . |  _| .'|_ -|  _| | |
+	 *  |___|_| |_| |___|___|__,|___|___|_|_|
+	 *
+	 * tries to replace utf8 characters from the config to their ascii cousins.
+	 * kudos: https://stackoverflow.com/a/5950598/6087758
+	 * iconv relies on locales that you may not have control over
+	 * and this is more versatile than https://stackoverflow.com/q/158241/6087758 with  mb_convert_encoding to ISO-8859-15
+	 */
+	public static function utf82ascii($string){
+		if (strpos($string = htmlentities($string, ENT_QUOTES, 'UTF-8'), '&') !== false){
+			$string = html_entity_decode(preg_replace('~&([a-z]{1,2})(?:caron|acute|cedil|circ|grave|lig|orn|ring|slash|tilde|uml);~i', '$1', $string), ENT_QUOTES, 'UTF-8');
+		}
+		return $string;
+	}
+
+	/**
 	 *             _                           _   
 	 *   _ _ _ ___| |_ ___ ___ ___ _ _ ___ ___| |_ 
 	 *  | | | | -_| . |  _| -_| . | | | -_|_ -|  _|

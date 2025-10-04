@@ -44,7 +44,7 @@ class USER extends API {
 	 */
 	private function defaultPic($name){
 		// avoid umlauts messing up imagettftext
-		$name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
+		$name = UTILITY::utf82ascii($name);
 		// explode and take first and last initial
 		$names = explode(' ', $name);
 		$initials = strtoupper(substr($names[0], 0, 1));
