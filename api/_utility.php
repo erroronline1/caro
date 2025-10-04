@@ -292,6 +292,7 @@ class UTILITY {
 	 * @return string|false matched pattern or not matched
 	 */
 	public static function forbiddenName($name, $extendedpattern = []){
+		if (!$name || !trim($name)) return 'empty';
 		foreach (CONFIG['forbidden']['names'] as $key => $pattern) {
 			if (isset($extendedpattern[$key])) $pattern = $extendedpattern[$key];
 			preg_match('/' . $pattern. '/m', $name, $match);
