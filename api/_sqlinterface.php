@@ -917,7 +917,7 @@ class SQLQUERY {
 			'sqlsrv' => "MERGE INTO caro_user WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :name AS name, :permissions AS permissions, :units AS units, :token AS token, :orderauth AS orderauth, :image AS image, :app_settings AS app_settings, :skills AS skills) AS source " .
 						"(id, name, permissions, units, token, orderauth, image, app_settings, skills) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills " .
+						"WHEN MATCHED THEN UPDATE SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills " .
 						"WHEN NOT MATCHED THEN INSERT (name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (:name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills);",
 		],
 		'user_get_datalist' => [
@@ -973,7 +973,7 @@ class SQLQUERY {
 			'sqlsrv' => "MERGE INTO caro_user_training WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :user_id AS user_id, :name AS name, :date AS date, :expires AS expires, :experience_points AS experience_points, :file_path AS file_path, :evaluation AS evaluation, :planned AS planned) AS source " .
 						"(id, user_id, name, date, expires, experience_points, file_path, evaluation, planned) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET SET name = :name, date = CONVERT(DATE, :date, 23), expires = CONVERT(DATE, :expires, 23), experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned " .
+						"WHEN MATCHED THEN UPDATE SET name = :name, date = CONVERT(DATE, :date, 23), expires = CONVERT(DATE, :expires, 23), experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned " .
 						"WHEN NOT MATCHED THEN INSERT (user_id, name, date, expires, experience_points, file_path, evaluation, planned) VALUES (:user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path, :evaluation, :planned);",
 		],
 		'user_training_get' => [
