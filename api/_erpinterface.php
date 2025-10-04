@@ -874,8 +874,6 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			(!isset($request['FiBu-Nummer']) || !trim($request['FiBu-Nummer'] ? : ''))
 		) return [];
 		
-		$request['Name'] = trim(str_replace([',', ';'], '', $request['Name'])); // handle workmates search customs
-
 		$name = SEARCH::expressions($request['Name'] ? : '');
 		$namesearch = [];
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){

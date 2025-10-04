@@ -1390,7 +1390,12 @@ class SEARCH{
 		preg_match_all('/([+-]{0,1})([\w\.]+:){0,1}((?:["\'])(.+?)(?:["\'])|\S+)/', $search ? : '', $expressions, PREG_SET_ORDER);
 		$result = [];
 		foreach($expressions as $expression){
+			// remove some leading or trailing characters on regular searches
+			// for it may be common to look for "surName, givenName" and surnames are unlikely to end on comma
+			$expression[3] = preg_replace('/^[,;]|[,;]$/', '', $expression[3]);
+			// assign regular expression unless explicit quoted 
 			$term = isset($expression[4]) ? $expression[4] : $expression[3];
+			// assign column if applicable
 			$column = isset($expression[2]) ? substr($expression[2], 0, -1) : null;
 			
 			// filter terms resulting in unnecessary huge result lists
