@@ -72,7 +72,9 @@ class AUDIT extends API {
 					':unit' => $template['unit'],
 					':content' => [],
 					':last_user' => $_SESSION['user']['name'],
-					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null
+					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.audit.execute.close')) ? 1 : null,
+					':last_touch' => isset($audit['last_touch']) ? $audit['last_touch'] : null,			
+					':notified' => isset($audit['notified']) ? $audit['notified'] : null
 				];
 				unset($this->_payload->{$this->_lang->PROPERTY('audit.audit.execute.close')});
 				$audit[':content'] = [
@@ -1681,6 +1683,8 @@ class AUDIT extends API {
 					':content' => isset($managementreview['content']) ? json_decode($managementreview['content'], true) : [],
 					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null,
+					':notified' => isset($managementreview['notified']) ? $managementreview['notified'] : null,
+					':last_touch' => isset($managementreview['last_touch']) ? $managementreview['last_touch'] : null
 				];
 				// process content according to required fields
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $value){
