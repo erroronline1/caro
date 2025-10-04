@@ -271,18 +271,14 @@ class SQLQUERY {
 		
 
 		'audit_and_management_post' => [
-			'mysql' => "INSERT INTO caro_manual (id, template, unit, content, last_touch, last_user, closed, notified) " .
+			'mysql' => "INSERT INTO caro_audit_and_management (id, template, unit, content, last_touch, last_user, closed, notified) " .
 						"VALUES (:id, :template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL) " .
 						"ON DUPLICATE KEY UPDATE content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed",
-			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING " .
+			'sqlsrv' => "MERGE INTO caro_audit_and_management WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :template AS template, :unit AS unit, :content AS content, :last_touch AS last_touch, :last_user AS last_user, :closed AS closed, :notified AS notified) AS source " .
 						"(id, template, unit, content, last_touch, last_user, closed, notified) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed " .
-						"WHEN NOT MATCHED THEN INSERT (id, template, unit, content, last_touch, last_user, closed, notified) VALUES (:id, :template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL);"
-		],
-		'audit_and_management_put' => [
-			'mysql' => "UPDATE caro_audit_and_management SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_audit_and_management SET content = :content, last_touch = CURRENT_TIMESTAMP, last_user = :last_user, closed = :closed WHERE id = :id"
+						"WHEN NOT MATCHED THEN INSERT (template, unit, content, last_touch, last_user, closed, notified) VALUES (:template, :unit, :content, CURRENT_TIMESTAMP, :last_user, :closed, NULL);"
 		],
 		'audit_and_management_notified' => [
 			'mysql' => "UPDATE caro_audit_and_management SET notified = :notified WHERE id = :id",
@@ -307,21 +303,14 @@ class SQLQUERY {
 	
 		
 		'audit_post_template' => [
-			'mysql' => "INSERT INTO caro_manual (id, content, objectives, unit, date, author, hint, method) " .
+			'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives, unit, date, author, hint, method) " .
 						"VALUES (:id, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method) " .
 						"ON DUPLICATE KEY UPDATE content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author",
-			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING " .
+			'sqlsrv' => "MERGE INTO caro_audit_templates WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :content AS content, :objectives AS objectives, :unit AS unit, :date AS date, :author AS author, :hint AS hint, :method AS method) AS source " .
 						"(id, content, objectives, unit, date, author, hint, method) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author " .
-						"WHEN NOT MATCHED THEN INSERT (id, content, objectives, unit, date, author, hint, method) VALUES (:id, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method);",
-
-						'mysql' => "INSERT INTO caro_audit_templates (id, content, objectives, unit, date, author, hint, method) VALUES (NULL, :content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method)",
-			'sqlsrv' => "INSERT INTO caro_audit_templates (content, objectives, unit, date, author, hint, method) VALUES (:content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method)"
-		],
-		'audit_put_template' => [
-			'mysql' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_audit_templates SET content = :content, objectives = :objectives, unit = :unit, hint = :hint, method = :method, date = CURRENT_TIMESTAMP, author = :author WHERE id = :id"
+						"WHEN NOT MATCHED THEN INSERT (content, objectives, unit, date, author, hint, method) VALUES (:content, :objectives, :unit, CURRENT_TIMESTAMP, :author, :hint, :method);",
 		],
 		'audit_get_templates' => [
 			'mysql' => "SELECT * FROM caro_audit_templates",
@@ -354,11 +343,11 @@ class SQLQUERY {
 			'mysql' => "INSERT INTO caro_manual (id, title, content, permissions) " .
 						"VALUES (:id, :title, :content, :permissions) " .
 						"ON DUPLICATE KEY UPDATE title = :title, content = :content, permissions = :permissions",
-			'sqlsrv' => "MERGE INTO caro_consumables_order_statistics WITH (HOLDLOCK) AS target USING " .
+			'sqlsrv' => "MERGE INTO caro_manual WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :title AS title, :content AS content, :permissions AS permissions) AS source " .
 						"(id, title, content, permissions) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET title = :title, content = :content, permissions = :permissions " .
-						"WHEN NOT MATCHED THEN INSERT (id, title, content, permissions) VALUES (:id, :title, :content, :permissions);"
+						"WHEN NOT MATCHED THEN INSERT (title, content, permissions) VALUES (:title, :content, :permissions);"
 		],
 		'application_get_manual' => [
 			'mysql' => "SELECT * FROM caro_manual ORDER BY title",
@@ -374,7 +363,8 @@ class SQLQUERY {
 		],
 		'application_post_session' => [
 			'mysql' => "INSERT IGNORE INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)",
-			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING (SELECT :id AS id, :user_id AS user_id, CURRENT_TIMESTAMP AS date) AS source (id, user_id, date) ON (target.id = source.id ) " .
+			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :user_id AS user_id, CURRENT_TIMESTAMP AS date) AS source (id, user_id, date) ON (target.id = source.id ) " .
 						"WHEN MATCHED THEN UPDATE SET date = CURRENT_TIMESTAMP " .
 						"WHEN NOT MATCHED THEN INSERT (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP);"
 		],
