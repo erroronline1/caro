@@ -555,8 +555,16 @@ class MESSAGE extends API {
 	public function register(){
 		// prepare existing users lists
 		$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		$response = ['render' => ['content' => []]];
+
+		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
+		// preset groups with given order from language file
+		foreach($this->_lang->_USER['permissions'] as $key => $void){
+			$groups['permission'][$key] = [];
+		}
+		foreach($this->_lang->_USER['units'] as $key => $void){
+			$groups['units'][$key] = [];
+		}
 
 		foreach ($users as $user){
 			if (PERMISSION::filteredUser($user)) continue;
@@ -566,13 +574,11 @@ class MESSAGE extends API {
 			if ($user['orderauth']) $groups['orderauth'][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 			if ($user['units'])
 				foreach (explode(',', $user['units']) as $unit){
-					if (!isset($groups['units'][$unit])) $groups['units'][$unit] = [];
 					$groups['units'][$unit][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
 			if ($user['permissions'])
 				foreach (explode(',', $user['permissions']) as $permission){
 					if (in_array($permission, ['user', 'group'])) continue;
-					if (!isset($groups['permissions'][$permission])) $groups['permissions'][$permission] = [];
 					$groups['permissions'][$permission][] = ['name' => $user['name'], 'image' => './api/api.php/file/stream/' . $user['image']];
 				}
 		}
@@ -610,6 +616,8 @@ class MESSAGE extends API {
 				// display units and permissions as slideable multipanels
 				$panel = [];
 				foreach ($content as $sub => $users){
+					if ($users) continue;
+
 					$users = array_unique($users, SORT_REGULAR);
 					ksort($users);
 
