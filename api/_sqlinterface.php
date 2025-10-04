@@ -909,12 +909,14 @@ class SQLQUERY {
 
 
 		'user_post' => [
-			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) VALUES ( NULL, :name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills)",
-			'sqlsrv' => "INSERT INTO caro_user (name, permissions, units, token, orderauth, image, app_settings, skills) VALUES ( :name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills)"
-		],
-		'user_put' => [
-			'mysql' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_user SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills WHERE id = :id"
+			'mysql' => "INSERT INTO caro_user (id, name, permissions, units, token, orderauth, image, app_settings, skills) " .
+						"VALUES (:id, :name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills) " .
+						"ON DUPLICATE KEY UPDATE name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills",
+			'sqlsrv' => "MERGE INTO caro_user WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :name AS name, :permissions AS permissions, :units AS units, :token AS token, :orderauth AS orderauth, :image AS image, :app_settings AS app_settings, :skills AS skills) AS source " .
+						"(id, name, permissions, units, token, orderauth, image, app_settings, skills) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET SET name = :name, permissions = :permissions, units = :units, token = :token, orderauth = :orderauth, image = :image, app_settings = :app_settings, skills = :skills " .
+						"WHEN NOT MATCHED THEN INSERT (name, permissions, units, token, orderauth, image, app_settings, skills) VALUES (:name, :permissions, :units, :token, :orderauth, :image, :app_settings, :skills);",
 		],
 		'user_get_datalist' => [
 			'mysql' => "SELECT id, name, orderauth, permissions, units, image, app_settings, skills FROM caro_user ORDER BY name ASC",
@@ -963,12 +965,14 @@ class SQLQUERY {
 
 
 		'user_training_post' => [
-			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path, evaluation, planned) VALUES ( NULL, :user_id, :name, :date, :expires, :experience_points, :file_path, :evaluation, :planned)",
-			'sqlsrv' => "INSERT INTO caro_user_training (user_id, name, date, expires, experience_points, file_path, evaluation, planned) VALUES ( :user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path, :evaluation, :planned)"
-		],
-		'user_training_put' => [
-			'mysql' => "UPDATE caro_user_training SET name = :name, date = :date, expires = :expires, experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_user_training SET name = :name, date = CONVERT(DATE, :date, 23), expires = CONVERT(DATE, :expires, 23), experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned WHERE id = :id"
+			'mysql' => "INSERT INTO caro_user_training (id, user_id, name, date, expires, experience_points, file_path, evaluation, planned) " .
+						"VALUES (:id, :user_id, :name, :date, :expires, :experience_points, :file_path, :evaluation, :planned) " .
+						"ON DUPLICATE KEY UPDATE name = :name, date = :date, expires = :expires, experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned",
+			'sqlsrv' => "MERGE INTO caro_user_training WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :user_id AS user_id, :name AS name, :date AS date, :expires AS expires, :experience_points AS experience_points, :file_path AS file_path, :evaluation AS evaluation, :planned AS planned) AS source " .
+						"(id, user_id, name, date, expires, experience_points, file_path, evaluation, planned) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET SET name = :name, date = CONVERT(DATE, :date, 23), expires = CONVERT(DATE, :expires, 23), experience_points = :experience_points, file_path = :file_path, evaluation = :evaluation, planned = :planned " .
+						"WHEN NOT MATCHED THEN INSERT (user_id, name, date, expires, experience_points, file_path, evaluation, planned) VALUES (:user_id, :name, CONVERT(DATE, :date, 23), CONVERT(DATE, :expires, 23), :experience_points, :file_path, :evaluation, :planned);",
 		],
 		'user_training_get' => [
 			'mysql' => "SELECT caro_user_training.*, caro_user.name AS user_name FROM caro_user_training LEFT JOIN caro_user ON caro_user_training.user_id = caro_user.id WHERE caro_user_training.id = :id",

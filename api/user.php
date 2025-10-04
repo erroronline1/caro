@@ -86,11 +86,24 @@ class USER extends API {
 				// prepare user-array to update, return error if not found
 				if (!$user) $this->response(null, 406);
 
+				//set up user properties
+				$user = [
+					':id' => $user['id'],
+					':name' => $user['name'],
+					':permissions' => $user['permissions'],
+					':units' => $user['units'],
+					':token' => $user['token'],
+					':orderauth' => $user['orderauth'],
+					':image' => $user['image'],
+					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
+					':skills' => $user['skills'],
+				];
+
 				// convert image
 				// save and convert image
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					$tempPhoto = tmpfile();
-					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
+					fwrite($tempPhoto, $this->defaultPic($user[':name'])); 
 					$_FILES[$this->_lang->PROPERTY('user.take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
@@ -98,84 +111,74 @@ class USER extends API {
 					];
 				}
 				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
-					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
+					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user['image']);
 
-					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
-					$user['image'] = substr($user['image'], 3);
+					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
+					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					$user[':image'] = substr($user[':image'], 3);
 				}
 				// process settings
-				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-				$user['app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.force_desktop'));
-				$user['app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.homeoffice'));
-				$user['app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.language')) ? : CONFIG['application']['defaultlanguage'];
-				$user['app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.theme'));
-				$user['app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.masonry'));
-				$user['app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_forth'));
-				$user['app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_back'));
-				$user['app_settings']['autocomplete_swipe'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_swipe'));
-				$user['app_settings']['dateformat'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.dateformat'));
-				$user['app_settings']['location'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.location'));
-				$user['app_settings']['timezone'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.timezone'));
+				$user[':app_settings']['forceDesktop'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.force_desktop'));
+				$user[':app_settings']['homeoffice'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.homeoffice'));
+				$user[':app_settings']['language'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.language')) ? : CONFIG['application']['defaultlanguage'];
+				$user[':app_settings']['theme'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.theme'));
+				$user[':app_settings']['masonry'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.masonry'));
+				$user[':app_settings']['autocomplete_forth'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_forth'));
+				$user[':app_settings']['autocomplete_back'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_back'));
+				$user[':app_settings']['autocomplete_swipe'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.autocomplete_swipe'));
+				$user[':app_settings']['dateformat'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.dateformat'));
+				$user[':app_settings']['location'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.location'));
+				$user[':app_settings']['timezone'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.timezone'));
 
 				// unset defaults
-				if ($user['app_settings']['language'] === CONFIG['application']['defaultlanguage']) $user['app_settings']['language'] = null;
-				if ($user['app_settings']['dateformat'] === array_key_first(CONFIG['calendar']['dateformats'])) $user['app_settings']['dateformat'] = null;
-				if ($user['app_settings']['location'] === array_key_first(CONFIG['locations'])) $user['app_settings']['location'] = null;
-				if ($user['app_settings']['timezone'] === array_key_first(CONFIG['calendar']['timezones'])) $user['app_settings']['timezone'] = null;
+				if ($user[':app_settings']['language'] === CONFIG['application']['defaultlanguage']) $user[':app_settings']['language'] = null;
+				if ($user[':app_settings']['dateformat'] === array_key_first(CONFIG['calendar']['dateformats'])) $user[':app_settings']['dateformat'] = null;
+				if ($user[':app_settings']['location'] === array_key_first(CONFIG['locations'])) $user[':app_settings']['location'] = null;
+				if ($user[':app_settings']['timezone'] === array_key_first(CONFIG['calendar']['timezones'])) $user[':app_settings']['timezone'] = null;
 
 				if ($primaryUnit = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.primary_unit'))){
-					$user['app_settings']['primaryUnit'] = array_search($primaryUnit, $this->_lang->_USER['units']);
+					$user[':app_settings']['primaryUnit'] = array_search($primaryUnit, $this->_lang->_USER['units']);
 				}
 				if ($primaryRecordState = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.primary_recordstate'))){
 					if ($primaryRecordState === $this->_lang->GET('record.casestate_filter_all'))
-						unset($user['app_settings']['primaryRecordState']);
+						unset($user[':app_settings']['primaryRecordState']);
 					else
-						$user['app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
+						$user[':app_settings']['primaryRecordState'] = array_search($primaryRecordState, $this->_lang->_USER['casestate']['casedocumentation']);
 				}
 				if ($orderLayout = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.order_layout'))){
 					if ($orderLayout === $this->_lang->GET('user.settings.order_layout_full'))
-						unset($user['app_settings']['orderLayout']);
+						unset($user[':app_settings']['orderLayout']);
 					else
 						switch($orderLayout){
 							// in case other options may become implemented also see utility.js _client.order.approved()
 							case $this->_lang->GET('user.settings.order_layout_table'):
-								$user['app_settings']['orderLayout'] = 'table';
+								$user[':app_settings']['orderLayout'] = 'table';
 								break;
 							case $this->_lang->GET('user.settings.order_layout_tile'):
-								$user['app_settings']['orderLayout'] = 'tile';
+								$user[':app_settings']['orderLayout'] = 'tile';
 								break;
 						}
 				}
-
-				foreach ($user['app_settings'] as $key => $value){
-					if (!$value) unset($user['app_settings'][$key]);
+				// sanitize app settings for empty values
+				foreach ($user[':app_settings'] as $key => $value){
+					if (!$value) unset($user[':app_settings'][$key]);
 				}
+				$user[':app_settings'] = UTILITY::json_encode($user[':app_settings']);
 
 				// update user
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
-					'values' => [
-						':id' => $user['id'],
-						':name' => $user['name'],
-						':permissions' => $user['permissions'],
-						':units' => $user['units'],
-						':token' => $user['token'],
-						':orderauth' => $user['orderauth'],
-						':image' => $user['image'],
-						':app_settings' => UTILITY::json_encode($user['app_settings']),
-						':skills' => $user['skills']
-					]
+				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
+					'values' => $user
 				]) !== false) {
 					$this->response([
 					'response' => [
-						'id' => $user['id'],
-						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user['name']]),
+						'id' => $user[':id'],
+						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
 						'type' => 'success'
 					]]);
 				}
 				else $this->response([
 					'response' => [
-						'id' => $user['id'],
+						'id' => $user[':id'],
 						'msg' => $this->_lang->GET('user.user_not_saved'),
 						'type' => 'error'
 					]]);
@@ -567,29 +570,45 @@ class USER extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$permissions = [];
-				$units = [];
+			case 'PUT':
+				$permissions = $units = $user = [];
+				if ($this->_requestedID) {
+					$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
+						'replacements' => [
+							':id' => intval($this->_requestedID),
+							':name' => ''
+						]
+					]);
+					$user = $user ? $user[0] : null;
+					// prepare user-array to update, return error if not found
+					if (!$user) $this->response(null, 406);
+				}
+
+				$submittedName = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name'));
+				$nameUpdate = !isset($user['name']) || $user['name'] !== $submittedName;
+
 				//set up user properties
 				$user = [
-					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name')),
-					'permissions' => '',
-					'units' => '',
-					'token' => '',
-					'orderauth' => '',
-					'image' => '',
-					'app_settings' => [],
-					'skills' => []
+					':id' => isset($user['id']) ? $user['id'] : null,
+					':name' => $submittedName,
+					':permissions' => null,
+					':units' => null,
+					':token' => isset($user['token']) ? $user['token'] : '',
+					':orderauth' => isset($user['orderauth']) ? $user['orderauth'] : '',
+					':image' => isset($user['image']) ? $user['image'] : '',
+					':app_settings' => isset($user['app_settings']) ? json_decode($user['app_settings'], true) : [],
+					':skills' => [],
 				];
 
 				//check forbidden names
 				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => '',
-						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name'))
+						':name' => $submittedName
 					]
 				]);
 				$nametaken = $nametaken ? $nametaken[0] : null;
-				if (UTILITY::forbiddenName($user['name']) || $nametaken) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($user[':name']) || ($nametaken && $nametaken['id'] !== $user[':id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user[':name']]), 'type' => 'error']]);
 		
 				// checked permission levels
 				if ($setpermissions = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.permissions'))){
@@ -597,7 +616,7 @@ class USER extends API {
 						$permissions[] = array_search($setpermission, $this->_lang->_USER['permissions']);
 					}
 				}
-				$user['permissions'] = implode(',', $permissions);
+				$user[':permissions'] = implode(',', $permissions);
 
 				// checked organizational units
 				if ($setunits = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.units'))){
@@ -605,18 +624,18 @@ class USER extends API {
 						$units[] = array_search($setunit, $this->_lang->_USER['units']);
 					}
 				}
-				$user['units'] = implode(',', $units);
+				$user[':units'] = implode(',', $units);
 
 				// gather timesheet setup
 				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.annual_vacation'));
-				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
+				$user[':app_settings']['annualvacation'] = $annualvacation ? : '';
 				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.weekly_hours'));
-				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
-				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.initial_overtime'));
+				$user[':app_settings']['weeklyhours'] = $weeklyhours ? : '';
+				$user[':app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.initial_overtime'));
 				// check formats according to _calendarutility.php
 				foreach (['weeklyhours', 'annualvacation'] as $setting){
-					if (isset($user['app_settings'][$setting])){
-						$settingentries = explode('\n', $user['app_settings'][$setting]);
+					if (isset($user[':app_settings'][$setting])){
+						$settingentries = explode('\n', $user[':app_settings'][$setting]);
 						natsort($settingentries);
 						foreach ($settingentries as $line){
 							// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
@@ -634,26 +653,31 @@ class USER extends API {
 				// set custom idle timeout
 				$idle_prolonging_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
 				if ($idle_prolonging_factor > 0){
-					$user['app_settings']['idle'] = ($idle_prolonging_factor + 1) * CONFIG['lifespan']['session']['idle'];
+					$user[':app_settings']['idle'] = ($idle_prolonging_factor + 1) * CONFIG['lifespan']['session']['idle'];
 				}
-				else unset ($user['app_settings']['idle']);
+				else unset ($user[':app_settings']['idle']);
 
 				// sanitize app settings for empty values
-				foreach ($user['app_settings'] as $key => $value){
-					if (!$value) unset ($user['app_settings'][$key]);
+				foreach ($user[':app_settings'] as $key => $value){
+					if (!$value) unset($user[':app_settings'][$key]);
 				}
+				$user[':app_settings'] = UTILITY::json_encode($user[':app_settings']);
 
 				// gather user skills
 				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
 					if ($duty === '_LEVEL') continue;
 					foreach ($skills as $skill => $skilldescription){
 						if ($level = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('skills.' . $duty . '._DESCRIPTION') . '_' . $this->_lang->PROPERTY('skills.' . $duty . '.' . $skill))){
-							if ($level != 0) $user['skills'][] = $duty . '.' . $skill . '.' . $level;
+							if ($level != 0) $user[':skills'][] = $duty . '.' . $skill . '.' . $level;
 						}
 					}
 				}
+				$user[':skills'] = UTILITY::json_encode($user[':skills']);
 
 				// generate order auth
+				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
+					$user[':orderauth'] = '';
+				}
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
 					$orderauths = [];
 					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
@@ -661,88 +685,83 @@ class USER extends API {
 						$orderauths[] = $row['orderauth'];
 					}
 					do {
-						$user['orderauth'] = random_int(10000, max(99999, count($users)*100)); 
-					} while (in_array($user['orderauth'], $orderauths));
+						$user[':orderauth'] = random_int(10000, max(99999, count($users)*100)); 
+					} while (in_array($user[':orderauth'], $orderauths));
 				}
 
 				// generate token
 				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
-					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
+					$user[':token'] = hash('sha256', $user[':name'] . random_int(100000,999999) . time());
 				}
 
 				// save and convert image or create default
-				if (!(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name'])) {
+				if ((!(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) && $nameUpdate) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
 					$tempPhoto = tmpfile();
-					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
+					fwrite($tempPhoto, $this->defaultPic($user[':name'])); 
 					$_FILES[$this->_lang->PROPERTY('user.take_photo')] = [
 						'name' => 'defaultpic.png',
 						'type' => 'image/png',
 						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
 					];
 				}
-				$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-				UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
-				$user['image'] = substr($user['image'], 3);
+				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
+					if ($user[':image'] && $user[':id'] > 1) UTILITY::delete('../' . $user[':image']);
+					$user[':image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user[':name']])[0];
+					UTILITY::alterImage($user[':image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
+					$user[':image'] = substr($user[':image'], 3);
+				}
 
 				// insert user into database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
-					'values' => [
-						':name' => $user['name'],
-						':permissions' => $user['permissions'],
-						':units' => $user['units'],
-						':token' => $user['token'],
-						':orderauth' => $user['orderauth'],
-						':image' => $user['image'],
-						':app_settings' => UTILITY::json_encode($user['app_settings']),
-						':skills' => implode(',', $user['skills'])
-					]
-				])) {
-					// create welcome message
-					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-					$appname = 'Caro App';
-					$roles = [
-						'supervisor' => [],
-						'qmo' => [],
-						'prrc' => [],
-						'admin' => [],						
-					];
-					// construct permission- and unit-contact persons
-					foreach ($users as $registered){
-						if ($registered['id'] < 2){
-							$appname = $registered['name'];
-							continue;
-						}
-						$registered['permissions'] = explode(',', $registered['permissions']);
-						$registered['units'] = explode(',', $registered['units']);
-						foreach ($roles as $key => &$values){
-							if (in_array($key, $registered['permissions'])) {
-								if ($key !== 'supervisor' || ($key === 'supervisor' && array_intersect($units, $registered['units'])))
-									$values[] = $registered['name'];
+					'values' => $user
+				]) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
+					if (!$user[':id']){
+						// create welcome message
+						$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+						$appname = 'Caro App';
+						$roles = [
+							'supervisor' => [],
+							'qmo' => [],
+							'prrc' => [],
+							'admin' => [],						
+						];
+						// construct permission- and unit-contact persons
+						foreach ($users as $registered){
+							if ($registered['id'] < 2){
+								$appname = $registered['name'];
+								continue;
+							}
+							$registered['permissions'] = explode(',', $registered['permissions']);
+							$registered['units'] = explode(',', $registered['units']);
+							foreach ($roles as $key => &$values){
+								if (in_array($key, $registered['permissions'])) {
+									if ($key !== 'supervisor' || ($key === 'supervisor' && array_intersect($units, $registered['units'])))
+										$values[] = $registered['name'];
+								}
 							}
 						}
-					}
-					foreach ($roles as $key => &$values){
-						$values = array_unique($values);
-						$values = array_map(fn($v) => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\''. $this->_lang->GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
-					}
+						foreach ($roles as $key => &$values){
+							$values = array_unique($values);
+							$values = array_map(fn($v) => '<a href="javascript:void(0);" onclick="_client.message.newMessage(\''. $this->_lang->GET('order.message_orderer', [':orderer' => $v]) .'\', \'' . $v . '\', \'\', {}, [])">' . $v . '</a>', $values);
+						}
 
-					$message = [
-						':name' => $user['name'],
-						':appname' => $appname,
-						':supervisor' => implode(', ', $roles['supervisor']),
-						':qmo' => implode(', ', $roles['qmo']),
-						':prrc' => implode(', ', $roles['prrc']),
-						':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('message.navigation.register', [], true) . '</a>',
-						':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'about\')">' . $this->_lang->GET('application.navigation.about', [], true) . '</a>',
-						':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('application.navigation.user_profile', [], true) . '</a>',
-						':admin' => implode(', ', $roles['admin'])
-					];
-					$this->alertUserGroup(['user' => [$user['name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
-					
+						$message = [
+							':name' => $user[':name'],
+							':appname' => $appname,
+							':supervisor' => implode(', ', $roles['supervisor']),
+							':qmo' => implode(', ', $roles['qmo']),
+							':prrc' => implode(', ', $roles['prrc']),
+							':register' => '<a href="javascript:void(0);" onclick="api.message(\'get\', \'register\')">' . $this->_lang->GET('message.navigation.register', [], true) . '</a>',
+							':landingpage' => '<a href="javascript:void(0);" onclick="api.application(\'get\', \'about\')">' . $this->_lang->GET('application.navigation.about', [], true) . '</a>',
+							':profile' => '<a href="javascript:void(0);" onclick="api.user(\'get\', \'profile\')">' . $this->_lang->GET('application.navigation.user_profile', [], true) . '</a>',
+							':admin' => implode(', ', $roles['admin'])
+						];
+						$this->alertUserGroup(['user' => [$user[':name']]], preg_replace(['/\r/'], [''], $this->_lang->GET('user.welcome_message', $message, true)));
+					}
 					$this->response([
 					'response' => [
-						'id' => $this->_pdo->lastInsertId(),
-						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user['name']]),
+						'id' => $user[':id'] ? : $this->_pdo->lastInsertId(),
+						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
 						'type' => 'success'
 					]]);
 				}
@@ -753,163 +772,6 @@ class USER extends API {
 						'type' => 'error'
 					]]);
 				break;
-
-			case 'PUT':
-				$permissions = [];
-				$units = [];
-		
-				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => intval($this->_requestedID),
-						':name' => ''
-					]
-				]);
-				$user = $user ? $user[0] : null;
-				// prepare user-array to update, return error if not found
-				if (!$user) $this->response(null, 406);
-				$user['app_settings'] = $user['app_settings'] ? json_decode($user['app_settings'], true) : [];
-				
-				// check forbidden names
-				$updateName = !($user['name'] == UTILITY::propertySet($this->_payload, $this->_lang->GET('user.name')));
-				$user['name'] = UTILITY::propertySet($this->_payload, $this->_lang->GET('user.name'));
-				$nametaken = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => '',
-						':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.name'))
-					]
-				]);
-				$nametaken = $nametaken ? $nametaken[0] : null;
-				if (UTILITY::forbiddenName($user['name']) || ($nametaken && $nametaken['id'] !== $user['id'])) $this->response(['response' => ['msg' => $this->_lang->GET('user.error_forbidden_name', [':name' => $user['name']]), 'type' => 'error']]);
-				
-				// chain checked permission levels
-				foreach ($this->_lang->_USER['permissions'] as $level => $description){
-					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('permissions.' . $level))) {
-						$permissions[] = $level;
-					}
-				}
-				$user['permissions'] = implode(',', $permissions);
-
-				// chain checked organizational units
-				foreach ($this->_lang->_USER['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('units.' . $unit))) {
-						$units[] = $unit;
-					}
-				}
-				$user['units'] = implode(',', $units);
-
-				// update timesheet settings
-				$annualvacation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.annual_vacation'));
-				$user['app_settings']['annualvacation'] = $annualvacation ? : '';
-				$weeklyhours = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.weekly_hours'));
-				$user['app_settings']['weeklyhours'] = $weeklyhours ? : '';
-				$user['app_settings']['initialovertime'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.initial_overtime'));
-				// check formats according to _calendarutility.php
-				foreach (['weeklyhours', 'annualvacation'] as $setting){
-					if (isset($user['app_settings'][$setting])){
-						$settingentries = explode('\n', $user['app_settings'][$setting]);
-						natsort($settingentries);
-						foreach ($settingentries as $line){
-							// match ISO 8601 start date of contract settings, days of annual vacation or weekly hours
-							preg_match('/(\d{4}.\d{2}.\d{2}).+?([\d,\.]+)/', $line, $lineentry);
-							// append datetime value and contract value
-							if ($line && (!isset($lineentry[1]) || !isset($lineentry[2]))) $this->response([
-								'response' => [
-									'msg' => $this->_lang->GET('user.timesheet_format_error'),
-									'type' => 'error'
-								]]);
-						}
-					}
-				}
-
-				// set custom idle timeout
-				$idle_prolonging_factor = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.settings.idle'));
-				if ($idle_prolonging_factor > 0){
-					$user['app_settings']['idle'] = ($idle_prolonging_factor + 1) * CONFIG['lifespan']['session']['idle'];
-				}
-				else unset ($user['app_settings']['idle']);
-
-				// sanitize app settings for empty values
-				foreach ($user['app_settings'] as $key => $value){
-					if (!$value) unset ($user['app_settings'][$key]);
-				}
-
-				// update skills
-				$user['skills'] = [];
-				foreach ($this->_lang->_USER['skills'] as $duty => $skills){
-					if ($duty === '_LEVEL') continue;
-					foreach ($skills as $skill => $skilldescription){
-						if ($level = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('skills.' . $duty . '._DESCRIPTION') . '_' . $this->_lang->PROPERTY('skills.' . $duty . '.' . $skill))){
-							if ($level != 0) $user['skills'][] = $duty . '.' . $skill . '.' . $level;
-						}
-					}
-				}
-
-				// generate order auth
-				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_revoke')){
-					$user['orderauth'] = '';
-				}
-				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.order_authorization')) == $this->_lang->GET('user.order_authorization_generate')){
-					$orderauths = [];
-					$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-					foreach ($users as $row){
-						$orderauths[] = $row['orderauth'];
-					}
-					do {
-						$user['orderauth'] = random_int(10000, max(99999, count($users)*100));
-					} while (in_array($user['orderauth'], $orderauths));
-				}
-
-				// generate token
-				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.token_renew'))){
-					$user['token'] = hash('sha256', $user['name'] . random_int(100000,999999) . time());
-				}
-
-				// save and convert image or create default - default image overides custom in case of name update!
-				if ((!(isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) && $updateName) || UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.reset_photo'))) {
-					$tempPhoto = tmpfile();
-					fwrite($tempPhoto, $this->defaultPic($user['name'])); 
-					$_FILES[$this->_lang->PROPERTY('user.take_photo')] = [
-						'name' => 'defaultpic.png',
-						'type' => 'image/png',
-						'tmp_name' => stream_get_meta_data($tempPhoto)['uri']
-					];
-				}
-				if (isset($_FILES[$this->_lang->PROPERTY('user.take_photo')]) && $_FILES[$this->_lang->PROPERTY('user.take_photo')]['tmp_name']) {
-					if ($user['image'] && $user['id'] > 1) UTILITY::delete('../' . $user['image']);
-					$user['image'] = UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.take_photo')], UTILITY::directory('users'), ['profilepic_' . $user['name']])[0];
-					UTILITY::alterImage($user['image'], CONFIG['limits']['user_image'], UTILITY_IMAGE_REPLACE);
-					$user['image'] = substr($user['image'], 3);
-				}
-
-				// update user
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_put', [
-					'values' => [
-						':id' => $user['id'],
-						':name' => $user['name'],
-						':permissions' => $user['permissions'],
-						':units' => $user['units'],
-						':token' => $user['token'],
-						':orderauth' => $user['orderauth'],
-						':image' => $user['image'],
-						':app_settings' => UTILITY::json_encode($user['app_settings']),
-						':skills' => implode(',', $user['skills'])
-					]
-				]) !== false) {
-					$this->response([
-					'response' => [
-						'id' => $user['id'],
-						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user['name']]),
-						'type' => 'success'
-					]]);
-				}
-				else $this->response([
-					'response' => [
-						'id' => $user['id'],
-						'msg' => $this->_lang->GET('user.user_not_saved'),
-						'type' => 'error'
-					]]);
-				break;
-
 			case 'GET':
 				$datalist = [];
 				$options = ['...' . $this->_lang->GET('user.existing_user_new') => (!$this->_requestedID) ? ['selected' => true] : []];
@@ -1355,13 +1217,21 @@ class USER extends API {
 		if (!PERMISSION::permissionFor('regulatory')) $this->response([], 401);
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-				$usernames = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.name'));
-
-				if (!($usernames && $usernames = preg_split('/([,;]\s{0,})/', $usernames))) $this->response([], 406);
+			case 'PUT':
+				$training = [];
+				if ($this->_requestedID && $this->_requestedID !== 'null'){
+					$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
+					]);
+					$training = $training ? $training[0] : [];
+				}
 
 				$training = [
+					':id' => isset($training['id']) ? $training['id'] : null,
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_training')),
-					':user_id' => null,
+					':user_id' => isset($training['user_id']) ? $training['user_id'] : null,
 					':date' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_date'))) ? : null,
 					':expires' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_expires'))) ? : null,
 					':experience_points' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_experience_points')) ? : 0,
@@ -1385,6 +1255,10 @@ class USER extends API {
 				if (!$training[':name'] || !($training[':date'] || $training[':planned'])) $this->response([], 406);
 
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
+
+				if (isset($training['user_name'])) $usernames = [$training['user_name']];
+				else $usernames = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.name'));
+				if (!($usernames && $usernames = preg_split('/([,;]\s{0,})/', $usernames))) $this->response([], 406);
 
 				$notfound = [];
 				foreach ($usernames as $username){
@@ -1412,65 +1286,6 @@ class USER extends API {
 						'msg' => $this->_lang->GET('user.training.not_found', [':names' => implode(', ', $notfound)]),
 						'type' => 'error'
 					]]);
-				break;
-			case 'PUT':
-				if ($this->_requestedID && $this->_requestedID !== 'null'){
-					$training = SQLQUERY::EXECUTE($this->_pdo, 'user_training_get', [
-						'values' => [
-							':id' => $this->_requestedID
-						]
-					]);
-					if ($training = $training ? $training[0] : null){
-						if ($training['user_name']){
-							$training['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_training'));
-							$training['date'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_date'))) ? : null;
-							$training['expires'] = $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_expires'))) ? : null;
-							$training['experience_points'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_experience_points')) ? : 0;
-							$training['evaluation'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation')) ? UTILITY::json_encode([
-									'user' => $_SESSION['user']['name'],
-									'date' => $this->_date['servertime']->format('Y-m-d H:i'),
-									'content' => [$this->_lang->GET('user.training.add_evaluation', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.add_evaluation'))]
-								]): null;
-							$training['planned'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.schedule_timespan')) ? UTILITY::json_encode([
-									'user' => $_SESSION['user']['name'],
-									'date' => $this->_date['servertime']->format('Y-m-d H:i'),
-									'content' => [$this->_lang->GET('user.training.schedule_timespan', [], true) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('user.training.schedule_timespan'))]
-								]): null;
-							// if date is set it can not be planned
-							if ($training['date']) {
-								$training['planned'] = null;
-							}
-							// must have name and either date or planned
-							if (!$training['name'] || !($training['date'] || $training['planned'])) $this->response([], 406);
-
-							// upload files only if date is set
-							if ($training['date'] && isset($_FILES[$this->_lang->PROPERTY('user.training.add_document')]) && $_FILES[$this->_lang->PROPERTY('user.training.add_document')]['tmp_name']) {
-								$training['file_path'] = substr(UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('user.training.add_document')], UTILITY::directory('users'), [$training['user_id'] . '_' . $training['user_name']], [$training['name'] . '_' . $training['date'] . '_' . $training['expires']], false)[0], 1);
-							}
-							if (SQLQUERY::EXECUTE($this->_pdo, 'user_training_put', [
-								'values' => [
-									':id' => $training['id'],
-									':name' => $training['name'],
-									':date' => $training['date'],
-									':expires' => $training['expires'],
-									':experience_points' => $training['experience_points'],
-									':file_path' => $training['file_path'],
-									':evaluation' => $training['evaluation'],
-									':planned' => $training['planned']
-								]
-							])) $this->response([
-								'response' => [
-									'msg' => $this->_lang->GET('user.training.save_success'),
-									'type' => 'success'
-								]]);
-						}
-						else $this->response([
-							'response' => [
-								'msg' => $this->_lang->GET('user.training.not_found', [':names' => implode(', ', $training['user_name'])]),
-								'type' => 'error'
-							]]);
-					}
-				}
 				break;
 			case 'GET':
 				$prefill = [

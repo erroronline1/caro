@@ -67,6 +67,7 @@ class AUDIT extends API {
 
 				// set up general properties
 				$audit = [
+					':id' => isset($audit['id']) ? $audit['id'] : null, 
 					':template' => $template['id'],
 					':unit' => $template['unit'],
 					':content' => [],
@@ -88,23 +89,25 @@ class AUDIT extends API {
 					if ($uploaded = UTILITY::storeUploadedFiles([$fileinput], UTILITY::directory('audit_attachments'), [preg_replace('/[^\w\d]/m', '', $this->_date['servertime']->format('YmdHis') . '_' . $template['unit'])], null, true)){
 						for($i = 0; $i < count($files['name']); $i++){
 							if (in_array(strtolower(pathinfo($uploaded[$i])['extension']), ['jpg', 'jpeg', 'gif', 'png'])) UTILITY::alterImage($uploaded[$i], CONFIG['limits']['record_image'], UTILITY_IMAGE_REPLACE);
-							preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
+							preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $fileinput, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
 							if (isset($audit[':content']['questions'][intval($set[1])]['files'])) $audit[':content']['questions'][intval($set[1])]['files'][] = substr($uploaded[$i], 1);
 							else $audit[':content']['questions'][intval($set[1])]['files'] = [substr($uploaded[$i], 1)];
 						}
 					}
 				}
-
 				// iterate over payload, match template question index, input name and possible multiples
 				// values always will be stored within an array to handle multiples by default
 				foreach ($this->_payload as $key => $value){
 					if ($key === 'null') continue;
-					if (!$value) $value = ''; // the audit has to contain all questions as planned
-					preg_match('/^(\d+):_(.+?)(?:\((\d+)\)|$)/m', $key, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
+					if (!$value || $value === 'undefined') $value = ''; // the audit has to contain all questions as planned
+					if (gettype($value) === 'array' && !isset($value[0])) continue; // unless it has been previously processed files
+					preg_match('/^(\d+): (.+?)(?:\((\d+)\)|$)/m', $key, $set); // get current question set information: [1] setindex, [2] input, isset [3] possible multiple field
 					$set[2] = str_replace('_', ' ', $set[2]);
-					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute']))
+					if ($input = array_search($set[2], $this->_lang->_USER['audit']['audit']['execute'])){
 						// translateable system fields
+						if (in_array($input, ['files', 'photos'])) continue; // skip previously processesd files
 						$audit[':content']['questions'][intval($set[1])][$input][isset($set[3]) ? $set[3] - 1 : 0] = $value;
+					}
 					else
 						// manual human template question
 						$audit[':content']['questions'][intval($set[1])][$set[2]][0] = $value;
@@ -1672,12 +1675,12 @@ class AUDIT extends API {
 				}
 
 				$managementreview = [
+					':id' => isset($managementreview['id']) ? $managementreview['id'] : null,
 					':template' => null,
 					':unit' => null,
 					':content' => isset($managementreview['content']) ? json_decode($managementreview['content'], true) : [],
 					':last_user' => $_SESSION['user']['name'],
 					':closed' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('audit.managementreview.close')) ? 1 : null,
-					':id' => isset($managementreview['id']) ? $managementreview['id'] : null
 				];
 				// process content according to required fields
 				foreach ($this->_lang->_USER['audit']['managementreview']['required'] as $key => $value){
@@ -2878,17 +2881,20 @@ class AUDIT extends API {
 					////////////////////////////////////////
 					if (!$value || $value == 'on') unset($this->_payload->$key);
 				}
-				if ((array) $this->_payload)
-					SQLQUERY::EXECUTE($this->_pdo, 'user_training_put', [
-						'values' => [
-							':id' => $this->_requestedID,
-							':evaluation' => UTILITY::json_encode([
-								'user' => $_SESSION['user']['name'],
-								'date' => $this->_date['servertime']->format('Y-m-d H:i'),
-								'content' => (array) $this->_payload
-							])
-						]
+				if ((array) $this->_payload){
+					$trainingclone = [];
+					foreach($training as $key => $value){
+						$trainingclone[':' . $key] = $value;
+					}
+					$trainingclone[':evaluation'] = UTILITY::json_encode([
+						'user' => $_SESSION['user']['name'],
+						'date' => $this->_date['servertime']->format('Y-m-d H:i'),
+						'content' => (array) $this->_payload
 					]);
+					SQLQUERY::EXECUTE($this->_pdo, 'user_training_post', [
+						'values' => $trainingclone
+					]);
+				}
 			}
 		}
 
