@@ -560,7 +560,7 @@ class MESSAGE extends API {
 		$groups = ['units' => [], 'permissions' => [], 'orderauth' => [], 'name' => []];
 		// preset groups with given order from language file
 		foreach($this->_lang->_USER['permissions'] as $key => $void){
-			$groups['permission'][$key] = [];
+			$groups['permissions'][$key] = [];
 		}
 		foreach($this->_lang->_USER['units'] as $key => $void){
 			$groups['units'][$key] = [];
@@ -616,7 +616,7 @@ class MESSAGE extends API {
 				// display units and permissions as slideable multipanels
 				$panel = [];
 				foreach ($content as $sub => $users){
-					if ($users) continue;
+					if (!$users) continue;
 
 					$users = array_unique($users, SORT_REGULAR);
 					ksort($users);
