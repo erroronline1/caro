@@ -1603,7 +1603,7 @@ export const api = {
 	 */
 	purchase: (method, ...request) => {
 		request = [...request];
-		if (method === "get") api.history.write(["purchase", ...request]);
+		if (method === "get" && !["productsearch"].includes(request[0])) api.history.write(["purchase", ...request]);
 
 		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "exportpricelist", "productsearch"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
@@ -1630,7 +1630,7 @@ export const api = {
 						switch (request[4]) {
 							case "productselection": // coming from assemble.js widget
 								successFn = function (data) {
-									let article = document.querySelector("#inputmodal form article");
+									let article = document.querySelector("#_productselectionDialog form article");
 									let sibling = article.children[3], // as per assemble after button, label, hint and hidden input
 										deletesibling;
 									sibling = sibling.nextSibling;
