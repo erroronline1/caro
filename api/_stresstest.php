@@ -176,32 +176,26 @@ class STRESSTEST extends INSTALL{
 				];
 
 			}
+			$exists = [];
 			if (($record = array_search($identifier, array_column($records, 'identifier'))) !== false){
 				$exists = $records[$record];
-				$records = json_decode($exists['content'], true);
-				$records[] = $current_record;
-				$success = SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
-					'values' => [
-						':case_state' => null,
-						':record_type' => $exists['record_type'] ? : null,
-						':identifier' => $identifier,
-						':last_user' => 2,
-						':last_document' => $document['name'],
-						':content' => UTILITY::json_encode($records),
-						':id' => $exists['id'],
-						':lifespan' => $exists['lifespan'],
-						':erp_case_number' => null
-					]
-				]);
+				$recordcontent = json_decode($exists['content'], true);
+				$recordcontent[] = $current_record;
 			}
-			else SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+			else $recordcontent = [$current_record];
+			SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
 					':context' => 'casedocumentation',
+					':case_state' => null,
 					':record_type' => 'treatment',
 					':identifier' => $identifier,
 					':last_user' => 2,
 					':last_document' => $document['name'],
-					':content' => UTILITY::json_encode($current_record),
+					':content' => UTILITY::json_encode($recordcontent),
+					':lifespan' => null,
+					':erp_case_number' => null,
+					':note' => null,
+					':id' => isset($exists['id']) ? $exists['id'] : null,
 				]
 			]);
 		}
