@@ -699,12 +699,14 @@ class SQLQUERY {
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
 		],
 		'order_post_prepared_order' => [
-			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) VALUES (NULL, :order_data)",
-			'sqlsrv' => "INSERT INTO caro_consumables_prepared_orders (order_data) VALUES (:order_data)"
-		],
-		'order_put_prepared_order' => [
-			'mysql' => "UPDATE caro_consumables_prepared_orders SET order_data = :order_data WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_prepared_orders SET order_data = :order_data WHERE id = :id"
+			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) " .
+						"VALUES (:id, :order_data) " .
+						"ON DUPLICATE KEY UPDATE order_data = :order_data",
+			'sqlsrv' => "MERGE INTO caro_consumables_prepared_orders WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :order_data AS order_data) AS source " .
+						"(id, order_data) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET order_data = :order_data " .
+						"WHEN NOT MATCHED THEN INSERT (order_data) VALUES (:order_data);"
 		],
 		'order_get_prepared_order' => [
 			'mysql' => "SELECT * FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",

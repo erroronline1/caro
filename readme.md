@@ -40,7 +40,6 @@ Things are still in motion. Images may be outdated.
     * calendar, _calendar
     * consumables
     * document
-    * order
 
 ## Content
 * [Aims](#aims)

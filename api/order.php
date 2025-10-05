@@ -156,6 +156,7 @@ class ORDER extends API {
 								// add to prepared orders
 								SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
 									'values' => [
+										':id' => null,
 										':order_data' => UTILITY::json_encode($prepared)
 									]
 								]);
@@ -845,18 +846,20 @@ class ORDER extends API {
 		$notifications = new NOTIFICATION;
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				$processedOrderData = $this->processOrderForm();
 
 				// check whether an approval has been submitted
 				if (!$processedOrderData['approval']){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_post_prepared_order', [
 						'values' => [
+							':id' => $this->_requestedID,
 							':order_data' => UTILITY::json_encode($processedOrderData['order_data'])
 						]
 					]);
 					$response = [
 						'response' => [
-							'id' => $this->_pdo->lastInsertId(),
+							'id' => $this->_requestedID ? : $this->_pdo->lastInsertId(),
 							'msg' => $this->_lang->GET('order.saved_to_prepared'),
 							'type' => 'info'
 						],
@@ -868,40 +871,16 @@ class ORDER extends API {
 				// else process approved order
 				$response = $this->postApprovedOrder($processedOrderData);
 
-				break;
-			case 'PUT':
-				$processedOrderData = $this->processOrderForm();
-
-				// check whether an approval has been submitted
-				if (!$processedOrderData['approval']){
-					SQLQUERY::EXECUTE($this->_pdo, 'order_put_prepared_order', [
-						'values' => [
-							':order_data' => UTILITY::json_encode($processedOrderData['order_data']),
-							':id' => $this->_requestedID
-						]
-					]);
-					$response = [
-						'response' => [
-							'id' => $this->_requestedID,
-							'msg' => $this->_lang->GET('order.saved_to_prepared'),
-							'type' => 'info'
-						]
-					];
-					break;
-				}
-
-				// else process approved order
-				$response = $this->postApprovedOrder($processedOrderData);
-				
 				// delete prepared order if successfully approved
-				if ($response['response']['msg'] === $this->_lang->GET('order.saved')){
+				if ($response['response']['msg'] === $this->_lang->GET('order.saved') && $this->_requestedID){
 					SQLQUERY::EXECUTE($this->_pdo, 'order_delete_prepared_orders', [
 						'replacements' => [
 							':id' => intval($this->_requestedID)
 						]
 					]);
-					$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
+				$response['data'] = ['order_prepared' => $notifications->preparedorders(), 'order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()];
 				}
+
 				break;
 			case 'GET':
 				$datalist = [];
