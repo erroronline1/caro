@@ -1291,6 +1291,8 @@ button:disabled {
 	color: var(--red);
 }
 
+textarea:disabled,
+textarea:read-only,
 input:disabled,
 input:read-only {
 	color: var(--disabled);
