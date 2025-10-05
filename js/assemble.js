@@ -2390,11 +2390,10 @@ export class Assemble {
 					options: options,
 				}).then((response) => {
 					const e = document.getElementById(input.id);
-					delete response.null;
 					if (Object.keys(response).length) {
+						delete response.null;
 						e.value = Object.keys(response).join(", ");
 					}
-					else e.value = '';
 					e.dispatchEvent(new Event("change"));
 					e.blur();
 				});
@@ -3454,7 +3453,7 @@ export class Assemble {
 			textarea = div;
 		}
 
-		if (this.currentElement.autocomplete && this.currentElement.autocomplete.length) {
+		if (!(this.currentElement.attributes.disabled || this.currentElement.attributes.readonly) && this.currentElement.autocomplete && this.currentElement.autocomplete.length) {
 			/**
 			 * adds a *simple* autocomplete option for textareas with keyup event listener
 			 * appends rest of match if the input so far matches one of the datalist options.
