@@ -345,3 +345,6 @@
 26.09.25,8,"consumables-api, order-api, calendar-api"
 27.09.25,7,"record-api, calendar-api, erp-interface, ui-assembler"
 28.09.25,3,"documentation, code maintenance"
+02.10.25,8,"api, erp-interface"
+03.10.25,9,"erp-interface"
+04.10.25,10,"user-api, erp-interface, code maintenance"
