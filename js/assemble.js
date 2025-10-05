@@ -2390,9 +2390,11 @@ export class Assemble {
 					options: options,
 				}).then((response) => {
 					const e = document.getElementById(input.id);
+					delete response.null;
 					if (Object.keys(response).length) {
 						e.value = Object.keys(response).join(", ");
 					}
+					else e.value = '';
 					e.dispatchEvent(new Event("change"));
 					e.blur();
 				});
