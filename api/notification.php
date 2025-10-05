@@ -193,18 +193,19 @@ class NOTIFICATION extends API {
 									if ($current_records) {
 										$records = json_decode($case['content'], true);
 										array_push($records, ...$current_records);
-										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_put'),
+										$updates = SQLQUERY::CHUNKIFY($updates, strtr(SQLQUERY::PREPARE('records_post'),
 											[
+												':context' => $case['context'],
 												':case_state' => $this->_pdo->quote(UTILITY::json_encode($case['case_state'])),
 												':record_type' => $this->_pdo->quote($case['record_type']) ? : 'NULL',
 												':identifier' => $this->_pdo->quote($case['identifier']),
 												':last_user' => $_SESSION['user']['id'],
 												':last_document' => 'NULL',
 												':content' => $this->_pdo->quote(UTILITY::json_encode($records)),
-												':id' => $case['id'],
 												':lifespan' => $case['lifespan'] ? intval($case['lifespan']) : 'NULL',
 												':erp_case_number' => $this->_pdo->quote($case['erp_case_number']),
-												':note' => $this->_pdo->quote($case['note'] ? : '')
+												':note' => $this->_pdo->quote($case['note'] ? : ''),
+												':id' => $case['id'] // must come after :identifier, otherwise replacements fail
 											]) . '; ');
 									}
 								}

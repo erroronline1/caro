@@ -69,16 +69,35 @@ class RECORD extends API {
 				$case = $case ? $case[0] : null;
 				if ($case){
 					
-					if ($this->_caseState ==='lifespan'){
+					$successMsg = null;
+					$current_record = null;
+
+					$case = [
+						':id' => $case['id'],
+						':context' => $case['context'],
+						':case_state' => json_decode($case['case_state'] ? : '', true),
+						':record_type' => $case['record_type'] ? : null,
+						':identifier' => $this->_requestedID,
+						':last_user' => $_SESSION['user']['id'],
+						':last_document' => $case['last_document'],
+						':content' => json_decode($case['content'], true),
+						':lifespan' => $case['lifespan'],
+						':erp_case_number' => $case['erp_case_number'],
+						':note' => $case['note']
+					];
+
+					if ($this->_caseState === 'lifespan'){
 						if (in_array(strval($this->_caseStateValue), array_keys($this->_lang->_USER['record']['lifespan']['years']))){
+							$case[':lifespan'] = $this->_caseStateValue;
 							$current_record = [
 								'author' => $_SESSION['user']['name'],
 								'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 								'document' => 0,
 								'content' => UTILITY::json_encode([
-									$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue], true)
+									$this->_lang->GET('record.pseudodocument_' . $case[':context'], [], true) => $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue], true)
 								])
 							];
+							$successMsg = $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue]);
 						}
 						else $this->response([
 						'response' => [
@@ -86,81 +105,45 @@ class RECORD extends API {
 							'type' => 'error'
 						]]);
 					}
-					elseif ($this->_caseState ==='erp_case_number'){
-						if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
-							'values' => [
-								':case_state' => $case['case_state'],
-								':record_type' => $case['record_type'],
-								':identifier' => $this->_requestedID,
-								':last_user' => $case['last_user'],
-								':last_document' => $case['last_document'],
-								':content' => $case['content'],
-								':id' => $case['id'],
-								':lifespan' => $case['lifespan'],
-								':erp_case_number' => $this->_caseStateValue,
-								':note' => $case['note']
-							]
-						])) $this->response([
-							'response' => [
-								'msg' => $this->_lang->GET($this->_caseStateValue ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['record']['erp_case_number']]),
-								'type' => 'success'
-							]]);
+					elseif ($this->_caseState === 'erp_case_number'){
+						$case[':erp_case_number'] = $this->_caseStateValue;
+						$successMsg = $this->_lang->GET($this->_caseStateValue ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['record']['erp_case_number']]);
 					}
-					elseif ($this->_caseState ==='note'){
+					elseif ($this->_caseState === 'note'){
 						$this->_caseStateValue = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('record.note')) ? : null;
 						if ($this->_caseStateValue) $this->_caseStateValue .= "\n" . $this->_lang->GET('record.note_edit', [':name' => $_SESSION['user']['name'], ':date' => $this->_date['servertime']->format('Y-m-d H:i')]); 
-
-						if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
-							'values' => [
-								':case_state' => $case['case_state'],
-								':record_type' => $case['record_type'],
-								':identifier' => $this->_requestedID,
-								':last_user' => $case['last_user'],
-								':last_document' => $case['last_document'],
-								':content' => $case['content'],
-								':id' => $case['id'],
-								':lifespan' => $case['lifespan'],
-								':erp_case_number' => $case['erp_case_number'],
-								':note' => $this->_caseStateValue
-							]
-						])) $this->response([
-							'response' => [
-								'msg' => $this->_lang->GET($this->_caseStateValue ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['record']['note']]),
-								'type' => 'success'
-							]]);
+						$case[':note'] = $this->_caseStateValue;
+						$successMsg = $this->_lang->GET($this->_caseStateValue ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['record']['note']]);
 					}
 					else {
+						$case[':last_document'] = null;
 						$current_record = [
 							'author' => $_SESSION['user']['name'],
 							'date' => $this->_date['servertime']->format('Y-m-d H:i:s'),
 							'document' => 0,
 							'content' => UTILITY::json_encode([
-								$this->_lang->GET('record.pseudodocument_' . $case['context'], [], true) => $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $case['context'] . '.' . $this->_caseState, [], true)], true)
+								$this->_lang->GET('record.pseudodocument_' . $case[':context'], [], true) => $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->GET('casestate.' . $case[':context'] . '.' . $this->_caseState, [], true)], true)
 							])
 						];
 					}
 
-					$records = json_decode($case['content'], true);
-					$records[] = $current_record;
-					$case_state = json_decode($case['case_state'] ? : '', true);
-					if ($this->_caseStateValue === 'true') $case_state[$this->_caseState] = true;
-					else unset($case_state[$this->_caseState]);
-					if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
-						'values' => [
-							':case_state' => UTILITY::json_encode($case_state) ? : null,
-							':record_type' => $case['record_type'] ? : null,
-							':identifier' => $this->_requestedID,
-							':last_user' => $_SESSION['user']['id'],
-							':last_document' => null,
-							':content' => UTILITY::json_encode($records),
-							':id' => $case['id'],
-							':lifespan' => ($this->_caseState ==='lifespan' && in_array(strval($this->_caseStateValue), array_keys($this->_lang->_USER['record']['lifespan']['years']))) ? intval($this->_caseStateValue) : $case['lifespan'],
-							':erp_case_number' => $case['erp_case_number'],
-							':note' => $case['note']
-						]
+					$records = $case[':content'];
+					if ($current_record) $records[] = $current_record;
+					$case_state = $case[':case_state'];
+					if (!in_array($this->_caseState, ['lifespan', 'erp_case_number', 'note'])){
+						if ($this->_caseStateValue === 'true') $case_state[$this->_caseState] = true;
+						else unset($case_state[$this->_caseState]);
+					}
+					$case[':case_state'] = UTILITY::json_encode($case_state) ? : null;
+					$case[':content'] = UTILITY::json_encode($records) ? : null;
+					if (!$successMsg) $successMsg = $this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]]);
+
+				var_dump($case, $successMsg);
+					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+						'values' => $case
 					])) $this->response([
 						'response' => [
-							'msg' => $this->_caseState ==='lifespan' ? $this->_lang->GET('record.lifespan.set', [':years' => $this->_caseStateValue]) : ($this->_lang->GET($this->_caseStateValue === 'true' ? 'record.casestate_set' : 'record.casestate_revoked', [':casestate' => $this->_lang->_USER['casestate'][$case['context']][$this->_caseState]])),
+							'msg' => $successMsg,
 							'type' => 'success'
 						]]);
 				}
@@ -1022,37 +1005,42 @@ class RECORD extends API {
 						]
 					]);
 					$case = $case ? $case[0] : null;
-					if ($case){ // update record
-						$records = json_decode($case['content'], true);
-						$records[] = $current_record; // append current record
-						$success = SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
-							'values' => [
-								':case_state' => $case['case_state'] ? : null,
-								':record_type' => $case['record_type'] ? : null,
-								':identifier' => $identifier,
-								':last_user' => $_SESSION['user']['id'],
-								':last_document' => $document_name,
-								':content' => UTILITY::json_encode($records),
-								':id' => $case['id'],
-								':lifespan' => $case['lifespan'],
-								':erp_case_number' => $case['erp_case_number'],
-								':note' => $case['note']
-							]
-						]);
+					if ($case){ 
+						$case = [
+							':id' => $case['id'],
+							':context' => $case['context'],
+							':case_state' => $case['case_state'] ? : null,
+							':record_type' => $case['record_type'] ? : null,
+							':identifier' => $identifier,
+							':last_user' => $_SESSION['user']['id'],
+							':last_document' => $document_name,
+							':content' => json_decode($case['content'], true),
+							':lifespan' => $case['lifespan'],
+							':erp_case_number' => $case['erp_case_number'],
+							':note' => $case['note']
+						];
 					}
-					else { // create a new record
-						$success = SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
-							'values' => [
-								':context' => $context,
-								':record_type' => $record_type ? : null,
-								':identifier' => $identifier,
-								':last_user' => $_SESSION['user']['id'],
-								':last_document' => $document_name,
-								':content' => UTILITY::json_encode([$current_record]),
-							]
-						]);
+					else {
+						$case = [
+							':id' => null,
+							':context' => $context,
+							':case_state' => null,
+							':record_type' => $record_type ? : null,
+							':identifier' => $identifier,
+							':last_user' => $_SESSION['user']['id'],
+							':last_document' => $document_name,
+							':content' => [],
+							':lifespan' => null,
+							':erp_case_number' => null,
+							':note' => null
+						];
 					}
-					if ($success){		
+					$case[':content'][] = $current_record; // append current record
+					$case[':content'] = UTILITY::json_encode($case[':content']);
+
+					if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
+							'values' => $case
+						])){		
 						// append next document recommendation for common and matching user units
 						$bd = SQLQUERY::EXECUTE($this->_pdo, 'document_bundle_datalist');
 						$hidden = $recommended = [];
@@ -1865,18 +1853,19 @@ class RECORD extends API {
 
 		if (!$original) {
 			// overwrite identifier, append record altering
-			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
+					':context' => $merge['context'],
 					':case_state' => $merge['case_state'] ? : null,
 					':record_type' => $merge['record_type'],
 					':identifier' => $new_id,
 					':last_user' => $_SESSION['user']['id'],
 					':last_document' => $merge['last_document'],
 					':content' => UTILITY::json_encode($merge['content']),
-					':id' => $merge['id'],
-					':lifespan' => max($original['lifespan'], $merge['lifespan']),
+					':lifespan' => $merge['lifespan'],
 					':erp_case_number' => $merge['erp_case_number'],
-					':note' => $merge['note']
+					':note' => $merge['note'],
+					':id' => $merge['id'],
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.reidentify_success'),
@@ -1891,8 +1880,9 @@ class RECORD extends API {
 			}
 			usort($original['content'], Fn($a, $b) => $a['date'] <=> $b['date']);
 	
-			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
+					':context' => $original['context'],
 					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $original['record_type'],
 					':identifier' => $new_id,
@@ -1900,10 +1890,10 @@ class RECORD extends API {
 					// get last considered document, offset -1 because pseudodocument has been added before by default
 					':last_document' => $original['content'][count($original['content']) - 2]['document'] ? : $this->_lang->GET('record.retype_pseudodocument_name', [], true),
 					':content' => UTILITY::json_encode($original['content']),
-					':id' => $original['id'],
 					':lifespan' => max($original['lifespan'], $merge['lifespan']),
 					':erp_case_number' => $original['erp_case_number'],
-					':note' => $original['note']
+					':note' => $original['note'],
+					':id' => $original['id'],
 			]]) && SQLQUERY::EXECUTE($this->_pdo, 'records_delete', [
 				'values' => [
 					':id' => $merge['id']
@@ -1953,18 +1943,19 @@ class RECORD extends API {
 					], true)]
 			];
 			// update record
-			if (SQLQUERY::EXECUTE($this->_pdo, 'records_put', [
+			if (SQLQUERY::EXECUTE($this->_pdo, 'records_post', [
 				'values' => [
+					':context' => $original['context'],
 					':case_state' => $original['case_state'] ? : null,
 					':record_type' => $record_type,
 					':identifier' => $original['identifier'],
 					':last_user' => $_SESSION['user']['id'],
 					':last_document' => $original['last_document'],
 					':content' => UTILITY::json_encode($original['content']),
-					':id' => $original['id'],
 					':lifespan' => $original['lifespan'],
 					':erp_case_number' => $original['erp_case_number'],
-					':note' => $original['note']
+					':note' => $original['note'],
+					':id' => $original['id'],
 			]])) $this->response([
 				'response' => [
 					'msg' => $this->_lang->GET('record.saved'),

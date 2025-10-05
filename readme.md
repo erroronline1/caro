@@ -35,14 +35,12 @@ Things are still in motion. Images may be outdated.
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
 * refactor redundant post/put
+    * stresstest (adapt sql queries)
     * notification (adapt sql queries)
     * calendar, _calendar
     * consumables
     * document
-    * file
-    * measure
     * order
-    * record
 
 ## Content
 * [Aims](#aims)

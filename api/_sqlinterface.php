@@ -47,13 +47,12 @@ class SQLQUERY {
 				}
 
 				if (gettype($value) === 'NULL' || $value === false) {
-					$query = strtr($query, [$key => 'NULL']);
+					$query = preg_replace('/(' . $key . ')(\W|$)/m', 'NULL$2', $query); // :id in :identity would be replaced with strtr too
 					unset($parameters['values'][$key]);
 				}
 				else $parameters['values'][$key] = trim($value);
 			}
 		} else $parameters['values'] = [];
-
 		// replace tokens in query that can not be executed
 		if (isset($parameters['replacements'])) {
 			foreach ($parameters['replacements'] as $key => $value){
@@ -790,6 +789,7 @@ class SQLQUERY {
 						"(order_id, order_data, ordered, partially_received, received, ordertype) ON (target.order_id = source.order_id) " .
 						"WHEN MATCHED THEN UPDATE SET order_data = :order_data, partially_received = CONVERT(SMALLDATETIME, :partially_received, 120), received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype " .
 						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :partially_received, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype);"
+													// ^ insert id here as opposed to any other query because other tables have id as auto increment, but this is primary only	
 		],
 		'order_get_order_statistics' => [
 			'mysql' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id",
@@ -807,12 +807,14 @@ class SQLQUERY {
 
 
 		'records_post' => [
-			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) VALUES (NULL, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL)",
-			'sqlsrv' => "INSERT INTO caro_records (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL)"
-		],
-		'records_put' => [
-			'mysql' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, lifespan = :lifespan, closed = NULL, erp_case_number = :erp_case_number, note = :note WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_records SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, lifespan = :lifespan, closed = NULL, erp_case_number = :erp_case_number, note = :note WHERE id = :id"
+			'mysql' => "INSERT INTO caro_records (id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) " .
+						"VALUES (:id, :context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL) " .
+						"ON DUPLICATE KEY UPDATE case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note",
+			'sqlsrv' => "MERGE INTO caro_records WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :context AS context, :case_state AS case_state, :record_type AS record_type, :identifier AS identifier, :last_user AS last_user, :last_document AS last_document, :content AS content, :lifespan AS lifespan, :erp_case_number AS erp_case_number, :note AS note) AS source " .
+						"(id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note " .
+						"WHEN NOT MATCHED THEN INSERT (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL);"
 		],
 		'records_get_all' => [
 			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id",
