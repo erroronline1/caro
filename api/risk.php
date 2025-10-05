@@ -36,8 +36,10 @@ class RISK extends API {
 	public function risk(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
 				$risk = [
+					':id' => intval($this->_requestedID),
 					':type' => UTILITY::propertySet($this->_payload,'_type'),
 					':process' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.process')),
 					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')),
@@ -52,9 +54,9 @@ class RISK extends API {
 					':risk_benefit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_benefit')) ? : null,
 					':measure_remainder' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_remainder')) ? : null,
 					':proof' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.proof')) ? : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					':author' => $_SESSION['user']['name']
 				];
-
 				if (!$risk[':type']) $this->response([], 417);
 
 				// convert values to languagefile keys for risks
@@ -84,23 +86,28 @@ class RISK extends API {
 								':measure_damage',
 								':risk_benefit',
 								':measure_remainder',
-								':proof'
+								':proof',
+								':hidden'
 								])) continue;
-							if (isset($risk[':relevance']) && $risk[':relevance'] === 0 && in_array($key, [
+							if (!isset($risk[':relevance']) && in_array($key, [
 								':risk',
-								':cause'
+								':cause',
+								':relevance'
 								])) continue;
-							if (!$value && $value !== 0) $this->response([], 417);
+							if (!$value && $value !== 0) {
+								$this->response([], 417);
+							}
 						}		
 						break;
-					default: // risks
+					default: // risk
 						// check if neccessary values have been provided, match with _install.php
 						foreach ($risk as $key => $value){
 							if (in_array($key, [
 								':measure_remainder',
-								':proof'
+								':proof',
+								':hidden'
 								])) continue;
-							if (isset($risk[':relevance']) && $risk[':relevance'] === 0 && in_array($key, [
+							if (!$risk[':relevance'] && in_array($key, [
 								':cause',
 								':effect',
 								':probability',
@@ -108,9 +115,12 @@ class RISK extends API {
 								':measure',
 								':measure_probability',
 								':measure_damage',
-								':risk_benefit'
+								':risk_benefit',
+								':relevance'
 							])) continue;								
-							if (!$value && $value !== 0) $this->response([], 417);
+							if (!$value && $value !== 0) {
+								$this->response([], 417);
+							}
 						}		
 						break;
 				}
@@ -309,7 +319,7 @@ class RISK extends API {
 									'type' => 'hidden',
 									'attributes' => [
 										'name' => '_type',
-										'value' => $risk['type']
+										'value' => $risk['type'] ? : 'characteristic'
 									]
 								], [
 									'type' => 'text',
@@ -334,7 +344,7 @@ class RISK extends API {
 									],
 									'content' => [
 										$this->_lang->GET('risk.relevance_yes') => $risk['relevance'] === 1 ? ['checked' => true, 'value' => 1] : ['value' => 1], 
-										$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => 0, 'class' => 'red'] : ['value' => 0, 'class' => 'red'],
+										$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => '0', 'class' => 'red'] : ['value' => '0', 'class' => 'red'],
 									]
 								], [
 									'type' => 'textarea',
@@ -361,13 +371,13 @@ class RISK extends API {
 								foreach ([4, 5, 6, 7] as $index){
 									if (isset($response['render']['content'][$last][$index]['content'])){
 										foreach ($response['render']['content'][$last][$index]['content'] as $key => $value){
-											$response['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
+											$response['render']['content'][$last][$index]['content'][$key]['readonly'] = true;
 										}
 									}
 									else {
 										unset ($response['render']['content'][$last][$index]['attributes']['onclick']);
 										unset ($response['render']['content'][$last][$index]['attributes']['onpointerdown']);
-										$response['render']['content'][$last][$index]['attributes']['disabled'] = true;
+										$response['render']['content'][$last][$index]['attributes']['readonly'] = true;
 									}
 								}
 
@@ -417,7 +427,7 @@ class RISK extends API {
 										],
 										'content' => [
 											$this->_lang->GET('risk.relevance_yes') => $risk['relevance'] === 1 ? ['checked' => true, 'value' => 1, 'disabled' => true] : ['value' => 1, 'disabled' => true], 
-											$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => 0, 'class' => 'red', 'disabled' => true] : ['value' => 0, 'class' => 'red', 'disabled' => true],
+											$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => '0', 'class' => 'red', 'disabled' => true] : ['value' => '0', 'class' => 'red', 'disabled' => true],
 										]
 									], [
 										'type' => 'textsection',
@@ -486,7 +496,7 @@ class RISK extends API {
 								'type' => 'hidden',
 								'attributes' => [
 									'name' => '_type',
-									'value' => $risk['type']
+									'value' => $risk['type'] ? : 'risk'
 								]
 							],[
 								'type' => 'text',
@@ -510,7 +520,7 @@ class RISK extends API {
 								],
 								'content' => [
 									$this->_lang->GET('risk.relevance_yes') => $risk['relevance'] === 1 ? ['checked' => true, 'value' => 1] : ['value' => 1], 
-									$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => 0, 'class' => 'red'] : ['value' => 0, 'class' => 'red'],
+									$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => '0', 'class' => 'red'] : ['value' => '0', 'class' => 'red'],
 							]
 							], [
 								'type' => 'textarea',
@@ -615,15 +625,16 @@ class RISK extends API {
 						if ($risk['id']){
 							$last = count($response['render']['content']) - 1;
 							foreach ([3, 5, 6, 8, 12, 13, 17] as $index){
+								var_dump($response['render']['content'][$last][$index]);
 								if (isset($response['render']['content'][$last][$index]['content'])){
 									foreach ($response['render']['content'][$last][$index]['content'] as $key => $value){
-										$response['render']['content'][$last][$index]['content'][$key]['disabled'] = true;
+										$response['render']['content'][$last][$index]['content'][$key]['readonly'] = true;
 									}
 								}
 								else {
 									unset ($response['render']['content'][$last][$index]['attributes']['onclick']);
 									unset ($response['render']['content'][$last][$index]['attributes']['onpointerdown']);
-									$response['render']['content'][$last][$index]['attributes']['disabled'] = true;
+									$response['render']['content'][$last][$index]['attributes']['readonly'] = true;
 								}
 							}
 							$hidden = null;
@@ -672,7 +683,7 @@ class RISK extends API {
 									],
 									'content' => [
 										$this->_lang->GET('risk.relevance_yes') => $risk['relevance'] === 1 ? ['checked' => true, 'value' => 1, 'disabled' => true] : ['value' => 1, 'disabled' => true], 
-										$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => 0, 'class' => 'red', 'disabled' => true] : ['value' => 0, 'class' => 'red', 'disabled' => true],
+										$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => '0', 'class' => 'red', 'disabled' => true] : ['value' => '0', 'class' => 'red', 'disabled' => true],
 								]
 								], [
 									'type' => 'textsection',

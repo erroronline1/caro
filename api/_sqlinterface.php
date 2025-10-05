@@ -865,12 +865,14 @@ class SQLQUERY {
 
 
 		'risk_post' => [
-			'mysql' => "INSERT INTO caro_risks (id, type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) VALUES (NULL, :type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author)",
-			'sqlsrv' => "INSERT INTO caro_risks (type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) VALUES (:type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author)"
-		],
-		'risk_put' => [
-			'mysql' => "UPDATE caro_risks SET risk = :risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = :proof, hidden = :hidden WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_risks SET risk = :risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = :proof, hidden = :hidden WHERE id = :id"
+			'mysql' => "INSERT INTO caro_risks (id, type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) " .
+						"VALUES (:id, :type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author) " .
+						"ON DUPLICATE KEY UPDATE risk = :risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = :proof, hidden = :hidden",
+			'sqlsrv' => "MERGE INTO caro_risks WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :type AS type, :process AS process, :risk AS risk, :relevance AS relevance, :cause AS cause, :effect AS effect, :probability AS probability, :damage AS damage, :measure AS measure, :measure_probability AS measure_probability, :measure_damage AS measure_damage, :risk_benefit AS risk_benefit, :measure_remainder AS measure_remainder, :proof AS proof, :date AS date, :author AS author) AS source " .
+						"(id, type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET risk = :risk, probability = :probability, damage = :damage, measure_probability = :measure_probability, measure_damage = :measure_damage, proof = :proof, hidden = :hidden " .
+						"WHEN NOT MATCHED THEN INSERT (type, process, risk, relevance, cause, effect, probability, damage, measure, measure_probability, measure_damage, risk_benefit, measure_remainder, proof, date, author) VALUES (:type, :process, :risk, :relevance, :cause, :effect, :probability, :damage, :measure, :measure_probability, :measure_damage, :risk_benefit, :measure_remainder, :proof, CURRENT_TIMESTAMP, :author);"
 		],
 		'risk_datalist' => [
 			'mysql' => "SELECT * FROM caro_risks ORDER BY process, risk, cause, effect",
