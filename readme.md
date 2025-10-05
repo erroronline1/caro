@@ -35,11 +35,12 @@ Things are still in motion. Images may be outdated.
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
 * refactor redundant post/put
-    * stresstest (adapt sql queries)
     * notification (adapt sql queries)
-    * calendar, _calendar
+    * calendar, _calendar, stresstest
     * consumables
     * document
+    * method caller (events, forms)
+    * sanitize api endpoints
 
 ## Content
 * [Aims](#aims)

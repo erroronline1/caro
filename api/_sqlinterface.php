@@ -449,7 +449,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)"
 		],
-
+		// ??? verify ??? on duplicate key update / merging does not make sense for products, for queries are dis- and reassembled for improved performance
 		'consumables_post_product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)",
 			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)"
@@ -527,6 +527,7 @@ class SQLQUERY {
 
 
 
+		// on duplicate key update / merging does not make sense for csvfilters, for entries are micro-updated and handled by one post method only anyway
 		'csvfilter_post' => [
 			'mysql' => "INSERT INTO caro_csvfilter (id, name, date, author, content, hidden) VALUES (NULL, :name, CURRENT_TIMESTAMP, :author, :content, :hidden)",
 			'sqlsrv' => "INSERT INTO caro_csvfilter (name, date, author, content, hidden) VALUES (:name, CURRENT_TIMESTAMP, :author, :content, :hidden)"
@@ -627,7 +628,7 @@ class SQLQUERY {
 		],
 
 
-
+		// on duplicate key update / merging does not make sense for measures for put and post are processed different
 		'measure_post' => [
 			'mysql' => "INSERT INTO caro_measures (id, timestamp, content, user_id, votes, measures, last_user, last_touch, closed) VALUES (NULL, CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL, NULL, NULL)",
 			'sqlsrv' => "INSERT INTO caro_measures (timestamp, content, user_id, votes, measures, last_user, last_touch, closed) VALUES (CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL, NULL, NULL)"
@@ -674,7 +675,6 @@ class SQLQUERY {
 			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)",
 			'sqlsrv' => "INSERT INTO caro_messages (user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (:to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)"
 		],
-
 		'message_get_conversations' => [
 			'mysql' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.conversation_user = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.id IN (SELECT MAX(caro_messages.id) FROM caro_messages WHERE caro_messages.user_id = :user GROUP BY caro_messages.conversation_user) ORDER BY caro_messages.timestamp DESC",
 			'sqlsrv' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.conversation_user = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.id IN (SELECT MAX(caro_messages.id) FROM caro_messages WHERE caro_messages.user_id = :user GROUP BY caro_messages.conversation_user) ORDER BY caro_messages.timestamp DESC"
@@ -698,6 +698,7 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL",
 			'sqlsrv' => "SELECT caro_consumables_products.*, caro_consumables_vendors.name as vendor_name FROM caro_consumables_products LEFT JOIN caro_consumables_vendors ON caro_consumables_products.vendor_id = caro_consumables_vendors.id WHERE ((caro_consumables_products.article_no LIKE :SEARCH) OR (caro_consumables_products.article_name LIKE :SEARCH) OR (caro_consumables_products.article_alias LIKE :SEARCH) OR caro_consumables_products.article_ean = :search OR caro_consumables_products.erp_id = :search) AND caro_consumables_products.vendor_id IN (:vendors) AND caro_consumables_vendors.hidden IS NULL AND caro_consumables_products.hidden IS NULL"
 		],
+
 		'order_post_prepared_order' => [
 			'mysql' => "INSERT INTO caro_consumables_prepared_orders (id, order_data) " .
 						"VALUES (:id, :order_data) " .
@@ -712,16 +713,16 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_prepared_orders WHERE id = :id LIMIT 1",
 			'sqlsrv' => "SELECT TOP 1 * FROM caro_consumables_prepared_orders WHERE CONVERT(VARCHAR, id) = :id"
 		],
+		'order_get_prepared_orders' => [
+			'mysql' => "SELECT * FROM caro_consumables_prepared_orders",
+			'sqlsrv' => "SELECT * FROM caro_consumables_prepared_orders"
+		],
 		'order_delete_prepared_orders' => [
 			'mysql' => "DELETE FROM caro_consumables_prepared_orders WHERE id IN (:id)",
 			'sqlsrv' => "DELETE FROM caro_consumables_prepared_orders WHERE id IN (:id)"
 		],
 
-		'order_get_prepared_orders' => [
-			'mysql' => "SELECT * FROM caro_consumables_prepared_orders",
-			'sqlsrv' => "SELECT * FROM caro_consumables_prepared_orders"
-		],
-
+		// on duplicate key update / merging does not make sense for approved orders, for entries are micro-updated anyway
 		'order_post_approved_order' => [
 			'mysql' => "INSERT INTO caro_consumables_approved_orders (id, order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified_received, notified_delivered) VALUES (NULL, :order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)",
 			'sqlsrv' => "INSERT INTO caro_consumables_approved_orders (order_data, organizational_unit, approval, approved, ordered, partially_received, received, partially_delivered, delivered, archived, ordertype, notified_received, notified_delivered) VALUES (:order_data, :organizational_unit, :approval, CURRENT_TIMESTAMP, NULL, NULL, NULL, NULL, NULL, NULL, :ordertype, NULL, NULL)"
@@ -738,7 +739,6 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
-
 		'order_get_approved_order_by_ids' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)"
@@ -791,7 +791,7 @@ class SQLQUERY {
 						"(order_id, order_data, ordered, partially_received, received, ordertype) ON (target.order_id = source.order_id) " .
 						"WHEN MATCHED THEN UPDATE SET order_data = :order_data, partially_received = CONVERT(SMALLDATETIME, :partially_received, 120), received = CONVERT(SMALLDATETIME, :received, 120), ordertype = :ordertype " .
 						"WHEN NOT MATCHED THEN INSERT (order_id, order_data, ordered, partially_received, received, ordertype) VALUES (:order_id, :order_data, CONVERT(SMALLDATETIME, :ordered, 120), CONVERT(SMALLDATETIME, :partially_received, 120), CONVERT(SMALLDATETIME, :received, 120), :ordertype);"
-													// ^ insert id here as opposed to any other query because other tables have id as auto increment, but this is primary only	
+													// ^^^^^^^^ insert id here as opposed to other merged queries because most other tables have id as auto increment, but this is primary only	
 		],
 		'order_get_order_statistics' => [
 			'mysql' => "SELECT * FROM caro_consumables_order_statistics ORDER BY order_id",
@@ -848,7 +848,7 @@ class SQLQUERY {
 		],
 
 
-
+		// on duplicate key update / merging does not make sense for datalists, for comparison does not occur based on key but rather other column values
 		'records_datalist_post' => [
 			'mysql' => "INSERT INTO caro_records_datalist (id, issue, unit, datalist) VALUES (NULL, :issue, :unit, :datalist)",
 			'sqlsrv' => "INSERT INTO caro_records_datalist (issue, unit, datalist) VALUES (:issue, :unit, :datalist)"
@@ -893,6 +893,7 @@ class SQLQUERY {
 
 
 
+		// on duplicate key update / merging does not make sense for text templates, for entries are micro-updated and handled by one post method only anyway
 		'texttemplate_post' => [
 			'mysql' => "INSERT INTO caro_texttemplates (id, name, unit, date, author, content, type, hidden) VALUES (NULL, :name, :unit, CURRENT_TIMESTAMP, :author, :content, :type, :hidden)",
 			'sqlsrv' => "INSERT INTO caro_texttemplates (name, unit, date, author, content, type, hidden) VALUES (:name, :unit, CURRENT_TIMESTAMP, :author, :content, :type, :hidden)"
