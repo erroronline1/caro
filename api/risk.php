@@ -322,6 +322,7 @@ class RISK extends API {
 										'value' => $risk['type'] ? : 'characteristic'
 									]
 								], [
+									// non editable after injection
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.process'),
@@ -330,6 +331,7 @@ class RISK extends API {
 									],
 									'datalist' => isset($datalist['process']) ? array_values($datalist['process']) : []
 								], [
+									// non editable after injection
 									'type' => 'text',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.type.characteristic'),
@@ -347,6 +349,7 @@ class RISK extends API {
 										$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => '0', 'class' => 'red'] : ['value' => '0', 'class' => 'red'],
 									]
 								], [
+									// non editable after injection
 									'type' => 'textarea',
 									'attributes' => [
 										'name' => $this->_lang->GET('risk.cause'),
@@ -368,7 +371,7 @@ class RISK extends API {
 							// disable non editable inputs and append hidden option
 							if ($risk['id']){
 								$last = count($response['render']['content']) - 1;
-								foreach ([4, 5, 6, 7] as $index){
+								foreach ([2, 3, 5] as $index){
 									if (isset($response['render']['content'][$last][$index]['content'])){
 										foreach ($response['render']['content'][$last][$index]['content'] as $key => $value){
 											$response['render']['content'][$last][$index]['content'][$key]['readonly'] = true;
@@ -499,6 +502,7 @@ class RISK extends API {
 									'value' => $risk['type'] ? : 'risk'
 								]
 							],[
+								// non editable after injection
 								'type' => 'text',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.process'),
@@ -521,8 +525,9 @@ class RISK extends API {
 								'content' => [
 									$this->_lang->GET('risk.relevance_yes') => $risk['relevance'] === 1 ? ['checked' => true, 'value' => 1] : ['value' => 1], 
 									$this->_lang->GET('risk.relevance_no') => $risk['relevance'] === 0 ? ['checked' => true, 'value' => '0', 'class' => 'red'] : ['value' => '0', 'class' => 'red'],
-							]
+								]
 							], [
+								// non editable after injection
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.cause'),
@@ -532,8 +537,7 @@ class RISK extends API {
 								],
 								'autocomplete' => isset($datalist['cause']) ? array_values($datalist['cause']) : null
 							], [
-								'type' => 'br'
-							], [
+								// non editable after injection
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.effect'),
@@ -542,8 +546,6 @@ class RISK extends API {
 									'data-loss' => 'prevent'
 								],
 								'autocomplete' => isset($datalist['effect']) ? array_values($datalist['effect']) : null
-							], [
-								'type' => 'br'
 							], [
 								'type' => 'select',
 								'attributes' => [
@@ -563,6 +565,7 @@ class RISK extends API {
 									'name' => $risk['probability'] * $risk['damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 								]
 							], [
+								// non editable after injection
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.measure'),
@@ -571,8 +574,6 @@ class RISK extends API {
 									'data-loss' => 'prevent'
 								],
 								'autocomplete' => isset($datalist['measure']) ? array_values($datalist['measure']) : null
-							], [
-								'type' => 'br'
 							], [
 								'type' => 'select',
 								'attributes' => [
@@ -592,6 +593,7 @@ class RISK extends API {
 									'name' => $risk['measure_probability'] * $risk['measure_damage'] > CONFIG['limits']['risk_acceptance_level'] ? $this->_lang->GET('risk.acceptance_level_above') : $this->_lang->GET('risk.acceptance_level_below')
 								]
 							], [
+								// non editable after injection
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.risk_benefit'),
@@ -601,8 +603,7 @@ class RISK extends API {
 								],
 								'autocomplete' => isset($datalist['risk_benefit']) ? array_values($datalist['risk_benefit']) : null
 							], [
-								'type' => 'br'
-							], [
+								// non editable after injection
 								'type' => 'textarea',
 								'attributes' => [
 									'name' => $this->_lang->GET('risk.measure_remainder'),
@@ -624,8 +625,7 @@ class RISK extends API {
 						// disable non editable inputs and append hidden option
 						if ($risk['id']){
 							$last = count($response['render']['content']) - 1;
-							foreach ([3, 5, 6, 8, 12, 13, 17] as $index){
-								var_dump($response['render']['content'][$last][$index]);
+							foreach ([2, 5, 6, 10, 14, 15] as $index){
 								if (isset($response['render']['content'][$last][$index]['content'])){
 									foreach ($response['render']['content'][$last][$index]['content'] as $key => $value){
 										$response['render']['content'][$last][$index]['content'][$key]['readonly'] = true;

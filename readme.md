@@ -44,7 +44,6 @@ Things are still in motion. Images may be outdated.
     * order
     * record
     * responsibility
-* risk review disabled/readonly elements on risks/characteritics
 
 ## Content
 * [Aims](#aims)
