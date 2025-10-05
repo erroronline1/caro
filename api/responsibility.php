@@ -228,7 +228,9 @@ class RESPONSIBILITY extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				$responsibility = [
+					':id' => intval($this->_requestedID),
 					':user_id' => $_SESSION['user']['id'],
 					':units' => [],
 					':assigned_users' => [],
@@ -286,69 +288,6 @@ class RESPONSIBILITY extends API {
 						'msg' => $this->_lang->GET('responsibility.save_error'),
 						'type' => 'error'
 					]]);
-				break;
-			case 'PUT':
-				$responsibility = [
-					':id' => intval($this->_requestedID),
-					':user_id' => $_SESSION['user']['id'],
-					':units' => [],
-					':assigned_users' => [],
-					':proxy_users' => [],
-					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_start'))),
-					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.applicability_end'))),
-					':responsibility' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.task')),
-					':description' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.context')),
-				];
-				// process selected units
-				if (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) {
-					foreach ( explode(' | ', UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('responsibility.units'))) as $unit){
-						$responsibility[':units'][] = array_search($unit, $this->_lang->_USER['units']);
-					}
-				}
-				$responsibility[':units'] = implode(',', $responsibility[':units']);
-
-				//user datalist
-				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-
-				// process assigned users
-				foreach ($this->_payload as $key => $value){
-					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.assigned')) || !$value) continue;
-					$responsibility[':assigned_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
-				}
-				if (!$responsibility[':assigned_users'] || !$responsibility[':span_start'] || !$responsibility[':span_end']) $this->response([], 406);
-				$responsibility[':assigned_users'] = UTILITY::json_encode($responsibility[':assigned_users']);
-
-				// process proxy users
-				foreach ($this->_payload as $key => $value){
-					if (!str_starts_with($key, $this->_lang->PROPERTY('responsibility.proxy')) || !$value) continue;
-					$responsibility[':proxy_users'][$users[array_search($value, array_column($users, 'name'))]['id']] = [];
-				}
-				$responsibility[':proxy_users'] = UTILITY::json_encode($responsibility[':proxy_users']);
-
-				// insert responsibility into database
-				if (SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_put', [
-					'values' => $responsibility
-				])) {
-					$responsibility[':assigned_users'] = json_decode($responsibility[':assigned_users'], true);
-					$responsibility[':proxy_users'] = json_decode($responsibility[':proxy_users'], true);
-					$recipients = array_map(fn($id) => $users[array_search($id, array_column($users, 'id'))]['name'], [...array_keys($responsibility[':assigned_users']), ...array_keys($responsibility[':proxy_users'])]);
-					$this->alertUserGroup(['user' => $recipients], str_replace('\n', ', ', $this->_lang->GET('responsibility.message', [
-						':user' => $_SESSION['user']['name'],
-						':task' => $responsibility[':responsibility'],
-						':link' => '<a href="javascript:void(0);" onclick="api.responsibility(\'get\', \'responsibilities\', \'null\', \'_my\')">' . $this->_lang->GET('responsibility.navigation.responsibility', [], true). '</a>',
-					], true)));
-					
-					$this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('responsibility.save_success'),
-						'type' => 'success'
-					]]);
-				} else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('responsibility.save_error'),
-						'type' => 'error'
-					]]);
-
 				break;
 			case 'GET':
 				$response = ['render' => ['form' => [

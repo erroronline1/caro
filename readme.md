@@ -43,7 +43,6 @@ Things are still in motion. Images may be outdated.
     * measure
     * order
     * record
-    * responsibility
 
 ## Content
 * [Aims](#aims)

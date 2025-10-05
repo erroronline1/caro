@@ -942,12 +942,14 @@ class SQLQUERY {
 
 
 		'user_responsibility_post' => [
-			'mysql' => "INSERT INTO caro_user_responsibility (id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) VALUES ( NULL, :user_id, :units, :assigned_users, :proxy_users, :span_start, :span_end, :responsibility, :description)",
-			'sqlsrv' => "INSERT INTO caro_user_responsibility (user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) VALUES ( :user_id, :units, :assigned_users, :proxy_users, CONVERT(DATE, :span_start, 23), CONVERT(DATE, :span_end, 23), :responsibility, :description)"
-		],
-		'user_responsibility_put' => [
-			'mysql' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start = :span_start, span_end = :span_end, responsibility = :responsibility, description = :description WHERE id = :id",
-			'sqlsrv' => "UPDATE  caro_user_responsibility SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start =  CONVERT(DATE, :span_start, 23),  span_end = CONVERT(DATE, :span_end, 23), responsibility = :responsibility, description = :description WHERE id = :id"
+			'mysql' => "INSERT INTO caro_user_responsibility (id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) " .
+						"VALUES (:id, :user_id, :units, :assigned_users, :proxy_users, :span_start, :span_end, :responsibility, :description) " .
+						"ON DUPLICATE KEY UPDATE user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start = :span_start, span_end = :span_end, responsibility = :responsibility, description = :description",
+			'sqlsrv' => "MERGE INTO caro_user_responsibility WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :user_id AS user_id, :units AS units, :assigned_users AS assigned_users, :proxy_users AS proxy_users, :span_start AS span_start, :span_end AS span_end, :responsibility AS responsibility, :description AS description) AS source " .
+						"(id, user_id, units, assigned_users, proxy_users, span_start, span_end, responsibility, description) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET user_id = :user_id, units = :units, assigned_users = :assigned_users, proxy_users = :proxy_users, span_start =  CONVERT(DATE, :span_start, 23),  span_end = CONVERT(DATE, :span_end, 23), responsibility = :responsibility, description = :description WHERE id = :id " .
+						"WHEN NOT MATCHED THEN INSERT (:user_id, :units, :assigned_users, :proxy_users, CONVERT(DATE, :span_start, 23), CONVERT(DATE, :span_end, 23), :responsibility, :description);",
 		],
 		'user_responsibility_accept' => [
 			'mysql' => "UPDATE caro_user_responsibility SET assigned_users = :assigned_users, proxy_users = :proxy_users WHERE id = :id",
