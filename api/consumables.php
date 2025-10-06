@@ -2032,24 +2032,42 @@ class CONSUMABLES extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
+				$vendor = [];
+				if ($this->_requestedID){
+					$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
+						'values' => [
+							':id' => $this->_requestedID
+						]
+					]);
+					$vendor = $vendor ? $vendor[0] : null;
+					if (!$vendor) $this->response(null, 406);
+				}
+
 				$vendor = [
-					'name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-					'info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
-					'pricelist' => ['validity' => '', 'filter' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'))],
-					'evaluation' => []
+					':id' => isset($vendor['id']) ? $vendor['id'] : null,
+					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
+					':info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
+					':pricelist' => isset($vendor['pricelist']) ? json_decode($vendor['pricelist'], true) : [],
+					':evaluation' => isset($vendor['evaluation']) ? json_decode($vendor['evaluation'], true) : []
 				];
+				$vendor[':pricelist']['filter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'));
+				$vendor[':pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['product']['mdr14_sample_interval'];
+				$vendor[':pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['product']['mdr14_sample_reusable'];
+				$vendor[':pricelist']['validity'] = '';
 				
+
 				// check forbidden names
-				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
+				if (UTILITY::forbiddenName($vendor[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor[':name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
-				if ($vendor['pricelist']['filter']){
-					if (!json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor[':pricelist']['filter']){
+					if (!json_decode($vendor[':pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
 					// prettify
 					else {
-						$vendor['pricelist']['filter'] = UTILITY::json_encode(json_decode($vendor['pricelist']['filter'], true), JSON_PRETTY_PRINT);
+						$vendor[':pricelist']['filter'] = UTILITY::json_encode(json_decode($vendor[':pricelist']['filter'], true), JSON_PRETTY_PRINT);
 					}
 				}
 
@@ -2058,6 +2076,37 @@ class CONSUMABLES extends API {
 				$oneYearFromNow->modify('+1 year');
 				$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
 				$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
+
+				// update pricelist
+				$pricelistImportError = '';
+				$pricelistImportResult = [];
+				if ($vendor[':id'] && isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name']) {
+					if (!$vendor[':pricelist']['filter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+
+					$files = [
+						'pricelist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name'][0],
+					];
+					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name']){
+						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name'][0];
+					}
+					$pricelistImportResult = $this->update_pricelist($files, $vendor[':pricelist']['filter'], $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.pricelist_erp_match_selected'));
+					$vendor[':pricelist']['validity'] = $pricelistImportResult[0];
+					if (!strlen($vendor[':pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
+					// unset pricelist files for later file processing after successful update
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]);
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]);
+				}
+
+				// tidy up consumable products database if inactive
+				if ($vendor[':id'] && $vendor[':hidden']){
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
+						'values' => [
+							':id' => $vendor[':id']
+							]
+					]);
+					unset ($vendor[':pricelist']['validity']);
+				}
+
 
 				// unset all backend defined payload variables leaving vendor evaluation inputs
 				foreach ([...array_values($vendor_info),
@@ -2095,7 +2144,7 @@ class CONSUMABLES extends API {
 				if ($missing = $document->unmatchedrequired($evaluationdocument, $evaluation)) {
 					$this->response([
 						'response' => [
-							'id' => $vendor['id'],
+							'id' => $vendor[':id'],
 							'msg' => $this->_lang->GET('general.missing_form_data') . "\n". implode("\n- ", $missing),
 							'type' => 'error'
 						]]);
@@ -2103,29 +2152,28 @@ class CONSUMABLES extends API {
 				if ($evaluation){
 					$evaluation['_author'] = $_SESSION['user']['name'];
 					$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
-					$vendor['evaluation'][] = $evaluation;
+					$vendor[':evaluation'][] = $evaluation;
 				}
-				else $vendor['evaluation'] = null;
+				else $vendor[':evaluation'] = null;
 
 				// tidy up unused properties
-				foreach ($vendor['info'] as $key => $value){
-					if (!$value) unset($vendor['info'][$key]);
+				foreach ($vendor[':info'] as $key => $value){
+					if (!$value) unset($vendor[':info'][$key]);
 				}
-				foreach ($vendor['pricelist'] as $key => $value){
-					if (!$value) unset($vendor['pricelist'][$key]);
+				foreach ($vendor[':pricelist'] as $key => $value){
+					if (!$value) unset($vendor[':pricelist'][$key]);
 				}
+
+				$vendor[':info'] = $vendor[':info'] ? UTILITY::json_encode($vendor[':info']) : null;
+				$vendor[':pricelist'] = $vendor[':pricelist'] ? UTILITY::json_encode($vendor[':pricelist']) : null;
+				$vendor[':evaluation'] = $vendor[':evaluation'] ? UTILITY::json_encode($vendor[':evaluation']) : null;
 
 				// save vendor to database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_vendor', [
-					'values' => [
-						':name' => $vendor['name'],
-						':hidden' => $vendor['hidden'],
-						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
-						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
-						':evaluation' => $vendor['evaluation'] ? UTILITY::json_encode($vendor['evaluation']) : null
-					]
+					'values' => $vendor
 				])) {
-					$vendor['id'] = $this->_pdo->lastInsertId();
+					// file handling only after successful insertion/update especially for evaluation document files
+					$vendor[':id'] = $vendor[':id'] ? : $this->_pdo->lastInsertId();
 
 					// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
 					$filenamewarning = [];
@@ -2143,207 +2191,29 @@ class CONSUMABLES extends API {
 
 					// save documents after creating database entry providing id
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
+						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':id' => $vendor[':id']]), [$vendor[':name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
 						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
 					}
 					// remaining files are possibly from evaluation
 					if ($_FILES) {
 						foreach ($_FILES as $input => $files){
-							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
+							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':id' => $vendor[':id']]), [$vendor[':name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
 						}
 					}
 
 					$this->response([
 					'response' => [
-						'id' => $vendor['id'],
-						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.vendor.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
+						'id' => $vendor[':id'],
+						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor[':name']]) .
+							$pricelistImportError .
+							(isset($pricelistImportResult[1]) ? " \n \n" . implode(" \n", $pricelistImportResult[1]) : '') .
+							($filenamewarning ? ' ' . $this->_lang->GET('consumables.vendor.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'info'
 					]]);
 				}
 				else $this->response([
 					'response' => [
 						'id' => false,
-						'name' => $this->_lang->GET('consumables.vendor.not_saved'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
-				if (!PERMISSION::permissionFor('vendors')) $this->response([], 401);
-				// prepare vendor-array to update, return error if not found
-				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
-					'values' => [
-						':id' => $this->_requestedID
-					]
-				]);
-				$vendor = $vendor ? $vendor[0] : null;
-				if (!$vendor) $this->response(null, 406);
-
-				// update vendor data
-				$vendor['hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null;
-				$vendor['name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name'));
-				$vendor['info'] = array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : '', $vendor_info);
-				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
-				$vendor['pricelist']['filter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'));
-				$vendor['pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['product']['mdr14_sample_interval'];
-				$vendor['pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['product']['mdr14_sample_reusable'];
-
-				// check forbidden names
-				if (UTILITY::forbiddenName($vendor['name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor['name']]), 'type' => 'error']]);
-
-				// ensure valid json for filters
-				if ($vendor['pricelist']['filter']){
-					if (!json_decode($vendor['pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
-					// prettify
-					else {
-						$vendor['pricelist']['filter'] = UTILITY::json_encode(json_decode($vendor['pricelist']['filter'], true), JSON_PRETTY_PRINT);
-					}
-				}
-
-				// set expiry date for provided files before unsetting the payload property 
-				$oneYearFromNow = clone $this->_date['servertime'];
-				$oneYearFromNow->modify('+1 year');
-				$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
-				$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
-
-				// update pricelist
-				$pricelistImportError = '';
-				$pricelistImportResult = [];
-				if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name']) {
-					if (!$vendor['pricelist']['filter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
-
-					$files = [
-						'pricelist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name'][0],
-					];
-					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name']){
-						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name'][0];
-					}
-					$pricelistImportResult = $this->update_pricelist($files, $vendor['pricelist']['filter'], $vendor['id'], $this->_lang->PROPERTY('erpquery.integrations.pricelist_erp_match_selected'));
-					$vendor['pricelist']['validity'] = $pricelistImportResult[0];
-					if (!strlen($vendor['pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
-					// unset pricelist files for later file processing after successful update
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]);
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]);
-				}
-
-				// tidy up consumable products database if inactive
-				if ($vendor['hidden']){
-					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
-						'values' => [
-							':id' => $vendor['id']
-							]
-					]);
-					unset ($vendor['pricelist']['validity']);
-				}
-
-				// unset all backend defined payload variables leaving vendor evaluation inputs
-				foreach ([...array_values($vendor_info),
-					'consumables.vendor.edit_existing_vendors',
-					'consumables.vendor.edit_existing_vendors_search',
-					'consumables.vendor.name',
-					'consumables.vendor.availability',
-					'consumables.vendor.available',
-					'consumables.vendor.documents_update',
-					'consumables.vendor.documents_validity',
-					'consumables.vendor.pricelist_filter',
-					'consumables.vendor.message_vendor_select_special_attention_products',
-					'consumables.vendor.samplecheck_interval',
-					'consumables.vendor.samplecheck_interval_reusable',
-					'consumables.vendor.message_vendor_select_special_attention_products',
-					'erpquery.integrations.pricelist_erp_match',
-					'erpquery.integrations.pricelist_erp_match_selected',
-				] as $var) {
-					unset($this->_payload->{$this->_lang->PROPERTY($var)});
-				}
-
-				// create proper evaluation data
-				// unset checkboxes while relying on a prepared additional dataset
-				// unset empty values
-				$evaluation = [];
-				foreach ($this->_payload as $key => &$value){
-					if (gettype($value) === 'array') $value = trim(implode(' ', $value));
-					/////////////////////////////////////////
-					// BEHOLD! unsetting value==on relies on a prepared formdata/_payload having a dataset containing all selected checkboxes
-					////////////////////////////////////////
-					if (!$value || $value === 'on' || $value === '...') unset($this->_payload->$key);
-					else $evaluation[$key] = $value;
-				}
-				// check if any required fields have been left out, else construct evaluation data
-				if ($missing = $document->unmatchedrequired($evaluationdocument, $evaluation)) {
-					$this->response([
-						'response' => [
-							'id' => $vendor['id'],
-							'msg' => $this->_lang->GET('general.missing_form_data') . "\n". implode("\n- ", $missing),
-							'type' => 'error'
-						]]);
-				}
-				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];
-				// get latest evaluation to compare if any novel entries have been made, append in this case 
-				$latest_vendor_evaluation = isset($vendor['evaluation'][count($vendor['evaluation']) - 1]) ? $vendor['evaluation'][count($vendor['evaluation']) - 1] : null;
-				if ($latest_vendor_evaluation) unset($latest_vendor_evaluation['_author'], $latest_vendor_evaluation['_date']);
-				if ($latest_vendor_evaluation != $evaluation) {
-					if ($evaluation){
-						$evaluation['_author'] = $_SESSION['user']['name'];
-						$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
-						$vendor['evaluation'][] = $evaluation;
-					}
-				}
-			
-				// tidy up unused properties
-				foreach ($vendor['info'] as $key => $value){
-					if (!$value) unset($vendor['info'][$key]);
-				}
-				foreach ($vendor['pricelist'] as $key => $value){
-					if (!$value) unset($vendor['pricelist'][$key]);
-				}
-
-				// update vendor
-				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_vendor', [
-					'values' => [
-						':id' => $vendor['id'],
-						':hidden' => $vendor['hidden'],
-						':name' => $vendor['name'],
-						':info' => $vendor['info'] ? UTILITY::json_encode($vendor['info']) : null,
-						':pricelist' => $vendor['pricelist'] ? UTILITY::json_encode($vendor['pricelist']) : null,
-						':evaluation' => $vendor['evaluation'] ? UTILITY::json_encode($vendor['evaluation']) : null
-					]
-				]) !== false) {
-					// file handling only after successful update especially for evaluation document files
-
-					// check whether filename is allowed or does match the automated filename convention resulting in unsetting from $_FILE and warn on storage success
-					$filenamewarning = [];
-					foreach($_FILES as $input => $files){
-						foreach($files['name'] as $index => $file){
-							preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)$/', $file, $fileNameComponents);
-							if ($fileNameComponents){
-								$filenamewarning[] = $file;
-								foreach(array_keys($_FILES[$input]) as $property){
-									unset($_FILES[$input][$property][$index]);
-								}
-							}
-						}
-					}
-
-					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]['tmp_name']) {
-						UTILITY::storeUploadedFiles([$this->_lang->PROPERTY('consumables.vendor.documents_update')], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
-						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.documents_update')]);
-					}
-					// remaining files are possibly from evaluation
-					if ($_FILES) {
-						foreach ($_FILES as $input => $files){
-							UTILITY::storeUploadedFiles([$input], UTILITY::directory('vendor_documents', [':id' => $vendor['id']]), [$vendor['name'] . '_' . $this->_date['servertime']->format('Ymd') . '-' . $expiry]);
-						}
-					}
-
-					$this->response([
-					'response' => [
-						'id' => $vendor['id'],
-						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor['name']]) . $pricelistImportError . (isset($pricelistImportResult[1]) ? " \n \n" . implode(" \n", $pricelistImportResult[1]) : '') . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.vendor.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
-						'type' => 'info'
-					]]);
-				}
-				else $this->response([
-					'response' => [
-						'id' => $vendor['id'],
 						'name' => $this->_lang->GET('consumables.vendor.not_saved'),
 						'type' => 'error'
 					]]);

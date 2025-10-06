@@ -1298,7 +1298,7 @@ class INSTALL {
 	}
 
 	/**
-	 * installs vendors by novel name
+	 * installs users by novel name
 	 */
 	public function installUsers(){
 		$json = $this->importJSON('../templates/', 'users');
@@ -1418,6 +1418,7 @@ class INSTALL {
 				}
 
 				$insertions[] = [
+					':id' => null,
 					':name' => $entry['name'],
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
 					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode($entry['pricelist']) : null,

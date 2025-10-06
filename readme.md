@@ -34,7 +34,6 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
-* SEARCH filter out queries with huge results eg **** or ????
 * refactor redundant post/put
     * notification (adapt sql queries)
     * calendar, _calendar, stresstest

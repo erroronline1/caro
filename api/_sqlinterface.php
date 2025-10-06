@@ -430,12 +430,14 @@ class SQLQUERY {
 
 
 		'consumables_post_vendor' => [
-			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, pricelist, evaluation) VALUES ( NULL, :hidden, :name, :info, :pricelist, :evaluation)",
-			'sqlsrv' => "INSERT INTO caro_consumables_vendors (hidden, name, info, pricelist, evaluation) VALUES ( :hidden, :name, :info, :pricelist, :evaluation)"
-		],
-		'consumables_put_vendor' => [
-			'mysql' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_vendors SET hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation WHERE id = :id"
+			'mysql' => "INSERT INTO caro_consumables_vendors (id, `hidden`, name, info, pricelist, evaluation) " .
+						"VALUES (:id, :hidden, :name, :info, :pricelist, :evaluation) " .
+						"ON DUPLICATE KEY UPDATE `hidden` = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation",
+			'sqlsrv' => "MERGE INTO caro_consumables_vendors WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :hidden AS hidden, :name AS name, :info AS info, :pricelist AS pricelist, :evaluation AS evaluation) AS source " .
+						"(id, hidden, name, info, pricelist, evaluation) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation " .
+						"WHEN NOT MATCHED THEN INSERT (hidden, name, info, pricelist, evaluation) VALUES (:hidden, :name, :info, :pricelist, :evaluation);"
 		],
 		'consumables_get_vendor_datalist' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",
@@ -449,7 +451,7 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)"
 		],
-		// ??? verify ??? on duplicate key update / merging does not make sense for products, for queries are dis- and reassembled for improved performance
+		// on duplicate key update / merging does not make sense for products, for queries are dis- and reassembled for improved performance
 		'consumables_post_product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)",
 			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)"
