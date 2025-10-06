@@ -690,7 +690,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 */
 	public function customercases($request = null){
 		$query = <<<'END'
-		SELECT TOP(1000)
+		SELECT
 			vorgang.REFERENZ,
 			vorgang.LEISTUNG,
 			CONVERT(varchar(255), vorgang.KV_DATUM, 104) AS KV_DATUM,
@@ -765,7 +765,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		 * array keys according to record document field names, drop or append reasonable options, e.g. multilanguage if applicable
 		 */
 		$query = <<<'END'
-		SELECT TOP(1000)
+		SELECT 
 			pat.*,
 			KOSTENTRAEGER.NAME_1 AS KOSTENTRAEGER_NAME,
 			EMAIL.EMAIL,

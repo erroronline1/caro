@@ -26,14 +26,15 @@ Things are still in motion. Images may be outdated.
 * post-market evaluation
 * complaint and rejection analyses (number, costs, causes, e.g. for vendor evaluation)
     * devops folder with prepared sheets?
+* https://github.com/thiagoalessio/tesseract-ocr-for-php
 
 ## to do
 * unittests
 * templates
 * erp_interface, additional usecases?
-* https://github.com/thiagoalessio/tesseract-ocr-for-php
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
+* SEARCH filter out queries with huge results eg **** or ????
 * refactor redundant post/put
     * notification (adapt sql queries)
     * calendar, _calendar, stresstest
