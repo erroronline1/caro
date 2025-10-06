@@ -1401,7 +1401,9 @@ class SEARCH{
 			
 			// filter terms resulting in unnecessary huge result lists
 			if (in_array($term, ['+', '-'])) continue; // most probably a typo 
-			if (strlen($term) < 2 && $term !== '%' && !$column) continue; // still allows explicit int(bool) and general system searches
+			if ((strlen($term) < 2 && $term !== '%' && !$column) // still allows explicit int(bool) and general system searches
+				|| preg_match('/^[*?]*$/m', $term) // drop term with only asterisk and question mark wildcards
+				) continue;
 
 			$result[] = [
 				'operator' => $expression[1] ? : null,
@@ -1469,6 +1471,9 @@ class SEARCH{
 			unset($expressions[$index]); // avoid double term filtering
 		}
 
+		// remove duplicates, for whatever reason they might exist
+		$results = array_unique($results, SORT_REGULAR);
+
 		// unset rows not matching the column condition some_result_column:hasvalue or -some_result_column:hasvalue
 		// also if column is not found!
 		foreach($columns as $column){
@@ -1477,7 +1482,7 @@ class SEARCH{
 					unset($results[$r_index]);
 					continue;
 				}
-				preg_match('/.*' . $column['pregterm']. '.*/imu', $row[$column['column']], $match);
+				preg_match('/' . $column['pregterm']. '/imu', $row[$column['column']], $match);
 				if (($match && $column['operator'] === '-') || (!$match && $column['operator'] !== '-')) unset($results[$r_index]);
 			}
 		}
