@@ -1431,7 +1431,7 @@ class SEARCH{
 		$any = $mandatory = false;
 		foreach ($expressions as $expression){
 			foreach($terms as $term){
-				preg_match('/' . $expression['pregterm'] . '/i', $term ? : '', $matches);
+				preg_match('/' . $expression['pregterm'] . '/iu', $term ? : '', $matches);
 				if ($expression['operator'] === '-' && $matches) return false; // this term should not have been included
 				elseif ($expression['operator'] === '+' && $matches) $mandatory = true; // this term must have been included
 				elseif ($matches) $any = true;
@@ -1477,7 +1477,7 @@ class SEARCH{
 					unset($results[$r_index]);
 					continue;
 				}
-				preg_match('/.*' . $column['pregterm']. '.*/im', $row[$column['column']], $match);
+				preg_match('/.*' . $column['pregterm']. '.*/imu', $row[$column['column']], $match);
 				if (($match && $column['operator'] === '-') || (!$match && $column['operator'] !== '-')) unset($results[$r_index]);
 			}
 		}
@@ -1488,14 +1488,14 @@ class SEARCH{
 			foreach($expressions as $expression){
 				foreach($weighted as $column) {
 					if (!isset($a[$column])) continue;
-					if (preg_match('/' . $expression['pregterm'] . '/im', $a[$column] ? : '', $matches)) {
+					if (preg_match('/' . $expression['pregterm'] . '/imu', $a[$column] ? : '', $matches)) {
 						$a_matches++;
 						break;
 					}
 				}
 				foreach($weighted as $column) {
 					if (!isset($b[$column])) continue;
-					if (preg_match('/' . $expression['pregterm'] . '/im', $b[$column] ? : '', $matches)) {
+					if (preg_match('/' . $expression['pregterm'] . '/imu', $b[$column] ? : '', $matches)) {
 						$b_matches++;
 						break;
 					}
