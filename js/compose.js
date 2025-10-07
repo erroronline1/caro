@@ -398,7 +398,6 @@ export class Composer {
 						if (node.id in this.newDocumentComponents) {
 							if (this.newDocumentComponents[node.id].attributes != undefined) delete this.newDocumentComponents[node.id].attributes["placeholder"];
 							content.push(this.newDocumentComponents[node.id]);
-							if (!["text", "links", "image"].includes(this.newDocumentComponents[node.id].type)) isForm = true;
 						}
 					}
 				}
@@ -412,8 +411,6 @@ export class Composer {
 			hidden: hidden,
 			approve: approve,
 		};
-		// append form if applicable, aka available inputs
-		if (isForm) answer.form = {};
 		if (raw_import || (name && componentContent)) return answer;
 		new Toast(api._lang.GET("assemble.compose.component.not_saved_missing"), "error");
 		return null;
