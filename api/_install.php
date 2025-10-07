@@ -1068,12 +1068,15 @@ class INSTALL {
 
 			$name_context[] = $entry['name'] . '_' . $entry['context'];
 			$insertions[] = [
+				':id' => null,
 				':name' => $entry['name'],
 				':alias' => isset($entry['alias']) ? $entry['alias'] : '',
 				':context' => $entry['context'],
 				':unit' => $entry['unit'],
 				':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
 				':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
+				':hidden' => null,
+				':approval' => null,
 				':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $entry['regulatory_context'] : '',
 				':permitted_export' => isset($entry['permitted_export']) && $entry['permitted_export'] ? $entry['permitted_export'] : null,
 				':restricted_access' => isset($entry['restricted_access']) && $entry['restricted_access'] ? $entry['restricted_access'] : null,
