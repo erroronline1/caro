@@ -699,7 +699,6 @@ class DOCUMENT extends API {
 				unset($component['hidden']);
 				$component_approve = array_search($component['approve'], $this->_lang->_USER['units']);
 				unset($component['approve']);
-				unset($component['form']);
 
 				/**
 				 * uploads files and populates component image widgets with the final path and file name
@@ -1520,6 +1519,8 @@ class DOCUMENT extends API {
 					}
 				}
 				
+				$this->_payload->approve = array_search($this->_payload->approve, $this->_lang->_USER['units']);
+
 				$document = [
 					':id' => null,
 					':name' => $this->_payload->name,
@@ -1544,8 +1545,6 @@ class DOCUMENT extends API {
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
 				$approved = PERMISSION::fullyapproved('documentapproval', $exists['approval']);
-
-				$this->_payload->approve = array_search($this->_payload->approve, $this->_lang->_USER['units']);
 
 				if (isset($exists['id'])){ 
 					if (!$approved) {
