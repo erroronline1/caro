@@ -340,6 +340,8 @@ class SQLQUERY {
 			'mysql' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))",
 			'sqlsrv' => "SELECT id FROM caro_user WHERE (units LIKE :group OR units LIKE CONCAT(:group, ',%') OR units LIKE CONCAT('%,', :group, ',%') OR units LIKE CONCAT('%,', :group))"
 		],
+
+
 		'application_post_manual' => [
 			'mysql' => "INSERT INTO caro_manual (id, title, content, permissions) " .
 						"VALUES (:id, :title, :content, :permissions) " .
@@ -362,6 +364,8 @@ class SQLQUERY {
 			'mysql' => "DELETE FROM caro_manual WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_manual WHERE id = :id"
 		],
+
+
 		'application_post_session' => [
 			'mysql' => "INSERT IGNORE INTO caro_sessions (id, user_id, date) VALUES (:id, :user_id, CURRENT_TIMESTAMP)",
 			'sqlsrv' => "MERGE INTO caro_sessions WITH (HOLDLOCK) AS target USING " .
@@ -387,21 +391,24 @@ class SQLQUERY {
 		],
 
 
+
 		'calendar_post' => [
-			'mysql' => "INSERT INTO caro_calendar (id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) VALUES (NULL, :type, :span_start, :span_end, :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert, :autodelete)",
-			'sqlsrv' => "INSERT INTO caro_calendar (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) VALUES (:type, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert, :autodelete)",
-		],
-		'calendar_put' => [
-			'mysql' => "UPDATE caro_calendar SET span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert, autodelete = :autodelete WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_calendar SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert, autodelete = :autodelete WHERE id = :id",
-		],
-		'calendar_get_by_id' => [
-			'mysql' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
-			'sqlsrv' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
+			'mysql' => "INSERT INTO caro_calendar (id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) " .
+						"VALUES (:id, :type, :span_start, :span_end, :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert, :autodelete) " .
+						"ON DUPLICATE KEY UPDATE span_start = :span_start, span_end = :span_end, author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert, autodelete = :autodelete",
+			'sqlsrv' => "MERGE INTO caro_calendar WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :type AS type, :span_start AS span_start, :span_end AS span_end, :author_id AS author_id, :affected_user_id AS affected_user_id, :organizational_unit AS organizational_unit, :subject AS subject, :misc AS misc, :closed AS closed, :alert AS alert, :autodelete AS autodelete) AS source " .
+						"(id, type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET span_start = CONVERT(SMALLDATETIME, :span_start, 120), span_end = CONVERT(SMALLDATETIME, :span_end, 120), author_id = :author_id, affected_user_id = :affected_user_id, organizational_unit = :organizational_unit, subject = :subject, misc = :misc, closed = :closed, alert = :alert, autodelete = :autodelete " .
+						"WHEN NOT MATCHED THEN INSERT (type, span_start, span_end, author_id, affected_user_id, organizational_unit, subject, misc, closed, alert, autodelete) VALUES (:type, CONVERT(SMALLDATETIME, :span_start, 120), CONVERT(SMALLDATETIME, :span_end, 120), :author_id, :affected_user_id, :organizational_unit, :subject, :misc, :closed, :alert, :autodelete);"
 		],
 		'calendar_complete' => [
 			'mysql' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_calendar SET closed = :closed WHERE id = :id",
+		],
+		'calendar_get_by_id' => [
+			'mysql' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
+			'sqlsrv' => "SELECT * FROM caro_calendar WHERE id IN (:id)",
 		],
 		'calendar_get_day' => [
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE :date BETWEEN DATE_FORMAT(caro_calendar.span_start, '%Y-%m-%d') AND DATE_FORMAT(caro_calendar.span_end, '%Y-%m-%d') ORDER BY caro_calendar.span_end ASC",
@@ -419,14 +426,15 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE (caro_calendar.subject LIKE :SEARCH) OR (c_u2.name LIKE :SEARCH) ORDER BY caro_calendar.span_end ASC",
 			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE (caro_calendar.subject LIKE :SEARCH) OR (c_u2.name LIKE :SEARCH) ORDER BY caro_calendar.span_end ASC",
 		],
-		'calendar_delete' => [
-			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
-			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
-		],
 		'calendar_alert' => [
 			'mysql' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP",
 			'sqlsrv' => "SELECT caro_calendar.*, c_u1.name AS author, c_u2.name AS affected_user, c_u2.units AS affected_user_units FROM caro_calendar LEFT JOIN caro_user AS c_u1 ON caro_calendar.author_id = c_u1.id LEFT JOIN caro_user AS c_u2 ON caro_calendar.affected_user_id = c_u2.id WHERE caro_calendar.alert = 1 AND caro_calendar.subject != '' AND caro_calendar.span_start <= CURRENT_TIMESTAMP; UPDATE caro_calendar SET alert = 0 WHERE alert = 1 AND span_start <= CURRENT_TIMESTAMP",
 		],
+		'calendar_delete' => [
+			'mysql' => "DELETE FROM caro_calendar WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_calendar WHERE id = :id",
+		],
+
 
 
 		'consumables_post_vendor' => [
@@ -451,7 +459,10 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_vendors WHERE (name LIKE :SEARCH)"
 		],
+
+
 		// on duplicate key update / merging does not make sense for products, for queries are dis- and reassembled for improved performance
+		// also micro-updates
 		'consumables_post_product' => [
 			'mysql' => "INSERT INTO caro_consumables_products (id, vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (NULL, :vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)",
 			'sqlsrv' => "INSERT INTO caro_consumables_products (vendor_id, article_no, article_name, article_alias, article_unit, article_ean, article_info, hidden, has_files, trading_good, checked, sample_checks, incorporated, has_expiry_date, special_attention, last_order, stock_item, erp_id, document_reminder) VALUES (:vendor_id, :article_no, :article_name, :article_alias, :article_unit, :article_ean, :article_info, :hidden, :has_files, :trading_good, NULL, NULL, :incorporated, :has_expiry_date, :special_attention, NULL, :stock_item, :erp_id, NULL)"
@@ -632,7 +643,8 @@ class SQLQUERY {
 		],
 
 
-		// on duplicate key update / merging does not make sense for measures for put and post are processed different
+
+		// on duplicate key update / merging does not make sense for measures, for put and post are processed different
 		'measure_post' => [
 			'mysql' => "INSERT INTO caro_measures (id, timestamp, content, user_id, votes, measures, last_user, last_touch, closed) VALUES (NULL, CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL, NULL, NULL)",
 			'sqlsrv' => "INSERT INTO caro_measures (timestamp, content, user_id, votes, measures, last_user, last_touch, closed) VALUES (CURRENT_TIMESTAMP, :content, :user_id, NULL, NULL, NULL, NULL, NULL)"
@@ -659,18 +671,7 @@ class SQLQUERY {
 		],
 
 
-		'message_get_unnotified' => [
-			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0",
-			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0"
-		],
-		'message_put_notified' => [
-			'mysql' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user",
-			'sqlsrv' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user"
-		],		
-		'message_get_unseen' => [
-			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
-			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
-		],
+
 		'message_post_message' => [
 			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :from_user, :to_user, :from_user, :message, CURRENT_TIMESTAMP, 1, 1), (NULL, :to_user, :from_user, :from_user, :message, CURRENT_TIMESTAMP, 0, 0)",
 			'sqlsrv' => "INSERT INTO caro_messages (user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (:from_user, :to_user, :from_user, :message, CURRENT_TIMESTAMP, 1, 1), (:to_user, :from_user, :from_user, :message, CURRENT_TIMESTAMP, 0, 0)"
@@ -678,6 +679,18 @@ class SQLQUERY {
 		'message_post_system_message' => [
 			'mysql' => "INSERT INTO caro_messages (id, user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (NULL, :to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)",
 			'sqlsrv' => "INSERT INTO caro_messages (user_id, conversation_user, sender, message, timestamp, notified, seen) VALUES (:to_user, 1, 1, :message, CURRENT_TIMESTAMP, 0, 0)"
+		],
+		'message_put_notified' => [
+			'mysql' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user",
+			'sqlsrv' => "UPDATE caro_messages SET notified = 1 WHERE user_id = :user"
+		],		
+		'message_get_unnotified' => [
+			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0",
+			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND notified = 0"
+		],
+		'message_get_unseen' => [
+			'mysql' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0",
+			'sqlsrv' => "SELECT COUNT(id) as number FROM caro_messages WHERE user_id = :user AND seen = 0"
 		],
 		'message_get_conversations' => [
 			'mysql' => "SELECT caro_messages.*, caro_user.name as conversation_user_name, caro_user.image FROM caro_messages LEFT JOIN caro_user ON caro_messages.conversation_user = caro_user.id WHERE caro_messages.user_id = :user AND caro_messages.id IN (SELECT MAX(caro_messages.id) FROM caro_messages WHERE caro_messages.user_id = :user GROUP BY caro_messages.conversation_user) ORDER BY caro_messages.timestamp DESC",
@@ -743,6 +756,10 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET order_data = :order_data, ordered = NULL, partially_received = NULL, received = NULL, partially_delivered = NULL, delivered = NULL, archived = NULL, ordertype = 'cancellation' WHERE id = :id"
 		],
+		'order_notified' => [
+			'mysql' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id",
+			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id"
+		],
 		'order_get_approved_order_by_ids' => [
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE id IN (:ids)"
@@ -758,10 +775,6 @@ class SQLQUERY {
 		'order_get_appoved_oldest_approval' =>[
 			'mysql' => "SELECT approved FROM caro_consumables_approved_orders ORDER BY approved ASC LIMIT 1",
 			'sqlsrv' => "SELECT TOP(1) approved FROM caro_consumables_approved_orders ORDER BY approved ASC"
-		],
-		'order_delete_approved_order' => [
-			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id",
-			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
 		'order_get_approved_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE (organizational_unit IN (:organizational_unit) OR order_data LIKE 'orderer\":\":user') AND (order_data LIKE :SEARCH)",
@@ -779,10 +792,11 @@ class SQLQUERY {
 			'mysql' => "SELECT * FROM caro_consumables_approved_orders WHERE archived IS NOT NULL",
 			'sqlsrv' => "SELECT * FROM caro_consumables_approved_orders WHERE archived IS NOT NULL",
 		],
-		'order_notified' => [
-			'mysql' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_consumables_approved_orders SET notified_received = :notified_received, notified_delivered = :notified_delivered WHERE id = :id"
+		'order_delete_approved_order' => [
+			'mysql' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id",
+			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE id = :id"
 		],
+
 
 
 		// kudos https://stackoverflow.com/a/30660857/6087758
@@ -822,6 +836,14 @@ class SQLQUERY {
 						"WHEN MATCHED THEN UPDATE SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note " .
 						"WHEN NOT MATCHED THEN INSERT (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL);"
 		],
+		'records_close' => [
+			'mysql' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier",
+			'sqlsrv' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier"
+		],
+		'records_notified' => [
+			'mysql' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier",
+			'sqlsrv' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier"
+		],
 		'records_get_all' => [
 			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id",
 			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id"
@@ -834,22 +856,15 @@ class SQLQUERY {
 			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE caro_records.identifier = :identifier",
 			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE caro_records.identifier = :identifier"
 		],
-		'records_close' => [
-			'mysql' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier",
-			'sqlsrv' => "UPDATE caro_records SET closed = :closed WHERE identifier = :identifier"
-		],
-		'records_notified' => [
-			'mysql' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier",
-			'sqlsrv' => "UPDATE caro_records SET notified = :notified WHERE identifier = :identifier"
+		'records_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
+			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search",
+			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search"
 		],
 		'records_delete' => [
 			'mysql' => "DELETE FROM caro_records WHERE id = :id",
 			'sqlsrv' => "DELETE FROM caro_records WHERE id = :id"
 		],
-		'records_search' => [ // :SEARCH is a reserved keyword for application of self::SEARCH()
-			'mysql' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search",
-			'sqlsrv' => "SELECT caro_records.*, caro_user.units FROM caro_records LEFT JOIN caro_user ON caro_records.last_user = caro_user.id WHERE (caro_records.identifier LIKE :SEARCH) OR (caro_records.note LIKE :SEARCH) OR caro_records.content LIKE :search OR caro_records.erp_case_number LIKE :search"
-		],
+
 
 
 		// on duplicate key update / merging does not make sense for datalists, for comparison does not occur based on key but rather other column values

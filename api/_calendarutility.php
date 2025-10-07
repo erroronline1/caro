@@ -694,6 +694,7 @@ class CALENDARUTILITY {
 	 *  |_|
 	 * @param array $columns
 	 * 	[
+	 * 	':id' => int | null,
 	 * 	':type' => string,
 	 * 	':span_start' => string Y-m-d H:i:s,
 	 * 	':span_end' => string Y-m-h H:i:s,
@@ -711,39 +712,10 @@ class CALENDARUTILITY {
 	public function post($columns = []){
 		if (SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 			'values' => $columns
-		])) return $this->_pdo->lastInsertId();
+		])) return isset($columns[':id']) ? $columns[':id'] : $this->_pdo->lastInsertId();
 		return false;
 	}
 	
-	/**
-	 *           _
-	 *   ___ _ _| |_
-	 *  | . | | |  _|
-	 *  |  _|___|_|
-	 *  |_|
-	 * @param array $columns
-	 * 	[
-	 * 	':id' => int
-	 * 	type isn't supposed to change
-	 * 	':span_start' => string Y-m-d H:i:s,
-	 * 	':span_end' => string Y-m-h H:i:s,
-	 * 	':author_id' => int,
-	 * 	':affected_user_id' => int | null,
-	 * 	':organizational_unit' => str | null,
-	 * 	':subject' => str | null,
-	 * 	':misc' => str (e.g. UTILITY::json_encoded whatnot) | null,
-	 * 	':closed' => str (e.g. UTILITY::json_encoded when, by whom) | null,
-	 * 	':alert' => int 1 | null,
-	 * 	':autodelete' => int 1 | null
-	 * 	]
-	 * @return int affected rows
-	 */
-	public function put($columns = []){
-		return SQLQUERY::EXECUTE($this->_pdo, 'calendar_put', [
-			'values' => $columns
-		]);
-	}
-
 	/**
 	 *                 _
 	 *   ___ ___ ___ _| |___ ___

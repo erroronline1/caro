@@ -550,6 +550,7 @@ class NOTIFICATION extends API {
 									}
 									if (!$open){
 										$calendar->post([
+											':id' => null,
 											':type' => 'tasks',
 											':span_start' => $today->format('Y-m-d H:i:s'),
 											':span_end' => $today->format('Y-m-d H:i:s'),
@@ -599,6 +600,7 @@ class NOTIFICATION extends API {
 										}
 										if (!$open){
 											$calendar->post([
+												':id' => null,
 												':type' => 'tasks',
 												':span_start' => $today->format('Y-m-d H:i:s'),
 												':span_end' => $today->format('Y-m-d H:i:s'),
@@ -640,6 +642,7 @@ class NOTIFICATION extends API {
 										}
 										if (!$open){
 											$calendar->post([
+												':id' => null,
 												':type' => 'tasks',
 												':span_start' => $today->format('Y-m-d H:i:s'),
 												':span_end' => $today->format('Y-m-d H:i:s'),
@@ -671,6 +674,7 @@ class NOTIFICATION extends API {
 									}
 									if (!$open){
 										$calendar->post([
+											':id' => null,
 											':type' => 'tasks',
 											':span_start' => $today->format('Y-m-d H:i:s'),
 											':span_end' => $today->format('Y-m-d H:i:s'),
@@ -714,7 +718,8 @@ class NOTIFICATION extends API {
 											if (!$reminder['closed']) $open = true;
 										}
 										if (!$open){
-												$calendar->post([
+											$calendar->post([
+												':id' => null,
 												':type' => 'tasks',
 												':span_start' => $today->format('Y-m-d H:i:s'),
 												':span_end' => $today->format('Y-m-d H:i:s'),

@@ -108,6 +108,7 @@ class STRESSTEST extends INSTALL{
 			if (!($i % intval($this->_calendarentries/12/30))) $this->_currentdate->modify('+1 day');
 			SQLQUERY::EXECUTE($this->_pdo, 'calendar_post', [
 				'values' => [
+					':id' => null,
 					':type' => 'tasks',
 					':span_start' => $this->_currentdate->format('Y-m-d H:i:s'),
 					':span_end' => $this->_currentdate->format('Y-m-d H:i:s'),

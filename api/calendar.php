@@ -923,11 +923,13 @@ class CALENDAR extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
 				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = null;
 
 				// set up event properties
 				$event = [
+					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId') ? : null,
 					':type' => 'tasks',
 					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.date'))),
 					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.due'))),
@@ -942,6 +944,8 @@ class CALENDAR extends API {
 				];
 				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
 
+				if ($event[':id'] && !PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
+
 				// default end if not provided
 				if (!$event[':span_end']){
 					$due = new \DateTime($event[':span_start']);
@@ -949,7 +953,7 @@ class CALENDAR extends API {
 					$event[':span_end'] = $due->format('Y-m-d');	
 				}
 
-				// post event
+				// post or update event
 				if ($newid = $calendar->post($event)) $this->response([
 					'response' => [
 						'id' => $newid,
@@ -957,55 +961,11 @@ class CALENDAR extends API {
 						'type' => 'success'
 					],
 					'data' => ['calendar_uncompletedtasks' => $notifications->tasks()]]);
-				else $this->response([
-					'response' => [
-						'id' => false,
-						'msg' => $this->_lang->GET('calendar.tasks.error'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
-				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
-				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
-				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = null;
-
-				// set up event properties from payload
-				$event = [
-					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
-					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.date'))),
-					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.due'))),
-					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => $affected_user_id,
-					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.organizational_unit')),
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.content')),
-					':misc' => null,
-					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
-					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']])) ? 1 : null
-				];
-				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'])) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
-
-				// default end if not provided
-				if (!$event[':span_end']){
-					$due = new \DateTime($event[':span_start']);
-					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
-					$event[':span_end'] = $due->format('Y-m-d');	
-				}
-
-				// update event
-				if ($calendar->put($event)) $this->response([
-					'response' => [
-						'id' => $event[':id'],
-						'msg' => $this->_lang->GET('calendar.tasks.success'),
-						'type' => 'success'
-					],
-					'data' => ['calendar_uncompletedtasks' => $notifications->tasks()]]);
-				else {
+				elseif ($event[':id']){
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
 					$calendar->delete($event[':id']);
-					unset($event[':id']);
-					$event[':type'] = 'tasks';
+					$event[':id'] = null;
 					if ($newid = $calendar->post($event)) $this->response([
 						'response' => [
 							'id' => $newid,
@@ -1013,13 +973,14 @@ class CALENDAR extends API {
 							'type' => 'success'
 						],
 						'data' => ['calendar_uncompletedtasks' => $notifications->tasks()]]);
-					else $this->response([
-						'response' => [
-							'id' => false,
-							'msg' => $this->_lang->GET('calendar.tasks.error'),
-							'type' => 'error'
-						]]);
-					}
+				}
+
+				$this->response([
+				'response' => [
+					'id' => false,
+					'msg' => $this->_lang->GET('calendar.tasks.error'),
+					'type' => 'error'
+				]]);
 				break;
 			case 'GET':
 				$response = ['render' => ['content' => []]];
@@ -1283,6 +1244,7 @@ class CALENDAR extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
 				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id']; // if not selected default to current user!
 				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
@@ -1291,9 +1253,25 @@ class CALENDAR extends API {
 						':name' => ''
 					]
 				])) $affected_user = $affected_user[0];
-				
+
+				if (UTILITY::propertySet($this->_payload, 'calendarEventId')){
+					// editing of timesheet entries is allowed for admin and affected user for regulatory security only
+					$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
+						'replacements' => [
+							':id' => UTILITY::propertySet($this->_payload, 'calendarEventId')
+						]
+					]);
+					$calendarentry = $calendarentry ? $calendarentry[0] : null;
+					if (!$calendarentry) $this->response([], 404);
+					
+					if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || 
+					($affected_user['id'] === $_SESSION['user']['id'] && !$calendarentry['closed']))
+					) $this->response([], 401);
+				}
+
 				// set up event properties
 				$event = [
+					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId') ? : null,
 					':type' => 'timesheet',
 					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_time')) . ':00'),
 					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00'),
@@ -1324,102 +1302,34 @@ class CALENDAR extends API {
 				// match required properties
 				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.timesheet.error_missing'), 'type' => 'error']]);
 
-				// post timesheet event
+				// post or update timesheet event
 				if ($newid = $calendar->post($event)) $this->response([
 					'response' => [
 						'id' => $newid,
 						'msg' => $this->_lang->GET('calendar.tasks.success'),
 						'type' => 'success'
 					]]);
-				else $this->response([
-					'response' => [
-						'id' => false,
-						'msg' => $this->_lang->GET('calendar.tasks.error'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
-				// editing of timesheet entries is allowed for admin and affected user for regulatory security only
-				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
-				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = $_SESSION['user']['id'];
-				if ($affected_user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
-					'replacements' => [
-						':id' => $affected_user_id,
-						':name' => ''
-					]
-				])) $affected_user = $affected_user[0];
-
-				$calendarentry = SQLQUERY::EXECUTE($this->_pdo, 'calendar_get_by_id', [
-					'replacements' => [
-						':id' => UTILITY::propertySet($this->_payload, 'calendarEventId')
-					]
-				]);
-				$calendarentry = $calendarentry ? $calendarentry[0] : null;
-				if (!$calendarentry) $this->response([], 404);
-				
-				if (!(array_intersect(['admin'], $_SESSION['user']['permissions']) || 
-				($affected_user['id'] === $_SESSION['user']['id'] && !$calendarentry['closed']))
-				) $this->response([], 401);
-				
-				// set up event properties with payload
-				$event = [
-					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
-					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.start_time')) . ':00'),
-					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_date')) . ' ' . UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.end_time')) . ':00'),
-					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => $affected_user['id'],
-					':organizational_unit' => null,
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_exemption')) ? : null,
-					':misc' => null,
-					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
-					':autodelete' => null
-				];
-				if ($event[':subject'] === 'regular') $event[':subject'] = '';
-
-				// construct daily information
-				$misc = $event[':subject'] ? [] : [
-					'note' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto_note')) ? : '',
-					'break' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.break_time'))
-				];
-				if ($workinghourscorrection = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.pto.workinghourscorrection'))){
-					$misc['workinghourscorrection'] = $workinghourscorrection;
-				}
-				if ($homeoffice = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.timesheet.homeoffice'))){
-					$misc['homeoffice'] = $homeoffice;
-				}
-				$event[':misc'] = UTILITY::json_encode($misc);
-
-				// match required properties
-				if (!($event[':span_start'] && $event[':span_end'] && (isset($misc['break']) || $event[':subject']))) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.timesheet.error_missing'), 'type' => 'error']]);
-
-				// update timesheet event
-				if ($calendar->put($event)) $this->response([
-					'response' => [
-						'id' => $event[':id'],
-						'msg' => $this->_lang->GET('calendar.tasks.success'),
-						'type' => 'success'
-					]]);
-				else {
+				elseif ($event[':id']){
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
 					$calendar->delete($event[':id']);
-					unset($event[':id']);
-					$event[':type'] = 'timesheet';
+					$event[':id'] = null;
 					if ($newid = $calendar->post($event)) $this->response([
 						'response' => [
 							'id' => $newid,
 							'msg' => $this->_lang->GET('calendar.tasks.success'),
 							'type' => 'success'
 						]]);
-					else $this->response([
-						'response' => [
-							'id' => false,
-							'msg' => $this->_lang->GET('calendar.tasks.error'),
-							'type' => 'error'
-						]]);
-					}
+				}
+				
+				$this->response([
+					'response' => [
+						'id' => false,
+						'msg' => $this->_lang->GET('calendar.tasks.error'),
+						'type' => 'error'
+					]]);
 				break;
+
 			case 'GET':
 				$response = ['render' => ['content' => []]];
 				// set up calendar
@@ -1762,11 +1672,13 @@ class CALENDAR extends API {
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
 				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
 				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = null;
 
 				// set up event properties
 				$event = [
+					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId') ? : null,
 					':type' => 'worklists',
 					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.date'))),
 					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.due'))),
@@ -1779,6 +1691,9 @@ class CALENDAR extends API {
 					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
 					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete'), [':days' => CONFIG['lifespan']['calendar']['autodelete']]) ? 1 : null
 				];
+
+				if ($event[':id'] && !PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
+
 				$misc = [];
 				foreach($this->_payload as $key => $value){
 					preg_match('/^' . preg_quote($this->_lang->PROPERTY('calendar.worklists.station'), '/') . '(?:\(\d+\))*$/', $key, $station);
@@ -1807,66 +1722,11 @@ class CALENDAR extends API {
 						'type' => 'success'
 					],
 					'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
-				else $this->response([
-					'response' => [
-						'id' => false,
-						'msg' => $this->_lang->GET('calendar.tasks.error'),
-						'type' => 'error'
-					]]);
-				break;
-			case 'PUT':
-				if (!PERMISSION::permissionFor('calendaredit')) $this->response([], 401);
-				$affected_user_id = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.affected_user'));
-				if (!$affected_user_id || $affected_user_id === '...') $affected_user_id = null;
-
-				// set up event properties from payload
-				$event = [
-					':id' => UTILITY::propertySet($this->_payload, 'calendarEventId'),
-					':span_start' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.date'))),
-					':span_end' => $this->convertToServerTime(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.due'))),
-					':author_id' => $_SESSION['user']['id'],
-					':affected_user_id' => $affected_user_id,
-					':organizational_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.organizational_unit')),
-					':subject' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.worklists.name')),
-					':misc' => null,
-					':closed' => null,
-					':alert' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.alert')) ? 1 : null,
-					':autodelete' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('calendar.tasks.autodelete', [':days' => CONFIG['lifespan']['calendar']['autodelete']])) ? 1 : null
-				];
-				$misc = [];
-				foreach($this->_payload as $key => $value){
-					preg_match('/^' . preg_quote($this->_lang->PROPERTY('calendar.worklists.station'), '/') . '(?:\(\d+\))*$/', $key, $station);
-					if (!$station || !$value) continue;
-					$misc[] = [
-						'station' => $value
-					];
-				}
-
-				if (!($event[':span_start'] && $event[':organizational_unit'] && $event[':subject'] && $misc)) $this->response(['response' => ['msg' => $this->_lang->GET('calendar.tasks.error_missing'), 'type' => 'error']]);
-
-				$event[':misc'] = UTILITY::json_encode($misc);
-
-				// default end if not provided
-				if (!$event[':span_end']){
-					$due = new \DateTime($event[':span_start']);
-					$due->modify('+' . CONFIG['calendar']['default_due'] . ' months');
-					$event[':span_end'] = $due->format('Y-m-d');	
-				}
-
-				// update event
-				if ($calendar->put($event)) $this->response([
-					'response' => [
-						'id' => $event[':id'],
-						'msg' => $this->_lang->GET('calendar.tasks.success'),
-						'type' => 'success'
-					],
-					'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
-				else {
+				elseif ($event[':id']) {
 					// without changed values (e.g. on aborting) affected rows returns 0
 					// to avoid duplicate entries delete and reinsert
 					$calendar->delete($event[':id']);
-					unset($event[':id']);
-					$event[':type'] = 'worklists';
+					$event[':id'] = null;
 					if ($newid = $calendar->post($event)) $this->response([
 						'response' => [
 							'id' => $newid,
@@ -1874,13 +1734,14 @@ class CALENDAR extends API {
 							'type' => 'success'
 						],
 						'data' => ['calendar_uncompletedworklists' => $notifications->worklists()]]);
-					else $this->response([
-						'response' => [
-							'id' => false,
-							'msg' => $this->_lang->GET('calendar.tasks.error'),
-							'type' => 'error'
-						]]);
-					}
+				}
+
+				$this->response([
+					'response' => [
+						'id' => false,
+						'msg' => $this->_lang->GET('calendar.tasks.error'),
+						'type' => 'error'
+					]]);
 				break;
 			case 'GET':
 				$response = ['render' => ['content' => []]];
