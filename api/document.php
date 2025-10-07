@@ -320,19 +320,25 @@ class DOCUMENT extends API {
 
 				// initiate bundle properties
 				$bundle = [
-					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.name')),
+					':id' => null,
+					':name' => trim(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.name')) ? : ''),
 					':alias' => '',
 					':context' => 'bundle',
 					':unit' => UTILITY::propertySET($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.unit')) ? : 'common',
 					':author' => $_SESSION['user']['name'],
-					':content' => $content,
+					':content' => trim($content),
+					':hidden' => null,
+					':approval' => null,
 					':regulatory_context' => '',
 					':permitted_export' => null,
 					':restricted_access' => null,
 					':patient_access' => null,
 				];
 
-				if (!trim($bundle[':name']) || !trim($bundle[':content'])) $this->response([], 400);
+				if (!$bundle[':name'] || !$bundle[':content']) $this->response([], 400);
+
+				// check forbidden names
+				if (UTILITY::forbiddenName($bundle[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
 
 				// put hidden attribute if anything else remains the same
 				// get latest by name
@@ -347,32 +353,11 @@ class DOCUMENT extends API {
 				}
 				// update unit and hidden on latest available bundle if content remains
 				if ($exists && $exists['content'] === $bundle[':content']) {
-					if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
-						'values' => [
-							':alias' => $exists['alias'],
-							':context' => $exists['context'],
-							':unit' => $bundle[':unit'],
-							':author' => $exists['author'],
-							':content' => $exists['content'],
-							':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-							':approval' => $exists['approval'],
-							':regulatory_context' => '',
-							':permitted_export' => null,
-							':restricted_access' => null,
-							':patient_access' => null,
-							':id' => $exists['id'],
-						]
-					])) $this->response([
-						'response' => [
-							'name' => $bundle[':name'],
-							'msg' => $this->_lang->GET('assemble.compose.bundle.saved', [':name' => $bundle[':name']]),
-							'type' => 'success'
-						]]);	
+					$bundle[':id'] = $exists['id'];
+					$bundle[':author'] = $exists['author'];
+					$bundle[':hidden'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('assemble.compose.bundle.availability')) === $this->_lang->PROPERTY('assemble.compose.bundle.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null;
+					$bundle[':approval'] = $exists['approval'];
 				}
-
-				// check forbidden names
-				if (UTILITY::forbiddenName($bundle[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $bundle[':name']]), 'type' => 'error']]);
-
 				// append bundle to database
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
 					'values' => $bundle
@@ -714,6 +699,7 @@ class DOCUMENT extends API {
 				unset($component['hidden']);
 				$component_approve = array_search($component['approve'], $this->_lang->_USER['units']);
 				unset($component['approve']);
+				unset($component['form']);
 
 				/**
 				 * uploads files and populates component image widgets with the final path and file name
@@ -772,6 +758,22 @@ class DOCUMENT extends API {
 					return $result;
 				}
 				
+				$document_component = [
+					':id' => null,
+					':name' => $component_name,
+					':alias' => '',
+					':context' => 'component',
+					':unit' => $component_approve ? : null,
+					':author' => $_SESSION['user']['name'],
+					':content' => [],
+					':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
+					':approval' => null,
+					':regulatory_context' => '',
+					':permitted_export' => null,
+					':restricted_access' => null,
+					':patient_access' => null,
+				];
+
 				// select latest document by name
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_component_get_by_name', [
 					'values' => [
@@ -791,64 +793,30 @@ class DOCUMENT extends API {
 						$new_images = array_unique(usedImages($component['content']));
 						foreach (array_diff($former_images, $new_images) as $path) UTILITY::delete($path);
 
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
-							'values' => [
-								':alias' => '',
-								':context' => 'component',
-								':unit' => $component_approve ? : null,
-								':author' => $_SESSION['user']['name'],
-								':content' => UTILITY::json_encode($component),
-								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-								':approval' => null,
-								':regulatory_context' => '',
-								':permitted_export' => null,
-								':restricted_access' => null,
-								':patient_access' => null,
-								':id' => $exists['id'],
-							]
-						])) $this->response([
-								'response' => [
-									'name' => $exists['name'],
-									'msg' => $this->_lang->GET('assemble.compose.component.saved', [':name' => $exists['name']]),
-									'type' => 'success'
-								]]);
-						else $this->response([
-							'response' => [
-								'name' => false,
-								'msg' => $this->_lang->GET('assemble.compose.component.not_saved'),
-								'type' => 'error'
-							]]);
+						$document_component[':id'] = $exists['id'];
+						$document_component[':content'] = UTILITY::json_encode($component);
 					}
 					if ($approved && json_decode($exists['content'], true) == $component) {
 						// update component properties as long as the content remains unchanged
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
-							'values' => [
-								':alias' => '',
-								':context' => 'component',
-								':unit' => $component_approve ? : null,
-								':author' => $exists['author'],
-								':content' => $exists['content'],
-								':hidden' => $component_hidden ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-								':approval' => $exists['approval'],
-								':regulatory_context' => '',
-								':permitted_export' => null,
-								':restricted_access' => null,
-								':patient_access' => null,
-								':id' => $exists['id'],
-							]
-						])) $this->response([
-								'response' => [
-									'name' => $exists['name'],
-									'msg' => $this->_lang->GET('assemble.compose.component.saved', [':name' => $exists['name']]),
-									'type' => 'success'
-								]]);
-						else $this->response([
-							'response' => [
-								'name' => false,
-								'msg' => $this->_lang->GET('assemble.compose.component.not_saved'),
-								'type' => 'error'
-							]]);
+						$document_component[':id'] = $exists['id'];
+						$document_component[':content'] = $exists['content'];
+						$document_component[':approval'] = $exists['approval'];
 					}
+
+					if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
+						'values' => $document_component
+					])) $this->response([
+							'response' => [
+								'name' => $exists['name'],
+								'msg' => $this->_lang->GET('assemble.compose.component.saved', [':name' => $exists['name']]),
+								'type' => 'success'
+							]]);
+					else $this->response([
+						'response' => [
+							'name' => false,
+							'msg' => $this->_lang->GET('assemble.compose.component.not_saved'),
+							'type' => 'error'
+						]]);
 				}
 				// until here the component has not existed, or the content of an approved component has been changed resulting in a new version
 
@@ -859,19 +827,11 @@ class DOCUMENT extends API {
 				if (UTILITY::forbiddenName($component_name)) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.render.error_forbidden_name', [':name' => $component_name]), 'type' => 'error']]);
 
 				$component['content'] = fileupload($component['content'], $component_name, $this->_date['servertime']->format('YmdHis'));
+
+				$document_component[':content'] = UTILITY::json_encode($component);
+
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-					'values' => [
-						':name' => $component_name,
-						':alias' => '',
-						':context' => 'component',
-						':unit' => $component_approve,
-						':author' => $_SESSION['user']['name'],
-						':content' => UTILITY::json_encode($component),
-						':regulatory_context' => '',
-						':permitted_export' => NULL,
-						':restricted_access' => NULL,
-						':patient_access' => NULL,
-					]
+					'values' => $document_component
 				])) {
 					// alert userGroups for approval
 					$component_id = $this->_pdo->lastInsertId();
@@ -1560,6 +1520,22 @@ class DOCUMENT extends API {
 					}
 				}
 				
+				$document = [
+					':id' => null,
+					':name' => $this->_payload->name,
+					':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
+					':context' => $this->_payload->context,
+					':unit' => $this->_payload->approve ? : null,
+					':author' => $_SESSION['user']['name'],
+					':content' => implode(',', $this->_payload->content),
+					':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
+					':approval' => null,
+					':regulatory_context' => implode(',', $regulatory_context),
+					':permitted_export' => $this->_payload->permitted_export ? 1 : null,
+					':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
+					':patient_access' => $this->_payload->patient_access ? 1 : null,
+				];
+
 				// select latest document by name
 				$exists = SQLQUERY::EXECUTE($this->_pdo, 'document_document_get_by_name', [
 					'values' => [
@@ -1574,64 +1550,30 @@ class DOCUMENT extends API {
 				if (isset($exists['id'])){ 
 					if (!$approved) {
 						// update anything, reset approval
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
-							'values' => [
-								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
-								':context' => $this->_payload->context,
-								':unit' => $this->_payload->approve ? : null,
-								':author' => $_SESSION['user']['name'],
-								':content' => implode(',', $this->_payload->content),
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-								':approval' => null,
-								':regulatory_context' => implode(',', $regulatory_context),
-								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
-								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
-								':patient_access' => $this->_payload->patient_access ? 1 : null,
-								':id' => $exists['id'],
-							]
-						])) $this->response([
-								'response' => [
-									'name' => $this->_payload->name,
-									'msg' => $this->_lang->GET('assemble.compose.document.saved', [':name' => $this->_payload->name]),
-									'type' => 'success'
-								]]);
-						else $this->response([
-							'response' => [
-								'name' => false,
-								'msg' => $this->_lang->GET('assemble.compose.document.not_saved'),
-								'type' => 'error'
-							]]);
+						$document[':id'] = $exists['id'];
 					}
 					if ($approved && $exists['content'] == implode(',', $this->_payload->content)) {
 						// update document properties as long as the content remains unchanged
-						if (SQLQUERY::EXECUTE($this->_pdo, 'document_put', [
-							'values' => [
-								':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias) : $this->_payload->alias,
-								':context' => $this->_payload->context,
-								':unit' => $this->_payload->approve ? : null,
-								':author' => $exists['author'],
-								':content' => $exists['content'],
-								':hidden' => $this->_payload->hidden && $this->_payload->hidden !=='false' ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-								':approval' => $exists['approval'],
-								':regulatory_context' => implode(',', $regulatory_context),
-								':permitted_export' => $this->_payload->permitted_export ? 1 : null,
-								':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
-								':patient_access' => $this->_payload->patient_access ? 1 : null,
-								':id' => $exists['id'],
-							]
-						])) $this->response([
-								'response' => [
-									'name' => $this->_payload->name,
-									'msg' => $this->_lang->GET('assemble.compose.document.saved', [':name' => $this->_payload->name]),
-									'type' => 'success'
-								]]);
-						else $this->response([
-							'response' => [
-								'name' => false,
-								'msg' => $this->_lang->GET('assemble.compose.document.not_saved'),
-								'type' => 'error'
-							]]);
+						$document[':id'] = $exists['id'];
+						$document[':author'] = $exists['author'];
+						$document[':content'] = $exists['content'];
+						$document[':approval'] = $exists['approval'];
 					}
+
+					if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
+						'values' => $document
+					])) $this->response([
+							'response' => [
+								'name' => $this->_payload->name,
+								'msg' => $this->_lang->GET('assemble.compose.document.saved', [':name' => $this->_payload->name]),
+								'type' => 'success'
+							]]);
+					else $this->response([
+						'response' => [
+							'name' => false,
+							'msg' => $this->_lang->GET('assemble.compose.document.not_saved'),
+							'type' => 'error'
+						]]);
 				}
 				// until here the document has not existed, or the content of an approved document has been changed resulting in a new version
 
@@ -1639,18 +1581,7 @@ class DOCUMENT extends API {
 				if (!$this->_payload->approve) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_saved_missing'), 'type' => 'error']]);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-					'values' => [
-						':name' => $this->_payload->name,
-						':alias' => gettype($this->_payload->alias) === 'array' ? implode(' ', $this->_payload->alias): $this->_payload->alias,
-						':context' => gettype($this->_payload->context) === 'array' ? '': $this->_payload->context,
-						':unit' => $this->_payload->approve,
-						':author' => $_SESSION['user']['name'],
-						':content' => implode(',', $this->_payload->content),
-						':regulatory_context' => implode(',', $regulatory_context),
-						':permitted_export' => $this->_payload->permitted_export ? 1 : null,
-						':restricted_access' => $restricted_access ? implode(',', $restricted_access) : NULL,
-						':patient_access' => $this->_payload->patient_access ? 1 : null,
-					]
+					'values' => $document
 				])) {
 						$document_id = $this->_pdo->lastInsertId();
 						$message = $this->_lang->GET('assemble.approve.document_request_alert', [':name' => '<a href="javascript:void(0);" onclick="api.document(\'get\', \'approval\', ' . $document_id . ')"> ' . $this->_payload->name . '</a>'], true);

@@ -430,9 +430,9 @@ class SQLQUERY {
 
 
 		'consumables_post_vendor' => [
-			'mysql' => "INSERT INTO caro_consumables_vendors (id, `hidden`, name, info, pricelist, evaluation) " .
+			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, pricelist, evaluation) " .
 						"VALUES (:id, :hidden, :name, :info, :pricelist, :evaluation) " .
-						"ON DUPLICATE KEY UPDATE `hidden` = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation",
+						"ON DUPLICATE KEY UPDATE hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation",
 			'sqlsrv' => "MERGE INTO caro_consumables_vendors WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :hidden AS hidden, :name AS name, :info AS info, :pricelist AS pricelist, :evaluation AS evaluation) AS source " .
 						"(id, hidden, name, info, pricelist, evaluation) ON (target.id = source.id) " .
@@ -581,12 +581,14 @@ class SQLQUERY {
 
 
 		'document_post' => [
-			'mysql' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) VALUES (NULL, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, NULL, '', :regulatory_context, :permitted_export, :restricted_access, :patient_access)",
-			'sqlsrv' => "INSERT INTO caro_documents (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, NULL, '', :regulatory_context, :permitted_export, :restricted_access, :patient_access)"
-		],
-		'document_put' => [
-			'mysql' => "UPDATE caro_documents SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access, patient_access = :patient_access WHERE id = :id",
-			'sqlsrv' => "UPDATE caro_documents SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access, patient_access = :patient_access WHERE id = :id"
+			'mysql' => "INSERT INTO caro_documents (id, name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) " .
+						"VALUES (:id, :name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, NULL, '', :regulatory_context, :permitted_export, :restricted_access, :patient_access) " .
+						"ON DUPLICATE KEY UPDATE alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access, patient_access = :patient_access",
+			'sqlsrv' => "MERGE INTO caro_documents WITH (HOLDLOCK) AS target USING " .
+						"(SELECT :id AS id, :name AS name, :alias AS alias, :context AS context, :unit AS unit, :author AS author, :content AS content, :hidden AS hidden, :approval AS approval, :regulatory_context AS regulatory_context, :permitted_export AS permitted_export, :restricted_access AS restricted_access, :patient_access AS patient_access) AS source " .
+						"(id, name, alias, context, unit, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET alias = :alias, context = :context, unit = :unit, author = :author, content = :content, hidden = :hidden, approval = :approval, regulatory_context = :regulatory_context, permitted_export = :permitted_export, restricted_access = :restricted_access, patient_access = :patient_access " .
+						"WHEN NOT MATCHED THEN INSERT (name, alias, context, unit, date, author, content, hidden, approval, regulatory_context, permitted_export, restricted_access, patient_access) VALUES (:name, :alias, :context, :unit, CURRENT_TIMESTAMP, :author, :content, NULL, '', :regulatory_context, :permitted_export, :restricted_access, :patient_access);"
 		],
 		'document_put_approve' => [
 			'mysql' => "UPDATE caro_documents SET approval = :approval WHERE id = :id",

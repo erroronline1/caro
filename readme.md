@@ -37,8 +37,6 @@ Things are still in motion. Images may be outdated.
 * refactor redundant post/put
     * notification (adapt sql queries)
     * calendar, _calendar, stresstest
-    * consumables
-    * document
     * method caller (events, forms)
     * sanitize api endpoints
 
