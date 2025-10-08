@@ -1058,6 +1058,7 @@ export class Assemble {
 		this.codeEditor = [];
 		this.names = setup.names || {};
 		this.composer = setup.composer;
+		this.isSafari = navigator.userAgent.toLowerCase().includes("safari");
 	}
 
 	/**
@@ -3530,7 +3531,7 @@ export class Assemble {
 				});
 			}
 
-			let autocomplete_hint = api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey, ":swipe": swipe ? api._lang.GET("assemble.render.api._settings.session.textareaAutocompleteSwipe_active") : "" });
+			let autocomplete_hint = api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey, ":swipe": (swipe ? api._lang.GET("assemble.render.textarea_autocomplete_swipe_active") : "") });
 			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + autocomplete_hint : autocomplete_hint;
 		}
 
