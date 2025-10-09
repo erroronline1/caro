@@ -1074,8 +1074,8 @@
 			"update_via_erp_interface": ":systemuser via ERP interface"
 		},
 		"navigation": {
-			"casedata": "Case data",
-			"caselist": "Cases",
+			"casedata": "Case data by case number",
+			"caselist": "Cases by patients",
 			"csvdump": "ERP database query",
 			"erpquery": "ERP customer and case data requests",
 			"patientlookup": "Patient lookup",

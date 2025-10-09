@@ -1074,8 +1074,8 @@
 			"update_via_erp_interface": ":systemuser über die ERP-Anbindung"
 		},
 		"navigation": {
-			"casedata": "Vorgangsdaten",
-			"caselist": "Vorgänge",
+			"casedata": "Vorgangsdaten nach Vorgangsnummer",
+			"caselist": "Vorgänge nach Patienten",
 			"csvdump": "EVA Datenbanken-Abfrage",
 			"erpquery": "EVA Vorgangs- und Patientendaten",
 			"patientlookup": "Patientensuche",
