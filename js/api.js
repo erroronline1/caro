@@ -98,10 +98,11 @@ export const api = {
 	send: async (method, request, successFn = null, errorFn = null, payload = {}) => {
 		if (!(await api.preventDataloss.proceedAnyway(method))) return false;
 		api.preventDataloss.stop();
-		api.loadindicator(true);
 
 		// ensure passed parameters are encoded e.g. to enable #-characters within a passed api path-parameter
 		request = request.map((i) => encodeURIComponent(i).replace("+", "%2B"));
+
+		api.loadindicator(request, true);
 
 		// default reset masonry breakpoint if former call (current history has been set by recent api call) had prevented this
 		// currently masonry is counterproductive for conversations
@@ -160,7 +161,7 @@ export const api = {
 				}
 				if (data.status === 511) {
 					// session timeout
-					api.loadindicator(false);
+					api.loadindicator(request, false);
 					clearInterval(_serviceWorker.notif.interval);
 					_serviceWorker.notif.interval = null;
 					if (JSON.stringify(request) !== JSON.stringify(["application", "authentify"])) api._unauthorizedRequest = { method: method, request: request };
@@ -201,7 +202,7 @@ export const api = {
 				// safari debugging
 				new Dialog({ type: "confirm", render: error + JSON.stringify([method, request]) });
 			});
-		api.loadindicator(false);
+		api.loadindicator(request, false);
 	},
 	/**
 	 *   _           _ _       _ _         _
@@ -210,12 +211,13 @@ export const api = {
 	 *  |_|___|__,|___|_|_|_|___|_|___|__,|_| |___|_|
 	 *
 	 * ui feedback on occuring requests that are expected to take longer
-	 * @param {any} toggle initiates inidicator, undefined|null|false disables all
+	 * @param {any} toggle initiates indicator, undefined|null|false disables all
 	 * @returns none
 	 */
-	loadindicator: (toggle) => {
+	loadindicator: (request, toggle) => {
 		if (toggle) {
-			api.loadindicatorTimeout.push(
+			if (!api.loadindicatorTimeout[request]) api.loadindicatorTimeout[request] = [];
+			api.loadindicatorTimeout[request].push(
 				setTimeout(() => {
 					document.querySelector("body").style.cursor = "wait";
 					document.querySelector(".loader").style.display = "block";
@@ -224,15 +226,18 @@ export const api = {
 			); // wait a bit to avoid flash on every request
 			return;
 		}
-		api.loadindicatorTimeout.map((id) => clearTimeout(id));
-		api.loadindicatorTimeout = [];
-		document.querySelector("body").style.cursor = "initial";
-		document.querySelector(".loader").style.opacity = "0";
-		setTimeout(() => {
-			document.querySelector(".loader").style.display = "none";
-		}, 300);
+		if (api.loadindicatorTimeout[request]) {
+			api.loadindicatorTimeout[request].map((id) => clearTimeout(id));
+			delete api.loadindicatorTimeout[request];
+
+			document.querySelector("body").style.cursor = "initial";
+			document.querySelector(".loader").style.opacity = "0";
+			setTimeout(() => {
+				document.querySelector(".loader").style.display = "none";
+			}, 300);
+		}
 	},
-	loadindicatorTimeout: [],
+	loadindicatorTimeout: {},
 
 	/**
 	 *             _     _       _             _
@@ -251,6 +256,44 @@ export const api = {
 			behavior: "smooth",
 		});
 		document.querySelector("#menustart").focus();
+	},
+
+	update_user_settings: async function () {
+		for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
+			switch (key) {
+				case "forceDesktop":
+					if (value) {
+						let stylesheet;
+						for (const [i, sname] of Object.entries(document.styleSheets)) {
+							if (!sname.href.includes("style.css")) continue;
+							stylesheet = document.styleSheets[i].cssRules;
+							break;
+						}
+						for (let i = 0; i < stylesheet.length; i++) {
+							if (stylesheet[i].conditionText === "only screen and (max-width: 64rem)") {
+								stylesheet[i].media.mediaText = "only screen and (max-width: 1rem)";
+							}
+						}
+					}
+					break;
+				case "masonry":
+					if (value) {
+						await window.Masonry.breakpoints(true);
+					}
+					break;
+				case "theme":
+					if (value) {
+						document.getElementsByTagName("head")[0].removeChild(document.getElementById("csstheme"));
+						const link = document.createElement("link");
+						link.href = "./" + value + ".css";
+						link.type = "text/css";
+						link.rel = "stylesheet";
+						link.media = "screen";
+						link.id = "csstheme";
+						document.getElementsByTagName("head")[0].appendChild(link);
+					}
+			}
+		}
 	},
 
 	/**
@@ -476,6 +519,7 @@ export const api = {
 					case "post":
 						successFn = function (data) {
 							if (data.user) api._settings.user = data.user;
+							api.update_user_settings();
 							if (data.config) api._settings.config = data.config;
 
 							// sometimes an error occures, try to show what's happening
@@ -685,41 +729,7 @@ export const api = {
 
 					// override css properties with user settings
 					if (api._settings.user.app_settings) {
-						for (const [key, value] of Object.entries(api._settings.user.app_settings)) {
-							switch (key) {
-								case "forceDesktop":
-									if (value) {
-										let stylesheet;
-										for (const [i, sname] of Object.entries(document.styleSheets)) {
-											if (!sname.href.includes("style.css")) continue;
-											stylesheet = document.styleSheets[i].cssRules;
-											break;
-										}
-										for (let i = 0; i < stylesheet.length; i++) {
-											if (stylesheet[i].conditionText === "only screen and (max-width: 64rem)") {
-												stylesheet[i].media.mediaText = "only screen and (max-width: 1rem)";
-											}
-										}
-									}
-									break;
-								case "masonry":
-									if (value) {
-										await window.Masonry.breakpoints(true);
-									}
-									break;
-								case "theme":
-									if (value) {
-										document.getElementsByTagName("head")[0].removeChild(document.getElementById("csstheme"));
-										const link = document.createElement("link");
-										link.href = "./" + value + ".css";
-										link.type = "text/css";
-										link.rel = "stylesheet";
-										link.media = "screen";
-										link.id = "csstheme";
-										document.getElementsByTagName("head")[0].appendChild(link);
-									}
-							}
-						}
+						api.update_user_settings();
 					}
 
 					const render = new Assemble(data.render);
@@ -1326,8 +1336,8 @@ export const api = {
 	},
 
 	/**
-	 *                                   
-	 *   ___ ___ ___ ___ _ _ ___ ___ _ _ 
+	 *
+	 *   ___ ___ ___ ___ _ _ ___ ___ _ _
 	 *  | -_|  _| . | . | | | -_|  _| | |
 	 *  |___|_| |  _|_  |___|___|_| |_  |
 	 *          |_|   |_|           |___|
@@ -2405,6 +2415,23 @@ export const api = {
 				break;
 			case "post":
 			case "put":
+				switch (request[1]) {
+					case "profile":
+						successFn = function (data) {
+							if (data.render) {
+								api.update_header(title[request[1]]);
+								const render = new Assemble(data.render);
+								document.getElementById("main").replaceChildren(render.initializeSection());
+								render.processAfterInsertion();
+							}
+							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+							if (data.data) {
+								api._settings.user.app_settings = data.data;
+								api.update_user_settings();
+							}
+						};
+						break;
+				}
 				if (3 in request && request[3] && request[3] instanceof FormData) {
 					// training
 					payload = request[3]; // form data object passed by utility.js
