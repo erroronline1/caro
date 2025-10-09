@@ -97,6 +97,8 @@ class _ERPINTERFACE {
 	 */
 	public function customercases($request = null){
 		/**
+		 * try to preserve the order passed from customerdata() to keep the refined weighted order
+		 * 
 		 * return [
 		 * 		'{patient}' => [ // e.g. a concatenation of patient name and date of birth
 		 * 			'caseid' => string,
@@ -153,7 +155,7 @@ class _ERPINTERFACE {
 		 * 			'Phone number' => string,
 		 * 			'eMail address' => string,
 		 * 			'Insurance' => string,
-		 * 			'Patient number' => string
+		 * 			'Patient number' => string // may be also required/useful for continued processing of customercases() if applicable
 		 * 		],
 		 * 		...
 		 * ]
@@ -695,7 +697,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			vorgang.LEISTUNG,
 			CONVERT(varchar(255), vorgang.KV_DATUM, 104) AS KV_DATUM,
 			CONVERT(varchar(255), vorgang.FAKTURIERT_DATUM, 104) AS FAKTURIERT_DATUM,
-			CONCAT(pat.NAME_2, ' ', pat.NAME_3, ' ', pat.NAME_4, ' ', pat.NACHNAME, ' *' , pat.GEBURTSDATUM) as PATIENT
+			pat.REFERENZ as Patientennummer
 		FROM [eva3_02_viva_souh].[dbo].[vorgaenge] as vorgang
 		INNER JOIN (
 			SELECT
@@ -730,15 +732,29 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		}
 		$result = $statement->fetchAll();
 		$statement = null;
-		$response = [];
+		$pre_response = $response = [];
 
+		// prepare response by iterating over customers to preserve customerdata refinement regarding weight
+		foreach($customers as $customer){
+			$pre_response[$customer['ERPNR']] = [
+				'patient' => $customer['Name'] . ' *' . $customer['Geburtsdatum'],
+				'cases' => []
+			];
+
+		}
+		// insert cases
 		foreach ($result as $row){
-			$response[$row['PATIENT']][] = [
+			$pre_response[$row['Patientennummer']]['cases'][] = [
 				'caseid' => $row['REFERENZ'],
 				'text' => $row['LEISTUNG'],
 				'reimbursement' => $row['KV_DATUM'],
 				'settled' => $row['FAKTURIERT_DATUM']
 			];
+		}
+		// skip empty, make patient name key for response
+		foreach($pre_response as $patient){
+			if (!$patient['cases']) continue;
+			$response[$patient['patient']] = $patient['cases'];
 		}
 
 		return $response;
