@@ -163,6 +163,7 @@ class USER extends API {
 				foreach ($user[':app_settings'] as $key => $value){
 					if (!$value) unset($user[':app_settings'][$key]);
 				}
+				$settings = $user[':app_settings'];
 				$user[':app_settings'] = UTILITY::json_encode($user[':app_settings']);
 
 				// update user
@@ -170,11 +171,13 @@ class USER extends API {
 					'values' => $user
 				]) !== false) {
 					$this->response([
-					'response' => [
-						'id' => $user[':id'],
-						'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
-						'type' => 'success'
-					]]);
+						'response' => [
+							'id' => $user[':id'],
+							'msg' => $this->_lang->GET('user.user_saved', [':name' => $user[':name']]),
+							'type' => 'success'
+						],
+						'data' => $settings
+					]);
 				}
 				else $this->response([
 					'response' => [
