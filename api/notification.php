@@ -159,9 +159,9 @@ class NOTIFICATION extends API {
 								$data = SQLQUERY::EXECUTE($this->_pdo, 'records_get_unclosed');
 								// split multiple erp case numbers within records
 								$casenumbers = [];
-								foreach ($data as &$case){
-									$case['_erp_case_numbers'] = preg_split('/[\s;,]+/', $case['erp_case_number'] ? : '');
-									array_push($casenumbers, ...$case['_erp_case_numbers']);
+								foreach ($data as $row => $case){
+									$data[$row]['_erp_case_numbers'] = preg_split('/[\s;,]+/', $case['erp_case_number'] ? : '');
+									array_push($casenumbers, ...$data[$row]['_erp_case_numbers']);
 								}
 
 								if (!($erpdata = ERPINTERFACE->casestate($casenumbers))) break;
