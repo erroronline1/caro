@@ -882,7 +882,7 @@ class CONSUMABLES extends API {
 
 					$this->response([
 					'response' => [
-						'id' => $this->_pdo->lastInsertId(),
+						'id' => intval($this->_pdo->lastInsertId()),
 						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 					]]);
@@ -1078,7 +1078,7 @@ class CONSUMABLES extends API {
 					]
 				])) $this->response([
 					'response' => [
-						'id' => $this->_requestedID,
+						'id' => intval($this->_requestedID),
 						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($_batchhidden || $_batchupdate ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): '') . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 						],
@@ -1086,7 +1086,7 @@ class CONSUMABLES extends API {
 					]);
 				else $this->response([
 					'response' => [
-						'id' => $this->_requestedID,
+						'id' => intval($this->_requestedID),
 						'msg' => $this->_lang->GET('consumables.product.not_saved'),
 						'type' => 'error'
 					]]);
