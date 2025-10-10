@@ -1058,15 +1058,14 @@
 				"amount": "Amount",
 				"contract_position": "Position",
 				"text": "Position text"
-			},
-			"null": "For the provided case number(s) are no results available."
+			}
 		},
 		"csvdump": {
-			"none": "There were no results for this query",
 			"null": "This query does not exists",
 			"select": "Select query to export as CSV",
 			"select_hint": "No fitting query found? Contact a programmer to set one up."
 		},
+		"download": "Download file(s). On exporting sensitive data you are responsible for their safety.",
 		"integrations":{
 			"data_import": "Data from the ERP-software",
 			"pricelist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
@@ -1081,6 +1080,7 @@
 			"patientlookup": "Patient lookup",
 			"upload": "Submit ERP data files"
 		},
+		"null": "There were no results for this query",
 		"upload": {
 			"failure": "An error occured, file could not be saved. Please try again.",
 			"file": "Source file",

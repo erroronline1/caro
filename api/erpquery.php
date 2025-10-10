@@ -135,12 +135,28 @@ class ERPQUERY extends API {
 					foreach($files[$case] as $attachment){
 						$attachments[$attachment['description'] . ' ' . $attachment['date']] = ['href' => $attachment['url'], 'download' => $attachment['filename']];
 					}
+
+					$casecontent[] = [
+						'type' => 'textsection',
+						'attributes' => [
+							'class' => 'orange',
+							'name' => $this->_lang->GET('erpquery.download')
+						]
+					];
 					$casecontent[] = [
 						'type' => 'links',
 						'content' => $attachments
 					];
 				}
 				if ($casecontent) $content[] = $casecontent;
+			}
+			if (count($content) < 2){
+				$content[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('erpquery.null')
+					]
+				];
 			}
 		}
 		return $content;
@@ -170,8 +186,8 @@ class ERPQUERY extends API {
 		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 			$fields = [];
 			if ($result = ERPINTERFACE->customercases((array)$this->_payload)) {
-
 				foreach($result as $patient => $cases){
+					if (!$cases) continue;
 					$links = [];
 					foreach($cases as $case){
 						$description = $case['caseid'] . ' - ' . $case['text'];
@@ -185,6 +201,14 @@ class ERPQUERY extends API {
 						'content' => $links
 					];
 				}
+			}
+			if (count($content) < 2){
+				$content[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('erpquery.null')
+					]
+				];
 			}
 		}
 
@@ -242,6 +266,14 @@ class ERPQUERY extends API {
 						];
 				}
 			}
+			if (count($content) < 2){
+				$content[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('erpquery.null')
+					]
+				];
+			}
 		}
 
 		return $content;
@@ -269,16 +301,10 @@ class ERPQUERY extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 				$result = ERPINTERFACE->customcsvdump($this->_requestedType);
-				if ($result === null) $this->response([
+				if ($result === null ||  !$result) $this->response([
 					'response' => [
 						'name' => false,
-						'msg' => $this->_lang->GET('erpquery.csvdump.null'),
-						'type' => 'error'
-					]]);
-				if (!$result) $this->response([
-					'response' => [
-						'name' => false,
-						'msg' => $this->_lang->GET('erpquery.csvdump.none'),
+						'msg' => $this->_lang->GET('erpquery.null'),
 						'type' => 'error'
 					]]);
 				

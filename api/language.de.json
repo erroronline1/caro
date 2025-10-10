@@ -1058,15 +1058,14 @@
 				"amount": "Anzahl",
 				"contract_position": "Position",
 				"text": "Positionstext"
-			},
-			"null": "Für die angegebenden Vorgangsnummer(n) gibt es keine Ergebnisse."
+			}
 		},
 		"csvdump": {
-			"none": "Es gab keine Ergebnisse für diese Abfrage",
 			"null": "Diese Abfrage existiert nicht",
 			"select": "Wähle eine Abfrage für den CSV-Export",
 			"select_hint": "Keine passende Abfrage gefunden? Frage einen Programmierer nach einer Einrichtung."
 		},
+		"download": "Datei(en) herunterladen. Beachte den Datenschutz. Für die Sicherheit exportierter Daten bist du selbst veranwortlich.",
 		"integrations":{
 			"data_import": "Daten aus der Verwaltungssoftware",
 			"pricelist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
@@ -1081,6 +1080,7 @@
 			"patientlookup": "Patientensuche",
 			"upload":"Bereitstellen von ERP-Daten"
 		},
+		"null": "Es gab keine Ergebnisse für diese Abfrage",
 		"upload": {
 			"failure": "Es trat ein Fehler auf, bitte versuche es erneut.",
 			"file":"Quelldatei",
