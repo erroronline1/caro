@@ -1,10 +1,10 @@
 /**
- * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)  
+ * [CARO - Cloud Assisted Records and Operations](https://github.com/erroronline1/caro)
  * Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)
- * 
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.  
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.  
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
@@ -521,6 +521,32 @@ export class Dialog {
 				if (element) this.form.append(element);
 			}
 			this.dialog.append(this.form);
+
+
+			// compare nodelist if similar dialog has been opened just before, aborting display
+			function objectifyNode(element) {
+				let obj = {};
+				obj.name = element.localName;
+				obj.attributes = [];
+				obj.children = [];
+				Array.from(element.attributes).forEach((a) => {
+					// ignore id, for and class (e.g. for active slides which is set after insertion)
+					if (!["id", "for", "class"].includes(a.name)) obj.attributes.push({ name: a.name, value: a.value });
+				});
+				Array.from(element.children).forEach((c) => {
+					obj.children.push(objectifyNode(c));
+				});
+
+				return obj;
+			}
+			const thisdialog = JSON.stringify(objectifyNode(this.dialog.firstChild));
+			for (const opendialog of Object.values(document.querySelectorAll("dialog[open]"))) {
+				if (JSON.stringify(objectifyNode(opendialog.firstChild)) == thisdialog) {
+					return new Promise((resolve, reject) => {
+						reject;
+					});
+				}
+			}
 
 			// append to dom before initializing following library functions to avoid errors
 			document.body.append(this.dialog);
@@ -2795,7 +2821,7 @@ export class Assemble {
 			const options = {};
 			options[api._lang.GET("assemble.compose.document.cancel")] = false;
 			options[api._lang.GET("assemble.compose.document.confirm")] = { value: true, class: "reducedCTA" };
-			new Dialog({ 
+			new Dialog({
 				type: "input",
 				header: api._lang.GET("consumables.product.search"),
 				render: [
@@ -2822,7 +2848,7 @@ export class Assemble {
 					],
 				],
 				options: options,
-				id: "_productselectionDialog"
+				id: "_productselectionDialog",
 			}).then((response) => {
 				if (Boolean(response)) {
 					const inputfield = document.getElementById(input.id);
@@ -3050,7 +3076,7 @@ export class Assemble {
 						},
 					},
 				];
-			if (this.currentElement.identify_erp_import_fields){
+			if (this.currentElement.identify_erp_import_fields) {
 				inputs.push(
 					{ type: "hr" },
 					{
@@ -3074,12 +3100,15 @@ export class Assemble {
 			options[api._lang.GET("general.cancel_button")] = false;
 			options[api._lang.GET("record.import.import")] = { value: true, class: "reducedCTA" };
 			button.onclick = function () {
-				new Dialog({
-					type: "input",
-					header: api._lang.GET("assemble.render.merge"),
-					options: options,
-					render: JSON.parse(inputs),
-				}, "FormData").then((response) => {
+				new Dialog(
+					{
+						type: "input",
+						header: api._lang.GET("assemble.render.merge"),
+						options: options,
+						render: JSON.parse(inputs),
+					},
+					"FormData"
+				).then((response) => {
 					if (response) {
 						api.record("post", "import", null, response);
 					}
@@ -3531,7 +3560,7 @@ export class Assemble {
 				});
 			}
 
-			let autocomplete_hint = api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey, ":swipe": (swipe ? api._lang.GET("assemble.render.textarea_autocomplete_swipe_active") : "") });
+			let autocomplete_hint = api._lang.GET("assemble.render.textarea_autocomplete", { ":forth": forthKey, ":back": backKey, ":swipe": swipe ? api._lang.GET("assemble.render.textarea_autocomplete_swipe_active") : "" });
 			this.currentElement.hint = this.currentElement.hint ? this.currentElement.hint + " " + autocomplete_hint : autocomplete_hint;
 		}
 
