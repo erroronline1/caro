@@ -139,48 +139,6 @@ class RISK extends API {
 						'type' => 'error'
 					]]);
 				break;
-			case 'PUT':
-				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
-
-				$risk = [
-					':id' => intval($this->_requestedID),
-					':risk' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk')) ? : null,
-					':proof' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.proof')) ? : null,
-					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.availability')) === $this->_lang->GET('risk.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-					':probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.probability'))) ? : null,
-					':damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.damage'))) ? : null,
-					':measure_probability' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_probability'))) ? : null,
-					':measure_damage' => intval(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.measure_damage'))) ? : null,
-				];
-				if (!$risk[':risk']) { // characteristic
-					$risk[':risk'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.risk_related')) ? : null;
-				}
-
-				// convert values to languagefile keys for risks
-				$risks_converted = [];
-				if ($risk[':risk']) {
-					$rsks = explode(', ', $risk[':risk']);
-					foreach ($rsks as $rsk){
-						$risks_converted[] = array_search($rsk, $this->_lang->_USER['risks']); 
-					}
-					$risk[':risk'] = implode(',', $risks_converted);
-				}
-				
-				if (SQLQUERY::EXECUTE($this->_pdo, 'risk_put', [
-					'values' => $risk
-				])) $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('risk.risk_saved'),
-						'id' => intval($this->_requestedID),
-						'type' => 'success'
-					]]);
-				else $this->response([
-					'response' => [
-						'msg' => $this->_lang->GET('risk.risk_save_error'),
-						'id' => false,
-						'type' => 'error'
-					]]);
-				break;
 			case 'GET':
 				$datalist = $select = [];
 
@@ -267,22 +225,28 @@ class RISK extends API {
 				$selection = [];
 				foreach ($this->_lang->_USER['risk']['type'] as $type => $translation){
 					$typeselection = [
-						[
-							'type' => 'textsection',
-							'attributes' => [
-								'name' => $translation
-							]
-						], [
-							'type' => 'button',
-							'attributes' => [
-								'value' => $this->_lang->GET('risk.new'),
-								'onclick' => "api.risk('get', 'risk', '" . $type . "')"
+						'type' => 'collapsible',
+						'attributes' => [
+							'class' => 'em16'
+						],
+						'content' => [
+							[
+								'type' => 'textsection',
+								'attributes' => [
+									'name' => $translation
+								]
+							], [
+								'type' => 'button',
+								'attributes' => [
+									'value' => $this->_lang->GET('risk.new'),
+									'onclick' => "api.risk('get', 'risk', '" . $type . "')"
+								]
 							]
 						]
 					];
 					if (isset($select[$type]))
 						foreach ($select[$type] as $process => $dbrisks){
-							$typeselection[] = [
+							$typeselection['content'][] = [
 								'type' => 'select',
 								'numeration' => 'prevent',
 								'attributes' => [
@@ -292,7 +256,7 @@ class RISK extends API {
 								'content' => $dbrisks
 							];
 						}
-					$selection[] = $typeselection;
+					$selection[] = [$typeselection];
 				}
 				if ($selection) $response['render']['content'][] = $selection;
 
