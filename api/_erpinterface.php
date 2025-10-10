@@ -567,7 +567,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		if (!$erp_case_numbers) return [[]];
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref), $erp_case_numbers))
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote(intval($ref)), $erp_case_numbers))
 			]));
 			$statement->execute();	
 		}
@@ -656,7 +656,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		if (!$erp_case_numbers) return [[]];
 		try{
 			$statement = $this->_pdo->prepare(strtr($query, [
-				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref), $erp_case_numbers))
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote(intval($ref)), $erp_case_numbers))
 			]));
 			$statement->execute();	
 		}
@@ -894,7 +894,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 		$namesearch = [];
 		foreach(['NACHNAME', 'NAME_2', 'NAME_3', 'NAME_4'] as $column){
 			foreach($name as $namepart){
-				$namesearch[] = 'pat.' . $column . ($namepart['operator'] === '-' ? ' NOT LIKE ' : ' LIKE ') . $this->_pdo->quote($namepart['term']);
+				$namesearch[] = 'pat.' . $column . ($namepart['operator'] === '-' ? ' NOT LIKE ' : ' LIKE ') . $this->_pdo->quote($namepart['sqlterm']);
 			}
 		}
 
@@ -1158,6 +1158,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'last_order' => $row['WARENEINGANGSDATUM'] ? : null
 			];
 		}
+		if (!$response) return [[]];
 		return $response;
 	}
 	
@@ -1213,6 +1214,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'filename' => $row['vorgang'] . ' ' . $row['ANGELEGT_AM'] . ' ' . $row['BESCHREIBUNG'] . '.' . pathinfo($row['DATEINAME'])['extension']
 			];
 		}
+		if (!$response) return [[]];
 		return $response;
 	}
 
@@ -1310,6 +1312,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				'order_reference' => $row['BESTELL_BELEGNUMMER']
 			];
 		}
+		if (!$response) return [[]];
 		return $response;
 	}
 }
