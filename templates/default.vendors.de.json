@@ -1082,7 +1082,7 @@
 			"customer_id": ""
 		},
 		"pricelist": {
-			"filter":{
+			"filter": {
 				"filesetting": {
 					"columns": ["supplierPartNum", "itemDescDE", "gtin"]
 				},
@@ -2442,7 +2442,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Mat Nr", "Mat Bez lang", "ME", "EAN"] 
+					"columns": ["Mat Nr", "Mat Bez lang", "ME", "EAN"]
 				},
 				"filter": [
 					{
@@ -2685,7 +2685,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["ArtikelNr", "Bezeichnung", "Mengeneinh", "EAN-Nummer"]
+					"columns": ["Artikel.Nr.", "Art.-Bezeichnung", "Mengeneinh.", "EAN-Nummer"]
 				},
 				"filter": [
 					{
@@ -2693,9 +2693,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["ArtikelNr"],
+							"orderby": ["Artikel.Nr."],
 							"descending": false,
-							"column": "ArtikelNr",
+							"column": "Artikel.Nr.",
 							"amount": 1
 						}
 					},
@@ -2735,7 +2735,7 @@
 						],
 						"match": {
 							"all": {
-								"ArtikelNr": "BESTELL_NUMMER"
+								"Artikel.Nr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -2751,12 +2751,12 @@
 						"stock_item": "0"
 					},
 					"conditional_or": [
-						["special_attention", "1", ["Bezeichnung", "noppenhaft"]],
+						["special_attention", "1", ["Art.-Bezeichnung", "noppenhaft"]],
 						[
 							"stock_item",
 							"1",
 							[
-								"ArtikelNr",
+								"Artikel.Nr.",
 								"K10090(?:1|2|3|6)|5650223|5650132|5650224|5650222|R013313|R013314|R013312000|R013212|R133302000|R133303000|R133304000|R013213|R012214|R133202000|R133203000|R133204000|G061391|G061392|G061393|G061394|G061395|G061396|G061291|G061292|G061293|G061294|G061295|G061296"
 							]
 						]
@@ -2764,9 +2764,9 @@
 					"replace": [["EAN-Nummer", "\\.", ""]],
 					"rewrite": [
 						{
-							"article_no": ["ArtikelNr"],
-							"article_name": ["Bezeichnung"],
-							"article_unit": ["Mengeneinh"],
+							"article_no": ["Artikel.Nr."],
+							"article_name": ["Art.-Bezeichnung"],
+							"article_unit": ["Mengeneinh."],
 							"article_ean": ["EAN-Nummer"]
 						}
 					]
@@ -2790,7 +2790,7 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"columns": ["Artikelnummer", "Einheit", "Staffel"]
+					"columns": ["Artikelnr.", "Kurztext", "Einheit"]
 				},
 				"filter": [
 					{
@@ -2799,7 +2799,7 @@
 						"keep": true,
 						"match": {
 							"all": {
-								"Artikelnummer": ".+"
+								"Artikelnr.": ".+"
 							}
 						}
 					},
@@ -2808,9 +2808,9 @@
 						"comment": "delete multiple pricelist entries",
 						"keep": true,
 						"duplicates": {
-							"orderby": ["Artikelnummer"],
+							"orderby": ["Artikelnr."],
 							"descending": false,
-							"column": "Artikelnummer",
+							"column": "Artikelnr.",
 							"amount": 1
 						}
 					},
@@ -2850,7 +2850,7 @@
 						],
 						"match": {
 							"all": {
-								"Artikelnummer": "BESTELL_NUMMER"
+								"Artikelnr.": "BESTELL_NUMMER"
 							}
 						},
 						"transfer": {
@@ -2865,13 +2865,13 @@
 						"stock_item": "0"
 					},
 					"conditional_or": [
-						["special_attention", "1", ["Staffel", "pryx|deusith"]],
-						["stock_item", "1", ["Artikelnummer", "425706-000|405004-024|405006-000"]]
+						["special_attention", "1", ["Kurztext", "pryx|deusith"]],
+						["stock_item", "1", ["Artikelnr.", "425706-000|405004-024|405006-000"]]
 					],
 					"rewrite": [
 						{
-							"article_no": ["Artikelnummer"],
-							"article_name": ["Staffel"],
+							"article_no": ["Artikelnr."],
+							"article_name": ["Kurztext"],
 							"article_unit": ["Einheit"],
 							"article_ean": [""]
 						}
@@ -2885,7 +2885,7 @@
 	{
 		"name": "MMIB",
 		"info": {
-			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV in Excel umschreiben - die ersten drei Spalten verketten und als Wert in article_no einfügen, article_name ergänzen, den Rest löschen",
+			"purchase_info": "Preislistenimport: XSL in Excel umschreiben - die ersten drei Spalten in H verketten (=VERKETTEN($A8; \" \"; $B8; \" \"; $C8)) und als Wert neu einfügen, Bezeichnungen in I einfügen, Überschriften article_no und article_name ergänzen, den Rest löschen, XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -2896,9 +2896,20 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
+					"headerrow": 1,
 					"columns": ["article_no", "article_name"]
 				},
 				"filter": [
+					{
+						"apply": "filter_by_expression",
+						"comment": "delete headers",
+						"keep": true,
+						"match": {
+							"all": {
+								"article_no": ".+"
+							}
+						}
+					},
 					{
 						"apply": "filter_by_duplicates",
 						"comment": "delete multiple pricelist entries",
@@ -3551,7 +3562,7 @@
 	{
 		"name": "Ormed GmbH",
 		"info": {
-			"purchase_info": "Preislistenimport: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"purchase_info": "Preislistenimport: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
 			"mail": "",
 			"phone": "",
@@ -3562,8 +3573,81 @@
 		"pricelist": {
 			"filter": {
 				"filesetting": {
-					"headerrow": 1,
-					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+					"headerrow": 6,
+					"columns": ["Art-Bezeichnung                      ", "Art-Nr", "EK- Einh.", "GTIN (EAN)"]
+				},
+				"filter": [
+					{
+						"apply": "filter_by_duplicates",
+						"comment": "delete multiple pricelist entries",
+						"keep": true,
+						"duplicates": {
+							"orderby": ["Art-Nr"],
+							"descending": false,
+							"column": "Art-Nr",
+							"amount": 1
+						}
+					},
+					{
+						"apply": "filter_by_comparison_file",
+						"comment": "transfer erp_id. source will be set if match file is provided",
+						"filesetting": {
+							"source": "ERPDUMP.csv",
+							"headerrow": 2,
+							"columns": ["STATUS", "REFERENZ", "LIEFERANTENNAME", "BESTELL_NUMMER", "BESTELLSTOP", "WE_DAT_ARTIKELSTAMM"]
+						},
+						"filter": [
+							{
+								"apply": "filter_by_expression",
+								"comment": "delete inactive articles and unneccessary vendors",
+								"keep": true,
+								"match": {
+									"all": {
+										"STATUS": "false",
+										"LIEFERANTENNAME": "ormed",
+										"BESTELLSTOP": "false",
+										"WE_DAT_ARTIKELSTAMM": ".+"
+									}
+								}
+							},
+							{
+								"apply": "filter_by_monthdiff",
+								"comment": "lösche alle Produkte, die vor über fünf Jahren bestellt wurden",
+								"keep": false,
+								"date": {
+									"column": "WE_DAT_ARTIKELSTAMM",
+									"format": "d.m.Y H:i",
+									"threshold": 36,
+									"bias": ">"
+								}
+							}
+						],
+						"match": {
+							"all": {
+								"Art-Nr": "BESTELL_NUMMER"
+							}
+						},
+						"transfer": {
+							"erp_id": "REFERENZ",
+							"last_order": "WE_DAT_ARTIKELSTAMM"
+						}
+					}
+				],
+				"modify": {
+					"add": {
+						"trading_good": "1",
+						"has_expiry_date": "0",
+						"stock_item": "0"
+					},
+					"conditional_or": [["trading_good", "0", ["Art-Bezeichnung                      ", "zubeh(?:ö|Ö)r|boa|ofen|messger|gurt|polster|keile|austausch|set|cover|innenbezug"]]],
+					"rewrite": [
+						{
+							"article_no": ["Art-Nr"],
+							"article_name": ["Art-Bezeichnung                      "],
+							"article_unit": ["EK- Einh."],
+							"article_ean": ["GTIN (EAN)"]
+						}
+					]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -4974,7 +5058,7 @@
 			"filter": {
 				"filesetting": {
 					"headerrow": 1,
-					"columns": ["Artikel-Nr.:", "Artikelkurztext", "ME", "EAN"]
+					"columns": ["Artikel-Nr.:", "Artikelkurztext", "Größe", "Weite", "(Grund-)Farbe", "Name", "ME", "EAN"]
 				},
 				"filter": [
 					{
@@ -5041,7 +5125,7 @@
 					"rewrite": [
 						{
 							"article_no": ["Artikel-Nr.:"],
-							"article_name": ["Artikelkurztext"],
+							"article_name": ["Artikelkurztext", " ", "Größe", " ", "Weite", " ", "(Grund-)Farbe", " ", "Name"],
 							"article_unit": ["ME"],
 							"article_ean": ["EAN"]
 						}
