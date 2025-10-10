@@ -213,27 +213,43 @@ class TEXTTEMPLATE extends API {
 					'content' => [
 						[
 							[
-								...$renderoptions,
 								[
-									'type' => 'search',
-									'numeration' => 'prevent',
+									'type' => 'collapsible',
 									'attributes' => [
-										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-										'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
+										'class' => 'em16'
 									],
-									'datalist' => array_values(array_unique($chunkdatalist))
+									'content' => [
+										[
+											'type' => 'search',
+											'numeration' => 'prevent',
+											'attributes' => [
+												'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
+												'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
+											],
+											'datalist' => array_values(array_unique($chunkdatalist))
+										],
+										...$renderoptions
+									]
 								]
 							],
 							[
-								...$renderalloptions,
 								[
-									'type' => 'search',
-									'numeration' => 'prevent',
+									'type' => 'collapsible',
 									'attributes' => [
-										'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
-										'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
+										'class' => 'em16'
 									],
-									'datalist' => array_values(array_unique($chunkdatalist))
+									'content' => [
+										[
+											'type' => 'search',
+											'numeration' => 'prevent',
+											'attributes' => [
+												'name' => $this->_lang->GET('texttemplate.chunk.edit_chunk'),
+												'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'chunk', this.value); return false;}"
+											],
+											'datalist' => array_values(array_unique($chunkdatalist))
+										],
+										...$renderalloptions
+									]
 								]
 							]
 						], [
@@ -497,27 +513,43 @@ class TEXTTEMPLATE extends API {
 				$response['render'] = ['content' => [
 					[
 						[
-							...$renderoptions,
 							[
-								'type' => 'search',
-								'numeration' => 'prevent',
+								'type' => 'collapsible',
 								'attributes' => [
-									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-									'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+									'class' => 'em16'
 								],
-								'datalist' => array_values(array_unique($templatedatalist))
+								'content' => [
+									[
+										'type' => 'search',
+										'numeration' => 'prevent',
+										'attributes' => [
+											'name' => $this->_lang->GET('texttemplate.template.edit_template'),
+											'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+										],
+										'datalist' => array_values(array_unique($templatedatalist))
+									],
+									...$renderoptions
+								]
 							]
 						],
 						[
-							...$renderalloptions,
 							[
-								'type' => 'search',
-								'numeration' => 'prevent',
+								'type' => 'collapsible',
 								'attributes' => [
-									'name' => $this->_lang->GET('texttemplate.template.edit_template'),
-									'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+									'class' => 'em16'
 								],
-								'datalist' => array_values(array_unique($templatedatalist))
+								'content' => [
+									[
+										'type' => 'search',
+										'numeration' => 'prevent',
+										'attributes' => [
+											'name' => $this->_lang->GET('texttemplate.template.edit_template'),
+											'onkeydown' => "if (event.key === 'Enter') {api.texttemplate('get', 'template', this.value); return false;}"
+										],
+										'datalist' => array_values(array_unique($templatedatalist))
+									],
+									...$renderalloptions
+								]
 							]
 						]
 					], [

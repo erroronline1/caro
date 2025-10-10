@@ -1038,29 +1038,45 @@ class DOCUMENT extends API {
 				[
 					[
 						[
-							'type' => 'textsection',
+							'type' => 'collapsible',
 							'attributes' => [
-								'name' => $this->_lang->GET('assemble.compose.component.existing_components_select'),
+								'class' => 'em16'
 							],
-						],
-						...$options_selection,
-						[
-							'type' => 'search',
-							'numeration' => 'prevent',
-							'attributes' => [
-								'name' => $this->_lang->GET('assemble.compose.component.existing_components'),
-								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component_editor', encodeURIComponent(this.value)); return false;}"
-							],
-							'datalist' => array_values(array_unique($componentdatalist))
+							'content' => [
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('assemble.compose.component.existing_components_select'),
+									],
+								],
+								[
+									'type' => 'search',
+									'numeration' => 'prevent',
+									'attributes' => [
+										'name' => $this->_lang->GET('assemble.compose.component.existing_components'),
+										'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'component_editor', encodeURIComponent(this.value)); return false;}"
+									],
+									'datalist' => array_values(array_unique($componentdatalist))
+								],
+								...$options_selection
+							]
 						]
 					],[
 						[
-							'type' => 'textsection',
+							'type' => 'collapsible',
 							'attributes' => [
-								'name' => $this->_lang->GET('assemble.compose.component.existing_components_all'),
+								'class' => 'em16'
 							],
-						],
-						...$alloptions_selection
+							'content' => [
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('assemble.compose.component.existing_components_all'),
+									],
+								],
+								...$alloptions_selection
+							]
+						]
 					]
 				],[
 					[[
@@ -1847,29 +1863,45 @@ class DOCUMENT extends API {
 				[
 					[
 						[
-							'type' => 'textsection',
+							'type' => 'collapsible',
 							'attributes' => [
-								'name' => $this->_lang->GET('assemble.compose.document.existing_documents_select'),
+								'class' => 'em16'
 							],
-						],
-						...$options_selection,
-						[
-							'type' => 'search',
-							'numeration' => 'prevent',
-							'attributes' => [
-								'name' => $this->_lang->GET('assemble.compose.document.existing_documents'),
-								'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'document_editor', encodeURIComponent(this.value)); return false;}"
-							],
-							'datalist' => array_values(array_unique($documentdatalist))
+							'content' => [
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('assemble.compose.document.existing_documents_select'),
+									],
+								],
+								[
+									'type' => 'search',
+									'numeration' => 'prevent',
+									'attributes' => [
+										'name' => $this->_lang->GET('assemble.compose.document.existing_documents'),
+										'onkeydown' => "if (event.key === 'Enter') {api.document('get', 'document_editor', encodeURIComponent(this.value)); return false;}"
+									],
+									'datalist' => array_values(array_unique($documentdatalist))
+								],
+								...$options_selection
+							]
 						]
-					],[
+					], [
 						[
-							'type' => 'textsection',
+							'type' => 'collapsible',
 							'attributes' => [
-								'name' => $this->_lang->GET('assemble.compose.document.existing_documents_all'),
+								'class' => 'em16'
 							],
-						],
-						...$alloptions_selection
+							'content' => [
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('assemble.compose.document.existing_documents_all'),
+									],
+								],
+								...$alloptions_selection
+							]
+						]
 					]
 				], [
 					[
