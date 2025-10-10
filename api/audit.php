@@ -1970,7 +1970,7 @@ class AUDIT extends API {
 		// this is actually faster than a nested sql query
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		foreach ($vendors as &$vendor){
-			$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true); 
+			$vendor['products'] = json_decode($vendor['products'] ? : '', true); 
 		}
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
 			'replacements' => [
@@ -1988,7 +1988,7 @@ class AUDIT extends API {
 			}
 			$vendor = $vendors[array_search($product['vendor_name'], array_column($vendors, 'name'))];
 			$check = new \DateTime($product['checked']);
-			if (isset($vendor['pricelist']['samplecheck_reusable']) && intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']){
+			if (isset($vendor['products']['samplecheck_reusable']) && intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['products']['samplecheck_reusable']){
 				$checkable[$product['vendor_name']][] = $product['id'];
 			}
 		}
@@ -1996,7 +1996,7 @@ class AUDIT extends API {
 		foreach ($products as $product){
 			if (!$product['trading_good'] || !$product['checked'] || !isset($checkable[$product['vendor_name']])) continue;
 			$check = new \DateTime($product['checked']);
-			if (isset($vendor['pricelist']['samplecheck_interval']) && intval($check->diff($this->_date['servertime'])->format('%a')) <= $vendor['pricelist']['samplecheck_interval']){
+			if (isset($vendor['products']['samplecheck_interval']) && intval($check->diff($this->_date['servertime'])->format('%a')) <= $vendor['products']['samplecheck_interval']){
 				unset($checkable[$product['vendor_name']]);
 			}
 		}
@@ -3448,7 +3448,7 @@ class AUDIT extends API {
 	 *  | | | -_|   | . | . |  _|_ -|
 	 *   \_/|___|_|_|___|___|_| |___|
 	 *
-	 * returns all current active vendors with stored info, most recent pricelist import, MDR sample check and certificate details in alphabetical order
+	 * returns all current active vendors with stored info, most recent products import, MDR sample check and certificate details in alphabetical order
 	 */
 	private function vendors(){
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
@@ -3483,9 +3483,9 @@ class AUDIT extends API {
 				$vendor['info'] = array_filter($vendor['info'], function($value){return $value;});
 				$info .= implode(" \n", array_map(Fn($key, $value) => $value ? $this->_lang->GET($vendor_info[$key]) . ': ' . $value : false, array_keys($vendor['info']), $vendor['info'])) . "\n";
 			}
-			$vendor['pricelist'] = isset($vendor['pricelist']) ? $vendor['pricelist'] : [];
-			$pricelist = json_decode($vendor['pricelist'] ? : '', true);
-			if (isset($pricelist['validity']) && $pricelist['validity']) $info .= $this->_lang->GET('consumables.vendor.pricelist_validity') . ' ' . $this->convertFromServerTime($pricelist['validity'], true) . "\n";
+			$vendor['products'] = isset($vendor['products']) ? $vendor['products'] : [];
+			$productlist = json_decode($vendor['products'] ? : '', true);
+			if (isset($productlist['validity']) && $productlist['validity']) $info .= $this->_lang->GET('consumables.vendor.productlist_validity') . ' ' . $this->convertFromServerTime($productlist['validity'], true) . "\n";
 			if (($samplecheck = array_search($vendor['id'], array_column($lastchecks, 'vendor_id'))) !== false) $info .= $this->_lang->GET('audit.checks_type.mdrsamplecheck') . ' ' . $this->convertFromServerTime($lastchecks[$samplecheck]['checked'], true) . "\n";
 			if ($vendor['evaluation']){
 				$vendor['evaluation'] = json_decode($vendor['evaluation'] ? : '', true) ? : [];

@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_09_27'] as $update){
+		foreach (['_2025_10_10'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -208,6 +208,23 @@ class UPDATE{
 				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",
 				"ALTER TABLE caro_records ADD COLUMN IF NOT EXISTS note text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; ",
 				"UPDATE caro_user SET image = 'media/favicon/icon192.png' where id = 1; "
+			],
+			'sqlsrv' => [
+				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",
+				"IF COL_LENGTH('caro_records', 'note') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_records" .
+				"    ADD note varchar(MAX) NULL DEFAULT NULL" .
+				" END; ",
+				"UPDATE caro_user SET image = 'media/favicon/icon192.png' where id = 1; "
+			]
+		];
+	}
+
+	private function _2025_10_10(){
+		return [
+			'mysql' => [
+				"ALTER TABLE `caro_consumables_vendors` CHANGE `pricelist` `products` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
 			],
 			'sqlsrv' => [
 				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",

@@ -1615,7 +1615,7 @@ export const api = {
 		request = [...request];
 		if (method === "get" && !["productsearch"].includes(request[0])) api.history.write(["purchase", ...request]);
 
-		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "exportpricelist", "productsearch"].includes(request[0])) request.splice(0, 0, "consumables");
+		if (["vendor", "product", "mdrsamplecheck", "incorporation", "pendingincorporations", "exportproductlist", "productsearch"].includes(request[0])) request.splice(0, 0, "consumables");
 		else request.splice(0, 0, "order");
 
 		let payload,

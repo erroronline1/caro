@@ -10,8 +10,8 @@
 			"sales_representative": "John Knowitall",
 			"customer_id": "76513"
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrowindex": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -32,6 +32,6 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {}
+		"products": {}
 	}
 ]

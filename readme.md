@@ -44,10 +44,7 @@ Things are still in motion. Images may be outdated.
     * set up named array as private class variable (for comprehension), stringify later
 * assemble swipe to toggle autocomplete for safari
 * describe application api manual
-* update default permissions in runtime variables
-* login dialog close on logout event with blank input
-* save product -> remain, no viewport update for new -> consider response determining data-loss warning?
-* manual order checkboxes for special_attention, expiry date, trading_good; port to "add product" (post method?)
+* manual order checkboxes for special_attention, expiry date, trading_good - not possible, update manual adding warning
 * [Stakeholder requirements](#stakeholder-requirements)
     * min/max **IS** stock
     * look for medical device flag
@@ -111,7 +108,7 @@ Things are still in motion. Images may be outdated.
     * [Known deficiencies](#known-deficiencies)
     * [Customisation](#customisation)
     * [User acceptance considerations](#user-acceptance-considerations)
-    * [Importing vendor pricelists](#importing-vendor-pricelists)
+    * [Importing vendor product lists](#importing-vendor-product-lists)
 * [Regulatory software requirements](#regulatory-software-requirements)
     * [Clinical evaluation, clinical evaluation plan, clinical evaluation report](#clinical-evaluation-clinical-evaluation-plan-clinical-evaluation-report)
     * [Data protection](#data-protection)
@@ -216,7 +213,7 @@ For technical details see [prerequisites](#prerequisites).
 ## What it is not
 Beside some architectural decisions to fit regulatory requirements the app is not a fully preset quality management system. You're still in control of your contents. Define your processes, documents and responsibilities for yourself. The application is solely supposed to help you with a structured flow and semiautomated fulfilment of regulatory issues. *Permissions showed within the below flowcharts resemble the non-binding recommended default settings.*
 
-The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This is a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors pricelists and sanitized from any unimportant data on a regular basis.
+The application does not replace an ERP system. Procurement data is solely accessible within the application based on its own database. This has initially been a concious decision against overwhelming ERP product databases that are not maintainable in reality and more often than not require a proprietary interface. The products database is supposed to be populated with vendors product lists (e.g. pricelists) and sanitized from any unimportant data on a regular basis. However ERP stock data exports can be used as well, and if your're lucky you can import tidy data trough the [ERP Interface](#erp-interface).
 
 Orders can be deleted by administrative users and requesting unit members at any time and will be deleted by default after a set timespan once being delivered. This module is for operational communication only, not for persistent documentation purpose.
 
@@ -878,7 +875,7 @@ External documents as described in ISO 13485 4.2.4 have to be identified and rou
 ![sample purchase menu](http://toh.erroronline.one/caro/purchase%20menu%20en.png)
 
 ### Vendor and product management
-Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import pricelists and define filters or disable vendors and products. [Importing pricelists](#importing-vendor-pricelists) with filtering makes use of the [CSV processor](#csv-processor) and maybe the [ERP interface](#erp-interface). Make sure, vendor names match the ERP data.
+Order operations rely on a vendor and product database. Also this is related to incorporation and sample checks of products, document and certification handling. Defined authorized users have permission to manage these categories, add and edit vendors and products, import product lists and define filters or disable vendors and products. [Importing product lists](#importing-vendor-product-lists) with filtering makes use of the [CSV processor](#csv-processor) and maybe the [ERP interface](#erp-interface). Make sure, vendor names match the ERP data.
 
 > Even if the ERP-Interface can provide data or could serve as a direct source of product data this will not happen! Not everyone may have access, let alone writing enabled. The redundant product database within the CARO App considers regulatory requirements that are not considered by default within ERP software.
 
@@ -887,7 +884,7 @@ Vendors are supposed to be evaluated. A document with the *Vendor evaluation*-co
 Vendor related files can be added. Through the dedicated input an expiry date is [inserted in the filename](#filename-conventions). Without provided date and for vendor evaluation document file uploads the validity is set to one year after the upload by default. The application will match the provided expiry-date and contribute to the [calendar](#calendar) once the date has passed to alert relevant units to look after an update. Files matching the filename convention for this type will be rejected.  
 The edit view for vendors allows for selecting [text recommendations](#text-recommendations). If these are set up properly, prepared values can be imported easily.  
 Small vendor portfolios may be edited within the application primarily or at least initially. Article-lists can be exported as well as the import filter. Latter [will be generated](#default-filter-on-export) if not defined.
-> Generated filters will not work on original pricelists, exported pricelists will not work with custom filter rules!
+> Generated filters will not work on original product lists, exported product lists will not work with custom filter rules!
 
 Defined authorized users (e.g. *purchase assistant*) can edit the alias definition of products to disburden purchase and enhance identification of products with company customs.
 
@@ -976,7 +973,7 @@ graph TD;
 
 ### Order
 The order module supports all parties. Purchase is supposed to obtain structured and complete data for placed orders and ordering units get information about the order state.
-Products are intended to be selected from the database populated by pricelist imports. Manual ordering is possible though. But only products within the database can provide additional information:  
+Products are intended to be selected from the database populated by product list imports. Manual ordering is possible though. But only products within the database can provide additional information:  
 Ordered products identify themself as incorporated or not or whether they are qualified for a necessary sample check. Both can be done from the list of ordered products, during operations and without being mixed-up. Delivered products get an update on the last ordered date.  
 Manual orders allow a quick import to the products database.
 
@@ -1126,7 +1123,7 @@ Furthermore hopefully beneficial information on
 ## Maintenance
 The application has some options to be maintained by authorized users:
 * The [logfile](#cron) `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
-* Existing vendors can be updated regarding their information and pricelist settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
+* Existing vendors can be updated regarding their information and product list settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
 * Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
 
 [Content](#content)
@@ -1321,7 +1318,7 @@ rendered to something as
 [Content](#content)
 
 ## CSV processor
-The CSV Processor is implemented within the CSV filter module as well as importing products via pricelist and marking them as trading good. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON), [regular expression pattern matching](https://regex101.com/) and [PHP-DateTime formats](https://www.php.net/manual/en/datetime.format.php).
+The CSV Processor is implemented within the CSV filter module as well as importing products via e.g pricelist and marking them as trading good, special attention and having an expiry date. It is a versatile tool but needs an understanding of [JavaScript object notation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON), [regular expression pattern matching](https://regex101.com/) and [PHP-DateTime formats](https://www.php.net/manual/en/datetime.format.php).
 
 Filters and modifications are processed in order of appearance. Modifications take place with the filtered list only for performance reasons. Compare lists can be filtered and manipulated likewise. Due to recursive implementation the origin list can be used as a filter by itself.
 
@@ -1616,8 +1613,8 @@ Customer data is fetched by request if any data is to be expected. The function 
 
 To prepare significant responses for customer data to import, the ERP-interface must consider the relevant document inputs by name.
 
-### Data matching on pricelist imports
-ERP-Data is fetched during pricelist imports if available and selected. For articles with matching article numbers for the selected vendor data for
+### Data matching on product list imports
+ERP-Data is fetched during product list imports if available and selected. For articles with matching article numbers for the selected vendor data for
 * article_unit
 * article_ean
 * trading_good
@@ -1697,7 +1694,7 @@ Application support legend:
 | ISO 13485 5.4.2 Quality management system planning | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 5.5.1 Responsibility and authority | yes | &bull; Users are assigned [special permissions](#users) that specify an explicit access or unclutter menu items.<br/>&bull; Permissions define access to app functions.<br/>&bull; Users can be assigned a pin to approve orders.<br/>&bull; A personnel register summarizes all users, also grouped by organizational unit and permission<br/>&bull; Responsibilities can be defined and are publicly accessible | [Users](#users), [Personnel register](#personnel-register), [Responsibilities](#responsibilities), [Runtime variables](#runtime-variables) |
 | ISO 13485 5.5.2 Management representative | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
-| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application allows for common or unitwise announcements on the landing page<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Announcements](#announcements), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 5.5.3 Internal communication | yes, structural | &bull; The application has a built in [messenger](#conversations). This messenger is being made use of internal modules to ensure decent data distribution e.g. alerting user groups for approving new document components and documents, alerting user groups about disapproved orders and order state changes, messaging inquiries to ordering users, alerting user groups about scheduled events, alerting about long untouched cases<br/>&bull; The application allows for common or unitwise announcements on the landing page<br/>&bull; The application has a built in calendar. This calendar is supposed to assist in scheduling operations and keeping track of time critical recurring events like calibrations etc.<br/>&bull; The application has an ordering module. Orders can be prepared and approved. Purchase will have all necessary data from vendor pricelists or ERP-stock data imports to handle the order request and can mark the order as processed thus giving immediate feedback to the ordering person.<br/>&bull; The application has a sharepoint for files and an STL-viewer to easily exchange information overstraining the messenger.<br/>&bull; The interface alerts on new messages, approved unprocessed orders (purchase members) and unclosed calendar events. The landing page also displays a brief summary of unfinished record cases and scheduled events for the current week as well as unfinished events.<br/>&bull; Documents can link to other documents being displayed (e.g. process or work instructions) to have a quick glance and transparent transfer.<br/>&bull; *describe within documents with the "Process or work instruction"-context* | [Conversations](#conversations), [Announcements](#announcements), [Calendar](#calendar), [Order](#order), [Files](#files), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.1 General management assessment | partial | &bull; The application has a form to add, edit or close management reviews, containing required issues by default. | [Management review](#management-review), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
 | ISO 13485 5.6.2 Rating input | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
 | ISO 13485 5.6.3 Rating results | yes | &bull; All required issues are displayed and can / should be commented on | [Runtime variables](#runtime-variables) |
@@ -1720,9 +1717,9 @@ Application support legend:
 | ISO 13485 7.3.8 Development transfer | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
 | ISO 13485 7.3.9 Controlling development changes | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
 | ISO 13485 7.3.10 Development files | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
-| ISO 13485 7.4.1 Procurement process | yes, structural | &bull; Procurement is guided through the application. Vendors and products can be added into the database.<br/>&bull; Vendor evaluation is implemented within the vendor manager by customizable documents with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns.<br/>&bull; Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.<br/>&bull; Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.<br/>&bull; Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated document with the respective context.<br/>&bull; Products are deleted by default on update of the pricelist unless an incorporation has been made, a sample check has been made, any document to the product has been provided, an alias has been modified, it has been ordered<br/>&bull; Vendor and product editing is permitted by defined authorized users only.<br/>&bull; Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *prepare documents with the "Vendor evaluation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
-| ISO 13485 7.4.2 Procurement data | partially | &bull; Orders preferably make use of the vendors own pricelists<br/>&bull; recording procurement data does have to take place in a third party software though (ERP) | [Vendor and product management](#vendor-and-product-management), [Order](#order) |
-| ISO 13485 7.4.3 Verification of procured products | yes, structural | &bull; MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-pricelists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.<br/>&bull; Sample check information is to be enriched through a dedicated document with the respective context. All users (except groups) can gather the required information and commit the check.<br/>&bull; Sample checks can be revoked by authorized users.&bull; *prepare documents with the "MDR §14 Sample Check"- or "Product incorporation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents) |
+| ISO 13485 7.4.1 Procurement process | yes, structural | &bull; Procurement is guided through the application. Vendors and products can be added into the database.<br/>&bull; Vendor evaluation is implemented within the vendor manager by customizable documents with the respective context. It is supported by an additional reduced order record that can be exported and used to e.g. evaluate delivery times, order cancellations and returns.<br/>&bull; Vendor data can be enriched with documents, certificates and certificate validity dates. Latter can be dispayed and exported. Vendors can be disabled but not deleted. Products of disabled vendors are not available in the order module.<br/>&bull; Products can be enriched with documents that will not be deleted. They are assigned the vendors name, a timestamp of submission and the products article number.<br/>&bull; Products are supposed to be incorporated. Incorporation can be granted, denied and revoked by authorized users. All users (except groups) can gather the required information beforehand. Incorporation information is to be enriched through a dedicated document with the respective context.<br/>&bull; Products are deleted by default on update of the product list unless an incorporation has been made, a sample check has been made, any document to the product has been provided, an alias has been modified, it has been ordered<br/>&bull; Vendor and product editing is permitted by defined authorized users only.<br/>&bull; Create text recommendations for purchase to prepare messages requesting regulatory documents for products requiring special attention or a renewed certificate.<br/>&bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *prepare documents with the "Vendor evaluation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Regulatory evaluations and summaries](#regulatory-evaluations-and-summaries) |
+| ISO 13485 7.4.2 Procurement data | partially | &bull; Orders preferably make use of the vendors own pricelists or ERP stock data imports<br/>&bull; recording procurement data does have to take place in a third party software though (ERP) | [Vendor and product management](#vendor-and-product-management), [Order](#order) |
+| ISO 13485 7.4.3 Verification of procured products | yes, structural | &bull; MDR §14 sample check will ask for a check for every vendors [product that qualifies as trading good](#importing-vendor-product-lists) if the last check for any product of this vendor exceeds the mdr14_sample_interval timespan set for the vendor, so e.g. once a year per vendor by default. This applies for all products that have not been checked within mdr14_sample_reusable timespan that can also be set for each vendor if the amount of products makes this necessary. Both values have a default value set within the [config.ini](#runtime-variables) file.<br/>&bull; Sample check information is to be enriched through a dedicated document with the respective context. All users (except groups) can gather the required information and commit the check.<br/>&bull; Sample checks can be revoked by authorized users.&bull; *prepare documents with the "MDR §14 Sample Check"- or "Product incorporation"-context* | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents) |
 | ISO 13485 7.5.1 Control of production and service | partial, structural | &bull; Dedicated documents are supposed to record any step within production. By accessing the most recent record the current state is visible. If e.g. you have a record for a given fabrication process where you define steps, you can add a checkbox for fulfillment. One step is defining the steps, storing these to the record and signalize the actual fabrication is required. The next step could be to reuse the document, ticking the checkbox, adding this content with username and date to the record.<br/>&bull; Form contexts allow the definition as process or work instructions.<br/>&bull; The inbuilt calendar assists in scheduling operations. | [Documents](#documents), [Records](#records), [Calendar](#calendar) |
 | ISO 13485 7.5.2 Product cleanliness | structural | &bull; *describe within documents with the "Process or work instruction"-context* | |
 | ISO 13485 7.5.3 Product installation | structural | &bull; *describe within documents with the "Process or work instruction"-context*<br/>&bull; *record with documents with the "Case documentation"- or "General company record"-context* | |
@@ -1765,7 +1762,7 @@ Application support legend:
 | ISO 19011 6.6 Completing audit | partial | &bull; Editing and finalizing is possible anytime as long as the audit is not marked as finished. | [Audit](#audit) |
 | MPDG §83 Medical device consultants| yes | &bull; medical device consultants are defined by the respective permission flag and listed as such within the register. | [Users](#users) |
 | SGB 5 §33 Additional Costs | structural | &bull; *describe within documents with the "Case documentation"-context* | |
-| MDR Art. 14 Sample check | yes, partial | &bull; Sample check is implemented. Set up a respective document, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents), [Importing vendor pricelists](#importing-vendor-pricelists) |
+| MDR Art. 14 Sample check | yes, partial | &bull; Sample check is implemented. Set up a respective document, eligible products will identify themself if ordered. | [Vendor and product management](#vendor-and-product-management), [Order](#order), [Documents](#documents), [Importing vendor product lists](#importing-vendor-product-lists) |
 | MDR Art. 61 Clinical evaluation | structural | &bull; *describe within documents with the "Case documentation"-context* | |
 | MDR Art. 83 Post-market surveillance system | partial | &bull; Post-Market-Surveillance is not a part of the application per se. The regulatory need to invite patients to check on the aids is not integrated, as consistent gathering of contact information would add to the workload and would be redundant as an additional ERP-Software is needed anyway. Instead use its data-exports of your customers and create a CSV-filter with custom rules to receive a list of corresponding addressees for serial letters. Store the filtered lists as a record of your invitations and regulatory fulfilments. | [Tools](#tools), [CSV processor](#csv-processor) |
 | MDR annex 1 General safety and performance requirements | structural | &bull; *describe within documents with the "Case documentation"-context* | |
@@ -1790,7 +1787,7 @@ Application support legend:
     * preferably Firefox, Edge or some other Chromium-Browser, [Safari is not fully compatible](#safaris-special-needs)
     * at best [no deletion of browser data](#network-connection-handling) (cache, indexedDB) on closing.
     * Printer access for terminal devices
-* Vendor pricelists as CSV-files ([see details](#importing-vendor-pricelists))
+* Vendor product lists (e.g. pricelists) as CSV-files ([see details](#importing-vendor-product-lists)), ERP stock list exports or a customized [ERP interface](#erp-interface)
 * Occasionally FTP-access to the server for updates of [runtime variables](#runtime-variables) and [language files](#customisation)
 
 Tested server environments:
@@ -1822,13 +1819,13 @@ It is strongly recommended to create an additional development environment to te
 ### Server setup
 * php.ini memory_limit ~4096M for [processing of large CSV-files and pricelist imports](#csv-processor), disable open_basedir at least for local IIS for file handlers.
     * [processing a CSV](#csv-processor) of 48mb @ 59k rows with several, including file-, filters consumes about 1.7GB of memory
-    * [pricelist import](#importing-vendor-pricelists) @ 100MB consumes about 2.3GB of memory
+    * [pricelist import](#importing-vendor-product-lists) @ 100MB consumes about 2.3GB of memory
 * php.ini upload_max_filesize & post_max_size / applicationhost.config | web.config for IIS according to your expected filesize for e.g. sharepoint- and CSV-files ~350MB. On IIS [uploadReadAheadSize](#https://techcommunity.microsoft.com/blog/iis-support-blog/solution-for-%E2%80%9Crequest-entity-too-large%E2%80%9D-error/501134) should be configured accordingly.
 * php.ini max_input_time -1 for large file uploads to share with max_execution_time, depending on your expected connection speed.
 * php.ini max_execution_time / fastCGI timeout (iis) ~ 300 (5min) for [CSV processing](#csv-processor) may take a while depending on your data amount, depending on your filters though. This might have to be adjusted. Possibly there has to be an adjustment for processor timout within the app pool settings of IIS and [session timeout](#runtime-variables) as well.
     * pricelist import @ 220k rows takes about 1 minute to import and process on Uniform Server, 1 minute on SQL Server
     * pricelist import @ 660k rows currently takes about 2 minutes to import and process on Uniform Server, 3 minutes on SQL Server
-    * pricelist import does take a lot longer on [updating products](#importing-vendor-pricelists) than deleting and reinserting
+    * pricelist import does take a lot longer on [updating products](#importing-vendor-product-lists) than deleting and reinserting
 * php.ini session.cookie_httponly = 1, session.cookie_secure = 1, session.use_strict_mode = 1
 * optional php.ini session.gc_maxlifetime in relation to [CONFIG[lifespan][session][idle]](#runtime-variables)
 * php.ini enable extensions:
@@ -1863,7 +1860,7 @@ The default provides [template files](#https://github.com/erroronline1/caro/tree
 
 > the default user is set to *CARO App* and should be changed in advance to a justified name for document creation to avoid confusion with auditors
 
-If you are going to prepare the deployment you are free to create multiple files of one type with a choosable name part for enhanced comprehensibility (before this design choice default risks had about 30k lines which was an even worse of a mess to track). This is optional and if you feel comfortable enough only. Also approvals, evaluations and pricelist imports have to be done the regular way after installation though. The templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
+If you are going to prepare the deployment you are free to create multiple files of one type with a choosable name part for enhanced comprehensibility (before this design choice default risks had about 30k lines which was an even worse of a mess to track). This is optional and if you feel comfortable enough only. Also approvals, evaluations and product list imports have to be done the regular way after installation though. The templates lack any images that should to be added manually in advance of approval to ensure being stored in their proper and audit safe location and manner.
 
 * Provide company logos (JPG, PNG) for record exports (e.g. company logo for upper right corner, department logo for lower right corner, watermark logo best with transparent background) e.g. in directory media/favicon/
 * Set up [runtime variables](#runtime-variables), especially the used sql subset and its credentials, packagesize in byte according to sql-configuration, path to logos. Apply set permissions to manual templates.
@@ -2247,8 +2244,8 @@ A weekend of mastering psychology \s has lead to the decision to personify the a
 
 [Content](#content)
 
-## Importing vendor pricelists
-Vendor pricelists must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
+## Importing vendor product lists
+Vendor product lists (e.g. pricelists) must have an easy structure to be importable. It may need additional off-app customizing available data to have input files like:
 
 | Article Number | Article Name | EAN         | Sales Unit |
 | :------------- | :----------- | :---------- | :--------- |
@@ -2371,7 +2368,7 @@ Other vendors may list products missing color variants appended to the article n
 
 You can, of course, decide to go the extra mile and apply any additional filter, e.g. to omit products you will not use anyway, speed up the import for next time by leaving out products that did not fit incorporation, etc.
 
-Products are deleted by default on update of the pricelist unless
+Products are deleted by default on update of the product list unless
 * an incorporation has been made,
 * a sample check has been made,
 * any document to the product has been provided,
@@ -2389,7 +2386,7 @@ You can as well define all products as trading goods and set to 0 conditionally 
 *special_attention* will be displayed within approved orders and is intended to inform about required batch number allocation for products with skin contact by default. This can be customized to anything within the language file.
 
 ### Default filter on export
-If not provided a simple import filter will be generated on export of pricelists. As described within [vendor and product management](#vendor-and-product-management), this may be reasonable if no initial pricelist is imported and primarily edited within the application. In this case the information on reimport is processed without conditions, filters and changes. This kind of filter can not be applied on vendor pricelists and will result in an error message.
+If not provided a simple import filter will be generated on export of product lists. As described within [vendor and product management](#vendor-and-product-management), this may be reasonable if no initial product list is imported and primarily edited within the application. In this case the information on reimport is processed without conditions, filters and changes. This kind of filter can not be applied on vendor product lists and will result in an error message.
 ```js
 {
     "filesetting": {
@@ -2478,7 +2475,7 @@ according to [default permissions](#environment-settings)
 | User | &bull; Orders, incorporation, sample check<br/>&bull; Records, import, export<br/>&bull; Calendar, planning, appointment notice<br/>&bull; Trainings, schedule, evaluation |
 | Supervisor, PRRC | &bull; Documents, approval<br/>&bull; Pending incorporations<br/>&bull; Sample checks, revoke |
 | QMO | &bull; Responsibilities<br/>&bull; Documents, creation<br/>&bull; Audit<br/>&bull; Management review<br/>&bull; User management<br/>&bull; Regulatory evaluations and summaries |
-| QMO, Purchase | &bull; Vendors, add, edit, evaluate, pricelist import<br/>&bull; Products, add, edit, deactivate<br/>&bull; Orders |
+| QMO, Purchase | &bull; Vendors, add, edit, evaluate, product list import<br/>&bull; Products, add, edit, deactivate<br/>&bull; Orders |
 
 [Content](#content)
 
@@ -3501,7 +3498,7 @@ Similar to tasks.
 
 ### Consumables endpoints
 
-> GET ./api/api.php/consumables/exportpricelist/{id}
+> GET ./api/api.php/consumables/exportproductlist/{id}
 
 Returns the current document for a sample check.
 
@@ -3512,7 +3509,7 @@ Parameters
 
 Sample response
 ```
-{"links":{"Download 1726252272testlieferantpricelist.csv":{"href":".\/fileserver\/tmp\/1726252272testlieferantpricelist.csv","download":"1726252272testlieferantpricelist.csv"},"Download 1726252272testlieferantpricelistfilter.txt":{"href":".\/fileserver\/tmp\/1726252272testlieferantpricelistfilter.txt","download":"1726252272testlieferantpricelistfilter.txt"}}}
+{"links":{"Download 1726252272testlieferantproductlist.csv":{"href":".\/fileserver\/tmp\/1726252272testlieferantproductlist.csv","download":"1726252272testlieferantproductlist.csv"},"Download 1726252272testlieferantprocudtlist_filefilter.txt":{"href":".\/fileserver\/tmp\/1726252272testlieferantproductlist_filefilter.txt","download":"1726252272testlieferantproductlist_filefilter.txt"}}}
 ```
 
 > GET ./api/api.php/consumables/incorporation

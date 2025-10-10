@@ -74,7 +74,7 @@
 	},
 	{
 		"title": "Manage Vendors and Products",
-		"content": "Purchase can add and edit vendors. You can add several documents if required. On importing the pricelist products become available for ordering. To import pricelists csv-files have to be suitable or prepared. An import-filter has to be phased. A programmer can help you with that. If you mark a vendor as inactive all products will be deleted.\nSpeaking of that, you can edit products. You can add documents as well. Once documents have been added, the product can not be deleted for compliance reasons and will be updated based on the vendors order number.",
+		"content": "Purchase can add and edit vendors. You can add several documents if required. On importing the product list products become available for ordering. To import product lists csv-files may have to be suitable or prepared. An import-filter has to be phased. A programmer can help you with that. If you mark a vendor as inactive all products will be deleted.\nSpeaking of that, you can edit products. You can add documents as well. Once documents have been added, the product can not be deleted for compliance reasons and will be updated based on the vendors order number.",
 		"permissions": "ceo,qmo,purchase,prrc"
 	},
 	{

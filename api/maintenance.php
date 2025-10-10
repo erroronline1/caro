@@ -349,7 +349,7 @@ class MAINTENANCE extends API {
 							'hint' => $vendor['hidden'] ? $this->_lang->GET('maintenance.vendorupdate.vendor_hidden') : null,
 							'content' => [
 								$this->_lang->GET('maintenance.vendorupdate.update_info') => [],
-								$this->_lang->GET('maintenance.vendorupdate.update_pricelist') => [],
+								$this->_lang->GET('maintenance.vendorupdate.update_productlist') => [],
 							]
 						];
 					}
@@ -403,14 +403,14 @@ class MAINTENANCE extends API {
 					if (in_array($this->_lang->GET('maintenance.vendorupdate.update_info'), $selected)){
 						$vendor['info'] = isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : $vendor['info'];
 					}
-					if (in_array($this->_lang->GET('maintenance.vendorupdate.update_pricelist'), $selected)) {
-						$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
-						$newpricelistfilter = (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' && isset($entry['pricelist']['filter'])) ? UTILITY::json_encode($entry['pricelist']['filter'], JSON_PRETTY_PRINT) : null;
-						$vendor['pricelist']['filter'] = $newpricelistfilter ? : (isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : null);
-						if(isset($entry['pricelist']['samplecheck_interval']) && $entry['pricelist']['samplecheck_interval']) $vendor['pricelist']['samplecheck_interval'] = $entry['pricelist']['samplecheck_interval'];
-						if(isset($entry['pricelist']['samplecheck_reusable']) && $entry['pricelist']['samplecheck_reusable']) $vendor['pricelist']['samplecheck_reusable'] = $entry['pricelist']['samplecheck_reusable'];
+					if (in_array($this->_lang->GET('maintenance.vendorupdate.update_productlist'), $selected)) {
+						$vendor['products'] = json_decode($vendor['products'] ? : '', true);
+						$newproductlistfilter = (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['filefilter'])) ? UTILITY::json_encode($entry['products']['filefilter'], JSON_PRETTY_PRINT) : null;
+						$vendor['products']['filefilter'] = $newproductlistfilter ? : (isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : null);
+						if(isset($entry['products']['samplecheck_interval']) && $entry['products']['samplecheck_interval']) $vendor['products']['samplecheck_interval'] = $entry['products']['samplecheck_interval'];
+						if(isset($entry['products']['samplecheck_reusable']) && $entry['products']['samplecheck_reusable']) $vendor['products']['samplecheck_reusable'] = $entry['products']['samplecheck_reusable'];
 
-						$vendor['pricelist'] = UTILITY::json_encode($vendor['pricelist'], JSON_PRETTY_PRINT);
+						$vendor['products'] = UTILITY::json_encode($vendor['products'], JSON_PRETTY_PRINT);
 					}
 
 					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_vendor'),
@@ -420,7 +420,7 @@ class MAINTENANCE extends API {
 							':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
 							':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
 							':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
-							':pricelist' => $vendor['pricelist'] ? $this->_pdo->quote($vendor['pricelist']) : 'NULL',
+							':products' => $vendor['products'] ? $this->_pdo->quote($vendor['products']) : 'NULL',
 						]) . '; ');
 					$success[] = $vendor['name'];
 				}

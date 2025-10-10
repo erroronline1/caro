@@ -384,7 +384,7 @@ class ORDER extends API {
 				// this is actually faster than a nested sql query
 				$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 				foreach ($vendors as &$vendor){
-					$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true); 
+					$vendor['products'] = json_decode($vendor['products'] ? : '', true); 
 				}
 				$preProducts = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products');
 				$products = [];
@@ -412,15 +412,15 @@ class ORDER extends API {
 					if (
 						(
 							// check longer ago than reusable interval
-							!isset($vendor['pricelist']['samplecheck_reusable'])
+							!isset($vendor['products']['samplecheck_reusable'])
 							|| (
-								isset($vendor['pricelist']['samplecheck_reusable'])
-								&& intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_reusable']
+								isset($vendor['products']['samplecheck_reusable'])
+								&& intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['products']['samplecheck_reusable']
 							)
 						) && (
 							// check longer ago than vendor interval
-							isset($vendor['pricelist']['samplecheck_interval'])
-							&& intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['pricelist']['samplecheck_interval']
+							isset($vendor['products']['samplecheck_interval'])
+							&& intval($check->diff($this->_date['servertime'])->format('%a')) > $vendor['products']['samplecheck_interval']
 						)
 					){
 						$sampleCheck[$product['id']] = true;

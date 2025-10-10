@@ -74,7 +74,7 @@
 	},
 	{
 		"title": "Bearbeitung von Lieferanten und Produkten",
-		"content": "Der Einkauf kann Lieferanten hinzufügen und bearbeiten. Es können unterschiedliche Dokumente hinzugefügt werden, falls das notwendig ist. Mit dem Import der Preisliste werden die Artikel bestellbar. Um Preislisten zu importieren müssen geeignete CSV-Dateien vorbereitet werden oder sein. Ein Filter muss fomuliert werden. Dabei kann ein Programmierer helfen. Wenn ein Lieferant als inaktiv gekennzeichnet wird, werden alle Produkte gelöscht.\nAuch Produkte können bearbeitet und Dokumente angefügt werden. Wenn Dokumente einmal angefügt werden kann das Produkt nicht mehr gelöscht werden und wird ggf. basierend auf seiner Artikelnummer aktualisiert.",
+		"content": "Der Einkauf kann Lieferanten hinzufügen und bearbeiten. Es können unterschiedliche Dokumente hinzugefügt werden, falls das notwendig ist. Mit dem Import der Artikelliste werden die Artikel bestellbar. Um Artikellisten zu importieren müssen gegebenenfalls geeignete CSV-Dateien vorbereitet werden oder sein. Ein Filter muss fomuliert werden. Dabei kann ein Programmierer helfen. Wenn ein Lieferant als inaktiv gekennzeichnet wird, werden alle Produkte gelöscht.\nAuch Produkte können bearbeitet und Dokumente angefügt werden. Wenn Dokumente einmal angefügt werden kann das Produkt nicht mehr gelöscht werden und wird ggf. basierend auf seiner Artikelnummer aktualisiert.",
 		"permissions": "ceo,qmo,purchase,prrc"
 	},
 	{

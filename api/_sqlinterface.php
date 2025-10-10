@@ -438,14 +438,14 @@ class SQLQUERY {
 
 
 		'consumables_post_vendor' => [
-			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, pricelist, evaluation) " .
-						"VALUES (:id, :hidden, :name, :info, :pricelist, :evaluation) " .
-						"ON DUPLICATE KEY UPDATE hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation",
+			'mysql' => "INSERT INTO caro_consumables_vendors (id, hidden, name, info, products, evaluation) " .
+						"VALUES (:id, :hidden, :name, :info, :products, :evaluation) " .
+						"ON DUPLICATE KEY UPDATE hidden = :hidden, name = :name, info = :info, products = :products, evaluation = :evaluation",
 			'sqlsrv' => "MERGE INTO caro_consumables_vendors WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :hidden AS hidden, :name AS name, :info AS info, :pricelist AS pricelist, :evaluation AS evaluation) AS source " .
-						"(id, hidden, name, info, pricelist, evaluation) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET hidden = :hidden, name = :name, info = :info, pricelist = :pricelist, evaluation = :evaluation " .
-						"WHEN NOT MATCHED THEN INSERT (hidden, name, info, pricelist, evaluation) VALUES (:hidden, :name, :info, :pricelist, :evaluation);"
+						"(SELECT :id AS id, :hidden AS hidden, :name AS name, :info AS info, :products AS products, :evaluation AS evaluation) AS source " .
+						"(id, hidden, name, info, products, evaluation) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET hidden = :hidden, name = :name, info = :info, products = :products, evaluation = :evaluation " .
+						"WHEN NOT MATCHED THEN INSERT (hidden, name, info, products, evaluation) VALUES (:hidden, :name, :info, :products, :evaluation);"
 		],
 		'consumables_get_vendor_datalist' => [
 			'mysql' => "SELECT * FROM caro_consumables_vendors ORDER BY name ASC",
@@ -471,11 +471,11 @@ class SQLQUERY {
 			'mysql' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET vendor_id = :vendor_id, article_no = :article_no, article_name = :article_name, article_alias = :article_alias, article_unit = :article_unit, article_ean = :article_ean, article_info = :article_info, hidden = :hidden, has_files = :has_files, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id"
 		],
-		'consumables_put_product_pricelist_import' => [
+		'consumables_put_product_productlist_import' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id",
 			'sqlsrv' => "UPDATE caro_consumables_products SET article_name = :article_name, article_unit = :article_unit, article_ean = :article_ean, trading_good = :trading_good, incorporated = :incorporated, has_expiry_date = :has_expiry_date, special_attention = :special_attention, stock_item = :stock_item, erp_id = :erp_id WHERE id = :id"
 		],
-		'consumables_put_product_pricelist_erp_import' => [
+		'consumables_put_product_productlist_erp_import' => [
 			'mysql' => "UPDATE caro_consumables_products SET article_unit = IF(article_unit IS NULL, :article_unit, article_unit), article_ean = IF(article_ean IS NULL, :article_ean, article_ean), trading_good = IF(trading_good IS NULL, :trading_good, trading_good), incorporated = IF(incorporated IS NULL, :incorporated, incorporated), has_expiry_date = IF(has_expiry_date IS  NULL, :has_expiry_date, has_expiry_date), special_attention = IF(special_attention IS NULL, :special_attention, special_attention), stock_item = IF(stock_item IS NULL, :stock_item, stock_item), erp_id = IF(erp_id IS NULL, :erp_id, erp_id) WHERE vendor_id = :vendor_id AND article_no = :article_no",
 			'sqlsrv' => "UPDATE caro_consumables_products SET article_unit = (CASE WHEN article_unit IS NULL THEN :article_unit ELSE article_unit END), article_ean = (CASE WHEN article_ean IS NULL THEN :article_ean ELSE article_ean END), trading_good = (CASE WHEN trading_good IS NULL THEN :trading_good ELSE trading_good END), incorporated = (CASE WHEN incorporated IS NULL THEN :incorporated ELSE incorporated END), has_expiry_date = (CASE WHEN has_expiry_date IS NULL THEN :has_expiry_date ELSE has_expiry_date END), special_attention = (CASE WHEN special_attention IS NULL THEN :special_attention ELSE special_attention END), stock_item = (CASE WHEN stock_item IS NULL THEN :stock_item ELSE stock_item END), erp_id = (CASE WHEN erp_id IS NULL THEN :erp_id ELSE erp_id END) WHERE vendor_id = :vendor_id AND article_no = :article_no"
 		],

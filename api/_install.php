@@ -145,7 +145,7 @@ define('DEFAULTSQL', [
 				"	`hidden` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
 				"	`info` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
-				"	`pricelist` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	`products` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
@@ -442,7 +442,7 @@ define('DEFAULTSQL', [
 				"	hidden varchar(MAX) NULL DEFAULT NULL," .
 				"	name varchar(MAX) NOT NULL," .
 				"	info varchar(MAX) NULL DEFAULT NULL," .
-				"	pricelist varchar(MAX) NULL DEFAULT NULL," .
+				"	products varchar(MAX) NULL DEFAULT NULL," .
 				"	evaluation varchar(MAX) NULL DEFAULT NULL" .
 				");"
 				.
@@ -1414,17 +1414,17 @@ class INSTALL {
 
 				$names[] = $entry['name'];
 
-				if (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' && isset($entry['pricelist']['filter'])){
-					$pricelistfilter = null;
-					$pricelistfilter = gettype($entry['pricelist']['filter']) === 'string' ? $entry['pricelist']['filter'] : UTILITY::json_encode($entry['pricelist']['filter'], JSON_PRETTY_PRINT);
-					$entry['pricelist']['filter'] = $pricelistfilter;
+				if (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['filefilter'])){
+					$productlistfilter = null;
+					$productlistfilter = gettype($entry['products']['filefilter']) === 'string' ? $entry['products']['filefilter'] : UTILITY::json_encode($entry['products']['filefilter'], JSON_PRETTY_PRINT);
+					$entry['products']['filefilter'] = $productlistfilter;
 				}
 
 				$insertions[] = [
 					':id' => null,
 					':name' => $entry['name'],
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
-					':pricelist' => isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' ? UTILITY::json_encode($entry['pricelist']) : null,
+					':products' => isset($entry['products']) && gettype($entry['products']) === 'array' ? UTILITY::json_encode($entry['products']) : null,
 					':evaluation' => null,
 					':hidden' => null
 				];
@@ -1436,7 +1436,7 @@ class INSTALL {
 	}
 
 	/**
-	 * update vendors info and/or pricelist by name
+	 * update vendors info and/or productlist properties by name
 	 * also see maintenance.php
 	 */
 	public function updateVendors(){
@@ -1466,7 +1466,7 @@ class INSTALL {
 					$vendor = $DBall[$vendor];
 					// whitespaces and periods replaced with underscore as in request parameters
 					$infovar = $vendor['name'] . '_info';
-					$filtervar = $vendor['name'] . '_pricelistfilter';
+					$filtervar = $vendor['name'] . '_productlistfilter';
 
 					if (!(isset($this->_payload[$infovar]) || isset($this->_payload[$filtervar])))
 						continue;
@@ -1475,13 +1475,13 @@ class INSTALL {
 						$vendor['info'] = isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : $vendor['info'];
 					}
 					if (isset($this->_payload[$filtervar])) {
-						$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
-						$newpricelistfilter = (isset($entry['pricelist']) && gettype($entry['pricelist']) === 'array' && isset($entry['pricelist']['filter'])) ? UTILITY::json_encode($entry['pricelist']['filter'], JSON_PRETTY_PRINT) : null;
-						$vendor['pricelist']['filter'] = $newpricelistfilter ? : (isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : null);
-						if(isset($entry['pricelist']['samplecheck_interval']) && $entry['pricelist']['samplecheck_interval']) $vendor['pricelist']['samplecheck_interval'] = $entry['pricelist']['samplecheck_interval'];
-						if(isset($entry['pricelist']['samplecheck_reusable']) && $entry['pricelist']['samplecheck_reusable']) $vendor['pricelist']['samplecheck_reusable'] = $entry['pricelist']['samplecheck_reusable'];
+						$vendor['products'] = json_decode($vendor['products'] ? : '', true);
+						$newproductlistfilter = (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['filefilter'])) ? UTILITY::json_encode($entry['products']['filefilter'], JSON_PRETTY_PRINT) : null;
+						$vendor['products']['filefilter'] = $newproductlistfilter ? : (isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : null);
+						if(isset($entry['products']['samplecheck_interval']) && $entry['products']['samplecheck_interval']) $vendor['products']['samplecheck_interval'] = $entry['products']['samplecheck_interval'];
+						if(isset($entry['products']['samplecheck_reusable']) && $entry['products']['samplecheck_reusable']) $vendor['products']['samplecheck_reusable'] = $entry['products']['samplecheck_reusable'];
 
-						$vendor['pricelist'] = UTILITY::json_encode($vendor['pricelist'], JSON_PRETTY_PRINT);
+						$vendor['products'] = UTILITY::json_encode($vendor['products'], JSON_PRETTY_PRINT);
 					}
 					echo $this->printSuccess($vendor['name'] . " updated");
 
@@ -1492,7 +1492,7 @@ class INSTALL {
 						':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
 						':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
 						':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
-						':pricelist' => $vendor['pricelist'] ? $this->_pdo->quote($vendor['pricelist']) : 'NULL',
+						':products' => $vendor['products'] ? $this->_pdo->quote($vendor['products']) : 'NULL',
 					]) . '; ');
 				}
 				foreach ($sqlchunks as $chunk){
@@ -1515,7 +1515,7 @@ class INSTALL {
 				foreach ($DBall as $vendor){
 					if (!in_array($vendor['name'], $intersections)) continue;
 					echo '<br /><br />' . $vendor['name'] . ($vendor['hidden'] ? ' (this vendor is marked as hidden)' : '');
-					echo '<br /><label><input type="checkbox" name="' . $vendor['name'] . '_info" /> info</label> | ' . '<label><input type="checkbox" name="' . $vendor['name'] . '_pricelistfilter" /> pricelist filter</label>';
+					echo '<br /><label><input type="checkbox" name="' . $vendor['name'] . '_info" /> info</label> | ' . '<label><input type="checkbox" name="' . $vendor['name'] . '_productlistfilter" /> productlist filter</label>';
 				}
 				echo '<br /><br /><input type="submit" value="update selected" />';
 				echo '</form>';

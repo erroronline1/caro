@@ -35,7 +35,7 @@ class CONSUMABLES extends API {
 		"filter": [
 			{
 				"apply": "filter_by_duplicates",
-				"comment": "delete multiple pricelist entries",
+				"comment": "delete multiple product list entries",
 				"keep": true,
 				"duplicates": {
 					"orderby": ["Article Number"],
@@ -132,9 +132,9 @@ class CONSUMABLES extends API {
 	 *  | -_|_'_| . | . |  _|  _| . |  _| |  _| -_| | |_ -|  _|
 	 *  |___|_,_|  _|___|_| |_| |  _|_| |_|___|___|_|_|___|_|  
 	 *          |_|             |_|
-	 * exports the pricelist and filter, the latter simply generated if not provided
+	 * exports the products and filter, the latter simply generated if not provided
 	 */
-	public function exportpricelist(){
+	public function exportproductlist(){
 		if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 		$products = [];
 		$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
@@ -155,13 +155,13 @@ class CONSUMABLES extends API {
 		]);
 		if (!$products) $this->response([
 			'response' => [
-				'msg' => $this->_lang->GET('consumables.vendor.pricelist_empty'),
+				'msg' => $this->_lang->GET('consumables.vendor.productlist_empty'),
 				'type' => 'error'
 			]]);
 
 		// create csv
 		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'last_order'];
-		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'pricelist.csv';
+		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'productlist.csv';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
 		fputcsv($file, $columns,
@@ -180,14 +180,14 @@ class CONSUMABLES extends API {
 			'download' => pathinfo($tempFile)['basename']
 		];
 		// create stupid filter for export files if none is provided
-		$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
-		$filter = isset($vendor['pricelist']['filter']) && json_decode($vendor['pricelist']['filter'], true) ? json_decode($vendor['pricelist']['filter'], true) : [
+		$vendor['products'] = json_decode($vendor['products'] ? : '', true);
+		$filter = isset($vendor['products']['filefilter']) && json_decode($vendor['products']['filefilter'], true) ? json_decode($vendor['products']['filefilter'], true) : [
 			'filesettings' => [
 				'headerrow' => CONFIG['csv']['headerrow'],
 				'columns' => $columns
 			]
 		];
-		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'pricelistfilter.txt';
+		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'productlist_filefilter.txt';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, UTILITY::json_encode($filter, JSON_PRETTY_PRINT));
 		fclose($file);
@@ -1793,15 +1793,15 @@ class CONSUMABLES extends API {
 	 *  | | | . | . | .'|  _| -_| . |  _| |  _| -_| | |_ -|  _|
 	 *  |___|  _|___|__,|_| |___|  _|_| |_|___|___|_|_|___|_|
 	 *      |_|                 |_|
-	 * imports pricelist according to set filter and populates product database
+	 * imports productlist according to set filter and populates product database
 	 * deletes all unprotected entries
 	 * updates all protected entries based on vendor name and order number
 	 * 
 	 * chunkifies requests to avoid overflow
 	 */
-	private function update_pricelist($files, $filter, $vendorID, $erp_import = false){
+	private function update_productlist($files, $filter, $vendorID, $erp_import = false){
 		$filter = json_decode($filter, true);
-		$filter['filesetting']['source'] = $files['pricelist'];
+		$filter['filesetting']['source'] = $files['productlist'];
 		$filter['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
 		if (!isset($filter['filesetting']['headerrow'])) $filter['filesetting']['headerrow'] = CONFIG['csv']['headerrow'];
 		if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
@@ -1816,21 +1816,21 @@ class CONSUMABLES extends API {
 			}
 		}
 
-		$pricelist = new Listprocessor($filter);
+		$productlist = new Listprocessor($filter);
 		$sqlchunks = [];
 		$date = '';
 
 
-		$log = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $pricelist->_log);
+		$log = array_map(fn($v) => mb_convert_encoding($v, 'UTF-8', mb_detect_encoding($v, ['ASCII', 'UTF-8', 'ISO-8859-1'])), $productlist->_log);
 
-		if (!(isset($pricelist->_list[1]) && count($pricelist->_list[1]))) {
+		if (!(isset($productlist->_list[1]) && count($productlist->_list[1]))) {
 			$this->response([
 			'response' => [
 				'msg' => implode("\n", $log),
 				'type' => 'error'
 			]]);
 			}
-		if (count($pricelist->_list[1])){
+		if (count($productlist->_list[1])){
 			// purge all unprotected products for a fresh data set
 			SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
 				'values' => [
@@ -1861,21 +1861,21 @@ class CONSUMABLES extends API {
 			}
 
 			// update remainders
-			foreach (array_uintersect(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
+			foreach (array_uintersect(array_column($productlist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$update = array_search($row, array_column($remainder, 'article_no')); // this feels quite unperformant, but i don't know better
 
 				// prepare query
-				$query = SQLQUERY::PREPARE('consumables_put_product_pricelist_import');
+				$query = SQLQUERY::PREPARE('consumables_put_product_productlist_import');
 				$replace = [
 					':id' => $remainder[$update]['id'],
-					':article_name' => $pricelist->_list[1][$index]['article_name'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_name'])) : 'NULL',
-					':article_unit' => $pricelist->_list[1][$index]['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_unit'])) : 'NULL',
-					':article_ean' => $pricelist->_list[1][$index]['article_ean'] ? $this->_pdo->quote(preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_ean'])) : 'NULL',
-					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) && intval($pricelist->_list[1][$index]['trading_good']) ? 1 : 'NULL',
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ? 1 : 'NULL',
-					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) && intval($pricelist->_list[1][$index]['special_attention']) ? 1 : 'NULL',
-					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) && intval($pricelist->_list[1][$index]['stock_item']) ? 1 : 'NULL',
-					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) && $pricelist->_list[1][$index]['erp_id'] ? $this->_pdo->quote($pricelist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
+					':article_name' => $productlist->_list[1][$index]['article_name'] ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name'])) : 'NULL',
+					':article_unit' => $productlist->_list[1][$index]['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit'])) : 'NULL',
+					':article_ean' => $productlist->_list[1][$index]['article_ean'] ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean'])) : 'NULL',
+					':trading_good' => isset($productlist->_list[1][$index]['trading_good']) && intval($productlist->_list[1][$index]['trading_good']) ? 1 : 'NULL',
+					':has_expiry_date' => isset($productlist->_list[1][$index]['has_expiry_date']) && intval($productlist->_list[1][$index]['has_expiry_date']) ? 1 : 'NULL',
+					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : 'NULL',
+					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : 'NULL',
+					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $this->_pdo->quote($productlist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
 				];
 				// iterate over columns and values, strip equals to shorten each query and crunch more into one the chunks to speed up sql
@@ -1901,31 +1901,31 @@ class CONSUMABLES extends API {
 
 			// insert replacements
 			$insertions = [];
-			foreach (array_udiff(array_column($pricelist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
+			foreach (array_udiff(array_column($productlist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$insertions[] = [
 					':vendor_id' => $vendorID,
-					':article_no' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_no']) ? : null,
-					':article_name' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_name']) ? : null,
+					':article_no' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_no']) ? : null,
+					':article_name' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name']) ? : null,
 					':article_alias' => null,
-					':article_unit' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_unit']) ? : null,
-					':article_ean' => preg_replace('/\n/', '', $pricelist->_list[1][$index]['article_ean']) ? : null,
+					':article_unit' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit']) ? : null,
+					':article_ean' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean']) ? : null,
 					':article_info' => null,
 					':hidden' => null,
 					':has_files' => null,
-					':trading_good' => isset($pricelist->_list[1][$index]['trading_good']) && intval($pricelist->_list[1][$index]['trading_good']) ? 1 : null,
-					':incorporated' => isset($pricelist->_list[1][$index]['last_order']) && $pricelist->_list[1][$index]['last_order'] 
+					':trading_good' => isset($productlist->_list[1][$index]['trading_good']) && intval($productlist->_list[1][$index]['trading_good']) ? 1 : null,
+					':incorporated' => isset($productlist->_list[1][$index]['last_order']) && $productlist->_list[1][$index]['last_order'] 
 						? UTILITY::json_encode([[
-							'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $pricelist->_list[1][$index]['last_order']], true),
+							'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $productlist->_list[1][$index]['last_order']], true),
 							'user' => [
 								'name' => CONFIG['system']['caroapp'],
 								'date' => $this->_date['servertime']->format('Y-m-d H:i')
 							]
 						]])
 						: null,
-					':has_expiry_date' => isset($pricelist->_list[1][$index]['has_expiry_date']) && intval($pricelist->_list[1][$index]['has_expiry_date']) ? 1 : null,
-					':special_attention' => isset($pricelist->_list[1][$index]['special_attention']) && intval($pricelist->_list[1][$index]['special_attention']) ? 1 : null,
-					':stock_item' => isset($pricelist->_list[1][$index]['stock_item']) && intval($pricelist->_list[1][$index]['stock_item']) ? 1 : null,
-					':erp_id' => isset($pricelist->_list[1][$index]['erp_id']) && $pricelist->_list[1][$index]['erp_id'] ? $pricelist->_list[1][$index]['erp_id'] : null,
+					':has_expiry_date' => isset($productlist->_list[1][$index]['has_expiry_date']) && intval($productlist->_list[1][$index]['has_expiry_date']) ? 1 : null,
+					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : null,
+					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : null,
+					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $productlist->_list[1][$index]['erp_id'] : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
@@ -1950,7 +1950,7 @@ class CONSUMABLES extends API {
 				}
 
 				if (isset($erp_dump[$vendor['name']]) && $erp_dump[$vendor['name']]){
-					$query = SQLQUERY::PREPARE('consumables_put_product_pricelist_erp_import');
+					$query = SQLQUERY::PREPARE('consumables_put_product_productlist_erp_import');
 					foreach($erp_dump[$vendor['name']] as $article){
 						if (!$article['article_no']) continue;
 						$replace = [
@@ -2050,24 +2050,24 @@ class CONSUMABLES extends API {
 					':name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.name')),
 					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.availability')) === $this->_lang->GET('consumables.vendor.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
 					':info' => array_map(Fn($value) => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY($value)) ? : null, $vendor_info),
-					':pricelist' => isset($vendor['pricelist']) ? json_decode($vendor['pricelist'], true) : [],
+					':products' => isset($vendor['products']) ? json_decode($vendor['products'], true) : [],
 					':evaluation' => isset($vendor['evaluation']) ? json_decode($vendor['evaluation'], true) : []
 				];
-				$vendor[':pricelist']['filter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.pricelist_filter'));
-				$vendor[':pricelist']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['product']['mdr14_sample_interval'];
-				$vendor[':pricelist']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['product']['mdr14_sample_reusable'];
-				$vendor[':pricelist']['validity'] = '';
+				$vendor[':products']['filefilter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.productlist_filter'));
+				$vendor[':products']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['product']['mdr14_sample_interval'];
+				$vendor[':products']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['product']['mdr14_sample_reusable'];
+				$vendor[':products']['validity'] = '';
 				
 
 				// check forbidden names
 				if (UTILITY::forbiddenName($vendor[':name'])) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.error_vendor_forbidden_name', [':name' => $vendor[':name']]), 'type' => 'error']]);
 
 				// ensure valid json for filters
-				if ($vendor[':pricelist']['filter']){
-					if (!json_decode($vendor[':pricelist']['filter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				if ($vendor[':products']['filefilter']){
+					if (!json_decode($vendor[':products']['filefilter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
 					// prettify
 					else {
-						$vendor[':pricelist']['filter'] = UTILITY::json_encode(json_decode($vendor[':pricelist']['filter'], true), JSON_PRETTY_PRINT);
+						$vendor[':products']['filefilter'] = UTILITY::json_encode(json_decode($vendor[':products']['filefilter'], true), JSON_PRETTY_PRINT);
 					}
 				}
 
@@ -2077,24 +2077,24 @@ class CONSUMABLES extends API {
 				$expiry = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.documents_validity'));
 				$expiry = $expiry ? str_replace('-', '', $expiry) : $oneYearFromNow->format('Ymd');
 
-				// update pricelist
-				$pricelistImportError = '';
-				$pricelistImportResult = [];
-				if ($vendor[':id'] && isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name']) {
-					if (!$vendor[':pricelist']['filter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.pricelist_filter_json_error'), 'type' => 'error']]);
+				// update productlist
+				$productlistImportError = '';
+				$productlistImportResult = [];
+				if ($vendor[':id'] && isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name']) {
+					if (!$vendor[':products']['filefilter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
 
 					$files = [
-						'pricelist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]['tmp_name'][0],
+						'productlist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name'][0],
 					];
-					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name']){
-						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]['tmp_name'][0];
+					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name']){
+						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name'][0];
 					}
-					$pricelistImportResult = $this->update_pricelist($files, $vendor[':pricelist']['filter'], $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.pricelist_erp_match_selected'));
-					$vendor[':pricelist']['validity'] = $pricelistImportResult[0];
-					if (!strlen($vendor[':pricelist']['validity'])) $pricelistImportError = $this->_lang->GET('consumables.vendor.pricelist_update_error');
-					// unset pricelist files for later file processing after successful update
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_update')]);
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.pricelist_match')]);
+					$productlistImportResult = $this->update_productlist($files, $vendor[':products']['filefilter'], $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected'));
+					$vendor[':products']['validity'] = $productlistImportResult[0];
+					if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
+					// unset productlist files for later file processing after successful update
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]);
+					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]);
 				}
 
 				// tidy up consumable products database if inactive
@@ -2104,7 +2104,7 @@ class CONSUMABLES extends API {
 							':id' => $vendor[':id']
 							]
 					]);
-					unset ($vendor[':pricelist']['validity']);
+					unset ($vendor[':products']['validity']);
 				}
 
 
@@ -2117,13 +2117,13 @@ class CONSUMABLES extends API {
 					'consumables.vendor.available',
 					'consumables.vendor.documents_update',
 					'consumables.vendor.documents_validity',
-					'consumables.vendor.pricelist_filter',
+					'consumables.vendor.productlist_filter',
 					'consumables.vendor.message_vendor_select_special_attention_products',
 					'consumables.vendor.samplecheck_interval',
 					'consumables.vendor.samplecheck_interval_reusable',
 					'consumables.vendor.message_vendor_select_special_attention_products',
-					'erpquery.integrations.pricelist_erp_match',
-					'erpquery.integrations.pricelist_erp_match_selected',
+					'erpquery.integrations.productlist_erp_match',
+					'erpquery.integrations.productlist_erp_match_selected',
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
 				}
@@ -2160,12 +2160,12 @@ class CONSUMABLES extends API {
 				foreach ($vendor[':info'] as $key => $value){
 					if (!$value) unset($vendor[':info'][$key]);
 				}
-				foreach ($vendor[':pricelist'] as $key => $value){
-					if (!$value) unset($vendor[':pricelist'][$key]);
+				foreach ($vendor[':products'] as $key => $value){
+					if (!$value) unset($vendor[':products'][$key]);
 				}
 
 				$vendor[':info'] = $vendor[':info'] ? UTILITY::json_encode($vendor[':info']) : null;
-				$vendor[':pricelist'] = $vendor[':pricelist'] ? UTILITY::json_encode($vendor[':pricelist']) : null;
+				$vendor[':products'] = $vendor[':products'] ? UTILITY::json_encode($vendor[':products']) : null;
 				$vendor[':evaluation'] = $vendor[':evaluation'] ? UTILITY::json_encode($vendor[':evaluation']) : null;
 
 				// save vendor to database
@@ -2205,8 +2205,8 @@ class CONSUMABLES extends API {
 					'response' => [
 						'id' => $vendor[':id'],
 						'msg' => $this->_lang->GET('consumables.vendor.saved', [':name' => $vendor[':name']]) .
-							$pricelistImportError .
-							(isset($pricelistImportResult[1]) ? " \n \n" . implode(" \n", $pricelistImportResult[1]) : '') .
+							$productlistImportError .
+							(isset($productlistImportResult[1]) ? " \n \n" . implode(" \n", $productlistImportResult[1]) : '') .
 							($filenamewarning ? ' ' . $this->_lang->GET('consumables.vendor.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'info'
 					]]);
@@ -2237,7 +2237,7 @@ class CONSUMABLES extends API {
 					'name' => '',
 					'hidden' => null,
 					'info' => null,
-					'pricelist' => null,
+					'products' => null,
 					'evaluation' => null
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && $this->_requestedID !== '...' . $this->_lang->GET('consumables.vendor.edit_existing_vendors_new') && !$vendor['id'])
@@ -2245,7 +2245,7 @@ class CONSUMABLES extends API {
 
 				// resolve objects
 				$vendor['info'] = json_decode($vendor['info'] ? : '', true) ? : [];
-				$vendor['pricelist'] = json_decode($vendor['pricelist'] ? : '', true);
+				$vendor['products'] = json_decode($vendor['products'] ? : '', true);
 				$isactive = !$vendor['hidden'] ? ['checked' => true] : [];
 				$isinactive = $vendor['hidden'] ? ['checked' => true, 'class' => 'red'] : ['class' => 'red'];
 
@@ -2510,8 +2510,8 @@ class CONSUMABLES extends API {
 								[
 									'type' => 'code',
 									'attributes' => [
-										'name' => $this->_lang->GET('consumables.vendor.pricelist_filter'),
-										'value' => isset($vendor['pricelist']['filter']) ? $vendor['pricelist']['filter'] : '',
+										'name' => $this->_lang->GET('consumables.vendor.productlist_filter'),
+										'value' => isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : '',
 										'placeholder' => $this->filtersample
 									]
 								]
@@ -2563,13 +2563,13 @@ class CONSUMABLES extends API {
 							];
 					}
 
-					// add pricelist upload form if filter is available
-					if (isset($vendor['pricelist']['filter']) && !$vendor['hidden']){
-						$pricelistupdateoptions = [
+					// add productlist upload form if filefilter is available
+					if (isset($vendor['products']['filefilter']) && !$vendor['hidden']){
+						$productlistupdateoptions = [
 							[
 								'type' => 'file',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.pricelist_update'),
+									'name' => $this->_lang->GET('consumables.vendor.productlist_update'),
 									'accept' => '.csv'
 								]
 							]
@@ -2577,29 +2577,29 @@ class CONSUMABLES extends API {
 
 						// match with erp interface
 						if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
-							$pricelistupdateoptions[] = [
+							$productlistupdateoptions[] = [
 								'type' => 'checkbox',
 								'attributes' => [
-									'name' => $this->_lang->GET('erpquery.integrations.pricelist_erp_match')
+									'name' => $this->_lang->GET('erpquery.integrations.productlist_erp_match')
 								],
 								'content' => [
-									$this->_lang->GET('erpquery.integrations.pricelist_erp_match_selected') => []
+									$this->_lang->GET('erpquery.integrations.productlist_erp_match_selected') => []
 								]
 							];
 						}
 						else {
 						// add another file upload if filter contains a comparison file
-							$filter = json_decode($vendor['pricelist']['filter'], true);
+							$filter = json_decode($vendor['products']['filefilter'], true);
 							if (isset($filter['filter'])) {
 								foreach ($filter['filter'] as $rule) {
 									if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
-										$pricelistupdateoptions[] = [
+										$productlistupdateoptions[] = [
 											'type' => 'file',
 											'attributes' => [
-												'name' => $this->_lang->GET('consumables.vendor.pricelist_match'),
+												'name' => $this->_lang->GET('consumables.vendor.productlist_match'),
 												'accept' => '.csv'
 											],
-											'hint' => $this->_lang->GET('consumables.vendor.pricelist_match_hint'),
+											'hint' => $this->_lang->GET('consumables.vendor.productlist_match_hint'),
 										];
 										break;
 									}
@@ -2609,47 +2609,47 @@ class CONSUMABLES extends API {
 
 						array_splice($response['render']['content'][3], 0, 0,
 							[
-								$pricelistupdateoptions
+								$productlistupdateoptions
 							]
 						);
 					}
 
-					// add pricelist info if provided
-					if (isset($vendor['pricelist']['validity'])) array_splice($response['render']['content'][3], 0, 0,
+					// add productlist info if provided
+					if (isset($vendor['products']['validity'])) array_splice($response['render']['content'][3], 0, 0,
 						[[
 							[
 								'type' => 'textsection',
 								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.pricelist_validity')
+									'name' => $this->_lang->GET('consumables.vendor.productlist_validity')
 								],
-								'content' => $vendor['pricelist']['validity']
+								'content' => $vendor['products']['validity']
 							],
 							[
 								'type' => 'number',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval'),
-									'value' => isset($vendor['pricelist']['samplecheck_interval']) ? $vendor['pricelist']['samplecheck_interval'] : CONFIG['lifespan']['product']['mdr14_sample_interval']
+									'value' => isset($vendor['products']['samplecheck_interval']) ? $vendor['products']['samplecheck_interval'] : CONFIG['lifespan']['product']['mdr14_sample_interval']
 								]
 							],
 							[
 								'type' => 'number',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval_reusable'),
-									'value' => isset($vendor['pricelist']['samplecheck_reusable']) ? $vendor['pricelist']['samplecheck_reusable'] : CONFIG['lifespan']['product']['mdr14_sample_reusable']
+									'value' => isset($vendor['products']['samplecheck_reusable']) ? $vendor['products']['samplecheck_reusable'] : CONFIG['lifespan']['product']['mdr14_sample_reusable']
 								]
 							]
 						]]
 					);
 					
-					// add pricelist export button
+					// add productlist export button
 					if ($vendor['id'] && $vendorproducts) $response['render']['content'][3][] = [
 						[
 							'type' => 'button',
 							'attributes' => [
-								'value' => $this->_lang->GET('consumables.vendor.pricelist_export'),
-								'onclick' => "api.purchase('get', 'exportpricelist', " . $vendor['id']. ")"
+								'value' => $this->_lang->GET('consumables.vendor.productlist_export'),
+								'onclick' => "api.purchase('get', 'exportproductlist', " . $vendor['id']. ")"
 							],
-							'hint' => $this->_lang->GET('consumables.vendor.pricelist_export_hint')
+							'hint' => $this->_lang->GET('consumables.vendor.productlist_export_hint')
 						]
 					];
 

@@ -10,8 +10,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikelnummer", "Bezeichnung", "EANNummer", "Einheit"]
@@ -114,8 +114,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["schwarz", "Bandagenbezeichnung", "Liefereinheit"]
@@ -217,8 +217,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 4,
 					"columns": ["Artikel ", "Größe", "Art.Nr.", "EAN-Code"]
@@ -320,8 +320,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikelbezeichnung", "Artikelnummer", "EAN"]
@@ -423,8 +423,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -445,8 +445,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Lager-Artikelnummer AMT", "Bezeichnung", "VE", "EAN/GTIN/UDI"],
 					"headerrow": 3
@@ -549,8 +549,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelnr.", "Artikelbeschreibung", "Einheit", "Barcode"]
 				},
@@ -651,8 +651,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikel-Nr.", "Artikelbeschreibung", "EAN/GTIN"],
 					"headerrow": 1
@@ -755,8 +755,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Art.-Nr.", "Artikel", "VE", "EAN/GTIN"]
 				},
@@ -857,8 +857,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -879,8 +879,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelnummer", "Produktbeschreibung"]
 				},
@@ -971,8 +971,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelnr.", "Variante", "Bezeichnung", "Größe", "Farbe", "Seite / Ausführung", "Einheit", "EAN", "CCL"]
 				},
@@ -1081,8 +1081,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["supplierPartNum", "itemDescDE", "gtin"]
 				},
@@ -1174,8 +1174,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -1196,8 +1196,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelnummer", "Bezeichnung", "Einheit"],
 					"headerrow": 15
@@ -1310,8 +1310,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Art. Nr.", "Bezeichung ", "Einheit"],
 					"headerrow": 1
@@ -1414,8 +1414,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Kategorie", "Produktname", "Produktbezeichnung", "Farbe", "Größenbez.", "Artikel-Nr.", "VE ", "EAN 13"]
@@ -1512,8 +1512,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -1534,8 +1534,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["7_Lieferanten_Artikelnummer", "8_Lieferanten_Artikelbezeichnung"]
@@ -1633,8 +1633,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelnr.", "Text", "Lagereinheit"]
 				},
@@ -1725,8 +1725,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 3,
 					"columns": ["Artikelnummer", "Artikelbezeichnung", "Verkaufseinheit"]
@@ -1818,8 +1818,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Art.-Nr.", "Bezeichnung", "Bezeichnung2", "ME", "EANNummer"]
 				},
@@ -1911,8 +1911,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 3,
 					"columns": ["Art. Nr.          ", "          Bezeichnung       ", "Menge"]
@@ -2000,8 +2000,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Art-Nr", "Beschreibung", "Einheit"]
@@ -2093,8 +2093,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 9,
 					"columns": ["Artikelnummer", "Bezeichnung", "GTIN", "Abgabeeinheit"]
@@ -2186,8 +2186,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 2,
 					"columns": ["Nr.", "Beschreibung 1", "Beschreibung 2", "Farbe", "Größe", "Einheit"]
@@ -2279,8 +2279,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -2301,8 +2301,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -2323,8 +2323,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelgruppe", "Artikelnummer", "Artikelbeschreibung", "Verkaufsmengeneinheit"],
 					"headerrow": 1
@@ -2417,8 +2417,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -2439,8 +2439,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Mat Nr", "Mat Bez lang", "ME", "EAN"]
 				},
@@ -2535,8 +2535,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["ArtNr", "Bez", "Einheit", "EANNR"]
@@ -2638,8 +2638,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -2660,8 +2660,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -2682,8 +2682,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikel.Nr.", "Art.-Bezeichnung", "Mengeneinh.", "EAN-Nummer"]
 				},
@@ -2787,8 +2787,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelnr.", "Kurztext", "Einheit"]
 				},
@@ -2893,8 +2893,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name"]
@@ -2995,8 +2995,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["M+W Artikelnummer", "Artikelbezeichnung", "Verkaufseinheit"]
 				},
@@ -3086,8 +3086,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 2,
 					"columns": ["Artikel-Nr.", "Artikelbezeichnung kurz", "Größe", "Farbe", "Einheit"]
@@ -3179,8 +3179,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 7,
 					"columns": ["article_ean", "article_name", "article_no"]
@@ -3281,8 +3281,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["MATCHCODE", "NAME1", "EANCODE", "VK_EINHEIT"]
@@ -3384,8 +3384,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikelnummer", "Bezeichnung", "EAN"]
@@ -3570,8 +3570,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 6,
 					"columns": ["Art-Bezeichnung                      ", "Art-Nr", "EK- Einh.", "GTIN (EAN)"]
@@ -3665,8 +3665,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 7,
 					"columns": ["Art.Nr.", "Bezeichnung", "ME", "UDI-DI"]
@@ -3867,8 +3867,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikel-Nr.", "Einh.", "EAN_UDI-DI-Nr.", "Auflistung mit Menge und Inhalt-(Pos)"]
 				},
@@ -3955,8 +3955,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikel-NR", "Bezeichnung1 Artikelname", "Bezeichnung2 = Farbe (falls vorhanden)", "Bezeichnung3 = Langtext (kein muss)", "Bezeichnung4 = Dimensionstext (Größe)", "EAN", "HMV-NR "]
 				},
@@ -4049,8 +4049,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelgruppe", "Artikelnummer", "Artikelbeschreibung", "Verkaufsmengeneinheit", "EAN / Barcode"],
 					"headerrow": 1
@@ -4143,8 +4143,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Material", "Materialbezeichnung", "Mengen-\neinheit", "EAN/UPC-Code"]
 				},
@@ -4250,8 +4250,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 6,
 					"columns": ["Material", "Materialkurztext", "ME", "EAN-Codes"]
@@ -4343,8 +4343,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikel-Nr.", "Bezeichnung 1", "Bezeichnung 2", "Einheit_Wert"]
@@ -4453,8 +4453,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 2,
 					"columns": ["Artikelnummer", "Bezeichnung", "EINH"]
@@ -4546,8 +4546,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikelnummer", "Bezeichnung", "Bezeichnung 2", "Farbe", "Größe", "WERTLISTE.Menge"]
@@ -4639,8 +4639,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
@@ -4661,8 +4661,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 3,
 					"columns": ["Art.-Nr. ", "Artikelbezeichnung1", "Artikelbezeichnung2", "EAN/GTIN", "ME"]
@@ -4768,8 +4768,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"columns": ["Artikelnummer", "Bezeichnung", "EAN", "Einheit"]
 				},
@@ -4859,8 +4859,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 11,
 					"columns": ["Artikelnr", "Bezeichnung", "Einheit", "GTIN (EAN)"]
@@ -4961,8 +4961,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 2,
 					"columns": ["Artikelnummer", "Artikelbezeichnung", "Basiseinheit"]
@@ -5054,8 +5054,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikel-Nr.:", "Artikelkurztext", "Größe", "Weite", "(Grund-)Farbe", "Name", "ME", "EAN"]
@@ -5151,8 +5151,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 2,
 					"columns": ["Bestell-Nr", "ArtikelBez1", "ArtikelBez2", "Seite", "Farbe", "Groesse", "ME", "EAN_CODE"]
@@ -5246,8 +5246,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikelnummer", "Bezeichnung", "Einheit", "GTIN-Code"]
@@ -5361,8 +5361,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 12,
 					"dialect": {
@@ -5466,8 +5466,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 4,
 					"dialect": {
@@ -5561,8 +5561,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikel-Nummer", "Art.-Bez. 1 NEU", "Art.-Bez. 2 NEU", "GTIN-13", "Verpackungseinheit"]
@@ -5677,8 +5677,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Bestellnr.", "Artikelbezeichnung 1", "Artikelbezeichnung 2", "Artikelbezeichnung 3", "Verpackung1"]
@@ -5774,8 +5774,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikelnr.", "Artikelbeschreibung"]
@@ -5866,8 +5866,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikel-Nr. ", "Beschreibung", "ME", "EAN"]
@@ -5977,8 +5977,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikel Nummer", "Produkt Name", "Beschreibung Design"]
@@ -6070,8 +6070,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 3,
 					"columns": ["Artikelnummer", "Beschreibung", "Einheit", "UDI-DI (GTIN)"]
@@ -6163,8 +6163,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["Artikelnummer", "Farbe/Größe", "Artikelbez. 1", "Artikelbez. 2", "EAN"]
@@ -6260,8 +6260,8 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": {
-			"filter": {
+		"products": {
+			"filefilter": {
 				"filesetting": {
 					"headerrow": 11,
 					"columns": ["Spalte1", "Spalte2", "Spalte4", "Spalte9"]
@@ -6353,6 +6353,6 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"pricelist": { "filter": {}, "samplecheck_interval": 93, "samplecheck_reusable": 1095 }
+		"products": { "filefilter": {}, "samplecheck_interval": 93, "samplecheck_reusable": 1095 }
 	}
 ]
