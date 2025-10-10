@@ -1365,7 +1365,7 @@
 		"orderer": "Besteller",
 		"orderer_group_hint": "Du bist mit einem Gruppenprofil angemeldet, bitte gib deinen Namen an.",
 		"orderer_group_identify": "Gruppenmitglied",
-		"ordernumber_label": "Bestellnummer",
+		"ordernumber_label": "Artikelnummer",
 		"orderstate": {
 			"notdeliverable": "nicht lieferbar",
 			"deliverydateannounced": "angekündigtes Lieferdatum",
