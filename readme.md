@@ -32,11 +32,29 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
+    * past orders from erp by patient
+    * describe that additional caro storing may still be beneficial in terms of returns
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
 * refactor redundant post/put
     * method caller (events, forms)
-    * sanitize api endpoints
+    * sanitize api endpoints 'post':\n.*'put':
+* stresstest add autocomplete for pending incorporations
+    * describe concerns within readme
+    * set up named array as private class variable (for comprehension), stringify later
+* assemble swipe to toggle autocomplete for safari
+* describe application api manual
+* update default permissions in runtime variables
+* login dialog close on logout event with blank input
+* save product -> remain, no viewport update for new -> consider response determining data-loss warning?
+* manual order checkboxes for special_attention, expiry date, trading_good; port to "add product" (post method?)
+* [Stakeholder requirements](#stakeholder-requirements)
+    * min/max **IS** stock
+    * look for medical device flag
+    * not Bestellstop=true, not Status=true
+    * port last order
+    * if erp interface method for import and vendor available drop pricelist import filter and show update button and filter for individual treatment of entries and vice versa  
+      consider dropping csv export/import in this case, also see erpinterface->consumables()
 
 ## Content
 * [Aims](#aims)
@@ -2586,6 +2604,11 @@ Stakeholder identification:
 | Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 | Critical return reasons alert incorporation authorized users and append an incorporation review; 2025-07-11 |
 | Hospital ward tour planning | User | 2025-09-22 | Implemented as work lists with identifier items, volatile note within records; 2025-09-27 |
 | ERP-data access for cases not available within caro | User | 2025-09-29 | Implemented; 2025-10-03 |
+| Additional field for orders with explicit ERP-relation, e.g. case number | CEO | 2025-10-10 |  |
+| Monitor rental part return on receival | CEO | 2025-10-10 |  |
+| General whiteboard for shortterm notes | User | 2025-10-10 |  |
+| ERP interface customerdata and casedata additional submitbutton near top | User | 2025-10-10 |  |
+| Reconsider pricelist imports in favour of ERP-Data | CEO, Purchase | 2025-10-10 |  |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
