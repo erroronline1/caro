@@ -1409,7 +1409,8 @@ class SEARCH{
 				'operator' => $expression[1] ? : null,
 				'column' => $column,
 				'term' => $term,
-				'pregterm' => preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $term)
+				'pregterm' => preg_replace(['/\?/', '/\*/'], ['.', '.{0,}'], $term),
+				'sqlterm' => preg_replace(['/\?/', '/\*/'], ['_', '%'], $term),
 			];
 		}
 		return $result;		
