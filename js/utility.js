@@ -1420,7 +1420,7 @@ export const _client = {
 						attributes: {
 							class: "inlinebutton",
 							value: api._lang.GET("order.productlink"),
-							onclick: "api.purchase('get', 'product', " + element.productid + ");",
+							onclick: "api.purchase('get', 'product', " + element.productid + "); _client.application.closeParentDialog(this);",
 						},
 					});
 				}
