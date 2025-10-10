@@ -1917,7 +1917,7 @@ class CONSUMABLES extends API {
 						? UTILITY::json_encode([[
 							'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $pricelist->_list[1][$index]['last_order']], true),
 							'user' => [
-								'name' => $_SESSION['user']['name'],
+								'name' => CONFIG['system']['caroapp'],
 								'date' => $this->_date['servertime']->format('Y-m-d H:i')
 							]
 						]])
