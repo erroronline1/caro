@@ -1415,7 +1415,7 @@ class ORDER extends API {
 
 				// userlist to decode orderer
 				$users = SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist');
-
+				$markdown = new MARKDOWN();
 				// display selected prepared orders 
 				if (count($organizational_orders)){
 					foreach ($organizational_orders as $order){ // order
@@ -1425,7 +1425,7 @@ class ORDER extends API {
 						foreach ($processedOrderData as $key => $value){ // data
 							if (is_array($value)){
 								foreach ($value as $item){
-									$items .= $this->_lang->GET('order.prepared_order_item', [
+									$items .= '* ' . $this->_lang->GET('order.prepared_order_item', [
 										':quantity' => UTILITY::propertySet($item, 'quantity_label') ? : '',
 										':unit' => UTILITY::propertySet($item, 'unit_label') ? : '',
 										':number' => UTILITY::propertySet($item, 'ordernumber_label') ? : '',
@@ -1456,7 +1456,7 @@ class ORDER extends API {
 							[
 								'type' => 'textsection',
 								'attributes' => $order_attributes,
-								'content' => $items,
+								'htmlcontent' => $markdown->md2html($items),
 							],[
 								'type' => 'textsection',
 								'content' => $info,
