@@ -99,6 +99,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["Bezeichnung", "^heft|^flausch|^klett"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -200,6 +205,11 @@
 							"article_ean": [""]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -305,6 +315,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -408,6 +423,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -428,6 +448,11 @@
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -534,6 +559,14 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["article_name", ".*"]],
+						["special_attention", "1", ["article_name", ".*"]]
+					]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -634,6 +667,11 @@
 							"article_ean": ["Barcode"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -740,6 +778,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -842,6 +885,17 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						[
+							"trading_good",
+							"1",
+							["article_name", "knieorthese|bandage|strumpf|ellenbogen|handlagerung|pavlik|select.*?on|hyperextension|tls|fingerorthese|cervical|boston|lacer|peronaeus|^toeoff|^ypsilon|^bluerocker|gait|a.s.o.|rhizo|schuh|c.o.s."]
+						]
+					]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -862,6 +916,11 @@
 				"filesetting": {
 					"headerrow": 1,
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -1064,6 +1123,11 @@
 							"article_ean": ["EAN"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^(?!.*?(ersatz|f(?:ü|Ü)r|tausch|bezug|luft)).*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -1295,6 +1359,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", "Ziegen-Narbenleder|macanta|liegeschalen|neoprene|nappa|multiform"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -1399,6 +1468,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", ".*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -1495,6 +1569,11 @@
 							"article_ean": ["EAN 13"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -1710,6 +1789,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["has_expiry_date", "1", ["article_no", "s35sc11_|sansc35_"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -1803,6 +1887,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", "^(?!.*?(polier|zirko|polish)).*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -1894,6 +1983,11 @@
 							"article_ean": ["EANNummer"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".+schuh"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -2078,6 +2172,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", "silikon"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -2171,6 +2270,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", "einfa[sß]+band|samtband|lycra|satin|drell"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -2262,6 +2366,11 @@
 							"article_ean": [""]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "socke|strumpf|ckchen|kniestr|shirt|body|hose"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -2402,6 +2511,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^(?!.*?(ersatz|griffe|zubehör|gummikapseln)).*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -2520,6 +2634,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["has_expiry_date", "1", ["article_name", "trikotschlauch"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -2621,6 +2740,11 @@
 							"article_ean": ["EANNR"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "kissen|handschuh|extensionsschiene|finger.*?schiene|orthese|protector|st(?:ü|Ü)tzschiene|handgelenkschiene|handschuh|TAP-Schiene|urias|buddy loop|comfy"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -2772,6 +2896,14 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["article_name", ".*"]],
+						["special_attention", "1", ["article_name", "noppenhaft"]]
+					]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -2878,6 +3010,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", "pryx|deusith"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -2980,6 +3117,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", ".*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -3069,6 +3211,11 @@
 							"article_ean": [""]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["special_attention", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -3161,6 +3308,14 @@
 							"article_unit": ["Einheit"],
 							"article_ean": [""]
 						}
+					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["article_name", ".*"]],
+						["has_expiry_date", "1", ["article_name", ".*"]]
 					]
 				}
 			},
@@ -3266,6 +3421,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -3366,6 +3526,20 @@
 							"article_unit": ["VK_EINHEIT"],
 							"article_ean": ["EANCODE"]
 						}
+					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						[
+							"trading_good",
+							"1",
+							[
+								"article_name",
+								"aircast|fersenkeil|push|^\\w+stabil|manu|^\\w+-hit|vertebra|epidyn|rhizo|handgelenk|stabilo|hallux|unterarm|^\\w+train|donjoy|4titude|manu|omox|secutec|epib|materna|gehstock|bort|gilchrist|malleo|achillo|t(?:ü|Ü)binger|orthese|walkon|2-kletter|bandage|cellacare|genu|epiflex|necky|spino|mks|knieschine|schuh|tricodur|clavicula|^\\w+force|^air\\w+|toeoff|bluerocker|collamed|medi|lumba|epico|afo|pluspoint|liner|psa|souplesse"
+							]
+						]
 					]
 				}
 			},
@@ -3555,6 +3729,14 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["article_name", "miami|occian|papoose|philadelphia|formfit|orthese|unloader|rebound|oa ease|firststep|cti|afo|keeogo"]],
+						["has_expiry_date", "1", ["article_name", "solvent"]]
+					]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -3648,6 +3830,11 @@
 							"article_ean": ["GTIN (EAN)"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^(?!.*?(zubeh(?:ö|Ö)r|boa|ofen|messger|gurt|polster|keile|austausch|set|cover|innenbezug)).*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -3852,6 +4039,26 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						[
+							"trading_good",
+							"1",
+							[
+								"article_name",
+								"liner|kniekappe|strumpf|wilmer|fersenkissen|tobisil|gelenksorthese|schuh|peroneusschiene|walker|kniebandage|knieorthese|lagerungsschiene|rotationsorthese|spreizhose|daumenorthese|handgelenksorthese|immobilisations|immobilisierung|ellenbogen.*bandage|ellenbogenorthese|schulterbandage|humerusorthese|cervicalorthese|rippeng(?:ü|Ü)rtel|mieder|lumbalbandage|lumbalorthese|elite pro|rumpforthese|extensionsorthese|r(?:ü|Ü)ckenorthese|"
+							]
+						],
+						["has_expiry_date", "1", ["article_name", "neofast"]],
+						[
+							"special_attention",
+							"1",
+							["article_name", "extrasoft|plastazote|multisoft|lunairmed|evazote|lunalastik|lunasoft|orthosoft|lunacell|neopren|syncrosoft|htv silikon|silikonfarbe|polyethylen|polypropylen|ppc|laminierharz|gießharz|drell|plex|cat-flex"]
+						]
+					]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -4034,6 +4241,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^(?!.*?(^komponente|^zubeh(?:ö|Ö)r)).*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -4126,6 +4338,11 @@
 							"article_ean": ["EAN / Barcode"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^(?!.*?(^ersatz|griffe|polster|tasche|zubehör|gummikapseln|sonder)).*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -4235,6 +4452,15 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["Materialbezeichnung", "knee comfort|strumpf|t(?:ü|Ü)binger|necky|walk.*on|genu|patella|liner|malleo|agilium|proflex|cosa|smartspine"]],
+						["has_expiry_date", "1", ["article_no", "633s2|617h.+|617p\\d\\d.+|617s\\d=|85h.+|636K.+|616T111|453h10|646m453"]],
+						["special_attention", "1", ["Materialbezeichnung", "ComforTex|pastasil|plastazote|trolen|innenlack|thermolyn"]]
+					]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -4326,6 +4552,11 @@
 							"article_ean": ["EAN-Codes"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^o|^ns|^av|schuh|^d\\d"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -4438,6 +4669,15 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["article_name", "Compression|Weste|Peron(?:ä|Ä)usschiene|Stax|liner"]],
+						["special_attention", "1", ["article_name", "prosil"]],
+						["expiry_date", "1", ["article_name", "prosil"]]
+					]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -4531,6 +4771,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "Compression|Weste|Peron(?:ä|Ä)usschiene|Stax|liner"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -4622,6 +4867,11 @@
 							"article_ean": [""]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "Lagerungsschiene|orthese|helm|headmaster"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -4753,6 +5003,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "stuhl|hilfe|wagen|rollator|stock|gehst(?:ü|Ü)tze|achselst(?:ü|Ü)tze|toiletten|gehgestell|vierfuß|fischer"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -4842,6 +5097,11 @@
 							"article_ean": ["EAN"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -4944,6 +5204,11 @@
 							"article_ean": ["GTIN (EAN)"]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -5136,6 +5401,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "einlage|schuh|orthese"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -5228,6 +5498,14 @@
 							"article_unit": ["ME"],
 							"article_ean": ["EAN_CODE"]
 						}
+					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["article_name", ".*"]],
+						["has_expiry_date", "1", ["article_no", ".*"]]
 					]
 				}
 			},
@@ -5343,6 +5621,22 @@
 							"article_unit": ["Einheit"],
 							"article_ean": ["GTIN-Code"]
 						}
+					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						[
+							"trading_good",
+							"1",
+							[
+								"article_name",
+								"fersenkeil|schutzh(?:ü|Ü)lle|einlagen|philadelphia|clearsil|extensionsorthese|contexgel|comfortsil|primosil|skincaresil|classicsil|ak-control|tl bandage|control4sil|walker|yale|support|achillomax|genumax|spreizhose|knieschiene|schuh|kompressionsstumpstrumpf"
+							]
+						],
+						["has_expiry_date", "1", ["article_name", "silikonspray|sekundenkleber"]],
+						["special_attention", "1", ["article_name", "kon-gel|varioform|streifydur|streifylast|PET glasklar|streifyflex|drell|jaquard|satine|elastinova|bandagengurt|diabetikermaterial|multiform"]]
 					]
 				}
 			},
@@ -5662,6 +5956,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^(?!.*?(^COTTON SHORT STRETCH|LOMBAMUM|binden|spray|biplast|pelotte|kulanz|pauschale|wechselpolster|flexi-pads|ersatz|verl(?:ä|Ä)ngerungs|haftpad)).*"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -5759,6 +6058,11 @@
 					]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "WS-Bandage|Wirbels(?:ä|Ä)ulenbandage|Damenhosenbandage|tigges-.+set|Lumbal.*?orthese|t-flex|BWS|Lumbalbandage"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -5849,6 +6153,11 @@
 							"article_ean": [""]
 						}
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -5959,6 +6268,14 @@
 							"article_unit": ["ME"],
 							"article_ean": ["EAN"]
 						}
+					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [
+						["trading_good", "1", ["article_name", "^bob|^daho|liner|philadelphia"]],
+						["special_attention", "1", ["article_name", "thermoflex"]]
 					]
 				}
 			},
@@ -6243,6 +6560,11 @@
 						["trading_good", "1", ["article_name", "Arthrodesenkissen"]],
 						["stock_item", "1", ["article_name", "Arthrodesenkissen"]]
 					]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "Arthrodesenkissen"]]]
 				}
 			},
 			"samplecheck_interval": 93,

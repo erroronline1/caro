@@ -17,6 +17,11 @@
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", "^velcro|^kit|^display"]]]
+				}
+			},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}

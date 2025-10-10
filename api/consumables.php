@@ -20,7 +20,7 @@ class CONSUMABLES extends API {
 	private $_requestedID = null;
 	private $_search = '';
 	private $_usecase = '';
-	private $filtersample = <<<'END'
+	private $filefiltersample = <<<'END'
 	{
 		"filesetting": {
 			"headerrow": 1,
@@ -113,7 +113,18 @@ class CONSUMABLES extends API {
 		}
 	}
 	END;
-
+	private $erpfiltersample = <<<'END'
+	{
+		"modify": {
+			"conditional_and": [["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]],
+			"conditional_or": [
+				["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
+				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]]
+			],
+			]
+		}
+	}
+	END;
 	/**
 	 * init parent class and set private requests
 	 */
@@ -1799,22 +1810,26 @@ class CONSUMABLES extends API {
 	 * 
 	 * chunkifies requests to avoid overflow
 	 */
-	private function update_productlist($files, $filter, $vendorID, $erp_import = false){
+	private function update_productlist($source, $filter, $vendorID, $erp_match = false){
 		$filter = json_decode($filter, true);
-		$filter['filesetting']['source'] = $files['productlist'];
-		$filter['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
-		if (!isset($filter['filesetting']['headerrow'])) $filter['filesetting']['headerrow'] = CONFIG['csv']['headerrow'];
-		if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
 
-		// update csv-filter filter_by_comparison_file if set or drop if not
-		if (isset($filter['filter'])){
-			foreach ($filter['filter'] as $ruleindex => &$rule) {
-				if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
-					if (isset($files['match']) && $files['match']) $rule['filesetting']['source'] = $files['match'];
-					else unset($filter['filter'][$ruleindex]);
+		if (isset($source['productlist'])){
+			$filter['filesetting']['source'] = $source['productlist'];
+			$filter['filesetting']['encoding'] = CONFIG['csv']['csvprocessor_source_encoding'];
+			if (!isset($filter['filesetting']['headerrow'])) $filter['filesetting']['headerrow'] = CONFIG['csv']['headerrow'];
+			if (!isset($filter['filesetting']['dialect'])) $filter['filesetting']['dialect'] = CONFIG['csv']['dialect'];
+
+			// update csv-filter filter_by_comparison_file if set or drop if not
+			if (isset($filter['filter'])){
+				foreach ($filter['filter'] as $ruleindex => &$rule) {
+					if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
+						if (isset($source['match']) && $source['match']) $rule['filesetting']['source'] = $source['match'];
+						else unset($filter['filter'][$ruleindex]);
+					}
 				}
 			}
 		}
+		else $filter['filesetting']['source'] = $source; // direct data from erp impoert of selected vendor
 
 		$productlist = new Listprocessor($filter);
 		$sqlchunks = [];
@@ -1931,7 +1946,7 @@ class CONSUMABLES extends API {
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
 
 			// update entries with data from erp interface is available and selected
-			if ($erp_import && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
+			if ($erp_match && ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
 				$vendor = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor', [
 					'values' => [
 						':id' => $vendorID
@@ -2054,6 +2069,7 @@ class CONSUMABLES extends API {
 					':evaluation' => isset($vendor['evaluation']) ? json_decode($vendor['evaluation'], true) : []
 				];
 				$vendor[':products']['filefilter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.productlist_filter'));
+				$vendor[':products']['erpfilter'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpfilter'));
 				$vendor[':products']['samplecheck_interval'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval')) ? : CONFIG['lifespan']['product']['mdr14_sample_interval'];
 				$vendor[':products']['samplecheck_reusable'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.vendor.samplecheck_interval_reusable')) ? : CONFIG['lifespan']['product']['mdr14_sample_reusable'];
 				$vendor[':products']['validity'] = '';
@@ -2070,6 +2086,13 @@ class CONSUMABLES extends API {
 						$vendor[':products']['filefilter'] = UTILITY::json_encode(json_decode($vendor[':products']['filefilter'], true), JSON_PRETTY_PRINT);
 					}
 				}
+				if ($vendor[':products']['erpfilter']){
+					if (!json_decode($vendor[':products']['erpfilter'], true)) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('erpquery.consumables.erpfilter')]), 'type' => 'error']]);
+					// prettify
+					else {
+						$vendor[':products']['erpfilter'] = UTILITY::json_encode(json_decode($vendor[':products']['erpfilter'], true), JSON_PRETTY_PRINT);
+					}
+				}
 
 				// set expiry date for provided files before unsetting the payload property 
 				$oneYearFromNow = clone $this->_date['servertime'];
@@ -2080,23 +2103,35 @@ class CONSUMABLES extends API {
 				// update productlist
 				$productlistImportError = '';
 				$productlistImportResult = [];
-				if ($vendor[':id'] && isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name']) {
-					if (!$vendor[':products']['filefilter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
+				if ($vendor[':id']){
+	
+					$source = [];
+	
+					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name']) {
+						if (!$vendor[':products']['filefilter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
 
-					$files = [
-						'productlist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name'][0],
-					];
-					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name']){
-						$files['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name'][0];
+						$source = [
+							'productlist' => $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name'][0],
+						];
+						if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name']){
+							$source['match'] = $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]['tmp_name'][0];
+						}
+						$importfilter = $vendor[':products']['filefilter'];
+						// unset productlist files for later file processing after successful update
+						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]);
+						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]);
 					}
-					$productlistImportResult = $this->update_productlist($files, $vendor[':products']['filefilter'], $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected'));
+					elseif (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport'))){
+						$source = ERPINTERFACE->consumables([$vendor[':name']]);
+						$source = isset($source[$vendor[':name']]) ? $source[$vendor[':name']] : []; 				 
+						$importfilter = $vendor[':products']['erpfilter'];
+					}
+
+					$productlistImportResult = $this->update_productlist($source, $importfilter, $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected'));
 					$vendor[':products']['validity'] = $productlistImportResult[0];
 					if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
-					// unset productlist files for later file processing after successful update
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]);
-					unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]);
 				}
-
+ 
 				// tidy up consumable products database if inactive
 				if ($vendor[':id'] && $vendor[':hidden']){
 					SQLQUERY::EXECUTE($this->_pdo, 'consumables_delete_all_unprotected_products', [
@@ -2124,6 +2159,8 @@ class CONSUMABLES extends API {
 					'consumables.vendor.message_vendor_select_special_attention_products',
 					'erpquery.integrations.productlist_erp_match',
 					'erpquery.integrations.productlist_erp_match_selected',
+					'erpquery.consumables.erpimport',
+					'erpquery.consumables.erpfilter'
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
 				}
@@ -2505,17 +2542,6 @@ class CONSUMABLES extends API {
 								],
 								'hint' => $this->_lang->GET('consumables.vendor.documents_validity_hint')
 							]
-						], [
-							[
-								[
-									'type' => 'code',
-									'attributes' => [
-										'name' => $this->_lang->GET('consumables.vendor.productlist_filter'),
-										'value' => isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : '',
-										'placeholder' => $this->filtersample
-									]
-								]
-							]
 						]
 					],
 					'form' => [
@@ -2563,95 +2589,137 @@ class CONSUMABLES extends API {
 							];
 					}
 
-					// add productlist upload form if filefilter is available
-					if (isset($vendor['products']['filefilter']) && !$vendor['hidden']){
-						$productlistupdateoptions = [
-							[
-								'type' => 'file',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.productlist_update'),
-									'accept' => '.csv'
-								]
-							]
-						];
+					// add update options and info for vendor products
+					if (!$vendor['hidden']){
+						$productlist = [];
 
-						// match with erp interface
-						if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
-							$productlistupdateoptions[] = [
-								'type' => 'checkbox',
-								'attributes' => [
-									'name' => $this->_lang->GET('erpquery.integrations.productlist_erp_match')
+						// add productlist info if provided
+						if (isset($vendor['products']['validity'])) $productlist[]=
+							[
+								[
+									'type' => 'textsection',
+									'attributes' => [
+										'name' => $this->_lang->GET('consumables.vendor.productlist_validity')
+									],
+									'content' => $vendor['products']['validity']
 								],
-								'content' => [
-									$this->_lang->GET('erpquery.integrations.productlist_erp_match_selected') => []
+								[
+									'type' => 'number',
+									'attributes' => [
+										'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval'),
+										'value' => isset($vendor['products']['samplecheck_interval']) ? $vendor['products']['samplecheck_interval'] : CONFIG['lifespan']['product']['mdr14_sample_interval']
+									]
+								],
+								[
+									'type' => 'number',
+									'attributes' => [
+										'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval_reusable'),
+										'value' => isset($vendor['products']['samplecheck_reusable']) ? $vendor['products']['samplecheck_reusable'] : CONFIG['lifespan']['product']['mdr14_sample_reusable']
+									]
+								]
+							];
+
+						if (ERPINTERFACE && ERPINTERFACE->_instatiated && ERPINTERFACE->_productsimport){
+							if ($vendor[':name'] && ERPINTERFACE->consumables([$vendor[':name']])) {
+								// add update button
+								$productlist[] = [
+									[
+										'type' => 'checkbox',
+										'content' => [
+											$this->_lang->GET('erpquery.consumables.erpimport') => []
+										]
+									]
+								];
+							}
+
+							// add erpfilter input
+							$productlist[] = [
+								[
+									'type' => 'code',
+									'attributes' => [
+										'name' => $this->_lang->GET('erpquery.consumables.erpfilter'),
+										'value' => isset($vendor['products']['erpfilter']) ? $vendor['products']['erpfilter'] : '',
+										'placeholder' => $this->erpfiltersample
+									]
 								]
 							];
 						}
 						else {
-						// add another file upload if filter contains a comparison file
-							$filter = json_decode($vendor['products']['filefilter'], true);
-							if (isset($filter['filter'])) {
-								foreach ($filter['filter'] as $rule) {
-									if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
-										$productlistupdateoptions[] = [
-											'type' => 'file',
-											'attributes' => [
-												'name' => $this->_lang->GET('consumables.vendor.productlist_match'),
-												'accept' => '.csv'
-											],
-											'hint' => $this->_lang->GET('consumables.vendor.productlist_match_hint'),
-										];
-										break;
+							// filefilter and upload options
+							if (isset($vendor['products']['filefilter'])){
+								$productlistupdateoptions = [
+									[
+										'type' => 'file',
+										'attributes' => [
+											'name' => $this->_lang->GET('consumables.vendor.productlist_update'),
+											'accept' => '.csv'
+										]
+									]
+								];
+
+								// match with erp interface
+								if (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'consumables') && ERPINTERFACE->consumables()){
+									$productlistupdateoptions[] = [
+										'type' => 'checkbox',
+										'attributes' => [
+											'name' => $this->_lang->GET('erpquery.integrations.productlist_erp_match')
+										],
+										'content' => [
+											$this->_lang->GET('erpquery.integrations.productlist_erp_match_selected') => []
+										]
+									];
+								}
+								else {
+									// add another file upload if filter contains a comparison file
+									$filter = json_decode($vendor['products']['filefilter'], true);
+									if (isset($filter['filter'])) {
+										foreach ($filter['filter'] as $rule) {
+											if ($rule['apply'] === 'filter_by_comparison_file' && (!isset($rule['filesetting']['source']) || $rule['filesetting']['source'] !== "SELF")){
+												$productlistupdateoptions[] = [
+													'type' => 'file',
+													'attributes' => [
+														'name' => $this->_lang->GET('consumables.vendor.productlist_match'),
+														'accept' => '.csv'
+													],
+													'hint' => $this->_lang->GET('consumables.vendor.productlist_match_hint'),
+												];
+												break;
+											}
+										}
 									}
 								}
+								
+								$productlist[] = $productlistupdateoptions;
 							}
+
+							// add filefilter input
+							$productlist[] = [
+								[
+									'type' => 'code',
+									'attributes' => [
+										'name' => $this->_lang->GET('consumables.vendor.productlist_filter'),
+										'value' => isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : '',
+										'placeholder' => $this->filefiltersample
+									]
+								]
+							];
+
+							// add productlist export button
+							if ($vendor['id'] && $vendorproducts) $productlist[] = [
+								[
+									'type' => 'button',
+									'attributes' => [
+										'value' => $this->_lang->GET('consumables.vendor.productlist_export'),
+										'onclick' => "api.purchase('get', 'exportproductlist', " . $vendor['id']. ")"
+									],
+									'hint' => $this->_lang->GET('consumables.vendor.productlist_export_hint')
+								]
+							];
 						}
 
-						array_splice($response['render']['content'][3], 0, 0,
-							[
-								$productlistupdateoptions
-							]
-						);
+						$response['render']['content'][] = $productlist;
 					}
-
-					// add productlist info if provided
-					if (isset($vendor['products']['validity'])) array_splice($response['render']['content'][3], 0, 0,
-						[[
-							[
-								'type' => 'textsection',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.productlist_validity')
-								],
-								'content' => $vendor['products']['validity']
-							],
-							[
-								'type' => 'number',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval'),
-									'value' => isset($vendor['products']['samplecheck_interval']) ? $vendor['products']['samplecheck_interval'] : CONFIG['lifespan']['product']['mdr14_sample_interval']
-								]
-							],
-							[
-								'type' => 'number',
-								'attributes' => [
-									'name' => $this->_lang->GET('consumables.vendor.samplecheck_interval_reusable'),
-									'value' => isset($vendor['products']['samplecheck_reusable']) ? $vendor['products']['samplecheck_reusable'] : CONFIG['lifespan']['product']['mdr14_sample_reusable']
-								]
-							]
-						]]
-					);
 					
-					// add productlist export button
-					if ($vendor['id'] && $vendorproducts) $response['render']['content'][3][] = [
-						[
-							'type' => 'button',
-							'attributes' => [
-								'value' => $this->_lang->GET('consumables.vendor.productlist_export'),
-								'onclick' => "api.purchase('get', 'exportproductlist', " . $vendor['id']. ")"
-							],
-							'hint' => $this->_lang->GET('consumables.vendor.productlist_export_hint')
-						]
-					];
 
 					// mail vendor e.g. requesting documents regarding products with special attention
 					// requires text chunks though

@@ -1060,6 +1060,10 @@
 				"text": "Position text"
 			}
 		},
+		"consumables":{
+			"erpfilter": "ERP stock data import filter",
+			"erpimport": "ERP stock data import"
+		},
 		"csvdump": {
 			"null": "This query does not exists",
 			"select": "Select query to export as CSV",

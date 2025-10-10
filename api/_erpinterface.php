@@ -24,7 +24,12 @@ class _ERPINTERFACE {
 	/**
 	 * set to true if class has been successfully constructed
 	 */
-	public $_instatiated = null; 
+	public $_instatiated = null;
+
+	/**
+	 * set to true if products can be directly imported from the erp_interface, depends on successful consumables implementation 
+	 */
+	public $_productsimport = null;
 
 	/**
 	 * define expected methods to be overridden by actual interface class if available
@@ -344,6 +349,11 @@ class TEST extends _ERPINTERFACE {
 	 */
 	public $_instatiated = null; 
 
+	/**
+	 * set to true if products can be directly imported from the erp_interface, depends on successful consumables implementation 
+	 */
+	public $_productsimport = null;
+
 	public function __construct(){
 		try {
 			parent::__construct();
@@ -522,6 +532,11 @@ class ODEVAVIVA extends _ERPINTERFACE {
 	 */
 	private $_pdo = null;
 	public $_instatiated = null;
+
+	/**
+	 * set to true if products can be directly imported from the erp_interface, depends on successful consumables implementation 
+	 */
+	public $_productsimport = true;
 
 	public function __construct(){
 		try {

@@ -1060,6 +1060,10 @@
 				"text": "Positionstext"
 			}
 		},
+		"consumables":{
+			"erpfilter": "Filter für Artikelimport aus EVA",
+			"erpimport": "EVA Artikelstamm importieren"
+		},
 		"csvdump": {
 			"null": "Diese Abfrage existiert nicht",
 			"select": "Wähle eine Abfrage für den CSV-Export",

@@ -1476,8 +1476,13 @@ class INSTALL {
 					}
 					if (isset($this->_payload[$filtervar])) {
 						$vendor['products'] = json_decode($vendor['products'] ? : '', true);
+
 						$newproductlistfilter = (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['filefilter'])) ? UTILITY::json_encode($entry['products']['filefilter'], JSON_PRETTY_PRINT) : null;
 						$vendor['products']['filefilter'] = $newproductlistfilter ? : (isset($vendor['products']['filefilter']) ? $vendor['products']['filefilter'] : null);
+
+						$newerpfilter = (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['erpfilter'])) ? UTILITY::json_encode($entry['products']['erpfilter'], JSON_PRETTY_PRINT) : null;
+						$vendor['products']['erpfilter'] = $newerpfilter ? : (isset($vendor['products']['erpfilter']) ? $vendor['products']['erpfilter'] : null);
+
 						if(isset($entry['products']['samplecheck_interval']) && $entry['products']['samplecheck_interval']) $vendor['products']['samplecheck_interval'] = $entry['products']['samplecheck_interval'];
 						if(isset($entry['products']['samplecheck_reusable']) && $entry['products']['samplecheck_reusable']) $vendor['products']['samplecheck_reusable'] = $entry['products']['samplecheck_reusable'];
 

@@ -2606,6 +2606,7 @@ Stakeholder identification:
 | General whiteboard for shortterm notes | User | 2025-10-10 |  |
 | ERP interface customerdata and casedata additional submitbutton near top | User | 2025-10-10 |  |
 | Reconsider pricelist imports in favour of ERP-Data | CEO, Purchase | 2025-10-10 |  |
+| Batch update alias | User | 2025-10-10 |  |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
