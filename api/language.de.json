@@ -1004,7 +1004,7 @@
 			"productlist_match": "Vergleiche mit ERP-Export um die EVA-Nummer gemäß Filter zu übernehmen",
 			"productlist_match_hint": "Das funktioniert natürlich nur zuverlässig bei einem aufgeräumten Artikelstamm im ERP-System",
 			"productlist_update": "Artikelliste importieren",
-			"productlist_update_error": ", aber die Artikelliste konnte nicht importiert werden. Bitte gleiche den Filter mit der Datei ab.",
+			"productlist_update_error": ", aber die Artikelliste konnte nicht importiert werden. Ursachen dafür können ein nicht übereinstimmender Lieferantenname, fehlerhafter Filter oder eine versehentlich falsch gewählte Datei sein.",
 			"productlist_validity": "Letzter Artikellistenimport am",
 			"purchase_info": "Informationen (nur für den Einkauf)",
 			"sales_representative": "Vertreter",

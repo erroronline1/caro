@@ -1004,7 +1004,7 @@
 			"productlist_match": "Match ERP-dump for ERP-ids based on import filter",
 			"productlist_match_hint": "Obviously this only works reliable with a tidy ERP-stock",
 			"productlist_update": "Import product lists",
-			"productlist_update_error": ", but product list has not been imported, match filter with file.",
+			"productlist_update_error": ", but product list has not been imported. Reasons could be an unmatching vendor name, faulty filter or accidentally wrong selected file.",
 			"productlist_validity": "Last product list import on",
 			"purchase_info": "Information (purchase only)",
 			"sales_representative": "Sales representative",
