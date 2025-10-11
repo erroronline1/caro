@@ -32,7 +32,8 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-    * past orders from erp by patient
+    * describe past orders from erp by patient
+    * describe 
     * describe that additional caro storing may still be beneficial in terms of returns
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
@@ -45,14 +46,8 @@ Things are still in motion. Images may be outdated.
 * assemble swipe to toggle autocomplete for safari
 * describe application api manual
 * manual order checkboxes for special_attention, expiry date, trading_good - not possible, update manual adding warning
-* [Stakeholder requirements](#stakeholder-requirements)
-    * min/max **IS** stock
+* [Stakeholder requirements](#rejected-requirements)
     * look for medical device flag
-    * not Bestellstop=true, not Status=true
-    * port last order
-    * if erp interface method for import and vendor available drop pricelist import filter and show update button and filter for individual treatment of entries and vice versa  
-      consider dropping csv export/import in this case, also see erpinterface->consumables()
-    * check why product validity date is not set
 
 ## Content
 * [Aims](#aims)
@@ -2605,8 +2600,8 @@ Stakeholder identification:
 | Additional field for orders with explicit ERP-relation, e.g. case number | CEO | 2025-10-10 |  |
 | Monitor rental part return on receival | CEO | 2025-10-10 |  |
 | General whiteboard for shortterm notes | User | 2025-10-10 |  |
-| ERP interface customerdata and casedata additional submitbutton near top | User | 2025-10-10 |  |
-| Reconsider pricelist imports in favour of ERP-Data | CEO, Purchase | 2025-10-10 |  |
+| ERP interface customerdata and casedata additional submitbutton near top | User | 2025-10-10 | Implemented; 2025-10-11 |
+| Reconsider pricelist imports in favour of ERP-Data | CEO, Purchase | 2025-10-10 | Implemented; 2025-10-11 |
 | Batch update alias | User | 2025-10-10 |  |
 
 #### Rejected requirements
