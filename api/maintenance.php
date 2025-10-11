@@ -418,7 +418,7 @@ class MAINTENANCE extends API {
 						$vendor['products'] = UTILITY::json_encode($vendor['products'], JSON_PRETTY_PRINT);
 					}
 
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_vendor'),
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
 						[
 							':id' => $vendor['id'],
 							':name' => $this->_pdo->quote($vendor['name']),

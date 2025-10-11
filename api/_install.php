@@ -1490,7 +1490,7 @@ class INSTALL {
 					}
 					echo $this->printSuccess($vendor['name'] . " updated");
 
-					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_vendor'),
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
 					[
 						':id' => $vendor['id'],
 						':name' => $this->_pdo->quote($vendor['name']),
