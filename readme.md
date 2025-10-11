@@ -43,6 +43,7 @@ Things are still in motion. Images may be outdated.
 * assemble swipe to toggle autocomplete for safari
 * [Stakeholder requirements](#rejected-requirements)
     * look for medical device flag
+    * message whiteboard
 
 ## Content
 * [Aims](#aims)

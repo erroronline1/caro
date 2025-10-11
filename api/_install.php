@@ -323,6 +323,15 @@ define('DEFAULTSQL', [
 				"	`evaluation` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	`planned` tinytext COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
+				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
+				.
+				"CREATE TABLE IF NOT EXISTS `caro_whiteboard` (" .
+				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
+				"	`editdate` date NULL," .
+				"	`unit` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`content` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
+				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
 
 		'sqlsrv' => "IF OBJECT_ID(N'caro_announcements', N'U') IS NULL " .
@@ -621,6 +630,15 @@ define('DEFAULTSQL', [
 				"	file_path varchar(MAX) NULL DEFAULT NULL," .
 				"	evaluation varchar(MAX) NULL DEFAULT NULL," .
 				"	planned varchar(255) NULL DEFAULT NULL" .
+				");"
+				.
+				"IF OBJECT_ID(N'dbo.caro_whiteboard', N'U') IS NULL " .
+				"CREATE TABLE caro_whiteboard (" .
+				"	id int NOT NULL IDENTITY(1,1)," .
+				"	name varchar(MAX) NOT NULL," .
+				"	editdate date NULL," .
+				"	unit varchar(MAX) NULL DEFAULT NULL," .
+				"	content varchar(MAX) NULL DEFAULT NULL" .
 				");"
 		],
 

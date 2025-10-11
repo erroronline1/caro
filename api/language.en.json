@@ -1252,12 +1252,16 @@
 			"announcements_manage": "Manage announcements",
 			"conversations": "Conversations",
 			"header": "Communication",
-			"register": "Personnel register"
+			"register": "Personnel register",
+			"whiteboard":"Whiteboard"
 		},
 		"register": {
 			"message_all": "Message to all",
 			"orderauth": "Users with order authorization",
 			"users": "All users by name"
+		},
+		"whiteboard":{
+
 		}
 	},
 	"order": {

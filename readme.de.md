@@ -1530,6 +1530,12 @@ Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung k
 Vorgangsmedien werden je Anfrage verarbeitet. Sofern verfügbar werden Verknüpfungen mit Daten-URLs angezeigt, welche die Datein aus den Vorgangsaufzeichnungen heraus gemäß der bereitgestellten Vorgangsnummern(n) beinhalten.  
 Die Daten werden so angezeigt, wie sie in der Klassenmethode der ERP Anbindung konstruiert werden.
 
+### Vergange Bestellungen
+Die CARO App speichert Bestellungen standardmäßig für einen relativ kurzen Zeitraum, es sei denn Bestellungen werden archiviert. Die ERP-Anbindung ist dafür vorbereitet derartige Daten direkt per Patient abzufragen. Sofern verfübar kann bei der individuellen Implementierung auch eine zeitliche Eingrenzung oder ein Begriffsfilter eingebaut werden. Bestellungen werden als Links dargestellt, die eine neue Bestellung mit vorbereiteter Suche initiieren.
+
+### ERP Artikellistenimport
+Falls verfügbar und aufgeräumt kann die CARO App Artikeldatenbank auch aus dem ERP-System befüllt werden. Dies bietet Vorteile z.B. beim Abgleich mit Bestelldaten und reduziert zweifellos die Menge an Daten, was das System erheblich beschleunigt.
+
 ### Angepasste Datenbankauszüge
 Die angepasste ERP-Interface-Klasse kann eine Methode beinhalten, die CSV-Dateien mit beleiebigen Inhalten bereistellt, z.B. individuelle ERP-Datenbank-Abfragen. Falls verfügbar taucht dieser Punkt bei den [Werkzeugen](#werkzeuge) auf.
 

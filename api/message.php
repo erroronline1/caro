@@ -626,5 +626,32 @@ class MESSAGE extends API {
 		}
 		$this->response($response);
 	}
+
+	/**
+	 *         _   _ _       _                 _ 
+	 *   _ _ _| |_|_| |_ ___| |_ ___ ___ ___ _| |
+	 *  | | | |   | |  _| -_| . | . | .'|  _| . |
+	 *  |_____|_|_|_|_| |___|___|___|__,|_| |___|
+	 *
+	 * temporary notes 
+	 */
+	public function whiteboard(){
+		$response = ['render' => ['content' => [
+			[
+				'type' => 'textsection',
+				'attributes' => [
+					'name' => 'TODO'
+				]
+			]
+		]]];
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				break;
+			case 'GET':
+				break;
+			case 'DELETE':
+		}
+		$this->response($response);
+	}
 }
 ?>

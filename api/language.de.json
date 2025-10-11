@@ -1252,12 +1252,16 @@
 			"announcements_manage": "Ankündigungen verwalten",
 			"conversations": "Unterhaltungen",
 			"header": "Kommunikation",
-			"register": "Mitarbeiterverzeichnis"
+			"register": "Mitarbeiterverzeichnis",
+			"whiteboard":"Whiteboard"
 		},
 		"register": {
 			"message_all": "Nachricht an alle",
 			"orderauth": "Nutzer mit Bestellberechtigung",
 			"users": "Alle Nutzer nach Name"
+		},
+		"whiteboard":{
+			
 		}
 	},
 	"order": {
