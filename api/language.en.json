@@ -1270,7 +1270,7 @@
 		"add_manually": "Add product manually",
 		"add_manually_cancel": "Cancel",
 		"add_manually_confirm": "Add",
-		"add_manually_warning": "Manually added products may not be considered regarding incorporation and sample check:erp_interface.",
+		"add_manually_warning": "Manually added products may not be considered regarding incorporation and sample check:erp_interface. Please add information if the product has skin contact, an expiry date or if it is a trading good.",
 		"add_manually_warning_erpinterface": ", as well as automated matching with order state",
 		"add_manually_warning_header": "Please consider",
 		"add_product_search_matches": "Add article from :number matches",
