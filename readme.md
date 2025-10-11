@@ -32,9 +32,6 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
-    * describe past orders from erp by patient
-    * describe 
-    * describe that additional caro storing may still be beneficial in terms of returns
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
 * refactor redundant post/put
@@ -44,8 +41,6 @@ Things are still in motion. Images may be outdated.
     * describe concerns within readme
     * set up named array as private class variable (for comprehension), stringify later
 * assemble swipe to toggle autocomplete for safari
-* describe application api manual
-* manual order checkboxes for special_attention, expiry date, trading_good - not possible, update manual adding warning
 * [Stakeholder requirements](#rejected-requirements)
     * look for medical device flag
 
@@ -1638,6 +1633,12 @@ Data will be presented as constructed within the custom interface-class-method. 
 Case media are fetched by request. If available, links with data-urls will be displayed containing the files from within the records according to the provided ERP case number(s).  
 Data will be presented as constructed within the custom interface-class-method.
 
+### Past orders
+The CARO App stores orders for a relatively short time by default unless orders are archived. The ERP-interface is prepared to access orders per request, per patient. If available you can decide to narrow things down by date and make use of filter functions. Displayed orders are presented as links, that refer to a new order and prepared search for the selected product.
+
+### ERP stock list imports
+If available and tidy the product database of the CARO App can be populated directly from the ERP data. This has the advantage of improved matching of products between the CARO App products and order data updates as well as most likely reducing the database size and speeding up any request.
+
 ### Custom database dumps
 Your custom erp interface class can contain a method to provide a CSV-file with custom contents, e.g. your custom queries from the ERP database. If this is provided a menu item will show up within the [Tools](#tools).
 
@@ -2956,6 +2957,49 @@ Parameters
 Sample response
 ```
 {"render":{"content":[{"type":"textsection","attributes":{"name":"CARO - Cloud Assisted Records and Operations"},"content":"Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and\/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful,....
+```
+
+> POST ./api/api.php/application/manual/{id}
+
+Saves a manual entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database entry id |
+| payload | form data | required | input data | 
+
+Sample response
+```
+{"response":{"id":"1","msg":"The manual topic '.CARO App' has been saved","type":"success"}}
+```
+
+> GET ./api/api.php/application/manual/{id}
+
+Returns a form to add or edit a manual entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | optional | database entry id |
+
+Sample response
+```
+{"render":{"content":[[{"type":"select","attributes":{"name":"Select topic","onchange":"api.application('get', 'manual', this.value)"},"content":{"...New topic":[],".CARO App":{"value":1,"selected":true},"Audit":{"value":17},"Aufzeichungen":{"value":7},"Bearbeitung von Dateien und Paketen":{"value":12},"Bearbeitung von Dokumenten":{"value":9},"Bearbeitung von Lieferanten und Produkten":{"value":15},"Bearbeitung von Nutzern und der Anleitung":{"value":2},"Bearbeitung von Textvorschlägen":{"value":6},"Bestellungen":{"value":13},"Dateien":{"value":11},"Kalender":{"value":10},"Konversationen":{"value":3},"Lieferanten und Produkte":{"value":14},"Risikomanagement":{"value":8},"Textvorschläge":{"value":5},"Verzeichnis":{"value":4},"Werkzeuge":{"value":16},"sfsdfg":{"value":21}}},{"type":"text","attributes":{"name":"Title","value":".CARO App"}},...
+```
+
+> DELETE ./api/api.php/application/manual/{id}
+
+Deletes a manual entry.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required | database entry id |
+
+Sample response
+```
+{"response":{"msg":"Topic deleted","id":false,"type":"deleted"}}
 ```
 
 > GET ./api/api.php/application/menu
