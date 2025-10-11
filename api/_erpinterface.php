@@ -318,6 +318,43 @@ class _ERPINTERFACE {
 	}
 
 	/**
+	 * retrieve processed orders for given timespan and customer selection, based on customerdata()-response and matched with whatever key is set to clearly identify a customer  
+	 * all processed orders for matched customers are returned
+	 * return an array of orders to compare at application level
+	 * @param array|null $request as named array with columns to match, similar to customerdata()
+	 * @return null|array
+	 * 
+	 * returns results to select from on application level
+	 * availability of the method must be signalled by something, preferably [[]] to enable identifier display within order module
+	 * also see orderdata for similarities. preparing response differs though
+	 */
+	public function pastorders($request = null){
+		/**
+		 * on !$request
+		 * return [
+		 * 		...$this->customerdata(),
+		 * 		[
+		 * 			'name' => string,
+		 * 			'type' => string, // text, date, number
+		 * 		],
+		 * 		...
+		 * ]
+		 * 
+		 * return [
+		 * 		'{patient}' => [
+		 *			'vendor' => string,
+		 *			'article_no' => string,
+		 *			'article_name' => string,
+		 *			'ordered' => Y-m-d,
+		 *			'amount' => string,
+		 *			'received' => Y-m-d,
+		 * 		],
+		 *		... 		
+		 * ]
+		 */
+		return null;	}
+
+	/**
 	 * retrieve expected file options for structured uploads of erp-data-files  
 	 * possibly used by other methods as custom source if database connections are not available  
 	 * returns an array of usecase descriptions and filenames to rename to
@@ -1328,6 +1365,177 @@ class ODEVAVIVA extends _ERPINTERFACE {
 			];
 		}
 		if (!$response) return [[]];
+		return $response;
+	}
+	
+	/**
+	 * retrieve processed orders for given timespan and customer selection, based on customerdata()-response and matched with whatever key is set to clearly identify a customer  
+	 * all processed orders for matched customers are returned
+	 * return an array of orders to compare at application level
+	 * @param array|null $request as named array with columns to match, similar to customerdata()
+	 * @return null|array
+	 * 
+	 * returns results to select from on application level
+	 * availability of the method must be signalled by something, preferably [[]] to enable identifier display within order module
+	 * also see orderdata for similarities. preparing response differs though
+	 */
+	public function pastorders($request = null){
+		$query = <<<'END'
+		SELECT
+			orders.BESTELLNUMMER,
+			orders.BEZEICHNUNG AS BESTELLTEXT,
+			article.ARTIKELBEZEICHNUNG,
+			CONVERT(varchar(255), orders.ORDER_DATUM, 23) AS ORDER_DATUM,
+			orders.MENGE,
+			CONVERT(varchar(255), orders2.WE_DATUM, 23) AS WE_DATUM,
+			orders2.WE_MENGE,
+			orders2.BESTELL_BELEGNUMMER,
+			vendor.NAME_1 as LIEFERANTEN_NAME,
+			orders.KUNDEN_REFERENZ
+		FROM [eva3_02_viva_souh].[dbo].[wws_order] as orders
+		LEFT JOIN (
+			SELECT
+				BESTELL_TEXT AS ARTIKELBEZEICHNUNG,
+				ARTIKEL_REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten]
+		) AS article ON orders.ARTIKELNUMMER = article.ARTIKEL_REFERENZ
+		LEFT JOIN (
+			SELECT
+				REFERENZ,
+				WE_DATUM,
+				WE_MENGE,
+				BESTELL_BELEGNUMMER
+			FROM [eva3_02_viva_souh].[dbo].[wws_bestellung]
+		) AS orders2 ON orders.BESTELLUNGS_REFERENZ = orders2.REFERENZ
+		LEFT JOIN (
+			SELECT 
+				v.NAME_1,
+				v.REFERENZ
+			FROM [eva3_02_viva_souh].[dbo].[inf_adressart] AS ia
+			INNER JOIN [eva3_02_viva_souh].[dbo].[adressen] AS v ON v.ADRESSART = ia.REFERENZ
+			WHERE ia.BEZEICHNUNG = 'Lieferanten'
+		) AS vendor ON orders.LIEFERANTEN_REFERENZ = vendor.REFERENZ
+
+		WHERE orders.ORDER_DATUM BETWEEN :from AND :until
+		AND orders.KUNDEN_REFERENZ IN (:ref)
+
+		ORDER BY orders.ORDER_DATUM DESC
+		END;
+
+		if (!$request) {
+			// this may handle available languages as well!
+			$language = isset($_SESSION['user']['app_settings']['language']) ? $_SESSION['user']['app_settings']['language'] : CONFIG['application']['defaultlanguage'];
+			switch($language){
+				case 'en':
+					return [
+						...$this->customerdata(),
+						[
+							'name' => 'From',
+							'type' => 'date'
+						],
+						[
+							'name' => 'Until',
+							'type' => 'date'
+						],
+						[
+							'name' => 'Filter',
+							'type' => 'text'
+						]
+					];
+				case 'de':
+					return [
+						...$this->customerdata(),
+						[
+							'name' => 'Von',
+							'type' => 'date'
+						],
+						[
+							'name' => 'Bis',
+							'type' => 'date'
+						],
+						[
+							'name' => 'Filter',
+							'type' => 'text'
+						]
+					];
+			}
+		}
+
+		if (!($customers = $this->customerdata($request))) return [[]];
+
+		// convert passed dated to DateTime objects, with default values on erroneous parameters
+		$from = '';
+		if (isset($request['From']) && $request['From']) $from = $request['From'];
+		elseif (isset($request['Von']) && $request['Von']) $from = $request['Von'];
+		$until = 'now';
+		if (isset($request['Until']) && $request['Until']) $until = $request['Until'];
+		elseif (isset($request['Bis']) && $request['Bis']) $until = $request['Bis'];
+
+		try {
+			$from = new \DateTime($from ? : '2010-01-01 00:00:00'); // intial date for the current erp system
+		}
+		catch (\Exception $e){
+			$from = new \DateTime('2010-01-01 00:00:00');
+		}
+		try {
+			$until = new \DateTime($until);
+		}
+		catch (\Exception $e){
+			$until = new \DateTime('now');
+		}
+		// convert to erp supported date format
+		$from = $from->format('Y-m-d H:i:s') . '.000';
+		$until = $until->format('Y-m-d H:i:s') . '.000';
+				
+		try{
+			$statement = $this->_pdo->prepare(strtr($query, [
+				':from' => $this->_pdo->quote($from),
+				':until' => $this->_pdo->quote($until),
+				':ref' => implode(',', array_map(fn($ref) => $this->_pdo->quote($ref['ERPNR']), $customers))
+			]));
+			$statement->execute();	
+		}
+		catch(\EXCEPTION $e){
+			UTILITY::debug($e, $statement->debugDumpParams());
+		}
+		$result = $statement->fetchAll();
+
+		if (isset($request['Filter']) && $request['Filter']){
+			foreach($result as $index => $order){
+				if (!SEARCH::filter($request['Filter'], [$order['BESTELLTEXT'], $order['ARTIKELBEZEICHNUNG']])) unset($result[$index]);
+			}
+			$result = SEARCH::refine($request['Filter'], $result, ['BESTELLTEXT', 'ARTIKELBEZEICHNUNG']);
+		}
+
+		if (!$result) return [[]];
+		$statement = null;
+		$pre_response = $response = [];
+
+		// prepare response by iterating over customers to preserve customerdata refinement regarding weight
+		foreach($customers as $customer){
+			$pre_response[$customer['ERPNR']] = [
+				'patient' => $customer['Name'] . ' *' . $customer['Geburtsdatum'],
+				'orders' => []
+			];
+		}
+		// insert order
+		foreach ($result as $row){
+			$pre_response[$row['KUNDEN_REFERENZ']]['orders'][] = [
+				'vendor' => $row['LIEFERANTEN_NAME'],
+				'article_no' => $row['BESTELLNUMMER'],
+				'article_name' =>  $row['ARTIKELBEZEICHNUNG'],
+				'ordered' => $row['ORDER_DATUM'] ? : null,
+				'amount' => $row['WE_MENGE'] ? : null,
+				'received' => $row['WE_DATUM'] ? : null,
+				'order_reference' => $row['BESTELL_BELEGNUMMER']
+			];
+		}
+		// skip empty, make patient name key for response
+		foreach($pre_response as $patient){
+			if (!$patient['orders']) continue;
+			$response[$patient['patient']] = $patient['orders'];
+		}
+
 		return $response;
 	}
 }

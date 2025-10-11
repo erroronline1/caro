@@ -1081,10 +1081,14 @@
 			"caselist": "Vorgänge nach Patienten",
 			"csvdump": "EVA Datenbanken-Abfrage",
 			"erpquery": "EVA Vorgangs- und Patientendaten",
+			"pastorders": "Kommissionsbestellungen",
 			"patientlookup": "Patientensuche",
 			"upload":"Bereitstellen von ERP-Daten"
 		},
 		"null": "Es gab keine Ergebnisse für diese Abfrage",
+		"past_orders":{
+			"item":":ordered: :article_no :article_name von :vendor, :amount am :received geliefert"
+		},
 		"upload": {
 			"failure": "Es trat ein Fehler auf, bitte versuche es erneut.",
 			"file":"Quelldatei",

@@ -1081,10 +1081,14 @@
 			"caselist": "Cases by patients",
 			"csvdump": "ERP database query",
 			"erpquery": "ERP customer and case data requests",
+			"pastorders": "Orders on commission",
 			"patientlookup": "Patient lookup",
 			"upload": "Submit ERP data files"
 		},
 		"null": "There were no results for this query",
+		"past_orders":{
+			"item":"of :article_no :article_name ordered on :ordered from :vendor :amount arrived on :received"
+		},
 		"upload": {
 			"failure": "An error occured, file could not be saved. Please try again.",
 			"file": "Source file",

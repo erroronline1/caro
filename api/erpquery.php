@@ -45,6 +45,7 @@ class ERPQUERY extends API {
 		if (method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata()) $categories[] = 'patientlookup';
 		if (PERMISSION::permissionFor('erpcasedata') && method_exists(ERPINTERFACE, 'casepositions') && ERPINTERFACE->casepositions()) $categories[] = 'casedata';
 		if (PERMISSION::permissionFor('erpcasedata') && method_exists(ERPINTERFACE, 'customerdata') && ERPINTERFACE->customerdata() && method_exists(ERPINTERFACE, 'customercases') && ERPINTERFACE->customercases()) $categories[] = 'caselist';
+		if (method_exists(ERPINTERFACE, 'pastorders') && ERPINTERFACE->pastorders() && method_exists(ERPINTERFACE, 'customercases') && ERPINTERFACE->customercases()) $categories[] = 'pastorders';
 
 		foreach ($categories as $category){
 				$selecttypes[$this->_lang->GET('erpquery.navigation.' . $category)] = ['value' => $category];
@@ -199,6 +200,64 @@ class ERPQUERY extends API {
 						'type' => 'links',
 						'description' => $patient,
 						'content' => $links
+					];
+				}
+			}
+			if (count($content) < 2){
+				$content[] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('erpquery.null')
+					]
+				];
+			}
+		}
+
+		return $content;
+	}
+
+	public function pastorders(){
+		$content = $fields = [];
+		foreach(ERPINTERFACE->pastorders() as $field){
+			$fields[] = [
+				'type' => $field['type'],
+				'attributes' => [
+					'name' => $field['name'],
+					'value' => UTILITY::propertySet($this->_payload, $field['name']) ? : ''
+				]
+			];
+		}
+		$content[] = [
+			'type' => 'collapsible',
+			'attributes' => [
+				'class' => 'em16'
+			],
+			'content' => $fields
+		];
+
+		if ($_SERVER['REQUEST_METHOD'] === 'POST'){
+			$fields = [];
+			if ($result = ERPINTERFACE->pastorders((array)$this->_payload)) {
+
+				foreach($result as $patient => $orders){
+					if (!$orders) continue;
+					$items = [];
+					foreach($orders as $order){
+						$items[$this->_lang->GET('erpquery.past_orders.item',
+							[
+								':article_no' => $order['article_no'],
+								':article_name' => str_replace("\n", ' ', $order['article_name']),
+								':ordered' => $order['ordered'] ? $this->convertFromServerTime($order['ordered']) : '?',
+								':vendor' => $order['vendor'],
+								':amount' => $order['amount'],
+								':received' => $order['received'] ? $this->convertFromServerTime($order['received']) : '?'
+							]
+						)] = ['href' => "javascript: api.purchase('get', 'productsearch', 'null', encodeURIComponent('" . $order['article_no'] . ' vendor_name:\"' . $order['vendor'] . "\"'), 'order')"];
+					}
+					$content[] = [
+						'type' => 'links',
+						'description' => $patient,
+						'content' => $items
 					];
 				}
 			}
