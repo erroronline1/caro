@@ -1829,7 +1829,9 @@ class CONSUMABLES extends API {
 				}
 			}
 		}
-		else $filter['filesetting']['source'] = $source; // direct data from erp impoert of selected vendor
+		else {
+			// direct data from erp import of selected vendor
+		}
 
 		$productlist = new Listprocessor($filter);
 		$sqlchunks = [];
@@ -2105,7 +2107,7 @@ class CONSUMABLES extends API {
 				$productlistImportResult = [];
 				if ($vendor[':id']){
 	
-					$source = [];
+					$source = $importfilter = [];
 	
 					if (isset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]) && $_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]['tmp_name']) {
 						if (!$vendor[':products']['filefilter']) $this->response(['response' => ['msg' => $this->_lang->GET('consumables.vendor.productlist_filter_json_error', [':filter' => $this->_lang->GET('consumables.vendor.productlist_filter')]), 'type' => 'error']]);
@@ -2123,13 +2125,26 @@ class CONSUMABLES extends API {
 					}
 					elseif (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport'))){
 						$source = ERPINTERFACE->consumables([$vendor[':name']]);
-						$source = isset($source[$vendor[':name']]) ? $source[$vendor[':name']] : []; 				 
-						$importfilter = $vendor[':products']['erpfilter'];
+						$source = isset($source[$vendor[':name']]) ? $source[$vendor[':name']] : [];
+//						var_dump($source);
+//						die();		 
+						$importfilter = [
+							'filesetting' => [
+								'columns' => array_keys($source[0]),
+								'source' => []
+							]];
+						if ($vendor[':products']['erpfilter']) $importfilter = array_merge($importfilter, json_decode($vendor[':products']['erpfilter'] ? : '', true));
+						foreach($source as $item){
+							$importfilter['filesetting']['source'][] = array_values($item);
+						}
+						$importfilter = UTILITY::json_encode($importfilter);
 					}
-
-					$productlistImportResult = $this->update_productlist($source, $importfilter, $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected'));
-					$vendor[':products']['validity'] = $productlistImportResult[0];
-					if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
+					if ($importfilter){
+						$productlistImportResult = $this->update_productlist($source, $importfilter, $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected'));
+						$vendor[':products']['validity'] = $productlistImportResult[0];
+						var_dump($productlistImportResult);
+						if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
+					}
 				}
  
 				// tidy up consumable products database if inactive
@@ -2620,7 +2635,7 @@ class CONSUMABLES extends API {
 							];
 
 						if (ERPINTERFACE && ERPINTERFACE->_instatiated && ERPINTERFACE->_productsimport){
-							if ($vendor[':name'] && ERPINTERFACE->consumables([$vendor[':name']])) {
+							if ($vendor['name'] && ERPINTERFACE->consumables([$vendor['name']])) {
 								// add update button
 								$productlist[] = [
 									[
