@@ -227,13 +227,24 @@ class UPDATE{
 				"ALTER TABLE `caro_consumables_vendors` CHANGE `pricelist` `products` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL; "
 			],
 			'sqlsrv' => [
-				"UPDATE caro_calendar SET type = 'tasks' WHERE type = 'schedule'; ",
-				"IF COL_LENGTH('caro_records', 'note') IS NULL" .
-				" BEGIN" .
-				"    ALTER TABLE caro_records" .
-				"    ADD note varchar(MAX) NULL DEFAULT NULL" .
-				" END; ",
-				"UPDATE caro_user SET image = 'media/favicon/icon192.png' where id = 1; "
+				"BEGIN TRANSACTION " .
+				"SET QUOTED_IDENTIFIER ON " .
+				"SET ARITHABORT ON " .
+				"SET NUMERIC_ROUNDABORT OFF " .
+				"SET CONCAT_NULL_YIELDS_NULL ON " .
+				"SET ANSI_NULLS ON " .
+				"SET ANSI_PADDING ON " .
+				"SET ANSI_WARNINGS ON " .
+				"COMMIT " .
+				"BEGIN TRANSACTION " .
+				"GO " .
+				"EXECUTE sp_rename N'dbo.caro_consumables_vendors.pricelist', N'Tmp_products_1', 'COLUMN'  " .
+				"GO " .
+				"EXECUTE sp_rename N'dbo.caro_consumables_vendors.Tmp_products_1', N'products', 'COLUMN'  " .
+				"GO " .
+				"ALTER TABLE dbo.caro_consumables_vendors SET (LOCK_ESCALATION = TABLE) " .
+				"GO " .
+				"COMMIT"
 			]
 		];
 	}
