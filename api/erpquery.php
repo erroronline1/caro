@@ -159,6 +159,15 @@ class ERPQUERY extends API {
 					]
 				];
 			}
+			else
+				array_splice($content, 1, 0, [
+					[
+						'type' => 'submitbutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('general.submit_button')
+						]
+					]
+				]);
 		}
 		return $content;
 	}
@@ -211,6 +220,15 @@ class ERPQUERY extends API {
 					]
 				];
 			}
+			else
+				array_splice($content, 1, 0, [
+					[
+						'type' => 'submitbutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('general.submit_button')
+						]
+					]
+				]);
 		}
 
 		return $content;
@@ -252,7 +270,7 @@ class ERPQUERY extends API {
 								':amount' => $order['amount'],
 								':received' => $order['received'] ? $this->convertFromServerTime($order['received']) : '?'
 							]
-						)] = ['href' => "javascript: api.purchase('get', 'productsearch', 'null', encodeURIComponent('" . $order['article_no'] . ' vendor_name:\"' . $order['vendor'] . "\"'), 'order')"];
+						)] = ['href' => "javascript: api.purchase('get', 'order'); api.purchase('get', 'productsearch', 'null', encodeURIComponent('" . $order['article_no'] . ' vendor_name:\"' . $order['vendor'] . "\"'), 'order')"];
 					}
 					$content[] = [
 						'type' => 'links',
@@ -269,6 +287,15 @@ class ERPQUERY extends API {
 					]
 				];
 			}
+			else
+				array_splice($content, 1, 0, [
+					[
+						'type' => 'submitbutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('general.submit_button')
+						]
+					]
+				]);
 		}
 
 		return $content;
@@ -333,6 +360,15 @@ class ERPQUERY extends API {
 					]
 				];
 			}
+			else
+				array_splice($content, 1, 0, [
+					[
+						'type' => 'submitbutton',
+						'attributes' => [
+							'value' => $this->_lang->GET('general.submit_button')
+						]
+					]
+				]);
 		}
 
 		return $content;
