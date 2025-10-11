@@ -52,6 +52,7 @@ Things are still in motion. Images may be outdated.
     * port last order
     * if erp interface method for import and vendor available drop pricelist import filter and show update button and filter for individual treatment of entries and vice versa  
       consider dropping csv export/import in this case, also see erpinterface->consumables()
+    * check why product validity date is not set
 
 ## Content
 * [Aims](#aims)
