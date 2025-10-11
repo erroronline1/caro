@@ -1885,9 +1885,9 @@ class CONSUMABLES extends API {
 				$query = SQLQUERY::PREPARE('consumables_put_product_productlist_import');
 				$replace = [
 					':id' => $remainder[$update]['id'],
-					':article_name' => $productlist->_list[1][$index]['article_name'] ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name'])) : 'NULL',
-					':article_unit' => $productlist->_list[1][$index]['article_unit'] ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit'])) : 'NULL',
-					':article_ean' => $productlist->_list[1][$index]['article_ean'] ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean'])) : 'NULL',
+					':article_name' => isset($productlist->_list[1][$index]['article_name']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name'])) : 'NULL',
+					':article_unit' => isset($productlist->_list[1][$index]['article_unit']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit'])) : 'NULL',
+					':article_ean' => isset($productlist->_list[1][$index]['article_ean']) ? $this->_pdo->quote(preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean'])) : 'NULL',
 					':trading_good' => isset($productlist->_list[1][$index]['trading_good']) && intval($productlist->_list[1][$index]['trading_good']) ? 1 : 'NULL',
 					':has_expiry_date' => isset($productlist->_list[1][$index]['has_expiry_date']) && intval($productlist->_list[1][$index]['has_expiry_date']) ? 1 : 'NULL',
 					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : 'NULL',
@@ -1921,12 +1921,12 @@ class CONSUMABLES extends API {
 			foreach (array_udiff(array_column($productlist->_list[1], 'article_no'), array_column($remainder, 'article_no'), fn($v1, $v2) => $v1 <=> $v2) as $index => $row){
 				$insertions[] = [
 					':vendor_id' => $vendorID,
-					':article_no' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_no']) ? : null,
-					':article_name' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name']) ? : null,
+					':article_no' => isset($productlist->_list[1][$index]['article_no']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_no']) : null,
+					':article_name' => isset($productlist->_list[1][$index]['article_name']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_name']) : null,
 					':article_alias' => null,
-					':article_unit' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit']) ? : null,
-					':article_ean' => preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean']) ? : null,
-					':article_info' => null,
+					':article_unit' => isset($productlist->_list[1][$index]['article_unit']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_unit']) : null,
+					':article_ean' => isset($productlist->_list[1][$index]['article_ean']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_ean']) : null,
+					':article_info' => isset($productlist->_list[1][$index]['article_info']) ? preg_replace('/\n/', '', $productlist->_list[1][$index]['article_info']) : null,
 					':hidden' => null,
 					':has_files' => null,
 					':trading_good' => isset($productlist->_list[1][$index]['trading_good']) && intval($productlist->_list[1][$index]['trading_good']) ? 1 : null,
@@ -1975,10 +1975,10 @@ class CONSUMABLES extends API {
 							':article_ean' => $article['article_ean'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['article_ean'])): 'NULL',
 							':trading_good' => isset($article['trading_good']) && intval($article['trading_good']) ? 1 : 'NULL',
 							':incorporated' => isset($article['last_order']) && $article['last_order'] 
-								?$this->_pdo->quote(UTILITY::json_encode([[
+								? $this->_pdo->quote(UTILITY::json_encode([[
 									'_check' => $this->_lang->GET('consumables.product.incorporation_import_default', [':date' => $article['last_order']], true),
 									'user' => [
-										'name' => $_SESSION['user']['name'],
+										'name' => CONFIG['system']['caroapp'],
 										'date' => $this->_date['servertime']->format('Y-m-d H:i')
 									]
 								]]))
@@ -2126,23 +2126,17 @@ class CONSUMABLES extends API {
 					elseif (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport'))){
 						$source = ERPINTERFACE->consumables([$vendor[':name']]);
 						$source = isset($source[$vendor[':name']]) ? $source[$vendor[':name']] : [];
-//						var_dump($source);
-//						die();		 
 						$importfilter = [
 							'filesetting' => [
 								'columns' => array_keys($source[0]),
-								'source' => []
+								'source' => $source
 							]];
 						if ($vendor[':products']['erpfilter']) $importfilter = array_merge($importfilter, json_decode($vendor[':products']['erpfilter'] ? : '', true));
-						foreach($source as $item){
-							$importfilter['filesetting']['source'][] = array_values($item);
-						}
 						$importfilter = UTILITY::json_encode($importfilter);
 					}
 					if ($importfilter){
 						$productlistImportResult = $this->update_productlist($source, $importfilter, $vendor[':id'], $this->_lang->PROPERTY('erpquery.integrations.productlist_erp_match_selected'));
 						$vendor[':products']['validity'] = $productlistImportResult[0];
-						var_dump($productlistImportResult);
 						if (!strlen($vendor[':products']['validity'])) $productlistImportError = $this->_lang->GET('consumables.vendor.productlist_update_error');
 					}
 				}
