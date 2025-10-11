@@ -817,23 +817,24 @@ class CONSUMABLES extends API {
 			case 'POST':
 				if (!PERMISSION::permissionFor('products')) $this->response([], 401);
 				$product = [
-					'id' => null,
-					'vendor_id' => null,
-					'vendor_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) !== $this->_lang->GET('consumables.product.vendor_select_default') ? UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor')),
-					'article_no' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : null,
-					'article_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null,
-					'article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null,
-					'article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
-					'article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
-					'article_info' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null,
-					'hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
-					'has_files' => null,
-					'trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
-					'incorporated' => null,
-					'has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
-					'special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null,
-					'stock_item' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null,
-					'erp_id' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.erp_id')) ? : null,
+					':id' => null,
+					':vendor_id' => null,
+					':vendor_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) !== $this->_lang->GET('consumables.product.vendor_select_default') ? UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor_select')) : UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.vendor')),
+					':article_no' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_no')) ? : null,
+					':article_name' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_name')) ? : null,
+					':article_alias' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_alias')) ? : null,
+					':article_unit' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_unit')) ? : null,
+					':article_ean' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_ean')) ? : null,
+					':article_info' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_info')) ? : null,
+					':hidden' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.availability')) === $this->_lang->GET('consumables.product.hidden') ? UTILITY::json_encode(['name' => $_SESSION['user']['name'], 'date' => $this->_date['servertime']->format('Y-m-d H:i:s')]) : null,
+					':has_files' => null,
+					':trading_good' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.article_trading_good')) ? 1 : null,
+					':incorporated' => null,
+					':has_expiry_date' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.expiry_date')) ? 1 : null,
+					':special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null,
+					':stock_item' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null,
+					':erp_id' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.erp_id')) ? : null,
+					':last_order' => null
 				];
 
 				// validate vendor
@@ -852,23 +853,7 @@ class CONSUMABLES extends API {
 				}
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'consumables_post_product', [
-					'values' => [
-						':vendor_id' => $product['vendor_id'],
-						':article_no' => $product['article_no'],
-						':article_name' => $product['article_name'],
-						':article_alias' => $product['article_alias'],
-						':article_unit' => $product['article_unit'],
-						':article_ean' => $product['article_ean'],
-						':article_info' => $product['article_info'],
-						':hidden' => $product['hidden'],
-						':has_files' => $product['has_files'],
-						':trading_good' => $product['trading_good'],
-						':incorporated' => $product['incorporated'],
-						':has_expiry_date' => $product['has_expiry_date'],
-						':special_attention' => $product['special_attention'],
-						':stock_item' => $product['stock_item'],
-						':erp_id' => $product['erp_id'],
-					]
+					'values' => $product
 				])) {
 					// save documents
 					$filenamewarning = [];
@@ -1086,6 +1071,7 @@ class CONSUMABLES extends API {
 						':special_attention' => $product['special_attention'],
 						':stock_item' => $product['stock_item'],
 						':erp_id' => $product['erp_id'],
+						':last_order' => $product['last_order']
 					]
 				])) $this->response([
 					'response' => [
@@ -1138,6 +1124,7 @@ class CONSUMABLES extends API {
 					'special_attention' => '',
 					'stock_item' => '',
 					'erp_id' => '',
+					'last_order' => null
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
 
@@ -1147,7 +1134,7 @@ class CONSUMABLES extends API {
 				foreach ($docfiles as $path){
 					$file = pathinfo($path);
 					$article_no = explode('_', $file['filename'])[2];
-					similar_text($article_no, $product['article_no'], $percent);
+					similar_text($article_no, $product['article_no'] ? : '', $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						// match expiry date in Vendor_{uploaddate}-{expirydate}_articlenumber_filename.extension
  						preg_match('/(.+?)_(\d{8,8})-(\d{8,8})_(.+?)_(.+?)$/', $file['basename'], $fileNameComponents);
@@ -1168,7 +1155,7 @@ class CONSUMABLES extends API {
 				$similarproducts = [];
 				foreach ($vendorproducts as $vendorproduct){
 					if (!$vendorproduct['article_no'] || $vendorproduct['article_no'] === $product['article_no']) continue;
-					similar_text($vendorproduct['article_no'], $product['article_no'], $percent);
+					similar_text($vendorproduct['article_no'], $product['article_no'] ? : '', $percent);
 					if ($percent >= CONFIG['likeliness']['consumables_article_no_similarity']) {
 						$similarproducts[$vendorproduct['article_no'] . ' ' . $vendorproduct['article_name']] = ['name' => '_' . $vendorproduct['id']];
 					}
@@ -1261,7 +1248,7 @@ class CONSUMABLES extends API {
 						];
 
 						// inform about last order
-						if ($product['id'] && $product['last_order']){
+						if ($product['last_order']){
 							$response['render']['content'][1][] = [
 								'type' => 'textsection',
 								'attributes' => [
@@ -1609,7 +1596,7 @@ class CONSUMABLES extends API {
 					}
 
 					// add last order info
-					if ($product['id'] && $product['last_order']){
+					if ($product['last_order']){
 						$response['render']['content'][2][] = [
 							'type' => 'textsection',
 							'attributes' => [
@@ -1893,7 +1880,8 @@ class CONSUMABLES extends API {
 					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : 'NULL',
 					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : 'NULL',
 					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $this->_pdo->quote($productlist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
-					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL'
+					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL',
+					':last_order' => isset($productlist->_list[1][$index]['last_order']) ? $this->_pdo->quote($productlist->_list[1][$index]['last_order']) : 'NULL'
 				];
 				// iterate over columns and values, strip equals to shorten each query and crunch more into one the chunks to speed up sql
 				foreach ([
@@ -1905,7 +1893,8 @@ class CONSUMABLES extends API {
 					'special_attention',
 					'stock_item',
 					'erp_id',
-					'incorporated'
+					'incorporated',
+					// 'last_order' does not work for having to be converted
 				] as $column){
 					if ( ($replace[':' . $column] === $remainder[$update][$column])
 						|| (!$remainder[$update][$column] && $replace[':' . $column] === 'NULL')
@@ -1943,6 +1932,7 @@ class CONSUMABLES extends API {
 					':special_attention' => isset($productlist->_list[1][$index]['special_attention']) && intval($productlist->_list[1][$index]['special_attention']) ? 1 : null,
 					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : null,
 					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $productlist->_list[1][$index]['erp_id'] : null,
+					':last_order' => isset($productlist->_list[1][$index]['last_order']) && $productlist->_list[1][$index]['last_order'] ? $productlist->_list[1][$index]['last_order'] : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
@@ -1967,7 +1957,7 @@ class CONSUMABLES extends API {
 				}
 
 				if (isset($erp_dump[$vendor['name']]) && $erp_dump[$vendor['name']]){
-					$query = SQLQUERY::PREPARE('consumables_put_product_productlist_erp_import');
+					$query = SQLQUERY::PREPARE('consumables_put_product_productlist_erp_amendment');
 					foreach($erp_dump[$vendor['name']] as $article){
 						if (!$article['article_no']) continue;
 						$replace = [
@@ -1988,7 +1978,8 @@ class CONSUMABLES extends API {
 							':stock_item' => isset($article['stock_item']) && boolval(intval($article['stock_item'])) ? 1 : 'NULL',
 							':erp_id' => $article['erp_id'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['erp_id'] ? : '')): 'NULL',
 							':vendor_id' => $vendor['id'],
-							':article_no' => $this->_pdo->quote(preg_replace('/\n/', '', $article['article_no']))
+							':article_no' => $this->_pdo->quote(preg_replace('/\n/', '', $article['article_no'])),
+							':last_order' => $article['last_order'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['last_order'])): 'NULL'
 						];
 						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr($query, $replace) . '; ');
 					}

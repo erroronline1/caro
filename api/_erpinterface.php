@@ -1113,7 +1113,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				specialattention*/
 			article2.MINDEST_BESTAND,
 			article.ARTIKEL_REFERENZ,
-			CONVERT(varchar(255), article.WARENEINGANGSDATUM, 23) AS WARENEINGANGSDATUM
+			CONVERT(varchar(255), article.WARENEINGANGSDATUM, 120) AS WARENEINGANGSDATUM
 		FROM [eva3_02_viva_souh].[dbo].[wws_artikel_lieferanten] AS article
 		LEFT JOIN (
 			SELECT
