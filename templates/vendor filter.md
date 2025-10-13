@@ -1,10 +1,5 @@
 > ean/gtin may have to be formatted as number or fracture before resaving as csv to avoid being displayed as exponential function within ms-office
 
-# content
-* ***[plan b](#plan-b-no-usable-list-or-no-vendor-response)***
-* [juzo](#juzo)
-* [ofa](#ofa)
-
 ### prepared filters
 prepared filters can be found within default.vendors.XX.json. these are by no means perfect and need tweaking according to your customs. They can be tested with _stresstest.php
 
@@ -400,65 +395,3 @@ import with default filter
 	}
 }
 ```
-
-### juzo
-> unusable list for having too much entries. requires alternate implementation
-
-delete unreqired columns
-
-```json
-{
-	"filesetting": {
-		"columns": ["JUZO-Artikelnr", "GTIN", "Mengeneinheit", "Artikelbezeichnung 1", "Artikelbezeichnung 2"]
-	},
-	"modify": {
-		"add": {
-			"trading_good": "1",
-			"has_expiry_date": "1"
-		},
-		"rewrite": [{
-			"article_no": ["JUZO-Artikelnr"],
-			"article_name": ["Artikelbezeichnung 1", ", ", "Artikelbezeichnung 2"],
-			"article_unit": ["Mengeneinheit"],
-			"article_ean": ["GTIN"]
-		}]
-	}
-}
-```
-
-[content](#content)
-
-### ofa
-> unusable list for having too much entries. requires alternate implementation
-
-delete . from headers
-
-```json
-{
-	"filesetting": {
-		"headerrowindex": 0,
-		"columns": ["Artikel", "Bez 1", "Bez II", "VME"]
-	},
-	"modify": {
-		"add": {
-			"trading_good": "1"
-		},
-		"replace":[
-			["Artikel", "\\s{2,}", " "],
-			["Bez 1", "\\s{2,}", " "],
-			["Bez II", "\\s{2,}", " "]
-		],
-		"rewrite": [{
-			"article_no": ["Artikel"],
-			"article_name": ["Bez 1", ", ", "Bez II"],
-			"article_unit": ["VME"],
-			"article_ean": [""]
-		}],
-		"conditional_or": [
-			["trading_good", "0", ["article_name", "Anti-Rutsch-Beschichtung"]]
-		]
-	}
-}
-```
-
-[content](#content)
