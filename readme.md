@@ -2373,6 +2373,15 @@ Products are deleted by default on update of the product list unless
 * an alias has been modified
 * or it has been ordered.
 
+In case you are able to import through your [ERP interface](#erp-interface) you may have to filter as well. Informations not provided, like special_attention, expiry_date or trading_good can be set with the ERP filter containing
+```js
+"modify": {
+    "conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+}
+```
+
+The RegEx pattern must resolve to positive outcomes, you may have to use positive lookaheads.
+
 ### Product incorporation
 In case of transfer of the last order date being part of the filter, an incorporation will be initiated with the last order date noted. Differing from a regular incorporation the approval only applies to the user role independently of other roles assigned to the updating user.
 

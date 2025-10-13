@@ -2260,6 +2260,15 @@ Produkte werden im Falle einer Artikellistenaktualisierung automatisch gelöscht
 * es wurde ein Alias festgelegt
 * oder es wurde schon einmal bestellt.
 
+Fall ein Import durch die [ERP-Anbindung](#erp-anbindung) möglich ist, kann ebenfalls ein Filter erforderlich sein. Informationen die nicht abgefragt werden können, wie special_attention, expiry_date oder trading_good, können durch den ERP-Filter mit
+```js
+"modify": {
+    "conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+}
+```
+
+ergänzt werden. Das RegEx-Muster musss dabei positiv übereinstimmen, ggf. müssen positive Lookaheads verwendet werden.
+
 ### Produkteinführung
 Ist der Transfer des letzten Bestelldatums Bestandteil des Filters, wird eine Produkteinführung insofern initiiert, als dass das letzte Bestelldatum vermerkt wird. Im Unterschied zu regulären Produkteinführungen wird die erste Freigabe nur in der Rolle eines Nutzers angelegt, ohne etwaige weitere Rollen des aktuellen Nutzers zu berücksichtigen.
 
