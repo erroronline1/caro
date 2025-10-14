@@ -922,7 +922,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'audit_get_templates'),
 		];
 
-		$insertions = [];
+		$sqlchunks = [];
 		foreach ($json as $entry){
 			if (!(
 				isset($entry['unit']) && $entry['unit'] &&
@@ -959,18 +959,27 @@ class INSTALL {
 					continue;
 				}
 
-				$insertions[] = [
-					':content' => $entry['content'],
-					':objectives' => $entry['objectives'],
-					':unit' => $entry['unit'],
-					':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-					':hint' => $entry['hint'] ? : null,
-					':method' => $entry['method']
-				];
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('audit_post_template'),
+				[
+					':content' => $this->_pdo->quote($entry['content']),
+					':objectives' => $this->_pdo->quote($entry['objectives']),
+					':unit' => $this->_pdo->quote($entry['unit']),
+					':author' => isset($entry['author']) ? $this->_pdo->quote($entry['author']) : $this->_pdo->quote($this->_defaultUser),
+					':hint' => $this->_pdo->quote($entry['hint']) ? : 'NULL',
+					':method' => $this->_pdo->quote($entry['method'])
+				]) . '; ');
 			}
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('audit_post_template'), $insertions)))
-			$this->printSuccess('Novel entries by unit and objectives from audits have been installed.');
+		foreach ($sqlchunks as $chunk){
+			try {
+				SQLQUERY::EXECUTE($this->_pdo, $chunk);
+			}
+			catch (\Exception $e) {
+				$this->printWarning('there has been an issue', [$e, $chunk]);
+				die();
+			}
+		}
+		if ($sqlchunks)	$this->printSuccess('Novel entries by unit and objectives from audits have been installed.');
 		else $this->printWarning('There were no novelties to install from audits ressources.');
 	}
 	
@@ -1051,7 +1060,7 @@ class INSTALL {
 		
 		$name_context = array_map(fn($doc) => $doc['name'] . '_' . $doc['context'], $DBall);
 
-		$insertions = [];
+		$sqlchunks = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken for the context
 			if (!(
@@ -1085,24 +1094,33 @@ class INSTALL {
 			$entry['restricted_access'] = implode(',', preg_split('/[^\w\d]+/m', $entry['restricted_access'] ? : ''));
 
 			$name_context[] = $entry['name'] . '_' . $entry['context'];
-			$insertions[] = [
-				':id' => null,
-				':name' => $entry['name'],
-				':alias' => isset($entry['alias']) ? $entry['alias'] : '',
-				':context' => $entry['context'],
-				':unit' => $entry['unit'],
-				':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser,
-				':content' => gettype($entry['content']) === 'array' ? UTILITY::json_encode($entry['content']) : $entry['content'],
-				':hidden' => null,
-				':approval' => null,
-				':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $entry['regulatory_context'] : '',
-				':permitted_export' => isset($entry['permitted_export']) && $entry['permitted_export'] ? $entry['permitted_export'] : null,
-				':restricted_access' => isset($entry['restricted_access']) && $entry['restricted_access'] ? $entry['restricted_access'] : null,
-				':patient_access' => isset($entry['patient_access']) && $entry['patient_access'] ? $entry['patient_access'] : null
-			];
+			$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('document_post'),
+			[
+				':id' => 'NULL',
+				':name' => $this->_pdo->quote($entry['name']),
+				':alias' => isset($entry['alias']) ? $this->_pdo->quote($entry['alias']) : '',
+				':context' => $this->_pdo->quote($entry['context']),
+				':unit' => $this->_pdo->quote($entry['unit']),
+				':author' => isset($entry['author']) ? $this->_pdo->quote($entry['author']) : $this->_pdo->quote($this->_defaultUser),
+				':content' => gettype($entry['content']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['content'])) : $this->_pdo->quote($entry['content']),
+				':hidden' => 'NULL',
+				':approval' => 'NULL',
+				':regulatory_context' => isset($entry['regulatory_context']) && $entry['regulatory_context'] ? $this->_pdo->quote($entry['regulatory_context']) : '',
+				':permitted_export' => isset($entry['permitted_export']) && $entry['permitted_export'] ? $this->_pdo->quote($entry['permitted_export']) : 'NULL',
+				':restricted_access' => isset($entry['restricted_access']) && $entry['restricted_access'] ? $this->_pdo->quote($entry['restricted_access']) : 'NULL',
+				':patient_access' => isset($entry['patient_access']) && $entry['patient_access'] ? $this->_pdo->quote($entry['patient_access']) : 'NULL'
+			]) . '; ');
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('document_post'), $insertions)))
-			$this->printSuccess('Novel entries by name from documents have been installed.');
+		foreach ($sqlchunks as $chunk){
+			try {
+				SQLQUERY::EXECUTE($this->_pdo, $chunk);
+			}
+			catch (\Exception $e) {
+				$this->printWarning('there has been an issue', [$e, $chunk]);
+				die();
+			}
+		}
+		if ($sqlchunks)	$this->printSuccess('Novel entries by name from documents have been installed.');
 		else $this->printWarning('There were no novelties to install from documents ressources.');
 	}
 
@@ -1116,7 +1134,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'application_get_manual'),
 		];
 
-		$insertions = $names = [];
+		$sqlchunks = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the title is not already taken
 			if (!(
@@ -1142,15 +1160,24 @@ class INSTALL {
 				$entry['permissions'] = implode(',', preg_split('/[^\w\d]+/m', $entry['permissions'] ? : ''));
 
 				$names[] = $entry['title'];
-				$insertions[] = [
-					':title' => $entry['title'],
-					':content' => $entry['content'],
-					':permissions' => $entry['permissions']
-				];
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('application_post_manual'),
+				[
+					':title' => $this->_pdo->quote($entry['title']),
+					':content' => $this->_pdo->quote($entry['content']),
+					':permissions' => $this->_pdo->quote($entry['permissions'])
+				]) . '; ');
 			}
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('application_post_manual'), $insertions)))
-			$this->printSuccess('Novel entries by name from manuals have been installed.');
+		foreach ($sqlchunks as $chunk){
+			try {
+				SQLQUERY::EXECUTE($this->_pdo, $chunk);
+			}
+			catch (\Exception $e) {
+				$this->printWarning('there has been an issue', [$e, $chunk]);
+				die();
+			}
+		}
+		if ($sqlchunks)	$this->printSuccess('Novel entries by name from manuals have been installed.');
 		else $this->printWarning('There were no novelties to install from manuals ressources.');
 	}
 
@@ -1164,7 +1191,7 @@ class INSTALL {
 		foreach (SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist') as $row){
 			$DBall[] = $row['process'].$row['risk'].$row['cause'].$row['measure'];
 		}
-		$insertions = [];
+		$sqlchunks = [];
 
 		foreach ($json as $entry){
 			// risks are only transferred if process+risk+cause+measure is not already taken
@@ -1226,30 +1253,37 @@ class INSTALL {
 					$entry['risk'] = implode(',', preg_split('/[^\w\d]+/m', $entry['risk'] ? : ''));
 
 					if (!in_array($entry['process'].$entry['risk'].$entry['cause'].$entry['measure'], $DBall))
-					$insertions[] = [
-						':type' => $entry['type'],
-						':process' => $entry['process'],
-						':risk' => $entry['risk'],
-						':relevance' => isset($entry['relevance']) ? $entry['relevance'] : 1,
-						':cause' => $entry['cause'],
-						':effect' => isset($entry['effect']) ? $entry['effect'] : null,
-						':probability' => isset($entry['probability']) ? $entry['probability'] : 4,
-						':damage' => isset($entry['damage']) ? $entry['damage'] : 4,
-						':measure' => isset($entry['measure']) ? $entry['measure'] : '',
-						':measure_probability' => isset($entry['measure_probability']) ? $entry['measure_probability'] : 4,
-						':measure_damage' => isset($entry['measure_damage']) ? $entry['measure_damage'] : 4,
-						':risk_benefit' => isset($entry['risk_benefit']) ? $entry['risk_benefit'] : null,
-						':measure_remainder' => isset($entry['measure_remainder']) ? $entry['measure_remainder'] : null,
-						':proof' => null,
-						':author' => isset($entry['author']) ? $entry['author'] : $this->_defaultUser
-					];
-					continue;
+						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('risk_post'),
+						[
+							':type' => $this->_pdo->quote($entry['type']),
+							':process' => $this->_pdo->quote($entry['process']),
+							':risk' => $this->_pdo->quote($entry['risk']),
+							':relevance' => isset($entry['relevance']) ? $this->_pdo->quote($entry['relevance']) : 1,
+							':cause' => $this->_pdo->quote($entry['cause']),
+							':effect' => isset($entry['effect']) ? $this->_pdo->quote($entry['effect']) : 'NULL',
+							':probability' => isset($entry['probability']) ? $this->_pdo->quote($entry['probability']) : 4,
+							':damage' => isset($entry['damage']) ? $this->_pdo->quote($entry['damage']) : 4,
+							':measure' => isset($entry['measure']) ? $this->_pdo->quote($entry['measure']) : '',
+							':measure_probability' => isset($entry['measure_probability']) ? $this->_pdo->quote($entry['measure_probability']) : 4,
+							':measure_damage' => isset($entry['measure_damage']) ? $this->_pdo->quote($entry['measure_damage']) : 4,
+							':risk_benefit' => isset($entry['risk_benefit']) ? $this->_pdo->quote($entry['risk_benefit']) : 'NULL',
+							':measure_remainder' => isset($entry['measure_remainder']) ? $this->_pdo->quote($entry['measure_remainder']) : 'NULL',
+							':proof' => 'NULL',
+							':author' => isset($entry['author']) ?$this->_pdo->quote($entry['author']) : $this->_pdo->quote($this->_defaultUser)
+						]) . '; ');
 				}
 			}
-			$this->printError('The following dataset is invalid and will be skipped:', $entry);
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('risk_post'), $insertions)))
-			$this->printSuccess('Novel entries by process+risk+cause+measure from risks have been installed.');
+		foreach ($sqlchunks as $chunk){
+			try {
+				SQLQUERY::EXECUTE($this->_pdo, $chunk);
+			}
+			catch (\Exception $e) {
+				$this->printWarning('there has been an issue', [$e, $chunk]);
+				die();
+			}
+		}
+		if ($sqlchunks)	$this->printSuccess('Novel entries by process+risk+cause+measure from risks have been installed.');
 		else $this->printWarning('There were no novelties to install from risks ressources.');
 	}
 	/**
@@ -1328,7 +1362,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'user_get_datalist'),
 		];
 
-		$insertions = $names = $orderauths = [];
+		$sqlchunks = $names = $orderauths = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
 			if (!(
@@ -1384,20 +1418,30 @@ class INSTALL {
 				$entry['units'] = implode(',', $entry['units']);
 
 				$names[] = $entry['name'];
-				$insertions[] = [
-					':name' => $entry['name'],
-					':permissions' => $entry['permissions'],
-					':units' => $entry['units'],
-					':token' => $entry['token'],
-					':orderauth' => $entry['orderauth'],
-					':image' => $entry['image'],
-					':app_settings' => UTILITY::json_encode($entry['app_settings']),
+
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('user_post'),
+				[
+					':name' => $this->_pdo->quote($entry['name']),
+					':permissions' => $this->_pdo->quote($entry['permissions']),
+					':units' => $this->_pdo->quote($entry['units']),
+					':token' => $this->_pdo->quote($entry['token']),
+					':orderauth' => $this->_pdo->quote($entry['orderauth']),
+					':image' =>$this->_pdo->quote( $entry['image']),
+					':app_settings' =>$this->_pdo->quote( UTILITY::json_encode($entry['app_settings'])),
 					':skills' => ''
-				];
+				]) . '; ');
 			}
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('user_post'), $insertions)))
-			$this->printSuccess('Novel entries by name from users have been installed.');
+		foreach ($sqlchunks as $chunk){
+			try {
+				SQLQUERY::EXECUTE($this->_pdo, $chunk);
+			}
+			catch (\Exception $e) {
+				$this->printWarning('there has been an issue', [$e, $chunk]);
+				die();
+			}
+		}
+		if ($sqlchunks)	$this->printSuccess('Novel entries by name for users have been installed.');
 		else $this->printWarning('There were no novelties to install from user ressources.');
 	}
 
@@ -1411,7 +1455,7 @@ class INSTALL {
 			...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist'),
 		];
 
-		$insertions = $names = [];
+		$sqlchunks = $names = [];
 		foreach ($json as $entry){
 			// documents are only transferred if the name is not already taken
 			if (!(
@@ -1433,23 +1477,37 @@ class INSTALL {
 				$names[] = $entry['name'];
 
 				if (isset($entry['products']) && gettype($entry['products']) === 'array' && isset($entry['products']['filefilter'])){
-					$productlistfilter = null;
-					$productlistfilter = gettype($entry['products']['filefilter']) === 'string' ? $entry['products']['filefilter'] : UTILITY::json_encode($entry['products']['filefilter'], JSON_PRETTY_PRINT);
-					$entry['products']['filefilter'] = $productlistfilter;
+					if (isset($entry['products']['filefilter'])){
+						$productlistfilter = gettype($entry['products']['filefilter']) === 'string' ? $entry['products']['filefilter'] : UTILITY::json_encode($entry['products']['filefilter'], JSON_PRETTY_PRINT);
+						$entry['products']['filefilter'] = $productlistfilter;
+					}
+					if (isset($entry['products']['erpfilter'])){
+						$erpfilter = gettype($entry['products']['erpfilter']) === 'string' ? $entry['products']['erpfilter'] : UTILITY::json_encode($entry['products']['erpfilter'], JSON_PRETTY_PRINT);
+						$entry['products']['erpfilter'] = $erpfilter;
+					}
 				}
 
-				$insertions[] = [
-					':id' => null,
-					':name' => $entry['name'],
-					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? UTILITY::json_encode($entry['info']) : null,
-					':products' => isset($entry['products']) && gettype($entry['products']) === 'array' ? UTILITY::json_encode($entry['products']) : null,
-					':evaluation' => null,
-					':hidden' => null
-				];
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
+				[
+					':id' => 'NULL',
+					':name' => $this->_pdo->quote($entry['name']),
+					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['info'])) : 'NULL',
+					':products' => isset($entry['products']) && gettype($entry['products']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['products'])) : 'NULL',
+					':evaluation' => 'NULL',
+					':hidden' => 'NULL'
+				]) . '; ');
 			}
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_vendor'), $insertions)))
-			$this->printSuccess('Novel entries by name for vendors have been installed.');
+		foreach ($sqlchunks as $chunk){
+			try {
+				SQLQUERY::EXECUTE($this->_pdo, $chunk);
+			}
+			catch (\Exception $e) {
+				$this->printWarning('there has been an issue', [$e, $chunk]);
+				die();
+			}
+		}
+		if ($sqlchunks)	$this->printSuccess('Novel entries by name for vendors have been installed.');
 		else $this->printWarning('There were no novelties to install from vendor ressources.');
 	}
 
