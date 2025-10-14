@@ -42,6 +42,7 @@ class ORDER extends API {
 		require_once('_shared.php');
 		$orderstatistics = new ORDERSTATISTICS($this->_pdo);
 		$notifications = new NOTIFICATION;
+		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'PUT':
@@ -191,7 +192,6 @@ class ORDER extends API {
 									$this->alertUserGroup(['user' => [$users[$userid]['name']]], $message);
 
 								// schedule review of disapproved order for unit (in case of vacation, sick leave etc.)
-								$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 								$calendar->post([
 									':id' => null,
 									':type' => 'tasks',
@@ -541,7 +541,15 @@ class ORDER extends API {
 						'addproduct' => null,
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
-						'identifier' => $erp_interface_available ? UTILITY::identifier(' ', $row['approved']) : null
+						'identifier' => $erp_interface_available ? UTILITY::identifier(' ', $row['approved']) : null,
+						'calendar' => $row['received'] ? $calendar->dialog([
+							':type' => 'tasks',
+							':subject' => (UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '') . ' ' .
+										(UTILITY::propertySet($decoded_order_data, 'productname_label') ? : '') . ' ' .
+										(UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : '') . ' ' .
+										(UTILITY::propertySet($decoded_order_data, 'commission') ? : ''),
+							':alert' => 1
+						]) : null
 					];
 
 					// add identified group user
@@ -1247,6 +1255,8 @@ class ORDER extends API {
 				if (!in_array($key, ['items', 'organizational_unit'])) $order_data2[$key] = $processedOrderData['order_data'][$key];
 			}
 			// try to match product id, assign if found
+			// this is done here instead of checking on display of orders for performance reasons!
+			// i am aware this may lead to buttons for adding a product after product list updates
 			if (isset($order_data2['ordernumber_label']) && isset($order_data2['vendor_label'] )){
 				if (isset($allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label']])){
 					$product = $allproducts_key[$order_data2['vendor_label'] . '_' . $order_data2['ordernumber_label']];

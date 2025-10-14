@@ -1332,6 +1332,18 @@ export const _client = {
 					});
 				}
 
+				// append calendar button
+				if (element.calendar){
+					collapsible.push({
+						type: "calendarbutton",
+						attributes:{
+							value: api._lang.GET("order.calendarbutton"),
+							onclick:element.calendar
+						},
+						hint: api._lang.GET("order.calendarbutton_hint")
+					})
+				}
+
 				// append delete button
 				if (element.delete) {
 					buttons = {};

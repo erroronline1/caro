@@ -1299,6 +1299,8 @@
 		"barcode_label": "EAN",
 		"bulk_approve_order": "Approve",
 		"bulk_update_state": "Set marked orders as",
+		"calendarbutton":"Add task to calendar",
+		"calendarbutton_hint":"e.g. return of rental parts, incorporation of new products after examination, etc.",
 		"cancellation": "Cancel order",
 		"cancellation_message": "Add a reason for cancellation",
 		"cancellation_message_cancel": "No, thank you",

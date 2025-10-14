@@ -1299,6 +1299,8 @@
 		"barcode_label": "EAN",
 		"bulk_approve_order": "Freigeben",
 		"bulk_update_state": "Markierte Bestellungen sind",
+		"calendarbutton":"Aufgabe zum Kalender hinzufügen",
+		"calendarbutton_hint":"z.B. Rücksendung von Leihteilen, Einführung neuer Produkte nach Prüfung, etc.",
 		"cancellation": "Bestellung stornieren",
 		"cancellation_message": "Füge eine Begründung für die Stornierung an",
 		"cancellation_message_cancel": "Nein danke",
