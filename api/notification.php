@@ -251,7 +251,7 @@ class NOTIFICATION extends API {
 								foreach ($orders as $order){
 									if ($order['ordered'] && $order['received']) continue;
 									
-									if ($identifiers = array_filter($erpdata, fn($o) => $o['identifier'] === UTILITY::identifier(' ', $order['approved']))){ // identifier matched
+									if ($identifiers = array_filter($erpdata, fn($o) => $o['identifier'] ? $o['identifier'] === UTILITY::identifier(' ', $order['approved']) : false)){ // identifier matched unless $erpdata ist an empty [[]]-array
 
 										$order['order_data'] = json_decode($order['order_data'], true);
 
