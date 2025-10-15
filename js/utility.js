@@ -812,6 +812,26 @@ export const _client = {
 						hint: api._lang.GET("order.copy_or_labelsheet"),
 					});
 
+					collapsible.push({
+						type: "br",
+					});
+				}
+
+				// copy- and label-option
+				if (element.administrative_mark) {
+					collapsible.push({
+						type: "text_copy",
+						numeration: "prevent",
+						attributes: {
+							value: element.administrative_mark,
+							name: api._lang.GET("order.administrative_mark"),
+							readonly: true,
+							class: "imagealigned",
+							onclick: "_client.application.toClipboard(this)"
+						},
+						hint: api._lang.GET("order.copy_value"),
+					});
+
 					// display qrcode
 					collapsible.push({
 						type: "image",
@@ -822,11 +842,11 @@ export const _client = {
 							name: api._lang.GET("order.commission"),
 						},
 					});
-				}
 
-				collapsible.push({
-					type: "br",
-				});
+					collapsible.push({
+						type: "br",
+					});
+				}
 
 				// append order number
 				if (element.ordernumber) {

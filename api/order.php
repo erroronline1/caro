@@ -135,6 +135,7 @@ class ORDER extends API {
 							'additional_info' => null,
 							'organizational_unit' => $order['organizational_unit'],
 							'commission' => null,
+							'administrative_mark' => null,
 							'orderer' => null,
 							'delivery_date' => null,
 							'order_type' => null,
@@ -520,6 +521,7 @@ class ORDER extends API {
 						'aut_idem' => UTILITY::propertySet($decoded_order_data, 'aut_idem') ? $this->_lang->GET('order.aut_idem') : null,
 						'ordernumber' => UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : null,
 						'commission' => UTILITY::propertySet($decoded_order_data, 'commission') ? : null,
+						'administrative_mark' => UTILITY::propertySet($decoded_order_data, 'administrative_mark') ? : null,
 						'approval' => null,
 						'information' => null,
 						'addinformation' => $permission['orderaddinfo'] || $unit_intersection,
@@ -925,6 +927,7 @@ class ORDER extends API {
 						'additional_info' => '',
 						'organizational_unit' => '',
 						'commission' => '',
+						'administrative_mark' => '',
 						'delivery_date' => '',
 						'order_type' => 'order',
 						'items' => false
@@ -1008,6 +1011,13 @@ class ORDER extends API {
 						], [
 							'type' => 'scanner',
 							'destination' => 'commission'
+						], [
+							'type' => 'scanner',
+							'attributes' => [
+								'name' => $this->_lang->GET('order.administrative_mark'),
+								'value' => isset($order['administrative_mark']) ? $order['administrative_mark'] : '',
+								'data-loss' => 'prevent',
+							]
 						], [
 							'type' => 'select',
 							'content' => $order_type,

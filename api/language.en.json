@@ -1281,6 +1281,7 @@
 		"added_confirmation": ":name has been added to the cart.",
 		"added_product": ":unit :number :name by :vendor",
 		"additional_info": "Additional Information",
+		"administrative_mark" : "Administrative mark",
 		"alert_archived_limit": "There are currently more than :max orders archived. Please review if you can clear up.",
 		"alert_disapprove_order": "An order \n\n:order \n\nfor :unit has been disapproved by :user and reset as prepared order since further inquiry is required. Please get in touch.",
 		"alert_orderstate_change": "An order state \n\n:order \n\nfor :unit has been updated by :user.",
