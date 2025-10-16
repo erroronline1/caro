@@ -760,6 +760,16 @@ export const _client = {
 					type: "br",
 				});
 
+				// append thirdparty_order information
+				if (element.thirdparty_order)
+				collapsible.push({
+					type: "textsection",
+					attributes: {
+						name: api._lang.GET("consumables.product.thirdparty_order"),
+						class: "orange",
+					},
+				});
+			
 				// append commission
 				if (element.commission) {
 					buttons = {};

@@ -137,6 +137,7 @@ define('DEFAULTSQL', [
 				"	`stock_item` tinyint NULL DEFAULT NULL," .
 				"	`erp_id` tinytext NULL DEFAULT NULL," .
 				"	`document_reminder` int NULL DEFAULT NULL," .
+				"	`thirdparty_order` tinyint NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;" 
 				.
@@ -442,7 +443,8 @@ define('DEFAULTSQL', [
 				"	last_order smalldatetime NULL DEFAULT NULL," .
 				"	stock_item tinyint NULL DEFAULT NULL," .
 				"	erp_id varchar(255) NULL DEFAULT NULL," .
-				"	document_reminder int NULL DEFAULT NULL" .
+				"	document_reminder int NULL DEFAULT NULL," .
+				"	thirdparty_order tinyint NULL DEFAULT NULL" .
 				");"
 				.
 				"IF OBJECT_ID(N'caro_consumables_vendors', N'U') IS NULL " .

@@ -959,6 +959,7 @@
 			"special_attention": "erfordert eine Chargennummer",
 			"stock_item": "Lagerware",
 			"tile_title": ":product von :vendor anzeigen",
+			"thirdparty_order": "Bestellung außerhalb EVAs, z.B. BISI",
 			"vendor": "oder gib den Namen ein",
 			"vendor_select": "Wähle einen Lieferanten",
 			"vendor_select_default": "..."

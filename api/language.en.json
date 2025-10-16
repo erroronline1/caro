@@ -959,6 +959,7 @@
 			"special_attention": "Requires a batch number",
 			"stock_item": "Stock item",
 			"tile_title": "display :product by :vendor",
+			"thirdparty_order": "Order outside of ERP software",
 			"vendor": "or type their name",
 			"vendor_select": "Select vendor",
 			"vendor_select_default": "..."

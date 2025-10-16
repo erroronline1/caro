@@ -36,7 +36,7 @@ class UPDATE{
 	}
 
 	public function update(){
-		foreach (['_2025_10_12'] as $update){
+		foreach (['_2025_10_15'] as $update){
 			foreach ($this->{$update}()[$this->driver] as $query){
 				if (!$this->backup($query)
 					|| SQLQUERY::EXECUTE($this->_pdo, $this->backup($query)[$this->driver][0]) !== false){
@@ -273,6 +273,22 @@ class UPDATE{
 			]
 		];
 	}
+
+	private function _2025_10_15(){
+		return [
+			'mysql' => [
+				"ALTER TABLE caro_consumables_products ADD COLUMN IF NOT EXISTS thirdparty_order tinyint NULL DEFAULT NULL; ",
+			],
+			'sqlsrv' => [
+				"IF COL_LENGTH('caro_consumables_products', 'thirdparty_order') IS NULL" .
+				" BEGIN" .
+				"    ALTER TABLE caro_consumables_products" .
+				"    ADD thirdparty_order tinyint NULL DEFAULT NULL" .
+				" END; ",
+			]
+		];
+	}
+
 }
 
 $db = new UPDATE();

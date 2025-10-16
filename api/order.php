@@ -400,6 +400,7 @@ class ORDER extends API {
 						'erp_id' =>$product['erp_id'],
 						'last_order' =>$product['last_order'],
 						'special_attention' =>$product['special_attention'],
+						'thirdparty_order' =>$product['thirdparty_order'],
 						'incorporated' => json_decode($product['incorporated'] ? : '', true)
 					];
 
@@ -551,7 +552,8 @@ class ORDER extends API {
 										(UTILITY::propertySet($decoded_order_data, 'vendor_label') ? : '') . ' ' .
 										(UTILITY::propertySet($decoded_order_data, 'commission') ? : ''),
 							':alert' => 1
-						]) : null
+						]) : null,
+						'thirdparty_order' => $product ? $product['thirdparty_order'] : null,
 					];
 
 					// add identified group user

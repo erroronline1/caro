@@ -776,6 +776,7 @@ Bei der Anpassung von Artikeln können unter anderem folgende Eigenschaften bear
 * Verfallsdatum,
 * besondere Beachtung (die konkrete Bedeutung wird in der Sprachdatei festgelegt, z.B. Hautkontakt),
 * Lagerware,
+* Bestellung außerhalb des ERP-Systems
 * Entzug der Produkteinführung,
 * den Artikel als *verfügbar* oder *nicht verfügbar* markieren.
 
@@ -1510,6 +1511,7 @@ Daten aus dem ERP-System werden abgerufen sofern verfügbar und aktiviert. Für 
 * has_expiry_date
 * special_attention
 * stock_item
+* thirdparty_order
 * erp_id
 
 vervollständigt, sofern nicht bereits beschrieben.
@@ -2260,10 +2262,11 @@ Produkte werden im Falle einer Artikellistenaktualisierung automatisch gelöscht
 * es wurde ein Alias festgelegt
 * oder es wurde schon einmal bestellt.
 
-Fall ein Import durch die [ERP-Anbindung](#erp-anbindung) möglich ist, kann ebenfalls ein Filter erforderlich sein. Informationen die nicht abgefragt werden können, wie special_attention, expiry_date oder trading_good, können durch den ERP-Filter mit
+Fall ein Import durch die [ERP-Anbindung](#erp-anbindung) möglich ist, kann ebenfalls ein Filter erforderlich sein. Informationen die nicht abgefragt werden können, wie special_attention, expiry_date, trading_good oder thirdparty_order, können durch den ERP-Filter mit
 ```js
 "modify": {
-    "conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+    "conditional_or": [["trading_good", "1", ["article_name", ".*"]]],
+    "thirdparty_order": [["thirdparty_order", "1", ["article_name", ".*"]]]
 }
 ```
 
@@ -2277,7 +2280,7 @@ Ist der Transfer des letzten Bestelldatums Bestandteil des Filters, wird eine Pr
 
 Es können auch alle Artikel mit "trading_good" = 1 angelegt und dann eine Bedingung für den Wert 0 erstellt werden, falls das einfacher ist. Das selbe gilt für Verfallsdaten und besondere Aufmerksamkeit.
 
-*special_attention* wird bei den freigegebenen Bestellungen angezeigt und ist dafür vorgesehen auf eine Vergabe von Chargennummern für Produkte mit Hautkontakt hinzuweisen. Dies kann aber in den Sprachdateien eine beliebige andere Aufgabe erhalten.
+*special_attention* und *thirdparty_order* werden bei den freigegebenen Bestellungen angezeigt und sind dafür vorgesehen auf eine Vergabe von Chargennummern für Produkte mit Hautkontakt oder die Abwicklung durch die Warenwirtschaft hinzuweisen. Beide können aber in den Sprachdateien eine beliebige andere Bezeichnung erhalten.
 
 ### Standardfilter bei Export
 Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter generiert. Wie bei der [Lieferanten- und Artikelverwaltung](#lieferanten--und-artikelverwaltung) beschrieben, kann dies sinnvoll sein, sofern anfänglich keine Artikelliste importiert wurde und der Artikelstamm eines Lieferanten primär in der Anwendung bearbeitet wurde. In diesem Fall werden die Informationen ohne Bedingungen, Filter und Änderungen reimportiert. Ein solcher Filter kann nicht auf Artikellisten von Lieferanten angewendet werden und erzeugt eine Fehlermeldung.
@@ -2294,6 +2297,7 @@ Falls nicht definiert wird bei einem Export von Artikellisten ein Standardfilter
             "has_expiry_date",
             "special_attention",
             "stock_item",
+            "thirdparty_order",
             "last_order"
         ]
     }
