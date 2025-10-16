@@ -100,7 +100,8 @@ class CONSUMABLES extends API {
 			"conditional_or": [
 				["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
 				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
-				["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]]
+				["stock_item", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE IN STOCK"]],
+				["thirdparty_order", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE ORDERED OUTSIDE ERP SOFTWARE"]]
 			],
 			"rewrite": [
 				{
@@ -119,7 +120,8 @@ class CONSUMABLES extends API {
 			"conditional_and": [["trading_good", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT QUALIFY AS TRADING GOODS"]]],
 			"conditional_or": [
 				["has_expiry_date", "1", ["Article Name", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NAMES THAT HAVE AN EXPIRY DATE"]],
-				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]]
+				["special_attention", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT NEED SPECIAL ATTENTION (E.G. BATCH NUMBER FOR HAVING SKIN CONTACT)"]],
+				["thirdparty_order", "1", ["Article Number", "ANY REGEX PATTERN THAT MIGHT MATCH ARTICLE NUMBERS THAT ARE ORDERED OUTSIDE ERP SOFTWARE"]]
 			],
 			]
 		}
@@ -171,7 +173,7 @@ class CONSUMABLES extends API {
 			]]);
 
 		// create csv
-		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'last_order'];
+		$columns = ['article_no', 'article_name', 'article_unit', 'article_ean', 'trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order', 'last_order'];
 		$tempFile = UTILITY::directory('tmp') . '/' . time() . $vendor['name'] . 'productlist.csv';
 		$file = fopen($tempFile, 'w');
 		fwrite($file, b"\xEF\xBB\xBF"); // tell excel this is utf8
@@ -834,6 +836,7 @@ class CONSUMABLES extends API {
 					':special_attention' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null,
 					':stock_item' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null,
 					':erp_id' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.erp_id')) ? : null,
+					':thirdparty_order' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.thirdparty_order')) ? 1 : null,
 					':last_order' => null
 				];
 
@@ -917,6 +920,7 @@ class CONSUMABLES extends API {
 					$product['special_attention'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.special_attention')) ? 1 : null;
 					$product['stock_item'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.stock_item')) ? 1 : null;
 					$product['erp_id'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.erp_id')) ? : null;
+					$product['thirdparty_order'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('consumables.product.thirdparty_order')) ? 1 : null;
 				}
 
 				// handle incorporation options that have not yet been approved
@@ -993,12 +997,40 @@ class CONSUMABLES extends API {
 					]);
 				}
 
-				// update trading good, expiry date, special attention or stock item on similar products
-				$_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate');
-				if (PERMISSION::permissionFor('products') && $_batchupdate){
+
+				// alias is allowed to be updated by purchase assistants as well
+				$_batchalias = null; // important to declare unconditionally for response
+				if (PERMISSION::permissionFor('products') && $_batchalias = UTILITY::propertySet($this->_payload, '_batchalias')){
+					$batchids = explode(',', $_batchalias);
+
+					// alias is allowed to be updated by purchase assistants as well
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						'values' => [
+							':value' => $product['article_alias'],
+						],
+						'replacements' => [
+							':field' => 'article_alias',
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
+						]
+					]);	
+				}
+
+				// update trading good, expiry date, special attention, stock item, thirdparty_order on similar products
+				$_batchupdate = null; // important to declare unconditionally for response
+				if (PERMISSION::permissionFor('products') && $_batchupdate = UTILITY::propertySet($this->_payload, '_batchupdate')){
 					$batchids = explode(',', $_batchupdate);
 
-					foreach (['trading_good', 'has_expiry_date', 'special_attention', 'stock_item'] as $field){ // apply setting to selected similar products
+					SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
+						'values' => [
+							':value' => $product['article_alias'],
+						],
+						'replacements' => [
+							':field' => 'article_alias',
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids)),	
+						]
+					]);	
+
+					foreach (['trading_good', 'has_expiry_date', 'special_attention', 'stock_item', 'thirdparty_order'] as $field){ // apply setting to selected similar products
 						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_batch', [
 							'values' => [
 								':value' => $product[$field],
@@ -1009,46 +1041,51 @@ class CONSUMABLES extends API {
 							]
 						]);	
 					}
-					// update incorporation state on similar products 
-					if (PERMISSION::permissionFor('incorporation')){
-						$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
-							'replacements' => [
-								':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids))
-							]
-						]);
-						foreach($products as $similarproduct){
-							$similarproduct['incorporated'] = json_decode($similarproduct['incorporated'] ? : '', true);
-							if ($similarproduct['incorporated']){
-								// get latest incorporation entry;
-								$latestincorporation = array_pop($similarproduct['incorporated']);
-								if ($latestincorporation){
-									if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation.state_approve'))){
-										$incorporation = explode(' | ', $incorporation);
-										if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $latestincorporation = null;
-										else {
-											foreach ($this->_lang->_USER['permissions'] as $permission => $translation){
-												if (in_array($translation, $incorporation)) $latestincorporation[$permission] = [
-													'name' => $_SESSION['user']['name'],
-													'date' => $this->_date['servertime']->format('Y-m-d H:i')
-												];
-											}
+				}
+
+				// update incorporation state on similar products
+				$_batchincorporation = null; // important to declare unconditionally for response
+				if (PERMISSION::permissionFor('incorporation') && $_batchincorporation = UTILITY::propertySet($this->_payload, '_batchincorporation')){
+					$batchids = explode(',', $_batchincorporation);
+
+					$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_product', [
+						'replacements' => [
+							':ids' => implode(',', array_map(Fn($id) => intval($id), $batchids))
+						]
+					]);
+					foreach($products as $similarproduct){
+						$similarproduct['incorporated'] = json_decode($similarproduct['incorporated'] ? : '', true);
+						if ($similarproduct['incorporated']){
+							// get latest incorporation entry;
+							$latestincorporation = array_pop($similarproduct['incorporated']);
+							if ($latestincorporation){
+								if ($incorporation = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('order.incorporation.state_approve'))){
+									$incorporation = explode(' | ', $incorporation);
+									if (in_array($this->_lang->GET('consumables.product.incorporated_revoke'), $incorporation)) $latestincorporation = null;
+									else {
+										foreach ($this->_lang->_USER['permissions'] as $permission => $translation){
+											if (in_array($translation, $incorporation)) $latestincorporation[$permission] = [
+												'name' => $_SESSION['user']['name'],
+												'date' => $this->_date['servertime']->format('Y-m-d H:i')
+											];
 										}
 									}
 								}
-								$similarproduct['incorporated'] = UTILITY::json_encode([...$similarproduct['incorporated'], $latestincorporation]);
 							}
-							elseif ($similarproduct['incorporated']) $product['incorporated'] = UTILITY::json_encode($similarproduct['incorporated']);
-							else $similarproduct['incorporated'] = null;
-
-							SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
-								'replacements' => [
-									':id' => $similarproduct['id'],
-									':incorporated' => $similarproduct['incorporated'] ? $this->_pdo->quote(UTILITY::json_encode($similarproduct['incorporated'])) : 'NULL'
-								]
-							]);
+							$similarproduct['incorporated'] = UTILITY::json_encode([...$similarproduct['incorporated'], $latestincorporation]);
 						}
+						// huh? elseif ($similarproduct['incorporated']) $product['incorporated'] = UTILITY::json_encode($similarproduct['incorporated']);
+						else $similarproduct['incorporated'] = null;
+
+						SQLQUERY::EXECUTE($this->_pdo, 'consumables_put_incorporation', [
+							'replacements' => [
+								':id' => $similarproduct['id'],
+								':incorporated' => $similarproduct['incorporated'] ? $similarproduct['incorporated'] : null
+							]
+						]);
 					}
 				}
+
 				require_once('notification.php');
 				$notifications = new NOTIFICATION;
 
@@ -1071,12 +1108,13 @@ class CONSUMABLES extends API {
 						':special_attention' => $product['special_attention'],
 						':stock_item' => $product['stock_item'],
 						':erp_id' => $product['erp_id'],
+						':thirdparty_order' => $product['thirdparty_order'],
 						':last_order' => $product['last_order']
 					]
 				])) $this->response([
 					'response' => [
 						'id' => intval($this->_requestedID),
-						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($_batchhidden || $_batchupdate ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): '') . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
+						'msg' => $this->_lang->GET('consumables.product.saved', [':name' => $product['article_name']]) . ($_batchhidden || $_batchalias || $_batchupdate || $_batchincorporation ? '. ' . $this->_lang->GET('consumables.product.batch_saved'): '') . ($filenamewarning ? ' ' . $this->_lang->GET('consumables.product.documents_name_error', [':files' => implode(', ', $filenamewarning)]): ''),
 						'type' => 'success'
 						],
 						'data' => ['order_unprocessed' => $notifications->order(), 'consumables_pendingincorporation' => $notifications->consumables()]
@@ -1124,6 +1162,7 @@ class CONSUMABLES extends API {
 					'special_attention' => '',
 					'stock_item' => '',
 					'erp_id' => '',
+					'thirdparty_order' => '',
 					'last_order' => null
 				];
 				if ($this->_requestedID && $this->_requestedID !== 'false' && !$product['id']) $response['response'] = ['msg' => $this->_lang->GET('consumables.product.error_product_not_found', [':name' => $this->_requestedID]), 'type' => 'error'];
@@ -1171,12 +1210,14 @@ class CONSUMABLES extends API {
 					$this->_lang->GET('consumables.product.expiry_date') => $product['has_expiry_date'] ? ['checked' => true] : [],
 					$this->_lang->GET('consumables.product.special_attention') => $product['special_attention'] ? ['checked' => true] : [],
 					$this->_lang->GET('consumables.product.stock_item') => $product['stock_item'] ? ['checked' => true] : [],
+					$this->_lang->GET('consumables.product.thirdparty_order') => $product['thirdparty_order'] ? ['checked' => true] : [],
 				];
 				if ($similarproducts) {
 					$regulatoryoptions[$this->_lang->GET('consumables.product.article_trading_good')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 					$regulatoryoptions[$this->_lang->GET('consumables.product.expiry_date')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 					$regulatoryoptions[$this->_lang->GET('consumables.product.special_attention')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 					$regulatoryoptions[$this->_lang->GET('consumables.product.stock_item')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
+					$regulatoryoptions[$this->_lang->GET('consumables.product.thirdparty_order')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
 				}
 
 				// prepare existing vendor lists
@@ -1366,8 +1407,9 @@ class CONSUMABLES extends API {
 								'type' => 'text',
 								'attributes' => [
 									'name' => $this->_lang->GET('consumables.product.article_alias'),
-									'value' => $product['article_alias']
-								]
+									'value' => $product['article_alias'],
+									'onchange' => $this->selectSimilarDialog('_batchalias', $similarproducts, '1')
+									]
 							], [
 								'type' => 'text',
 								'attributes' => [
@@ -1463,10 +1505,10 @@ class CONSUMABLES extends API {
 								$remaining_approvals = [];
 								foreach (PERMISSION::pending('incorporation', $incorporation) as $position){
 									$remaining_approvals[$this->_lang->GET('permissions.' . $position)] = [];
-									if ($similarproducts) $remaining_approvals[$this->_lang->GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
+									if ($similarproducts) $remaining_approvals[$this->_lang->GET('permissions.' . $position)]['onchange'] = $this->selectSimilarDialog('_batchincorporation', $similarproducts, '1');
 								}
 								$remaining_approvals[$this->_lang->GET('consumables.product.incorporated_revoke')] = [];
-								if ($similarproducts) $remaining_approvals[$this->_lang->GET('consumables.product.incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchupdate', $similarproducts, '1');
+								if ($similarproducts) $remaining_approvals[$this->_lang->GET('consumables.product.incorporated_revoke')]['onchange'] = $this->selectSimilarDialog('_batchincorporation', $similarproducts, '1');
 								$checkslides[$slide][] = [
 									'type' => 'checkbox',
 									'attributes' => [
@@ -1546,17 +1588,27 @@ class CONSUMABLES extends API {
 						$response['render']['content'][] = [
 							[
 								'type' => 'br'
-							],
-							[
+							], [
 								'type' => 'checkbox',
 								'content' => $regulatoryoptions,
 								'hint' => $this->_lang->GET('consumables.product.may_affect_import_filter')
-							],
-							[
+							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'id' => '_batchalias',
+									'name' => '_batchalias'
+								]
+							], [
 								'type' => 'hidden',
 								'attributes' => [
 									'id' => '_batchupdate',
 									'name' => '_batchupdate'
+								]
+							], [
+								'type' => 'hidden',
+								'attributes' => [
+									'id' => '_batchincorporation',
+									'name' => '_batchincorporation'
 								]
 							],
 						];
@@ -1860,6 +1912,7 @@ class CONSUMABLES extends API {
 					'special_attention' => $row['special_attention'],
 					'stock_item' => $row['stock_item'],
 					'incorporated' => $row['incorporated'],
+					'thirdparty_order' => $row['thirdparty_order'],
 					'erp_id' => $row['erp_id'],
 				];
 			}
@@ -1881,7 +1934,8 @@ class CONSUMABLES extends API {
 					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : 'NULL',
 					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $this->_pdo->quote($productlist->_list[1][$index]['erp_id']) : ($remainder[$update]['erp_id'] ? : 'NULL'),
 					':incorporated' => $remainder[$update]['incorporated'] ? $this->_pdo->quote($remainder[$update]['incorporated']) : 'NULL',
-					':last_order' => isset($productlist->_list[1][$index]['last_order']) ? $this->_pdo->quote($productlist->_list[1][$index]['last_order']) : 'NULL'
+					':last_order' => isset($productlist->_list[1][$index]['last_order']) ? $this->_pdo->quote($productlist->_list[1][$index]['last_order']) : 'NULL',
+					':thirdparty_order' => isset($productlist->_list[1][$index]['thirdparty_order']) && intval($productlist->_list[1][$index]['thirdparty_order']) ? 1 : 'NULL',
 				];
 				// iterate over columns and values, strip equals to shorten each query and crunch more into one the chunks to speed up sql
 				foreach ([
@@ -1893,6 +1947,7 @@ class CONSUMABLES extends API {
 					'special_attention',
 					'stock_item',
 					'erp_id',
+					'thirdparty_order',
 					'incorporated',
 					// 'last_order' does not work for having to be converted
 				] as $column){
@@ -1933,6 +1988,7 @@ class CONSUMABLES extends API {
 					':stock_item' => isset($productlist->_list[1][$index]['stock_item']) && intval($productlist->_list[1][$index]['stock_item']) ? 1 : null,
 					':erp_id' => isset($productlist->_list[1][$index]['erp_id']) && $productlist->_list[1][$index]['erp_id'] ? $productlist->_list[1][$index]['erp_id'] : null,
 					':last_order' => isset($productlist->_list[1][$index]['last_order']) && $productlist->_list[1][$index]['last_order'] ? $productlist->_list[1][$index]['last_order'] : null,
+					':thirdparty_order' => isset($productlist->_list[1][$index]['thirdparty_order']) && intval($productlist->_list[1][$index]['thirdparty_order']) ? 1 : null,
 				];
 			}
 			$sqlchunks = array_merge($sqlchunks, SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('consumables_post_product'), $insertions));
@@ -1977,6 +2033,7 @@ class CONSUMABLES extends API {
 							':special_attention' => isset($article['special_attention']) && intval($article['special_attention']) ? 1 : 'NULL',
 							':stock_item' => isset($article['stock_item']) && boolval(intval($article['stock_item'])) ? 1 : 'NULL',
 							':erp_id' => $article['erp_id'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['erp_id'] ? : '')): 'NULL',
+							':thirdparty_order' => isset($article['thirdparty_order']) && intval($article['thirdparty_order']) ? 1 : 'NULL',
 							':vendor_id' => $vendor['id'],
 							':article_no' => $this->_pdo->quote(preg_replace('/\n/', '', $article['article_no'])),
 							':last_order' => $article['last_order'] ? $this->_pdo->quote(preg_replace('/\n/', '', $article['last_order'])): 'NULL'
