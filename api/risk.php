@@ -36,7 +36,7 @@ class RISK extends API {
 	public function risk(){
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-			case 'PUT':
+			case 'PATCH':
 				if (!PERMISSION::permissionFor('riskmanagement')) $this->response([], 401);
 				$risk = [
 					':id' => intval($this->_requestedID),
@@ -269,7 +269,7 @@ class RISK extends API {
 						if (PERMISSION::permissionFor('riskmanagement')) {
 							$response['render']['form'] = [
 								'data-usecase' => 'risk',
-								'action' => "javascript:api.risk('" . ($risk['id'] ? 'put' : 'post') . "', 'risk', " . $risk['id'] . ")"
+								'action' => "javascript:api.risk('" . ($risk['id'] ? 'patch' : 'post') . "', 'risk', " . $risk['id'] . ")"
 							];
 
 							$response['render']['content'][] = [
@@ -417,7 +417,7 @@ class RISK extends API {
 					if (PERMISSION::permissionFor('riskmanagement')) {
 						$response['render']['form'] = [
 							'data-usecase' => 'risk',
-							'action' => "javascript:api.risk('" . ($risk['id'] ? 'put' : 'post') . "', 'risk', " . $risk['id'] . ")"
+							'action' => "javascript:api.risk('" . ($risk['id'] ? 'patch' : 'post') . "', 'risk', " . $risk['id'] . ")"
 						];
 	
 						// fallback for occasional level changes in languagefile during runtime

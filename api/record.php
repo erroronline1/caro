@@ -58,7 +58,7 @@ class RECORD extends API {
 	 */
 	public function casestate($context = null, $type = 'checkbox', $action = [], $checked = ''){
 		switch ($_SERVER['REQUEST_METHOD']){
-			case 'PUT':
+			case 'PATCH':
 				if (!PERMISSION::permissionFor('recordscasestate') || array_intersect(['group'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
 				$case = SQLQUERY::EXECUTE($this->_pdo, 'records_get_identifier', [
@@ -279,7 +279,7 @@ class RECORD extends API {
 		$document = $this->latestApprovedName('document_document_get_by_name', $this->_requestedID);
 		if (!$document || $document['hidden'] || !PERMISSION::permissionIn($document['restricted_access']) || (!$document['patient_access'] && array_intersect(['patient'], $_SESSION['user']['permissions']))) $this->response(['response' => ['msg' => $this->_lang->GET('assemble.compose.document.not_found', [':name' => $this->_requestedID]), 'type' => 'error']]);
 
-		$response = ['title' => $document['name'], 'render' => [
+		$response = ['header' => $document['name'], 'render' => [
 			'content' => []
 		]];
 
@@ -1174,12 +1174,12 @@ class RECORD extends API {
 							'value' => $this->_lang->GET('record.note_save'),
 							'onclick' => "const formdata = new FormData(); "
 								. "formdata.append('" . $this->_lang->GET('record.note') . "', document.getElementById('_quicknote').value); "
-								. "api.record('put', 'casestate', '" . $this->_requestedID . "', 'note', formdata);"
+								. "api.record('patch', 'casestate', '" . $this->_requestedID . "', 'note', formdata);"
 
 						]
 					]
 				];
-				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('put', 'casestate', '" . $this->_requestedID . "', this.dataset.casestate, this.checked);"
+				if ($casestate = $this->casestate($content['context'], 'checkbox', ['onchange' => "api.record('patch', 'casestate', '" . $this->_requestedID . "', this.dataset.casestate, this.checked);"
 					. " new _client.Dialog({type: 'input', header: '" . $this->_lang->GET('record.casestate_change_message') . "', render: JSON.parse('"
  					. UTILITY::json_encode($notification_recipients)
 					. "'), options: JSON.parse('"
@@ -1195,7 +1195,7 @@ class RECORD extends API {
 					foreach($this->_lang->_USER['record']['lifespan']['years'] as $years => $description){
 						$retention[$description] = [
 							'value' => $years,
-							'onchange' => "api.record('put', 'casestate', '" . $this->_requestedID . "', 'lifespan', this.value);"
+							'onchange' => "api.record('patch', 'casestate', '" . $this->_requestedID . "', 'lifespan', this.value);"
 						];
 						if ($content['lifespan'] == $years) $retention[$description]['checked'] = true;
 						if(!PERMISSION::permissionFor('recordscasestate')) $retention[$description]['disabled'] = true;
@@ -1207,7 +1207,7 @@ class RECORD extends API {
 						'attributes' => [
 							'name' => $this->_lang->GET('record.erp_case_number'),
 							'value' => $content['erp_case_number'] ? : '',
-							'onkeydown' => "if (event.key==='Enter') api.record('put', 'casestate', '" . $this->_requestedID . "', 'erp_case_number', this.value)",
+							'onkeydown' => "if (event.key==='Enter') api.record('patch', 'casestate', '" . $this->_requestedID . "', 'erp_case_number', this.value)",
 							'id' => '_erpcasenumbers'
 						]
 					];
@@ -1575,7 +1575,7 @@ class RECORD extends API {
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.complaint_mark_as_closed_info') . "', options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('record.mark_as_closed') . ' ' . $this->_lang->GET('permissions.' . $position) ."': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('patch', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
 							];
 						}
 					}
@@ -1586,7 +1586,7 @@ class RECORD extends API {
 								'onchange' => "if (this.checked) new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('record.mark_as_closed') ." ' + this.name, render: '" . $this->_lang->GET('record.mark_as_closed_info') . "', options:{".
 								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
 								"'" . $this->_lang->GET('record.mark_as_closed') . ' ' . $this->_lang->GET('permissions.' . $position) . "': {value: true, class: 'reducedCTA'},".
-								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('put', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
+								"}}).then(confirmation => {if (confirmation) {this.disabled = true; api.record('patch', 'close', '" . $this->_requestedID . "', this.value);} else this.checked = false;})"
 							];
 						}
 					}

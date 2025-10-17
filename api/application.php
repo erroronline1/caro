@@ -180,7 +180,7 @@ class APPLICATION extends API {
 		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
-			case 'PUT':	
+			case 'PUT':
 				// prepare entry
 				$permissions = [];
 				$entry = [

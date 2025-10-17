@@ -45,7 +45,7 @@ class ORDER extends API {
 		$calendar = new CALENDARUTILITY($this->_pdo, $this->_date);
 
 		switch ($_SERVER['REQUEST_METHOD']){
-			case 'PUT':
+			case 'PATCH':
 				$orders = SQLQUERY::EXECUTE($this->_pdo, 'order_get_approved_order_by_ids', [
 					'replacements' => [
 						':ids' => implode(',', array_map(fn($id) => intval($id), explode('_', $this->_requestedID)))

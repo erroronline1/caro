@@ -512,6 +512,7 @@ class UTILITY {
 				break;
 			case "POST":
 			case "PUT":
+			case "PATCH":
 				$raw_data = file_get_contents('php://input');
 				// linebreak depending on apache vs iis
 				$linebreak = stristr("\r\n", $raw_data) ? "\r\n" : "\n";

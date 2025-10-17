@@ -116,7 +116,7 @@ class API {
 			// valid user IS logged in
 
 			// override user with submitted user, especially for delayed cached requests by service worker (offline fallback)
-			if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])
+			if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'PATCH'])
 				&& isset(REQUEST[1]) && REQUEST[1] !== 'authentify'
 			){
 				// post and put MUST have _user_post_validation payload

@@ -704,7 +704,7 @@ export const _client = {
 			for (const input of inputs) {
 				if (input.value === stateinput.value) input.checked = stateinput.checked;
 			}
-			api.purchase("put", "approved", orders.join("_"), stateinput.value, stateinput.checked);
+			api.purchase("patch", "approved", orders.join("_"), stateinput.value, stateinput.checked);
 		},
 		full: (data, preventcollapsible = undefined) => {
 			// displays full fledged information of every item as article
@@ -1061,7 +1061,7 @@ export const _client = {
 									},
 									"FormData"
 								).then((response) => {
-									if (response) api.purchase("put", "approved", "element.id", "addinformation", response);
+									if (response) api.purchase("patch", "approved", "element.id", "addinformation", response);
 								});
 							}
 								.toString()
@@ -1150,7 +1150,7 @@ export const _client = {
 					for (const [attribute, value] of Object.entries(attributes)) states[api._lang.GET("order.order." + state)][attribute] = value;
 					if (attributes["data-" + state] === "true") states[api._lang.GET("order.order." + state)].checked = true;
 					if (!attributes.disabled && !states[api._lang.GET("order.order." + state)].onchange)
-						states[api._lang.GET("order.order." + state)].onchange = "api.purchase('put', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
+						states[api._lang.GET("order.order." + state)].onchange = "api.purchase('patch', 'approved', '" + element.id + "', '" + state + "', this.checked); this.setAttribute('data-" + state + "', this.checked.toString());";
 				}
 				// conditional customizing
 				if (states[api._lang.GET("order.order.partially_received")] && !states[api._lang.GET("order.order.partially_received")].disabled) {
@@ -1159,7 +1159,7 @@ export const _client = {
 					buttons[api._lang.GET("order.add_information_ok")] = { value: true, class: "reducedCTA" };
 					// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
 					states[api._lang.GET("order.order.partially_received")].onchange = function () {
-						api.purchase("put", "approved", "element.id", "partially_received", this.checked);
+						api.purchase("patch", "approved", "element.id", "partially_received", this.checked);
 						this.setAttribute("data-partially_received", this.checked.toString());
 						if (this.checked)
 							new _client.Dialog(
@@ -1179,7 +1179,7 @@ export const _client = {
 								},
 								"FormData"
 							).then((response) => {
-								if (response) api.purchase("put", "approved", "element.id", "addinformation", response);
+								if (response) api.purchase("patch", "approved", "element.id", "addinformation", response);
 							});
 					}
 						.toString()
@@ -1212,7 +1212,7 @@ export const _client = {
 								"FormData"
 							).then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", "element.id", "disapproved", response);
+									api.purchase("patch", "approved", "element.id", "disapproved", response);
 									this.disabled = true;
 									this.setAttribute("data-disapproved", "true");
 								} else this.checked = false;
@@ -1249,7 +1249,7 @@ export const _client = {
 								"FormData"
 							).then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", "element.id", "cancellation", response);
+									api.purchase("patch", "approved", "element.id", "cancellation", response);
 									this.disabled = true;
 									this.setAttribute("data-cancellation", "true");
 								} else this.checked = false;
@@ -1306,7 +1306,7 @@ export const _client = {
 								"FormData"
 							).then((response) => {
 								if (response !== false) {
-									api.purchase("put", "approved", "element.id", "return", response);
+									api.purchase("patch", "approved", "element.id", "return", response);
 									this.disabled = true;
 									this.setAttribute("data-return", "true");
 								} else this.checked = false;
@@ -1352,7 +1352,7 @@ export const _client = {
 								).then((response) => {
 									if (response) {
 										response[api._lang.GET("order.additional_info")] = api._lang.GET("order.orderstate_description") + " - " + this.value + ": " + response[api._lang.GET("order.additional_info")];
-										api.purchase("put", "approved", "element.id", "addinformation", response);
+										api.purchase("patch", "approved", "element.id", "addinformation", response);
 									}
 								});
 							}

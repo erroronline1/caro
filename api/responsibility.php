@@ -37,7 +37,7 @@ class RESPONSIBILITY extends API {
 	 */
 	public function responsibilities(){
 		switch ($_SERVER['REQUEST_METHOD']){
-			case 'PUT':
+			case 'PATCH':
 				$responsibility = SQLQUERY::EXECUTE($this->_pdo, 'user_responsibility_get', [
 					'values' => [
 						':id' => intval($this->_requestedID)

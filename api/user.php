@@ -75,7 +75,7 @@ class USER extends API {
 	 */
 	public function profile(){
 		switch ($_SERVER['REQUEST_METHOD']){
-			case 'PUT':
+			case 'PATCH':
 				$user = SQLQUERY::EXECUTE($this->_pdo, 'user_get', [
 					'replacements' => [
 						':id' => $_SESSION['user']['id'],
@@ -355,7 +355,7 @@ class USER extends API {
 					'content' => array_intersect(['patient'], $_SESSION['user']['permissions']) ? $user_data[0] : [$user_data],
 					'form' => [
 						'data-usecase' => 'user',
-						'action' => "javascript:api.user('put', 'profile')"
+						'action' => "javascript:api.user('patch', 'profile')"
 					]
 				];
 

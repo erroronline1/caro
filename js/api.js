@@ -108,7 +108,7 @@ export const api = {
 		// currently masonry is counterproductive for conversations
 		if (api._settings.user.app_settings && api._settings.user.app_settings.masonry) await window.Masonry.breakpoints(true);
 
-		if (api._settings.user && api._settings.user.fingerprint && ["post", "put"].includes(method)) {
+		if (api._settings.user && api._settings.user.fingerprint && ["post", "put", "patch"].includes(method)) {
 			let sanitizedpayload = {};
 			if (payload instanceof FormData) {
 				sanitizedpayload = {};
@@ -920,7 +920,7 @@ export const api = {
 	 *
 	 * planning and editing calendar entries
 	 *
-	 * @param {string} method get|post|put|delete
+	 * @param {string} method get|post|put|patch|delete
 	 * @param  {array} request api method, name|id
 	 * @returns request
 	 */
@@ -1001,20 +1001,15 @@ export const api = {
 				}
 				break;
 			case "put":
-				switch (request[1]) {
-					case "complete":
-						break;
-					default:
-						payload = request[2];
-						delete request[2];
-						// set unit language keys instead of values
-						let units = [];
-						for (const [key, value] of payload.entries()) {
-							if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
-						}
-						if (units.length) payload.set(api._lang.GET("calendar.tasks.organizational_unit"), units.join(","));
+				payload = request[2];
+				delete request[2];
+				// set unit language keys instead of values
+				let units = [];
+				for (const [key, value] of payload.entries()) {
+					if (value === "unit") units.push(Object.keys(api._lang._USER["units"]).find((unit) => api._lang._USER["units"][unit] === key));
 				}
-				break;
+				if (units.length) payload.set(api._lang.GET("calendar.tasks.organizational_unit"), units.join(","));
+			case "patch":
 			case "delete":
 				break;
 			default:
@@ -1609,7 +1604,7 @@ export const api = {
 	 * handles vendor and product management
 	 * handles orders
 	 *
-	 * @param {string} method get|post|put|delete
+	 * @param {string} method get|post|put|patch|delete
 	 * @param  {array} request api method, id / name / filter term, occasionally subrequest, occasionally message
 	 * @returns request
 	 */
@@ -1784,16 +1779,6 @@ export const api = {
 				}
 				break;
 			case "put":
-				if (["ordered", "partially_received", "received", "partially_delivered", "delivered", "archived", "disapproved", "cancellation", "return", "addinformation"].includes(request[3])) {
-					if (request[4] instanceof FormData) {
-						payload = request[4];
-						delete request[4];
-					}
-					successFn = function (data) {
-						new Toast(data.response.msg, data.response.type);
-						if (data.data) _serviceWorker.notif.consumables(data.data);
-					};
-				}
 				if (request[1] == "prepared") {
 					successFn = function (data) {
 						new Toast(data.response.msg, data.response.type);
@@ -1801,7 +1786,17 @@ export const api = {
 						api.purchase("get", "prepared");
 					};
 				}
-				if (request[1] !== "approved" && !payload) payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+				payload = _.getInputs("[data-usecase=purchase]", true); // exclude status updates
+				break;
+			case "patch":
+				if (request[4] instanceof FormData) {
+					payload = request[4];
+					delete request[4];
+				} else payload = _.getInputs("[data-usecase=purchase]", true);
+				successFn = function (data) {
+					new Toast(data.response.msg, data.response.type);
+					if (data.data) _serviceWorker.notif.consumables(data.data);
+				};
 				break;
 			case "delete":
 				switch (request[1]) {
@@ -1827,7 +1822,7 @@ export const api = {
 	 * handles records, displays record lists
 	 * imports data from other records
 	 *
-	 * @param {string} method get|post
+	 * @param {string} method get|post|patch
 	 * @param  {array} request api method, occasional identifier to import from
 	 * @returns request
 	 */
@@ -1863,7 +1858,7 @@ export const api = {
 							if (data.render) {
 								const options = {};
 								options[api._lang.GET("general.ok_button")] = false;
-								new Dialog({ type: "input", header: data.title, render: data.render, options: options });
+								new Dialog({ type: "input", header: data.header, render: data.render, options: options });
 							}
 							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
 						};
@@ -1879,7 +1874,7 @@ export const api = {
 					case "records":
 						successFn = function (data) {
 							if (data.render) {
-								api.update_header(title[request[1]] || data.title);
+								api.update_header(title[request[1]] || data.header);
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
@@ -1891,7 +1886,7 @@ export const api = {
 					default:
 						successFn = function (data) {
 							if (data.render) {
-								api.update_header(title[request[1]] || data.title);
+								api.update_header(title[request[1]] || data.header);
 								const render = new Assemble(data.render);
 								document.getElementById("main").replaceChildren(render.initializeSection());
 								render.processAfterInsertion();
@@ -2020,9 +2015,9 @@ export const api = {
 					delete request[3];
 				} else payload = _.getInputs("[data-usecase=record]", true);
 				break;
-			case "put":
+			case "patch":
 				if (request[4] instanceof FormData) {
-					payload = request[4];
+					payload = request[4]; // casestate
 					delete request[4];
 				}
 				break;
@@ -2086,7 +2081,7 @@ export const api = {
 	 * risk management
 	 * displays form to edit risks or overview, according to permissions
 	 *
-	 * @param {string} method get|post
+	 * @param {string} method get|post|patch
 	 * @param  {array} request api method
 	 * @returns request
 	 */
@@ -2131,11 +2126,8 @@ export const api = {
 				}
 				break;
 			case "post":
-			case "put":
-				switch (request[1]) {
-					default:
+			case "patch":
 						payload = _.getInputs("[data-usecase=risk]", true);
-				}
 				break;
 		}
 		api.send(method, request, successFn, null, payload);
@@ -2347,7 +2339,7 @@ export const api = {
 	 *
 	 * user manager and display of profile
 	 *
-	 * @param {string} method get|post|put|delete
+	 * @param {string} method get|post|put|patch|delete
 	 * @param  {array} request api method, name|id
 	 * @returns request
 	 */
@@ -2417,28 +2409,28 @@ export const api = {
 				break;
 			case "post":
 			case "put":
-				switch (request[1]) {
-					case "profile":
-						successFn = function (data) {
-							if (data.render) {
-								api.update_header(title[request[1]]);
-								const render = new Assemble(data.render);
-								document.getElementById("main").replaceChildren(render.initializeSection());
-								render.processAfterInsertion();
-							}
-							if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
-							if (data.data) {
-								api._settings.user.app_settings = data.data;
-								api.update_user_settings();
-							}
-						};
-						break;
-				}
 				if (3 in request && request[3] && request[3] instanceof FormData) {
 					// training
 					payload = request[3]; // form data object passed by utility.js
 					delete request[3];
 				} else payload = _.getInputs("[data-usecase=user]", true);
+				break;
+			case "patch":
+				// profile
+				successFn = function (data) {
+					if (data.render) {
+						api.update_header(title[request[1]]);
+						const render = new Assemble(data.render);
+						document.getElementById("main").replaceChildren(render.initializeSection());
+						render.processAfterInsertion();
+					}
+					if (data.response !== undefined && data.response.msg !== undefined) new Toast(data.response.msg, data.response.type);
+					if (data.data) {
+						api._settings.user.app_settings = data.data;
+						api.update_user_settings();
+					}
+				};
+				payload = _.getInputs("[data-usecase=user]", true);
 				break;
 			case "delete":
 				break;

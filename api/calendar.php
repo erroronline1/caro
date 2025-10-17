@@ -1154,7 +1154,7 @@ class CALENDAR extends API {
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 			// construct complete information
-			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'tasks')"];
+			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('patch', 'complete', '" . $row['id'] . "', this.checked, 'tasks')"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.tasks.complete')]['checked'] = true;
@@ -1438,7 +1438,7 @@ class CALENDAR extends API {
 						'type' => 'button',
 						'attributes' => [
 							'value' => $this->_lang->GET('calendar.timesheet.bulk_approve', [':number' => count($bulkapproval)]),
-							'onclick' => "api.calendar('put', 'complete', '" . implode(',', $bulkapproval) . "', true, 'timesheet')"
+							'onclick' => "api.calendar('patch', 'complete', '" . implode(',', $bulkapproval) . "', true, 'timesheet')"
 						]
 					];
 				}
@@ -1583,7 +1583,7 @@ class CALENDAR extends API {
 			];
 
 			// add completion toggle
-			$completed[$this->_lang->GET('calendar.timesheet.approve')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
+			$completed[$this->_lang->GET('calendar.timesheet.approve')] = ['onchange' => "api.calendar('patch', 'complete', '" . $row['id'] . "', this.checked, 'timesheet')"];
 			// completion can only be done by authorized and supervisors of affected user unit
 			if (!(PERMISSION::permissionFor('calendarfullaccess')
 				|| (array_intersect(['supervisor'], $_SESSION['user']['permissions']) 
@@ -1876,7 +1876,7 @@ class CALENDAR extends API {
 			if (!$row['affected_user']) $row['affected_user'] = $this->_lang->GET('general.deleted_user');
 
 			// construct complete information
-			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('put', 'complete', '" . $row['id'] . "', this.checked, 'worklists')"];
+			$completed[$this->_lang->GET('calendar.tasks.complete')] = ['onchange' => "api.calendar('patch', 'complete', '" . $row['id'] . "', this.checked, 'worklists')"];
 			$completed_hint = '';
 			if ($row['closed']) {
 				$completed[$this->_lang->GET('calendar.tasks.complete')]['checked'] = true;

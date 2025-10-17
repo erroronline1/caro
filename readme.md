@@ -34,9 +34,6 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
-* refactor redundant post/put
-    * method caller (events, forms)
-    * sanitize api endpoints 'post':\n.*'put':
 * stresstest add autocomplete for pending incorporations
     * describe concerns within readme
     * set up named array as private class variable (for comprehension), stringify later
@@ -2839,11 +2836,11 @@ Variables for _stresstest.php can be adjusted within the top class variables in 
 # API documentation
 All REST-API endpoint queries are returned as json routed by ./js/api.js and supposed to be processed/rendered primarily either by the clients Assemble-class, Compose-class, Dialog-class or Toast-class. Backend handles permissions and valid sessions, returning 511 Network Authentication Required or 401 Unauthorized if not logged in.
 Response properties are
-* *render* (for assemble or toast)
-* *title* (dynamic page title updates)
+* *render* (for assemble)
 * *user* (user settings on login/reload)
 * *config* (application settings on login/reload)
 * *data* (filtered ids, record imports, notif numbers, approved order data to be assembled by _client.order.approved())
+* *header* (dynamic page title for documents, records and consumable edits)
 * *response* (state messages, message type, affected ids, redirect path params, names)
 * *log* (CSV-filter log)
 * *links* (CSV-filter result file)
@@ -2977,14 +2974,14 @@ Sample response
 {"render":{"content":[{"type":"textsection","attributes":{"name":"CARO - Cloud Assisted Records and Operations"},"content":"Copyright (C) 2023-2025 error on line 1 (dev@erroronline.one)\n\nThis program is free software: you can redistribute it and\/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version. This program is distributed in the hope that it will be useful,....
 ```
 
-> POST ./api/api.php/application/manual/{id}
+> POST/PUT ./api/api.php/application/manual/{id}
 
 Saves a manual entry.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database entry id |
+| {id} | path parameter | required fpr PUT | database entry id |
 | payload | form data | required | input data | 
 
 Sample response
@@ -3052,35 +3049,19 @@ Samble response
 
 ### Audit endpoints
 
-> POST ./api/api.php/audit/audit/{template_id}
+> POST/PUT ./api/api.php/audit/audit/{template_id}/{audit_id}
 
-Stores a new audit to the database.
+Stores a new or updates an unclosed audit to the database.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {template_id} | path parameter | required | template id |
+| {template_id} | path parameter | required for PUT | template id |
 | payload | form data | required | input data |
 
 Sample response
 ```
 {"response":{"msg":"Audit saved","id":"2","type":"success"}}
-```
-
-> PUT ./api/api.php/audit/audit/{template_id}/{audit_id}
-
-Updates an unclosed audit.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {template_id} | path parameter | required | template database id |
-| {audit_id} | path parameter | required | audit database id |
-| payload | form data | optional | input data |
-
-Sample response
-```
-{"response":{"msg":"Audit saved","id":"","type":"success"}}
 ```
 
 > GET ./api/api.php/audit/audit/{template_id}/{audit_id}
@@ -3112,33 +3093,19 @@ Sample response
 {"response":{"msg":"Order statistics have been deleted.","type":"success"}}
 ```
 
-> POST ./api/api.php/audit/audittemplate/{template_id}
+> POST/PUT ./api/api.php/audit/audittemplate/null/{template_id}
 
-Stores a new audit template to the database.
+Stores a new or updates an audit template to the database.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {template_id} | path parameter | required for PUT | template database id |
 | payload | form data | optional | input data |
 
 Sample response
 ```
 {"response":{"msg":"Template saved","id":"3","type":"success"}}
-```
-
-> PUT ./api/api.php/audit/audittemplate/null/{template_id}
-
-Updates an audit template.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {template_id} | path parameter | required | template database id |
-| payload | form data | optional | input data |
-
-Sample response
-```
-{"response":{"msg":"Template saved","id":"","type":"success"}}
 ```
 
 > GET ./api/api.php/audit/audittemplate/null/{template_id}
@@ -3261,28 +3228,14 @@ Sample response
 {"data":"...whatever text..."}
 ```
 
-> POST ./api/api.php/audit/managementreview/null
+> POST/PUT ./api/api.php/audit/managementreview/null/{managementreview_id}
 
-Saves a new management review to database.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | optional | input data |
-
-Sample response
-```
-{"response":{"msg":"Management review saved","id":"0","type":"success"}}
-```
-
-> PUT ./api/api.php/audit/managementreview/null/{managementreview_id}
-
-Updates an unclosed management review.
+Saves a new or Uudates an unclosed management review.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {managementreview_id} | path parameter | required | managementreview database id |
+| {managementreview_id} | path parameter | required for PUT | managementreview database id |
 | payload | form data | optional | input data |
 
 Sample response
@@ -3348,16 +3301,16 @@ Sample response
 {"render":{"form":{"data-usecase":"appointment","action":"javascript:api.calendar('post', 'appointment')"},"content":[[{"type":"date","attributes":{"name":"Date","value":""}},{"type":"time","attributes":{"name":"Time","value":""}},{"type":"text","hint":"e.g. cast for orthosis, fitting for prosthesis, etc.","attributes":{"name":"Occasion","value":""}},{"type":"text","hint":"e.g. remember bringing shoes","attributes":{"name":"Reminder","value":""}},{"type":"number","attributes":{"name":"Approximate duration (hours)","min":1,"max":200,"step":1,"value":1}}]]}}
 ```
 
-> PUT ./api/api.php/calendar/complete/{id}/{bool}/{type}
+> PATCH ./api/api.php/calendar/complete/{id}/{bool}/{type}
 
 Marks scheduled events as complete or revoke state.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
+| {id} | path parameter | required | database id or multiple comma separated |
 | {bool} | path parameter| required | true or false completed state |
-| {type} | path parameter | required | tasks, timesheet or planning |
+| {type} | path parameter | required | tasks, timesheet or worklists |
 | payload | form data | required | form data including user validation |
 
 Sample response
@@ -3421,6 +3374,20 @@ Sample response
 {"render":[[{"type":"links","description":"Open the link, save or print the summary. Please respect data safety measures. On exporting sensitive data you are responsible for their safety.","content":{"Timesheet":{"href":".\/fileserver\/tmp\/Timesheet_202406102046.pdf"}}}]]}
 ```
 
+> GET ./api/api.php/calendar/search/{search}
+
+Returns scheduled tasks according to search phrase.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {search} | path parameter | optional | displays scheduled tasks according to search, calendar overview if omitted |
+
+Sample response
+```
+{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textsection","attributes":{"data-type":"textsection","name":"test event"},"content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'tasks')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
+```
+
 > DELETE ./api/api.php/calendar/tasks/{id}
 
 Deletes scheduled tasks.
@@ -3450,78 +3417,20 @@ Sample response
 {"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"calendar","description":"June 2024","content":[null,null,null,null,null,{"date":"2024-06-01","display":"Sat 1","today":false,"selected":false,"holiday":true},{"date":"2024-06-02","display":"Sun 2","today":false,"selected":false,"holiday":true},{"date":"2024-06-03","display":"Mon 3","today":false,"selected":false,"holiday":false},....
 ```
 
-> POST ./api/api.php/calendar/tasks
+> POST/PUT ./api/api.php/calendar/tasks/{id}
 
-Contributes scheduled tasks to the calendar.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | values for database |
-
-Sample response
-```
-{"response":{"id":"8","msg":"Event has been saved.","type":"success"},"data":{"calendar_uncompletedevents":2}}
-```
-
-> PUT ./api/api.php/calendar/tasks/{id}
-
-Updates scheduled tasks.
+Contributes or update scheduled tasks to the calendar.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {id} | path parameter | mandatory for PUT | database id |
 | payload | form data | required | values for database |
 
 Sample response
 ```
 {"response":{"id":"9","msg":"Event has been saved.","type":"success"},"data":{"calendar_uncompletedevents":2}}
 ```
-
-> GET ./api/api.php/calendar/search/{search}
-
-Returns scheduled tasks according to search phrase.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {search} | path parameter | optional | displays scheduled tasks according to search, calendar overview if omitted |
-
-Sample response
-```
-{"render":{"content":[[{"type":"scanner","destination":"recordfilter","description":"Scan a Code"},{"type":"search","attributes":{"id":"recordfilter","name":"Search","onkeydown":"if (event.key === 'Enter') {api.calendar('get', 'search', this.value); return false;}","onblur":"api.calendar('get', 'search', this.value); return false;"}}],[{"type":"tile","content":[{"type":"textsection","attributes":{"data-type":"textsection","name":"test event"},"content":"Date: 2024-05-30\nDue: 2024-06-06\nProsthetics II"},{"type":"checkbox","content":{"completed":{"onchange":"api.calendar('put', 'complete', '2', this.checked, 'tasks')","checked":true}},"hint":"marked as completed by error on line 1 on 2024-06-07"},.....
-```
-
-> DELETE ./api/api.php/calendar/worklists/{id}
-
-Deletes worklist entries.
-
-Similar to tasks.
-
-> GET ./api/api.php/calendar/worklists/{date Y-m-d}/{date Y-m-d}
-
-Returns a calendar.
-
-Similar to tasks with slightly adapted inputs for worklists.
-
-> POST ./api/api.php/calendar/worklists
-
-Contributes worklist entries to the calendar
-
-Similar to tasks.
-
-> PUT ./api/api.php/calendar/worklists/{id}
-
-Updates worklist entries
-
-Similar to tasks.
-
-> PUT ./api/api.php/calendar/worklists/{id}/{bool}/{type}
-
-Markes worklist entries as complete or revokes state
-
-Similar to tasks.
-
 
 > DELETE ./api/api.php/calendar/timesheet/{id}
 
@@ -3535,21 +3444,33 @@ Returns a calendar.
 
 Similar to tasks with slightly adapted inputs for time tracking.
 
-> POST ./api/api.php/calendar/timesheet
+> POST/PUT ./api/api.php/calendar/timesheet/{id}
 
 Contributes timesheet entries to the calendar
-
-Similar to tasks.
-
-> PUT ./api/api.php/calendar/timesheet/{id}
-
-Updates timesheet entries
 
 Similar to tasks.
 
 > PUT ./api/api.php/calendar/timesheet/{id}/{bool}/{type}
 
 Markes timesheet entries as complete or revokes state
+
+Similar to tasks.
+
+> DELETE ./api/api.php/calendar/worklists/{id}
+
+Deletes worklist entries.
+
+Similar to tasks.
+
+> GET ./api/api.php/calendar/worklists/{date Y-m-d}/{date Y-m-d}
+
+Returns a calendar.
+
+Similar to tasks with slightly adapted inputs for worklists.
+
+> POST/PUT ./api/api.php/calendar/worklists/{id}
+
+Contributes worklist entries to the calendar
 
 Similar to tasks.
 
@@ -3734,29 +3655,14 @@ Sample response
 {"render":{"content":[[{"type":"select","attributes":{"name":"Edit existing vendor","onchange":"api.purchase('get', 'vendor', this.value)"},"content":{"...New vendor":{"selected":true},"AET GmbH (TSM)":{"value":"AET GmbH (TSM)"},"AMT Aromando Medzintechnik GmbH":{"value":"AMT Aromando Medzintechnik GmbH"},"Albrecht GmbH":{"value":"Albrecht GmbH"},"Arthroven GmbH":{"value":"Arthroven GmbH"},"Aspen Medical Products GmbH":{"value":"Aspen Medical Products GmbH"},"Basko Orthop\u00e4die Handelsgesellschaft mbH":{"value":"Basko Orthop\u00e4die Handelsgesellschaft mbH"},"Blatchford Europe GmbH (Endolite)":{"value":"Blatchford Europe GmbH (Endolite)"},"Bort GmbH":{"value":"Bort GmbH"},....
 ```
 
-> POST ./api/api.php/consumables/vendor
+> POST/PUT ./api/api.php/consumables/vendor/{id}
 
-Stores new vendor data.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | information, files, etc |
-
-Sample response
-```
-
-{"response":{"id":1,"msg":"Vendor Otto Bock has been saved","type":"info"}}
-```
-
-> PUT ./api/api.php/consumables/vendor/{id}
-
-Updates vendor data.
+Stores or updates vendor data.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
+| {id} | path parameter | required for PUT | database id |
 | payload | form data | required | information, files, etc |
 
 Sample response
@@ -4393,28 +4299,14 @@ Sample response
 {"response":{"msg":"Announcement deleted.","type":"success"}}
 ```
 
-> POST ./api/api.php/message/announcement
+> POST/PUT ./api/api.php/message/announcement/{announcement id}
 
-Create a new announcement.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | containing announcement details |
-
-Sample response
-```
-{"response":{"msg":"Announcment saved.","type":"success"}}
-```
-
-> PUT ./api/api.php/message/announcement/{announcement id}
-
-Update an announcement.
+Create a new or update an announcement.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {announcement id} | path parameter | required | int id |
+| {announcement id} | path parameter | required for PUT | int id |
 | payload | form data | required | containing announcement details |
 
 Sample response
@@ -4544,7 +4436,7 @@ Sample response
 {"data":{"filter":"","state":"unprocessed","order":[{"id":1,"ordertype":"order","ordertext":"Organizational unit: Prosthetics II\nApproved: 2025-01-25 01:45:48 ","quantity":"1","unit":"PAK","barcode":"4032767124961","name":"Schlauch-Strumpf","vendor":"Otto Bock HealthCare Deutschland GmbH","ordernumber":"99B25","commission":"1234","approval":0,"addinformation":true,"orderer":"error on line 1","organizationalunit":"prosthetics2","state":{"ordered":{"data-ordered":"false"},"partially_received":{"data-partially_received":"false"},"received":{"data-received":"false"},"partially_delivered":{"data-partially_delivered":"false"},....
 ```
 
-> PUT ./api/api.php/order/approved/{ids}/{update}/{state}
+> PATCH ./api/api.php/order/approved/{ids}/{update}/{state}
 
 Updates approved orders (states, appending information, etc.) or transfer to prepared order revoking order authorization.
 
@@ -4610,28 +4502,14 @@ Sample response
 {"render": {"form": {"data-usecase": "purchase","action": "javascript:api.purchase('post', 'order')"},"content": [[{"type": "scanner","destination": "productsearch"},{"type": "select","content": {"... all vendors": {"value": "21_4_5_15_16_17_6_7_31_30_33_22_8_32_23_34_9_18_2_3_10_12_11_29_19_13_14_20_24_1_25_26_27_28"},"Basko": {"value": "21"},"Caroli": {"value": "4"},"Feet Control": {"value": "5"},....
 ```
 
-> POST ./api/api.php/order/order
+> POST/PUT ./api/api.php/order/order/{id}
 
-Stores order to database. If payload contains order authorization credentials each item is stored to approved orders, the whole order stored to prepared orders otherwise.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | ordered products, order info, sometimes authorization |
-
-Sample response
-```
-{"response": {"id": "83","msg": "Order has been saved to prepared orders but has still to be approved.","type": "info"}}
-```
-
-> PUT ./api/api.php/order/order/{id}
-
-Updates order in database. If payload contains order authorization credentials each item is stored to approved orders, the whole order stored to prepared orders otherwise.
+Stores or updates an order in database. If payload contains order authorization credentials each item is stored to approved orders, the whole order stored to prepared orders otherwise.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | prepared order database id (int) |
+| {id} | path parameter | required for PUT | prepared order database id (int) |
 | payload | form data | required | ordered products, order info, sometimes authorization |
 
 Sample response
@@ -4671,7 +4549,7 @@ Sample response
 
 ### Record endpoints
 
-> PUT ./api/api.php/record/casestate/{identifier}/{state}/{bool}
+> PATCH ./api/api.php/record/casestate/{identifier}/{state}/{bool}
 
 Sets the passed case state.
 
@@ -4702,7 +4580,7 @@ Sample response
 {"response":{"msg":"Message successfully sent","type":"success"}}
 ```
 
-> PUT ./api/api.php/record/close/{identifier}
+> PATCH ./api/api.php/record/close/{identifier}
 
 Marks database entries with passed identifier as closed.
 
@@ -4937,7 +4815,7 @@ Sample response
 
 ### Responsibility endpoints
 
-> PUT  ./api/api.php/responsibility/responsibilities/{id}
+> PATCH ./api/api.php/responsibility/responsibilities/{id}
 
 Updates acceptance by submitting user for the given responsibility
 
@@ -4966,28 +4844,14 @@ Sample response
 {"render":{"content":[[{"type":"radio","content":{"My responsibilities":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null', '_my')"},"My units":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null')","checked":true},"Prosthetics II":{"name":"Organizational_unit","onchange":"api.responsibility('get', 'responsibilities', 'null', 'prosthetics2')"}},....
 ```
 
-> POST ./api/api.php/responsibility/responsibility
+> POST/PUT ./api/api.php/responsibility/responsibility/{id}
 
-Stores a new responsibility to the database.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | details on the responsibility |
-
-Sample response
-```
-{"response":{"msg":"Responsibility saved","type":"success"}}
-```
-
-> PUT ./api/api.php/responsibility/responsibility/{id}
-
-Updates a responsibility
+Stores a new or updates a responsibility.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | database id |
+| {id} | path parameter | required for PUT | database id |
 | payload | form data | required | details on the responsibility |
 
 Sample response
@@ -5041,28 +4905,14 @@ Sample response
 {"render":{"content":[[{"type":"search","attributes":{"name":"Search","onkeydown":"if (event.key === 'Enter') {api.risk('get', 'search', this.value); return false;}"}}],[{"type":"hr"}],[[{"type":"textsection","attributes":{"name":"Risk"}},{"type":"button","attributes":{"value":"New","onpointerup":"api.risk('get', 'risk', 'risk')"}},{"type":"select","attributes":{"name":"CAD","onchange":"api.risk('get', 'risk', this.value)"},"content":{"...":[],"Scanspray nicht f\u00fcr Hautkontakt geeignet: Reizung der Haut nach Anwendung in z.B. Prothesenschaft":{"value":"526"},"unzureichende Layerhaftung additiv gefertigter Verschlusssysteme: mangelhafte Stabilit\u00e4t und Funktionsverlust des Verschlussystems":{"value":"528"},"unzureichende Passgenauigkeit nach digitaler\/additiver Modellerstellung: Druckstellen":{"value":"527"}}},....
 ```
 
-> POST ./api/api.php/risk/risk
+> POST/PATCH ./api/api.php/risk/risk/{id}
 
-Stores a risk.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required |  |
-
-Sample response
-```
-{"response":{"msg":"The edited risk has been saved","id":2,"type":"success"}}
-```
-
-> PUT ./api/api.php/risk/risk/{id}
-
-Updates a risk.
+Stores or updates a risk.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | database id for risk |
+| {id} | path parameter | required for PATCH | database id for risk |
 | payload | form data | required |  |
 
 Sample response
@@ -5347,28 +5197,14 @@ Sample response
 {"render":{"content":[[{"type":"select","attributes":{"name":"Edit existing user","onchange":"api.user('get', 'user', this.value)"},"content":{"...New user":{"selected":true},"CARO App":[],"error on line 1":[],"user":[]}},{"type":"search","attributes":{"name":"Search by name","onkeydown":"if (event.key === 'Enter') {api.user('get', 'user', this.value); return false;}"},"datalist":["CARO App","error on line 1","user"]}],[{"type":"text","attributes":{"name":"Name","required":true,"value":""}},{"type":"checkbox","attributes":{"name":"Authorize"},"content":{"User":[],"Group":[],"Medical device consultant":[],"Supervisor":[],"Office":[],"Human ressources":[],"Purchase":[],"Purchase assistant":[],"Quality management officer":[],"Person responsible for regulatory compliance":[],"CEO":[],"Application admin":[]},....
 ```
 
-> POST ./api/api.php/user/user
+> POST/PUT ./api/api.php/user/user/{id}
 
-Stores a new user.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| payload | form data | required | user image, application settings |
-
-Sample response
-```
-{"response": {"id": "2","msg": "User error on line 1 has been saved","type": "success"}}
-```
-
-> PUT ./api/api.php/user/user/{id}
-
-Updates user settings.
+Stores a new user or updates user settings.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {id} | path parameter | required | user id |
+| {id} | path parameter | required for PUT | user id |
 | payload | form data | required | user image, application settings |
 
 Sample response
@@ -5390,7 +5226,7 @@ Sample response
 {"content": [[{"type": "textsection","attributes":{"name": "Your data within CARO"},"content": "Name: error on line 1\nAuthorized: User, Supervisor, Purchase, Quality management officer, Application admin\nOrganizational units: Administration, Orthotics I, Prosthetics II, CAD\n \nYou have an order authorization pin. Ask administration for details. \n \nOvertime hours on starting time tracking: 10 \nAverage weekly hours: 2024-05-01 5 \n-9.5 hours of overtime as of end of this month \n \nAnnual vacation days: 2023-01-01 30\r\n2024-01-01 30 \n54 Days of unused vacation"},....
 ```
 
-> POST ./api/api.php/user/profile
+> PATCH ./api/api.php/user/profile
 
 Stores custom settings.
 
@@ -5433,28 +5269,15 @@ Sample response
 {"render":{"content":[[{"type":"text","attributes":{"name":"Trainee","value":"error on line 1","readonly":true},"datalist":["error on line 1","user"]},{"type":"text","attributes":{"name":"Add training","value":""}},{"type":"text","attributes":{"name":"Time of scheduled training","value":""},"hint":"e.g. a date, month or calendar quarter"},{"type":"hr"},{"type":"date","attributes":{"name":"Date of training"}},{"type":"date","attributes":{"name":"Date of expiry"}},{"type":"number","attributes":{"name":"Experience points"}},{"type":"checkbox","attributes":{"name":"Evaluation"},"content":{"Evaluation is unreasonable, this is a mandatory training.":[]}},{"type":"file","attributes":{"name":"Add document"},"hint":"Without a training title other edits are ignored. Training date will be set to today if not provided. Expiry, experience points and file are optional."}]]}}
 ```
 
-> POST ./api/api.php/user/training/null
+> POST/PUT ./api/api.php/user/training/{id}
 
-Stores a new or scheduled training. null is ignored.
+Stores a new or scheduled training or updates a training.
 
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
+| {id} | path parameter | required for PUT | training id |
 | payload | form data | required |  |
-
-Sample response
-```
-{"response":{"msg":"undefined language","type":"success"}}
-```
-
-> PUT ./api/api.php/user/training/{id}
-
-Updates a training.
-
-Parameters
-| Name | Data Type | Required | Description |
-| ---- | --------- | -------- | ----------- |
-| {id} | path parameter | optional | training id |
 
 Sample response
 ```
