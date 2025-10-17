@@ -24,6 +24,34 @@ class STRESSTEST extends INSTALL{
 	public $_autopermission = true;
 	public $_csvInput = '../unittests/sample-csv-files-sample-6.csv';
 
+	public $_incorporationApproval = [
+		"_check" => "Quality management system migration", // will be appended to the initial message
+		"user"=> [ // roles according to the configuration incorporation persmission
+			"name"=> "CARO App", // appropriate name of responsible persons
+			"date"=> "2025-07-11 23:56" // Y-m-d H:i
+		],
+		"qmo"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+		],
+		"prrc"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+		],
+		"ceo"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+		],
+		"supervisor"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+		],
+		"hazardous_materials"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+			]
+	];
+
 	// optional overrides of parent properties
 	public $_defaultUser = "Caro App";
 	public $_defaultLanguage = 'de';
@@ -299,6 +327,42 @@ class STRESSTEST extends INSTALL{
 			echo '[*] all documents in the database have been approved';
 		}
 		else $this->printError('autopermission has not been enabled');
+	}
+
+	/**
+	 * approve all pending incorporations
+	 */
+	public function approvePendingIncorporations(){
+		if ($this->_incorporationApproval){
+			$sqlchunks = [];
+			$DBall = [...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products')];
+			foreach ($DBall as $row){
+				if (!$row['incorporated']) continue;
+				$row['incorporated'] = json_decode($row['incorporated'], true);
+				if (PERMISSION::fullyapproved('incorporation', $row['incorporated'])) continue;
+				
+				if (isset($row['incorporated']['_check']) && isset($this->_incorporationApproval['_check'])) $row['incorporated']['_check'] .= ' ' . $this->_incorporationApproval['_check'];
+				// fill up missing approvals with + operator
+				$row['incorporated'] = $row['incorporated'] + $this->_incorporationApproval;
+
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_incorporation'),
+				[
+					':incorporated' => $this->_pdo->quote(UTILITY::json_encode($row['incorporated'])),
+					':id' => $row['id']
+				]) . '; ');
+			}
+			foreach ($sqlchunks as $chunk){
+				try {
+					SQLQUERY::EXECUTE($this->_pdo, $chunk);
+				}
+				catch (\Exception $e) {
+					$this->printWarning('there has been an issue', [$e, $chunk]);
+					die();
+				}
+			}
+			echo '[*] all pending incorporation have been approved.';			
+		}
+		else $this->printError('incorporation approval has not been defined');
 	}
 
 	/**

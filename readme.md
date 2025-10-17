@@ -34,9 +34,6 @@ Things are still in motion. Images may be outdated.
 * erp_interface, additional usecases?
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
-* stresstest add autocomplete for pending incorporations
-    * describe concerns within readme
-    * set up named array as private class variable (for comprehension), stringify later
 * assemble swipe to toggle autocomplete for safari
 * [Stakeholder requirements](#rejected-requirements)
     * look for medical device flag
@@ -1873,6 +1870,7 @@ If you are going to prepare the deployment you are free to create multiple files
 * choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken. You must be logged in with adminstrator privileges to take these actions.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * [Install as progressive web app (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_from_the_web) from the initial browser request and give requested permissions on any elegible workplace.
+* consider incorporation handling through the [_stresstest](#stress-test-and-performance)-tool
 
 [Content](#content)
 
@@ -2818,11 +2816,13 @@ During development following outcomes could be noted:
 * 1k approved orders process in about 2.7s on the server side and 3s on the client side (in full data tile view on desktop) on 282k entries within the products database. 5k have no significant rise on the server side, but still need 3s on the client side per 1k summing up to approximately 15 seconds.
 * The products database and depending functions (product search) show a processing time of about 0.5 seconds per 100k entries. On 1m entries this can lead up to a 5 second delay. Also see [performance on importing pricelists](#server-setup).
 
-Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script must be removed from the production server once being tested, before going public.**
+Not all functions can be unittested, as this application is mostly a skeleton for your dynamic data. Many functions have to be tested by using the regular ways using the application. [Template files](#application-setup) can help to an extend. As the stresstest extends the [installation](#installation-procedure) script this can be used for database injections based on the template files as well. It is also possible to delete entries similar to the values of the template files, regardless of approvals. It is not advised to use this in production. **Deleting documents, risks and components from the database in production violates regulatory requirements and leads to unexpected irrevisible long-term results within records. The script should be removed from the production server once being tested, before going public.**
 
 Same applies to vendors. Vendor-directories will not be deleted if filled in the meantime. Deletion of vendors occurs if name and info is the same as within the template file. **Deleting vendors and their files in production is not intended as persistence is required for regulatory reasons.**
 
-Variables for _stresstest.php can be adjusted within the top class variables in the sourcecode.
+One special usecase may be the auto-approval incorporations on migration from another quality management system. If you agree within the administration on the terms, you can set up the approvals that will override all currently pending incorporations. This step should be well thought out, documented and only being used once after initial migration and imports of product lists through the [erp interface](#erp-interface), assuming previous known products have been incorporated already. 
+
+Variables for _stresstest.php can be adjusted within the top class variables in the sourcecode. To run any method you have to be signed into CARO with administrator priviledges.
 
 [Content](#content)
 
