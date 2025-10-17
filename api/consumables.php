@@ -2171,7 +2171,7 @@ class CONSUMABLES extends API {
 						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_update')]);
 						unset($_FILES[$this->_lang->PROPERTY('consumables.vendor.productlist_match')]);
 					}
-					elseif (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport'))){
+					elseif (UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('erpquery.consumables.erpimport_option'))){
 						$source = ERPINTERFACE->consumables([$vendor[':name']]);
 						if (isset($source[$vendor[':name']]) && $source = $source[$vendor[':name']]) {
 							$importfilter = [
@@ -2219,7 +2219,8 @@ class CONSUMABLES extends API {
 					'erpquery.integrations.productlist_erp_match',
 					'erpquery.integrations.productlist_erp_match_selected',
 					'erpquery.consumables.erpimport',
-					'erpquery.consumables.erpfilter'
+					'erpquery.consumables.erpimport_option',
+					'erpquery.consumables.erpfilter',
 				] as $var) {
 					unset($this->_payload->{$this->_lang->PROPERTY($var)});
 				}
@@ -2245,13 +2246,22 @@ class CONSUMABLES extends API {
 							'type' => 'error'
 						]]);
 				}
-				if ($evaluation){
-					$evaluation['_author'] = $_SESSION['user']['name'];
-					$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
-					$vendor[':evaluation'][] = $evaluation;
+				if ($evaluation ){
+					$last = count($vendor[':evaluation']) ? $vendor[':evaluation'][count($vendor[':evaluation']) - 1] : null;
+					if ($last){
+						// unset for content comparison
+						unset($last['_author']);
+						unset($last['_date']);
+					}
+					if (!$last || UTILITY::json_encode($last) != UTILITY::json_encode($evaluation))
+					{
+						$evaluation['_author'] = $_SESSION['user']['name'];
+						$evaluation['_date'] = $this->_date['servertime']->format('Y-m-d');
+						$vendor[':evaluation'][] = $evaluation;
+					}
 				}
 				else $vendor[':evaluation'] = null;
-
+				
 				// tidy up unused properties
 				foreach ($vendor[':info'] as $key => $value){
 					if (!$value) unset($vendor[':info'][$key]);
@@ -2684,8 +2694,11 @@ class CONSUMABLES extends API {
 								$productlist[] = [
 									[
 										'type' => 'checkbox',
+										'attributes' => [
+											'name' => $this->_lang->GET('erpquery.consumables.erpimport')
+										],
 										'content' => [
-											$this->_lang->GET('erpquery.consumables.erpimport') => []
+											$this->_lang->GET('erpquery.consumables.erpimport_option') => []
 										]
 									]
 								];

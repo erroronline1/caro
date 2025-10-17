@@ -1063,7 +1063,8 @@
 		},
 		"consumables":{
 			"erpfilter": "ERP stock data import filter",
-			"erpimport": "ERP stock data import"
+			"erpimport": "ERP stock data import",
+			"erpimport_option": "Import and update products"
 		},
 		"csvdump": {
 			"null": "This query does not exists",

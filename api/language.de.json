@@ -1063,7 +1063,8 @@
 		},
 		"consumables":{
 			"erpfilter": "Filter für Artikelimport aus EVA",
-			"erpimport": "EVA Artikelstamm importieren"
+			"erpimport": "EVA Artikelstamm importieren",
+			"erpimport_option": "Artikel importieren und aktualisieren"
 		},
 		"csvdump": {
 			"null": "Diese Abfrage existiert nicht",
