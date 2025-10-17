@@ -8,12 +8,12 @@
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-const cacheName = "20240629_0101"; // Change value to force update
+const cacheName = "20251017_2115"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
 	name: "caro",
-	table: "cached_post_put_delete",
+	table: "cached_post_put_patch_delete",
 };
 
 addEventListener("message", async (message) => {
@@ -119,7 +119,7 @@ self.addEventListener("fetch", (event) => {
 					return fetchedResponse;
 				})
 				.catch(async () => {
-					// If the network is unavailable, get cached get requests or store post, put, delete
+					// If the network is unavailable, get cached get requests or store post, put, patch, delete
 					if (event.request.method === "GET")
 						return cache.match(event.request).then(
 							// resolve
