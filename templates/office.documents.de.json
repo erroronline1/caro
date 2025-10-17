@@ -251,6 +251,7 @@
 							"required": true
 						},
 						"content": {
+							"Kein Einfluss auf die Sicherheit der Medizinprodukte": [],
 							"Direkter Einfluss auf die Sicherheit der Medizinprodukte": [],
 							"Indirekter Einfluss auf die Sicherheit der Medizinprodukte": [],
 							"Direkter Einfluss auf die Leistung der Medizinprodukte": [],
