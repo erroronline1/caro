@@ -44,6 +44,9 @@ Things are still in motion. Images may be outdated.
 * [Stakeholder requirements](#rejected-requirements)
     * look for medical device flag
     * message whiteboard
+* risk management csv import
+    * on updates/inserts author=user
+    * compare headerrows with system default language
 
 ## Content
 * [Aims](#aims)
@@ -885,6 +888,7 @@ While editing products, one can edit the
 * *has expiry date*-setting,
 * *special attention*-setting (meaning being defined within languagefile),
 * *stock item*-setting
+* *third party ordering*-setting
 * revoke a possible *incorporated*-state and
 * set the product *active and available* or *inactive*.
 
@@ -1614,6 +1618,7 @@ ERP-Data is fetched during product list imports if available and selected. For a
 * has_expiry_date
 * special_attention
 * stock_item
+* thirdparty_order
 * erp_id
 
 is updated if not already set within the system.
@@ -2373,10 +2378,11 @@ Products are deleted by default on update of the product list unless
 * an alias has been modified
 * or it has been ordered.
 
-In case you are able to import through your [ERP interface](#erp-interface) you may have to filter as well. Informations not provided, like special_attention, expiry_date or trading_good can be set with the ERP filter containing
+In case you are able to import through your [ERP interface](#erp-interface) you may have to filter as well. Informations not provided, like special_attention, expiry_date, trading_good or thirdparty_order can be set with the ERP filter containing
 ```js
 "modify": {
-    "conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
+    "conditional_or": [["trading_good", "1", ["article_name", ".*"]]],
+    "thirdparty_order": [["thirdparty_order", "1", ["article_name", ".*"]]]
 }
 ```
 
@@ -2390,7 +2396,7 @@ In case of transfer of the last order date being part of the filter, an incorpor
 
 You can as well define all products as trading goods and set to 0 conditionally if this filter is easier formulate. Same applies to expiry dates and required special attention.
 
-*special_attention* will be displayed within approved orders and is intended to inform about required batch number allocation for products with skin contact by default. This can be customized to anything within the language file.
+*special_attention* and *thirdparty_order* will be displayed within approved orders and is intended to inform about required batch number allocation for products with skin contact or information for purchase by default. Both can be customized to anything within the language file.
 
 ### Default filter on export
 If not provided a simple import filter will be generated on export of product lists. As described within [vendor and product management](#vendor-and-product-management), this may be reasonable if no initial product list is imported and primarily edited within the application. In this case the information on reimport is processed without conditions, filters and changes. This kind of filter can not be applied on vendor product lists and will result in an error message.
@@ -2407,6 +2413,7 @@ If not provided a simple import filter will be generated on export of product li
             "has_expiry_date",
             "special_attention",
             "stock_item",
+            "thirdparty_order",
             "last_order"
         ]
     }
@@ -2608,12 +2615,13 @@ Stakeholder identification:
 | Consider order return reason product safety related | Supervisor, PRRC | 2025-07-07 | Critical return reasons alert incorporation authorized users and append an incorporation review; 2025-07-11 |
 | Hospital ward tour planning | User | 2025-09-22 | Implemented as work lists with identifier items, volatile note within records; 2025-09-27 |
 | ERP-data access for cases not available within caro | User | 2025-09-29 | Implemented; 2025-10-03 |
-| Additional field for orders with explicit ERP-relation, e.g. case number | CEO | 2025-10-10 |  |
-| Monitor rental part return on receival | CEO | 2025-10-10 |  |
+| Additional field for orders with explicit ERP-relation, e.g. case number | CEO | 2025-10-10 | Added administrative mark field to orders; 2025-10-14 |
+| Monitor rental part return on receival | CEO | 2025-10-10 | Added a calendar button with respective hint; 2025-10-14 |
 | General whiteboard for shortterm notes | User | 2025-10-10 |  |
 | ERP interface customerdata and casedata additional submitbutton near top | User | 2025-10-10 | Implemented; 2025-10-11 |
 | Reconsider pricelist imports in favour of ERP-Data | CEO, Purchase | 2025-10-10 | Implemented; 2025-10-11 |
-| Batch update alias | User | 2025-10-10 |  |
+| Batch update product alias | User | 2025-10-10 | Implemented; 2025-10-15 |
+| Product property: order via erp or third party ("BISI") | Purchase | 2025-10-10 | Implemented; 2025-10-15 |
 
 #### Rejected requirements
 > ~~Translation of ERP order-dump is not satisfiable given the current provided data (12/24)~~
