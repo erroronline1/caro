@@ -1,5 +1,28 @@
 [
 	{
+		"name": "3Dmensionals / PONTIALIS GmbH & Co. KG",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Ottostr. 12, 50859 Köln",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Achim Ruthner GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: ODS-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -928,6 +951,29 @@
 		}
 	},
 	{
+		"name": "Bionic Germany",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Buchenweg 13, 59909 Bestwig",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Blatchford Europe GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -1013,6 +1059,28 @@
 							"article_ean": [""]
 						}
 					]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Bohle AG",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Dieselstr. 10, 42781 Haan",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -1369,6 +1437,29 @@
 		}
 	},
 	{
+		"name": "Conrad Electronic GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Klaus-Conrad-Str. 1, 92240 Hirschau",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Cosmesil.de",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -1581,6 +1672,28 @@
 		}
 	},
 	{
+		"name": "Das Humane System GmbH & Co.KG",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "Segufix",
+			"mail": "",
+			"phone": "",
+			"address": "Allerbeeksring 33, 21266 Jesteburg",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Dirame Ortho N.V.",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
@@ -1598,6 +1711,75 @@
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "DOI ortho-innovativ GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Industriestr. 18c, 87448 Waltenhofen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "E.W. Neu GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Cornelius-Heyl-Strasse 58, 67547 Worms",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Engelbert Strauss GmbH & Co.",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Frankfurter Str. 98-102, 63599 Biebergemünd",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -1996,6 +2178,29 @@
 		}
 	},
 	{
+		"name": "FIDLOCK GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Kirchhorster Straße 39, 30659 Hannover",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Fior & Gentz GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, CSV Kopfzeile Bezeichnung2 ergänzen",
@@ -2281,6 +2486,29 @@
 		}
 	},
 	{
+		"name": "Gutekunst + Co.",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Carl-Zeiss-Str. 15, 72555 Metzingen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Heinrich Caroli e.K.",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -2521,6 +2749,29 @@
 					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
 				}
 			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Heinrich Kipp Werk KG",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Heubergstraße 2, 72172 Sulz-Holzhausen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -2912,6 +3163,33 @@
 			"erpfilter": {
 				"modify": {
 					"conditional_or": [["special_attention", "1", ["article_name", ".*"]]]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Medco GmbH & Co. KG",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Ostdamm 135a, 48249 Dülmen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {
+				"modify": {
+					"conditional_or": [["trading_good", "1", ["article_name", ".*"]]]
 				}
 			},
 			"samplecheck_interval": 93,
@@ -3603,7 +3881,7 @@
 		}
 	},
 	{
-		"name": "Ormed GmbH",
+		"name": "Ormed GmbH (Enovis)",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
 			"infotext": "",
@@ -3920,6 +4198,29 @@
 					]
 				}
 			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Orthomobility Ltd.",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Eisenbahnstr. 30, 15517 Fürstenwalde",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -4619,6 +4920,29 @@
 		}
 	},
 	{
+		"name": "Plastico Kunststoffe GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Am Föhrenried 31, 88255 Baindt",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "POCHERT GmbH & Co. KG",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -4733,6 +5057,52 @@
 					]
 				}
 			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Polyform Kunststofftechnik",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Braasstrasse 15, 31737 Rinteln",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Proteor",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "6 rue de la Redoute, F 21078 Dijon Cedex",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -5169,6 +5539,28 @@
 		}
 	},
 	{
+		"name": "ROBUSO Stahlwarenfabrik Buntenbach & Sohn GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Neuenhofer Straße 75, 42657 Solingen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Ruck MedicalTec",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -5367,7 +5759,6 @@
 			"samplecheck_reusable": 1095
 		}
 	},
-
 	{
 		"name": "Schein Orthopädie",
 		"info": {
@@ -5466,6 +5857,98 @@
 					"conditional_or": [["trading_good", "1", ["article_name", "einlage|schuh|orthese"]]]
 				}
 			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Schrauben Jäger AG",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Industriestr. 15, 76189 Kalsruhe",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "sealprene",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Altenlinde 78, 51789 Lindlar",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Siliconesandmore.com",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Hofdwarsweg 20, NL 6161DD Geleen",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Spannrit GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Industriestrasse 3, 63801 Kleinostheim",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -5700,6 +6183,29 @@
 					]
 				}
 			},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
+		"name": "Subolab GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Reetzstr. 79, 76327 Pfinztal",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
 			"samplecheck_interval": 93,
 			"samplecheck_reusable": 1095
 		}
@@ -6332,6 +6838,29 @@
 		}
 	},
 	{
+		"name": "WAKO GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Granitweg 1, A 4202 Kirchschlag bei Linz",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Wagner Polymertechnik GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Preislistenimports: XSL-Datei als CSV (Trennzeichen-getrennt) speichern",
@@ -6527,6 +7056,29 @@
 		}
 	},
 	{
+		"name": "Werkzeug-Jäger GmbH",
+		"info": {
+			"purchase_info": "Im Falle eines Preislistenimports: ERP-Export nutzen, ggf. zuvor trading_good, has_expiry_date und special_attention bearbeiten",
+			"infotext": "",
+			"mail": "",
+			"phone": "",
+			"address": "Industriestr. 17, 76189 Karlsruhe",
+			"sales_representative": "",
+			"customer_id": ""
+		},
+		"products": {
+			"filefilter": {
+				"filesetting": {
+					"headerrow": 1,
+					"columns": ["article_no", "article_name", "article_unit", "article_ean", "erp_id", "trading_good", "has_expiry_date", "special_attention", "last_order"]
+				}
+			},
+			"erpfilter": {},
+			"samplecheck_interval": 93,
+			"samplecheck_reusable": 1095
+		}
+	},
+	{
 		"name": "Wilhelm Julius Teufel GmbH",
 		"info": {
 			"purchase_info": "Im Falle eines Im Falle eines Preislistenimportss: XSL-Datei als CSV (Trennzeichen-getrennt) speichern, Tabellen zusammenführen",
@@ -6630,6 +7182,6 @@
 			"sales_representative": "",
 			"customer_id": ""
 		},
-		"products": { "filefilter": {}, "samplecheck_interval": 93, "samplecheck_reusable": 1095 }
+		"products": { "filefilter": {}, "erpfilter": {}, "samplecheck_interval": 93, "samplecheck_reusable": 1095 }
 	}
 ]
