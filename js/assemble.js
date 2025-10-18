@@ -3546,14 +3546,14 @@ export class Assemble {
 			});
 
 			if (swipe) {
-				// toggle by swipe especially for tablets as buttons appeared too occupying
+				// toggle by swipe especially for tablets as buttons appeared too occupying, kudos https://www.kirupa.com/html5/detecting_touch_swipe_gestures.htm
 				textarea.addEventListener("touchstart", (event) => {
-					api._settings.session.textareaAutocompleteSwipe = [event.clientX, event.clientY];
+					api._settings.session.textareaAutocompleteSwipe = [event.touches[0].clientX, event.touches[0].clientY];
 				});
-				textarea.addEventListener("touchend", (event) => {
-					const travel = [api._settings.session.textareaAutocompleteSwipe[0] - event.clientX, api._settings.session.textareaAutocompleteSwipe[1] - event.clientY];
+				textarea.addEventListener("touchmove", (event) => {
+					const travel = [api._settings.session.textareaAutocompleteSwipe[0] - event.touches[0].clientX, api._settings.session.textareaAutocompleteSwipe[1] - event.touches[0].clientY];
 					// filter for mostly horizontal swipes
-					if (Math.abs(travel[0]) - Math.abs(travel[1]) > 0) {
+					if (Math.abs(travel[0]) - Math.abs(travel[1]) > 0 && Math.abs(travel[0]) > 20) {
 						event.preventDefault();
 						autocomplete(travel[0] > 0 ? "forth" : "back");
 					}
