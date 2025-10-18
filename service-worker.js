@@ -8,7 +8,7 @@
  * Third party libraries are distributed under their own terms (see [readme.md](readme.md#external-libraries))
  */
 
-const cacheName = "20251017_2115"; // Change value to force update
+const cacheName = "20251019_0128"; // Change value to force update
 importScripts("./libraries/erroronline1.js");
 var database = _.idb;
 database.database = {
