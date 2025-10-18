@@ -81,6 +81,7 @@ class MAINTENANCE extends API {
 		foreach ([
 			'cron_log',
 			'records_datalist',
+			'riskupdate',
 			'vendorupdate',
 			] as $category){
 				$selecttypes[$this->_lang->GET('maintenance.navigation.' . $category)] = ['value' => $category];
@@ -303,13 +304,250 @@ class MAINTENANCE extends API {
 	}
 
 	/**
+	 *       _     _             _     _       
+	 *   ___|_|___| |_ _ _ ___ _| |___| |_ ___ 
+	 *  |  _| |_ -| '_| | | . | . | .'|  _| -_|
+	 *  |_| |_|___|_,_|___|  _|___|__,|_| |___|
+	 *                    |_|
+	 * import and update lists from csv files matching the structure of this applications risk exports
+	 */
+	private function riskupdate(){
+		$response = ['render' => ['content' => []]];
+		$risks = SQLQUERY::EXECUTE($this->_pdo, 'risk_datalist');
+
+		switch ($_SERVER['REQUEST_METHOD']){
+			case 'POST':
+				$process = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('risk.process'));
+				$type = array_search(UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('maintenance.riskupdate.type')), $this->_lang->_USER['risk']['type']);
+
+				if (!trim($process) || !$type || !isset($_FILES[$this->_lang->PROPERTY('maintenance.riskupdate.file')]) || !$_FILES[$this->_lang->PROPERTY('maintenance.riskupdate.file')]['tmp_name'][0]) $this->response([$process, $type, $_FILES[$this->_lang->PROPERTY('maintenance.riskupdate.file')]['tmp_name'][0]], 417);
+
+				require_once('./_csvprocessor.php');
+
+				$filter = [
+					'risk' => [
+						'filesetting' => [
+							'headerrow' => 3,
+							'columns' => [
+								$this->_lang->GET('risk.risk_related', [], true),
+								$this->_lang->GET('risk.relevance', [], true),
+								$this->_lang->GET('risk.cause', [], true),
+								$this->_lang->GET('risk.effect', [], true),
+								$this->_lang->GET('risk.probability', [], true),
+								$this->_lang->GET('risk.damage', [], true),
+								$this->_lang->GET('risk.measure', [], true),
+								$this->_lang->GET('risk.measure_probability', [], true),
+								$this->_lang->GET('risk.measure_damage', [], true),
+								$this->_lang->GET('risk.risk_benefit', [], true),
+								$this->_lang->GET('risk.measure_remainder', [], true)
+							]
+						],
+						'modify' => [
+							'rewrite' => [
+								[
+									'risk' => [$this->_lang->GET('risk.risk_related', [], true)],
+									'relevance' => [$this->_lang->GET('risk.relevance', [], true)],
+									'cause' => [$this->_lang->GET('risk.cause', [], true)],
+									'effect' => [$this->_lang->GET('risk.effect', [], true)],
+									'probability' => [$this->_lang->GET('risk.probability', [], true)],
+									'damage' => [$this->_lang->GET('risk.damage', [], true)],
+									'measure' => [$this->_lang->GET('risk.measure', [], true)],
+									'measure_probability' => [$this->_lang->GET('risk.measure_probability', [], true)],
+									'measure_damage' => [$this->_lang->GET('risk.measure_damage', [], true)],
+									'risk_benefit' => [$this->_lang->GET('risk.risk_benefit', [], true)],
+									'measure_remainder' => [$this->_lang->GET('risk.measure_remainder', [], true)]
+								]
+							]
+						]
+					],
+					'characteristic' => [
+						'filesetting' => [
+							'headerrow' => 3,
+							'columns' => [
+								$this->_lang->GET('risk.type.characteristic', [], true),
+								$this->_lang->GET('risk.relevance', [], true),
+								$this->_lang->GET('risk.cause', [], true),
+								$this->_lang->GET('risk.risk_related', [], true)
+							]
+						],
+						'modify' => [
+							'rewrite' => [
+								[
+									'risk' => [$this->_lang->GET('risk.risk_related', [], true)],
+									'relevance' => [$this->_lang->GET('risk.relevance', [], true)],
+									'cause' => [$this->_lang->GET('risk.cause', [], true)],
+									'measure' => [$this->_lang->GET('risk.type.characteristic', [], true)]
+								]
+							]
+						]
+					]
+				];
+
+				$content = $filter[$type];
+				$content['filesetting']['source'] = $_FILES[$this->_lang->PROPERTY('maintenance.riskupdate.file')]['tmp_name'][0];
+				$content['filesetting']['dialect'] =  CONFIG['csv']['dialect'];
+				
+				$datalist = new Listprocessor($content);
+				if (!isset($datalist->_list[1])) $this->response([
+					'response' => [
+						'msg' => implode('<br />', $datalist->_log),
+						'type' => 'error'
+					]
+				]);
+
+				$sqlchunks = $anomalies = [];
+				$new = count($datalist->_list[1]);
+				$update = 0;
+				foreach ($datalist->_list[1] as $importrisk){
+					$newrisk = [
+						':id' => null,
+						':type' => $type,
+						':process' => $process,
+						':risk' => '',
+						':relevance' => isset($importrisk['relevance']) ? ($importrisk['relevance'] === $this->_lang->GET('risk.relevance_yes', [], true) ? 1 : 0): null,
+						':cause' => isset($importrisk['cause']) ? $importrisk['cause']: null,
+						':effect' => isset($importrisk['effect']) ? $importrisk['effect']: null,
+						':probability' => null,
+						':damage' => null,
+						':measure' => isset($importrisk['measure']) ? $importrisk['measure']: null,
+						':measure_probability' => isset($importrisk['measure_probability']) ? array_search($importrisk['measure_probability'], $this->_lang->_DEFAULT['risk']['probabilities']) + 1 : null,
+						':measure_damage' => isset($importrisk['measure_damage']) ? array_search($importrisk['measure_damage'], $this->_lang->_DEFAULT['risk']['damages']) + 1 : null,
+						':risk_benefit' => isset($importrisk['risk_benefit']) ? $importrisk['risk_benefit']: null,
+						':measure_remainder' => isset($importrisk['measure_remainder']) ? $importrisk['measure_remainder']: null,
+						':proof' => null,
+						':hidden' => null,
+						':author' => $_SESSION['user']['name']
+					];
+
+					// translate risks, probabilies and damages to language file keys
+					if (isset($importrisk['risk']) && $importrisk['risk']){
+						$translated = [];
+						foreach(explode("\n", $importrisk['risk']) as $r){
+							if ($key = array_search(trim($r), $this->_lang->_DEFAULT['risks'])) $translated[] = $key;
+							else $anomalies[] = $this->_lang->GET('maintenance.riskupdate.anomalies.risk_mismatch', [':risk' => $r]);
+						}
+						if ($translated) $newrisk[':risk'] = implode(',', $translated);
+						else {
+							$new--;
+							continue;
+						}
+					}
+					foreach(['probability', 'measure_probability'] as $column){
+						if (!isset($importrisk[$column]) || !$importrisk[$column]) continue;
+						if (($key = array_search($importrisk[$column], $this->_lang->_DEFAULT['risk']['probabilities'])) !== false) $newrisk[':' . $column] = $key + 1;
+						else {
+							$anomalies[] = $this->_lang->GET('maintenance.riskupdate.anomalies.probability_mismatch', [':probability' => $importrisk[$column]]);
+							$newrisk[':' . $column] = count($this->_lang->_DEFAULT['risk']['probabilities']);
+						}
+					}
+					foreach(['damage', 'measure_damage'] as $column){
+						if (!isset($importrisk[$column]) || !$importrisk[$column]) continue;
+						if (($key = array_search($importrisk[$column], $this->_lang->_DEFAULT['risk']['damages'])) !== false) $newrisk[':' . $column] = $key + 1;
+						else {
+							$anomalies[] = $this->_lang->GET('maintenance.riskupdate.anomalies.damage_mismatch', [':damage' => $importrisk[$column]]);
+							$newrisk[':' . $column] = count($this->_lang->_DEFAULT['risk']['damages']);
+						}
+					}
+
+					// compare existing risks to consider updating
+					foreach($risks as $risk){
+						if ($risk['process'] !== $process || $risk['type'] !== $type) continue;
+
+						// if these match, assign existing properties for updating
+						if ($risk['cause'] == $newrisk[':cause']
+							&& $risk['effect'] == $newrisk[':effect']
+							&& $risk['measure'] == $newrisk[':measure']
+							&& $risk['risk_benefit'] == $newrisk[':risk_benefit']
+						) {
+							$newrisk[':id'] = $risk['id'];
+							$newrisk[':proof'] = $risk['proof'];
+							$new--;
+							$update++;
+							break;
+						}
+					}
+
+					foreach($newrisk as $key => $value){
+						if (gettype($value) === 'string') $newrisk[$key] = $this->_pdo->quote($value);
+						if (gettype($value) === 'NULL') $newrisk[$key] = 'NULL';
+					}
+					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('risk_post'), $newrisk) . '; ');
+				}
+
+				//var_dump($sqlchunks);
+				//die();
+				foreach ($sqlchunks as $chunk){
+					try {
+						SQLQUERY::EXECUTE($this->_pdo, $chunk);
+					}
+					catch (\Exception $e) {
+						$anomalies[] = UTILITY::json_encode([$e, $chunk], JSON_PRETTY_PRINT);
+					}
+				}
+				$this->response(
+					[
+						'response' => [
+							'msg' => $this->_lang->GET('maintenance.riskupdate.response', [':new' => $new, ':update' => $update]) . ($anomalies ? implode(', ', $anomalies) : ''),
+							'type' => 'info'
+						]
+					]
+				);
+
+				break;
+			case 'GET':
+				$processes = array_values(array_unique(array_column($risks, 'process')));
+				sort($processes);
+
+				// upload form
+				$response['render']['content'][] = [
+					'type' => 'textsection',
+					'attributes' => [
+						'name' => $this->_lang->GET('maintenance.navigation.riskupdate'),
+					],
+					'content' => $this->_lang->GET('maintenance.riskupdate.description'),
+				];
+				$response['render']['content'][] = [
+					'type' => 'text',
+					'attributes' => [
+						'required'=> true,
+						'name' => $this->_lang->GET('risk.process'),
+					],
+					'datalist' => $processes
+				];
+				$response['render']['content'][] = [
+					'type' => 'radio',
+					'attributes' => [
+						'required'=> true,
+						'name' => $this->_lang->GET('maintenance.riskupdate.type'),
+					],
+					'content' => [
+						$this->_lang->GET('risk.type.risk') => [],
+						$this->_lang->GET('risk.type.characteristic') => [],
+					]
+				];
+				$response['render']['content'][] = [
+					'type' => 'file',
+					'attributes' => [
+						'required'=> true,
+						'name' => $this->_lang->GET('maintenance.riskupdate.file'),
+						'accept' => '.csv'
+					] 
+				];
+				$response['render']['form'] = [
+					'data-usecase' => 'maintenance',
+					'action' => "javascript:api.maintenance('post', 'task', '" . $this->_requestedType . "')"
+				];
+		}
+		return $response;
+	}
+
+	/**
 	 *                 _                   _     _       
 	 *   _ _ ___ ___ _| |___ ___ _ _ ___ _| |___| |_ ___ 
 	 *  | | | -_|   | . | . |  _| | | . | . | .'|  _| -_|
 	 *   \_/|___|_|_|___|___|_| |___|  _|___|__,|_| |___|
 	 *                              |_|
-	 * also see install.php
-	 * this is only somewhat a duplicate of install.php since the template file can be uploaded to not be reliant on server access
+	 * update vendor productlist filters and information with an uploaded template file
 	 */
 	private function vendorupdate(){
 		$response = ['render' => ['content' => []]];

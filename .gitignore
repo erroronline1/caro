@@ -1,6 +1,7 @@
 *.csv
 !shadow*
 !unittests/*
+!templates/*
 fileserver
 *.log
 *.pdf

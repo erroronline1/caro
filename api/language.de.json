@@ -1152,6 +1152,7 @@
 			"cron_log": "Cron Log",
 			"maintenance": "Wartung",
 			"records_datalist": "Textvorschläge für Aufzeichnungen",
+			"riskupdate": "Aktualisierung der Risikoanalyse-Inhalte",
 			"vendorupdate": "Lieferantenupdate"
 		},
 		"record_datalist": {
@@ -1164,6 +1165,18 @@
 			"update_error": "Das Update schlug fehl.",
 			"update_success": ":unit wurde erfolgreich aktualisiert.",
 			"upload": "Wähle eine CSV-Datei um die Datenbank zu überschreiben"
+		},
+		"riskupdate": {
+			"anomalies": {
+				"damage_mismatch": "Die Schadenshöhe :damage hatte keine Übereinstimmung mit den Sprachpaketen der Anwendung und wurde daher vorsichthalber auf den aktuellen Maximalwert gesetzt.",
+				"probability_mismatch": "Die Eintrittswahrscheinlichkeit :probability hatte keine Übereinstimmung mit den Sprachpaketen der Anwendung und wurde daher vorsichthalber auf den aktuellen Maximalwert gesetzt.",
+				"risk_mismatch": "Der Risikobezug :risk hatte keine Übereinstimmung mit den Sprachpaketen der Anwendung und konnte nicht zugewiesen werden."
+			},
+			"description": "Lade eine ordentlich vorbereitete Vorlagen-Datei für den gewählten Prozess hoch. Neue Risiken werden ergänzt.\nDie Tabellen für Risiken und Eigenschaften muss der Struktur der Vorlagendateien entsprechen.\nDer Risikobezug, die Eintrittswahrscheinlichkeiten und Schadenshöhe werden für gleiche Ursachen, Wirkungen, Maßnahmen und verbleibende Maßnahmen aktualisiert, andernfalls wird ein neuer Eintrag erstellt.",
+			"file": "Vorlagen-Datei",
+			"file_error": "Keine Datei bereitgestellt",
+			"response": "Import abgeschlossen. Es wurden :new neue Einträge übernommen, :update Einträge aktualisiert.",
+			"type": "Datentyp"
 		},
 		"vendorupdate": {
 			"description": "Lade eine ordentlich vorbereitete Vorlagen-Datei hoch. Anschließend kannst du die Informationen je Lieferant für die Aktualisierung auswählen.",

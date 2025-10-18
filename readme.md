@@ -37,9 +37,6 @@ Things are still in motion. Images may be outdated.
 * assemble swipe to toggle autocomplete for safari
 * [Stakeholder requirements](#rejected-requirements)
     * look for medical device flag
-* risk management csv import
-    * on updates/inserts author=user
-    * compare headerrows with system default language
 
 ## Content
 * [Aims](#aims)
@@ -435,7 +432,7 @@ To reduce pointless data and possible malignant spam, suggestions can be deleted
 
 ### Whiteboard
 Volatile information, brief notes or anything that otherwise would go onto a sticky note or a piece of rough paper can be noted on a custom whiteboard. The overview shows all whiteboards that are created by the current user or matching selected organizational units. Contributing is allowed for all users, editing the name and deleting for the owning user and admin only. The user name and editing date is appended by default.  
-On deleting users whiteboards are not removed for possibly containing relevent information to others. Removal ist possible by users with administrator priviledges.
+On deleting users whiteboards are not removed for possibly containing relevant information to others. Removal ist possible by users with administrator priviledges.
 
 [Content](#content)
 
@@ -694,7 +691,11 @@ The risk management supports describing risks according to ISO 14971 and in acco
 As required with ISO 14971 you can describe characteristics for medical devices and applicable risks. Since the DGIHV fortunately decided defining characteristics and risks on a group of medical devices (e.g. prostheses and orthoses in general) as reasonable, all evaluations are based and grouped by a process.  
 Furthermore you are supposed to track a cause and effect, recognize a probability and damage, describe measures, reevaluate probability and damage, do a risk-benefit assessment and define remaining measures. The form displays a message whether the risk (before and after measure) passes the acceptance level threshold as defined within [config.ini](#runtime-variables). The threshold is the product of probability times damage according to their position within the language files lists for risk.probabilities and risk.damages. This method is the most practical way of an algorithmic processing and highlighting of acceptance levels. To proof your regulatory compliance you can link any of your documents containing measures as defined.
 
-Entries are persistent and can be exported if desired through the [evaluation and summary-module](#regulatory-evaluations-and-summaries). Available entries store and display the user name and date of the last edit. 
+Entries are persistent and can be exported if desired through the [evaluation and summary-module](#regulatory-evaluations-and-summaries). Available entries store and display the user name and date of the last edit.
+
+Beside manually edits, updates are possible through the [maintenance](#maintenance)-module as well. For this purpose CSV-files are processed because I presume no one is able to convice the DGIHV to consider proper machine data formats. This way the circulating Excel-files are convertable with less effort. The structure must adhere to the template files though, risks relations, propability- and damage-estimates must be set within the [language files](#customisation).
+
+For risks with the same cause, effect, measure and remaining measures risk relations, probabilities and damages will be updated, otherwise a new entry will be stored. This way accidental misjudgements can be corrected.
 
 ![risk screenshot](http://toh.erroronline.one/caro/risks%20en.png)
 
@@ -1121,6 +1122,7 @@ The application has some options to be maintained by authorized users:
 * The [logfile](#cron) `cron.log` within the api directory with success and error messages can be viewed and deleted. A deletion retriggers the updates.
 * Existing vendors can be updated regarding their information and product list settings (import filter and sample check intervals). A file similar to the [template file](#application-setup) can be provided. The update items can be selected for every matching vendor.
 * Documents can have fields that are supposed to learn to recommend past entries for each unit. There may be faulty entries. You can download, edit and reupload a CSV-file, or use the upload option for prefilling recommendations. A provided file overwrites the entire dataset for the selected unit. Table headers resemble input field names, rows are for recommendations. Without a provided file you get the export.
+* Risk data can be imported/updated through dedicated CSV-files.
 
 [Content](#content)
 
@@ -1854,7 +1856,6 @@ The default provides [template files](#https://github.com/erroronline1/caro/tree
 	* csvfilter
 	* documents
 	* manuals
-	* risks
 	* texts
 	* users
     * vendors
@@ -1876,7 +1877,12 @@ If you are going to prepare the deployment you are free to create multiple files
 * choose to install [templates](#application-setup) - no worries, in case of a rerun nothing serious will happen. Contents are installed only if the names are not already taken. You must be logged in with adminstrator privileges to take these actions.
 * Depending on your installation password strength it may be worthwile to change the system users token to the recommended 64byte-token. Export the token qr-code and store it in a safe place!
 * [Install as progressive web app (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_from_the_web) from the initial browser request and give requested permissions on any elegible workplace.
+
+After installation you can
+* import [risks](#risk-management) through the [maintenance](#maintenance)-module; presets are found within the template files
+* import product lists for the possibly previously installed vendors
 * consider incorporation handling through the [_stresstest](#stress-test-and-performance)-tool
+* approve possibly previously installed documents
 
 [Content](#content)
 
@@ -4191,7 +4197,7 @@ Depending on {task}:
 Parameters
 | Name | Data Type | Required | Description |
 | ---- | --------- | -------- | ----------- |
-| {task} | path parameter | required | records_datalist or vendorupdate |
+| {task} | path parameter | required | records_datalist, vendorupdate or riskupdate |
 | payload | form data | required | suggestion |
 
 Sample response

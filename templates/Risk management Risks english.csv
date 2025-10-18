@@ -1,0 +1,38 @@
+"PROCESS";"Risk";"Effective as of 2025-10-19 00:31:59";;;;;;;;;;
+;;;;;;;;;;;;
+"Risk related";"Relevant";"Cause";"Effect";"Probability";"Damage";"Acceptance level";"Measure";"Post measure probability";"Post measure damage";"Acceptance level afterwards";"Risk-benefit assessment";"Remaining measures if reasonable"
+"2 Biological risks 2.11 Pyrogenicity
+3 Environmental hazards 3.6 Storage or use off required environmental conditions
+3 Environmental hazards 3.11 Flammability";"yes";;;"unlikely";"low";;;"unlikely";"low";;;
+"2 Biological risks 2.12 Inability to maintain hygienic safety
+2 Biological risks 2.5 Allergenecity
+7 Hazards due to functional faults, incorrect maintenance and ageing 7.7 Reuse and/or incorrect reuse";"no";;;"possible";"medium";;;"possible";"medium";;;
+"2 Biological risks 2.13 Degradation of the material";;;;"likely";"high";;;"likely";"high";;;
+"2 Biological risks 2.2 Incompatibility";;;;"most likely";"particularly high";;;"most likely";"particularly high";;;
+"2 Biological risks 2.2 Incompatibility
+2 Biological risks 2.4 Toxicity
+2 Biological risks 2.5 Allergenecity
+2 Biological risks 2.6 Mutagenicity
+2 Biological risks 2.7 Oncogenicity
+2 Biological risks 2.8 Teratogenicity
+2 Biological risks 2.9 Carcinogenicity";;;;;;;;;;;;
+"3 Environmental hazards 3.6 Storage or use off required environmental conditions";;;;;;;;;;;;
+"3 Environmental hazards 3.9 Insufficient resistance to cleaning agents and disinfectants";;;;;;;;;;;;
+"5 Hazards in connection with the use of the medical device 5.1 Inadequate labeling";;;;;;;;;;;;
+"5 Hazards in connection with the use of the medical device 5.18 Sharp edges and corners";;;;;;;;;;;;
+"5 Hazards in connection with the use of the medical device 5.8 Justified foreseeable abuse
+5 Hazards in connection with the use of the medical device 5.11 Mechanical damage
+5 Hazards in connection with the use of the medical device 5.12 Faulty mechanical connection";;;;;;;;;;;;
+"6 Unsuitable, inadequate or overly complicated interface with the user 6.3 Mistakes and errors (on a physical or mental basis)";;;;;;;;;;;;
+"6 Unsuitable, inadequate or overly complicated interface with the user 6.3 Mistakes and errors (on a physical or mental basis)";;;;;;;;;;;;
+"6 Unsuitable, inadequate or overly complicated interface with the user 6.3 Mistakes and errors (on a physical or mental basis)";;;;;;;;;;;;
+"7 Hazards due to functional faults, incorrect maintenance and ageing 7.2 Missing or inadequate specifications for maintenance, including inadequate specifications for functional testing after maintenance
+7 Hazards due to functional faults, incorrect maintenance and ageing 7.4 Lack of suitable determination of when the medical device will cease to be fit for use";;;;;;;;;;;;
+"7 Hazards due to functional faults, incorrect maintenance and ageing 7.5 Loss of electrical/mechanical integrity";;;;;;;;;;;;
+"7 Hazards due to functional faults, incorrect maintenance and ageing 7.5 Loss of electrical/mechanical integrity
+3 Environmental hazards 3.10 Insufficient resistance to perspiration";;;;;;;;;;;;
+"7 Hazards due to functional faults, incorrect maintenance and ageing 7.6 Unsuitable packaging (contamination and/or impairment of the medical device)";;;;;;;;;;;;
+"7 Hazards due to functional faults, incorrect maintenance and ageing 7.7 Reuse and/or incorrect reuse";;;;;;;;;;;;
+"8 Hazards due to manufacturing defects 8.1 Faulty supplier components";;;;;;;;;;;;
+"8 Hazards due to manufacturing defects 8.4 Faulty production";;;;;;;;;;;;
+"8 Hazards due to manufacturing defects 8.4 Faulty production";;;;;;;;;;;;

@@ -1,0 +1,10 @@
+"PROCESS";"Characteristic related to safety";"Effective as of 2025-10-19 00:31:59";
+;;;
+"Characteristic related to safety";"Relevant";"Cause";"Risk related"
+;"yes";;"1 Risks by energy"
+;"no";;"2 Biological risks"
+;;;"3 Environmental hazards"
+;;;"5 Hazards in connection with the use of the medical device"
+;;;"6 Unsuitable, inadequate or overly complicated interface with the user"
+;;;"7 Hazards due to functional faults, incorrect maintenance and ageing"
+;;;"8 Hazards due to manufacturing defects"

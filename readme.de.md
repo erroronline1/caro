@@ -587,7 +587,11 @@ Das Risikomanagement unterstützt bei der Beschreibung von Risiken gemäß ISO 1
 Wie in der ISO 14971 gefordert können Eigenschaften von Medizinprodukten und dahingehend anwendbare Risiken beschrieben werden. Da die DGIHV erfreulicherweise die Definition von Eigenschaften und Risiken für Gruppen von Medizinprodukten (z.B. Prothesen und Orthesen im allgemeinen) als angemessen betrachtet, werden alle Bewertungen prozessweise zugeordnet.  
 Ferner werden Ursache und Auswirkungen erfasst, die Eintrittswahrscheinlichkeit und Schadenshöhe bewertet, Maßnahmen beschrieben, die Wahrscheinlichkeit und der Schaden neubewertet, eine Risko-Nutzen-Bewertung durchgeführt und Restmaßnahmen beschrieben. Das Formular gibt eine Meldung aus, ob das Risko vor und nach der Maßnahme innerhalb des in der [config.ini](#laufzeitvariablen) festgelegten Akzeptanzbereichs liegt. Die Schwelle ist das Produkt aus Wahrscheinlichkeit x Schaden gemäß der jeweiligen Positionen in den Auflistungen der Sprachdateien für risk.probabilities und risk.damages. Diese Methode ist der praktischste Weg einer algorithmischen Verarbeitung und Hervorhebung des Akzeptanzbereichs.
 
-Die Einträge können nicht gelöscht und durch das [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) exportiert werden. Einträge speichern den Nutzernamen und das Datum der letzten Änderung. 
+Die Einträge können nicht gelöscht und durch das [Regulatorische Auswertungen und Zusammenfassungen-Modul](#regulatorische-auswertungen-und-zusammenfassungen) exportiert werden. Einträge speichern den Nutzernamen und das Datum der letzten Änderung.
+
+Eine Aktualisierung ist, neben der manuellen Pflege, auch über einen Import durch das [Wartungs](#wartung)-Modul möglich. Dafür werden CSV-Dateien verarbeitet, da nicht davon auszugehen ist, dass die DGIHV zur Verwendung eines richtigen Maschinendaten-Formats zu überzeugen ist. Auf diese Weise können die kursierenden Excel-Dateien mit wenig Aufwand umgewandelt werden. Die Struktur muss sich aber an denen der Template-Dateien orientieren, Risikobezüge, Wahrscheinlichkeits- und Schaden-Einschätzungen müssen in den [Sprachdateien](#anpassung) wiederzufinden sein.
+
+Für Risiken mit der selben Ursache, Auswirkung, Maßnahme und verbleibender Maßnahme werden Risikobezüge, Wahrscheinlichkeiten und Schadenshöhe aktualisiert, andernfalls ein neuer Eintrag erstellt. Auf diese Weise können versehentliche Fehleinschätzungen korrigiert werden.
 
 ![risk screenshot](http://toh.erroronline.one/caro/risks%20de.png)
 
@@ -1022,6 +1026,7 @@ Die Anwendung hat einige Optionen für die Wartung durch berechtigte Nutzer:
 * Die [Log-Datei](#cron) `cron.log` innerhalb des API-Verzeichnisses mit Erfolg- oder Fehlermeldungen kann angezeigt und gelöscht werden. Die Löschung der Log-Datei löst das Update erneut aus.
 * Bestehende Lieferanten können in Bezug auf ihre Informationen und die Artikellisten-Einstellungen (Importfilter und Stichproben-Intervalle) aktualisiert werden. Eine Datei gemäß [Vorlage](#anwendungseinrichtung) kann bereitgestellt werden. Die jeweiligen Aktualisierungen können für jeden übereinstimmenden Lieferanten gewählt werden.
 * Dokumente können lernende Eingabefelder beinhalten um vergangene Einträge eines Fachbereichs vorzuschlagen. Es können dabei fehlerhafte Einträge erfolgen. Es kann eine CSV-Datei heruntergeladen, bearbeitet und wieder bereitgestellt werden, oder vorbereitete Empfehlungen bereitgestellt werden. Eine hochgeladene Datei überschreibt die kompletten Datensätze des gewählten Fachbereichs. Tabellenüberschriften entsprechen den Namen der Eingabefelder, die Zeilen den Vorschlägen. Ohne bereitgestellte Datei gibt es den Export.
+* Risiko-Daten können durch entsprechende CSV-Dateien importiert oder aktualisiert werden.
 
 [Übersicht](#übersicht)
 
@@ -1754,7 +1759,6 @@ Der Standardumfang der Anwendung stellt [Vorlagen](https://github.com/erroronlin
 	* csvfilter
 	* documents
 	* manuals
-	* risks
 	* texts
 	* users
     * vendors
@@ -1776,7 +1780,12 @@ Wenn die Inbetriebnahme der Anwendung mit den Vorlagen vorbereitet wird können 
 * Wahl [Templates](#anwendungseinrichtung) zu installieren - keine Sorge, bei einem erneuten Aufruf passiert nichts schlimmes. Inhalte werden nur installiert, sofern die Namen nicht schon vergeben sind. Die Durchführung kann nur erfolgen, wenn ein Nutzer mit Administrator-Berechtigung angemeldet ist.
 * Abhängig von der Kennwortstärke kann es empfehlenswert sein, den Zugangstoken der Systemnutzerin auf einen empfohlenden 64-Byte-Token zu aktualisieren. Den Zugangstoken als QR-Code exportieren und sicher verwahren!
 * Eine [Installation als Progressive Web App (PWA)](https://developer.mozilla.org/de/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable#installation_aus_dem_web) ist möglich, eine Aufforderung erfolgt ggf. durch den Browser. Erteilung der Browserberechtigungen.
-* Die Nutzung des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) für eine Produkteinführung im Sonderfall ist möglich.
+
+Nach der Installation können
+* [Risiken](#risikomanagement) durch das [Wartungs](#wartung)-Modul importiert werden; Volagen finden sich bei den Template-Dateien
+* Artikellisten der möglicherweise zuvor installierten Lieferanten importiert werden
+* die Nutzung des _stresstest-Werkzeugs (siehe englischsprachige Anleitung) für eine Produkteinführung im Sonderfall erwogen werden 
+* die möglicherweise zuvor installierten Dokumente freigegeben werden
 
 [Übersicht](#übersicht)
 

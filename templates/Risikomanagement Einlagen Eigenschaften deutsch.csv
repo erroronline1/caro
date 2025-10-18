@@ -1,0 +1,156 @@
+"Einlagen";"Eigenschaft mit Auswirkungen auf die Sicherheit";"Gültigkeit am 2025-10-18 19:04:59";
+;;;
+"Eigenschaft mit Auswirkungen auf die Sicherheit";"Relevant";"Ursache";"Risikobezug"
+"Bestimmungsgemäßer Gebrauch und Anwendung: besondere Schulung";"nein";;
+"Bestimmungsgemäßer Gebrauch und Anwendung: Installation des Produktes durch besonderes Personal";"nein";;
+"Bestimmungsgemäßer Gebrauch und Anwendung: Kultureller Hintergrund / Kenntnisniveau des Anwenders";"nein";;
+"Rolle des Medizinproduktes: Erkennen von Krankheiten/Verletzungen";"nein";;
+"Rolle des Medizinproduktes: Verhüten von Krankheiten/Verletzungen";"nein";;
+"Rolle des Medizinproduktes: Überwachen von Krankheiten/Verletzungen";"nein";;
+"Rolle des Medizinproduktes: Das Produkt ist lebenserhaltend";"nein";;
+"Rolle des Medizinproduktes: Das Produkt ist lebensunterstützend";"nein";;
+"Rolle des Medizinproduktes: Besondere Handlungen im Falle eines Ausfalls des Medizinproduktes";"nein";;
+"Rolle des Medizinproduktes: Besondere Bedenken bezüglich Schnittstellen, die zu unbeabsichtigten Bedienfehlern beitragen könnten (Med.-Geräte)";"nein";;
+"Kontakt: Oberflächenkontakt vorübergehend (< 60 min. ununterbrochen)";"nein";;
+"Kontakt: Oberflächenkontakt langzeitig (> 30 Tage ununterbrochen)";"nein";;
+"Kontakt: invasiver Kontakt (Dauer, Häufigkeit)";"nein";;
+"Kontakt: Implantat";"nein";;
+"Energietransfer: übertragende Energieart";"nein";;
+"Energietransfer: Beschaffenheit";"nein";;
+"Energietransfer: Menge";"nein";;
+"Energietransfer: Dauer";"nein";;
+"Zuführung von Substanzen: Zuführung oder Abführung der Stoffe";"nein";;
+"Zuführung von Substanzen: Einzelsubstanz";"nein";;
+"Zuführung von Substanzen: Reihe von Substanzen";"nein";;
+"Zuführung von Substanzen: Zufuhrraten";"nein";;
+"Zuführung von Substanzen: Steuerung";"nein";;
+"Bearbeitung von Substanzen zur Wiederverwendung";"nein";;
+"Sterilität, Sterilisation, mikrobiologische Beherrschbarkeit: Einmalgebrauch";"nein";;
+"Sterilität, Sterilisation, mikrobiologische Beherrschbarkeit: Verpackung";"nein";;
+"Sterilität, Sterilisation, mikrobiologische Beherrschbarkeit: Haltbarkeitsdauer";"nein";;
+"Sterilität, Sterilisation, mikrobiologische Beherrschbarkeit: Begrenzung";"nein";;
+"Sterilität, Sterilisation, mikrobiologische Beherrschbarkeit: Häufigkeit der Wiederverwendung";"nein";;
+"Sterilität, Sterilisation, mikrobiologische Beherrschbarkeit: Verfahren der Sterilisation";"nein";;
+"Reinigung durch Anwender: Begrenzung der Anzahl der Reinigungszyklen";"nein";;
+"Reinigung durch Anwender: Design des Medizinprodukts";"nein";;
+"Änderungen an der Umgebung durch das Medizinprodukt: Temperatur";"nein";;
+"Änderungen an der Umgebung durch das Medizinprodukt: Feuchtigkeit";"nein";;
+"Änderungen an der Umgebung durch das Medizinprodukt: Zusammensetzung des atmosphärischen Gases";"nein";;
+"Änderungen an der Umgebung durch das Medizinprodukt: Luftdruck";"nein";;
+"Änderungen an der Umgebung durch das Medizinprodukt: Lichtverhältnisse";"nein";;
+"Messungen: gemessene Variablen";"nein";;
+"Messungen: Genauigkeit und Präzision der Messung";"nein";;
+"Lieferung interpretierter Aussagen: Schlussfolgerungen aus Eingabedaten oder erfassten Daten";"nein";;
+"Lieferung interpretierter Aussagen: Algorithmen und die Vertrauensbereiche";"nein";;
+"Beinflussung, Steuerung von oder Wechselwirkung bei Abgabe von Medikamenten: Produkte und Medikamente, die beteiligt sein können";"nein";;
+"Beinflussung, Steuerung von oder Wechselwirkung bei Abgabe von Medikamenten: mögliche Probleme mit Wechselwirkungen";"nein";;
+"Beinflussung, Steuerung von oder Wechselwirkung bei Abgabe von Medikamenten: Verträglichkeit der Therapie";"nein";;
+"Unerwünschte Abgabe von Energie und Substanzen: energetischen Faktoren (Geräusche, Schwingungen, Wärme, Strahlung, Kontakttemperatur, Leckströme, elektrische und/oder magnetische Felder)";"nein";;
+"Empfindlichkeit gegen Umwelteinflüsse: Licht";"nein";;
+"Empfindlichkeit gegen Umwelteinflüsse: Schwingungen";"nein";;
+"Empfindlichkeit gegen Umwelteinflüsse: Empfindlichkeit gegenüber Schwankungen in der Energieversorgung";"nein";;
+"Empfindlichkeit gegen Umwelteinflüsse: Kühlung";"nein";;
+"Beeinflussung der Umwelt: Auswirkungen auf die Strom- und Kühlmittelversorgung";"nein";;
+"Beeinflussung der Umwelt: Abgabe toxischer Substanzen";"nein";;
+"Beeinflussung der Umwelt: Erzeugung elektromagnetischer Störfelder";"nein";;
+"Verbrauchsmaterialen und Zubehör: Spezifikationen für solche Verbrauchsmaterialen";"nein";;
+"Verbrauchsmaterialen und Zubehör: Zubehörteile";"nein";;
+"Verbrauchsmaterialen und Zubehör: jegliche Einschränkungen, die dem Anwender bei deren Auswahl auferlegt sind.";"nein";;
+"Software: Installation, Verifizierung, Änderung oder Austausch der Software";"nein";;
+"Software: Anwender und/oder Bediener vorgesehen?";"nein";;
+"Begrenzung der Nutzungsdauer: Entsorgung";"nein";;
+"Einwirkende mechanische Kräfte auf das Produkt: Belastung vom Anwender / Dritten beeinflussbar";"nein";;
+"Einwirkende mechanische Kräfte auf das Produkt: Belastung unabhängig vom Anwender / Dritten";"nein";;
+"Einfluss auf die Lebensdauer des Produkts: Erschöpfung von Batterien/Akkus";"nein";;
+"Einfluss auf die Lebensdauer des Produkts: Ist das Medizinprodukt zum Einmalgebrauch bestimmt?";"nein";;
+"Sichere Außerbetriebnahme oder Entsorgung: wiederverwertbare Werkstoffe";"nein";;
+"Sichere Außerbetriebnahme oder Entsorgung: Toxische oder gefährliche Substanzen";"nein";;
+"Spezialausbildung zur Anwendung erforderlich: Ausführung der Anwendung von Personen ohne die notwendige Fertigkeiten";"nein";;
+"Bestimmungsgemäßer Gebrauch und Anwendung: Kann Patient das Produkt steuern oder beeinflussen";"nein";;
+"Herstellungsprozesse: neue Produktionsmengen";"nein";;
+"Schnittstelle zur Menschen: Gerätesteuerung";"nein";;
+"Schnittstelle zur Menschen: Verwendete Symbole";"nein";;
+"Schnittstelle zur Menschen: Ergonomische Merkmale";"nein";;
+"Schnittstelle zur Menschen: Hierarchie der Betriebsabläufe";"nein";;
+"Schnittstelle zur Menschen: Menüs für softwaregesteuerte Geräte";"nein";;
+"Schnittstelle zur Menschen: Gute Sichtbarkeit von Warnvorrichtungen";"nein";;
+"Schnittstelle zur Menschen: Gute Hörbarkeit akustischer Warnsignale";"nein";;
+"Schnittstelle zur Menschen: Genormte Farbkodierung";"nein";;
+"Verbindungs- oder Zubehörteile: Möglichkeit falscher Anschlüsse";"nein";;
+"Verbindungs- oder Zubehörteile: Unterscheidbarkeit";"nein";;
+"Verbindungs- oder Zubehörteile: Ähnlichkeit mit anderen Geräteanschlüssen,";"nein";;
+"Verbindungs- oder Zubehörteile: die zum Anschließen erforderliche Kraft";"nein";;
+"Verbindungs- oder Zubehörteile: Rückmeldung des Zustandekommens der Verbindung";"nein";;
+"Verbindungs- oder Zubehörteile: zu festes oder zu lockeres Anziehen von Verbindungen";"nein";;
+"Schnittstelle für die Steuerung: Abstand";"nein";;
+"Schnittstelle für die Steuerung: Kodierung";"nein";;
+"Schnittstelle für die Steuerung: Gruppierung der Bedienelemente";"nein";;
+"Schnittstelle für die Steuerung: Lageanordnung";"nein";;
+"Schnittstelle für die Steuerung: Modi der Rückmeldung";"nein";;
+"Schnittstelle für die Steuerung: Fehlbedienungsmöglichkeit";"nein";;
+"Schnittstelle für die Steuerung: Versehen des Bedieners";"nein";;
+"Schnittstelle für die Steuerung: Differenzierbarkeit der Steuerung";"nein";;
+"Schnittstelle für die Steuerung: Gute Sichtbarkeit";"nein";;
+"Schnittstelle für die Steuerung: Richtungen von Einschaltung oder Umschaltung";"nein";;
+"Schnittstelle für die Steuerung: Steuerung stufenlos oder schrittweise";"nein";;
+"Schnittstelle für die Steuerung: Umkehrbarkeit von Einstellungen oder Schaltungen";"nein";;
+"Anzeige von Informationen: Sichtbarkeit in unterschiedlicher Umgebung";"nein";;
+"Anzeige von Informationen: Räumliche Anordnung der Einstellungen";"nein";;
+"Anzeige von Informationen: Navigationsverfahren";"nein";;
+"Anzeige von Informationen: Anzahl der Schritte je Bedienhaltung";"nein";;
+"Anzeige von Informationen: Klarheit der Frequenzen";"nein";;
+"Anzeige von Informationen: Probleme der Erinnerung";"nein";;
+"Anzeige von Informationen: Wichtigkeit der Steuerfunktion im Verhältnis zu ihrer Zugänglichkeit";"nein";;
+"Vorgesehene Ortsbeweglichkeit oder Tragfähigkeit: Erforderliche Griffe";"nein";;
+"Vorgesehene Ortsbeweglichkeit oder Tragfähigkeit: Handgriffe";"nein";;
+"Vorgesehene Ortsbeweglichkeit oder Tragfähigkeit: Räder und Bremsen";"nein";;
+"Vorgesehene Ortsbeweglichkeit oder Tragfähigkeit: Mechanische Stabilität und Festigkeit";"nein";;
+"Vorgesehene Ortsbeweglichkeit oder Tragfähigkeit: Gewicht";"nein";;
+"Bestimmungsgemäßer Gebrauch und Anwendung: Kann Patient das Produkt steuern oder beeinflussen";"nein";;
+"Energietransfer: Steuerung";"nein";;"1 Gefährdungen durch Energien"
+"Einwirkende mechanische Kräfte auf das Produkt: Belastung vom Anwender / Dritten abhängig aber nicht beeinflussbar";"ja";"Durch das Trageverhalten (Dauer, sportlichem Einsatz, etc.) wirken unterschiedliche Kräfte auf das Medizinprodukt ein.";"1 Gefährdungen durch Energien"
+"Einwirkende mechanische Kräfte auf das Produkt: Kräfte";"ja";"Einlagen werden nutzungsabhängig durch innere wie auch äußere Kräfte beaufschlagt.";"1 Gefährdungen durch Energien"
+"Kontakt: Oberflächenkontakt kurzzeitig (< 30 Tage ununterbrochen)";"ja";"Die Nutzung von Einlagen findet typischerweise täglich über mehrere Stunden statt.";"2 Biologische Gefährdungen"
+"Kontakt: Kontakt mit verletzter Haut (Dermis nicht durchtrennt)";"ja";"Einlagen können auch mit verletzter Haut in Kontakt kommen (bei bestimmten Krankheitsbildern wie Diabetes) jedoch unter kontrollierten Bedingungen";"2 Biologische Gefährdungen"
+"Eigenschaften der Materialien bzw. Baugruppen";"ja";"Einlagen können mit einer Vielzahl von Materialien und Materialkombinationen hergestellt werden. Hierbei werden Kunststoffe (Polyethylen, Ethylvinylacetat, Polyurethan, Silikon), Kork, Metall, Faserverbundstoffe, Leder... verwendet";"2 Biologische Gefährdungen"
+"Kontakt: Kontakt nur zu unverletzter Haut";"ja";"Einlagen werden im Regelfall auf unverletzter Haut getragen.";"2 Biologische Gefährdungen"
+"Entsorgung";"ja";"Es erfolgt der Hinweis in der Gebrauchsanweisung das Hilfsmittel zur fachgerechten Entsorgung an den Inverkehrbringer zurück zu geben. Eine Entsorgung durch den Anwender ist nicht vorgesehen und über den Hausmüll ausgeschlossen.";"2 Biologische Gefährdungen"
+"Unerwünschte Abgabe von Energie und Substanzen: stoffliche Faktoren ( Freisetzung von Chemikalien, Abfallprodukten, Körperflüssigkeiten)";"ja";"Es können unter Umständen von dem Material ausgehend die Freisetzung von Chemikalien (Material, Kleber, etc.) erfolgen.";"2 Biologische Gefährdungen"
+"Empfindlichkeit gegen Umwelteinflüsse: elektromagnetische Störungen";"nein";;"3 Gefährdungen durch die Umwelt"
+"Empfindlichkeit gegen Umwelteinflüsse: Eindringen von Flüssigkeiten";"ja";"Einlagen dürfen typischerweise nicht mit Feuchtigkeit in Kontakt kommen, es sei denn sie sind explizit dafür ausgelegt und entsprechend in der Gebrauchsanweisung freigegeben. Es kann andernfalls zur Korrosion und Funktionsausfällen kommen.";"3 Gefährdungen durch die Umwelt"
+"Empfindlichkeit gegen Umwelteinflüsse: Betriebs-, Transport- und Lagerbedingungen";"ja";"Einlagen können bei falschen Lagerbedingungen oder auch bei falschem Einsatz Schaden erleiden, so dass die Passform oder auch das Produkt selbst in Mitleidenschaft gezogen wird.";"3 Gefährdungen durch die Umwelt"
+"Empfindlichkeit gegen Umwelteinflüsse: Temperatur";"ja";"Temperaturbeständigkeiten hängen von verwendeten Materialien und Komponenten ab.";"3 Gefährdungen durch die Umwelt"
+"Reinigung durch Anwender: Art der Reinigungs- und Desinfektionsmittel";"ja";"Zur Reinigung sollen geeignete Mittel verwendet werden (siehe Gebrauchsanweisung)";"3 Gefährdungen durch die Umwelt"
+"Bestimmungsgemäßer Gebrauch und Anwendung: Hilfestellung einer anderen Person bei der Benutzung des Produktes erforderlich (Angehörige, Pflegepersonal, o.a.)";"ja";"Bei Anwendung (An- und Ablegen) und Pflege durch Dritte sind diese ebenfalls zu schulen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Betroffene Personengruppen: Angehörige (der o.g. Personen)";"ja";"Bei Anwendung (An- und Ablegen) und Pflege durch Dritte sind diese ebenfalls zu schulen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Betroffene Personengruppen: Pflegepersonal (Krankenhaus, Pflegeheim, etc.)";"ja";"Bei Anwendung (An- und Ablegen) und Pflege durch Dritte sind diese ebenfalls zu schulen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Bestimmungsgemäßer Gebrauch und Anwendung: erforderliche Kenntnisse und Fertigkeiten";"ja";"Der Anwender benötigt Informationen über den Gebrauch, das Reinigen und den Kontrollterminen. Diese erhält er persönlich bei Abholung des Produkts und kann die Informationen auch in der Gebrauchsanweisung nachlesen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Betroffene Personengruppen: Patient, Kind";"ja";"Der Bedarf der Versorgung mit Einlagen wird vom behandelnden Arzt, ggf. vom OTM / OSM festgestellt. Je nach Krankheitsbild bzw. Indikation werden die Patienten individuell versorgt um eventuell scherzende Füße, Deformationen oder Fehlstellungen zu Behandeln und eventuelle Schmerzen zu lindern.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Betroffene Personengruppen: Patient, Erwachsener (normale körperliche / geistige Fähigkeiten)";"ja";"Der Bedarf der Versorgung mit Einlagen wird vom behandelnden Arzt, ggf. vom OTM / OSM festgestellt. Je nach Krankheitsbild bzw. Indikation werden die Patienten individuell versorgt um eventuell scherzende Füße, Deformationen oder Fehlstellungen zu Behandeln und eventuelle Schmerzen zu lindern.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Betroffene Personengruppen: Patient, Erwachsener (eingeschränkte körperliche. u. geistige Fähigkeiten)";"ja";"Der Bedarf der Versorgung mit Einlagen wird vom behandelnden Arzt, ggf. vom OTM / OSM festgestellt. Je nach Krankheitsbild bzw. Indikation werden die Patienten individuell versorgt um eventuell scherzende Füße, Deformationen oder Fehlstellungen zu Behandeln und eventuelle Schmerzen zu lindern.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Anwendung";"ja";"Die Anwendung erfolgt im Regelfall täglich durch das Tragen im Alltag.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Betroffene Personengruppen: Arzt";"ja";"Die Feststellung einer notwendigen Versorgung mit Einlagen wird auch vom behandelnden Arzt festgestellt.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Rolle des Medizinproduktes: Linderung von Krankheiten/Verletzungen";"ja";"Einlagen können im Sinne einer Progredienzbremse dienen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Reinigung durch Anwender: Routine-Reinigung und Desinfektion";"ja";"Einlagen sollten vom Anwender regelmäßig gereinigt werden. Erforderliche Maßnahmen und freigegebene Reinigungs- und Desinfektionsmittel werden in der Gebrauchsanweisung angegeben. Die verwendeten Mittel dürfen keinen Einfluss auf die Funktionen (Festigkeit etc.) haben.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Rolle des Medizinproduktes: Kompensation von Verletzungen, Behinderungen bei Ersatz oder Veränderung der Anatomie";"ja";"Einlagen unterstützen eine insuffiziente Fußstabilität oder neurologische Abweichungen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Bestimmungsgemäßer Gebrauch und Anwendung: Umgebungsbedingungen";"ja";"Herstellervorgaben der Hersteller und der intended use sind zu beachten.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Bestimmungsgemäßer Gebrauch und Anwendung: mentale Fähigkeiten (ggf. Behinderungen)";"ja";"Hier kann es sein, dass der Anwender zusätzliche Hilfestellung beim richtigen Gebrauch des Hilfsmittels benötigt.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Bestimmungsgemäßer Gebrauch und Anwendung: physische Fähigkeiten (ggf. Behinderungen)";"ja";"Hier kann es sein, dass der Anwender zusätzliche Hilfestellung beim richtigen Gebrauch des Hilfsmittels benötigt.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Spezialausbildung zur Anwendung erforderlich: Zusammenstellen und das Übergeben an den Endverbraucher";"ja";"Hierfür ist die Ausbildung zum Orthopädie-Technik-Meister bzw. Orthopädie-Schuhmacher-Meister erforderlich um die notwendigen Kenntnisse der Produktversorgung zu erlangen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Spezialausbildung zur Anwendung erforderlich: Wartung erfordert Spezialausbildung und Spezialwerkzeug";"ja";"Hierfür ist die Ausbildung zum Orthopädie-Technik-Meister bzw. Orthopädie-Schuhmacher-Meister erforderlich um die notwendigen Kenntnisse der Produktversorgung zu erlangen.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Betroffene Personengruppen: Sonstige Anwender";"ja";"OTM / OSM fertigen die Einlagen individuell für Patienten an. Hierfür werden je nach Krankheitsbild unterschiedlich Methode zur Ganganalyse sowie zum Fußabdruck verwendet.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Rolle des Medizinproduktes: Behandeln von Krankheiten/Verletzungen";"ja";"Patientenindividuelle Einlagen dienen der Behandlung sowie Linderung von Verletzungen und/oder Behinderungen und bieten im Fall von Fußdeformitäten oder Fehlstellungen eine kompensatorische Funktion.";"5 Gefährdungen im Zusammenhang mit der Anwendung des Medizinprodukts"
+"Schnittstelle zur Menschen: Gestaltungsmerkmale der Schnittstelle zum Anwender, die zu Fehlern bei der Anwendung beitragen können.";"ja";"Da die Einlagenversorgung aus zwei Paar Einlagen besteht, werden diese individuelle gekennzeichnet um ein richtiges einlegen in den Schuh zu gewährleisten.";"6 Ungeeignete, unzulängliche oder zu komplizierte Schnittstelle mit dem Anwender"
+"Schnittstelle zur Menschen: Falsche Anwendung des Gerätes";"ja";"Die Anwendung ist in der Gebrauchsanweisung geregelt, wie die Tragedauer, ""Ruhephasen"", etc.. Potentiell besteht stets die Gefahr der Fehlbedienung.";"6 Ungeeignete, unzulängliche oder zu komplizierte Schnittstelle mit dem Anwender"
+"Schnittstelle zur Menschen: Physikalische Gestaltung";"ja";"Durch die Tragehäufigkeit, Belastung der Einlage kann die Wirkung ohne dass der Anwender diese tatsächliche erkennt, nachlassen.";"6 Ungeeignete, unzulängliche oder zu komplizierte Schnittstelle mit dem Anwender"
+"Einfluss auf die Lebensdauer des Produkts: Alterung";"ja";"Alterung und die einsatzbedingte Abnutzung der verwendeten Materialien (Kunststoffe etc.) kann die Lebensdauer der Einlagen verringern.";"7 Gefährdungen infolge von Funktionsfehlern, falscher Wartung und Alterung"
+"Wartung und Kalibrierung: Besondere Werkzeuge";"ja";"Bei Diabetes-adaptierten Fußbettung ist für die Innenschuhmessung ein elektronisches Meßgerät notwendig.";"7 Gefährdungen infolge von Funktionsfehlern, falscher Wartung und Alterung"
+"Begrenzung der Nutzungsdauer: Kennzeichnung oder die Indikatoren";"ja";"Die Nutzungsdauer kann vom Hersteller festgelegt und in der Gebrauchsanweisung dargestellt werden.";"7 Gefährdungen infolge von Funktionsfehlern, falscher Wartung und Alterung"
+"Sterilität, Sterilisation, mikrobiologische Beherrschbarkeit: Wiederverwendung";"ja";"Einlagen werden vom Anwender wiederverwendet und sollten hierfür gemäß Herstellervorgaben gereinigt werden.";"7 Gefährdungen infolge von Funktionsfehlern, falscher Wartung und Alterung"
+"Ergonomische und kumulative Auswirkungen einer Langzeitanwendung";"ja";"Genannte Auswirkungen können sowohl im positiven als auch negativen Sinne auftreten. Hintergründe können sowohl Fehlfunktionen der Einlage als auch körperliche, strukturelle Veränderungen der Nutzer sein.";"7 Gefährdungen infolge von Funktionsfehlern, falscher Wartung und Alterung"
+"Wartung und Kalibrierung: Wartung und/oder Kalibrierung durch den Bediener, den Anwender oder einen Fachmann.";"ja";"Kontrolltermine der Passform der Einlage dienen der ordnungsgemäßen Versorgung und sollten vom Hersteller der Einlage spezifiziert / definiert werden. Bei Diabetes-adaptierten Fußbettung kann eine Innenschuhmessung wichtige Ergebnisse liefern.";"7 Gefährdungen infolge von Funktionsfehlern, falscher Wartung und Alterung"
+"Herstellungsprozesse: Neue Herstellungsprozesse müssen als mögliche Ursache neuer Gefährdungen betrachtet werden";"ja";"Änderungen etablierter Fertigungsverfahren aber auch die Weiterentwicklung der Herstellungsmöglichkeiten lassen auf Grund des Materialeinsatzes unterschiedliche Gefährdungen entstehen.";"8 Gefährdungen infolge von Herstellungsfehlern"
+"Herstellungsprozesse: etablierte Verfahren";"ja";"Auch hier können durch Veränderung des Materialeinsatzes, der Umgebungsbedingungen oder auch nur chargenbedingt neue Gefährdungen entstehen";"8 Gefährdungen infolge von Herstellungsfehlern"
+"Herstellungsprozesse: Neue Technologie";"ja";"Die mechanischen verbleibenden Restrisiken können unterschiedlich ausfallen";"8 Gefährdungen infolge von Herstellungsfehlern"
+"Herstellungsprozesse: neues Verfahren";"ja";"Die mechanischen verbleibenden Restrisiken können unterschiedlich ausfallen";"8 Gefährdungen infolge von Herstellungsfehlern"
+"Herstellung";"ja";"Einlagen werden für jeden Patienten individuell angefertigt nachdem diese ggf. von einem Arzt oder OTM / OSM begutachtet wurden und nachdem entsprechende Abdrücke genommen wurden.";"8 Gefährdungen infolge von Herstellungsfehlern"
