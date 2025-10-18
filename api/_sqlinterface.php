@@ -1020,18 +1020,18 @@ class SQLQUERY {
 
 
 		'whiteboard_post' => [
-			'mysql' => "INSERT INTO caro_whiteboard (id, name, editdate, unit, content) " .
-						"VALUES (:id, :name, :editdate, :unit, :content) " .
-						"ON DUPLICATE KEY UPDATE name = :name, editdate = :editdate, unit = :unit, content = :content ",
+			'mysql' => "INSERT INTO caro_whiteboard (id, user_id, name, last_touch, organizational_unit, content) " .
+						"VALUES (:id, :user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content) " .
+						"ON DUPLICATE KEY UPDATE name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content ",
 			'sqlsrv' => "MERGE INTO caro_user_training WITH (HOLDLOCK) AS target USING " .
-						"(SELECT :id AS id, :name AS name, :editdate AS editdate, :unit AS unit, :content AS content) AS source " .
-						"(id, name, editdate, unit, content) ON (target.id = source.id) " .
-						"WHEN MATCHED THEN UPDATE SET name = :name, editdate = CONVERT(DATE, :editdate, 120), unit = :unit, content = :content " .
-						"WHEN NOT MATCHED THEN INSERT (name, editdate, unit, content) VALUES (:name, CONVERT(DATE, :editdate, 120), :unit, :content);",
+						"(SELECT :id AS id, :user_id AS user_id, :name AS name, CURRENT_TIMESTAMP AS last_touch, :organizational_unit AS organizational_unit, :content AS content) AS source " .
+						"(id, user_id, name, last_touch, organizational_unit, content) ON (target.id = source.id) " .
+						"WHEN MATCHED THEN UPDATE SET name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content " .
+						"WHEN NOT MATCHED THEN INSERT (name, user_id, last_touch, organizational_unit, content) VALUES (:name, :user_id, CURRENT_TIMESTAMP, :organizational_unit, :content);",
 		],
 		'whiteboard_get_all' => [
-			'mysql' => "SELECT * FROM caro_whiteboard",
-			'sqlsrv' => "SELECT * FROM caro_whiteboard"
+			'mysql' => "SELECT caro_whiteboard.*, caro_user.name as user_name FROM caro_whiteboard LEFT JOIN caro_user ON caro_whiteboard.user_id = caro_user.id",
+			'sqlsrv' => "SELECT caro_whiteboard.*, caro_user.name as user_name FROM caro_whiteboard LEFT JOIN caro_user ON caro_whiteboard.user_id = caro_user.id"
 		],
 		'whiteboard_get' => [
 			'mysql' => "SELECT * FROM caro_whiteboard WHERE id = :id",

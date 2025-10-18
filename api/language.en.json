@@ -1061,7 +1061,7 @@
 				"text": "Position text"
 			}
 		},
-		"consumables":{
+		"consumables": {
 			"erpfilter": "ERP stock data import filter",
 			"erpimport": "ERP stock data import",
 			"erpimport_option": "Import and update products"
@@ -1072,7 +1072,7 @@
 			"select_hint": "No fitting query found? Contact a programmer to set one up."
 		},
 		"download": "Download file(s). On exporting sensitive data you are responsible for their safety.",
-		"integrations":{
+		"integrations": {
 			"data_import": "Data from the ERP-software",
 			"productlist_erp_match": "Articles can be matched with the ERP database and supplemented with data.",
 			"productlist_erp_match_selected": "Match with ERP database",
@@ -1088,8 +1088,8 @@
 			"upload": "Submit ERP data files"
 		},
 		"null": "There were no results for this query",
-		"past_orders":{
-			"item":"of :article_no :article_name ordered on :ordered from :vendor :amount arrived on :received"
+		"past_orders": {
+			"item": "of :article_no :article_name ordered on :ordered from :vendor :amount arrived on :received"
 		},
 		"upload": {
 			"failure": "An error occured, file could not be saved. Please try again.",
@@ -1220,7 +1220,7 @@
 			"last_edit": "Last edit by :author on :date",
 			"new": "New announcement",
 			"saved_error": "Announcement could not be saved. Please try again.",
-			"saved_success": "Announcment saved.",
+			"saved_success": "Announcement saved.",
 			"start": "Starts",
 			"subject": "Subject",
 			"text": "Description",
@@ -1255,15 +1255,27 @@
 			"conversations": "Conversations",
 			"header": "Communication",
 			"register": "Personnel register",
-			"whiteboard":"Whiteboard"
+			"whiteboard": "Whiteboard"
 		},
 		"register": {
 			"message_all": "Message to all",
 			"orderauth": "Users with order authorization",
 			"users": "All users by name"
 		},
-		"whiteboard":{
-
+		"whiteboard": {
+			"all": "All whiteboards",
+			"content": "Content",
+			"delete": "Delete",
+			"delete_confirm": "Permanently delete Whiteboard?",
+			"deleted_error": "Whiteboard could not be deleted. Please try again.",
+			"deleted_success": "Whiteboard deleted.",
+			"name": "Name",
+			"new": "New whiteboard",
+			"note_edit": "by :name on :date",
+			"saved_error": "Whiteboard could not be saved. Please try again.",
+			"saved_success": "Whiteboard saved.",
+			"touch": "created by :name, last edit on :date",
+			"units": "Concerns only"
 		}
 	},
 	"order": {
@@ -1283,7 +1295,7 @@
 		"added_confirmation": ":name has been added to the cart.",
 		"added_product": ":unit :number :name by :vendor",
 		"additional_info": "Additional Information",
-		"administrative_mark" : "Administrative mark",
+		"administrative_mark": "Administrative mark",
 		"alert_archived_limit": "There are currently more than :max orders archived. Please review if you can clear up.",
 		"alert_disapprove_order": "An order \n\n:order \n\nfor :unit has been disapproved by :user and reset as prepared order since further inquiry is required. Please get in touch.",
 		"alert_orderstate_change": "An order state \n\n:order \n\nfor :unit has been updated by :user.",
@@ -1302,8 +1314,8 @@
 		"barcode_label": "EAN",
 		"bulk_approve_order": "Approve",
 		"bulk_update_state": "Set marked orders as",
-		"calendarbutton":"Add task to calendar",
-		"calendarbutton_hint":"e.g. return of rental parts, incorporation of new products after examination, etc.",
+		"calendarbutton": "Add task to calendar",
+		"calendarbutton_hint": "e.g. return of rental parts, incorporation of new products after examination, etc.",
 		"cancellation": "Cancel order",
 		"cancellation_message": "Add a reason for cancellation",
 		"cancellation_message_cancel": "No, thank you",

@@ -374,7 +374,7 @@ class APPLICATION extends API {
 				$this->_lang->GET('message.navigation.register') => ['onclick' => "api.message('get', 'register')"],
 				$this->_lang->GET('responsibility.navigation.responsibility') => ['onclick' => "api.responsibility('get', 'responsibilities')"],
 				$this->_lang->GET('measure.navigation.measure') => ['onclick' => "api.measure('get', 'measure')"],
-				$this->_lang->GET('message.navigation.whiteboard') => ['onclick' => "api.message('get', 'whiteboard')"],
+				$this->_lang->GET('message.navigation.whiteboard') => ['onclick' => "api.message('get', 'whiteboards')"],
 			],
 			$this->_lang->GET('record.navigation.header') => [
 				$this->_lang->GET('record.navigation.create_identifier') => ['onclick' => "api.record('get', 'identifier')"],

@@ -37,7 +37,6 @@ Things are still in motion. Images may be outdated.
 * assemble swipe to toggle autocomplete for safari
 * [Stakeholder requirements](#rejected-requirements)
     * look for medical device flag
-    * message whiteboard
 * risk management csv import
     * on updates/inserts author=user
     * compare headerrows with system default language
@@ -61,6 +60,7 @@ Things are still in motion. Images may be outdated.
         * [Text recommendations](#text-recommendations)
         * [Responsibilities](#responsibilities)
         * [Improvement suggestions](#improvement-suggestions)
+        * [Whiteboard](#whiteboard)
     * [Records](#records)
         * [Documents](#documents)
         * [Records](#records-1)
@@ -430,6 +430,12 @@ All users can publicy suggest improvements to any topic, including processes. Ev
 To reduce pointless data and possible malignant spam, suggestions can be deleted although by default it is not recommended to do so. Entries have no record character but are supposed to gather opinion formation and serve as a source for quality improvement and management reporting.
 
 ![measure management screenshot](http://toh.erroronline.one/caro/measure%20management%20en.png)
+
+[Content](#content)
+
+### Whiteboard
+Volatile information, brief notes or anything that otherwise would go onto a sticky note or a piece of rough paper can be noted on a custom whiteboard. The overview shows all whiteboards that are created by the current user or matching selected organizational units. Contributing is allowed for all users, editing the name and deleting for the owning user and admin only. The user name and editing date is appended by default.  
+On deleting users whiteboards are not removed for possibly containing relevent information to others. Removal ist possible by users with administrator priviledges.
 
 [Content](#content)
 
@@ -2612,7 +2618,7 @@ Stakeholder identification:
 | ERP-data access for cases not available within caro | User | 2025-09-29 | Implemented; 2025-10-03 |
 | Additional field for orders with explicit ERP-relation, e.g. case number | CEO | 2025-10-10 | Added administrative mark field to orders; 2025-10-14 |
 | Monitor rental part return on receival | CEO | 2025-10-10 | Added a calendar button with respective hint; 2025-10-14 |
-| General whiteboard for shortterm notes | User | 2025-10-10 |  |
+| General whiteboard for shortterm notes | User | 2025-10-10 | Implemented; 2025-10-18 |
 | ERP interface customerdata and casedata additional submitbutton near top | User | 2025-10-10 | Implemented; 2025-10-11 |
 | Reconsider pricelist imports in favour of ERP-Data | CEO, Purchase | 2025-10-10 | Implemented; 2025-10-11 |
 | Batch update product alias | User | 2025-10-10 | Implemented; 2025-10-15 |
@@ -4311,7 +4317,7 @@ Parameters
 
 Sample response
 ```
-{"response":{"msg":"Announcment saved.","type":"success"}}
+{"response":{"msg":"Announcement saved.","type":"success"}}
 ```
 
 > GET ./api/api.php/message/announcements
@@ -4382,6 +4388,49 @@ Parameters
 Sample response
 ```
 {"render":{"content":[[[{"type":"links","description":"Unit Administration","content":{"error on line 1":{"href":"javascript:void(0)","data-type":"","onpointerup":"_client.message.newMessage('Message to error on line 1','error on line 1','',{},[])"}}}],[{"type":"links","description":"Unit CAD","content":{"error on line 1":{"href":....
+```
+
+> DELETE ./api/api.php/message/whiteboard/{whiteboard id}
+
+Delete whiteboard.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {whiteboard id} | path parameter | required | int id |
+
+Sample response
+```
+{"response":{"msg":"Whiteboard deleted.","type":"success"}}
+```
+
+> POST/PUT ./api/api.php/message/whiteboard/{whiteboard id}
+
+Create a new or update a whiteboard.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| {whiteboard id} | path parameter | required for PUT | int id |
+| payload | form data | required | containing whiteboard details |
+
+Sample response
+```
+{"response":{"msg":"Whiteboard saved.","type":"success"}}
+```
+
+> GET ./api/api.php/message/whiteboards
+
+Displays all whiteboards.
+
+Parameters
+| Name | Data Type | Required | Description |
+| ---- | --------- | -------- | ----------- |
+| none | | | |
+
+Sample response
+```
+{"render":{"content":[[{"type":"button","attributes":{"value":"New whiteboard","onclick":"api.message('get', 'whiteboard')"}}],[{"type":"links","description":"All whiteboards","content":{"testboard created by error on line 1, last edit on 2025-10-18 02:30:36":{"href":"javascript: void(0);","onclick":"api.message('get', 'whiteboard', 3)"}}}]]}}
 ```
 
 [Content](#content)

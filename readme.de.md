@@ -21,6 +21,7 @@ Eine Qualitätsmanagement-Software als geräteunabhängige Web-Anwendung für lo
         * [Textvorschläge](#textvorschläge)
         * [Verantwortlichkeiten](#verantwortlichkeiten)
         * [Verbesserungsvorschläge](#verbesserungsvorschläge)
+        * [Whiteboard](#whiteboard)
     * [Aufzeichnungen](#aufzeichnungen)
         * [Dokumente](#dokumente)
         * [Aufzeichnungen](#aufzeichnungen-1)
@@ -336,6 +337,12 @@ Jeder Nutzer kann öffentlich Verbesserungsvorschläge zu beliebigen Themen einr
 Um nicht zielführende Daten und möglicherweise bösartigen Spam zu begegnen, können Vorschläge gelöscht werden, wenngleich dies Standardmäßig nicht empfohlen wird. Beiträge haben keinen Aufzeichnungscharakter, beabsichtigen aber Meinungsbilder einzusammeln und als Eingabe für Qualitätsverbesserungen und die Managementbewertung zu dienen.
 
 ![measure management screenshot](http://toh.erroronline.one/caro/measure%20management%20de.png)
+
+[Übersicht](#übersicht)
+
+### Whiteboard
+Kurzzeitige Informationen, Kurznotizen und alles, was sonst auf Haftnotizen oder Schmierzettel geschrieben wird kann in eigenen Whiteboards festgehalten werden. Die Übersicht zeigt alle Whiteboards des erstellenden Nutzers and und diejenigen, deren gewählten Bereiche übereinstimmen. Die Bearbeitung ist allen Nutzern erlaubt, Namensänderungen und die Löschung jedoch nur dem erstellenden Nutzer und Administratoren. Der nutzername und das Änderungsdatum werden automatisch angehängt.  
+Whiteboards werden bei der Löschung eines Nutzers nicht entfernt, da sie für andere kurzfristig relevante Daten enthalten können. Eine Löschung ist dann nur durch Administratoren möglich.
 
 [Übersicht](#übersicht)
 

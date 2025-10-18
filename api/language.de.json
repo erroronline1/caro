@@ -175,7 +175,7 @@
 		"prevent_dataloss": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du fortfahren möchtest?",
 		"prevent_dataloss_cancel": "Ich möchte weiter bearbeiten",
 		"prevent_dataloss_ok": "Ja, ist in Ordnung",
-		"safari":{
+		"safari": {
 			"downloads": "Downloads in Safari im Browser-Modus sind risikobehaftet, da sich die Anwendung danach eventuell neu startet. Wähle \"laden\" statt \"anzeigen\". Füge CARO als App zum Startbildschirm für ein verbessertes Nutzungserlebnis hinzu."
 		},
 		"save": ":title speichern?",
@@ -796,13 +796,13 @@
 			"tasks": "Aufgaben",
 			"timesheet": "Zeiterfassung"
 		},
-		"worklists":{
+		"worklists": {
 			"events_assigned_units": "Aktuelle Arbeitslisten für deine Bereiche",
-			"name":"Bezeichnung",
-			"new":"neuen Plan erstellen",
+			"name": "Bezeichnung",
+			"new": "neuen Plan erstellen",
 			"station": "Vorgangskennzeichen",
-			"week_next":"nächste Woche",
-			"week_previous":"vorherige Woche"
+			"week_next": "nächste Woche",
+			"week_previous": "vorherige Woche"
 		},
 		"tasks": {
 			"affected_user": "Betroffene Mitarbeiter",
@@ -1061,7 +1061,7 @@
 				"text": "Positionstext"
 			}
 		},
-		"consumables":{
+		"consumables": {
 			"erpfilter": "Filter für Artikelimport aus EVA",
 			"erpimport": "EVA Artikelstamm importieren",
 			"erpimport_option": "Artikel importieren und aktualisieren"
@@ -1072,7 +1072,7 @@
 			"select_hint": "Keine passende Abfrage gefunden? Frage einen Programmierer nach einer Einrichtung."
 		},
 		"download": "Datei(en) herunterladen. Beachte den Datenschutz. Für die Sicherheit exportierter Daten bist du selbst veranwortlich.",
-		"integrations":{
+		"integrations": {
 			"data_import": "Daten aus der Verwaltungssoftware",
 			"productlist_erp_match": "Die Artikel können anhand ihrer Artkelnummer mit der EVA-Datenbank abgeglichen und informativ ergänzt werden.",
 			"productlist_erp_match_selected": "Mit EVA abgleichen",
@@ -1085,15 +1085,15 @@
 			"erpquery": "EVA Vorgangs- und Patientendaten",
 			"pastorders": "Kommissionsbestellungen",
 			"patientlookup": "Patientensuche",
-			"upload":"Bereitstellen von ERP-Daten"
+			"upload": "Bereitstellen von ERP-Daten"
 		},
 		"null": "Es gab keine Ergebnisse für diese Abfrage",
-		"past_orders":{
-			"item":":ordered: :article_no :article_name von :vendor, :amount am :received geliefert"
+		"past_orders": {
+			"item": ":ordered: :article_no :article_name von :vendor, :amount am :received geliefert"
 		},
 		"upload": {
 			"failure": "Es trat ein Fehler auf, bitte versuche es erneut.",
-			"file":"Quelldatei",
+			"file": "Quelldatei",
 			"select": "Verwendungszweck",
 			"success": "Datei wurde bereitgestellt."
 		}
@@ -1255,15 +1255,27 @@
 			"conversations": "Unterhaltungen",
 			"header": "Kommunikation",
 			"register": "Mitarbeiterverzeichnis",
-			"whiteboard":"Whiteboard"
+			"whiteboard": "Whiteboard"
 		},
 		"register": {
 			"message_all": "Nachricht an alle",
 			"orderauth": "Nutzer mit Bestellberechtigung",
 			"users": "Alle Nutzer nach Name"
 		},
-		"whiteboard":{
-			
+		"whiteboard": {
+			"all": "Alle Whiteboards",
+			"content": "Inhalt",
+			"delete": "Löschen",
+			"delete_confirm": "Whiteboard unwiderruflich löschen?",
+			"deleted_error": "Whiteboard konnte nicht gelöscht werden. Bitte versuche es erneut.",
+			"deleted_success": "Whiteboard gelöscht.",
+			"name": "Bezeichnung",
+			"new": "Neues Whiteboard erstellen",
+			"note_edit": "von :name am :date",
+			"saved_error": "Whiteboard konnte nicht gespeichert werden. Bitte versuche es erneut.",
+			"saved_success": "Whiteboard gespeichert",
+			"touch": "erstellt von :name, letzte Änderung am :date",
+			"units": "Betrifft nur"
 		}
 	},
 	"order": {
@@ -1283,7 +1295,7 @@
 		"added_confirmation": ":name wurde zur Bestellung hinzugefügt.",
 		"added_product": ":unit :number :name von :vendor",
 		"additional_info": "Zusätzliche Informationen",
-		"administrative_mark" : "Verwaltungskennzeichen",
+		"administrative_mark": "Verwaltungskennzeichen",
 		"alert_archived_limit": "Aktuell sind mehr als :max Bestellungen archiviert. Bitte prüft ob davon welche gelöscht werden können.",
 		"alert_disapprove_order": "Die Bestellung \n\n:order \n\nfür :unit wurde von :user zurückgewiesen und als vorbereitete Bestellung zurückgesetzt, da weitere Recherchen erforderlich sind. Bitte tretet in Kontakt.",
 		"alert_orderstate_change": "Der Bestellstatus \n\n:order \n\nfür :unit wurde von :user aktualisiert.",
@@ -1302,8 +1314,8 @@
 		"barcode_label": "EAN",
 		"bulk_approve_order": "Freigeben",
 		"bulk_update_state": "Markierte Bestellungen sind",
-		"calendarbutton":"Aufgabe zum Kalender hinzufügen",
-		"calendarbutton_hint":"z.B. Rücksendung von Leihteilen, Einführung neuer Produkte nach Prüfung, etc.",
+		"calendarbutton": "Aufgabe zum Kalender hinzufügen",
+		"calendarbutton_hint": "z.B. Rücksendung von Leihteilen, Einführung neuer Produkte nach Prüfung, etc.",
 		"cancellation": "Bestellung stornieren",
 		"cancellation_message": "Füge eine Begründung für die Stornierung an",
 		"cancellation_message_cancel": "Nein danke",
@@ -1347,7 +1359,7 @@
 			"submit": "Einführung übermitteln",
 			"success": "Die Angaben zur Einführung wurde gespeichert"
 		},
-		"manual_match" :"Ist der Artikel vielleicht doch in der Datenbank?",
+		"manual_match": "Ist der Artikel vielleicht doch in der Datenbank?",
 		"message": ":quantity :unit :number :name von :vendor :aut_idem für :commission\\n:info",
 		"message_orderer": "Mitteilung an :orderer",
 		"message_to_orderer": "Mitteilung senden",

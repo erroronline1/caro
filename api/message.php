@@ -17,12 +17,13 @@ class MESSAGE extends API {
 	public $_requestedMethod = REQUEST[1];
 	private $_conversation = null;
 	private $_announcement = null;
+	private $_requestedID = null;
 
 	public function __construct(){
 		parent::__construct();
 		if (!isset($_SESSION['user']) || array_intersect(['patient'], $_SESSION['user']['permissions'])) $this->response([], 401);
 
-		$this->_conversation = $this->_announcement = isset(REQUEST[2]) ? REQUEST[2] : null;
+		$this->_conversation = $this->_announcement = $this->_requestedID = isset(REQUEST[2]) ? REQUEST[2] : null;
 	}
 
 	/**
@@ -636,21 +637,171 @@ class MESSAGE extends API {
 	 * temporary notes 
 	 */
 	public function whiteboard(){
-		$response = ['render' => ['content' => [
-			[
-				'type' => 'textsection',
-				'attributes' => [
-					'name' => 'TODO'
-				]
-			]
-		]]];
+		$response = ['render' => ['content' => []]];
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
+			case 'PUT':
+				$whiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', ['values' => [
+					':id' => $this->_requestedID
+				]]);
+				$whiteboard = $whiteboard ? $whiteboard[0]: [
+					':id' => null,
+					':user_id' => $_SESSION['user']['id'],
+					':name' => null,
+					':organizational_unit' => null,
+					':content' => null
+				];
+				if (!$whiteboard['id'] || $whiteboard['user_id'] === $_SESSION['user']['id'] || array_intersect(['admin'], $_SESSION['user']['permissions']))
+					$whiteboard[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.name')) ? : null;
+				
+				$whiteboard[':content'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.content')) ? : 'null';
+				$whiteboard[':content'] .= "\n" . $this->_lang->GET('message.whiteboard.note_edit', [':name' => $_SESSION['user']['name'], ':date' => $this->_date['servertime']->format('Y-m-d H:i')]); 
+
+				// chain checked units
+				$units = [];
+				foreach ($this->_lang->_USER['units'] as $unit => $description){
+					if (UTILITY::propertySet($this->_payload, $description)) {
+						$units[] = $unit;
+					}
+				}
+				if ($units) $whiteboard[':organizational_unit'] = implode(',', $units);
+
+				if (SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_post', [
+					'values' => $whiteboard
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.whiteboard.saved_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.whiteboard.saved_error'),
+						'type' => 'error'
+					]]);
 				break;
 			case 'GET':
+				$whiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', ['values' => [
+					':id' => $this->_requestedID
+				]]);
+				$whiteboard = $whiteboard ? $whiteboard[0]: null;
+
+				$response['render']['form'] = [
+					'data-usecase' => 'message',
+					'action' => "javascript:api.message('" . ($whiteboard ? 'put' : 'post') . "', 'whiteboard', " . $this->_requestedID . ")"
+
+				];
+				$response['render']['content'][] = [
+					[
+						'type' => 'text',
+						'attributes' => [
+							'name' => $this->_lang->GET('message.whiteboard.name'),
+							'value' => $whiteboard ? $whiteboard['name'] : ''
+						]
+					],
+					[
+						'type' => 'textarea',
+						'attributes' => [
+							'name' => $this->_lang->GET('message.whiteboard.content'),
+							'value' => $whiteboard ? $whiteboard['content'] : '',
+							'rows' => 40
+						]
+					]
+				];
+
+				if ($whiteboard){
+					if ($whiteboard['user_id'] !== $_SESSION['user']['id'] && !array_intersect(['admin'], $_SESSION['user']['permissions'])) {
+						$response['render']['content'][count($response['render']['content']) - 1][0]['attributes']['readonly'] = true;
+					}
+					else {
+						$response['render']['content'][count($response['render']['content']) - 1][] = [
+							'type' => 'deletebutton',
+							'attributes' => [
+								'value' => $this->_lang->GET('message.whiteboard.delete'),
+							'onclick' => "new _client.Dialog({type: 'confirm', header: '". $this->_lang->GET('message.whiteboard.delete_confirm') ."', options:{".
+								"'" . $this->_lang->GET('general.cancel_button') . "': false,".
+								"'" . $this->_lang->GET('general.ok_button') . "': {value: true, class: 'reducedCTA'}".
+							"}}).then(confirmation => {if (confirmation) {api.message('delete', 'whiteboard', " . $whiteboard['id'] . "); this.disabled = true;}})"
+							]
+						];
+					}
+				}
+
+				$organizational_units = [];
+				foreach($this->_lang->_USER['units'] as $key => $value){
+					$organizational_units[$value] = [];
+					if (!$whiteboard && isset($_SESSION['user']['app_settings']['primaryUnit']) && $key === $_SESSION['user']['app_settings']['primaryUnit']) $organizational_units[$value]['checked'] = true;
+				}
+				if ($whiteboard) {
+					foreach(array_filter(explode(',', $whiteboard['organizational_unit'] ? : ''), fn($u) => boolval($u)) as $unit){
+						$organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
+					}
+				}
+				$response['render']['content'][] = [
+					[
+						'type' => 'checkbox',
+						'attributes' => [
+							'name' => $this->_lang->GET('message.whiteboard.units')
+						],
+						'content' => $organizational_units
+					]
+				];
+
 				break;
 			case 'DELETE':
+				if (SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_delete', [
+					'values' => [
+						':id' => $this->_requestedID
+					]
+				])) $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.whiteboard.deleted_success'),
+						'type' => 'success'
+					]]);
+				else $this->response([
+					'response' => [
+						'msg' => $this->_lang->GET('message.whiteboard.deleted_error'),
+						'type' => 'error'
+					]]);
 		}
+		$this->response($response);
+	}
+
+	/**
+	 *         _   _ _       _                 _ 
+	 *   _ _ _| |_|_| |_ ___| |_ ___ ___ ___ _| |
+	 *  | | | |   | |  _| -_| . | . | .'|  _| . |
+	 *  |_____|_|_|_|_| |___|___|___|__,|_| |___|
+	 *
+	 * temporary notes 
+	 */
+	public function whiteboards(){
+		$response = ['render' => ['content' => []]];
+
+		$whiteboards = [];
+		foreach(SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get_all') as $whiteboard){
+			if ($whiteboard['organizational_unit']) $whiteboard['organizational_unit'] = explode(',', $whiteboard['organizational_unit']);
+			if (!$whiteboard['organizational_unit'] || $whiteboard['user_id'] === $_SESSION['user']['id'] || in_array('common', $whiteboard['organizational_unit']) || array_intersect($_SESSION['user']['units'], $whiteboard['organizational_unit'])){
+				$whiteboards[$whiteboard['name'] . ' ' . $this->_lang->GET('message.whiteboard.touch', [':name' => $whiteboard['user_name'], ':date' => $this->convertFromServerTime($whiteboard['last_touch'])])] = ['href' => 'javascript: void(0);', 'onclick' => "api.message('get', 'whiteboard', " . $whiteboard['id'] . ")"];
+			}
+		}
+
+		$response['render']['content'][] = [
+			[
+				'type' => 'button',
+				'attributes' => [
+					'value' => $this->_lang->GET('message.whiteboard.new'),
+					'onclick' => "api.message('get', 'whiteboard')"
+				]
+			]
+		];
+		if ($whiteboards) $response['render']['content'][] = [
+			[
+				'type' => 'links',
+				'description' => $this->_lang->GET('message.whiteboard.all'),
+				'content' => $whiteboards
+			]
+		];
+		
 		$this->response($response);
 	}
 }

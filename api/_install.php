@@ -328,9 +328,10 @@ define('DEFAULTSQL', [
 				.
 				"CREATE TABLE IF NOT EXISTS `caro_whiteboard` (" .
 				"	`id` int NOT NULL AUTO_INCREMENT," .
+				"	`user_id` int NOT NULL," .
 				"	`name` text COLLATE utf8mb4_unicode_ci NOT NULL," .
-				"	`editdate` date NULL," .
-				"	`unit` text COLLATE utf8mb4_unicode_ci NULL," .
+				"	`last_touch` datetime NULL," .
+				"	`organizational_unit` text COLLATE utf8mb4_unicode_ci NULL," .
 				"	`content` text COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL," .
 				"	PRIMARY KEY (`id`)" .
 				") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
@@ -637,9 +638,10 @@ define('DEFAULTSQL', [
 				"IF OBJECT_ID(N'dbo.caro_whiteboard', N'U') IS NULL " .
 				"CREATE TABLE caro_whiteboard (" .
 				"	id int NOT NULL IDENTITY(1,1)," .
+				"	user_id int NOT NULL," .
 				"	name varchar(MAX) NOT NULL," .
-				"	editdate date NULL," .
-				"	unit varchar(MAX) NULL DEFAULT NULL," .
+				"	last_touch smalldatetime NULL," .
+				"	organizational_unit varchar(MAX) NULL DEFAULT NULL," .
 				"	content varchar(MAX) NULL DEFAULT NULL" .
 				");"
 		],
