@@ -641,21 +641,28 @@ class MESSAGE extends API {
 		switch ($_SERVER['REQUEST_METHOD']){
 			case 'POST':
 			case 'PUT':
-				$whiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', ['values' => [
-					':id' => $this->_requestedID
-				]]);
-				$whiteboard = $whiteboard ? $whiteboard[0]: [
+				$whiteboard = [
 					':id' => null,
 					':user_id' => $_SESSION['user']['id'],
 					':name' => null,
 					':organizational_unit' => null,
-					':content' => null
+					':content' => UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.content')) ? : ''
 				];
-				if (!$whiteboard['id'] || $whiteboard['user_id'] === $_SESSION['user']['id'] || array_intersect(['admin'], $_SESSION['user']['permissions']))
-					$whiteboard[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.name')) ? : null;
-				
-				$whiteboard[':content'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.content')) ? : 'null';
 				$whiteboard[':content'] .= "\n" . $this->_lang->GET('message.whiteboard.note_edit', [':name' => $_SESSION['user']['name'], ':date' => $this->_date['servertime']->format('Y-m-d H:i')]); 
+
+
+				$owhiteboard = SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get', ['values' => [
+					':id' => $this->_requestedID
+				]]);
+				$owhiteboard = $owhiteboard ? $owhiteboard[0] : null;
+				if ($owhiteboard){
+					$whiteboard[':id'] = $owhiteboard['id'];
+					$whiteboard[':user_id'] = $owhiteboard['user_id'];
+					$whiteboard[':name'] = $owhiteboard['name'];
+				}
+
+				if (!$whiteboard[':id'] || $whiteboard[':user_id'] === $_SESSION['user']['id'] || array_intersect(['admin'], $_SESSION['user']['permissions']))
+					$whiteboard[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.name')) ? : null;
 
 				// chain checked units
 				$units = [];
