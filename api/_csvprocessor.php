@@ -794,14 +794,14 @@ class Listprocessor {
 				switch ($modify){
 					case 'add':
 						if (!in_array($rule, $this->_setting['filesetting']['columns']))
-						$this->_setting['filesetting']['columns'][] = $key;
+							$this->_setting['filesetting']['columns'][] = $key;
 						foreach ($this->_list as $i => $row){
 							if (!$row) continue;
 
 							if (is_array($rule)){
 								$expression = [];
 								foreach ($rule as $possible_col){
-									$expression[] = isset($row[$possible_col]) ? $row[$possible_col] : $possible_col;
+									$expression[] = isset($row[$possible_col]) || array_key_exists($possible_col, $row) ? $row[$possible_col] : $possible_col;
 								}
 							}
 							else
@@ -857,7 +857,7 @@ class Listprocessor {
 
 								$concatenate = '';
 								foreach ($combine as $column){
-									if (isset($row[$column])) $concatenate .= $row[$column];
+									if (isset($row[$column]) || array_key_exists($column, $row)) $concatenate .= $row[$column];
 									else $concatenate .= $column;
 								}
 								$row[$new_column] = $concatenate; // SplFixedArray has problems accessing nested elements, must assign array to key directly
