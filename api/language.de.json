@@ -1593,8 +1593,8 @@
 		"update_hint": "Im Falle einer Aktualisierung müssen alle benannten Mitarbeiter erneut bestätigen."
 	},
 	"risk": {
-		"acceptance_level_above": "Überschreitet das definierte Akzeptanzniveau",
-		"acceptance_level_below": "Innerhalb des definierten Akzeptanzniveaus",
+		"acceptance_level_above": "kritisch",
+		"acceptance_level_below": "akzeptabel",
 		"author": "erstellt von :author am :date",
 		"availability": "Gültigkeit",
 		"available": "gültig",

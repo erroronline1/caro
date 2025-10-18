@@ -1593,8 +1593,8 @@
 		"update_hint": "On updating all assigned users have to reaccept."
 	},
 	"risk": {
-		"acceptance_level_above": "Above the defined acceptance level",
-		"acceptance_level_below": "Below the defined acceptance level",
+		"acceptance_level_above": "critical",
+		"acceptance_level_below": "acceptable",
 		"author": "created by :author on :date",
 		"availability": "Applicability",
 		"available": "valid",
