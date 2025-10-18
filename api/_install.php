@@ -717,11 +717,11 @@ class INSTALL {
 			echo '<a href="' . (isset(REQUEST[1]) ? '../': '') . '../_install.php">back</a><br />';
 
 			if ($method !== 'installDatabase' && (!isset($_SESSION['user']) || !array_intersect(['admin'], $_SESSION['user']['permissions']))){
-				$this->printError('You have to be logged in with administrator privilege to run this. <a href="../../index.html" target="_blank">Open Caro App in new window</a>');
+				echo $this->printError('You have to be logged in with administrator privilege to run this. <a href="../../index.html" target="_blank">Open Caro App in new window</a>');
 				die();
 			}
 
-			$this->{$method}();
+			echo $this->{$method}();
 		}
 		else {
 			foreach (get_class_vars(get_class($this)) as $varName => $varValue){
@@ -781,7 +781,7 @@ class INSTALL {
 	 * @param string|array $item entry item from source
 	 */
 	public function printError($message = '', $item = []){
-		echo '<br />[X] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
+		return '<br />[X] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
 	}
 
 	/**
@@ -790,7 +790,7 @@ class INSTALL {
 	 * @param string|array $item entry item from source
 	 */
 	public function printSuccess($message = '', $item = []){
-		echo '<br />[*] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
+		return '<br />[*] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
 	}
 
 	/**
@@ -799,7 +799,7 @@ class INSTALL {
 	 * @param string|array $item entry item from source
 	 */
 	public function printWarning($message = '', $item = []){
-		echo '<br />[!] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
+		return '<br />[!] ' . ($message ? : '') . ($item ? '<br /><code>' . (gettype($item) === 'array' ? UTILITY::json_encode($item) : $item) . '</code>' : '') . '<br />';
 	}
 
 	/**
@@ -808,21 +808,21 @@ class INSTALL {
 	 * @return int
 	 */
 	public function executeSQL($sqlchunks){
+		$response = '';
 		$counter = 0;
 		foreach ($sqlchunks as $chunk){
 			try {
 				if (SQLQUERY::EXECUTE($this->_pdo, $chunk)) {
-					$this->printSuccess('Success:', $chunk);
+					$response .= $this->printSuccess('Success:', $chunk);
 					$counter++;
 				}
 			}
 			catch (\Exception $e) {
-				$this->printError($e, $chunk);
-				die();
+				$response .= $this->printError($e, $chunk);
 			}
 		}
-		echo "<br />";
-		return $counter;
+		$response .=  '<br />' . $counter . ' successful SQL executions.<br />';
+		return $response;
 	}
 
 	/**
@@ -914,12 +914,14 @@ class INSTALL {
 			])) $this->printSuccess('Default user has been installed.');
 			else $this->printError('There has been an error inserting the default user! Did you provide an initial custom login token by requesting _install.php/installDatabase/*your_selected_installation_password*?');
 		}
+		return '';
 	}
 
 	/**
 	 * installs audit templates
 	 */
 	public function installAudittemplates(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'audits');
 		// gather possibly existing entries
 		$DBall = [
@@ -934,7 +936,7 @@ class INSTALL {
 				isset($entry['content']) && $entry['content'] &&
 				isset($entry['method']) && $entry['method']
 				)){
-				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 
@@ -959,7 +961,7 @@ class INSTALL {
 					if (isset($question['regulatory']) && $question['regulatory']) $question['regulatory'] = implode(',', preg_split('/[^\w\d]+/m', $question['regulatory'] ? : ''));
 				}
 				if (!array_filter($entry['content'], fn($q) => boolval($q)) || ($entry['content'] = UTILITY::json_encode($entry['content'])) === false){
-					$this->printError('A question set is malformed. This item will be skipped:', $entry);
+					$response .= $this->printError('A question set is malformed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -979,18 +981,20 @@ class INSTALL {
 				SQLQUERY::EXECUTE($this->_pdo, $chunk);
 			}
 			catch (\Exception $e) {
-				$this->printWarning('there has been an issue', [$e, $chunk]);
-				die();
+				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 			}
 		}
-		if ($sqlchunks)	$this->printSuccess('Novel entries by unit and objectives from audits have been installed.');
-		else $this->printWarning('There were no novelties to install from audits ressources.');
+		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by unit and objectives from audits have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from audits ressources.');
+
+		return $response;
 	}
 	
 	/**
 	 * installs csv filter
 	 */
 	public function installCSVFilter(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'csvfilter');
 		// gather possibly existing entries
 		$DBall = [
@@ -1004,7 +1008,7 @@ class INSTALL {
 				isset($entry['name']) && $entry['name'] &&
 				isset($entry['content']) && $entry['content'] && UTILITY::json_encode($entry['content'], JSON_PRETTY_PRINT)
 				)){
-				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 			$entry['content'] = UTILITY::json_encode($entry['content'], JSON_PRETTY_PRINT);
@@ -1021,14 +1025,17 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('csvfilter_post'), $insertions)))
-			$this->printSuccess('Novel entries by name and content from csv-filter have been installed.');
-		else $this->printWarning('There were no novelties to install from csv-filter ressources.');
+			$response .= $this->printSuccess('Novel entries by name and content from csv-filter have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from csv-filter ressources.');
+
+		return $response;
 	}
 	
 	/**
 	 * installs documents by novel name
 	 */
 	public function installDocuments(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'documents');
 		// gather possibly existing entries
 		$DBall = [
@@ -1073,22 +1080,22 @@ class INSTALL {
 				isset($entry['unit']) && $entry['unit'] &&
 				isset($entry['content']) && $entry['content']
 				)){
-				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 
 			if (in_array($entry['name'] . '_' . $entry['context'], $name_context)){
-				$this->printError('Multiple occurences of the name ' . $entry['name'] . ' are not allowed for context ' . $entry['context'] . '. This item may be already installed and in use and will be skipped:', $entry);
+				$response .= $this->printError('Multiple occurences of the name ' . $entry['name'] . ' are not allowed for context ' . $entry['context'] . '. This item may be already installed and in use and will be skipped:', $entry);
 				continue;
 			}
 
 			if($pattern = UTILITY::forbiddenName($entry['name'])){
-				$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+				$response .= $this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 				continue;
 			}
 			if ($entry['context'] === 'component' && $entry['content']){
 				if ($forbidden = containsForbidden($entry['content'])){
-					$this->printError('The component ' . $entry['name'] . ' contains a forbidden input name: ' . $forbidden['name']. ' is not allowed by matching ' . $forbidden['pattern'] . '. This item will be skipped:', $entry);
+					$response .= $this->printError('The component ' . $entry['name'] . ' contains a forbidden input name: ' . $forbidden['name']. ' is not allowed by matching ' . $forbidden['pattern'] . '. This item will be skipped:', $entry);
 					continue;
 				}
 			}
@@ -1120,18 +1127,20 @@ class INSTALL {
 				SQLQUERY::EXECUTE($this->_pdo, $chunk);
 			}
 			catch (\Exception $e) {
-				$this->printWarning('there has been an issue', [$e, $chunk]);
-				die();
+				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 			}
 		}
-		if ($sqlchunks)	$this->printSuccess('Novel entries by name from documents have been installed.');
-		else $this->printWarning('There were no novelties to install from documents ressources.');
+		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name from documents have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from documents ressources.');
+
+		return $response;
 	}
 
 	/**
 	 * installs manual entries by novel title
 	 */
 	public function installManual(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'manuals');
 		// gather possibly existing entries
 		$DBall = [
@@ -1146,17 +1155,17 @@ class INSTALL {
 				isset($entry['content']) && $entry['content'] &&
 				isset($entry['permissions']) && $entry['permissions']
 				)){
-				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 
 			if (isset($entry['title']) && $entry['title'] && !in_array($entry['title'], array_column($DBall, 'title'))) {
 				if($pattern = UTILITY::forbiddenName($entry['title'])){
-					$this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					$response .= $this->printError('The title ' . $entry['title'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
 				if (in_array($entry['title'], $names)) {
-					$this->printError('Multiple occurences of the title are not allowed. This item will be skipped:', $entry);
+					$response .= $this->printError('Multiple occurences of the title are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -1177,18 +1186,20 @@ class INSTALL {
 				SQLQUERY::EXECUTE($this->_pdo, $chunk);
 			}
 			catch (\Exception $e) {
-				$this->printWarning('there has been an issue', [$e, $chunk]);
-				die();
+				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 			}
 		}
-		if ($sqlchunks)	$this->printSuccess('Novel entries by name from manuals have been installed.');
-		else $this->printWarning('There were no novelties to install from manuals ressources.');
+		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name from manuals have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from manuals ressources.');
+
+		return $response;
 	}
 
 	/**
 	 * installs risks by novel process+risk+cause+measure
 	 */
 	public function installRisks(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'risks');
 		// gather possibly existing entries
 		$DBall = [];
@@ -1222,7 +1233,7 @@ class INSTALL {
 								])) continue;								
 							if (!$value && $value !== 0) {
 								$valid = false;
-								echo var_dump($value) . ' for ' . $key . ' is not allowed!';
+								$response .=  $value . ' for ' . $key . ' is not allowed!';
 								break;
 							}
 						}		
@@ -1245,7 +1256,7 @@ class INSTALL {
 						])) continue;								
 						if (!$value && $value !== 0) {
 							$valid = false;
-							echo var_dump($value) . ' for ' . $key . ' is not allowed!';
+							$response .=  $value . ' for ' . $key . ' is not allowed!';
 							break;
 						}
 					}		
@@ -1283,17 +1294,19 @@ class INSTALL {
 				SQLQUERY::EXECUTE($this->_pdo, $chunk);
 			}
 			catch (\Exception $e) {
-				$this->printWarning('there has been an issue', [$e, $chunk]);
-				die();
+				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 			}
 		}
-		if ($sqlchunks)	$this->printSuccess('Novel entries by process+risk+cause+measure from risks have been installed.');
-		else $this->printWarning('There were no novelties to install from risks ressources.');
+		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by process+risk+cause+measure from risks have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from risks ressources.');
+
+		return $response;
 	}
 	/**
 	 * installs texttemplates by novel name
 	 */
 	public function installTexttemplates(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'texts');
 		// gather possibly existing entries
 		$DBall = [
@@ -1324,19 +1337,19 @@ class INSTALL {
 				isset($entry['content']) && $entry['content'] &&
 				isset($entry['type']) && $entry['type']
 				)){
-				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				if ($pattern = UTILITY::forbiddenName($entry['name'], $entry['type'] === 'template' ? [] : ['characters' => $allowed])){
-					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					$response .= $this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
 				$used = $entry['type'] === 'template' ? $names['template'] : [...$names['text'], ...$names['replacement']];
 				foreach ($used as $name){
 					if (str_starts_with($entry['name'], $name) || str_starts_with($name, $entry['name']))
-					$this->printError($entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed. This item will be skipped:', $entry);
+					$response .= $this->printError($entry['name'] . ' matches ' . $name . '. Multiple occurences of the name or parts of it for placeholders are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -1352,14 +1365,17 @@ class INSTALL {
 			}
 		}
 		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
-			$this->printSuccess('Novel entries by name from textx have been installed.');
-		else $this->printWarning('There were no novelties to install from texts ressources.');
+			$response .= $this->printSuccess('Novel entries by name from textx have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from texts ressources.');
+
+		return $response;
 	}
 
 	/**
 	 * installs users by novel name
 	 */
 	public function installUsers(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'users');
 		// gather possibly existing entries
 		$DBall = [
@@ -1372,16 +1388,16 @@ class INSTALL {
 			if (!(
 				isset($entry['name']) && $entry['name']
 				)){
-				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				if($pattern = UTILITY::forbiddenName($entry['name'])){
-					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					$response .= $this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
 				if (in_array($entry['name'], $names)) {
-					$this->printError('Multiple occurences of the name are not allowed. This item will be skipped:', $entry);
+					$response .= $this->printError('Multiple occurences of the name are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -1441,18 +1457,20 @@ class INSTALL {
 				SQLQUERY::EXECUTE($this->_pdo, $chunk);
 			}
 			catch (\Exception $e) {
-				$this->printWarning('there has been an issue', [$e, $chunk]);
-				die();
+				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 			}
 		}
-		if ($sqlchunks)	$this->printSuccess('Novel entries by name for users have been installed.');
-		else $this->printWarning('There were no novelties to install from user ressources.');
+		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name for users have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from user ressources.');
+
+		return $response;
 	}
 
 	/**
 	 * installs vendors by novel name
 	 */
 	public function installVendors(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'vendors');
 		// gather possibly existing entries
 		$DBall = [
@@ -1465,16 +1483,16 @@ class INSTALL {
 			if (!(
 				isset($entry['name']) && $entry['name']
 				)){
-				$this->printError('The following dataset is invalid and will be skipped:', $entry);
+				$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 				continue;
 			}
 			if (!in_array($entry['name'], array_column($DBall, 'name'))) {
 				if($pattern = UTILITY::forbiddenName($entry['name'])){
-					$this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
+					$response .= $this->printError('The name ' . $entry['name'] . ' is not allowed by matching ' . $pattern . '. This item will be skipped:', $entry);
 					continue;
 				}
 				if (in_array($entry['name'], $names)) {
-					$this->printError('Multiple occurences of the name are not allowed. This item will be skipped:', $entry);
+					$response .= $this->printError('Multiple occurences of the name are not allowed. This item will be skipped:', $entry);
 					continue;
 				}
 
@@ -1507,12 +1525,13 @@ class INSTALL {
 				SQLQUERY::EXECUTE($this->_pdo, $chunk);
 			}
 			catch (\Exception $e) {
-				$this->printWarning('there has been an issue', [$e, $chunk]);
-				die();
+				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 			}
 		}
-		if ($sqlchunks)	$this->printSuccess('Novel entries by name for vendors have been installed.');
-		else $this->printWarning('There were no novelties to install from vendor ressources.');
+		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name for vendors have been installed.');
+		else $response .= $this->printWarning('There were no novelties to install from vendor ressources.');
+
+		return $response;
 	}
 
 	/**
@@ -1520,6 +1539,7 @@ class INSTALL {
 	 * also see maintenance.php
 	 */
 	public function updateVendors(){
+		$response = '';
 		$json = $this->importJSON('../templates/', 'vendors');
 		// gather possibly existing entries
 		$DBall = [
@@ -1535,7 +1555,7 @@ class INSTALL {
 					if (!(
 						isset($entry['name']) && $entry['name']
 						)){
-						$this->printError('The following dataset is invalid and will be skipped:', $entry);
+						$response .= $this->printError('The following dataset is invalid and will be skipped:', $entry);
 						continue;
 					}
 					$vendor = array_search($entry['name'], array_column($DBall, 'name'));
@@ -1568,7 +1588,7 @@ class INSTALL {
 
 						$vendor['products'] = UTILITY::json_encode($vendor['products'], JSON_PRETTY_PRINT);
 					}
-					echo $this->printSuccess($vendor['name'] . " updated");
+					$response .=  $this->printSuccess($vendor['name'] . " updated");
 
 					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
 					[
@@ -1585,27 +1605,27 @@ class INSTALL {
 						SQLQUERY::EXECUTE($this->_pdo, $chunk);
 					}
 					catch (\Exception $e) {
-						$this->printWarning('there has been an issue', [$e, $chunk]);
-						die();
+						$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 					}
 				}
-				if ($sqlchunks)	$this->printSuccess('Entries by name for vendors have been updated.');
-				if ($unfound) $this->printError('The following vendors from import file have not been found in database:', implode(', ', $unfound));
-				else $this->printWarning('There were no updates. Select items to update or check vendor names matching your database entries.');
+				if ($sqlchunks)	$response .= $this->printSuccess('Entries by name for vendors have been updated.');
+				if ($unfound) $response .= $this->printError('The following vendors from import file have not been found in database:', implode(', ', $unfound));
+				else $response .= $this->printWarning('There were no updates. Select items to update or check vendor names matching your database entries.');
 				break;
 			case 'GET':
-				echo 'Check what to update by vendor. If template has any value it will override the database, otherwise the original will be kept.<br />Missing a vendor? Most probably names don\'t match...';
-				echo '<form method="post">';
-				$intersections=array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
+				$response .=  'Check what to update by vendor. If template has any value it will override the database, otherwise the original will be kept.<br />Missing a vendor? Most probably names don\'t match...';
+				$response .=  '<form method="post">';
+				$intersections = array_intersect(array_column($DBall, 'name'), array_column($json, 'name'));
 				foreach ($DBall as $vendor){
 					if (!in_array($vendor['name'], $intersections)) continue;
-					echo '<br /><br />' . $vendor['name'] . ($vendor['hidden'] ? ' (this vendor is marked as hidden)' : '');
-					echo '<br /><label><input type="checkbox" name="' . $vendor['name'] . '_info" /> info</label> | ' . '<label><input type="checkbox" name="' . $vendor['name'] . '_productlistfilter" /> productlist filter</label>';
+					$response .=  '<br /><br />' . $vendor['name'] . ($vendor['hidden'] ? ' (this vendor is marked as hidden)' : '');
+					$response .=  '<br /><label><input type="checkbox" name="' . $vendor['name'] . '_info" /> info</label> | ' . '<label><input type="checkbox" name="' . $vendor['name'] . '_productlistfilter" /> productlist filter</label>';
 				}
-				echo '<br /><br /><input type="submit" value="update selected" />';
-				echo '</form>';
+				$response .=  '<br /><br /><input type="submit" value="update selected" />';
+				$response .=  '</form>';
 				break;
 		}
+		return $response;
 	}
 }
 

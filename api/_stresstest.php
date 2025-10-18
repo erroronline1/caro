@@ -69,19 +69,19 @@ class STRESSTEST extends INSTALL{
 			echo '<a href="../_stresstest.php">back</a><br />';
 
 			if ($method !== 'installDatabase' && (!isset($_SESSION['user']) || !array_intersect(['admin'], $_SESSION['user']['permissions']))){
-				$this->printError('You have to be logged in with administrator privilege to run this. <a href="../../index.html" target="_blank">Open Caro App in new window</a>');
+				echo $this->printError('You have to be logged in with administrator privilege to run this. <a href="../../index.html" target="_blank">Open Caro App in new window</a>');
 				die();
 			}
 
-			$this->{$method}();
+			echo $this->{$method}();
 		}
 		else {
 			foreach (get_class_vars(get_class($this)) as $varName => $varValue){
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
 			}
-			echo '<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION';
-			echo '<br />[~] USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.';
+			echo $this->printWarning('<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION');
+			echo $this->printWarning('<br />[~] USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.');
 			echo '<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
@@ -124,7 +124,7 @@ class STRESSTEST extends INSTALL{
 			'processedYear' => $this->_currentdate->format("Y")
 		]);
 
-		echo '<pre>' . var_export($datalist, true) . '</pre>';
+		return '<pre>' . var_export($datalist, true) . '</pre>';
 	}
 
 	/**
@@ -151,7 +151,7 @@ class STRESSTEST extends INSTALL{
 				]
 			]);
 		}
-		echo '[*] ' . $i. ' task entries done, please check the application for performance';
+		return $this->printSuccess($i. ' task entries done, please check the application for performance');
 	}
 
 	/**
@@ -171,7 +171,7 @@ class STRESSTEST extends INSTALL{
 				]
 			]);
 		}
-		echo '[*] ' . count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted';
+		return $this->printSuccess(count($entries) . ' entries with prefix ' . $this->_prefix . ' deleted');
 	}
 
 	/**
@@ -228,7 +228,7 @@ class STRESSTEST extends INSTALL{
 				]
 			]);
 		}
-		echo '[*] ' . $i. ' records done, please check the application for performance';
+		return $this->printSuccess($i. ' records done, please check the application for performance');
 	}
 
 	/**
@@ -240,13 +240,14 @@ class STRESSTEST extends INSTALL{
 			'sqlsrv' => "DELETE FROM caro_records WHERE identifier LIKE '%" . $this->_prefix . "%'"
 		];
 		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
-		echo '[*] ' . $del . ' entries with prefix ' . $this->_prefix . ' deleted';
+		return $this->printSuccess($del . ' entries with prefix ' . $this->_prefix . ' deleted');
 	}
 
 	/**
 	 * installs approved orders with prefix
 	 */
 	public function createOrders(){
+		$response = '';
 		$vendors = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_vendor_datalist');
 		$products = SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products_by_vendor_id', [
 			'replacements' => [
@@ -281,11 +282,12 @@ class STRESSTEST extends INSTALL{
 				if (SQLQUERY::EXECUTE($this->_pdo, $chunk));
 			}
 			catch (\Exception $e) {
-				echo $e, $chunk;
-				die();
+				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 			}
 		}
-		echo '[*] ' . $i. ' orders done, please check the application for performance';
+		$response .= $this->printSuccess($i. ' orders done, please check the application for performance');
+
+		return $response;
 	}
 
 	/**
@@ -297,7 +299,7 @@ class STRESSTEST extends INSTALL{
 			'sqlsrv' => "DELETE FROM caro_consumables_approved_orders WHERE order_data LIKE '%" . $this->_prefix . "%'"
 		];
 		$del = SQLQUERY::EXECUTE($this->_pdo, $deletion[CONFIG['sql']['use']]);
-		echo '[*] ' . $del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted';
+		return $this->printSuccess($del . ' orders with commission containing prefix ' . $this->_prefix . ' deleted');
 	}
 
 	/**
@@ -324,15 +326,16 @@ class STRESSTEST extends INSTALL{
 					]
 				]);
 			}
-			echo '[*] all documents in the database have been approved';
+			return $this->printSuccess('all documents in the database have been approved');
 		}
-		else $this->printError('autopermission has not been enabled');
+		return $this->printError('autopermission has not been enabled');
 	}
 
 	/**
 	 * approve all pending incorporations
 	 */
 	public function approvePendingIncorporations(){
+		$response = '';
 		if ($this->_incorporationApproval){
 			$sqlchunks = [];
 			$DBall = [...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products')];
@@ -356,13 +359,14 @@ class STRESSTEST extends INSTALL{
 					SQLQUERY::EXECUTE($this->_pdo, $chunk);
 				}
 				catch (\Exception $e) {
-					$this->printWarning('there has been an issue', [$e, $chunk]);
-					die();
+					$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 				}
 			}
-			echo '[*] all pending incorporation have been approved.';			
+			$response .= $this->printSuccess('all pending incorporation have been approved.');			
 		}
-		else $this->printError('incorporation approval has not been defined');
+		else $response .= $this->printError('incorporation approval has not been defined');
+
+		return $response;
 	}
 
 	/**
@@ -394,7 +398,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' audit templates according to template file deleted';
+		return $this->printSuccess($matches . ' audit templates according to template file deleted');
 	}
 
 	/**
@@ -422,7 +426,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' filters according to template file deleted.';
+		return $this->printSuccess($matches . ' filters according to template file deleted.');
 	}
 
 
@@ -480,7 +484,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' components and documents according to template file deleted, not used within sample records';
+		return $this->printSuccess($matches . ' components and documents according to template file deleted, not used within sample records');
 	}
 
 	/**
@@ -508,7 +512,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' manual entries according to template file deleted.';
+		return $this->printSuccess($matches . ' manual entries according to template file deleted.');
 	}
 
 	/**
@@ -542,7 +546,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' risk entries according to template file deleted.';
+		return $this->printSuccess( $matches . ' risk entries according to template file deleted.');
 	}
 
 	/**
@@ -573,7 +577,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' text template entries according to template file deleted.';
+		return $this->printSuccess($matches . ' text template entries according to template file deleted.');
 	}
 
 	/**
@@ -618,7 +622,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' users and their trainings according to template file deleted.';
+		return $this->printSuccess($matches . ' users and their trainings according to template file deleted.');
 	}
 
 	/**
@@ -646,7 +650,7 @@ class STRESSTEST extends INSTALL{
 				}
 			}
 		}
-		echo '[*] ' . $matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the vendor fileserver directories, head over directly to the file system and don\'t mess up production server!';
+		return $this->printSuccess($matches . ' vendors according to template file deleted. Special chars within the vendors name may prevent deletion due to character encoding. If you filled the vendor fileserver directories, head over directly to the file system and don\'t mess up production server!');
 	}
 
 	/**
@@ -753,7 +757,7 @@ some@mail.address and escaped\@mail.address
 [second header](#plain-text-1)
 END;
 		$markdown = new MARKDOWN();
-		echo $markdown->md2html($sample);
+		return $markdown->md2html($sample);
 	}
 }
 
