@@ -808,7 +808,9 @@ class INSTALL {
 	 * @return int
 	 */
 	public function executeSQL($sqlchunks){
+		if (!$sqlchunks) return null;
 		$response = '';
+
 		$counter = 0;
 		foreach ($sqlchunks as $chunk){
 			try {
@@ -821,7 +823,6 @@ class INSTALL {
 				$response .= $this->printError($e, $chunk);
 			}
 		}
-		$response .=  '<br />' . $counter . ' successful SQL executions.<br />';
 		return $response;
 	}
 
@@ -902,6 +903,7 @@ class INSTALL {
 
 			if (REQUEST[1] && SQLQUERY::EXECUTE($this->_pdo, 'user_post', [
 				'values' => [
+					':id' => null,
 					':name' => $this->_defaultUser,
 					':permissions' => 'admin',
 					':units' => '',
@@ -967,6 +969,7 @@ class INSTALL {
 
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('audit_post_template'),
 				[
+					':id' => 'NULL',
 					':content' => $this->_pdo->quote($entry['content']),
 					':objectives' => $this->_pdo->quote($entry['objectives']),
 					':unit' => $this->_pdo->quote($entry['unit']),
@@ -976,15 +979,9 @@ class INSTALL {
 				]) . '; ');
 			}
 		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				SQLQUERY::EXECUTE($this->_pdo, $chunk);
-			}
-			catch (\Exception $e) {
-				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-			}
-		}
-		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by unit and objectives from audits have been installed.');
+
+		if ($execution = $this->executeSQL($sqlchunks))
+			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from audits ressources.');
 
 		return $response;
@@ -1024,8 +1021,9 @@ class INSTALL {
 				];
 			}
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('csvfilter_post'), $insertions)))
-			$response .= $this->printSuccess('Novel entries by name and content from csv-filter have been installed.');
+
+		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('csvfilter_post'), $insertions)))
+			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from csv-filter ressources.');
 
 		return $response;
@@ -1122,15 +1120,9 @@ class INSTALL {
 				':patient_access' => isset($entry['patient_access']) && $entry['patient_access'] ? $this->_pdo->quote($entry['patient_access']) : 'NULL'
 			]) . '; ');
 		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				SQLQUERY::EXECUTE($this->_pdo, $chunk);
-			}
-			catch (\Exception $e) {
-				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-			}
-		}
-		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name from documents have been installed.');
+
+		if ($execution = $this->executeSQL($sqlchunks))
+			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from documents ressources.');
 
 		return $response;
@@ -1175,21 +1167,16 @@ class INSTALL {
 				$names[] = $entry['title'];
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('application_post_manual'),
 				[
+					':id' => 'NULL',
 					':title' => $this->_pdo->quote($entry['title']),
 					':content' => $this->_pdo->quote($entry['content']),
 					':permissions' => $this->_pdo->quote($entry['permissions'])
 				]) . '; ');
 			}
 		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				SQLQUERY::EXECUTE($this->_pdo, $chunk);
-			}
-			catch (\Exception $e) {
-				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-			}
-		}
-		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name from manuals have been installed.');
+
+		if ($execution = $this->executeSQL($sqlchunks))
+			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from manuals ressources.');
 
 		return $response;
@@ -1270,6 +1257,7 @@ class INSTALL {
 					if (!in_array($entry['process'].$entry['risk'].$entry['cause'].$entry['measure'], $DBall))
 						$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('risk_post'),
 						[
+							':id' => 'NULL',
 							':type' => $this->_pdo->quote($entry['type']),
 							':process' => $this->_pdo->quote($entry['process']),
 							':risk' => $this->_pdo->quote($entry['risk']),
@@ -1289,15 +1277,10 @@ class INSTALL {
 				}
 			}
 		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				SQLQUERY::EXECUTE($this->_pdo, $chunk);
-			}
-			catch (\Exception $e) {
-				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-			}
-		}
-		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by process+risk+cause+measure from risks have been installed.');
+
+		if ($execution = $this->executeSQL($sqlchunks))
+			$response .= $execution;
+//		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by process+risk+cause+measure from risks have been installed.');
 		else $response .= $this->printWarning('There were no novelties to install from risks ressources.');
 
 		return $response;
@@ -1364,8 +1347,8 @@ class INSTALL {
 				];
 			}
 		}
-		if ($this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
-			$response .= $this->printSuccess('Novel entries by name from textx have been installed.');
+		if ($execution = $this->executeSQL(SQLQUERY::CHUNKIFY_INSERT($this->_pdo, SQLQUERY::PREPARE('texttemplate_post'), $insertions)))
+			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from texts ressources.');
 
 		return $response;
@@ -1441,6 +1424,7 @@ class INSTALL {
 
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('user_post'),
 				[
+					':id' => 'NULL',
 					':name' => $this->_pdo->quote($entry['name']),
 					':permissions' => $this->_pdo->quote($entry['permissions']),
 					':units' => $this->_pdo->quote($entry['units']),
@@ -1448,19 +1432,13 @@ class INSTALL {
 					':orderauth' => $this->_pdo->quote($entry['orderauth']),
 					':image' =>$this->_pdo->quote( $entry['image']),
 					':app_settings' =>$this->_pdo->quote( UTILITY::json_encode($entry['app_settings'])),
-					':skills' => ''
+					':skills' => '',
 				]) . '; ');
 			}
 		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				SQLQUERY::EXECUTE($this->_pdo, $chunk);
-			}
-			catch (\Exception $e) {
-				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-			}
-		}
-		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name for users have been installed.');
+
+		if ($execution = $this->executeSQL($sqlchunks))
+			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from user ressources.');
 
 		return $response;
@@ -1512,23 +1490,17 @@ class INSTALL {
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
 				[
 					':id' => 'NULL',
+					':hidden' => 'NULL',
 					':name' => $this->_pdo->quote($entry['name']),
 					':info' => isset($entry['info']) && gettype($entry['info']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['info'])) : 'NULL',
 					':products' => isset($entry['products']) && gettype($entry['products']) === 'array' ? $this->_pdo->quote(UTILITY::json_encode($entry['products'])) : 'NULL',
 					':evaluation' => 'NULL',
-					':hidden' => 'NULL'
 				]) . '; ');
 			}
 		}
-		foreach ($sqlchunks as $chunk){
-			try {
-				SQLQUERY::EXECUTE($this->_pdo, $chunk);
-			}
-			catch (\Exception $e) {
-				$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-			}
-		}
-		if ($sqlchunks)	$response .= $this->printSuccess('Novel entries by name for vendors have been installed.');
+
+		if ($execution = $this->executeSQL($sqlchunks))
+			$response .= $execution;
 		else $response .= $this->printWarning('There were no novelties to install from vendor ressources.');
 
 		return $response;
@@ -1593,22 +1565,16 @@ class INSTALL {
 					$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_post_vendor'),
 					[
 						':id' => $vendor['id'],
-						':name' => $this->_pdo->quote($vendor['name']),
-						':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
 						':hidden' => $vendor['hidden'] ? $this->_pdo->quote($vendor['hidden']) : 'NULL',
+						':name' => $this->_pdo->quote($vendor['name']),
 						':info' => $vendor['info'] ? $this->_pdo->quote($vendor['info']) : 'NULL',
 						':products' => $vendor['products'] ? $this->_pdo->quote($vendor['products']) : 'NULL',
+						':evaluation' => $vendor['evaluation'] ? $this->_pdo->quote($vendor['evaluation']) : 'NULL',
 					]) . '; ');
 				}
-				foreach ($sqlchunks as $chunk){
-					try {
-						SQLQUERY::EXECUTE($this->_pdo, $chunk);
-					}
-					catch (\Exception $e) {
-						$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
-					}
-				}
-				if ($sqlchunks)	$response .= $this->printSuccess('Entries by name for vendors have been updated.');
+
+				if ($execution = $this->executeSQL($sqlchunks))
+					$response .= $execution;
 				if ($unfound) $response .= $this->printError('The following vendors from import file have not been found in database:', implode(', ', $unfound));
 				else $response .= $this->printWarning('There were no updates. Select items to update or check vendor names matching your database entries.');
 				break;
