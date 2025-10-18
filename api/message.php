@@ -775,11 +775,11 @@ class MESSAGE extends API {
 
 	/**
 	 *         _   _ _       _                 _ 
-	 *   _ _ _| |_|_| |_ ___| |_ ___ ___ ___ _| |
-	 *  | | | |   | |  _| -_| . | . | .'|  _| . |
-	 *  |_____|_|_|_|_| |___|___|___|__,|_| |___|
+	 *   _ _ _| |_|_| |_ ___| |_ ___ ___ ___ _| |___ 
+	 *  | | | |   | |  _| -_| . | . | .'|  _| . |_ -|
+	 *  |_____|_|_|_|_| |___|___|___|__,|_| |___|___|
 	 *
-	 * temporary notes 
+	 * temporary notes overview and navigation
 	 */
 	public function whiteboards(){
 		$response = ['render' => ['content' => []]];
