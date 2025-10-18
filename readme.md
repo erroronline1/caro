@@ -32,11 +32,10 @@ Things are still in motion. Images may be outdated.
 * unittests
 * templates
 * erp_interface, additional usecases?
+    * product import, look for medical device flag regarding trading good
 * consider search _shared.php
     * describe advanced options *somewhere* within the application?
 * assemble swipe to toggle autocomplete for safari
-* [Stakeholder requirements](#rejected-requirements)
-    * look for medical device flag
 
 ## Content
 * [Aims](#aims)
