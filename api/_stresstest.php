@@ -79,9 +79,15 @@ class STRESSTEST extends INSTALL{
 			foreach (get_class_vars(get_class($this)) as $varName => $varValue){
 				if (in_array(gettype($varValue), ['string', 'integer', 'boolean']))
 					echo gettype($varValue) . ': ' . $varName . ': ' . $varValue . '<br />';
+				elseif (gettype($varValue) === 'array'){
+					echo gettype($varValue) . ': ' . $varName . ': ';
+					var_dump($varValue);
+					echo '<br />';	
+				}
 			}
-			echo $this->printWarning('<br />[~] DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS A REGULATORY VIOLATION, AS IS AUTOPERMISSION');
-			echo $this->printWarning('<br />[~] USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.');
+			echo $this->printWarning('DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS CONSIDERED A REGULATORY VIOLATION, AS IS AUTOPERMISSION');
+			echo $this->printWarning('AUTOAPPROVAL OF PENDING PRODUCT INCORPORATIONS SHOULD BE PROPERLY DOCUMENTED');
+			echo $this->printWarning('USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.');
 			echo '<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
