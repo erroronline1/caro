@@ -3553,8 +3553,9 @@ export class Assemble {
 				textarea.addEventListener("touchmove", (event) => {
 					const travel = [api._settings.session.textareaAutocompleteSwipe[0] - event.touches[0].clientX, api._settings.session.textareaAutocompleteSwipe[1] - event.touches[0].clientY];
 					// filter for mostly horizontal swipes
-					if (Math.abs(travel[0]) - Math.abs(travel[1]) > 0 && Math.abs(travel[0]) > 20) {
+					if (Math.abs(travel[0]) - Math.abs(travel[1]) > 0 && Math.abs(travel[0]) > 100) {
 						event.preventDefault();
+						api._settings.session.textareaAutocompleteSwipe = [event.touches[0].clientX, event.touches[0].clientY];
 						autocomplete(travel[0] > 0 ? "forth" : "back");
 					}
 				});
