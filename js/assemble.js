@@ -522,7 +522,6 @@ export class Dialog {
 			}
 			this.dialog.append(this.form);
 
-
 			// compare nodelist if similar dialog has been opened just before, aborting display
 			function objectifyNode(element) {
 				let obj = {};
@@ -2454,6 +2453,36 @@ export class Assemble {
 
 		label.dataset.type = this.currentElement.type;
 		label.append(span, input);
+
+		if (["search", "filter"].includes(type)) {
+			const search_pattern = document.createElement("a"),
+			option = {};
+			option[api._lang.GET('general.ok_button')] = false;
+			search_pattern.href = "javascript:void(0)";
+			search_pattern.dataset.type = "";
+			search_pattern.classList.add("inline");
+			search_pattern.onclick = function () {
+				new Dialog({
+					type: "input",
+					header: api._lang.GET("general.search_pattern"),
+					render: [
+						[
+							{ type: "textsection", htmlcontent: api._lang.GET("general.search_pattern_content") }
+						]
+					],
+					options: option
+				});
+			};
+			search_pattern.append(document.createTextNode(api._lang.GET("general.search_pattern")));
+			if (hint) hint[0].append(search_pattern);
+			else {
+				let div = document.createElement("div");
+				div.classList.add("hint");
+				div.role = "note";
+				div.append(search_pattern);
+				hint = [div];
+			}
+		}
 
 		if (imagealigned) {
 			const container = document.createElement("div");
