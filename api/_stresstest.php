@@ -21,12 +21,26 @@ class STRESSTEST extends INSTALL{
 	public $_calendarentries = 20000;
 	public $_recordentries = 20000;
 	public $_orderentries = 1000;
-	public $_autopermission = true;
 	public $_csvInput = '../unittests/sample-csv-files-sample-6.csv';
 
-	public $_incorporationApproval = [
+	public $_documentApproval = [ // null;
+		"supervisor"=> [ // roles according to the configuration documentapproval permission
+			"name"=> "CARO App", // appropriate name of responsible persons
+			"date"=> "2025-07-11 23:56" // Y-m-d H:i
+		],
+		"qmo"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+		],
+		"ceo"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+		],
+	];
+
+	public $_incorporationApproval = [ // null;
 		"_check" => "Quality management system migration", // will be appended to the initial message
-		"user"=> [ // roles according to the configuration incorporation persmission
+		"user"=> [ // roles according to the configuration incorporation permission
 			"name"=> "CARO App", // appropriate name of responsible persons
 			"date"=> "2025-07-11 23:56" // Y-m-d H:i
 		],
@@ -85,9 +99,9 @@ class STRESSTEST extends INSTALL{
 					echo '<br />';	
 				}
 			}
-			echo $this->printWarning('DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS CONSIDERED A REGULATORY VIOLATION, AS IS AUTOPERMISSION');
-			echo $this->printWarning('AUTOAPPROVAL OF PENDING PRODUCT INCORPORATIONS SHOULD BE PROPERLY DOCUMENTED');
+			echo $this->printWarning('DO NOT USE THIS IN PRODUCTION - DELETION OF DOCUMENTS, RISKS AND VENDORS IS CONSIDERED A REGULATORY VIOLATION');
 			echo $this->printWarning('USER AND CSVFILTER DELETION IS FOR TEST PURPOSES ONLY AND MAY LEAVE SHADOW ENTRIES.');
+			echo $this->printWarning('AUTOAPPROVAL OF DOCUMENTS AND PENDING PRODUCT INCORPORATIONS SHOULD BE PROPERLY DOCUMENTED');
 			echo '<br /><br />';
 			$methods = get_class_methods($this);
 			sort($methods);
@@ -309,50 +323,61 @@ class STRESSTEST extends INSTALL{
 	}
 
 	/**
-	 * approves all documents and components
+	 * approve all documents and components
 	 */
 	public function approveDocuments(){
-		if ($this->_autopermission) {
-			$permissions = [];
-			foreach (preg_split('/\W+/', CONFIG['permissions']['documentapproval']) as $permission){
-				$permissions[$permission] = [
-					'name' => $this->_defaultUser,
-					'date' => $this->_currentdate->format("Y-m-d H:i")
-				];
-			}
+		if ($this->_documentApproval) {
+			$sqlchunks = [];
+			$response = '';
 			$DBall = [
 				...SQLQUERY::EXECUTE($this->_pdo, 'document_component_datalist'),
 				...SQLQUERY::EXECUTE($this->_pdo, 'document_document_datalist')
 			];
 			foreach ($DBall as $row){
-				SQLQUERY::EXECUTE($this->_pdo, 'document_put_approve', [
-					'values' => [
-						':approval' => UTILITY::json_encode($permissions),
-						':id' => $row['id']
-					]
-				]);
+				$row['approval'] = json_decode($row['approval'] ? : '', true) ? : [];
+				if (PERMISSION::fullyapproved('documentapproval', $row['approval'])) continue;
+
+				$row['approval'] = $row['approval'] + $this->_documentApproval;
+
+				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('document_put_approve'),
+				[
+					':approval' => $this->_pdo->quote(UTILITY::json_encode($row['approval'])),
+					':id' => $row['id']
+				]) . '; ');
 			}
-			return $this->printSuccess('all documents in the database have been approved');
+			foreach ($sqlchunks as $chunk){
+				try {
+					SQLQUERY::EXECUTE($this->_pdo, $chunk);
+				}
+				catch (\Exception $e) {
+					$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
+				}
+			}
+			$response .= $this->printSuccess('all documents in the database have been approved.');
+
+			return $response;
 		}
-		return $this->printError('autopermission has not been enabled');
+		return $this->printError('document approval has not been defined');
 	}
 
 	/**
 	 * approve all pending incorporations
 	 */
 	public function approvePendingIncorporations(){
-		$response = '';
 		if ($this->_incorporationApproval){
 			$sqlchunks = [];
+			$response = '';
 			$DBall = [...SQLQUERY::EXECUTE($this->_pdo, 'consumables_get_products')];
 			foreach ($DBall as $row){
 				if (!$row['incorporated']) continue;
 				$row['incorporated'] = json_decode($row['incorporated'], true);
-				if (PERMISSION::fullyapproved('incorporation', $row['incorporated'])) continue;
+				$lastincorporation = $row['incorporated'][count($row['incorporated']) - 1 ];
+				if (PERMISSION::fullyapproved('incorporation', $lastincorporation)) continue;
 				
-				if (isset($row['incorporated']['_check']) && isset($this->_incorporationApproval['_check'])) $row['incorporated']['_check'] .= ' ' . $this->_incorporationApproval['_check'];
+				if (isset($lastincorporation['_check']) && isset($this->_incorporationApproval['_check'])) $lastincorporation['_check'] .= ' ' . $this->_incorporationApproval['_check'];
 				// fill up missing approvals with + operator
-				$row['incorporated'] = $row['incorporated'] + $this->_incorporationApproval;
+				$lastincorporation = $lastincorporation + $this->_incorporationApproval;
+				$row['incorporated'][count($row['incorporated']) - 1 ] = $lastincorporation;
 
 				$sqlchunks = SQLQUERY::CHUNKIFY($sqlchunks, strtr(SQLQUERY::PREPARE('consumables_put_incorporation'),
 				[
@@ -368,11 +393,10 @@ class STRESSTEST extends INSTALL{
 					$response .= $this->printWarning('there has been an issue', [$e, $chunk]);
 				}
 			}
-			$response .= $this->printSuccess('all pending incorporation have been approved.');			
+			$response .= $this->printSuccess('all pending incorporation have been approved.');
+			return $response;
 		}
-		else $response .= $this->printError('incorporation approval has not been defined');
-
-		return $response;
+		else return $this->printError('incorporation approval has not been defined');
 	}
 
 	/**
