@@ -781,7 +781,7 @@ class DOCUMENT extends API {
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
 				$approved = PERMISSION::fullyapproved('documentapproval', $exists['approval']);
-
+				$update = false;
 				if (isset($exists['id'])){ 
 					if (!$approved) {
 						// update anything, delete unused images, reset approval
@@ -794,28 +794,32 @@ class DOCUMENT extends API {
 
 						$document_component[':id'] = $exists['id'];
 						$document_component[':content'] = UTILITY::json_encode($component);
+						$update = true;
 					}
 					if ($approved && json_decode($exists['content'], true) == $component) {
 						// update component properties as long as the content remains unchanged
 						$document_component[':id'] = $exists['id'];
 						$document_component[':content'] = $exists['content'];
 						$document_component[':approval'] = $exists['approval'];
+						$update = true;
 					}
 
-					if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-						'values' => $document_component
-					])) $this->response([
+					if ($update){
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
+							'values' => $document_component
+						])) $this->response([
+								'response' => [
+									'name' => $exists['name'],
+									'msg' => $this->_lang->GET('assemble.compose.component.saved', [':name' => $exists['name']]),
+									'type' => 'success'
+								]]);
+						else $this->response([
 							'response' => [
-								'name' => $exists['name'],
-								'msg' => $this->_lang->GET('assemble.compose.component.saved', [':name' => $exists['name']]),
-								'type' => 'success'
+								'name' => false,
+								'msg' => $this->_lang->GET('assemble.compose.component.not_saved'),
+								'type' => 'error'
 							]]);
-					else $this->response([
-						'response' => [
-							'name' => false,
-							'msg' => $this->_lang->GET('assemble.compose.component.not_saved'),
-							'type' => 'error'
-						]]);
+					}
 				}
 				// until here the component has not existed, or the content of an approved component has been changed resulting in a new version
 
@@ -1561,6 +1565,7 @@ class DOCUMENT extends API {
 				]);
 				$exists = $exists ? $exists[0] : ['approval' => null];
 				$approved = PERMISSION::fullyapproved('documentapproval', $exists['approval']);
+				$update = false;
 
 				if (isset($exists['id'])){ 
 					if (!$approved) {
@@ -1573,22 +1578,25 @@ class DOCUMENT extends API {
 						$document[':author'] = $exists['author'];
 						$document[':content'] = $exists['content'];
 						$document[':approval'] = $exists['approval'];
+						$update = true;
 					}
 
-					if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
-						'values' => $document
-					])) $this->response([
+					if ($update) {
+						if (SQLQUERY::EXECUTE($this->_pdo, 'document_post', [
+							'values' => $document
+						])) $this->response([
+								'response' => [
+									'name' => $this->_payload->name,
+									'msg' => $this->_lang->GET('assemble.compose.document.saved', [':name' => $this->_payload->name]),
+									'type' => 'success'
+								]]);
+						else $this->response([
 							'response' => [
-								'name' => $this->_payload->name,
-								'msg' => $this->_lang->GET('assemble.compose.document.saved', [':name' => $this->_payload->name]),
-								'type' => 'success'
+								'name' => false,
+								'msg' => $this->_lang->GET('assemble.compose.document.not_saved'),
+								'type' => 'error'
 							]]);
-					else $this->response([
-						'response' => [
-							'name' => false,
-							'msg' => $this->_lang->GET('assemble.compose.document.not_saved'),
-							'type' => 'error'
-						]]);
+					}
 				}
 				// until here the document has not existed, or the content of an approved document has been changed resulting in a new version
 
