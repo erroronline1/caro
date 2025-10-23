@@ -687,9 +687,17 @@ export class Composer {
 			targetform,
 			forms = document.querySelectorAll("form"),
 			newElements,
-			element;
+			element,
+			widgetId;
 
-		type = document.getElementById(widgetcontainer.dataTransfer.getData("text")).childNodes[0].dataset.type;
+		try {
+			type = document.getElementById(widgetcontainer.dataTransfer.getData("text")).childNodes[0].dataset.type; // drag event
+			widgetId = widgetcontainer.dataTransfer.getData("text");
+		} catch {
+			type = widgetcontainer.childNodes[0].dataset.type; // context menu
+			widgetId = widgetcontainer.id;
+		}
+
 		if (!type) {
 			new Toast(api._lang.GET("assemble.compose.context.edit_error"), "error");
 			return;
@@ -713,8 +721,7 @@ export class Composer {
 			}
 		}
 		if (!targetform) return;
-		if (!(element = newElements[widgetcontainer.dataTransfer.getData("text")])) {
-			var_dump(element, type);
+		if (!(element = newElements[widgetId])) {
 			new Toast(api._lang.GET("assemble.compose.context.edit_error"), "error");
 			return;
 		}
@@ -740,7 +747,10 @@ export class Composer {
 				if (sibling.localName === "label" && sibling.childNodes.length) sibling = sibling.childNodes[sibling.childNodes.length - 1];
 				if (!sibling.name) continue;
 				siblingName = sibling.name.replace(/\(.*?\)|\[\]/g, "");
-				if (siblingName === api._lang.GET("assemble.compose.component.field_hint") && element.hint) sibling.value = element.hint;
+				if (siblingName === api._lang.GET("assemble.compose.component.field_hint")) {
+					sibling.value = element.hint || "";
+					continue;
+				}
 				if (siblingName === api._lang.GET("assemble.compose.component.texttemplate")) sibling.checked = Boolean(element.texttemplates);
 				if (siblingName === api._lang.GET("assemble.compose.component.required")) sibling.checked = Boolean("required" in element.attributes && element.attributes.required);
 				if (siblingName === api._lang.GET("assemble.compose.component.multiple")) sibling.checked = Boolean("multiple" in element.attributes && element.attributes.multiple);
