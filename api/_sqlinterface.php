@@ -832,7 +832,7 @@ class SQLQUERY {
 						"ON DUPLICATE KEY UPDATE case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note",
 			'sqlsrv' => "MERGE INTO caro_records WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :context AS context, :case_state AS case_state, :record_type AS record_type, :identifier AS identifier, :last_user AS last_user, :last_document AS last_document, :content AS content, :lifespan AS lifespan, :erp_case_number AS erp_case_number, :note AS note) AS source " .
-						"(id, context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) ON (target.id = source.id) " .
+						"(id, context, case_state, record_type, identifier, last_user, last_document, content, lifespan, erp_case_number, note) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET case_state = :case_state, record_type = :record_type, identifier = :identifier, last_user = :last_user, last_touch = CURRENT_TIMESTAMP, last_document = :last_document, content = :content, closed = NULL, lifespan = :lifespan, erp_case_number = :erp_case_number, note = :note " .
 						"WHEN NOT MATCHED THEN INSERT (context, case_state, record_type, identifier, last_user, last_touch, last_document, content, closed, notified, lifespan, erp_case_number, note) VALUES (:context, NULL, :record_type, :identifier, :last_user, CURRENT_TIMESTAMP, :last_document, :content, NULL, NULL, NULL, NULL, NULL);"
 		],
@@ -1023,11 +1023,11 @@ class SQLQUERY {
 			'mysql' => "INSERT INTO caro_whiteboard (id, user_id, name, last_touch, organizational_unit, content) " .
 						"VALUES (:id, :user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content) " .
 						"ON DUPLICATE KEY UPDATE name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content ",
-			'sqlsrv' => "MERGE INTO caro_user_training WITH (HOLDLOCK) AS target USING " .
+			'sqlsrv' => "MERGE INTO caro_whiteboard WITH (HOLDLOCK) AS target USING " .
 						"(SELECT :id AS id, :user_id AS user_id, :name AS name, CURRENT_TIMESTAMP AS last_touch, :organizational_unit AS organizational_unit, :content AS content) AS source " .
 						"(id, user_id, name, last_touch, organizational_unit, content) ON (target.id = source.id) " .
 						"WHEN MATCHED THEN UPDATE SET name = :name, last_touch = CURRENT_TIMESTAMP, organizational_unit = :organizational_unit, content = :content " .
-						"WHEN NOT MATCHED THEN INSERT (name, user_id, last_touch, organizational_unit, content) VALUES (:name, :user_id, CURRENT_TIMESTAMP, :organizational_unit, :content);",
+						"WHEN NOT MATCHED THEN INSERT (user_id, name, last_touch, organizational_unit, content) VALUES (:user_id, :name, CURRENT_TIMESTAMP, :organizational_unit, :content);",
 		],
 		'whiteboard_get_all' => [
 			'mysql' => "SELECT caro_whiteboard.*, caro_user.name as user_name FROM caro_whiteboard LEFT JOIN caro_user ON caro_whiteboard.user_id = caro_user.id",
