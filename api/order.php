@@ -479,10 +479,6 @@ class ORDER extends API {
 
 				$erp_interface_available = (ERPINTERFACE && ERPINTERFACE->_instatiated && method_exists(ERPINTERFACE, 'orderdata') && ERPINTERFACE->orderdata());
 
-				// create array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
-				foreach ($order as $row){
-					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
-				}
 				foreach ($order as $row) {
 					// filter selected state or default to unprocessed
 					if (!$this->_subMethodState && $row['ordered']) continue;
@@ -495,6 +491,9 @@ class ORDER extends API {
 						}
 					}
 					
+					// append to array with reusable images to reduce payload (approval signatures if allowed per CONFIG)
+					if (str_contains($row['approval'], 'data:image/png') && !in_array($row['approval'], $response['data']['approval'])) $response['data']['approval'][] = $row['approval'];
+
 					$decoded_order_data = json_decode($row['order_data'], true);
 
 					$product = null;
@@ -544,7 +543,7 @@ class ORDER extends API {
 						'addproduct' => null,
 						'editproductrequest' => null,
 						'productid' => $product ? $product['id'] : null,
-						'identifier' => $erp_interface_available ? UTILITY::identifier(' ', $row['approved']) : null,
+						'identifier' => $erp_interface_available && $permission['orderprocessing'] ? UTILITY::identifier(' ', $row['approved']) : null,
 						'calendar' => $row['received'] ? $calendar->dialog([
 							':type' => 'tasks',
 							':subject' => (UTILITY::propertySet($decoded_order_data, 'ordernumber_label') ? : '') . ' ' .
@@ -617,6 +616,12 @@ class ORDER extends API {
 								else $response['data']['allowedstateupdates'][] = $s;
 								break;
 							case 'delivered':
+								if ($row['received']){
+									$delete = new \DateTime($row['received']);
+									$delete->modify('+ ' . CONFIG['lifespan']['order']['autodelete'] . 'days');
+									$data['autodelete'] = $this->_lang->GET('order.autodelete', [':date' => $this->convertFromServerTime($delete->format('Y-m-d')), ':unit' => $this->_lang->_USER['units'][$data['organizationalunit']]]);
+								}
+								// no break
 							case 'archived':
 								if (!($permission['admin'] || $unit_intersection)){
 									$data['state'][$s]['disabled'] = true;
