@@ -889,7 +889,7 @@ class ODEVAVIVA extends _ERPINTERFACE {
 				mail.NUMMER AS PHONE,
 				mail.ADRESSEN_REFERENZ
 			FROM [eva3_02_viva_souh].[dbo].[adz_kontakte] AS mail INNER JOIN [eva3_02_viva_souh].[dbo].[inf_kontaktart] as im ON mail.KONTAKTART = im.REFERENZ
-			WHERE im.BEZEICHNUNG = 'Telefonnummer'
+			WHERE im.BEZEICHNUNG = 'Handynummer'
 		) AS MOBILE ON pat.REFERENZ = MOBILE.ADRESSEN_REFERENZ
 
 		WHERE :dob :patientnumber :namesearch
