@@ -1027,7 +1027,7 @@ export const _client = {
 								name: api._lang.GET("order.additional_info"),
 								readonly: true,
 							},
-							numeration: "none",
+							numeration: "prevent",
 							hint: api._lang.GET("order.copy_value"),
 						}
 					);
@@ -1327,7 +1327,7 @@ export const _client = {
 					collapsible.push({
 						type: "select",
 						content: element.orderstatechange,
-						numeration: 0,
+						numeration: "prevent",
 						attributes: {
 							name: api._lang.GET("order.orderstate_description"),
 							// _client.dialog for scope of stringified function is set to window, where Dialog is not directly accessible
