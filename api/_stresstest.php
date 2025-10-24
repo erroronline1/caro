@@ -36,6 +36,10 @@ class STRESSTEST extends INSTALL{
 			"name"=> "CARO App",
 			"date"=> "2025-07-11 23:56"
 		],
+		"prrc"=> [
+			"name"=> "CARO App",
+			"date"=> "2025-07-11 23:56"
+		],
 	];
 
 	public $_incorporationApproval = [ // null;
