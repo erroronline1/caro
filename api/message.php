@@ -659,19 +659,20 @@ class MESSAGE extends API {
 					$whiteboard[':id'] = $owhiteboard['id'];
 					$whiteboard[':user_id'] = $owhiteboard['user_id'];
 					$whiteboard[':name'] = $owhiteboard['name'];
+					$whiteboard[':organizational_unit'] = $owhiteboard['organizational_unit'];
 				}
 
-				if (!$whiteboard[':id'] || $whiteboard[':user_id'] === $_SESSION['user']['id'] || array_intersect(['admin'], $_SESSION['user']['permissions']))
+				if (!$whiteboard[':id'] || $whiteboard[':user_id'] === $_SESSION['user']['id'] || array_intersect(['admin'], $_SESSION['user']['permissions'])){
 					$whiteboard[':name'] = UTILITY::propertySet($this->_payload, $this->_lang->PROPERTY('message.whiteboard.name')) ? : null;
-
-				// chain checked units
-				$units = [];
-				foreach ($this->_lang->_USER['units'] as $unit => $description){
-					if (UTILITY::propertySet($this->_payload, $description)) {
-						$units[] = $unit;
+					// chain checked units
+					$units = [];
+					foreach ($this->_lang->_USER['units'] as $unit => $description){
+						if (UTILITY::propertySet($this->_payload, $description)) {
+							$units[] = $unit;
+						}
 					}
+					if ($units) $whiteboard[':organizational_unit'] = implode(',', $units);
 				}
-				if ($units) $whiteboard[':organizational_unit'] = implode(',', $units);
 
 				if (SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_post', [
 					'values' => $whiteboard
@@ -740,7 +741,7 @@ class MESSAGE extends API {
 				}
 				if ($whiteboard) {
 					foreach(array_filter(explode(',', $whiteboard['organizational_unit'] ? : ''), fn($u) => boolval($u)) as $unit){
-						$organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
+						if (isset($this->_lang->_USER['units'][$unit]))	$organizational_units[$this->_lang->_USER['units'][$unit]]['checked'] = true;
 					}
 				}
 				$response['render']['content'][] = [
@@ -784,11 +785,15 @@ class MESSAGE extends API {
 	public function whiteboards(){
 		$response = ['render' => ['content' => []]];
 
-		$whiteboards = [];
+		$whiteboards = $adminview = [];
 		foreach(SQLQUERY::EXECUTE($this->_pdo, 'whiteboard_get_all') as $whiteboard){
+			$whiteboard['user_name'] = $whiteboard['user_name'] ? : $this->_lang->GET('general.deleted_user');
 			if ($whiteboard['organizational_unit']) $whiteboard['organizational_unit'] = explode(',', $whiteboard['organizational_unit']);
 			if (!$whiteboard['organizational_unit'] || $whiteboard['user_id'] === $_SESSION['user']['id'] || in_array('common', $whiteboard['organizational_unit']) || array_intersect($_SESSION['user']['units'], $whiteboard['organizational_unit'])){
 				$whiteboards[$whiteboard['name'] . ' ' . $this->_lang->GET('message.whiteboard.touch', [':name' => $whiteboard['user_name'], ':date' => $this->convertFromServerTime($whiteboard['last_touch'])])] = ['href' => 'javascript: void(0);', 'onclick' => "api.message('get', 'whiteboard', " . $whiteboard['id'] . ")"];
+			}
+			else {
+				$adminview[$whiteboard['name'] . ' ' . $this->_lang->GET('message.whiteboard.touch', [':name' => $whiteboard['user_name'], ':date' => $this->convertFromServerTime($whiteboard['last_touch'])])] = ['href' => 'javascript: void(0);', 'onclick' => "api.message('get', 'whiteboard', " . $whiteboard['id'] . ")"];
 			}
 		}
 
@@ -806,6 +811,21 @@ class MESSAGE extends API {
 				'type' => 'links',
 				'description' => $this->_lang->GET('message.whiteboard.all'),
 				'content' => $whiteboards
+			]
+		];
+		if ($adminview && array_intersect($_SESSION['user']['permissions'], ['admin'])) $response['render']['content'][] = [
+			[
+				'type' => 'collapsible',
+				'attributes' => [
+					'class' => 'em12'
+				],
+				'content' => [
+					[
+						'type' => 'links',
+						'description' => $this->_lang->GET('message.whiteboard.all'),
+						'content' => $adminview
+					]
+				]
 			]
 		];
 		
